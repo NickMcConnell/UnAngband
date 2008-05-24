@@ -300,14 +300,6 @@ static byte *base_art_rarity;
 /* Global just for convenience. */
 static int randart_verbose = 0;
 
-/*ARD_RAND - Extra global variable.
- * Used to create random artifacts along side existing artifacts.
- *
- * a_max is the old z_info->a_max.
- */
-byte a_max;
-
-
 /*
  * Use W. Sheldon Simms' random name generator.
  */
@@ -348,7 +340,7 @@ static errr init_names(void)
 			continue;
 		}
 
-		if ((!adult_randarts) && (i<a_max))
+		if ((!adult_randarts) && (i<z_info->a_max_standard))
 		{
 			names[i-1] = string_make(a_name+a_info[i].name);
 
@@ -954,68 +946,72 @@ static s32b artifact_power(int a_idx)
 	{
 		if (a_ptr->flags1 & TR1_STR)
 		{
-			p += 3 * a_ptr->pval * a_ptr->pval / 4;
+			p += 2 * a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for STR bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_INT)
 		{
-			p += a_ptr->pval * a_ptr->pval / 2;
+			p += a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for INT bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_WIS)
 		{
-			p += a_ptr->pval * a_ptr->pval / 2;
+			p += a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for WIS bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_DEX)
 		{
-			p += a_ptr->pval * a_ptr->pval;
+			p += 2 * a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for DEX+AGI bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_CON)
 		{
-			p += a_ptr->pval * a_ptr->pval;
+			p += 2 * a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for CON bonus %d, total is %d\n", a_ptr->pval, p);
+		}
+		if (a_ptr->flags1 & TR1_CHR)
+		{
+			p += 1 + a_ptr->pval * a_ptr->pval / 2;
+			LOG_PRINT2("Adding power for CHR bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_SAVE)
 		{
-			p += a_ptr->pval * a_ptr->pval / 4;
+			p += 1 + a_ptr->pval * a_ptr->pval / 2;
 			LOG_PRINT2("Adding power for save bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_DEVICE)
 		{
-			p += a_ptr->pval * a_ptr->pval / 6;
+			p += 1 + a_ptr->pval * a_ptr->pval / 3;
 			LOG_PRINT2("Adding power for device bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_STEALTH)
 		{
-			p += a_ptr->pval * a_ptr->pval / 4;
+			p += 1 + a_ptr->pval * a_ptr->pval / 2;
 			LOG_PRINT2("Adding power for stealth bonus %d, total is %d\n", a_ptr->pval, p);
 		}
 		if (a_ptr->flags1 & TR1_TUNNEL)
 		{
-			p += a_ptr->pval * a_ptr->pval / 6;
+			p += 1 + a_ptr->pval * a_ptr->pval / 4; /* Can't get lower */
 			LOG_PRINT2("Adding power for tunnel bonus %d, total is %d\n", a_ptr->pval, p);
 		}
-		/* For now add very small amount for searching */
 		if (a_ptr->flags1 & TR1_SEARCH)
 		{
-			p += a_ptr->pval * a_ptr->pval / 12;
+			p += a_ptr->pval > 5 + randint(15) ? 0 : a_ptr->pval; /* To make foo of Searching rare deeper down */
 			LOG_PRINT2("Adding power for searching bonus %d, total is %d\n", a_ptr->pval , p);
 		}
 		if (a_ptr->flags3 & TR3_REGEN_HP)
 		{
-			p += (a_ptr->pval * a_ptr->pval) * 3 / 2; /* Was constant 3 */
+			p += 3 * a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for regenerate hit points bonus %d, total is %d\n", a_ptr->pval , p);
 		}
 		if (a_ptr->flags3 & TR3_REGEN_MANA)
 		{
-			p += (a_ptr->pval * a_ptr->pval) * 3 / 2; /* Was constant 3 */
+			p += 2 * a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for regenerate mana bonus bonus %d, total is %d\n", a_ptr->pval , p);
 		}
 		if (a_ptr->flags3 & TR3_LITE)
 		{
-			p += (a_ptr->pval * a_ptr->pval) * 3; /* Was constant 3 */
+			p += a_ptr->pval * a_ptr->pval;
 			LOG_PRINT2("Adding power for lite bonus %d, total is %d\n", a_ptr->pval , p);
 		}
 
@@ -1027,28 +1023,21 @@ static s32b artifact_power(int a_idx)
 		if (a_ptr->flags1 & TR1_WIS) p += 2 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_DEX) p += 4 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_CON) p += 4 * a_ptr->pval;
-		if (a_ptr->flags1 & TR1_STEALTH) p += a_ptr->pval;
+		if (a_ptr->flags1 & TR1_CHR) p += a_ptr->pval;
+		if (a_ptr->flags1 & TR1_SAVE) p += a_ptr->pval;
+		if (a_ptr->flags1 & TR1_DEVICE) p += a_ptr->pval;
+		if (a_ptr->flags1 & TR1_STEALTH) p += 2 * a_ptr->pval;
 		if (a_ptr->flags1 & TR1_TUNNEL) p += a_ptr->pval;
 		if (a_ptr->flags1 & TR1_SEARCH) p += a_ptr->pval;
 		if (a_ptr->flags1 & TR1_INFRA) p += a_ptr->pval;
-		if (a_ptr->flags3 & TR3_REGEN_HP) p -= 16;
-		if (a_ptr->flags3 & TR3_REGEN_MANA) p -= 8;
+		if (a_ptr->flags3 & TR3_REGEN_HP) p += 6 * a_ptr->pval;
+		if (a_ptr->flags3 & TR3_REGEN_MANA) p += 4 * a_ptr->pval;
 		if (a_ptr->flags3 & TR3_LITE) p += 3 * a_ptr->pval;
 		LOG_PRINT1("Subtracting power for negative ability values, total is %d\n", p);
 	}
-	if (a_ptr->flags1 & TR1_CHR)
-	{
-		p += a_ptr->pval;
-		LOG_PRINT2("Adding power for CHR bonus/penalty %d, total is %d\n", a_ptr->pval, p);
-	}
-	if (a_ptr->flags1 & TR1_INFRA)
-	{
-		p += a_ptr->pval;
-		LOG_PRINT2("Adding power for infra bonus/penalty %d, total is %d\n", a_ptr->pval, p);
-	}
 	if (a_ptr->flags1 & TR1_SPEED)
 	{
-		p += 7 * a_ptr->pval;
+		p += 3 * a_ptr->pval * a_ptr->pval;
 		LOG_PRINT2("Adding power for speed bonus/penalty %d, total is %d\n", a_ptr->pval, p);
 	}
 
@@ -1057,7 +1046,7 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("sustain WIS",	 2, TR2_SUST_WIS, 2,sustains++);
 	ADD_POWER("sustain DEX",	 4, TR2_SUST_DEX, 2,sustains++);
 	ADD_POWER("sustain CON",	 3, TR2_SUST_CON, 2,sustains++);
-	ADD_POWER("sustain CHR",	 0, TR2_SUST_CHR, 2,sustains++);
+	ADD_POWER("sustain CHR",	 1, TR2_SUST_CHR, 2,sustains++);
 
 	/* Add bonus for sustains getting 'sustain-lock' */
 	if (sustains > 1)
@@ -1104,9 +1093,6 @@ static s32b artifact_power(int a_idx)
 	ADD_POWER("sense nature",	4, TR3_ESP_NATURE, 3,);
 	ADD_POWER("telepathy",	  18, TR3_TELEPATHY, 3,);
 	ADD_POWER("slow digestion",	 1, TR3_SLOW_DIGEST, 3,);
-
-	/* Digging moved to general section since it can be on anything now */
-	ADD_POWER("tunnelling",	 a_ptr->pval, TR1_TUNNEL, 1,);
 
 	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2, low_resists++);
 	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2, low_resists++);
@@ -4606,7 +4592,7 @@ static void scramble_artifact(int a_idx)
 			 */
 			k_ptr = &k_info[k_idx];
 			rarity_new = ( (s16b) rarity_old * (s16b) base_rarity_old ) /
-				(s16b) (k_ptr->chance[0] ? k_ptr->chance[0] : 1);
+				(s16b) (k_ptr->chance[0] ? k_ptr->chance[0] : base_rarity_old);
 
 			if (rarity_new > 255) rarity_new = 255;
 			if (rarity_new < 1) rarity_new = 1;
@@ -4843,11 +4829,10 @@ static errr scramble(void)
 	{
 		int a_idx;
 
-/* ARD_RAND - Note boundary condition. We only scramble the artifacts about the old
- * z_info->a_max if adult_randarts is not set.
- */
+		/* Note boundary condition. We only scramble the artifacts about the old
+			z_info->a_max if adult_randarts is not set. */
 		/* Generate all the artifacts. */
-		for (a_idx = (adult_randarts ? 1 : a_max) ; a_idx < z_info->a_max; a_idx++)
+		for (a_idx = (adult_randarts ? 1 : z_info->a_max_standard) ; a_idx < z_info->a_max; a_idx++)
 		{
 			scramble_artifact(a_idx);
 		}
@@ -4888,9 +4873,6 @@ errr do_randart(u32b randart_seed, bool full)
 	int i;
 	u32b j;
 
-	/* Hack -- already initialised full randarts */
-	if (z_info->a_max == 256) return (err);
-
 	/* Prepare to use the Angband "simple" RNG. */
 	Rand_value = randart_seed;
 	Rand_quick = TRUE;
@@ -4905,6 +4887,7 @@ errr do_randart(u32b randart_seed, bool full)
 		}
 
 		LOG_PRINT("===============================\n");
+		LOG_PRINT1("Seed is %d.\n", randart_seed);
 		LOG_PRINT1("Total monster power is %d.\n", tot_mon_power);
 
 
@@ -4922,21 +4905,13 @@ errr do_randart(u32b randart_seed, bool full)
 
 		artifact_type *a_info_new;
 
-		object_info *a_list_new;
-
-		int art_high_slot = 255;
-
-		/* Allocate the new artifact range */
-		a_info_new = C_ZNEW(256, artifact_type);
-
-		/* Allocate the new artifact lore range */
-		a_list_new = C_ZNEW(256, object_info);
+		int art_high_slot = z_info->a_max - 1;
 
 		/* Copy base artifacts to seed random powers */
-		for (i = ART_MIN_NORMAL; i < z_info->a_max;i++)
+		for (i = ART_MIN_NORMAL; i < z_info->a_max_standard;i++)
 		{
 			artifact_type *a_ptr = &a_info[i];
-			artifact_type *a2_ptr = &a_info_new[art_high_slot];
+			artifact_type *a2_ptr = &a_info[art_high_slot];
 
 			if (a_info[i].tval == 0) continue;
 			if (i == ART_POWER) continue;
@@ -4945,34 +4920,9 @@ errr do_randart(u32b randart_seed, bool full)
 			
 			COPY(a2_ptr,a_ptr,artifact_type);
 			art_high_slot--;
+			if (--art_high_slot < z_info->a_max_standard)
+				break;
 		}
-
-		/* Copy existing a_info array to a_info_new */
-		for (i = 0; i< z_info->a_max;i++)
-		{
-			artifact_type *a_ptr = &a_info[i];
-			artifact_type *a2_ptr = &a_info_new[i];
-	
-			COPY(a2_ptr,a_ptr,artifact_type);
-		}
-	
-		/* Free existing a_info array */
-		FREE(a_info);
-
-		/* Free existing a_list array */
-		FREE(a_list);		
-	
-		/* Set new a_info array to existing */
-		a_head.info_ptr = a_info = a_info_new;
-
-		/* Set new a_info array to existing */
-		a_list = a_list_new;
-
-		/* Temporarily store old number of artifacts */
-		a_max = z_info->a_max;
-
-		/* Update number of artifacts */
-		z_info->a_max = 256;
 
 		/* Allocate the "kinds" array */
 		kinds = C_ZNEW(z_info->a_max, s16b);

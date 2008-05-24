@@ -1636,7 +1636,7 @@ errr parse_z_info(char *buf, header *head)
 		z_info->k_max = max;
 	}
 
-	/* Process 'A' for "Maximum a_info[] index" */
+	/* Process 'A' for "Maximum number of standard artifacts " */
 	else if (buf[2] == 'A')
 	{
 		int max;
@@ -1646,6 +1646,18 @@ errr parse_z_info(char *buf, header *head)
 
 		/* Save the value */
 		z_info->a_max = max;
+	}
+
+	/* Process 'a' for "Maximum a_info[] index" */
+	else if (buf[2] == 'a')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->a_max_standard = max;
 	}
 
 	/* Process 'E' for "Maximum e_info[] index" */

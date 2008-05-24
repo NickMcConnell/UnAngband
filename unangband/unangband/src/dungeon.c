@@ -3620,7 +3620,8 @@ void play_game(bool new_game)
 		seed_town = rand_int(0x10000000);
 
 		/* Hack -- seed for random artifacts */
-		if (adult_reseed_artifacts) seed_randart = rand_int(0x10000000);
+		if (adult_reseed_artifacts) 
+			seed_randart = rand_int(0x10000000);
 
 		/* Hack -- clear artifact memory */
 		if (adult_reseed_artifacts)
@@ -3647,7 +3648,9 @@ void play_game(bool new_game)
 		/* Roll up a new character */
 		player_birth();
 
-		/* Randomize the artifact names */
+		/* Generate random artifacts */
+		/* Needs to be done even with no adult_reseed_artifacts,
+			because the state of adult_randarts may have changed either way */
 		do_randart(seed_randart, TRUE);
 
 		/* Hack -- enter the world */

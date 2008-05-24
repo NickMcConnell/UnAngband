@@ -2358,7 +2358,7 @@ static errr rd_savefile_new_aux(void)
 	   by the save file data. */
 	do_randart(0x10000000, TRUE);
 
-	/* Load the Artifacts */
+	/* Load the Artifact lore */
 	rd_u16b(&tmp16u);	
 
 	/* Incompatible save files */
@@ -2368,11 +2368,11 @@ static errr rd_savefile_new_aux(void)
 		return (-1);
 	}
 
-	/* Set the new artifact max */
+	/* Set the new artifact max; we don't generate the missing ones */
 	z_info->a_max = tmp16u;
 
 	/* Read the artifact flags */
-	for (i = 0; i < z_info->a_max; i++)
+	for (i = 0; i < tmp16u; i++)
 	{
 		object_info *n_ptr = &a_list[i];
 
@@ -2401,7 +2401,7 @@ static errr rd_savefile_new_aux(void)
 		rd_byte(&tmp8u);
 	}
 
-	if (arg_fiddle) note("Loaded Artifacts");
+	if (arg_fiddle) note("Loaded Artifact Lore");
 
 	/* Load the Ego items */
 	rd_u16b(&tmp16u);
@@ -2441,7 +2441,7 @@ static errr rd_savefile_new_aux(void)
 		rd_byte(&tmp8u);
 	}
 
-	if (arg_fiddle) note("Loaded Ego Items");
+	if (arg_fiddle) note("Loaded Ego Item Lore");
 
 	/* Read the extra stuff */
 	if (rd_extra()) return (-1);
@@ -2480,7 +2480,7 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Read random artifacts */
-	if (adult_randarts)
+	if (!older_than(0, 6, 2, 8))
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");

@@ -5820,16 +5820,18 @@ s32b object_power(const object_type *o_ptr)
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
 	/* Lookup the item if not yet cached */
-	k_idx = lookup_kind(o_ptr->tval, o_ptr->sval);
+	k_idx = o_ptr->k_idx;
 
-	/* Get the object */
+	assert (k_idx = lookup_kind(o_ptr->tval, o_ptr->sval));
+
+	/* Get the object kind */
 	k_ptr = &k_info[k_idx];
 
 	/* Set the base kind flags */
-	kf1 = k_info[o_ptr->k_idx].flags1;
-	kf2 = k_info[o_ptr->k_idx].flags2;
-	kf3 = k_info[o_ptr->k_idx].flags3;
-	kf4 = k_info[o_ptr->k_idx].flags4;
+	kf1 = k_info[k_idx].flags1;
+	kf2 = k_info[k_idx].flags2;
+	kf3 = k_info[k_idx].flags3;
+	kf4 = k_info[k_idx].flags4;
 
 	/* Evaluate certain abilities based on type of object. */
 	switch (o_ptr->tval)
@@ -6229,7 +6231,7 @@ s32b object_power(const object_type *o_ptr)
 #endif
 			ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, );
 			ADD_POWER("resist cold",	 1, TR2_RES_COLD, 2, );
-			ADD_POWER("resist water",	 3, TR2_RES_COLD, 4, );
+			ADD_POWER("resist water",	 3, TR4_RES_WATER, 4, );
 
 			/* Fall through */
 		}
@@ -6482,64 +6484,67 @@ s32b object_power(const object_type *o_ptr)
 			return(p);
 	}
 
-	/* Other abilities are evaluated independent of the object type. */
+	/* Other abilities are evaluated independent of the object type.
+		Note that there is no need to subtract k_ptr->pval from o_ptr->pval,
+		because we want to penalize non-standard pval, even just 1 higher,
+		especially if it's atop already high standard pval */
 	if (o_ptr->pval > 0)
 	{
-		if (f1 & TR1_STR)
+		if (f1 & TR1_STR && (!(kf1 & TR1_STR) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 2 * o_ptr->pval * o_ptr->pval;  /* Was 3 * o_ptr->pval */
+			p += 2 * o_ptr->pval * o_ptr->pval; 
 		}
-		if (f1 & TR1_INT)
+		if (f1 & TR1_INT && (!(kf1 & TR1_INT) || o_ptr->pval > k_ptr->pval))
 		{
-			p += o_ptr->pval * o_ptr->pval;  /* Was 2 * o_ptr->pval */
+			p += o_ptr->pval * o_ptr->pval;
 		}
-		if (f1 & TR1_WIS)
+		if (f1 & TR1_WIS && (!(kf1 & TR1_WIS) || o_ptr->pval > k_ptr->pval))
 		{
-			p += o_ptr->pval * o_ptr->pval;  /* Was 2 * o_ptr->pval */
+			p += o_ptr->pval * o_ptr->pval;
 		}
-		if (f1 & TR1_DEX)
+		if (f1 & TR1_DEX && (!(kf1 & TR1_DEX) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 2 * o_ptr->pval * o_ptr->pval;  /* Was 3 * o_ptr->pval */
+			p += 2 * o_ptr->pval * o_ptr->pval;
 		}
-		if (f1 & TR1_CON)
+		if (f1 & TR1_CON && (!(kf1 & TR1_CON) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 2 * o_ptr->pval * o_ptr->pval;  /* Was 4 * o_ptr->pval */
+			p += 2 * o_ptr->pval * o_ptr->pval; 
 		}
-		if (f1 & TR1_CHR)
+		if (f1 & TR1_CHR && (!(kf1 & TR1_CHR) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 1 + o_ptr->pval * o_ptr->pval / 2; /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 2;
 		}
-		if (f1 & TR1_SAVE)
+		if (f1 & TR1_SAVE && (!(kf1 & TR1_SAVE) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 1 + o_ptr->pval * o_ptr->pval / 2; /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 2;
 		}
-		if (f1 & TR1_DEVICE)
+		if (f1 & TR1_DEVICE && (!(kf1 & TR1_DEVICE) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 1 + o_ptr->pval * o_ptr->pval / 3; /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 3;
 		}
-		if (f1 & TR1_STEALTH)
+		if (f1 & TR1_STEALTH && (!(kf1 & TR1_STEALTH) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 1 + o_ptr->pval * o_ptr->pval / 2; /* Was o_ptr->pval */
+			p += 1 + o_ptr->pval * o_ptr->pval / 2;
 		}
-		if (f1 & TR1_TUNNEL)
-		{
-			p += 1 + o_ptr->pval * o_ptr->pval / 4; /* Was o_ptr->pval */
-		}
-		if (f1 & TR1_SEARCH)
+		if (f1 & TR1_TUNNEL && (!(kf1 & TR1_TUNNEL) || o_ptr->pval > k_ptr->pval))
 		{
 			p += 1 + o_ptr->pval * o_ptr->pval / 4; /* Can't get lower */
 		}
-		if (f3 & TR3_REGEN_HP)
+		if (f1 & TR1_SEARCH && (!(kf1 & TR1_SEARCH) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 3 * o_ptr->pval * o_ptr->pval; /* Was constant 3 */
+			p += o_ptr->pval > 5 + randint(15) ? 0 : o_ptr->pval; /* To make foo of Searching rare deeper down */
 		}
-		if (f3 & TR3_REGEN_MANA)
+		if (f3 & TR3_REGEN_HP && (!(kf3 & TR3_REGEN_HP) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 3 * o_ptr->pval * o_ptr->pval; /* Was constant 3 */
+			p += 3 * o_ptr->pval * o_ptr->pval;
 		}
-		if (f3 & TR3_LITE)
+		if (f3 & TR3_REGEN_MANA && (!(kf3 & TR3_REGEN_MANA) || o_ptr->pval > k_ptr->pval))
 		{
-			p += 2 ^ o_ptr->pval; /* Was constant 3 */
+			p += 2 * o_ptr->pval * o_ptr->pval;
+		}
+		if (f3 & TR3_LITE && (!(kf3 & TR3_LITE) || o_ptr->pval > k_ptr->pval))
+		{
+			p += o_ptr->pval * o_ptr->pval;
 		}
 	}
 
@@ -6557,14 +6562,14 @@ s32b object_power(const object_type *o_ptr)
 		if (f1 & TR1_TUNNEL) p += o_ptr->pval;
 		if (f1 & TR1_SEARCH) p += o_ptr->pval;
 		if (f1 & TR1_INFRA) p += o_ptr->pval;
-		if (f3 & TR3_REGEN_HP) p -= 16;
-		if (f3 & TR3_REGEN_MANA) p -= 8;
+		if (f3 & TR3_REGEN_HP) p += 6 * o_ptr->pval;
+		if (f3 & TR3_REGEN_MANA) p += 4 * o_ptr->pval;
 		if (f3 & TR3_LITE) p += 3 * o_ptr->pval;
 	}
 
-	if (f1 & TR1_SPEED)
+	if (f1 & TR1_SPEED && (!(kf1 & TR1_SPEED) || o_ptr->pval > k_ptr->pval))
 	{
-		p += 7 * o_ptr->pval;
+		p += 3 * o_ptr->pval * o_ptr->pval;
 	}
 
 	ADD_POWER("sustain STR",	 5, TR2_SUST_STR, 2, sustains++);
@@ -6610,9 +6615,6 @@ s32b object_power(const object_type *o_ptr)
 	ADD_POWER("sense nature",	4, TR3_ESP_NATURE, 3,);
 	ADD_POWER("telepathy",	  18, TR3_TELEPATHY, 3,);
 	ADD_POWER("slow digestion",	 2, TR3_SLOW_DIGEST, 3,);
-
-	/* Digging moved to general section since it can be on anything now */
-	ADD_POWER("tunnelling",	 o_ptr->pval, TR1_TUNNEL, 1,);
 
 	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2, low_resists++);
 	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2, low_resists++);

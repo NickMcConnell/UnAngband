@@ -1189,6 +1189,7 @@ static bool wr_savefile_new(void)
 	/* Hack -- Dump the artifact lore */
 	tmp16u = z_info->a_max;
 	wr_u16b(tmp16u);
+
 	for (i = 0; i < tmp16u; i++)
 	{
 		artifact_type *a_ptr = &a_info[i];
@@ -1217,9 +1218,9 @@ static bool wr_savefile_new(void)
 		wr_byte(0);
 	}
 
-	/* Hack -- Dump the ego items */
-	tmp16u =z_info->e_max;
-        wr_u16b(tmp16u);
+	/* Hack -- Dump the ego items lore */
+	tmp16u = z_info->e_max;
+	wr_u16b(tmp16u);
 
         for (i = 0; i < tmp16u; i++)
         {
@@ -1275,7 +1276,7 @@ static bool wr_savefile_new(void)
 		}
         }
 
-	if (adult_randarts) wr_randarts();
+	wr_randarts();
 
 	/* Write the inventory */
 	for (i = 0; i < INVEN_TOTAL; i++)

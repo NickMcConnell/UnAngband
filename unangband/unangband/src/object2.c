@@ -2473,9 +2473,6 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		o_ptr->xtra1 = 16;
 		o_ptr->xtra2 = i;
 
-		/* Too shallow SPEED */
-		if (j == TR1_SPEED && p_ptr->depth < 40 + rand_int (20)) continue;
-
 		/* Skip non-weapons -- we have to do this because brands grant ignore flags XXX */
 		if ((j >= TR1_BRAND_ACID) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
 			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
@@ -3255,10 +3252,12 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 					o_ptr->pval = randint(3) + m_bonus(5, level);
 
 					/* Super-charge the ring */
-					while (rand_int(100) < 33) o_ptr->pval++;
+					while (p_ptr->depth > 25 + rand_int (20) 
+							 && rand_int(100) < 33) 
+						o_ptr->pval++;
 
-					/* Cursed Ring; Hack: above DL30 sure */
-					if (power < 0 || p_ptr->depth < 30 + rand_int (20))
+					/* Cursed Ring */
+					if (power < 0)
 					{
 						/* Reverse pval */
 						o_ptr->pval = 0 - (o_ptr->pval);
@@ -4889,6 +4888,13 @@ static bool kind_is_good(int k_idx)
 		{
 			if (k_ptr->to_h < 0) return (FALSE);
 			if (k_ptr->to_d < 0) return (FALSE);
+
+			/* Special case for staves */
+			if (k_ptr->tval == TV_STAFF 
+				 && k_ptr->level < 25
+				 && k_ptr->level < object_level + 5)
+				return (FALSE);
+
 			return (TRUE);
 		}
 
