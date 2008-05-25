@@ -794,6 +794,8 @@ static void wr_randarts(void)
 		wr_u16b(a_ptr->activation);
 		wr_u16b(a_ptr->time);
 		wr_u16b(a_ptr->randtime);
+
+		wr_s32b(a_ptr->power);
 	}
 }
 

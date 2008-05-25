@@ -1532,6 +1532,9 @@ static errr rd_randarts(void)
 
 		rd_u16b(&a_ptr->time);
 		rd_u16b(&a_ptr->randtime);
+
+		if (!older_than(0, 6, 2, 9))
+			rd_s32b(&a_ptr->power);
 	}
 
 	return (0);
