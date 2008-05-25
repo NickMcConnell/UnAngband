@@ -702,32 +702,14 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->return_y);
 	wr_s16b(p_ptr->return_x);
 	
-	/* Future use */
-	for (i = 0; i < 5; i++) wr_u32b(0L);
-
-	/* Random artifact version */
-	wr_u32b(RANDART_VERSION);
-
-	/* Random artifact seed */
-	wr_u32b(seed_randart);
-
-
-	/* Ignore some flags */
-	wr_u32b(0L);	/* oops */
-	wr_u32b(0L);	/* oops */
-	wr_u32b(0L);	/* oops */
-
-
 	/* Write the "object seeds" */
 	wr_u32b(seed_flavor);
 	wr_u32b(seed_town);
-
 
 	/* Special stuff */
 	wr_u16b(p_ptr->panic_save);
 	wr_u16b(p_ptr->total_winner);
 	wr_u16b(p_ptr->noscore);
-
 
 	/* Write death */
 	wr_byte(p_ptr->is_dead);
@@ -1185,6 +1167,12 @@ static bool wr_savefile_new(void)
 
 		wr_byte(q_list[i].stage);
 	}
+
+	/* Random artifact version */
+	wr_u32b(RANDART_VERSION);
+
+	/* Random artifact seed */
+	wr_u32b(seed_randart);
 
 	/* Hack -- Dump the artifact lore */
 	tmp16u = z_info->a_max;

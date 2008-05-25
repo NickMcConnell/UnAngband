@@ -4916,17 +4916,7 @@ errr do_randart(u32b randart_seed, bool full)
 			if (i == ART_GROND) continue;
 			if (i == ART_MORGOTH) continue;
 
-			{ /* TODO: VERY UGLY HACK: do_randart is invoked 2 times
-				 at load, while it should be 0 time,
-				 so we have to prevent overwriting some data */
-				int cur_num = a_ptr->cur_num;
-				int activated = a_ptr->activated;
-
 			COPY(a2_ptr,a_ptr,artifact_type);
-
-			    a2_ptr->cur_num = cur_num;
-				a2_ptr->activated = activated;
-			}
 			if (--art_high_slot < z_info->a_max_standard)
 				break;
 		}

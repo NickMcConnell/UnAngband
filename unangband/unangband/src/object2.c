@@ -2218,7 +2218,12 @@ static void object_mention(object_type *o_ptr)
 	if (artifact_p(o_ptr))
 	{
 		/* Silly message */
-		msg_format("Artifact (%s)", o_name);
+		if (o_ptr->name1 < ART_MIN_NORMAL)
+			msg_format("Specialart (%s)", o_name);
+		else if (o_ptr->name1 < z_info->a_max_standard)
+			msg_format("Artifact (%s)", o_name);
+		else
+			msg_format("Randart (%s)", o_name);
 	}
 
 	/* Ego-item */

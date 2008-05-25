@@ -1391,17 +1391,8 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->return_y);
 	rd_s16b(&p_ptr->return_x);
 
-	/* Future use */
-	strip_bytes(20);
-
-	/* Read the randart version */
-	rd_u32b(&randart_version);
-
-	/* Read the randart seed */
-	rd_u32b(&seed_randart);
-
-	/* Skip the flags */
-	strip_bytes(12);
+	if (older_than(0, 6, 2, 9))
+		strip_bytes(40);
 
 	/* Hack -- the two "special seeds" */
 	rd_u32b(&seed_flavor);
@@ -2352,9 +2343,19 @@ static errr rd_savefile_new_aux(void)
 
 	if (arg_fiddle) note("Loaded Quests");
 
-	/* TODO: Hack -- do the random artifacts now. These will be over-written
-	   by the save file data. */
-	do_randart(0x10000000, TRUE);
+	if (!older_than(0, 6, 2, 9))
+	{
+		/* Read the randart version */
+		rd_u32b(&randart_version);
+
+		/* Read the randart seed */
+		rd_u32b(&seed_randart);
+	}
+
+	/* Erroneously fixed seed before that version,
+	   we do not want to change peoples' randart's names mid-game */
+	if (older_than(0, 6, 2, 8))
+		seed_randart = 0x10000000;
 
 	/* Load the Artifact lore */
 	rd_u16b(&tmp16u);	
@@ -2365,6 +2366,12 @@ static errr rd_savefile_new_aux(void)
 		note(format("Too many (%u) artifacts!", tmp16u));
 		return (-1);
 	}
+
+	/* TODO: Hack -- do the random artifacts now, because we do not save 
+	   name nor power. These will be over-written by the save file data.
+	   Warning: whenever the randart code changes, the power will get
+	   out of sync with the saved data, coming from different randarts. */
+	do_randart(seed_randart, TRUE);
 
 	/* Set the new artifact max; we don't generate the missing ones */
 	z_info->a_max = tmp16u;
@@ -2482,10 +2489,6 @@ static errr rd_savefile_new_aux(void)
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
-
-		/* TODO: Very Ugly Hack -- do the random artifacts again, 
-		   with proper seed, because we do not save name nor power */
-		do_randart(seed_randart, TRUE);
 	}
 
 	/* Important -- Initialize the sex */
