@@ -3268,7 +3268,8 @@ errr parse_k_info(char *buf, header *head)
 		/* Save the values */
 		k_ptr->tval = tval;
 		k_ptr->sval = sval;
-		k_ptr->pval = pval;
+		/* No more annoying objects with lots of flags, but 0 pval */
+		k_ptr->pval = pval == 0 ? 1 : pval;
 	}
 
 	/* Process 'W' for "More Info" (one line only) */

@@ -2351,9 +2351,13 @@ static errr rd_savefile_new_aux(void)
 		rd_u32b(&seed_randart);
 	}
 
-	/* No seed in this place in the old savefiles */
+	/* No seed in this place in the old savefiles
+	   and no randarts saved, so have to be regenerated */
 	if (older_than(0, 6, 2, 8))
+	{
 		seed_randart = 0x10000000;
+		do_randart(seed_randart, TRUE);
+	}
 
 	/* Load the Artifact lore */
 	rd_u16b(&tmp16u);	
@@ -2366,14 +2370,6 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	z_info->a_max = tmp16u;
-
-	/* TODO: Hack -- do the random artifacts now, because we do not save 
-	   name nor power. These will be over-written by the save file data.
-	   Warning: whenever the randart code changes, the power will get
-	   out of sync with the saved data, coming from different randarts.
-	   I'm also not sure about names, but misteriously they seem 
-	   to stay the same, despite not being saved, apparently. RNG? */
-	do_randart(seed_randart, TRUE);
 
 	/* Read the artifact flags */
 	for (i = 0; i < tmp16u; i++)
@@ -2488,6 +2484,12 @@ static errr rd_savefile_new_aux(void)
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
+
+		/* Generate artifact names (only, hence FALSE) according to the seed.
+		   They are not stored in savefile but regenerated every time.
+		   The rest of artifact info (except field 'text', which is empty)
+		   is read from savefile later. */
+		do_randart(seed_randart, FALSE);
 	}
 
 	/* Important -- Initialize the sex */

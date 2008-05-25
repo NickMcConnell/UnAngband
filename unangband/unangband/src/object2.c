@@ -2055,7 +2055,7 @@ void object_prep(object_type *o_ptr, int k_idx)
 	o_ptr->sval = k_ptr->sval;
 
 	/* Default "pval" or 1 if zero */
-	o_ptr->pval = k_ptr->pval ? k_ptr->pval : 1;
+	o_ptr->pval = k_ptr->pval;
 
 	/* Default "charges" */
 	o_ptr->charges = k_ptr->charges;
