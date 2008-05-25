@@ -1168,9 +1168,6 @@ static bool wr_savefile_new(void)
 		wr_byte(q_list[i].stage);
 	}
 
-	/* Random artifact version */
-	wr_u32b(RANDART_VERSION);
-
 	/* Random artifact seed */
 	wr_u32b(seed_randart);
 

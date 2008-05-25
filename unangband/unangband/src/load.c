@@ -1063,10 +1063,6 @@ static void rd_ghost(void)
 	strip_bytes(60);
 }
 
-
-static u32b randart_version;
-
-
 /*
  * Read the "extra" information
  */
@@ -2345,9 +2341,6 @@ static errr rd_savefile_new_aux(void)
 
 	if (!older_than(0, 6, 2, 9))
 	{
-		/* Read the randart version */
-		rd_u32b(&randart_version);
-
 		/* Read the randart seed */
 		rd_u32b(&seed_randart);
 	}
@@ -2370,7 +2363,9 @@ static errr rd_savefile_new_aux(void)
 	/* TODO: Hack -- do the random artifacts now, because we do not save 
 	   name nor power. These will be over-written by the save file data.
 	   Warning: whenever the randart code changes, the power will get
-	   out of sync with the saved data, coming from different randarts. */
+	   out of sync with the saved data, coming from different randarts.
+	   I'm also not sure about names, but misteriously they seem 
+	   to stay the same, despite not being saved, apparently. RNG? */
 	do_randart(seed_randart, TRUE);
 
 	/* Set the new artifact max; we don't generate the missing ones */
