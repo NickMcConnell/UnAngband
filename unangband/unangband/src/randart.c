@@ -4943,15 +4943,17 @@ errr do_randart(u32b randart_seed, bool full)
 	/* Only do all the following if full randomization requested */
 	if (full)
 	{
-		/* Just for fun, look at the frequencies on the finished items */
-		/* Remove this prior to release */
-		store_base_power();
-		parse_frequencies();
-
-		/* Report artifact powers */
-		for (i = 0; i < z_info->a_max; i++)
+		if (randart_verbose)
 		{
-			LOG_PRINT2("Artifact %d power is now %d\n",i,a_info[i].power);
+			/* Just for fun, look at the frequencies on the finished items */
+			store_base_power();
+			parse_frequencies();
+
+			/* Report artifact powers */
+			for (i = 0; i < z_info->a_max; i++)
+			{
+				LOG_PRINT2("Artifact %d power is now %d\n",i,a_info[i].power);
+			}
 		}
 
 		/* Free the "kinds" array */

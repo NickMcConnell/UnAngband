@@ -496,6 +496,8 @@ static errr rd_item(object_type *o_ptr)
 	/* Hack -- extract the "broken" flag */
 	/*if (o_ptr->pval < 0) o_ptr->ident |= (IDENT_BROKEN);*/
 
+#if 0
+/* Do not overwrite randarts from old versions! */
 
 	/* Artifacts */
 	if (o_ptr->name1)
@@ -519,6 +521,7 @@ static errr rd_item(object_type *o_ptr)
 		/* Hack -- extract the "broken" flag */
 		if (!a_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
 	}
+#endif
 
 	/* Ego items */
 	if (o_ptr->name2)
@@ -2345,8 +2348,7 @@ static errr rd_savefile_new_aux(void)
 		rd_u32b(&seed_randart);
 	}
 
-	/* Erroneously fixed seed before that version,
-	   we do not want to change peoples' randart's names mid-game */
+	/* No seed in this place in the old savefiles */
 	if (older_than(0, 6, 2, 8))
 		seed_randart = 0x10000000;
 
@@ -2360,6 +2362,8 @@ static errr rd_savefile_new_aux(void)
 		return (-1);
 	}
 
+	z_info->a_max = tmp16u;
+
 	/* TODO: Hack -- do the random artifacts now, because we do not save 
 	   name nor power. These will be over-written by the save file data.
 	   Warning: whenever the randart code changes, the power will get
@@ -2367,9 +2371,6 @@ static errr rd_savefile_new_aux(void)
 	   I'm also not sure about names, but misteriously they seem 
 	   to stay the same, despite not being saved, apparently. RNG? */
 	do_randart(seed_randart, TRUE);
-
-	/* Set the new artifact max; we don't generate the missing ones */
-	z_info->a_max = tmp16u;
 
 	/* Read the artifact flags */
 	for (i = 0; i < tmp16u; i++)
