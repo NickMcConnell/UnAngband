@@ -500,6 +500,8 @@ static errr rd_item(object_type *o_ptr)
 	/* Hack -- extract the "broken" flag */
 	/*if (o_ptr->pval < 0) o_ptr->ident |= (IDENT_BROKEN);*/
 
+#if 0
+/* Do not overwrite randarts from old versions! */
 
 	/* Artifacts */
 	if (o_ptr->name1)
@@ -523,6 +525,7 @@ static errr rd_item(object_type *o_ptr)
 		/* Hack -- extract the "broken" flag */
 		if (!a_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
 	}
+#endif
 
 	/* Ego items */
 	if (o_ptr->name2)
@@ -1067,10 +1070,6 @@ static void rd_ghost(void)
 	strip_bytes(60);
 }
 
-
-static u32b randart_version;
-
-
 /*
  * Read the "extra" information
  */
@@ -1401,23 +1400,12 @@ static errr rd_extra(void)
 	rd_s16b(&p_ptr->return_y);
 	rd_s16b(&p_ptr->return_x);
 
-	/* Future use */
-	strip_bytes(20);
-
-	/* Read the randart version */
-	rd_u32b(&randart_version);
-
-	/* Read the randart seed */
-	rd_u32b(&seed_randart);
-
-	/* Skip the flags */
-	strip_bytes(12);
-
+	if (older_than(0, 6, 2, 10))
+		strip_bytes(40);
 
 	/* Hack -- the two "special seeds" */
 	rd_u32b(&seed_flavor);
 	rd_u32b(&seed_town);
-
 
 	/* Special stuff */
 	rd_u16b(&p_ptr->panic_save);
@@ -1554,6 +1542,9 @@ static errr rd_randarts(void)
 
 		rd_u16b(&a_ptr->time);
 		rd_u16b(&a_ptr->randtime);
+
+		if (!older_than(0, 6, 2, 10))
+			rd_s32b(&a_ptr->power);
 	}
 
 	return (0);
@@ -2373,11 +2364,20 @@ static errr rd_savefile_new_aux(void)
 
 	if (arg_fiddle) note("Loaded Quests");
 
-	/* Hack -- do the random artifacts now. These will be over-written
-	   by the save file data. */
-	do_randart(0x10000000, TRUE);
+	if (!older_than(0, 6, 2, 10))
+	{
+		/* Read the randart seed */
+		rd_u32b(&seed_randart);
+	}
+	else
+	{
+		/* No seed in this place in the old savefiles
+		   and no randarts saved, so have to be regenerated */
+		seed_randart = 0x10000000;
+		do_randart(seed_randart, TRUE);
+	}
 
-	/* Load the Artifacts */
+	/* Load the Artifact lore */
 	rd_u16b(&tmp16u);	
 
 	/* Incompatible save files */
@@ -2387,11 +2387,10 @@ static errr rd_savefile_new_aux(void)
 		return (-1);
 	}
 
-	/* Set the new artifact max */
 	z_info->a_max = tmp16u;
 
 	/* Read the artifact flags */
-	for (i = 0; i < z_info->a_max; i++)
+	for (i = 0; i < tmp16u; i++)
 	{
 		object_info *n_ptr = &a_list[i];
 
@@ -2420,7 +2419,7 @@ static errr rd_savefile_new_aux(void)
 		rd_byte(&tmp8u);
 	}
 
-	if (arg_fiddle) note("Loaded Artifacts");
+	if (arg_fiddle) note("Loaded Artifact Lore");
 
 	/* Load the Ego items */
 	rd_u16b(&tmp16u);
@@ -2460,7 +2459,7 @@ static errr rd_savefile_new_aux(void)
 		rd_byte(&tmp8u);
 	}
 
-	if (arg_fiddle) note("Loaded Ego Items");
+	if (arg_fiddle) note("Loaded Ego Item Lore");
 
 	/* Read the extra stuff */
 	if (rd_extra()) return (-1);
@@ -2499,10 +2498,16 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Read random artifacts */
-	if (adult_randarts)
+	if (!older_than(0, 6, 2, 10))
 	{
 		if (rd_randarts()) return (-1);
 		if (arg_fiddle) note("Loaded Random Artifacts");
+
+		/* Generate artifact names (only, hence FALSE) according to the seed.
+		   They are not stored in savefile but regenerated every time.
+		   The rest of artifact info (except field 'text', which is empty)
+		   is read from savefile later. */
+		do_randart(seed_randart, FALSE);
 	}
 
 	/* Important -- Initialize the sex */

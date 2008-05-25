@@ -67,8 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	2
-#define VERSION_EXTRA	9
-
+#define VERSION_EXTRA	10
 
 /*
  * Oldest version number that can still be imported
@@ -77,12 +76,6 @@
 #define OLD_VERSION_MINOR	6
 #define OLD_VERSION_PATCH	0
 #define OLD_VERSION_EXTRA	0
-
-
-/*
- * Version of random artifact code.
- */
-#define RANDART_VERSION	62
 
 
 /*

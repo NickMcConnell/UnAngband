@@ -11045,8 +11045,8 @@ static bool cave_gen(void)
 			case SPECIAL_STARBURST:
 				if (cheat_room) message_add("Building star burst level.", MSG_GENERIC);
 				if (!generate_starburst_room(4, 4, DUNGEON_HGT - 4, DUNGEON_WID - 4,
-					f_info[zone->fill].flags1 & (FF1_WALL) == 0 ? zone->fill : FEAT_FLOOR,
-						f_info[zone->fill].edge, (STAR_BURST_RAW_FLOOR | STAR_BURST_RAW_EDGE))) return (FALSE);
+											 (f_info[zone->fill].flags1 & (FF1_WALL)) == 0 ? zone->fill : FEAT_FLOOR,
+											 f_info[zone->fill].edge, (STAR_BURST_RAW_FLOOR | STAR_BURST_RAW_EDGE))) return (FALSE);
 				break;
 			case SPECIAL_CHAMBERS:
 				if (cheat_room) message_add("Building chambers level.", MSG_GENERIC);

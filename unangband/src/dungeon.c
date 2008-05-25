@@ -3542,6 +3542,8 @@ static void process_some_user_pref_files(void)
  */
 void play_game(bool new_game)
 {
+	int i;
+
 	/* Hack -- Increase "icky" depth */
 	character_icky++;
 
@@ -3624,34 +3626,33 @@ void play_game(bool new_game)
 		seed_town = rand_int(0x10000000);
 
 		/* Hack -- seed for random artifacts */
-		if (adult_reseed_artifacts) seed_randart = rand_int(0x10000000);
+		if (adult_reseed_artifacts) 
+			seed_randart = rand_int(0x10000000);
 
 		/* Hack -- clear artifact memory */
-		if (adult_reseed_artifacts)
+		/* Needs to be done even with no adult_reseed_artifacts,
+		   because the state of adult_randarts may have changed either way */
+		for (i = 0;i<z_info->a_max;i++)
 		{
-			int i;
+			object_info *n_ptr = &a_list[i];
+				
+			n_ptr->can_flags1 = 0x0L;
+			n_ptr->can_flags2 = 0x0L;
+			n_ptr->can_flags3 = 0x0L;
+			n_ptr->can_flags4 = 0x0L;
 
-			for (i = 0;i<z_info->a_max;i++)
-			{
-				object_info *n_ptr = &a_list[i];
-
-				n_ptr->can_flags1 = 0x0L;
-				n_ptr->can_flags2 = 0x0L;
-				n_ptr->can_flags3 = 0x0L;
-				n_ptr->can_flags4 = 0x0L;
-
-				n_ptr->not_flags1 = 0x0L;
-				n_ptr->not_flags2 = 0x0L;
-				n_ptr->not_flags3 = 0x0L;
-				n_ptr->not_flags4 = 0x0L;
-			}
-
+			n_ptr->not_flags1 = 0x0L;
+			n_ptr->not_flags2 = 0x0L;
+			n_ptr->not_flags3 = 0x0L;
+			n_ptr->not_flags4 = 0x0L;
 		}
 
 		/* Roll up a new character */
 		player_birth();
 
-		/* Randomize the artifact names */
+		/* Generate random artifacts */
+		/* Needs to be done even with no adult_reseed_artifacts,
+		   because the state of adult_randarts may have changed either way */
 		do_randart(seed_randart, TRUE);
 
 		/* Hack -- enter the world */
@@ -3689,8 +3690,6 @@ void play_game(bool new_game)
 	/* Mark the fixed monsters as quests */
 	if (adult_campaign)
 	{
-		int i;
-
 		for (i = 0; i < z_info->t_max; i++)
 		{
 			int guard, ii;

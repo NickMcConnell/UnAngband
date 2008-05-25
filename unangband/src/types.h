@@ -153,6 +153,7 @@ struct maxima
 	u16b d_max;     /* Max size for "d_info[]" */
 	u16b f_max;     /* Max size for "f_info[]" */
 
+	u16b a_max_standard; /* Max size for standard artifacts */
 	u16b a_max;     /* Max size for "a_info[]" */
 	u16b e_max;     /* Max size for "e_info[]" */
 
