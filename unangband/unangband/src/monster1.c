@@ -711,8 +711,6 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_SPIT:	p = "spit"; break;
 			case RBM_GAZE:	p = "gaze"; break;
 			case RBM_WAIL:	p = "wail"; break;
-			case RBM_HOWL:	p = "howl"; break;
-			case RBM_SHRIEK:	p = "shriek"; break;
 			case RBM_SPORE:	p = "release spores"; break;
 			case RBM_LASH:	p = "lash you with a whip"; break;
 			case RBM_BEG:	p = "beg"; break;
@@ -722,7 +720,6 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_TRAP: p = "trap"; break;
 			case RBM_BOULDER: p = "throw a boulder at you"; break;
 			case RBM_AURA: p = "radiate"; break;
-			case RBM_AURA_MINOR: p = "radiate"; break;
 			case RBM_SELF: p = "affect itself";break;
 			case RBM_ADJACENT: p = "affect all adjacent"; break;
 			case RBM_HANDS: p = "affect an adjacent target"; break;
@@ -733,8 +730,6 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_BLAST: p = "create an adjacent blast"; break;
 			case RBM_WALL: p = "create a wall"; break;
 			case RBM_BALL: p = "create a ball"; break;
-			case RBM_BALL_II: p = "create a large ball"; break;
-			case RBM_BALL_III: p = "create a huge ball"; break;
 			case RBM_CLOUD: p = "create a cloud"; break;
 			case RBM_STORM: p = "create a storm"; break;
 			case RBM_BREATH: p = "breathes"; break;
@@ -752,7 +747,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_EXPLODE: p = "explode"; break;
 			case RBM_ARROW:	p = "shoot you with a bow"; break;
 			case RBM_XBOLT:	p = "shoot you with a crossbow"; break;
-			case RBM_SPIKE:	p = "shoot you with a spike"; break;
+			case RBM_DAGGER:	p = "throws a dagger at you"; break;
 			case RBM_DART:	p = "shoot you with a dart"; break;
 			case RBM_SHOT:	p = "sling a shot at you"; break;
 			case RBM_ARC_20:	p = "create a 20 degree arc"; break;
@@ -762,15 +757,22 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_ARC_60:	p = "create a 60 degree arc"; break;
 			case RBM_FLASK:	p = "throw a grenade at you"; break;
 			case RBM_TRAIL:	p = "trail"; break;
+			case RBM_SHRIEK:	p = "shriek"; break;
+			case RBM_BOLT_MINOR: p = "create a minor bolt"; break;
+			case RBM_BALL_MINOR: p = "create a minor ball"; break;
+			case RBM_BALL_II: p = "create a large ball"; break;
+			case RBM_BALL_III: p = "create a huge ball"; break;
+			case RBM_AURA_MINOR: p = "radiate"; break;
 			case RBM_8WAY: p = "create a 8-way beam"; break;
 			case RBM_8WAY_II: p = "create a large 8-way beam"; break;
 			case RBM_8WAY_III: p = "create a huge 8-way beam"; break;
 			case RBM_SWARM: p = "create a swarm"; break;
-			case RBM_DAGGER:	p = "throws a dagger at you"; break;
+			case RBM_SPIKE:	p = "shoot you with a spike"; break;
 			case RBM_AIM_AREA:	p = "affect an area"; break;
 			case RBM_SCATTER:	p = "scatters"; break;
+			case RBM_HOWL:	p = "howl"; break;
+		default: p = "urge you to report a bug about missing attack method description"; break;
 		}
-
 
 		/* Default effect */
 		q = NULL;

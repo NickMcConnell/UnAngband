@@ -2682,42 +2682,36 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			/* Already displayed result */
 			result = NULL;
 
-			/* Only do if damage */
-			if (dam) switch (method)
-			{
+			/* For most, only do if damage */
+			if (dam || method == RBM_SHRIEK) 
+				switch (method)
+				{
 				case RBM_SPIT:	mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_GAZE:	msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_WAIL: msg_print(result);(void)project(who, what, 4, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
-				case RBM_HOWL: msg_print(result);(void)project(who, what, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
-				case RBM_SHRIEK: msg_print(result); (void)project(who, what, 6, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_ARC | PROJECT_HIDE, 20, 20); aggravate_monsters(who); break;
 				case RBM_SPORE:	mon_ball_minor_shot(who, what, y, x, effect, dam, 1, hit, result); break;
 				case RBM_LASH:  mon_beam(who, what, y, x, effect, dam, 2, result); break;
 				case RBM_BEG:	msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_INSULT: msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
+				case RBM_MOAN: msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_SING:  msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_TRAP:  msg_print(result);(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_BOULDER: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_AURA:	msg_print(result);(void)project(who, what, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
-				case RBM_AURA_MINOR:	msg_print(result);(void)project(who, what, 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
 				case RBM_SELF:	msg_print(result);(void)project(SOURCE_SELF, who, 0, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_DIRECT, 0, 0); break;
 				case RBM_ADJACENT: msg_print(result);(void)project(SOURCE_SELF, who, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				case RBM_HANDS: mon_beam(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_MISSILE: mon_bolt(who, what, y, x, effect, dam, result); break;
-				case RBM_BOLT_MINOR: mon_bolt(who, what, y, x, effect, dam, result); break;
 				case RBM_BOLT_10: (rand_int(100) < 10 ? mon_beam(who, what, y, x, effect, dam, 10, result) : mon_bolt(who, what, y, x, effect, dam, result)); break;
 				case RBM_BOLT: mon_bolt(who, what, y, x, effect, dam, result); break;
 				case RBM_BEAM: mon_beam(who, what, y, x, effect, dam, 10, result); break;
 				case RBM_BLAST: mon_ball(who, what, y, x, effect, dam, 0, TRUE, result); break;
 				case RBM_WALL: mon_beam(who, what, y, x, effect, dam, 12, result); break;
-				case RBM_BALL_MINOR: mon_ball_minor(who, what, y, x, effect, dam, 2, FALSE, result); break;
 				case RBM_BALL: mon_ball(who, what, y, x, effect, dam, 2, TRUE, result); break;
-				case RBM_BALL_II: mon_ball(who, what, y, x, effect, dam, 3, TRUE, result); break;
-				case RBM_BALL_III: mon_ball(who, what, y, x, effect, dam, 4, TRUE, result); break;
 				case RBM_CLOUD: mon_area(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_STORM: mon_area(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_BREATH: mon_arc(who, what, y, x, effect, MIN(dam, m_ptr->hp / d_side), 0, (powerful ? 40 : 20), result); break;
 				case RBM_AREA: (void)project(who, what, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_AREA, 0, 0);  break;
-				case RBM_AIM_AREA: (void)project(who, what, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_AREA, 0, 0);  break;
 				case RBM_LOS: (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
 				case RBM_LINE: mon_beam(who, what, y, x, effect, dam, 8, result); break;
 				case RBM_AIM: (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0);  break;
@@ -2728,12 +2722,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_LEVEL: (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT | PROJECT_WALL, 0, 0);  break;
 				case RBM_CROSS: mon_beam(who, what, y, x, effect, dam, 10, result); break;
 				case RBM_STRIKE: mon_ball(who, what, y, x, effect, dam, (rlev / 10) + 2, TRUE, result); break;
-				case RBM_EXPLODE: (void)project(SOURCE_SELF, who, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, damroll(5,8), GF_EXPLODE, FLG_MON_BALL, 0, 0); break;
+				case RBM_EXPLODE: (void)project(SOURCE_SELF, who, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL, 0, 0); break;
 				case RBM_ARROW: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_XBOLT: mon_shot(who, what, y, x, effect, dam, hit, result); break;
-				case RBM_SPIKE: mon_shot(who, what, y, x, effect, dam, hit, result); break;
-				case RBM_DART: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_DAGGER: mon_shot(who, what, y, x, effect, dam, hit, result); break;
+				case RBM_DART: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_SHOT: mon_shot(who, what, y, x, effect, dam, hit, result); break;
 				case RBM_ARC_20: mon_arc(who, what, y, x, effect, dam, 0, (powerful ? 40 : 20), result); break;
 				case RBM_ARC_30: mon_arc(who, what, y, x, effect, dam, 0, (powerful ? 50 : 30), result); break;
@@ -2741,11 +2734,20 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				case RBM_ARC_50: mon_arc(who, what, y, x, effect, dam, 0, 50, result); break;
 				case RBM_ARC_60: mon_arc(who, what, y, x, effect, dam, 0, 60, result); break;
 				case RBM_FLASK:	mon_ball_minor_shot(who, what, y, x, effect, dam, 1, hit, result); break;
-				case RBM_8WAY: mon_8way(who, what, y, x, effect, dam, 2, result); break;
+				case RBM_TRAIL: mon_beam(who, what, y, x, effect, dam, 10, result); break;
+				case RBM_SHRIEK: msg_print(result); if (dam) (void)project(who, what, 6, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_ARC | PROJECT_HIDE, 20, 20); aggravate_monsters(who); break;
+				case RBM_BOLT_MINOR: mon_bolt(who, what, y, x, effect, dam, result); break;
+				case RBM_BALL_MINOR: mon_ball_minor(who, what, y, x, effect, dam, 2, FALSE, result); break;
+				case RBM_BALL_II: mon_ball(who, what, y, x, effect, dam, 3, TRUE, result); break;
+				case RBM_BALL_III: mon_ball(who, what, y, x, effect, dam, 4, TRUE, result); break;				case RBM_8WAY: mon_8way(who, what, y, x, effect, dam, 2, result); break;
+				case RBM_AURA_MINOR:	msg_print(result);(void)project(who, what, 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_CLOUD, 0, 0);  break;
 				case RBM_8WAY_II: mon_8way(who, what, y, x, effect, dam, 3, result); break;
 				case RBM_8WAY_III: mon_8way(who, what, y, x, effect, dam, 4, result); break;
 				case RBM_SWARM: for (k = 0; k < (rlev / 20) + 2; k++) mon_ball_minor(who, what, y, x, effect, dam, 2, TRUE, result); break;
+				case RBM_SPIKE: mon_shot(who, what, y, x, effect, dam, hit, result); break;
+				case RBM_AIM_AREA: (void)project(who, what, (rlev / 10) + 1, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_AREA, 0, 0);  break;
 				case RBM_SCATTER: for (k = 0; k < (rlev / 10) + 3; k++) { scatter(&y, &x, m_ptr->fy, m_ptr->fx, 5, 0); (void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, dam, effect, FLG_MON_DIRECT, 0, 0); } break;
+				case RBM_HOWL: msg_print(result);(void)project(who, what, 2, m_ptr->fy, m_ptr->fx, m_ptr->fy, m_ptr->fx, dam, effect, FLG_MON_BALL | PROJECT_HIDE, 0, 0);  break;
 				default: mon_beam(who, what, y, x, effect, dam, 2, result); /* For all hurt huge attacks */
 			}
 

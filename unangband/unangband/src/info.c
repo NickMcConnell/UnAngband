@@ -1352,11 +1352,20 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		switch (method)
 		{
 			case RBM_HIT: p = "hits"; t = "one target"; break;
+
 			case RBM_SPIT: p = "spits"; t = "one target"; break;
+			case RBM_GAZE: p = "gazes"; t = "one target"; break;
+			case RBM_WAIL: p = "wails"; t = "one target"; break;
+			case RBM_SPORE: t = "one adjacent target"; break;
+			case RBM_LASH: t = "one adjacent target"; break;
+		case RBM_BEG: t = "one adjacent target"; break;
+		case RBM_INSULT: t = "one adjacent target"; break;
+		case RBM_MOAN: t = "one adjacent target"; break;
+		case RBM_SING: t = "one adjacent target"; break;
+		case RBM_TRAP: t = "one adjacent target"; break;
+		case RBM_BOULDER: t = "one adjacent target"; break;
 			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
-			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
 			case RBM_SELF: t = "you"; break;
-			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
 			case RBM_ADJACENT: t = "all enemies adjacent to you"; break;
 			case RBM_HANDS: t = "a beam"; rng = 3; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
 			case RBM_MISSILE: p = "creates a missile"; t = "your enemies"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
@@ -1366,26 +1375,24 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_BLAST: p = "creates an adjacent blast"; t = "your enemies"; d3 += level;break;
 			case RBM_WALL: p = "creates a wall"; t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
 			case RBM_BALL: p = "creates a ball"; t = "your enemies"; rad = 2; break;
-			case RBM_BALL_II: p = "creates a ball"; t = "your enemies"; rad = 3; break;
-			case RBM_BALL_III: p = "creates a ball"; t = "your enemies"; rad = 4; break;
 			case RBM_CLOUD: p = "creates a cloud"; t = "your enemies"; rad = 2; d3 += level/2; break;
 			case RBM_STORM: p = "creates a storm"; t = "your enemies"; rad = 3; break;
 			case RBM_BREATH: p = "breathes";  t = "your enemies"; d3 = p_ptr->chp * d3 / 300; break;
 			case RBM_AREA: p = "surrounds you with magic"; rad = (level/10)+1; break;
-			case RBM_AIM_AREA: p = "affects an area"; rad = (level/10)+1; break;
 			case RBM_LOS: t = "all your enemies in line of sight"; break;
 			case RBM_LINE: t = "one direction"; break;
 			case RBM_AIM: t = "one target"; break;
-			case RBM_PANEL: t = "the current panel"; break;
-			case RBM_LEVEL: t = "the current level"; break;
 			case RBM_ORB: p = "creates an orb"; t = "your enemies"; rad = (level < 30 ? 2 : 3); d3 += level/2; break;
-			case RBM_CROSS: p = "surrounds you with a cross"; t = "your enemies"; break;
-			case RBM_STRIKE: p = "strikes"; t = "your enemy"; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
 			case RBM_STAR: p = "surrounds you with a star"; t = "your enemies"; break;
 			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2; break;
+			case RBM_PANEL: t = "the current panel"; break;
+			case RBM_LEVEL: t = "the current level"; break;
+			case RBM_CROSS: p = "surrounds you with a cross"; t = "your enemies"; break;
+			case RBM_STRIKE: p = "strikes"; t = "your enemy"; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
+			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
 			case RBM_ARROW: p = "creates an arrow"; t="one target"; break;
 			case RBM_XBOLT: p = "creates a crossbow bolt"; t="one target"; break;
-			case RBM_SPIKE: p = "creates a spike"; t="one target"; break;
+			case RBM_DAGGER: p = "creates a dagger"; t="one target"; break;
 			case RBM_DART: p = "creates a dart"; t="one target"; break;
 			case RBM_SHOT: p = "creates a shot"; t="one target"; break;
 			case RBM_ARC_20: p = "creates an arc"; arc = 20; break;
@@ -1394,16 +1401,23 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case RBM_ARC_50: p = "creates an arc"; arc = 50; break;
 			case RBM_ARC_60: p = "creates an arc"; arc = 60; break;
 			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break;
+		case RBM_TRAIL: t = "one adjacent target"; break;
+		case RBM_SHRIEK: t = "one adjacent target"; break;
 			case RBM_BOLT_MINOR: p = "creates a bolt"; t = "your enemies"; rng = 4; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
 			case RBM_BALL_MINOR: p = "throws a ball"; t = "your enemies"; rad = 1; break;
+			case RBM_BALL_II: p = "creates a ball"; t = "your enemies"; rad = 3; break;
+			case RBM_BALL_III: p = "creates a ball"; t = "your enemies"; rad = 4; break;
+			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
 			case RBM_8WAY: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 2; break;
 			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
 			case RBM_8WAY_III: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 4; break;
 			case RBM_SWARM: p = "creates multiple balls"; t = "your enemies"; rad = 1; d3 += level / 2; break;
+			case RBM_SPIKE: p = "creates a spike"; t="one target"; break;
+			case RBM_AIM_AREA: p = "affects an area"; rad = (level/10)+1; break;
 			case RBM_SCATTER: p = "scatters magic around you"; t = "your enemies"; break;
-			default: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
+		case RBM_HOWL: t = "one adjacent target"; break;
+		default: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break; /* ? */
 		}
-
 
 		/* Default technique */
 		q = NULL;
