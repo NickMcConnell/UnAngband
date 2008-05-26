@@ -2550,7 +2550,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		else if (attack >=  96) manacost = spell_info_RF4[attack- 96][COL_SPELL_MANA_COST];
 		else return (FALSE);		/* Spend the mana */
 
-		m_ptr->mana -= manacost;
+		m_ptr->mana -= MIN(manacost, m_ptr->mana);
 
 		/* Use ammunition */
 		ammo = find_monster_ammo(who, attack - 96, FALSE);
@@ -4065,8 +4065,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						else msg_format("%^s absorbs mana from the surrounding water.", m_name);
 	
 						/* Big boost to mana */
-						n_ptr->mana += (power / 5) + 1;
-						if (n_ptr->mana > s_ptr->mana) n_ptr->mana = s_ptr->mana;
+						n_ptr->mana = MIN(255, n_ptr->mana + power / 5 + 1);
+						if (n_ptr->mana > s_ptr->mana) 
+							n_ptr->mana = s_ptr->mana;
 	
 						/* Done */
 						break;
@@ -4088,8 +4089,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target > 0)
 			{
 				/* Increase current mana.  Do not exceed maximum. */
-				n_ptr->mana += (spower / 15) + 1;
-				if (n_ptr->mana > s_ptr->mana) n_ptr->mana = s_ptr->mana;
+				n_ptr->mana = MIN(255, n_ptr->mana + spower / 15 + 1);
+				if (n_ptr->mana > s_ptr->mana) 
+					n_ptr->mana = s_ptr->mana;
 			}
 			else if (target < 0)
 			{

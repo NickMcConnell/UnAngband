@@ -4284,7 +4284,7 @@
  * Need special treatment in AI.
  */
 #define RF4_HARASS_MASK \
-        (RF4_SHRIEK)
+	(0L)
 
 #define RF5_HARASS_MASK \
  	(0L)
@@ -4384,7 +4384,7 @@
  * Annoying spells
  */
 #define RF4_ANNOY_MASK \
-	(RF4_SHRIEK)
+	(0L)
 
 #define RF5_ANNOY_MASK \
 	(RF5_DRAIN_MANA | RF5_SCARE | \

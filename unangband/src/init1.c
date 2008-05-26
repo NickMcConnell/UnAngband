@@ -4300,6 +4300,8 @@ errr parse_r_info(char *buf, header *head)
 		r_ptr->freq_innate = innate;
 		r_ptr->freq_spell = spell;
 		r_ptr->spell_power = power;
+		if (mana > 250) 
+			return (PARSE_ERROR_MISSING_RECORD_HEADER);
 		r_ptr->mana = mana;
 	}
 

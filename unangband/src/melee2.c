@@ -121,20 +121,24 @@ void find_range(int m_idx)
 	/* Maximum range to flee to (reduced elsewhere for themed levels */
 	if (!(m_ptr->min_range < FLEE_RANGE)) m_ptr->min_range = FLEE_RANGE;
 
-	/* Nearby monsters that cannot run away will not become run unless
-	 * completely afraid */
+	/* Nearby monsters that cannot run away, won't unless completely afraid */
 	else if ((m_ptr->cdis < TURN_RANGE) && (m_ptr->mspeed < p_ptr->pspeed))
 		m_ptr->min_range = 1;
 
 	/* Now find prefered range */
 	m_ptr->best_range = m_ptr->min_range;
 
-	/*Note below: Monsters who have had dangerous attacks happen to them are more extreme
-	 * as are monsters that are currenty hidden. */
+	/* Note below: Monsters who have had dangerous attacks happen to them 
+	   are more extreme as are monsters that are currenty hidden. */
 
-	/* Spellcasters want to sit back */
-	if ((r_ptr->freq_spell > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)) &&
-			(((r_ptr->flags5 & (RF5_ATTACK_MASK)) != 0) ||
+	/* TODO: take range of spell and innate attacks into account;
+	   update whenever mana levels change, not only when player attacks */
+
+	/* Spellcasters with mana want to sit back */
+	if (r_ptr->freq_spell 
+		> ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)
+		&& m_ptr->mana >= r_ptr->mana / 6
+		&& (((r_ptr->flags5 & (RF5_ATTACK_MASK)) != 0) ||
 			((r_ptr->flags6 & (RF6_ATTACK_MASK)) != 0) ||
 			((r_ptr->flags7 & (RF7_ATTACK_MASK)) != 0)))
 	{
@@ -149,16 +153,18 @@ void find_range(int m_idx)
 		m_ptr->best_range = 6;
 	}
 	
-	/* Archers want to sit back */
-	else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) && (find_monster_ammo(m_idx, -1, FALSE) >= 0))
+	/* Archers with ammo want to sit back */
+	else if (((r_ptr->flags2 & (RF2_ARCHER)) != 0) 
+			 && find_monster_ammo(m_idx, -1, FALSE) >= 0)
 	{
 		/* Don't back off for aggression due to limited range */
 		m_ptr->best_range = 6;
 	}
 	
-	/* Innate magic users want to sit back */
-	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)) &&
-			((r_ptr->flags4 & (RF4_ATTACK_MASK)) != 0))
+	/* Innate magic users with mana (or with 0 max mana) want to sit back */
+	else if (r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)
+			 && m_ptr->mana >= r_ptr->mana / 6
+			 && (r_ptr->flags4 & (RF4_ATTACK_MASK)) != 0)
 	{
 		m_ptr->best_range = 6 + ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 2 : 0);
 	}
@@ -7132,8 +7138,6 @@ static void recover_monster(int m_idx, bool regen)
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
-	int frac;
-
 	/* Get the origin */
 	int y = m_ptr->fy;
 	int x = m_ptr->fx;
@@ -7278,19 +7282,19 @@ static void recover_monster(int m_idx, bool regen)
 		if (m_ptr->mana < r_ptr->mana)
 		{
 			/* Monster regeneration depends on maximum mana */
-			frac = r_ptr->mana / 30;
+			int frac = r_ptr->mana / 30;
 
 			/* Minimal regeneration rate */
 			if (!frac) frac = 1;
-
-			/* Regenerate */
-			m_ptr->mana += frac;
 
 			/* Some monsters regenerate quickly */
 			if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
 
 			/* Inactive monsters rest */
 			if (!(m_ptr->mflag & (MFLAG_ACTV))) frac *= 2;
+
+			/* Regenerate */
+			m_ptr->mana += frac;
 
 			/* Do not over-regenerate */
 			if (m_ptr->mana > r_ptr->mana) m_ptr->mana = r_ptr->mana;
@@ -7303,7 +7307,7 @@ static void recover_monster(int m_idx, bool regen)
 		if (m_ptr->hp < m_ptr->maxhp)
 		{
 			/* Base regeneration */
-			frac = m_ptr->maxhp / 100;
+			int frac = m_ptr->maxhp / 100;
 
 			/* Minimal regeneration rate */
 			if (!frac) frac = 1;
