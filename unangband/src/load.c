@@ -2590,10 +2590,15 @@ static errr rd_savefile_new_aux(void)
 			if (!older_than(0, 6, 2, 4)) 
 				rd_byte(&t_info[i].visited);
 
-			if (!older_than(0, 6, 2, 5)) 
+			if (!older_than(0, 6, 2, 5))
 			{
-				rd_u16b(&t_info[i].guardian_ifvisited);
-				rd_u16b(&t_info[i].replace_guardian);
+				if (!p_ptr->is_dead)
+				{
+					rd_u16b(&t_info[i].guardian_ifvisited);
+					rd_u16b(&t_info[i].replace_guardian);
+				}
+				else
+					strip_bytes(4);
 			}
 
 			/* Read the store indexes */

@@ -875,7 +875,7 @@ void do_cmd_go_up(void)
 			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the sinister guardian at %s. The way forth lies open before you.", str));
 	
 			/* Change the dungeon */
-			p_ptr->dungeon = t_ptr->quest_opens;
+			p_ptr->dungeon = actual_route(t_ptr->quest_opens);
 		}
 		else
 		{
@@ -972,7 +972,7 @@ void do_cmd_go_down(void)
 			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the sinister guardian at %s. The way forth lies open before you.", str));
 	
 			/* Change the dungeon */
-			p_ptr->dungeon = t_ptr->quest_opens;
+			p_ptr->dungeon = actual_route(t_ptr->quest_opens);
 		}
 		else
 		{

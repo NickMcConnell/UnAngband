@@ -1146,35 +1146,29 @@ static void init_ranged_attack(monster_race *r_ptr)
 			case RBM_SPIT:	mana = 0; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf); break;
 			case RBM_WAIL:  mana = 5; range = 4; break;
-			case RBM_HOWL:  mana = 2; range = 2; break;
 			case RBM_SPORE:	mana = 0; range = 3; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_LASH:  mana = 0; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_BEG:	mana = 0; range = 4; break;
 			case RBM_INSULT: mana = 0; range = 4; break;
+			case RBM_MOAN: mana = 0; range = 2; break;
 			case RBM_SING:  mana = 0; range = 4; break;
 			case RBM_TRAP:  mana = 0; range = 1; break;
 			case RBM_BOULDER: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_AURA:	mana = 4; range = 2; hack = 7; break;
-			case RBM_AURA_MINOR:	mana = 3; range = 1; hack = 7; break;
 			case RBM_SELF:	mana = 3; range = 0; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_ADJACENT: mana = 3; range = 1; break;
 			case RBM_HANDS: mana = 2; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_MISSILE: mana = 2; range = MAX_RANGE; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BOLT_MINOR: mana = 2; range = 4; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_BOLT_10: mana = 5; range = MAX_RANGE; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_BOLT: mana = 4; range = MAX_RANGE; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_BEAM: mana = 6; range = 10; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_BLAST: mana = 3; range = 1; break;
 			case RBM_WALL: mana = 6; range = MAX_RANGE; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BALL_MINOR: mana = 3; range = MAX_RANGE + extend_range; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt);break;
 			case RBM_BALL: mana = 4; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BALL_II: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BALL_III: mana = 6; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_CLOUD: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_STORM: mana = 6; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_BREATH: mana = 0; range = 6; break;
 			case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
-			case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;			
 			case RBM_LOS: mana = 6; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_LINE: mana = 4; range = MAX_RANGE; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
@@ -1188,9 +1182,8 @@ static void init_ranged_attack(monster_race *r_ptr)
 			case RBM_EXPLODE: mana = 0; range = 1; hack = 6; break;
 			case RBM_ARROW: mana = 0; range = 10; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_XBOLT: mana = 0; range = 12; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_SPIKE: mana = 0; range = 4; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_DART: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_DAGGER: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_DART: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_SHOT: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_ARC_20: mana = 6; range = 8; break;
 			case RBM_ARC_30: mana = 5; range = 6; break;
@@ -1198,11 +1191,21 @@ static void init_ranged_attack(monster_race *r_ptr)
 			case RBM_ARC_50: mana = 6; range = 6; break;
 			case RBM_ARC_60: mana = 6; range = 6; break;
 			case RBM_FLASK: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_TRAIL: mana = 1; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_SHRIEK: mana = 1; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BOLT_MINOR: mana = 2; range = 4; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BALL_MINOR: mana = 3; range = MAX_RANGE + extend_range; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt);break;
+			case RBM_BALL_II: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_BALL_III: mana = 6; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
+			case RBM_AURA_MINOR:	mana = 3; range = 1; hack = 7; break;
 			case RBM_8WAY: mana = 4; range = MAX_RANGE; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_8WAY_II: mana = 5; range = MAX_RANGE; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_8WAY_III: mana = 6; range = MAX_RANGE; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
 			case RBM_SWARM: mana = 6; range = MAX_RANGE + extend_range; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-   		case RBM_SCATTER:  mana = 1; range = MAX_SIGHT; break; /* TODO: repair, no clue what to do here */
+ 			case RBM_SPIKE: mana = 0; range = 4; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
+ 			case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;			
+ 		    case RBM_SCATTER:  mana = 1; range = MAX_SIGHT; break;
+			case RBM_HOWL:  mana = 2; range = 2; break;
 			default: mana = 0; range = 2; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break; /* For all hurt huge attacks */
 		}
 
