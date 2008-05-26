@@ -158,7 +158,7 @@ void find_range(int m_idx)
 	
 	/* Innate magic users want to sit back */
 	else if ((r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)) &&
-			((r_ptr->flags4 & (RF4_ATTACK_MASK)) != 0))
+			((r_ptr->flags4 & (RF4_ATTACK_MASK)) == 0))
 	{
 		m_ptr->best_range = 6 + ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 2 : 0);
 	}
@@ -7132,8 +7132,6 @@ static void recover_monster(int m_idx, bool regen)
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
-	int frac;
-
 	/* Get the origin */
 	int y = m_ptr->fy;
 	int x = m_ptr->fx;
@@ -7278,19 +7276,19 @@ static void recover_monster(int m_idx, bool regen)
 		if (m_ptr->mana < r_ptr->mana)
 		{
 			/* Monster regeneration depends on maximum mana */
-			frac = r_ptr->mana / 30;
+			int frac = r_ptr->mana / 30;
 
 			/* Minimal regeneration rate */
 			if (!frac) frac = 1;
-
-			/* Regenerate */
-			m_ptr->mana += frac;
 
 			/* Some monsters regenerate quickly */
 			if (r_ptr->flags2 & (RF2_REGENERATE)) frac *= 2;
 
 			/* Inactive monsters rest */
 			if (!(m_ptr->mflag & (MFLAG_ACTV))) frac *= 2;
+
+			/* Regenerate */
+			m_ptr->mana += frac;
 
 			/* Do not over-regenerate */
 			if (m_ptr->mana > r_ptr->mana) m_ptr->mana = r_ptr->mana;
@@ -7303,7 +7301,7 @@ static void recover_monster(int m_idx, bool regen)
 		if (m_ptr->hp < m_ptr->maxhp)
 		{
 			/* Base regeneration */
-			frac = m_ptr->maxhp / 100;
+			int frac = m_ptr->maxhp / 100;
 
 			/* Minimal regeneration rate */
 			if (!frac) frac = 1;

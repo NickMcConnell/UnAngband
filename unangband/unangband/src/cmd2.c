@@ -710,7 +710,7 @@ static void do_cmd_travel(void)
 				/* Hack -- Consume most food not inscribed with !< */
 				while (p_ptr->food < PY_FOOD_FULL)
 				{
-					for (i = 0; i < INVEN_PACK; i++)
+					for (i = INVEN_PACK - 1; i >= 0; i--)
 					{
 						/* Eat the food */
 						if (auto_consume_okay(&inventory[i]))
@@ -723,7 +723,7 @@ static void do_cmd_travel(void)
 					}
 					
 					/* Escape out if no food */
-					if (i == INVEN_PACK) break;
+					if (i < 0) break;
 				}
 
 				if (easy_more) messages_easy(FALSE);
