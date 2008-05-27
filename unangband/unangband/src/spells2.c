@@ -6223,7 +6223,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		/* Roll out level dependent damage */
 		if (blow_ptr->l_side)
 		{
-			damage += damroll(blow_ptr->l_side * level / blow_ptr->levels, blow_ptr->l_side);
+			damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
 		}
 		
 		/* Add constant damage */
