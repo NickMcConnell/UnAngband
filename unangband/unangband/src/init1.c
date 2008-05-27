@@ -8308,7 +8308,9 @@ errr eval_r_power(header *head)
 			if (lvl == 0) r_ptr->mexp = 0L;
 			else
 			{
-				/* Compute depths and exp of non-unique monsters */
+				/* Compute depths and exp of non-unique monsters.
+				   Enable occasionally even for uniques and then manually
+				   repair for the 3 Trolls, Beorn, etc. */
 				if (!(r_ptr->flags1 & (RF1_UNIQUE)))
 				{
 					long mexp = (hp * dam) / 25;
