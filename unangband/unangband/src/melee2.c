@@ -1212,7 +1212,7 @@ static void init_ranged_attack(monster_race *r_ptr)
 		/* Initialise the table */
 		spell_info_RF4[hack][COL_SPELL_MANA_COST] = mana;
 		spell_info_RF4[hack][COL_SPELL_DAM_MULT] = d_dice * (d_side + 1) / 2;
-		spell_info_RF4[hack][COL_SPELL_DAM_DIV] = MAX(r_ptr->spell_power, 1);
+		spell_info_RF4[hack][COL_SPELL_DAM_DIV] = r_ptr->spell_power;
 		spell_info_RF4[hack][COL_SPELL_DAM_VAR] = d_side;
 		spell_info_RF4[hack][COL_SPELL_BEST_RANGE] = range;
 		spell_desire_RF4[hack][D_BASE] = (mana ? 40 : 50);	/* Hack -- 40 for all blows, 50 for spells */

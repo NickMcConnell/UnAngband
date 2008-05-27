@@ -3269,7 +3269,7 @@ errr parse_k_info(char *buf, header *head)
 		k_ptr->tval = tval;
 		k_ptr->sval = sval;
 		/* No more annoying objects with lots of flags, but 0 pval */
-		k_ptr->pval = pval == 0 ? 1 : pval;
+		k_ptr->pval = MAX(1, pval);
 	}
 
 	/* Process 'W' for "More Info" (one line only) */
@@ -4305,7 +4305,8 @@ errr parse_r_info(char *buf, header *head)
 		/* Save the values */
 		r_ptr->freq_innate = innate;
 		r_ptr->freq_spell = spell;
-		r_ptr->spell_power = power;
+		/* No more spellcasters with no spell power */
+		r_ptr->spell_power = MAX(1 + r_ptr->level / 10, power);
 		if (mana > 250) 
 			return (PARSE_ERROR_MISSING_RECORD_HEADER);
 		r_ptr->mana = mana;
@@ -7439,7 +7440,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					
 					real_dam = TRUE;
 					
-					/*Hack - handle Wound spell differently */
+					/* Hack - handle Wound spell differently */
 					if ((x == 2) && (i == 20))
 					{
 						if (r_ptr->spell_power > 75) this_dam = 225 + r_ptr->spell_power - 75;
@@ -7472,7 +7473,7 @@ static long eval_max_dam(monster_race *r_ptr)
 						else if (flag_counter == RF6_FORGET) this_dam = rlev / 3;
 						else if (flag_counter == RF6_DISPEL) this_dam = rlev;
 						else if (flag_counter == RF6_ILLUSION) this_dam = rlev;
-						else if (flag_counter == RF6_DRAIN_MANA) this_dam = rlev * 2;
+						else if (flag_counter == RF6_DRAIN_MANA) this_dam = 40 + r_ptr->spell_power; /* Especially dangerous at low levels */
 						else if (flag_counter == RF6_HUNGER) this_dam = rlev;
 						else if (flag_counter == RF6_PROBE) this_dam = rlev / 3;
 						else if (flag_counter == RF6_SCARE) this_dam = rlev;
@@ -7536,7 +7537,7 @@ static long eval_max_dam(monster_race *r_ptr)
 
 			}
 
-			/* Hack - record most damaging spell for diagnostics */
+			/* Hack - record most damaging attack */
 			if (threat_mod(this_dam, r_ptr, TRUE) > r_ptr->highest_threat)
 			{
 				r_ptr->highest_threat = threat_mod(this_dam, r_ptr, TRUE);
@@ -7581,12 +7582,15 @@ static long eval_max_dam(monster_race *r_ptr)
 				}
 #endif
 				/* Adjust frequency for ammo */
-				if (has_ammo * 5 < freq) freq = has_ammo * 5;
+				freq = MIN(freq, has_ammo * 5);
 
-				/* Adjust frequency for mana -- casters that can add mana and need to do so */
-				if ((r_ptr->flags6 & (RF6_ADD_MANA)) && (need_mana) && (freq > r_ptr->mana * 10 / need_mana))
+				/* Adjust frequency for mana -
+				   -- casters that can add mana and need to do so */
+				if ((r_ptr->flags6 & (RF6_ADD_MANA)) 
+					&& need_mana 
+					&& (freq > r_ptr->mana * 10 / need_mana))
 				{
-					freq = MIN(freq, (freq + r_ptr->mana * 10 / need_mana) / 2);
+					freq = (freq + r_ptr->mana * 10 / need_mana) / 2;
 				}
 
 				/* Adjust frequency for mana */
@@ -7609,7 +7613,8 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (this_dam > spell_dam)
 			{
 				spell_dam = this_dam;
-				if (this_dam > 2 * spell_dam) r_ptr->best_spell = 96 + x * 32 + i;
+				if (this_dam > 2 * spell_dam_real) 
+					r_ptr->best_spell = 96 + x * 32 + i;
 			}
 
 			/* Better spell? */
@@ -7640,8 +7645,8 @@ static long eval_max_dam(monster_race *r_ptr)
 
 			/* Multiply average damage by 2 to simplify calculations */
 			atk_dam = eval_blow_effect(effect, 
-												d_dice * (d_side + 1), 
-												r_ptr->level);
+									   d_dice * (d_side + 1), 
+									   r_ptr->level);
 
 			switch (method)
 			{
@@ -7710,7 +7715,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					}
 				}
 
-				/* Hack - record most damaging spell for diagnostics */
+				/* Hack - record most damaging attack */
 				if (threat_mod(atk_dam, r_ptr, TRUE) > r_ptr->highest_threat)
 				{
 					r_ptr->highest_threat = threat_mod(atk_dam, r_ptr, TRUE);
@@ -7819,12 +7824,15 @@ static long eval_max_dam(monster_race *r_ptr)
 				}
 #endif
 				/* Adjust frequency for ammo */
-				if (has_ammo * 5 < freq) freq = has_ammo * 5;
+				freq = MIN(freq, has_ammo * 5);
 
-				/* Adjust frequency for mana -- casters that can add mana and need to do so */
-				if ((r_ptr->flags6 & (RF6_ADD_MANA)) && (mana) && (freq > r_ptr->mana * 10 / mana))
+				/* Adjust frequency for mana 
+				   --- casters that can add mana and need to do so */
+				if ((r_ptr->flags6 & (RF6_ADD_MANA)) 
+					&& mana 
+					&& freq > r_ptr->mana * 10 / mana)
 				{
-					freq = MIN(freq, (freq + r_ptr->mana * 10 / mana) / 2);
+					freq = (freq + r_ptr->mana * 10 / mana) / 2;
 				}
 
 				/* Adjust frequency for mana */
@@ -7858,7 +7866,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			}
 		}
 
-		/* Hack - record most damaging spell for diagnostics */
+		/* Hack - record most damaging attack */
 		if ((threat_mod(melee_dam, r_ptr, FALSE) > r_ptr->highest_threat) && (!(r_ptr->flags1 & (RF1_NEVER_MOVE)) || (r_ptr->flags2 & (RF2_MULTIPLY))))
 		{
 			r_ptr->highest_threat = threat_mod(melee_dam, r_ptr, FALSE);
@@ -8300,7 +8308,7 @@ errr eval_r_power(header *head)
 			if (lvl == 0) r_ptr->mexp = 0L;
 			else
 			{
-				/* Compute depths of non-unique monsters */
+				/* Compute depths and exp of non-unique monsters */
 				if (!(r_ptr->flags1 & (RF1_UNIQUE)))
 				{
 					long mexp = (hp * dam) / 25;
@@ -8317,24 +8325,25 @@ errr eval_r_power(header *head)
 	
 					/* Set level */
 					r_ptr->level = lvl;
-				}
+
+					/* Hack -- for Ungoliant-like monsters */
+					if (hp > 10000) r_ptr->mexp = (hp / 25) * (dam / lvl);
+					else r_ptr->mexp = (hp * dam) / (lvl * 25);
 	
-				/* Hack -- for Ungoliant */
-				if (hp > 10000) r_ptr->mexp = (hp / 25) * (dam / lvl);
-				else r_ptr->mexp = (hp * dam) / (lvl * 25);
-	
-				/* Round to 2 significant figures */
-				if (r_ptr->mexp > 100)
-				{
-					if (r_ptr->mexp < 1000) { r_ptr->mexp = (r_ptr->mexp + 5) / 10; r_ptr->mexp *= 10; }
-					else if (r_ptr->mexp < 10000) { r_ptr->mexp = (r_ptr->mexp + 50) / 100; r_ptr->mexp *= 100; }
-					else if (r_ptr->mexp < 100000) { r_ptr->mexp = (r_ptr->mexp + 500) / 1000; r_ptr->mexp *= 1000; }
-					else if (r_ptr->mexp < 1000000) { r_ptr->mexp = (r_ptr->mexp + 5000) / 10000; r_ptr->mexp *= 10000; }
-					else if (r_ptr->mexp < 10000000) { r_ptr->mexp = (r_ptr->mexp + 50000) / 100000; r_ptr->mexp *= 100000; }
+					/* Round to 2 significant figures */
+					if (r_ptr->mexp > 100)
+					{
+						if (r_ptr->mexp < 1000) { r_ptr->mexp = (r_ptr->mexp + 5) / 10; r_ptr->mexp *= 10; }
+						else if (r_ptr->mexp < 10000) { r_ptr->mexp = (r_ptr->mexp + 50) / 100; r_ptr->mexp *= 100; }
+						else if (r_ptr->mexp < 100000) { r_ptr->mexp = (r_ptr->mexp + 500) / 1000; r_ptr->mexp *= 1000; }
+						else if (r_ptr->mexp < 1000000) { r_ptr->mexp = (r_ptr->mexp + 5000) / 10000; r_ptr->mexp *= 10000; }
+						else if (r_ptr->mexp < 10000000) { r_ptr->mexp = (r_ptr->mexp + 50000) / 100000; r_ptr->mexp *= 100000; }
+					}
 				}
 			}
 	
-			if ((lvl) && (r_ptr->mexp < 1L)) r_ptr->mexp = 1L;
+			if ((lvl) && (r_ptr->mexp < 1L)) 
+				r_ptr->mexp = 1L;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 
 			/*
@@ -9060,7 +9069,6 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	/* Output 'G' for "Graphics" (one line only) */
 	fprintf(fp, "G:%c:%c\n",r_ptr->d_char,color_attr_to_char(r_ptr->d_attr));
 	
-	/* TODO: Enable this when we go to 256 colours to help reduce duplicate monster appearances */
 	/* Show other monsters with same appearance */
 	for (n = 1; n < z_info->r_max; n++)
 	{

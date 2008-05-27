@@ -2560,8 +2560,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			return (TRUE);
 		}
 
-		/* Extract the monster's spell power.  Must be at least 1. */
-		spower = MAX(1, r_ptr->spell_power);
+		/* Extract the monster's spell power. */
+		spower = r_ptr->spell_power;
 
 		/* Monster has cast a spell */
 		m_ptr->mflag &= ~(MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
