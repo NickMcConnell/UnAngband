@@ -3250,7 +3250,8 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 		if (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_SEEN))
 		{
 			/* Find a safe spot to lurk in */
-			if ((get_move_retreat(m_idx, ty, tx)) && !(play_info[*ty][*tx] & (PLAY_SEEN)))
+			if (!(play_info[*ty][*tx] & (PLAY_SEEN))
+				&& get_move_retreat(m_idx, ty, tx))
 			{
 				*fear = TRUE;
 			}
@@ -7750,18 +7751,21 @@ static void recover_monster(int m_idx, bool regen)
 			m_ptr->tim_invis = 0;
 
 			/* And reveal */
-			if (!m_ptr->ml) update_mon(m_idx,FALSE);
-
-			/* Hack --- tell the player if something unhides */
-			if (m_ptr->ml)
+			if (!m_ptr->ml) 
 			{
-				/* Get the monster name */
-				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+				update_mon(m_idx,FALSE);
 
-				msg_format("%^s appears from nowhere.",m_name);
+				/* Hack --- tell the player if something unhides */
+				if (m_ptr->ml)
+				{
+					/* Get the monster name */
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
-				/* Learn about ability -- can be cast on others */
-				if ((r_ptr->flags6 & (RF6_INVIS)) != 0) l_ptr->flags6 |= (RF6_INVIS);
+					msg_format("%^s appears from nowhere.",m_name);
+
+					/* Learn about ability -- can be cast on others */
+					if ((r_ptr->flags6 & (RF6_INVIS)) != 0) l_ptr->flags6 |= (RF6_INVIS);
+				}
 			}
 		}
 	}
