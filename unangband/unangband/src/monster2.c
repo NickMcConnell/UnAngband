@@ -2790,7 +2790,9 @@ int place_monster_here(int y, int x, int r_idx)
 			yi = ddy[d];
 			xi = ddx[d];
 
-			if ((f_info[cave_feat[yi][xi]].flags2 & (FF2_CAN_CLIMB)) != 0) return(MM_CLIMB);
+			if (yi < DUNGEON_HGT && xi < DUNGEON_WID 
+				&& (f_info[cave_feat[yi][xi]].flags2 & (FF2_CAN_CLIMB)) != 0) 
+				return(MM_CLIMB);
 		}
 
 	}
