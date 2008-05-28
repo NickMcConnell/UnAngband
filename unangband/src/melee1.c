@@ -2592,8 +2592,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			return (TRUE);
 		}
 
-		/* Extract the monster's spell power.  Must be at least 1. */
-		spower = MAX(1, r_ptr->spell_power);
+		/* Extract the monster's spell power. */
+		spower = r_ptr->spell_power;
 
 		/* Monster has cast a spell */
 		m_ptr->mflag &= ~(MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH);
@@ -2604,10 +2604,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			/* Not "normal" target */
 			normal = FALSE;
-
-			/* Check "projectable" */
-			direct = ((projectable(m_ptr->fy, m_ptr->fx, y, x, 0)) != PROJECT_NO);
-
 		}
 		else if (target < 0)
 		{
@@ -2616,10 +2612,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			/* Assume "normal" target */
 			normal = TRUE;
-
-			/* Check "projectable" */
-			direct = ((projectable(m_ptr->fy, m_ptr->fx, y, x, 0)) != PROJECT_NO);
-
 		}
 		else
 		{
@@ -2627,10 +2619,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			/* Assume "normal" target */
 			normal = TRUE;
-
-			/* Check "projectable" */
-			direct = ((projectable(m_ptr->fy, m_ptr->fx, y, x, 0)) != PROJECT_NO);
 		}
+
+		/* Check "projectable" */
+		direct = ((projectable(m_ptr->fy, m_ptr->fx, y, x, 0)) != PROJECT_NO);
 
 		/* Attacking itself */
 		if (who == target)
@@ -4392,7 +4384,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target > 0)
 			{
-				if ((known) || (direct)) disturb(1, 0);
+				direct = player_can_see_bold(m_ptr->fy,m_ptr->fx);
+				if (known) disturb(1, 0);
 
 				/* Get the target name (using "A"/"An") again. */
 				monster_desc(t_name, sizeof(t_name), target, 0x08);
@@ -4403,17 +4396,16 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 * If it comes into view from around a corner (unlikely)
 				 * give a message and learn about the casting
 				 */
-				if (!direct && m_ptr->ml)
+				if (!direct 
+					&& player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+					&& m_ptr->ml)
 				{
-					/* Get the target name (using "A"/"An") again. */
-					monster_desc(t_name, sizeof(t_name), target, 0x08);
-										
 					seen = TRUE;
 					msg_format("%^s blinks into view.", t_nref);
 				}
 
 				/* Normal message */
-				else if (direct)
+				else if (known && !m_ptr->ml)
 				{
 					msg_format("%^s blinks away.", t_nref);
 				}
@@ -4432,7 +4424,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target > 0)
 			{
-				if ((known) || (direct)) disturb(1, 0);
+				direct = player_can_see_bold(m_ptr->fy,m_ptr->fx);
+				if (known) disturb(1, 0);
 
 				/* Get the target name (using "A"/"An") again. */
 				monster_desc(t_name, sizeof(t_name), target, 0x08);
@@ -4443,17 +4436,16 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 * If it comes into view from around a corner (unlikely)
 				 * give a message and learn about the casting
 				 */
-				if (!direct && m_ptr->ml)
+				if (!direct 
+					&& player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+					&& m_ptr->ml)
 				{
-					/* Get the target name (using "A"/"An") again. */
-					monster_desc(t_name, sizeof(t_name), target, 0x08);
-
 					seen = TRUE;
 					msg_format("%^s teleports into view.", t_nref);
 				}
 
 				/* Normal message */
-				else if (direct)
+				else if (known && !m_ptr->ml)
 				{
 					msg_format("%^s teleports away.", t_nref);
 				}

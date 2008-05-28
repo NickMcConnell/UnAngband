@@ -4346,7 +4346,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Get the target name (using "A"/"An") again. */
 				monster_desc(t_name, sizeof(t_name), target, 0x08);
 
-				teleport_away(target, 100);
+				teleport_away(target, 10);
 
 				/*
 				 * If it comes into view from around a corner (unlikely)

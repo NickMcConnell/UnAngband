@@ -6878,8 +6878,11 @@ s32b object_power(const object_type *o_ptr)
 			p += o_ptr->pval * o_ptr->pval;
 		}
 	}
-
-	else if (o_ptr->pval < 0)	/* hack: don't give large negatives */
+	/* Hack: don't give large negatives.
+	   Also, don't penalize for pval less than k_ptr->pval,
+	   so that default pvals are no lowered to decrease power
+	   and we may end with the boring 0 pval */
+	else if (o_ptr->pval < 0)
 	{
 		if (f1 & TR1_STR) p += 4 * o_ptr->pval;
 		if (f1 & TR1_INT) p += 2 * o_ptr->pval;

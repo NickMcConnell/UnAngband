@@ -151,7 +151,7 @@ bool require_torch_lit(int y, int x)
 bool has_torch_lit(int y, int x)
 {
 	/* No monster, no torch lite */
-	if (!cave_m_idx[y][x]) return FALSE;
+	if (cave_m_idx[y][x] <= 0) return FALSE;
 	
 	/* Check monster lite */
 	if (check_monster_lite(cave_m_idx[y][x])) return TRUE;
@@ -2831,7 +2831,9 @@ int place_monster_here(int y, int x, int r_idx)
 			yi = ddy[d];
 			xi = ddx[d];
 
-			if ((f_info[cave_feat[yi][xi]].flags2 & (FF2_CAN_CLIMB)) != 0) return(MM_CLIMB);
+			if (in_bounds(yi, xi) 
+				&& (f_info[cave_feat[yi][xi]].flags2 & (FF2_CAN_CLIMB)) != 0) 
+				return(MM_CLIMB);
 		}
 
 	}
