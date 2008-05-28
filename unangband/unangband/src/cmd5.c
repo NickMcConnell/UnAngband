@@ -110,6 +110,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 	{
 		object_type object_type_body;
 		object_type *j_ptr = &object_type_body;
+		(void)WIPE(j_ptr, object_type);
 
 		j_ptr->tval = o_ptr->xtra1;
 		j_ptr->sval = o_ptr->xtra2;
