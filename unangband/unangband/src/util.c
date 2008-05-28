@@ -3151,7 +3151,7 @@ void text_out_to_screen(byte a, cptr str)
 	if ((text_out_wrap > 0) && (text_out_wrap < wid))
 		wrap = text_out_wrap;
 	else
-		wrap = wid;
+		wrap = wid - 1;
 
 	/* Process the string */
 	for (s = str; *s; s++)
@@ -3214,8 +3214,9 @@ void text_out_to_screen(byte a, cptr str)
 			/* Clear line, move cursor */
 			Term_erase(x, y, 255);
 
-			/* Ident after the wrap */
-			Term_addch(av[n], ' ');
+			/* Indent after the wrap */
+			Term_addch(TERM_DARK, ' ');
+			x++;
 
 			/* Wrap the word (if any) */
 			for (i = n; i < wrap - 1; i++)
