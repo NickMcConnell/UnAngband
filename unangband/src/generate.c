@@ -118,15 +118,15 @@
 #define DUN_SPECIAL    	3       /* Chance in 100 of having a special dungeon */
 
 #define SPECIAL_EERIE		1		/* Islands of rock over a chasm */
-#define SPECIAL_GREAT_HALL	2		/* An open area with large square pillars */
-#define SPECIAL_GREAT_CAVE	3		/* An open area with large natural pillars */
+#define SPECIAL_GREAT_HALL	2		/* An open area with large square pillars & rooms */
+#define SPECIAL_GREAT_CAVE	3		/* An open area with large natural pillars & rooms */
 #define SPECIAL_CHAMBERS	4		/* Chambers over whole level */
 #define SPECIAL_STARBURST	5		/* Starburst over whole level */
 #define SPECIAL_LABYRINTH	6		/* Maze over whole level */
-#define SPECIAL_GREAT_MAZE	7		/* Maze connecting chambers */
+#define SPECIAL_GREAT_PILLARS	7	/* An open area with large square pillars */
 #define SPECIAL_ISLANDS		8		/* Islands of terrain in a sea */
 
-#define MAX_SPECIAL_DUNGEONS	5
+#define MAX_SPECIAL_DUNGEONS	9
 
 /*
  * Dungeon tunnel generation values
@@ -1420,7 +1420,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 					if (((x < xdim - 1) || (width_outer)) && (cave_feat[j + width_path / 2][i + width_path] == feat_path)) dir[dirs++] = 4;
 
 					/* Dead end */
-					if ((dirs == 1) && (!rand_int(++k)))
+					if ((dirs == 1) && (one_in_(++k)))
 					{
 						ty = y;
 						tx = x;
@@ -1448,7 +1448,6 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			if (!k) break;
 			
 			/* Convert coordinates */
-			/* FIXME: ty and tx may probably be 0 here from initialization, is it correct? */
 			y = ty;
 			x = tx;
 			j = YPOS(y, y1);
@@ -1458,7 +1457,6 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 			if (loops)
 			{
 				/* Place floors */
-			        /* FIXME: dy and dx may probably be 0 here from initialization, is it correct? */
 				for (yi = j - (dy < 0 ? width_wall + width_path : 0); yi < j + (dy < 0 ? 0 : width_path) + (dy > 0 ? width_wall + width_path : 0); yi++)
 				{
 					for (xi = i - (dx < 0 ? width_wall + width_path : 0); xi < i + (dx < 0 ? 0 : width_path) + (dx > 0 ? width_wall + width_path : 0); xi++)
@@ -3133,6 +3131,24 @@ static bool cave_feat_pool(int f_idx)
 
 	/* Hack -- Ignore solid features */
 	if ((f_ptr->flags1 & (FF1_MOVE)) == 0)
+	{
+		return (FALSE);
+	}
+
+	/* All remaining lake features will be fine */
+	return (cave_feat_lake(f_idx));
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid island feature
+ */
+static bool cave_feat_island(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Hack -- Ignore damaging features */
+	if ((f_ptr->blow.effect) == 0)
 	{
 		return (FALSE);
 	}
@@ -8750,6 +8766,7 @@ static bool build_type7(int room, int type)
 	int y1, x1, y2, x2;
 	int size_mod = 0;
 	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
+	bool spaced = (flooded) || (dun->special == SPECIAL_EERIE) || (dun->special == SPECIAL_ISLANDS);
 
 	/* Deeper in the dungeon, chambers are less likely to be lit. */
 	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
@@ -8763,7 +8780,7 @@ static bool build_type7(int room, int type)
 	width = BLOCK_WID * (size_mod + rand_int(3));
 
 	/* Calculate additional space for moat */
-	if (flooded)
+	if (spaced)
 	{
 		height += 2 * BLOCK_HGT;
 		width += 2 * BLOCK_WID;
@@ -8773,7 +8790,7 @@ static bool build_type7(int room, int type)
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
 	/* Calculate original room size */
-	if (flooded)
+	if (spaced)
 	{
 		height -= 2 * BLOCK_HGT;
 		width -= 2 * BLOCK_WID;
@@ -8792,8 +8809,10 @@ static bool build_type7(int room, int type)
 	build_chambers(y1, x1, y2, x2, 30, light);
 
 	/* Handle flooding */
-	if (flooded)
+	if (spaced)
 	{
+		int moat = flooded ? dun->flood_feat : pick_proper_feature(cave_feat_island); 
+		
 		/* Grow the moat around the chambers */
 		y1 = MAX(y1 - BLOCK_HGT, 1);
 		x1 = MAX(x1 - BLOCK_WID, 1);
@@ -8801,7 +8820,7 @@ static bool build_type7(int room, int type)
 		x2 = MIN(x2 + BLOCK_WID, DUNGEON_WID  - 2);
 
 		/* Place the moat */
-		generate_starburst_room(y1, x1, y2, x2, dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
+		generate_starburst_room(y1, x1, y2, x2, moat, f_info[moat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
 			
 		/* Hack -- 'room' part is not flooded */
 		room_info[room].flags &= ~(ROOM_FLOODED);
@@ -8831,8 +8850,8 @@ static bool build_type8910(int room, int type)
 	int limit = 0;
 	int height, width;
 
-	/* Hack -- no interesting rooms in flooded dungeon */
-	if (type == ROOM_INTERESTING) room_info[room].flags &= ~(ROOM_FLOODED);
+	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
+	bool spaced = (flooded) || (dun->special == SPECIAL_EERIE) || (dun->special == SPECIAL_ISLANDS);
 
 	/* Pick a lesser vault */
 	while (TRUE)
@@ -8852,7 +8871,7 @@ static bool build_type8910(int room, int type)
 	width = v_ptr->wid;
 
 	/* Calculate additional space for moat */
-	if ((room_info[room].flags & (ROOM_FLOODED)) != 0)
+	if (spaced)
 	{
 		height += 2 * BLOCK_HGT;
 		width += 2 * BLOCK_WID;
@@ -8871,8 +8890,10 @@ static bool build_type8910(int room, int type)
 	build_vault(room, y0, x0, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
 	/* Handle flooding */
-	if (room_info[room].flags & (ROOM_FLOODED))
+	if (spaced)
 	{
+		int moat = flooded ? dun->flood_feat : pick_proper_feature(cave_feat_island); 
+		
 		/* Grow the moat around the chambers */
 		int y1 = MAX(y0 - height / 2, 1);
 		int x1 = MAX(x0 - width / 2, 1);
@@ -8880,7 +8901,7 @@ static bool build_type8910(int room, int type)
 		int x2 = MIN(x0 + (width + 1) / 2, DUNGEON_WID  - 2);
 
 		/* Place the moat */
-		generate_starburst_room(y1, x1, y2, x2, dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);			
+		generate_starburst_room(y1, x1, y2, x2, moat, f_info[moat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);			
 
 		/* Hack -- 'room' part is not flooded */
 		room_info[room].flags &= ~(ROOM_FLOODED);
@@ -9053,6 +9074,7 @@ static bool build_type171819(int room, int type)
 	
 	int pool = 0;
 	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
+	bool spaced = flooded || (dun->special == SPECIAL_EERIE) || (dun->special == SPECIAL_ISLANDS);
 	
 	/* Maze flags */
 	u32b maze_flags = (MAZE_OUTER_N | MAZE_OUTER_S | MAZE_OUTER_E | MAZE_OUTER_W | MAZE_WALL | MAZE_ROOM | MAZE_FILL);
@@ -9116,8 +9138,8 @@ static bool build_type171819(int room, int type)
 	height = (ydim * width_path) + ((ydim - 1) * width_wall) + 2;
 	width = (xdim * width_path) + ((xdim - 1) * width_wall) + 2;
 	
-	/* Calculate additional space for moat */
-	if (flooded)
+	/* Calculate additional space for moat / around islands etc */
+	if (spaced)
 	{
 		height += 2 * BLOCK_HGT;
 		width += 2 * BLOCK_WID;
@@ -9127,7 +9149,7 @@ static bool build_type171819(int room, int type)
 	if (!find_space(&y0, &x0, height, width)) return (FALSE);
 
 	/* Calculate original room size */
-	if (flooded)
+	if (spaced)
 	{
 		height -= 2 * BLOCK_HGT;
 		width -= 2 * BLOCK_WID;
@@ -9163,8 +9185,10 @@ static bool build_type171819(int room, int type)
 	if (draw_maze(y1, x1, y2, x2, FEAT_WALL_OUTER, FEAT_FLOOR, width_wall, width_path, pool, maze_flags))
 	{		
 		/* Handle flooding */
-		if (flooded)
+		if (spaced)
 		{
+			int moat = flooded ? dun->flood_feat : pick_proper_feature(cave_feat_island); 
+			
 			/* Grow the moat around the chambers */
 			y1 = MAX(y1 - BLOCK_HGT, 1);
 			x1 = MAX(x1 - BLOCK_WID, 1);
@@ -9172,7 +9196,7 @@ static bool build_type171819(int room, int type)
 			x2 = MIN(x2 + BLOCK_WID, DUNGEON_WID  - 2);
 	
 			/* Place the moat */
-			generate_starburst_room(y1, x1, y2, x2, dun->flood_feat, f_info[dun->flood_feat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
+			generate_starburst_room(y1, x1, y2, x2, moat, f_info[moat].edge, STAR_BURST_RAW_EDGE | STAR_BURST_MOAT);
 		}
 	
 		/* Set the vault / interesting room flags */
@@ -10935,7 +10959,7 @@ static bool cave_gen(void)
 
 	/* Various special level types. Only deep in dungeon */
 	if (((level_flag & (LF1_TOWER | LF1_SURFACE)) == 0) && 
-		(rand_int(100) < DUN_SPECIAL))
+		(rand_int(3/* 100 */) < DUN_SPECIAL))
 	{
 		dun->special = randint(MAX_SPECIAL_DUNGEONS);
 
@@ -10947,11 +10971,14 @@ static bool cave_gen(void)
 				base = FEAT_CHASM;
 				level_flag |= (LF1_WILD);
 				break;
+			case SPECIAL_GREAT_PILLARS:
+				level_flag &= ~(LF1_ROOMS);
 			case SPECIAL_GREAT_HALL:
 			case SPECIAL_GREAT_CAVE:
 				if (f_info[zone->fill].flags1 & (FF1_FLOOR)) base = zone->fill;
 				else base = FEAT_FLOOR;
 				level_flag |= (LF1_WILD);
+				level_flag &= ~(LF1_TUNNELS);
 				break;
 			case SPECIAL_STARBURST:
 				base = f_info[zone->fill].flags1 & (FF1_WALL) ? zone->fill : FEAT_WALL_EXTRA;
@@ -11036,17 +11063,104 @@ static bool cave_gen(void)
 		switch(dun->special)
 		{
 			case SPECIAL_EERIE:
+			{
 				/* Place islands of rock later */
 				break;
+			}
+			case SPECIAL_GREAT_PILLARS:
 			case SPECIAL_GREAT_HALL:
 			case SPECIAL_GREAT_CAVE:
-				/* Place pillars later */
+			{
+				int w = dun->special == SPECIAL_GREAT_PILLARS ? 1 : rand_int(2) + 1;
+				int w1 = dun->special == SPECIAL_GREAT_PILLARS ? 1 : rand_int(2) + 2;
+				
+				/* Place pillars */
+				for (by = 1; by < dun->row_rooms; by += dun->special == SPECIAL_GREAT_PILLARS ? 1 : 3)
+				{
+					for (bx = w; bx < dun->col_rooms; dun->special == w1)
+					{
+						if (dun->room_map[by][bx]) continue;
+						
+						dun->room_map[by][bx] = TRUE;
+						
+						switch(dun->special)
+						{
+							/* 7x7 pillars with corner cut */
+							case SPECIAL_GREAT_PILLARS:
+							case SPECIAL_GREAT_HALL:
+							{
+								for (y = 2; y < BLOCK_HGT - 2; y++)
+								{
+									for (x = 2; x < BLOCK_WID - 2; x++)
+									{
+										if (((y == 2) || (y == BLOCK_HGT - 3)) &&
+												((x == 2) || (x == BLOCK_HGT - 3))) continue;
+										
+										/* Draw pillar */
+										cave_set_feat(by * BLOCK_HGT + y, bx * BLOCK_WID + x, FEAT_WALL_EXTRA);
+									}
+								}
+								break;
+							}
+							/* Fractl 9x9 pillars */
+							case SPECIAL_GREAT_CAVE:
+							{
+								fractal_map map;
+								fractal_template *t_ptr;
+
+								/* Choose a template for the pool */
+								while (TRUE)
+								{
+									/* Pick a random template */
+									int which = rand_int(N_ELEMENTS(fractal_repository));
+
+									t_ptr = &fractal_repository[which];
+
+									/* Found the desired template type? */
+									if (t_ptr->type == FRACTAL_TYPE_9x9) break;
+								}
+
+								/* Create and reset the fractal map */
+								map = fractal_map_create(t_ptr);
+
+								/* Complete the map */
+								fractal_map_complete(map, t_ptr);
+
+								/* Copy the map into the dungeon */
+								for (y = 0; y < 9; y++)
+								{
+									for (x = 0; x < 9; x++)
+									{
+										/* Translate map coordinates to dungeon coordinates */
+										int yy = by * BLOCK_HGT + 1 + y;
+										int xx = bx * BLOCK_WID + 1 + x;
+
+										/* Ignore non-floors grid types in the map */
+										if (map[y][x] != FRACTAL_FLOOR) continue;
+
+										/* Ignore annoying locations */
+										if (!in_bounds_fully(yy, xx)) continue;
+
+										/* Set the feature */
+										cave_set_feat(yy, xx, FEAT_WALL_EXTRA);
+									}
+								}
+
+								/* Free resources */
+								FREE(map);
+
+								break;
+							}
+						}
+					}
+				}
 				break;
+			}				
 			case SPECIAL_STARBURST:
 				if (cheat_room) message_add("Building star burst level.", MSG_GENERIC);
 				if (!generate_starburst_room(4, 4, DUNGEON_HGT - 4, DUNGEON_WID - 4,
-											 (f_info[zone->fill].flags1 & (FF1_WALL)) == 0 ? zone->fill : FEAT_FLOOR,
-											 f_info[zone->fill].edge, (STAR_BURST_RAW_FLOOR | STAR_BURST_RAW_EDGE))) return (FALSE);
+					(f_info[zone->fill].flags1 & (FF1_WALL)) == 0 ? zone->fill : FEAT_FLOOR,
+						f_info[zone->fill].edge, (STAR_BURST_RAW_FLOOR | STAR_BURST_RAW_EDGE))) return (FALSE);
 				break;
 			case SPECIAL_CHAMBERS:
 				if (cheat_room) message_add("Building chambers level.", MSG_GENERIC);
@@ -11058,10 +11172,10 @@ static bool cave_gen(void)
 				int ydim, xdim;
 				int height = DUNGEON_HGT - 2;
 				int width = DUNGEON_WID - 2;
-				u32b maze_flags = 0L;
+				u32b maze_flags = (MAZE_DEAD) | (zone->fill ? (MAZE_POOL) : (0L));
 				
 				/* Choose path and wall width */
-				width_wall = rand_int(9) / 3 + 1;
+				width_wall = rand_int(9) / 3 + 2;
 				width_path = rand_int(15) / 6 + 1;
 
 				/* Ensure bigger paths on stronghold levels. This allows these corridors to connect correctly to the maze. */
@@ -11091,11 +11205,12 @@ static bool cave_gen(void)
 				if (xdim < 3) xdim = 3;	
 				
 				/* Recalculate height and width based on maze size */
-				height = (ydim * width_path) + ((ydim - 1) * width_wall) + 2;
-				width = (xdim * width_path) + ((xdim - 1) * width_wall) + 2;
+				height = (ydim * width_path) + ((ydim - 1) * width_wall);
+				width = (xdim * width_path) + ((xdim - 1) * width_wall);
 								
-				if (!draw_maze(1, 1, height + 1, width + 1, FEAT_WALL_EXTRA,
-				    FEAT_FLOOR, width_wall, width_path, zone->fill,maze_flags)) return (FALSE);
+				if (!draw_maze((DUNGEON_HGT - height) / 2, (DUNGEON_WID - width) / 2,
+						(DUNGEON_HGT - height) / 2 + height, (DUNGEON_WID - width) / 2 + width, FEAT_WALL_EXTRA,
+				    FEAT_FLOOR, width_wall, width_path, zone->fill, maze_flags)) return (FALSE);
 				break;
 			}
 			case SPECIAL_ISLANDS:
@@ -11169,7 +11284,7 @@ static bool cave_gen(void)
 
 	/* Destroy the level if necessary */
 	if ((level_flag & (LF1_DESTROYED)) != 0) destroy_level();
-
+	
 	/* Build streamers and entrance markings in caves */
 	place_decorations();
 
