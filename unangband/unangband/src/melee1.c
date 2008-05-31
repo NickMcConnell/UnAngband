@@ -2496,7 +2496,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		monster_desc(m_poss, sizeof(m_poss), who, 0x22);
 
 		/* Extract the "see-able-ness" */
-		seen = (!blind && m_ptr->ml);
+		seen = !blind && m_ptr->ml;
 
 		/* Extract the monster level.  Must be at least 1. */
 		rlev = MAX(1, r_ptr->level);
@@ -2552,7 +2552,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		else if (m_ptr->mflag & (MFLAG_SMART)) failrate /= 2;
 
 		/* Check for spell failure (breath/shot attacks never fail) */
-		if ((attack >= 128) && (rand_int(100) < failrate) && ((m_ptr->mflag != (MFLAG_ALLY)) == 0))
+		if (attack >= 128 
+			&& rand_int(100) < failrate 
+			&& !(m_ptr->mflag & MFLAG_ALLY))
 		{
 			/* Message */
 			msg_format("%^s tries to cast a spell, but fails.", m_name);
@@ -2617,7 +2619,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/*** Execute the ranged attack chosen. ***/
 	switch (attack)
 	{
-
 		/* RF4_BLOW_1 */
 		/* RF4_BLOW_2 */
 		/* RF4_BLOW_3 */
@@ -4340,12 +4341,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target > 0)
 			{
-				direct = player_can_see_bold(m_ptr->fy,m_ptr->fx);
+				direct = !blind && player_can_see_bold(m_ptr->fy,m_ptr->fx);
 				if (known) disturb(1, 0);
 
 				/* Get the target name (using "A"/"An") again. */
 				monster_desc(t_name, sizeof(t_name), target, 0x08);
 
+				/* Move monster (also updates "m_ptr->ml"). */
 				teleport_away(target, 10);
 
 				/*
@@ -4353,10 +4355,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 * give a message and learn about the casting
 				 */
 				if (!direct 
-					&& player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx) 
 					&& m_ptr->ml)
 				{
-					seen = TRUE;
 					msg_format("%^s blinks into view.", t_nref);
 				}
 
@@ -4371,6 +4372,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					msg_format("%^s blinks.", t_nref);
 				}
+
+				/* Add to the "see-able-ness" after teleport*/
+				seen = seen || (!blind && m_ptr->ml);
 			}
 			break;
 		}
@@ -4380,12 +4384,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target > 0)
 			{
-				direct = player_can_see_bold(m_ptr->fy,m_ptr->fx);
+				direct = !blind && player_can_see_bold(m_ptr->fy,m_ptr->fx);
 				if (known) disturb(1, 0);
 
 				/* Get the target name (using "A"/"An") again. */
 				monster_desc(t_name, sizeof(t_name), target, 0x08);
 
+				/* Move monster (also updates "m_ptr->ml"). */
 				teleport_away(target, MAX_SIGHT * 2 + 5);
 
 				/*
@@ -4393,10 +4398,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 * give a message and learn about the casting
 				 */
 				if (!direct 
-					&& player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx) 
 					&& m_ptr->ml)
 				{
-					seen = TRUE;
 					msg_format("%^s teleports into view.", t_nref);
 				}
 
@@ -4411,6 +4415,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					msg_format("%^s teleports.", t_nref);
 				}
+
+				/* Add to the "see-able-ness" after teleport*/
+				seen = seen || (!blind && m_ptr->ml);
 			}
 			break;
 		}
@@ -4458,11 +4465,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				int old_cdis = m_ptr->cdis;
 
+				direct = !blind && player_can_see_bold(m_ptr->fy,m_ptr->fx);
+
 				/* Move monster near player (also updates "m_ptr->ml"). */
 				teleport_towards(m_ptr->fy, m_ptr->fx, y, x);
 
-				/* Monster is now visible, but wasn't before. */
-				if ((!seen) && (m_ptr->ml))
+				/* Monster is now directly visible, but wasn't before. */
+				if (!direct
+					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+					&& m_ptr->ml)
 				{
 					/* Get the name (using "A"/"An") again. */
 					monster_desc(m_name, sizeof(m_name), who > SOURCE_MONSTER_START ? who : what, 0x08);
@@ -4472,16 +4483,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Monster was visible before, but isn't now. */
-				else if ((seen) && (!m_ptr->ml))
+				else if (seen && !m_ptr->ml)
 				{
 					/* Message */
 					msg_format("%^s blinks away.", m_name);
 				}
 
 				/* Monster is visible both before and after. */
-				else if ((seen) && (m_ptr->ml))
+				else if (seen && m_ptr->ml)
 				{
-					if (distance(m_ptr->fy, m_ptr->fx, p_ptr->py, p_ptr->px) < (old_cdis - 1))
+					if (player_can_see_bold(m_ptr->fy, m_ptr->fx)
+						&& (distance(m_ptr->fy, m_ptr->fx, p_ptr->py, p_ptr->px)
+							< (old_cdis - 1)))
 					{
 						msg_format("%^s blinks toward you.", m_name);
 					}
@@ -4490,10 +4503,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_format("%^s blinks.", m_name);
 					}
 				}
-
-				/* Have we seen them at any point?  If so, we will learn about the spell. */
-				if (m_ptr->ml) seen = TRUE;
 			}
+
+			/* Add to the "see-able-ness" after teleport*/
+			seen = seen || (!blind && m_ptr->ml);
 
 			break;
 		}
@@ -6490,7 +6503,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Monster updates */
-	if (who > SOURCE_MONSTER_START)
+	if (who >= SOURCE_MONSTER_START)
 	{
 		/* Mark minimum desired range for recalculation */
 		m_ptr->min_range = 0;

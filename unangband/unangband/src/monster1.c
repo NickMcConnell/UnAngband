@@ -353,12 +353,12 @@ static void describe_monster_spells(const monster_race *r_ptr, const monster_lor
 	if (l_ptr->flags6 & RF6_CURE)        vp[vn++] = "cure-self";
 	if (l_ptr->flags6 & RF6_BLINK)       vp[vn++] = "blink-self";
 	if (l_ptr->flags6 & RF6_TPORT)       vp[vn++] = "teleport-self";
-	if (l_ptr->flags6 & RF6_INVIS)       vp[vn++] = "become invisible";
+	if (l_ptr->flags6 & RF6_INVIS)       vp[vn++] = "give invisibility";
 	if (l_ptr->flags6 & RF6_TELE_SELF_TO)vp[vn++] = "teleport-self to";
 	if (l_ptr->flags6 & RF6_TELE_TO)     vp[vn++] = "teleport to";
 	if (l_ptr->flags6 & RF6_TELE_AWAY)   vp[vn++] = "teleport away";
 	if (l_ptr->flags6 & RF6_TELE_LEVEL)  vp[vn++] = "push through floor or ceiling";
-	if (l_ptr->flags6 & RF6_WRAITHFORM)  vp[vn++] = "assume wraithform";
+	if (l_ptr->flags6 & RF6_WRAITHFORM)  vp[vn++] = "incur wraithform";
 	if (l_ptr->flags6 & RF6_DARKNESS)    vp[vn++] = "create darkness";
 	if (l_ptr->flags6 & RF6_TRAPS)       vp[vn++] = "create traps";
 	if (l_ptr->flags6 & RF6_DRAIN_MANA)  vp[vn++] = "drain mana";
@@ -366,10 +366,10 @@ static void describe_monster_spells(const monster_race *r_ptr, const monster_lor
 	if (l_ptr->flags6 & RF6_DISPEL)    vp[vn++] = "dispel enchantments on you";
 	if (l_ptr->flags6 & RF6_MIND_BLAST)  vp[vn++] = "cause mind blasting";
 	if (l_ptr->flags6 & RF6_WOUND)       vp[vn++] = "cause wounds";
-	if (l_ptr->flags6 & RF6_BLESS)       vp[vn++] = "become heroic";
-	if (l_ptr->flags6 & RF6_BERSERK)      vp[vn++] = "become beserk";
+	if (l_ptr->flags6 & RF6_BLESS)       vp[vn++] = "incur heroism";
+	if (l_ptr->flags6 & RF6_BERSERK)     vp[vn++] = "incur beserk rage";
 	if (l_ptr->flags6 & RF6_SHIELD)      vp[vn++] = "create a shield";
-	if (l_ptr->flags6 & RF6_OPPOSE_ELEM) vp[vn++] = "become resistant to the elements";
+	if (l_ptr->flags6 & RF6_OPPOSE_ELEM) vp[vn++] = "give resistance to the elements";
 	if (l_ptr->flags6 & RF6_HUNGER)      vp[vn++] = "cause hunger";
 	if (l_ptr->flags6 & RF6_PROBE)       vp[vn++] = "probe your weaknesses";
 
@@ -747,7 +747,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_EXPLODE: p = "explode"; break;
 			case RBM_ARROW:	p = "shoot you with a bow"; break;
 			case RBM_XBOLT:	p = "shoot you with a crossbow"; break;
-			case RBM_DAGGER:	p = "throws a dagger at you"; break;
+			case RBM_DAGGER:	p = "throw a dagger at you"; break;
 			case RBM_DART:	p = "shoot you with a dart"; break;
 			case RBM_SHOT:	p = "sling a shot at you"; break;
 			case RBM_ARC_20:	p = "create a 20 degree arc"; break;
