@@ -3961,7 +3961,7 @@ errr file_character(cptr name, bool full)
 			text_out(format("%c) %s\n", index_to_label(i), o_name));
 
 			/* Describe random object attributes */
-			identify_random_gen(&inventory[i]);
+/*			identify_random_gen(&inventory[i]); */
 		}
 
 		text_out("\n");
@@ -3983,7 +3983,7 @@ errr file_character(cptr name, bool full)
 			text_out(format("%c) %s\n", index_to_label(i), o_name));
 
 			/* Describe random object attributes */
-			identify_random_gen(&inventory[i]);
+/*			identify_random_gen(&inventory[i]);*/
 		}
 
 		text_out("\n");
@@ -4009,7 +4009,7 @@ errr file_character(cptr name, bool full)
 		}
 		else
 			/* Describe random object attributes */
-			identify_random_gen(&inventory[i]);
+			1;/*			identify_random_gen(&inventory[i]);*/
 	}
 
 	text_out("\n");
@@ -4037,7 +4037,7 @@ errr file_character(cptr name, bool full)
 			}
 			else
 				/* Describe random object attributes */
-				identify_random_gen(&st_ptr->stock[i]);
+				1;/*				identify_random_gen(&st_ptr->stock[i]);*/
 		}
 
 		/* Add an empty line */
@@ -4072,7 +4072,7 @@ errr file_character(cptr name, bool full)
 			}
 			else
 				/* Describe random object attributes */
-				identify_random_gen(&st_ptr->stock[i]);
+				1;/*				identify_random_gen(&st_ptr->stock[i]);*/
 		}
 
 		/* Add an empty line */
