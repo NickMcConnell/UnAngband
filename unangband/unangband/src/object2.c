@@ -4842,7 +4842,6 @@ static void name_drop(object_type *j_ptr)
  */
 static bool kind_is_shroom(int k_idx)
 {
-
 	object_kind *k_ptr = &k_info[k_idx];
 
 	if (k_ptr->tval != TV_FOOD) return (FALSE);
@@ -4850,7 +4849,6 @@ static bool kind_is_shroom(int k_idx)
 	if (k_ptr->sval >= SV_FOOD_MIN_FOOD) return (FALSE);
 
 	return (TRUE);
-
 }
 
 /*

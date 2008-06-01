@@ -2561,7 +2561,7 @@
  * Special "sval" limit -- maximum number of bags
  */
 #define SV_BAG_MAX_BAGS		24
-
+#define SV_BAG_HARMFUL_MUSHROOMS 1
 
 /*
  * Special "sval" value -- unknown "sval"

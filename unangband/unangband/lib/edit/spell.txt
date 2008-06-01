@@ -3851,7 +3851,7 @@ B:SELF:LOSE_INT
 B:SELF:FORGET
 F:DEC_EXP |
 S:CURE_DISEASE:15
-D:You feel your memories fade.
+D:You see darkness engulfing your mind.
 
 N:289:Ruination
 A:75:15:1
