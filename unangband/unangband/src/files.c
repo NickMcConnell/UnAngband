@@ -3753,6 +3753,10 @@ errr file_character(cptr name, bool full)
 
 	int day = bst(DAY, turn);
 
+	bool bags_listed[SV_BAG_MAX_BAGS];
+
+	(void)C_WIPE(bags_listed, SV_BAG_MAX_BAGS, bool);
+
 	/* Format time of the day */
 	strnfmt(buf2, 20, get_day(bst(YEAR, turn) + START_YEAR));
 
@@ -3994,8 +3998,18 @@ errr file_character(cptr name, bool full)
 		object_desc(o_name, sizeof(o_name), &inventory[i], TRUE, 3);
 		text_out(format("%c) %s\n", index_to_label(i), o_name));
 
-		/* Describe random object attributes */
-		identify_random_gen(&inventory[i]);
+		if (inventory[i].tval == TV_BAG)
+		{
+			if (!bags_listed[inventory[i].sval])
+			{
+				/* List the bag contents only once */
+				identify_random_gen(&inventory[i]);
+				bags_listed[inventory[i].sval] = TRUE;
+			}
+		}
+		else
+			/* Describe random object attributes */
+			identify_random_gen(&inventory[i]);
 	}
 
 	text_out("\n");
@@ -4012,8 +4026,18 @@ errr file_character(cptr name, bool full)
 			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
 			text_out(format("%c) %s\n", I2A(i), o_name));
 
-			/* Describe random object attributes */
-			identify_random_gen(&st_ptr->stock[i]);
+			if (st_ptr->stock[i].tval == TV_BAG)
+			{
+				if (!bags_listed[st_ptr->stock[i].sval])
+				{
+					/* List the bag contents only once */
+					identify_random_gen(&st_ptr->stock[i]);
+					bags_listed[st_ptr->stock[i].sval] = TRUE;
+				}
+			}
+			else
+				/* Describe random object attributes */
+				identify_random_gen(&st_ptr->stock[i]);
 		}
 
 		/* Add an empty line */
@@ -4036,9 +4060,19 @@ errr file_character(cptr name, bool full)
 		{
 			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
 			text_out(format("%c) %s\n", I2A(i), o_name));
-
-			/* Describe random object attributes */
-			identify_random_gen(&st_ptr->stock[i]);
+			
+			if (st_ptr->stock[i].tval == TV_BAG)
+			{
+				if (!bags_listed[st_ptr->stock[i].sval])
+				{
+					/* List the bag contents only once */
+					identify_random_gen(&st_ptr->stock[i]);
+					bags_listed[st_ptr->stock[i].sval] = TRUE;
+				}
+			}
+			else
+				/* Describe random object attributes */
+				identify_random_gen(&st_ptr->stock[i]);
 		}
 
 		/* Add an empty line */
