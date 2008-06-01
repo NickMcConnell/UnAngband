@@ -10798,8 +10798,22 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 		case GF_LOSE_CON:
 		{
-			/* Take damage */
-			take_hit(who, what, dam);
+			/* Heal the player if undead, but affect CON */
+			if (p_ptr->cur_flags4 & (TR4_UNDEAD))
+			{
+				obvious = hp_player(dam);
+
+				/* Always notice */
+				if (obvious) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+
+				dam = 0;
+			}
+			else
+			{
+				/* Take damage */
+				take_hit(who, what, dam);
+				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+			}
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_CON)))

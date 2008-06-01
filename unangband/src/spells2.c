@@ -7274,18 +7274,29 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags3 & (SF3_DEC_EXP))
 	{
-		if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) || !p_ptr->blessed || (p_ptr->exp == 0))
+		/* Undead races are healed instead */
+		if (p_ptr->cur_flags4 & TR4_UNDEAD
+			&& !p_ptr->blessed)
 		{
-			/* Always notice */
-			if (!p_ptr->blessed && (p_ptr->exp > 0)) equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+			obvious = hp_player(300);
+
+			equip_can_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
-		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
+		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0
+				 || p_ptr->blessed 
+				 || p_ptr->exp == 0)
+		{
+			if (!p_ptr->blessed && p_ptr->exp > 0) 
+				equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+			equip_not_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
+		}
+		else
 		{
 			lose_exp(p_ptr->exp / 4);
 			obvious = TRUE;
 
-			/* Always notice */
 			equip_not_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+			equip_not_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
 	}
 

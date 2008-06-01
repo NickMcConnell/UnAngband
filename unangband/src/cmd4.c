@@ -1353,15 +1353,11 @@ static void desc_art_fake(int a_idx)
 	screen_save();
 
 	/* Describe */
-	Term_flush();
-	anykey();
-
 	screen_object(o_ptr);
 
-	/* Load the screen */
-	screen_load();
-
+	Term_flush();
 	(void)anykey();
+	screen_load();
 }
 
 static int a_cmp_tval(const void *a, const void *b)
@@ -1475,9 +1471,7 @@ static void desc_ego_fake(int oid)
 	list_ego_item_runes(e_idx, cheat_lore);
 	
 	Term_flush();
-
-	anykey();
-
+	(void)anykey();
 	screen_load();
 }
 
@@ -1640,10 +1634,9 @@ static void desc_obj_fake(int oid)
 	/* Describe */
 	screen_object(o_ptr);
 
-	/* Load the screen */
-	screen_load();
-
+	Term_flush();
 	(void)anykey();
+	screen_load();
 }
 
 static int o_cmp_tval(const void *a, const void *b)
@@ -1851,9 +1844,8 @@ static void screen_store_object(int oid)
 	/* Describe */
 	screen_object(o_ptr);
 
-	/* Load the screen */
+	Term_flush();
 	(void)anykey();
-
 	screen_load();
 }
 
@@ -2021,10 +2013,10 @@ static void dungeon_lore(int oid) {
 	  if (my_zone == &t_info[dun].zone[zone])
 	    text_out_c(TERM_SLATE, "  This is where you stand right now.");
 	}
-	
-	/* Load the screen */
+
+	Term_flush();
+	(void)anykey();
 	screen_load();
-	anykey();
 }
 
 static void display_dungeon_zone(int col, int row, bool cursor, int oid)

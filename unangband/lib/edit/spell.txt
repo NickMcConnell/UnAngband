@@ -3620,44 +3620,45 @@ B:SELF:LOSE_INT
 B:SELF:FORGET
 F:DEC_EXP |
 S:CURE_DISEASE:15
-D:You feel your memories fade.
+D:You see darkness engulfing your mind.
 
 N:289:Ruination
 A:75:15:1
 P:0:0
 B:SELF:LOSE_ALL:10d10
+F:DEC_EXP |
 S:CURE_DISEASE:27
 D:Your nerves and muscles feel weak and lifeless.
 
 N:290:Weakness
 A:75:16:1
 P:0:0
-B:SELF:LOSE_STR
+B:SELF:LOSE_STR:3d6
 
 N:291:Stupidity
 A:75:17:1
 P:0:0
-B:SELF:LOSE_INT
+B:SELF:LOSE_INT:2d6
 
 N:292:Naivety
 A:75:18:1
 P:0:0
-B:SELF:LOSE_WIS
+B:SELF:LOSE_WIS:2d6
 
 N:293:Clumsiness
 A:75:19:1
 P:0:0
-B:SELF:LOSE_DEX
+B:SELF:LOSE_DEX:2d6
 
 N:294:Sickliness
 A:75:20:1
 P:0:0
-B:SELF:LOSE_CON
+B:SELF:LOSE_CON:3d6
 
 N:295:Ugliness
 A:75:21:1
 P:0:0
-B:SELF:LOSE_CHR
+B:SELF:LOSE_CHR:1d6
 
 N:296:Detonations
 A:75:22:1

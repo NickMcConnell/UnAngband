@@ -473,7 +473,7 @@ void wipe_o_list(void)
 		}
 
 		/* Wipe the object */
-		(void)WIPE(o_ptr, object_type);
+		object_wipe(o_ptr);
 	}
 
 	/* Reset "o_max" */
@@ -2131,7 +2131,7 @@ void object_prep(object_type *o_ptr, int k_idx)
 	object_kind *k_ptr = &k_info[k_idx];
 
 	/* Clear the record */
-	(void)WIPE(o_ptr, object_type);
+	object_wipe(o_ptr);
 
 	/* Save the kind index */
 	o_ptr->k_idx = k_idx;
@@ -2140,8 +2140,8 @@ void object_prep(object_type *o_ptr, int k_idx)
 	o_ptr->tval = k_ptr->tval;
 	o_ptr->sval = k_ptr->sval;
 
-	/* Default "pval" or 1 if zero */
-	o_ptr->pval = k_ptr->pval;
+	/* No more annoying objects with lots of flags, but 0 pval */
+	o_ptr->pval = k_ptr->pval ? k_ptr->pval : 1;
 
 	/* Default "charges" */
 	o_ptr->charges = k_ptr->charges;
@@ -4928,7 +4928,6 @@ static void name_drop(object_type *j_ptr)
  */
 static bool kind_is_shroom(int k_idx)
 {
-
 	object_kind *k_ptr = &k_info[k_idx];
 
 	if (k_ptr->tval != TV_FOOD) return (FALSE);
@@ -4936,7 +4935,6 @@ static bool kind_is_shroom(int k_idx)
 	if (k_ptr->sval >= SV_FOOD_MIN_FOOD) return (FALSE);
 
 	return (TRUE);
-
 }
 
 
@@ -7999,7 +7997,7 @@ void inven_item_optimize(int item)
 		}
 
 		/* Hack -- wipe hole */
-		(void)WIPE(&inventory[i], object_type);
+		object_wipe(&inventory[i]);
 
 		/* Redraw stuff */
 		p_ptr->redraw |= (PR_ITEM_LIST);
