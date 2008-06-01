@@ -1119,7 +1119,7 @@ static bool wr_savefile_new(void)
 
 	/* Dump the number of "messages" */
 	tmp16s = message_num();
-	if (tmp16s > 80) tmp16s = 80;
+	if (tmp16s > 800) tmp16s = 800;
 	wr_s16b(tmp16s);
 
 	/* Dump the messages (oldest first!) */
