@@ -3268,8 +3268,7 @@ errr parse_k_info(char *buf, header *head)
 		/* Save the values */
 		k_ptr->tval = tval;
 		k_ptr->sval = sval;
-		/* No more annoying objects with lots of flags, but 0 pval */
-		k_ptr->pval = MAX(1, pval);
+		k_ptr->pval = pval;
 	}
 
 	/* Process 'W' for "More Info" (one line only) */
@@ -7185,7 +7184,7 @@ static long eval_max_dam(monster_race *r_ptr)
 	else hp = r_ptr->hdice * (r_ptr->hside + 1) / 2;
 
 	/* Extract the monster level, force 1 for town monsters */
-	rlev = ((r_ptr->level >= 1) ? r_ptr->level : 1);
+	rlev = r_ptr->level ? r_ptr->level : 1;
 
 	for (x = 0; x < 4; x++)
 	{
@@ -7398,7 +7397,7 @@ static long eval_max_dam(monster_race *r_ptr)
 						}
 
 						/* Get damage */
-						this_dam = eval_blow_effect(which_gf, (this_dam * mult) / div_by, r_ptr->level);
+						this_dam = eval_blow_effect(which_gf, (this_dam * mult) / div_by, rlev);
 
 						/* Slight bonus for being powerful */
 						if (r_ptr->flags2 & (RF2_POWERFUL)) this_dam = this_dam * 8 / 7;
@@ -7414,25 +7413,25 @@ static long eval_max_dam(monster_race *r_ptr)
 					{
 						case 0:
 						{
-							this_dam = eval_blow_effect(spell_desire_RF4[i][6], r_ptr->spell_power * spell_info_RF4[i][COL_SPELL_DAM_MULT], r_ptr->level);
+							this_dam = eval_blow_effect(spell_desire_RF4[i][6], r_ptr->spell_power * spell_info_RF4[i][COL_SPELL_DAM_MULT], rlev);
 							this_dam /=  MAX(1, spell_info_RF4[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
 						case 1:
 						{
-							this_dam = eval_blow_effect(spell_desire_RF5[i][6], r_ptr->spell_power * spell_info_RF5[i][COL_SPELL_DAM_MULT], r_ptr->level);
+							this_dam = eval_blow_effect(spell_desire_RF5[i][6], r_ptr->spell_power * spell_info_RF5[i][COL_SPELL_DAM_MULT], rlev);
 							this_dam /=  MAX(1, spell_info_RF5[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
 						case 2:
 						{
-							this_dam = eval_blow_effect(spell_desire_RF6[i][6], r_ptr->spell_power * spell_info_RF6[i][COL_SPELL_DAM_MULT], r_ptr->level);
+							this_dam = eval_blow_effect(spell_desire_RF6[i][6], r_ptr->spell_power * spell_info_RF6[i][COL_SPELL_DAM_MULT], rlev);
 							this_dam /=  MAX(1, spell_info_RF6[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
 						case 3:
 						{
-							this_dam = eval_blow_effect(spell_desire_RF7[i][6], r_ptr->spell_power * spell_info_RF7[i][COL_SPELL_DAM_MULT], r_ptr->level);
+							this_dam = eval_blow_effect(spell_desire_RF7[i][6], r_ptr->spell_power * spell_info_RF7[i][COL_SPELL_DAM_MULT], rlev);
 							this_dam /=  MAX(1, spell_info_RF7[i][COL_SPELL_DAM_DIV]);
 							break;
 						}
@@ -7646,7 +7645,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			/* Multiply average damage by 2 to simplify calculations */
 			atk_dam = eval_blow_effect(effect, 
 									   d_dice * (d_side + 1), 
-									   r_ptr->level);
+									   rlev);
 
 			switch (method)
 			{
@@ -7728,14 +7727,14 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_SPIT:	mana = 0; range = 3; must_hit = TRUE; break;
 					case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf);break;
 					case RBM_WAIL:  mana = 5; range = 4; break;
-					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; has_ammo = rlev; break;
 					case RBM_LASH:  mana = 0; range = 3; break;
 					case RBM_BEG:	mana = 0; range = 4; break;
 					case RBM_INSULT: mana = 0; range = 4; break;
 					case RBM_MOAN: mana = 0; range = 2; break;
 					case RBM_SING:  mana = 0; range = 4; break;
 					case RBM_TRAP:  mana = 0; range = 1; break;
-					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; has_ammo = (r_ptr->level + 1) / 2; break;
+					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; has_ammo = (rlev + 1) / 2; break;
 					case RBM_AURA:	mana = 4; range = 2; break;
 					case RBM_SELF:	mana = 3; range = 0; break;
 					case RBM_ADJACENT: mana = 3; range = 1; break;
@@ -7750,7 +7749,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_CLOUD: mana = 5; range = MAX_RANGE; break;
 					case RBM_STORM: mana = 6; range = MAX_RANGE; break;
 					case RBM_BREATH: mana = 0; range = 6; break;
-					case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
+					case RBM_AREA: mana = 3; range = (rlev / 10) + 1; break;
 					case RBM_LOS: mana = 6; range = MAX_SIGHT; break;
 					case RBM_LINE: mana = 4; range = MAX_RANGE; break;
 					case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
@@ -7762,17 +7761,17 @@ static long eval_max_dam(monster_race *r_ptr)
 					case RBM_CROSS: mana = 4; range = MAX_RANGE; break;
 					case RBM_STRIKE: mana = 5; range = MAX_RANGE; break;
 					case RBM_EXPLODE: mana = 0; range = 1; break;
-					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; has_ammo = r_ptr->level; break;
-					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; has_ammo = r_ptr->level; break;
-					case RBM_DAGGER: mana = 0; range = 6; must_hit = TRUE; has_ammo = r_ptr->level; break;
-					case RBM_DART: mana = 0; range = 6; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; has_ammo = rlev; break;
+					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; has_ammo = rlev; break;
+					case RBM_DAGGER: mana = 0; range = 6; must_hit = TRUE; has_ammo = rlev; break;
+					case RBM_DART: mana = 0; range = 6; must_hit = TRUE; has_ammo = rlev; break;
 					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
 					case RBM_ARC_20: mana = 6; range = 8; break;
 					case RBM_ARC_30: mana = 5; range = 6; break;
 				   case RBM_ARC_40: mana = 5; range = 6; break;
 				   case RBM_ARC_50: mana = 6; range = 6; break;
 				   case RBM_ARC_60: mana = 6; range = 6; break;
-					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; has_ammo = (r_ptr->level + 1) / 2; break;
+					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; has_ammo = (rlev + 1) / 2; break;
 				case RBM_TRAIL: mana = 1; range = 3; break;
 				case RBM_SHRIEK: mana = 1; range = MAX_SIGHT; break;
 				   case RBM_BOLT_MINOR: mana = 2; range = 4; break;
@@ -7784,7 +7783,7 @@ static long eval_max_dam(monster_race *r_ptr)
 				   case RBM_8WAY_II: mana = 5; range = MAX_RANGE; break;
 				   case RBM_8WAY_III: mana = 6; range = MAX_RANGE; break;
 				   case RBM_SWARM: mana = 6; range = MAX_RANGE; break;
-					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; has_ammo = r_ptr->level; break;
+					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; has_ammo = rlev; break;
 					case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; break;
 				   case RBM_SCATTER:  mana = 4; range = MAX_SIGHT; break;
 				   case RBM_HOWL:  mana = 2; range = 2; break;
