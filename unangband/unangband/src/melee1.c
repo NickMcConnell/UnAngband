@@ -2324,9 +2324,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Some summons override cave ecology */
 	bool old_cave_ecology = cave_ecology.ready;
 
-	/* Hack -- don't summon on surface */
-	bool surface = p_ptr->depth == min_depth(p_ptr->dungeon);
-
 	/* Hack -- Confused monsters get a random target */
 	if ((who > SOURCE_MONSTER_START) && (target != who) && (m_list[who].confused) && (m_list[who].confused > rand_int(33)))
 	{
@@ -5619,9 +5616,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_KIN */
 		case 192 + 0:
 		{
-			if (surface) break;
 			disturb(1, 0);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if (((blind) && (known)) && (target < 0)) msg_format("%^s cries out for help.", m_name);
@@ -5656,8 +5651,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			/* Override cave ecology */
 			cave_ecology.ready = FALSE;
-
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5687,8 +5680,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			/* Override cave ecology */
 			cave_ecology.ready = FALSE;
-
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5706,7 +5697,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_MONSTER */
 		case 192 + 3:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5729,7 +5719,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_MONSTERS */
 		case 192 + 4:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5754,8 +5743,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			/* Override cave ecology */
 			cave_ecology.ready = FALSE;
-
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5777,8 +5764,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			/* Override cave ecology */
 			cave_ecology.ready = FALSE;
-
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5798,7 +5783,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_PLANT */
 		case 192 + 7:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5821,7 +5805,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_INSECT */
 		case 192 + 8:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5844,7 +5827,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_ANIMALS */
 		case 192 + 9:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5892,7 +5874,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_HOUND */
 		case 192 + 10:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5915,7 +5896,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_SPIDER */
 		case 192 + 11:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5938,7 +5918,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_CLASS */
 		case 192 + 12:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -5969,7 +5948,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_RACE */
 		case 192 + 13:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -6003,11 +5981,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_GROUP */
 		case 192 + 14:
 		{
-			if (surface) break;
 			disturb(1, 0);
-
 			summon_group_type = 0;
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if ((blind) && (known)) msg_format("%^s chants.", m_name);
@@ -6032,10 +6007,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 192 + 15:
 		{
 			int summon_type = SUMMON_FRIEND;
-
-			if (surface) break;
 			disturb(1, 0);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if (((blind) && (known)) && (target < 0)) msg_format("%^s calls out for help.", m_name);
@@ -6076,10 +6048,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 192 + 16:
 		{
 			int summon_type = SUMMON_FRIEND;
-
-			if (surface) break;
 			disturb(1, 0);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if (((blind) && (known)) && (target < 0)) msg_format("%^s calls out for help.", m_name);
@@ -6119,7 +6088,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_ORC */
 		case 192 + 17:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -6142,7 +6110,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_TROLL */
 		case 192 + 18:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -6165,7 +6132,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_GIANT */
 		case 192 + 19:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
@@ -6212,7 +6178,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_HI_DRAGON */
 		case 192 + 21:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			sound(MSG_SUM_HI_DRAGON);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
@@ -6237,10 +6202,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			/* Override cave ecology */
 			cave_ecology.ready = FALSE;
-
-			if (surface) break;
 			disturb(1, 0);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if ((blind) && (known)) result = format("%^s chants in a rumbling voice.", m_name);
@@ -6258,10 +6220,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			/* Override cave ecology */
 			cave_ecology.ready = FALSE;
-
-			if (surface) break;
 			disturb(1, 0);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if ((blind) && (known)) result = format("%^s chants in a clanking.", m_name);
@@ -6277,7 +6236,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_DEMON */
 		case 192 + 24:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			sound(MSG_SUM_DEMON);
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
@@ -6300,10 +6258,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_HI_DEMON */
 		case 192 + 25:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			sound(MSG_SUM_HI_DEMON);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if ((blind) && (known)) msg_format("%^s chants in an infernal voice.", m_name);
@@ -6397,10 +6353,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_UNDEAD */
 		case 192 + 29:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			sound(MSG_SUM_UNDEAD);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
@@ -6418,10 +6372,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF7_S_HI_UNDEAD */
 		case 192 + 30:
 		{
-			if (surface) break;
 			disturb(1, 0);
 			sound(MSG_SUM_HI_UNDEAD);
-
 			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
 			{
 				summoner = m_list[who > SOURCE_MONSTER_START ? who : what].r_idx;

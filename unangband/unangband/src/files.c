@@ -3836,22 +3836,17 @@ errr file_character(cptr name, bool full)
 		current_long_level_name(str);
 
 		/* Display location */
-		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		if (level_flag & (LF1_SURFACE))
 		{
 			text_out(format(" You are in %s.", str));
 		}
 		/* Display depth in feet */
 		else if (depth_in_feet)
 		{
-			dungeon_zone *zone=&t_info[0].zone[0];
-
-			/* Get the zone */
-			get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-
 			text_out(format(" You are %d ft %s %s.",
-								 (p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
-								 zone->tower ? "high above" : "deep in",
-								 str));
+							(p_ptr->depth - min_depth(p_ptr->dungeon)) * 50 ,
+							level_flag & (LF1_TOWER) ? "high above" : "deep in",
+							str));
 		}
 		/* Display depth */
 		else

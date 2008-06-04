@@ -1051,9 +1051,6 @@ void set_recall(void)
 		if (p_ptr->depth > min_depth(p_ptr->dungeon) 
 			 && p_ptr->depth != t_info[p_ptr->dungeon].attained_depth)
 		{
-			/*
-			 * TODO: Poll? Always reset recall depth?
-			 */
 			 if (get_check("Reset recall depth? "))
 				 t_info[p_ptr->dungeon].attained_depth = p_ptr->depth;
 		}
@@ -1894,8 +1891,11 @@ static void place_up_stairs(int y, int x)
  */
 static void place_down_stairs(int y, int x)
 {
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
+
 	/* Surface -- place entrance if outside */
-	if ((level_flag & (LF1_SURFACE)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+	if (outside)
 	{
 		cave_set_feat(y, x, FEAT_ENTRANCE);
 	}
@@ -1913,6 +1913,9 @@ static void place_down_stairs(int y, int x)
  */
 void place_quest_stairs(int y, int x)
 {
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
+
 	/* Create up stairs in tower */
 	if (level_flag & (LF1_TOWER))
 	{
@@ -1920,7 +1923,7 @@ void place_quest_stairs(int y, int x)
 	}		
 
 	/* Surface -- place entrance if outside */
-	else if ((level_flag & (LF1_SURFACE)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+	else if (outside)
 	{
 		cave_set_feat(y, x, FEAT_ENTRANCE);
 	}

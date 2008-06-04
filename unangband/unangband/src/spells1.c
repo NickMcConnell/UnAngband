@@ -7601,10 +7601,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			/* Hack -- no chasm/trap doors/down stairs on quest/bottom levels */
 			if (is_quest(p_ptr->depth) 
-				 || (p_ptr->depth == max_depth(p_ptr->dungeon) 
-					  && !t_info[p_ptr->dungeon].zone[0].tower)
-				 || (p_ptr->depth == min_depth(p_ptr->dungeon) 
-					  && t_info[p_ptr->dungeon].zone[0].tower))
+				|| (p_ptr->depth == max_depth(p_ptr->dungeon) 
+					&& !(level_flag & (LF1_TOWER)))
+				|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
+					&& level_flag & (LF1_TOWER)))
 			{
 				note = "falls into a chasm.";
 
@@ -10993,25 +10993,25 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			/* Hack -- no chasm/trap doors on quest/bottom levels */
 			if (is_quest(p_ptr->depth)
-				 || (typ == GF_FALL_MORE 
-					  && ((p_ptr->depth == max_depth(p_ptr->dungeon) 
-							 && !t_info[p_ptr->dungeon].zone[0].tower)
-							|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
-								 && t_info[p_ptr->dungeon].zone[0].tower)))
-				 || (typ == GF_FALL_LESS
-					  && ((p_ptr->depth == max_depth(p_ptr->dungeon) 
-							 && t_info[p_ptr->dungeon].zone[0].tower)
-							|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
-								 && !t_info[p_ptr->dungeon].zone[0].tower))))
+				|| (typ == GF_FALL_MORE 
+					&& ((p_ptr->depth == max_depth(p_ptr->dungeon) 
+						 && !(level_flag & (LF1_TOWER)))
+						|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
+							&& level_flag & (LF1_TOWER))))
+				|| (typ == GF_FALL_LESS
+					&& ((p_ptr->depth == max_depth(p_ptr->dungeon) 
+						 && level_flag & (LF1_TOWER))
+						|| (p_ptr->depth == min_depth(p_ptr->dungeon) 
+							&& !(level_flag & (LF1_TOWER))))))
 			{
 				/* Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
 			}
 			/* Hack -- tower level decreases depth */
 			else if ((typ == GF_FALL_MORE 
-						 && !t_info[p_ptr->dungeon].zone[0].tower)
-						|| (typ == GF_FALL_LESS 
-							 && t_info[p_ptr->dungeon].zone[0].tower))
+					  && !(level_flag & (LF1_TOWER)))
+					 || (typ == GF_FALL_LESS 
+						 && level_flag & (LF1_TOWER)))
 			{
 				/* New depth */
 				p_ptr->depth++;

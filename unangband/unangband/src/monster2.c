@@ -2201,19 +2201,18 @@ static void player_position()
 	int by = y/BLOCK_HGT;
 	int bx = x/BLOCK_WID;
 
-	bool outside;
-
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+
+	/* Update view if moved outside/inside */
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_ptr->flags3 & (FF3_OUTSIDE));
 	
 	/* Room is perma-lit */
-	if (cave_info[y][x] & (CAVE_GLOW)) room_info[dun_room[by][bx]].flags |= (ROOM_SEEN);
+	if (cave_info[y][x] & (CAVE_GLOW)) 
+		room_info[dun_room[by][bx]].flags |= (ROOM_SEEN);
 	
 	/* Player has heard the room */
 	room_info[dun_room[by][bx]].flags |= (ROOM_HEARD);
-
-	/* Update view if moved outside/inside */
-	outside = (((level_flag & (LF1_SURFACE)) != 0) && 
-		(f_ptr->flags3 & (FF3_OUTSIDE)));
 
 	/* Changed inside/outside */
 	if (outside != p_ptr->outside)
@@ -2505,18 +2504,13 @@ void monster_swap(int y1, int x1, int y2, int x2)
 
 bool mon_resist_feat(int feat, int r_idx)
 {
-	feature_type *f_ptr;
 	monster_race *r_ptr;
+	feature_type *f_ptr = &f_info[feat];
 
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+	bool daytime = level_flag & LF1_DAYLIGHT;
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_ptr->flags3 & (FF3_OUTSIDE));
 
-	bool daytime = ((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2));
-
-	bool outside = ((f_info[feat].flags3 & (FF3_OUTSIDE)) ? TRUE : FALSE);
-
-	/* Get feature info */
-	f_ptr= &f_info[feat];
-	
 	/* Paranoia */
 	if (!r_idx) return (FALSE);
 
@@ -2524,7 +2518,8 @@ bool mon_resist_feat(int feat, int r_idx)
 	r_ptr = &r_info[r_idx];
 
 	/* Always get burnt by daylight */
-	if ((surface && daytime && outside) && (r_ptr->flags3 & (RF3_HURT_LITE))) return (FALSE);
+	if ((daytime && outside) && (r_ptr->flags3 & (RF3_HURT_LITE))) 
+		return (FALSE);
 
 	/* Always risk traps if stupid */
 	if ((f_ptr->flags1 & (FF1_HIT_TRAP)) &&
@@ -2826,8 +2821,7 @@ int place_monster_here(int y, int x, int r_idx)
  */
 void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 {
-	/* Hack -- don't summon on surface */
-	bool surface = p_ptr->depth == min_depth(p_ptr->dungeon);
+	bool surface = (level_flag & (LF1_SURFACE));
 	bool lite = (m_ptr->mflag & (MFLAG_LITE)) != 0;
 
 	/* Get the feature */
