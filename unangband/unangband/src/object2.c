@@ -6503,17 +6503,11 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			/* Skip illegal grids */
 			if (!in_bounds_fully(ty, tx)) continue;
 
-			/* Require line of fire */
-			if (!generic_los(y, x, ty, tx, CAVE_XLOF)) continue;
-
 			/* Require drop space */
 			if ((f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP)) == 0) continue;
 
 			/* Requires terrain that won't destroy it */
 			if (hates_terrain(j_ptr, cave_feat[ty][tx])) continue;
-
-			/* Don't like hiding items space */
-			if ((f_info[cave_feat[ty][tx]].flags2 & (FF2_HIDE_ITEM)) && (rand_int(100)<80)) continue;
 
 			/* No objects */
 			k = 0;
@@ -6546,7 +6540,15 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			if (k > MAX_FLOOR_STACK) continue;
 
 			/* Calculate score */
-			s = 1000 - (d + k * 5);
+			s = 10000 - (d + k * 5);
+
+			/* Don't like hiding items space */
+			if (f_info[cave_feat[ty][tx]].flags2 & (FF2_HIDE_ITEM))
+				s = s / 2;
+
+			/* Don't like lack of  line of fire */
+			if (!generic_los(y, x, ty, tx, CAVE_XLOF))
+				s = s / 4;
 
 			/* Skip bad values */
 			if (s < bs) continue;
