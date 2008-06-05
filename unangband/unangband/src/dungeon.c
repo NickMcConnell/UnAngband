@@ -2222,6 +2222,10 @@ static void process_command(void)
 		/* Go up staircase */
 		case '<':
 		{
+			/* Save the old dungeon in case something goes wrong */
+			if (autosave_backup)
+				do_cmd_save_bkp();
+
 			do_cmd_go_up();
 			break;
 		}
@@ -2229,6 +2233,10 @@ static void process_command(void)
 		/* Go down staircase */
 		case '>':
 		{
+			/* Save the old dungeon in case something goes wrong */
+			if (autosave_backup)
+				do_cmd_save_bkp();
+
 			do_cmd_go_down();
 			break;
 		}
@@ -3882,7 +3890,6 @@ void play_game(bool new_game)
 
 				/* Note cause of death XXX XXX XXX */
 				my_strcpy(p_ptr->died_from, "Cheating death", sizeof(p_ptr->died_from));
-
 				/* New depth */
 				p_ptr->depth = min_depth(p_ptr->dungeon);
 

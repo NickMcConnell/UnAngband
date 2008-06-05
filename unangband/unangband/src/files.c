@@ -5212,7 +5212,34 @@ void do_cmd_save_game(void)
 	my_strcpy(p_ptr->died_from, "(alive and well)", sizeof(p_ptr->died_from));
 }
 
+/*
+ * Autosave (less verbose and writes to .bkp)
+ */
+void do_cmd_save_bkp(void)
+{
+	/* Handle stuff */
+	handle_stuff();
 
+	/* The player is not dead */
+	my_strcpy(p_ptr->died_from, "(saved)", sizeof(p_ptr->died_from));
+
+	/* Forbid suspend */
+	signals_ignore_tstp();
+
+	/* Save the player */
+	if (!save_player_bkp(TRUE))
+	{
+		prt("Saving game... failed!", 0, 0);
+		/* Refresh */
+		Term_fresh();
+	}
+
+	/* Allow suspend again */
+	signals_handle_tstp();
+
+	/* Note that the player is not dead */
+	my_strcpy(p_ptr->died_from, "(alive and well)", sizeof(p_ptr->died_from));
+}
 
 /*
  * Hack -- Calculates the total number of points earned

@@ -1700,6 +1700,10 @@ void do_cmd_debug(void)
 		/* Go up or down in the dungeon */
 		case 'j':
 		{
+			/* Save the old dungeon in case something goes wrong */
+			if (autosave_backup)
+				do_cmd_save_bkp();
+
 			do_cmd_wiz_jump();
 			break;
 		}

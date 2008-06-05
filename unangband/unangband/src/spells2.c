@@ -6997,6 +6997,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_ALTER_LEVEL))
 	{
+		/* Save the old dungeon in case something goes wrong */
+		if (autosave_backup)
+			do_cmd_save_bkp();
+
 		p_ptr->leaving = TRUE;
 		obvious = TRUE;
 	}
@@ -7196,6 +7200,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_RECALL))
 	{
+		/* Save the old dungeon in case something goes wrong */
+		if (autosave_backup)
+			do_cmd_save_bkp();
+
 		set_recall();
 		obvious = TRUE;
 	}
@@ -7902,6 +7910,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					msg_format("It's still %s.", s_ptr->type == SPELL_REST_UNTIL_DAWN ? "daylight" : "night");
 					return (TRUE);
 				}
+
+				/* Save the old dungeon in case something goes wrong */
+				if (autosave_backup)
+					do_cmd_save_bkp();
 				
 				/* Hack -- Set time to one turn before sun down / sunrise */
 				turn += ((10L * TOWN_DAWN) / 2) - (turn % ((10L * TOWN_DAWN) / 2)) - 1;
