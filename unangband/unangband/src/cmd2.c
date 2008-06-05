@@ -841,13 +841,13 @@ void do_cmd_go_up(void)
 		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
 		&& level_flag & (LF1_TOWER))
 	{
-	  int guard;
-	  dungeon_zone *zone;
+		int guard;
+		dungeon_zone *zone;
 
-	  /* Get the zone */
-	  get_zone(&zone, p_ptr->dungeon, p_ptr->depth);
+		/* Get the zone */
+		get_zone(&zone, p_ptr->dungeon, p_ptr->depth);
 
-	  guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
+		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
 		/* Check quests due to travelling - cancel if requested */
 		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
@@ -867,6 +867,12 @@ void do_cmd_go_up(void)
 			message(MSG_STAIRS_DOWN,0,format("You have reached the top of %s and you climb down outside.", str));
 		}
 
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
+
+		/* Clear stairs */
+		p_ptr->create_stair = 0;
+
 		/* Set the new depth */
 		p_ptr->depth = min_depth(p_ptr->dungeon);
 	}
@@ -882,11 +888,11 @@ void do_cmd_go_up(void)
 			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
 		}
 
-		/* Hack -- take a turn */
-		p_ptr->energy_use = 100;
-
 		/* Success */
 		message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
+
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
 
 		/* Create a way back */
 		p_ptr->create_stair = feat_state(cave_feat[py][px], FS_LESS);
@@ -965,6 +971,12 @@ void do_cmd_go_down(void)
 			/* Success */
 			message(MSG_STAIRS_DOWN,0,format("You have reached the bottom of %s and uncovered a secret shaft back up to the surface.", str));
 		}
+
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
+
+		/* Clear stairs */
+		p_ptr->create_stair = 0;
 		
 		/* Set the new depth */
 		p_ptr->depth = min_depth(p_ptr->dungeon);
@@ -983,6 +995,9 @@ void do_cmd_go_down(void)
 
 		/* Success */
 		message(MSG_STAIRS_DOWN, 0, "You enter a maze of down staircases.");
+
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
 
 		/* Create a way back */
 		p_ptr->create_stair = feat_state(cave_feat[py][px], FS_MORE);

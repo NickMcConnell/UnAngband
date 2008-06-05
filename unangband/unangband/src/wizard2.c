@@ -1123,6 +1123,9 @@ static void do_cmd_wiz_jump(void)
 	/* Accept request */
 	msg_format("You jump to dungeon level %d.", p_ptr->command_arg);
 
+	/* Clear stairs */
+	p_ptr->create_stair = 0;
+
 	/* New depth */
 	p_ptr->depth = p_ptr->command_arg + min_depth(p_ptr->dungeon);
 

@@ -4212,6 +4212,7 @@ bool mass_banishment(int who, int what, int y, int x)
 		if (distance(y, x, p_ptr->py, p_ptr->px) <= MAX_SIGHT)
 		{
 			msg_print("You are banished.");
+			p_ptr->create_stair = 0;
 			p_ptr->leaving = TRUE;
 		}
 	}
@@ -7000,7 +7001,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		/* Save the old dungeon in case something goes wrong */
 		if (autosave_backup)
 			do_cmd_save_bkp();
-
+		p_ptr->create_stair = 0;
 		p_ptr->leaving = TRUE;
 		obvious = TRUE;
 	}
