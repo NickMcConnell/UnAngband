@@ -3669,8 +3669,11 @@ bool get_check(cptr prompt)
 	char buf[80];
 
 	/* Flush easy_more messages */
-	if (easy_more) messages_easy(FALSE);
-	
+	if (easy_more)
+	{
+		msg_print(NULL);
+		messages_easy(FALSE);
+	}
 	/* Paranoia XXX XXX XXX */
 	else message_flush();
 
