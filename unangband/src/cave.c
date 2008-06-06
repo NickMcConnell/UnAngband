@@ -676,7 +676,9 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 void modify_grid_unseen_view(byte *a, char *c)
 {
 	/* Handle "blind", "asleep" and night time*/
-	if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP)  || !(((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))))
+	if (p_ptr->blind 
+		|| p_ptr->psleep >= PY_SLEEP_ASLEEP 
+		|| !(level_flag & (LF1_DAYLIGHT)))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -5039,8 +5041,6 @@ void cave_set_feat_aux(int y, int x, int feat)
 
 	bool use_feat = (f_info[cave_feat[y][x]].flags3 & (FF3_USE_FEAT)) != 0 ? f_info[cave_feat[y][x]].k_idx : 0;
 
-	bool outside;
-
 	s16b this_o_idx, next_o_idx = 0;
 
 	/* Paranoia */
@@ -5211,12 +5211,11 @@ void cave_set_feat_aux(int y, int x, int feat)
 	/* Check if location changed under player */
 	if ((p_ptr->py == y) && (p_ptr->px == x))
 	{
+		bool outside = (level_flag & (LF1_SURFACE)) && 
+			(f_info[feat].flags3 & (FF3_OUTSIDE));
+
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
-
-		/* Update view if moved outside/inside */
-		outside = ((p_ptr->depth == min_depth(p_ptr->dungeon)) && 
-			(f_info[feat].flags3 & (FF3_OUTSIDE)));
 
 		/* Changed inside/outside */
 		if (outside != p_ptr->outside)
@@ -5434,10 +5433,11 @@ bool require_daylight(int y, int x)
 
 bool has_daylight(int y, int x)
 {
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-	bool daytime = (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)));
+	bool daytime = level_flag & (LF1_DAYLIGHT);
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
 
-	return ( daytime && surface && ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) !=0));
+	return (daytime && outside);
 }
 
 bool redraw_daylight_loss(int y, int x)
@@ -5590,14 +5590,14 @@ void cave_set_feat(int y, int x, int feat)
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 	feature_type *f_ptr2 = &f_info[feat];
 
-	bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
-	bool daytime = (((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2)));
+	bool surface = (level_flag & (LF1_SURFACE));
+	bool daytime = level_flag & (LF1_DAYLIGHT);
 
-	bool halo = ((f_ptr->flags2 & FF2_GLOW) != 0);
-	bool halo2 = ((f_ptr2->flags2 & FF2_GLOW) != 0);
+	bool halo = (f_ptr->flags2 & FF2_GLOW) != 0;
+	bool halo2 = (f_ptr2->flags2 & FF2_GLOW) != 0;
 
-	bool dlit = (daytime && surface && (f_ptr->flags3 & (FF3_OUTSIDE))) !=0;
-	bool dlit2 = ( daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE))) !=0;
+	bool dlit = daytime && surface && (f_ptr->flags3 & (FF3_OUTSIDE));
+	bool dlit2 = daytime && surface && (f_ptr2->flags3 & (FF3_OUTSIDE));
 
 	bool tree = (f_ptr->flags3 & (FF3_TREE)) !=0;
 	bool tree2 = (f_ptr2->flags3 & (FF3_TREE)) != 0;
@@ -5634,7 +5634,8 @@ void cave_set_feat(int y, int x, int feat)
 			if (!in_bounds_fully(yy, xx)) continue;
 			
 			/* Record daylight */
-			if ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) != 0) dlit_adj |= 1 << i;
+			if ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) != 0) 
+				dlit_adj |= 1 << i;
 		}
 
 		/* Cause branches to fall */		
@@ -6659,9 +6660,11 @@ void init_level_flags(void)
 	guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
 	/* Set night and day level flag */
-	level_flag =  (p_ptr->depth == min_depth(p_ptr->dungeon)) ?
-			((((turn % (10L * TOWN_DAWN)) < ((10L * TOWN_DAWN) / 2))) ?
-				LF1_SURFACE | LF1_DAYLIGHT : LF1_SURFACE) : 0;
+	level_flag = (p_ptr->depth == min_depth(p_ptr->dungeon) ?
+				  (turn % (10L * TOWN_DAWN) < (10L * TOWN_DAWN) / 2 ?
+				   LF1_SURFACE | LF1_DAYLIGHT 
+				   : LF1_SURFACE)
+				  : 0);
 
 	/* Add 'common' level flags */
 	if (zone->tower) level_flag |= (LF1_TOWER);

@@ -7223,18 +7223,17 @@ static void recover_monster(int m_idx, bool regen)
 	/* Get hit by terrain continuously */
 	if (place_monster_here(y, x, m_ptr->r_idx) < MM_FAIL)
 	{
-		bool surface = (level_flag & (LF1_SURFACE));
-
-		bool daytime = (level_flag & (LF1_DAYLIGHT));
+		bool daytime = level_flag & (LF1_DAYLIGHT);
 
 		bool hurt_lite = ((r_ptr->flags3 & (RF3_HURT_LITE)) ? TRUE : FALSE);
 
-		bool outside = ((f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)) ? TRUE : FALSE);
+		bool outside = (level_flag & (LF1_SURFACE))
+			&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
 
 		/* Hack -- silently wake monster */
 		m_ptr->csleep = 0;
 
-		if (surface && daytime && hurt_lite && outside)
+		if (daytime && hurt_lite && outside)
 		{
 			/* Burn the monster */
 			project_m(SOURCE_DAYLIGHT, 0, y, x, damroll(4,6), GF_LITE);

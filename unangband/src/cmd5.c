@@ -1230,7 +1230,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 	{
 		/* Warning */
 		msg_format("You do not have enough mana to %s this %s.",p,t);
-		
+
 		/* No constitution to drain */
 		if (!p_ptr->stat_ind[A_CON]) return FALSE;
 

@@ -785,7 +785,7 @@ static void process_world(void)
 	/*** Handle the "town" (stores and sunshine) ***/
 
 	/* While in town */
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	if (level_flag & (LF1_SURFACE))
 	{
 		/* Hack -- Daybreak/Nighfall in town */
 		if (!(turn % ((10L * TOWN_DAWN) / 2)))
@@ -1572,8 +1572,10 @@ static void process_world(void)
 	sense_inventory();
 
 	/* Show tips */
-	if  (!(p_ptr->command_rep) && ((p_ptr->searching && !(turn % 1000)) ||
-			(is_typical_town(p_ptr->dungeon, p_ptr->depth) && !(turn % 100))))
+	if  (!p_ptr->command_rep
+		 && ((p_ptr->searching && !(turn % 1000)) 
+			 || (is_typical_town(p_ptr->dungeon, p_ptr->depth) 
+				 && !(turn % 100))))
 	{
 		/* Show a tip */
 		show_tip();
@@ -2217,6 +2219,10 @@ static void process_command(void)
 		/* Go up staircase */
 		case '<':
 		{
+			/* Save the old dungeon in case something goes wrong */
+			if (autosave_backup)
+				do_cmd_save_bkp();
+
 			do_cmd_go_up();
 			break;
 		}
@@ -2224,6 +2230,10 @@ static void process_command(void)
 		/* Go down staircase */
 		case '>':
 		{
+			/* Save the old dungeon in case something goes wrong */
+			if (autosave_backup)
+				do_cmd_save_bkp();
+
 			do_cmd_go_down();
 			break;
 		}
@@ -3239,7 +3249,7 @@ static void dungeon(void)
 
 	/* Track maximum dungeon level; surface does not count */
 	if (p_ptr->max_depth < p_ptr->depth 
-		 && p_ptr->depth > min_depth(p_ptr->dungeon))
+		&& p_ptr->depth > min_depth(p_ptr->dungeon))
 	{
 		p_ptr->max_depth = p_ptr->depth;
 	}
@@ -3323,7 +3333,8 @@ static void dungeon(void)
 	if (p_ptr->is_dead) return;
 
 	/* Announce (or repeat) the feeling */
-	if (p_ptr->depth > min_depth(p_ptr->dungeon)) do_cmd_feeling();
+	if (p_ptr->depth > min_depth(p_ptr->dungeon)) 
+		do_cmd_feeling();
 
 	/*** Process this dungeon level ***/
 
@@ -3883,7 +3894,6 @@ void play_game(bool new_game)
 
 				/* Note cause of death XXX XXX XXX */
 				my_strcpy(p_ptr->died_from, "Cheating death", sizeof(p_ptr->died_from));
-
 				/* New depth */
 				p_ptr->depth = min_depth(p_ptr->dungeon);
 

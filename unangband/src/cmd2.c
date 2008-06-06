@@ -35,7 +35,7 @@ bool do_cmd_test(int y, int x, int action)
 	if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 	{
 		disturb(1,0);
-/*		msg_print("This doesn't feel safe."); */
+		msg_print("This doesn't feel safe.");
 
 		if (!get_check("Are you sure you want to enter undetected territory?")) return (FALSE);
 
@@ -667,7 +667,7 @@ static void do_cmd_travel(void)
 	/* Get the top of the dungeon */
 	get_zone(&zone,p_ptr->dungeon,min_depth(p_ptr->dungeon));
 
-	if (p_ptr->depth == min_depth(p_ptr->dungeon))
+	if (level_flag & (LF1_SURFACE))
 	{
 		if (p_ptr->blind)
 		{
@@ -837,7 +837,7 @@ void do_cmd_go_up(void)
 	if (!(f_ptr->flags1 & (FF1_STAIRS)) || !(f_ptr->flags1 & (FF1_LESS)))
 	{
 		/* Travel if possible */
-		if (p_ptr->depth == min_depth(p_ptr->dungeon))
+		if (level_flag & (LF1_SURFACE))
 		{
 			do_cmd_travel();
 			return;
@@ -855,15 +855,17 @@ void do_cmd_go_up(void)
 	}
 
 	/* Hack -- travel through wilderness */
-	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)) && (t_ptr->zone[0].tower))
+	if (adult_campaign 
+		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
+		&& level_flag & (LF1_TOWER))
 	{
-	  int guard;
-	  dungeon_zone *zone;
+		int guard;
+		dungeon_zone *zone;
 
-	  /* Get the zone */
-	  get_zone(&zone, p_ptr->dungeon, p_ptr->depth);
+		/* Get the zone */
+		get_zone(&zone, p_ptr->dungeon, p_ptr->depth);
 
-	  guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
+		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
 		/* Check quests due to travelling - cancel if requested */
 		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
@@ -883,13 +885,19 @@ void do_cmd_go_up(void)
 			message(MSG_STAIRS_DOWN,0,format("You have reached the top of %s and you climb down outside.", str));
 		}
 
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
+
+		/* Clear stairs */
+		p_ptr->create_stair = 0;
+
 		/* Set the new depth */
 		p_ptr->depth = min_depth(p_ptr->dungeon);
 	}
 	else
 	{
 		/* Check quests due to travelling - cancel if requested */
-		if (t_ptr->zone[0].tower)
+		if (level_flag & (LF1_TOWER))
 		{
 			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
 		}
@@ -898,17 +906,17 @@ void do_cmd_go_up(void)
 			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
 		}
 
-		/* Hack -- take a turn */
-		p_ptr->energy_use = 100;
-
 		/* Success */
 		message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
+
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
 
 		/* Create a way back */
 		p_ptr->create_stair = feat_state(cave_feat[py][px], FS_LESS);
 
 		/* Hack -- tower level increases depth */
-		if (t_ptr->zone[0].tower)
+		if (level_flag & (LF1_TOWER))
 		{
 			/* New depth */
 			p_ptr->depth++;
@@ -952,7 +960,9 @@ void do_cmd_go_down(void)
 	p_ptr->energy_use = 100;
 
 	/* Hack -- travel through wilderness */
-	if ((adult_campaign) && (p_ptr->depth == max_depth(p_ptr->dungeon)) && !(t_ptr->zone[0].tower))
+	if (adult_campaign 
+		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
+		&& !(level_flag & (LF1_TOWER)))
 	{
 	  int guard;
 	  dungeon_zone *zone;
@@ -979,6 +989,12 @@ void do_cmd_go_down(void)
 			/* Success */
 			message(MSG_STAIRS_DOWN,0,format("You have reached the bottom of %s and uncovered a secret shaft back up to the surface.", str));
 		}
+
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
+
+		/* Clear stairs */
+		p_ptr->create_stair = 0;
 		
 		/* Set the new depth */
 		p_ptr->depth = min_depth(p_ptr->dungeon);
@@ -986,7 +1002,7 @@ void do_cmd_go_down(void)
 	else
 	{
 		/* Check quests due to travelling - cancel if requested */
-		if (t_ptr->zone[0].tower)
+		if (level_flag & (LF1_TOWER))
 		{
 			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
 		}
@@ -998,11 +1014,14 @@ void do_cmd_go_down(void)
 		/* Success */
 		message(MSG_STAIRS_DOWN, 0, "You enter a maze of down staircases.");
 
+		/* Hack -- take a turn */
+		p_ptr->energy_use = 100;
+
 		/* Create a way back */
 		p_ptr->create_stair = feat_state(cave_feat[py][px], FS_MORE);
 
 		/* Hack -- tower level decreases depth */
-		if (t_ptr->zone[0].tower)
+		if (level_flag & (LF1_TOWER))
 		{
 			/* New depth */
 			p_ptr->depth--;

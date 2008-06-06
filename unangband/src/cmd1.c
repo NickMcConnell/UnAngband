@@ -3230,7 +3230,7 @@ void move_player(int dir)
 		if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
-/*			msg_print("This doesn't feel safe."); */
+			msg_print("This doesn't feel safe."); 
 
 			if (!get_check("Are you sure you want to enter undetected territory?")) return;
 		}
@@ -3295,7 +3295,7 @@ void move_player(int dir)
 		if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
-/*			msg_print("This doesn't feel safe.");		*/
+			msg_print("This doesn't feel safe.");
 
 			if (!get_check("Are you sure you want to enter undetected territory?")) return;
 		}
@@ -3328,7 +3328,7 @@ void move_player(int dir)
 		if ((disturb_detect) && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
-/*			msg_print("This doesn't feel safe.");		*/
+			msg_print("This doesn't feel safe.");
 
 			if (!get_check("Are you sure you want to enter undetected territory?")) return;
 		}

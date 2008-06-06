@@ -1430,17 +1430,25 @@ static bool save_player_aux(cptr name)
 	return (TRUE);
 }
 
-
-
 /*
  * Attempt to save the player in a savefile
  */
 bool save_player(void)
 {
+	return save_player_bkp(FALSE);
+}
+
+
+/*
+ * Attempt to save the player in a savefile
+ */
+bool save_player_bkp(bool bkp)
+{
 	int result = FALSE;
 
 	char safe[1024];
 
+	char target_savefile[1024];
 
 #ifdef SET_UID
 
@@ -1453,6 +1461,17 @@ bool save_player(void)
 
 #endif
 
+	if (bkp)
+	{
+		/* The target will be the backup savefile */
+		my_strcpy(target_savefile, savefile, sizeof(safe));
+		my_strcat(target_savefile, ".bkp", sizeof(safe));
+	}
+	else
+	{
+		/* The target will be the regular savefile */
+		my_strcpy(target_savefile, savefile, sizeof(safe));
+	}
 
 	/* New savefile */
 	my_strcpy(safe, savefile, sizeof(safe));
@@ -1495,10 +1514,10 @@ bool save_player(void)
 		fd_kill(temp);
 
 		/* Preserve old savefile */
-		fd_move(savefile, temp);
+		fd_move(target_savefile, temp);
 
 		/* Activate new savefile */
-		fd_move(safe, savefile);
+		fd_move(safe, target_savefile);
 
 		/* Remove preserved savefile */
 		fd_kill(temp);

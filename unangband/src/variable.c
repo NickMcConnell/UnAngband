@@ -106,9 +106,6 @@ char summon_word_type[80];		/* Hack -- See summon_specific() */
 s32b turn;			      /* Current game turn */
 s32b old_turn;		      /* unused */
 
-bool surface;
-bool daytime;
-
 bool use_mouse;		 /* The "mouse" mode is enabled */
 bool use_trackmouse;	 /* The "trackmouse" mode is enabled */
 bool use_graphics;	      /* The "graphics" mode is enabled */

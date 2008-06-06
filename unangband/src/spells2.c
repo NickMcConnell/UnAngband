@@ -1051,9 +1051,6 @@ void set_recall(void)
 		if (p_ptr->depth > min_depth(p_ptr->dungeon) 
 			 && p_ptr->depth != t_info[p_ptr->dungeon].attained_depth)
 		{
-			/*
-			 * TODO: Poll? Always reset recall depth?
-			 */
 			 if (get_check("Reset recall depth? "))
 				 t_info[p_ptr->dungeon].attained_depth = p_ptr->depth;
 		}
@@ -1881,8 +1878,11 @@ static void place_up_stairs(int y, int x)
  */
 static void place_down_stairs(int y, int x)
 {
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
+
 	/* Surface -- place entrance if outside */
-	if ((level_flag & (LF1_SURFACE)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+	if (outside)
 	{
 		cave_set_feat(y, x, FEAT_ENTRANCE);
 	}
@@ -1900,6 +1900,9 @@ static void place_down_stairs(int y, int x)
  */
 void place_quest_stairs(int y, int x)
 {
+	bool outside = (level_flag & (LF1_SURFACE))
+		&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
+
 	/* Create up stairs in tower */
 	if (level_flag & (LF1_TOWER))
 	{
@@ -1907,7 +1910,7 @@ void place_quest_stairs(int y, int x)
 	}		
 
 	/* Surface -- place entrance if outside */
-	else if ((level_flag & (LF1_SURFACE)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
+	else if (outside)
 	{
 		cave_set_feat(y, x, FEAT_ENTRANCE);
 	}
@@ -4214,6 +4217,7 @@ bool mass_banishment(int who, int what, int y, int x)
 		if (distance(y, x, p_ptr->py, p_ptr->px) <= MAX_SIGHT)
 		{
 			msg_print("You are banished.");
+			p_ptr->create_stair = 0;
 			p_ptr->leaving = TRUE;
 		}
 	}
@@ -6999,6 +7003,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_ALTER_LEVEL))
 	{
+		/* Save the old dungeon in case something goes wrong */
+		if (autosave_backup)
+			do_cmd_save_bkp();
+		p_ptr->create_stair = 0;
 		p_ptr->leaving = TRUE;
 		obvious = TRUE;
 	}
@@ -7198,6 +7206,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_RECALL))
 	{
+		/* Save the old dungeon in case something goes wrong */
+		if (autosave_backup)
+			do_cmd_save_bkp();
+
 		set_recall();
 		obvious = TRUE;
 	}
@@ -7904,6 +7916,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					msg_format("It's still %s.", s_ptr->type == SPELL_REST_UNTIL_DAWN ? "daylight" : "night");
 					return (TRUE);
 				}
+
+				/* Save the old dungeon in case something goes wrong */
+				if (autosave_backup)
+					do_cmd_save_bkp();
 				
 				/* Hack -- Set time to one turn before sun down / sunrise */
 				turn += ((10L * TOWN_DAWN) / 2) - (turn % ((10L * TOWN_DAWN) / 2)) - 1;

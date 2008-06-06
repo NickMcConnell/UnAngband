@@ -4962,7 +4962,7 @@ void do_cmd_feeling(void)
 	}
 
 	/* Wilderness is easy to escape, so make it harder by no level feeling */
-	if (p_ptr->depth == min_depth(p_ptr->dungeon)) 
+	if (level_flag & (LF1_SURFACE))
 	{
 		switch (p_ptr->dungeon % 3)
 		{

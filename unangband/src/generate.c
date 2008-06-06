@@ -9936,7 +9936,8 @@ static void place_tower()
 	}
 
 	/* Hack -- always have upstairs in surface of tower */
-	if ((level_flag & LF1_SURFACE) && (p_ptr->depth < max_depth(p_ptr->dungeon)))
+	if ((level_flag & LF1_SURFACE) 
+		&& p_ptr->depth < max_depth(p_ptr->dungeon))
 	{
 		feat_near(FEAT_LESS, y, x);
 	}
@@ -10664,8 +10665,7 @@ static int alloc_object(int set, int typ, int num)
 		while (num)
 		{
 			bool room;
-
-			bool surface = (p_ptr->depth == min_depth(p_ptr->dungeon));
+			bool surface = (level_flag & (LF1_SURFACE));
 
 			/* Paranoia */
 			i++;
@@ -11077,7 +11077,9 @@ static bool cave_gen(void)
 				/* Place pillars */
 				for (by = 1; by < dun->row_rooms; by += dun->special == SPECIAL_GREAT_PILLARS ? 1 : 3)
 				{
-					for (bx = w; bx < dun->col_rooms; dun->special == w1)
+					for (bx = w; 
+						 bx < dun->col_rooms; 
+						 dun->special == w1)
 					{
 						if (dun->room_map[by][bx]) continue;
 						
@@ -11248,7 +11250,7 @@ static bool cave_gen(void)
 	}
 
 	/* Hack -- build a tower in the centre of the level */
-	if ((zone->tower) && (p_ptr->depth >= min_depth(p_ptr->dungeon)))
+	if (level_flag & (LF1_TOWER))
 	{
 		/* Generating */
 		if (cheat_room) message_add("Building tower.", MSG_GENERIC);
@@ -11606,7 +11608,8 @@ static void town_gen_hack(void)
 	}
 
 	/* Hack -- always have upstairs in surface of tower */
-	if (((level_flag & (LF1_TOWER)) != 0) && (p_ptr->depth == min_depth(p_ptr->dungeon)))
+	if ((level_flag & (LF1_TOWER)) 
+		&& (level_flag & (LF1_SURFACE)))
 	{
 		cave_set_feat(y, x, FEAT_LESS);
 	}
@@ -11619,12 +11622,12 @@ static void town_gen_hack(void)
 	/* Place the player */
 	player_place(y, x, TRUE);
 
-	/* Sometimes we have to place upstairs as well */
-	if ((t_info[p_ptr->dungeon].zone[0].tower 
+	/* Sometimes we have to place additional upstairs */
+	if ((level_flag & (LF1_TOWER)
 	     && p_ptr->depth < max_depth(p_ptr->dungeon) 
 	     && p_ptr->depth > min_depth(p_ptr->dungeon))
-	    || (!t_info[p_ptr->dungeon].zone[0].tower
-		&& p_ptr->depth > min_depth(p_ptr->dungeon)))
+	    || (!(level_flag & (LF1_TOWER))
+			&& p_ptr->depth > min_depth(p_ptr->dungeon)))
 	{
 		/* Place the up stairs */
 		while (TRUE)
