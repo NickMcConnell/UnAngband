@@ -723,9 +723,10 @@ N:54:Old Forest
 X:38:53:0:0
 R:PLANT
 Q:55:622
-L:6:0:420:153:622:0:a clearing in the
-L:7:56:420:420:0:0:the
-L:10:56:420:420:622:0:the
+L:6:420:420:153:0:0:Bonfire Glade in the
+L:7:420:420:153:0:0:a knoll in the
+L:8:420:420:153:0:0:Withywindle river in the
+L:10:0:420:153:622:0:a willow clearing in the
 S:0:0:0:0:0:0:0:0
 
 N:55:Bombadil's house
