@@ -228,7 +228,7 @@ D:Life goes as usual in Bree.  Men and hobbits trade peacefully together,
 D: despite the strange men recently coming from the south.
 D:  Regrettably, hobbits from the outskirts of the town
 D: can't help feeling unsafe since the southerners
-D: started gathering by the sewer exit at the edge of Chetwood Forest and,
+D: started gathering by the sewer exit at the foot of the Bree-hill and,
 D: as some boys claim, even disappearing in the main sewer tunnel occasionally.
 D:  The well leading down to the town sewers is marked with '>'
 D: and can be descended by pressing '>' when standing over the grates.
