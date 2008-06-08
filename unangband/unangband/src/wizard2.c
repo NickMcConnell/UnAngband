@@ -1114,8 +1114,9 @@ static void do_cmd_wiz_jump(void)
 		p_ptr->command_arg = atoi(tmp_val);
 	}
 
-	/* Paranoia */
-	if (p_ptr->command_arg < 0) p_ptr->command_arg = 0;
+	/* Save the old dungeon in case something goes wrong */
+	if (autosave_backup)
+		do_cmd_save_bkp();
 
 	if (p_ptr->command_arg < min_depth(p_ptr->dungeon))
 		p_ptr->command_arg = min_depth(p_ptr->dungeon);
@@ -1705,10 +1706,6 @@ void do_cmd_debug(void)
 		/* Go up or down in the dungeon */
 		case 'j':
 		{
-			/* Save the old dungeon in case something goes wrong */
-			if (autosave_backup)
-				do_cmd_save_bkp();
-
 			do_cmd_wiz_jump();
 			break;
 		}

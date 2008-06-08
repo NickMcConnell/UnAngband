@@ -2222,10 +2222,6 @@ static void process_command(void)
 		/* Go up staircase */
 		case '<':
 		{
-			/* Save the old dungeon in case something goes wrong */
-			if (autosave_backup)
-				do_cmd_save_bkp();
-
 			do_cmd_go_up();
 			break;
 		}
@@ -2233,10 +2229,6 @@ static void process_command(void)
 		/* Go down staircase */
 		case '>':
 		{
-			/* Save the old dungeon in case something goes wrong */
-			if (autosave_backup)
-				do_cmd_save_bkp();
-
 			do_cmd_go_down();
 			break;
 		}

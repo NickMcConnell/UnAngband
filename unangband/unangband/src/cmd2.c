@@ -700,7 +700,11 @@ static void do_cmd_travel(void)
 						/* Bail out */
 						return;
 				}
-			
+
+				/* Save the old dungeon in case something goes wrong */
+				if (autosave_backup)
+					do_cmd_save_bkp();
+
 				/* Will try to auto-eat? */
 				if (p_ptr->food < PY_FOOD_FULL)
 				{
@@ -836,6 +840,13 @@ void do_cmd_go_up(void)
 		return;
 	}
 
+	/* Save the old dungeon in case something goes wrong */
+	if (autosave_backup)
+		do_cmd_save_bkp();
+
+	/* Hack -- take a turn */
+	p_ptr->energy_use = 100;
+
 	/* Hack -- travel through wilderness */
 	if (adult_campaign 
 		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
@@ -937,6 +948,10 @@ void do_cmd_go_down(void)
 		msg_print("I see no down staircase here.");
 		return;
 	}
+
+	/* Save the old dungeon in case something goes wrong */
+	if (autosave_backup)
+		do_cmd_save_bkp();
 
 	/* Hack -- take a turn */
 	p_ptr->energy_use = 100;

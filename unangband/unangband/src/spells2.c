@@ -1042,10 +1042,14 @@ void set_recall(void)
 	if (!p_ptr->word_recall)
 	{
 		if (!get_check("The air starts crackling. Are you sure you want to continue? "))
-		  {
+		{
 		    msg_print("A sudden discharge fills the air with a strange smell...");
 		    return;
-		  }
+		}
+
+		/* Save the old dungeon in case something goes wrong */
+		if (autosave_backup)
+			do_cmd_save_bkp();
 
 		/* Reset recall depth */
 		if (p_ptr->depth > min_depth(p_ptr->dungeon) 
@@ -7001,6 +7005,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		/* Save the old dungeon in case something goes wrong */
 		if (autosave_backup)
 			do_cmd_save_bkp();
+
 		p_ptr->create_stair = 0;
 		p_ptr->leaving = TRUE;
 		obvious = TRUE;
@@ -7201,10 +7206,6 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_RECALL))
 	{
-		/* Save the old dungeon in case something goes wrong */
-		if (autosave_backup)
-			do_cmd_save_bkp();
-
 		set_recall();
 		obvious = TRUE;
 	}
