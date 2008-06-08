@@ -4773,7 +4773,7 @@ static void name_drop(object_type *j_ptr)
 			else
 			{
 				/* Generate monster appropriate for level */
-				r_idx = get_mon_num(p_ptr->depth);
+				r_idx = get_mon_num(monster_level);
 			}
 
 			/* Apply flags */
@@ -4818,7 +4818,7 @@ static void name_drop(object_type *j_ptr)
 		get_mon_num_prep();
 
 		/* Generate monster appropriate for level */
-		r_idx = get_mon_num(p_ptr->depth);
+		r_idx = get_mon_num(monster_level);
 
 		/* Restore the old hook */
 		get_mon_num_hook = get_mon_old_hook;

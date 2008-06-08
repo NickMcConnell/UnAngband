@@ -4942,12 +4942,12 @@ void do_cmd_feeling(void)
 		}
 		case 1:
 		{
-			msg_print("The future unfolds before you.");
+			msg_print("You feel the future unfolds before you.");
 			return;
 		}
 		case 2:
 		{
-			msg_print("Something is about to begin.");
+			msg_print("You feel something new is about to begin.");
 			return;
 		}
 		}

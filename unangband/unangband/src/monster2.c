@@ -759,7 +759,7 @@ s16b get_mon_num(int level)
 			}
 			
 			/*
-			 * No "hurt" lite monsters not allowed in daytime
+			 * No "hurt" lite monsters allowed in daytime
 			 * 
 			 * We have to check this here because it it 'time-dependent'
 			 */
@@ -847,29 +847,35 @@ s16b get_mon_num(int level)
 		if (!check_level_flags_race(r_idx)) continue;
 
 		/* Allow monsters to be generated 'nearly' in-depth */
-		if (table[i].level < MIN(p_ptr->depth - 4, level - 3))
+		if (table[i].level < MIN(monster_level - 4, level - 3))
 		{
 			int miss_level = table[i].level;
 			int count = 0;
 			
-			/* Modify up for powerful monsters */
+			/* Modify up for leveled monsters */
 			if (r_ptr->flags9 & RF9_LEVEL_MASK) miss_level += 15;
 			
 			/* Allow a best effort choice in the event we can't find anything */
-			/* Hack -- have a soft boundary, so we don't always get the same monster very deep */
-			if ((closest_miss_level + 5 < miss_level) || ((closest_miss_level <= miss_level) && (!rand_int(++count)) ))
+			/* Hack -- have a soft boundary, so we don't always get 
+			   the same monster very deep */
+			if (closest_miss_level + 5 < miss_level
+				|| (closest_miss_level <= miss_level 
+					&& !rand_int(++count)))
 			{
 				closest_miss_r_idx = table[i].index;
-				if (closest_miss_level < miss_level) closest_miss_level = miss_level;
+				if (closest_miss_level < miss_level) 
+					closest_miss_level = miss_level;
 			}
 			
-			/* Ensure minimum depth for monsters, except those that have friends or level up */
-			if ((table[i].level < MIN(p_ptr->depth - 4, level - 3))
-				&& ((r_ptr->flags1 & (RF1_FRIENDS)) == 0) 
-				&& ((r_ptr->flags9 & RF9_LEVEL_MASK) == 0)) continue;
+			/* Ensure minimum depth for monsters, 
+			   except those that have friends or level up */
+			if ((r_ptr->flags1 & RF1_FRIENDS) == 0 
+				&& (r_ptr->flags9 & RF9_LEVEL_MASK) == 0) 
+				continue;
 			
 			/* Ensure hard minimum depth for monsters */
-			if (table[i].level < MIN(p_ptr->depth - 19, level - 18)) continue;
+			if (table[i].level < MIN(monster_level - 19, level - 18)) 
+				continue;
 		}
 
 		/* Accept */
@@ -1249,7 +1255,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		
 		/* Scale a monster */
 		if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-			monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
+			monster_scale(&monster_race_scaled, m_idx, monster_level))
 		{
 			r_ptr = &monster_race_scaled;
 		}
@@ -3024,7 +3030,7 @@ int calc_monster_ac(int m_idx, bool ranged)
 
 	/* Scale a monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-		monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
+		monster_scale(&monster_race_scaled, m_idx, monster_level))
 	{
 		r_ptr = &monster_race_scaled;
 	}
@@ -3074,7 +3080,7 @@ int calc_monster_hp(int m_idx)
 
 	/* Scale the monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-		monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
+		monster_scale(&monster_race_scaled, m_idx, monster_level))
 	{
 		r_ptr = &monster_race_scaled;
 	}
@@ -3115,7 +3121,7 @@ byte calc_monster_speed(int m_idx)
 
 	/* Scale the monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-		monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
+		monster_scale(&monster_race_scaled, m_idx, monster_level))
 	{
 		r_ptr = &monster_race_scaled;
 	}
@@ -5616,10 +5622,10 @@ void get_monster_ecology(int r_idx)
 	/* For first few monsters on a level, we force some related monsters to appear */
 	if (cave_ecology.num_races <= 7) hack_ecology = randint(7);
 
-	/* Pick a monster if one not specified; make it strong */
+	/* Pick a monster if one not specified */
 	if (!r_idx)
 	{
-		r_idx = get_mon_num(monster_level + 2);
+		r_idx = get_mon_num(monster_level);
 	}
 
 	/* Add the monster */
@@ -5690,6 +5696,10 @@ void get_monster_ecology(int r_idx)
 		r_idx = cave_ecology.race[i];
 		r_ptr = &r_info[r_idx];
 
+		/* Try slightly lower monster level */  	 	 
+		monster_level = MAX(1, MIN(monster_level - 3, 
+								   (monster_level + r_ptr->level) / 2 - 1));
+ 
 		/* Set summoner */
 		summoner = r_idx;
 		
