@@ -2072,7 +2072,7 @@ void screen_monster_look(const int m_idx)
 		
 	/* Scale monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) == 0)
-			&& monster_scale(&race, m_idx, monster_level))
+			&& monster_scale(&race, m_idx, p_ptr->depth))
 	{
 		/* Scaled the monster successfully */
 	}

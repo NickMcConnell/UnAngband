@@ -709,6 +709,10 @@ s16b get_mon_num(int level)
 
 	alloc_entry *table = alloc_race_table;
 
+	int local_monster_level = MIN(99, MAX(0, monster_level));
+
+	level = MIN(99, MAX(0, level));
+
 	/*
 	 * Use the ecology model
 	 *
@@ -847,7 +851,7 @@ s16b get_mon_num(int level)
 		if (!check_level_flags_race(r_idx)) continue;
 
 		/* Allow monsters to be generated 'nearly' in-depth */
-		if (table[i].level < MIN(monster_level - 4, level - 3))
+		if (table[i].level < MIN(local_monster_level - 4, level - 3))
 		{
 			int miss_level = table[i].level;
 			int count = 0;
@@ -874,7 +878,7 @@ s16b get_mon_num(int level)
 				continue;
 			
 			/* Ensure hard minimum depth for monsters */
-			if (table[i].level < MIN(monster_level - 19, level - 18)) 
+			if (table[i].level < MIN(local_monster_level - 19, level - 18)) 
 				continue;
 		}
 
@@ -1255,7 +1259,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		
 		/* Scale a monster */
 		if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-			monster_scale(&monster_race_scaled, m_idx, monster_level))
+			monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
 		{
 			r_ptr = &monster_race_scaled;
 		}
@@ -3030,7 +3034,7 @@ int calc_monster_ac(int m_idx, bool ranged)
 
 	/* Scale a monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-		monster_scale(&monster_race_scaled, m_idx, monster_level))
+		monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
 	{
 		r_ptr = &monster_race_scaled;
 	}
@@ -3080,7 +3084,7 @@ int calc_monster_hp(int m_idx)
 
 	/* Scale the monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-		monster_scale(&monster_race_scaled, m_idx, monster_level))
+		monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
 	{
 		r_ptr = &monster_race_scaled;
 	}
@@ -3121,7 +3125,7 @@ byte calc_monster_speed(int m_idx)
 
 	/* Scale the monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) != 0) &&
-		monster_scale(&monster_race_scaled, m_idx, monster_level))
+		monster_scale(&monster_race_scaled, m_idx, p_ptr->depth))
 	{
 		r_ptr = &monster_race_scaled;
 	}
@@ -3915,7 +3919,11 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 		}
 		
 		/* No luck -- boost */
-		if (!escort_idx) monster_level += 3;
+		if (!escort_idx) 
+			monster_level += 3;
+
+		if (monster_level > 110)
+			break;
 	}
 
 	monster_level = old_monster_level;
