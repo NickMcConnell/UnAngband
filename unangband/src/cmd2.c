@@ -709,16 +709,56 @@ static void do_cmd_travel(void)
 			/* Display the list and get a selection */
 			if (get_list(print_routes, routes, num, "Routes", "Travel to where", ", L=locations, M=map", 1, 22, route_commands, &selection))
 			{
-			
-				if (count_routes(selection, p_ptr->dungeon) <= 0)
+				int found = 0;
+
+				if (!t_info[selection].visited)
+				{
+					char str[1000];
+
+					for (i = 1; i < z_info->t_max; i++) 
+					{
+						if (t_info[i].replace_ifvisited == selection)
+						{
+							if (found == 0) 
+							{
+								sprintf(str, "If you enter %s, you will never find %s", t_info[selection].name + t_name, t_info[i].name + t_name);
+								found = -1;
+							}
+							else if (found < 0)
+							{
+								found = i;
+							}
+							else
+							{
+								my_strcat(str, format(", %s", t_info[found].name + t_name), 1000);
+								found = i;
+							}
+						}
+					}
+					if (found > 0) 
+						my_strcat(str, format(" and %s again!", t_info[found].name + t_name), 1000);
+					else if (found < 0) 
+						my_strcat(str, " again!", 1000);
+					if (found != 0)
+						msg_print(str);
+				}
+
+				if (found == 0
+					&& count_routes(selection, p_ptr->dungeon) <= 0)
 				{
 					msg_print("As you set foot upon the path, you have the sudden feeling you might not be able to get back this way for a long while.");
-					
-					if (!get_check("Are you sure you want to travel? ")) 
-						/* Bail out */
-						return;
+					found = 1;
 				}
-			
+
+				if (found != 0 
+					&& !get_check("Are you sure you want to travel? ")) 
+					/* Bail out */
+					return;
+
+				/* Save the old dungeon in case something goes wrong */
+				if (autosave_backup)
+					do_cmd_save_bkp();
+
 				/* Will try to auto-eat? */
 				if (p_ptr->food < PY_FOOD_FULL)
 				{
@@ -854,6 +894,13 @@ void do_cmd_go_up(void)
 		return;
 	}
 
+	/* Save the old dungeon in case something goes wrong */
+	if (autosave_backup)
+		do_cmd_save_bkp();
+
+	/* Hack -- take a turn */
+	p_ptr->energy_use = 100;
+
 	/* Hack -- travel through wilderness */
 	if (adult_campaign 
 		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
@@ -955,6 +1002,10 @@ void do_cmd_go_down(void)
 		msg_print("I see no down staircase here.");
 		return;
 	}
+
+	/* Save the old dungeon in case something goes wrong */
+	if (autosave_backup)
+		do_cmd_save_bkp();
 
 	/* Hack -- take a turn */
 	p_ptr->energy_use = 100;

@@ -5995,7 +5995,7 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 		cave_ecology.single_ecology = TRUE;
 		
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
-		place_monster_aux(y, x, get_mon_num(p_ptr->depth),
+		place_monster_aux(y, x, get_mon_num(monster_level),
 			(rand_int(3)), FALSE, 0L);
 		
 		/* End enforcement of monster selection */
@@ -6146,27 +6146,27 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 				/* Monster */
 				case '&':
 				{
-					monster_level = p_ptr->depth + 5;
+					monster_level += 5;
 					vault_monster(y, x);
-					monster_level = p_ptr->depth;
+					monster_level -= 5;
 					break;
 				}
 
 				/* Meaner monster */
 				case '@':
 				{
-					monster_level = p_ptr->depth + 11;
+					monster_level += 11;
 					vault_monster(y, x);
-					monster_level = p_ptr->depth;
+					monster_level -= 11;
 					break;
 				}
 
 				/* Meaner monster, plus treasure */
 				case '9':
 				{
-					monster_level = p_ptr->depth + 9;
+					monster_level += 9;
 					vault_monster(y, x);
-					monster_level = p_ptr->depth;
+					monster_level -= 9;
 					object_level = p_ptr->depth + 7;
 					place_object(y, x, TRUE, FALSE);
 					object_level = p_ptr->depth;
@@ -6176,9 +6176,9 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 				/* Nasty monster and treasure */
 				case '8':
 				{
-					monster_level = p_ptr->depth + 40;
+					monster_level += 40;
 					vault_monster(y, x);
-					monster_level = p_ptr->depth;
+					monster_level -= 40;
 					object_level = p_ptr->depth + 20;
 					place_object(y, x, TRUE, TRUE);
 					object_level = p_ptr->depth;
@@ -6190,9 +6190,9 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 				{
 					if (rand_int(100) < 50)
 					{
-						monster_level = p_ptr->depth + 3;
+						monster_level += 3;
 						vault_monster(y, x);
-						monster_level = p_ptr->depth;
+						monster_level -= 3;
 					}
 					if (rand_int(100) < 50)
 					{
@@ -6319,7 +6319,7 @@ static void build_tower(int y0, int x0, int ymax, int xmax, cptr data)
 		if (!cave_naked_bold(y, x)) continue;
 
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
-		place_monster_aux(y, x, get_mon_num(p_ptr->depth),
+		place_monster_aux(y, x, get_mon_num(monster_level),
 			(rand_int(3)), FALSE, 0L);
 		
 		/* One less monster to place. */
@@ -9756,14 +9756,12 @@ static void init_ecology(int r_idx)
 
 	/* Initialise the dungeon ecology */
 	(void)WIPE(&cave_ecology, ecology_type);
+	assert (cave_ecology.ready == FALSE);
+	assert (cave_ecology.valid_hook == FALSE);
 
 	/* Count of different non-unique monsters in ecology */
 	k = (MIN_ECOLOGY_RACES / 2) + rand_int((MIN_ECOLOGY_RACES + 1) / 2);
 
-	/* Ecology is not yet valid */
-	cave_ecology.ready = FALSE;
-	cave_ecology.valid_hook = FALSE;
-	
 	/* Initialise ecology based on seed race */
 	if (r_idx)
 	{
@@ -11248,6 +11246,11 @@ static bool cave_gen(void)
 			init_ecology(0);
 		}
 	}
+	else
+	{
+		/* Wipe the previous dungeon ecology */
+		(void)WIPE(&cave_ecology, ecology_type);
+	}
 
 	/* Hack -- build a tower in the centre of the level */
 	if (level_flag & (LF1_TOWER))
@@ -11992,6 +11995,10 @@ void generate_cave(void)
 {
 	int i, j, y, x, num;
 
+	/* Reset the monster generation level; make level feeling interesting */
+	monster_level = p_ptr->depth >= 4 ? p_ptr->depth + 2 : 
+		(p_ptr->depth >= 2 ? p_ptr->depth + 1 : p_ptr->depth);
+
 	/* The dungeon is not ready */
 	character_dungeon = FALSE;
 
@@ -12068,9 +12075,9 @@ void generate_cave(void)
 		p_ptr->wy = DUNGEON_HGT;
 		p_ptr->wx = DUNGEON_WID;
 
-
-		/* Reset the monster generation level */
-		monster_level = p_ptr->depth;
+		/* Reset the monster generation level; make level feeling interesting */
+		monster_level = p_ptr->depth >= 4 ? p_ptr->depth + 2 : 
+			(p_ptr->depth >= 2 ? p_ptr->depth + 1 : p_ptr->depth);
 
 		/* Reset the object generation level */
 		object_level = p_ptr->depth;

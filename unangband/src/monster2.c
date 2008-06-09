@@ -709,6 +709,10 @@ s16b get_mon_num(int level)
 
 	alloc_entry *table = alloc_race_table;
 
+	int local_monster_level = MIN(59, MAX(0, monster_level));
+
+	level = MIN(59, MAX(0, level));
+
 	/*
 	 * Use the ecology model
 	 *
@@ -759,7 +763,7 @@ s16b get_mon_num(int level)
 			}
 			
 			/*
-			 * No "hurt" lite monsters not allowed in daytime
+			 * No "hurt" lite monsters allowed in daytime
 			 * 
 			 * We have to check this here because it it 'time-dependent'
 			 */
@@ -847,29 +851,35 @@ s16b get_mon_num(int level)
 		if (!check_level_flags_race(r_idx)) continue;
 
 		/* Allow monsters to be generated 'nearly' in-depth */
-		if (table[i].level < MIN(p_ptr->depth - 4, level - 3))
+		if (table[i].level < MIN(local_monster_level - 4, level - 3))
 		{
 			int miss_level = table[i].level;
 			int count = 0;
 			
-			/* Modify up for powerful monsters */
+			/* Modify up for leveled monsters */
 			if (r_ptr->flags9 & RF9_LEVEL_MASK) miss_level += 15;
 			
 			/* Allow a best effort choice in the event we can't find anything */
-			/* Hack -- have a soft boundary, so we don't always get the same monster very deep */
-			if ((closest_miss_level + 5 < miss_level) || ((closest_miss_level <= miss_level) && (one_in_(++count)) ))
+			/* Hack -- have a soft boundary, so we don't always get 
+			   the same monster very deep */
+			if (closest_miss_level + 5 < miss_level
+				|| (closest_miss_level <= miss_level 
+					&& one_in_(++count)))
 			{
 				closest_miss_r_idx = table[i].index;
-				if (closest_miss_level < miss_level) closest_miss_level = miss_level;
+				if (closest_miss_level < miss_level) 
+					closest_miss_level = miss_level;
 			}
 			
-			/* Ensure minimum depth for monsters, except those that have friends or level up */
-			if ((table[i].level < MIN(p_ptr->depth - 4, level - 3))
-				&& ((r_ptr->flags1 & (RF1_FRIENDS)) == 0) 
-				&& ((r_ptr->flags9 & RF9_LEVEL_MASK) == 0)) continue;
+			/* Ensure minimum depth for monsters, 
+			   except those that have friends or level up */
+			if ((r_ptr->flags1 & RF1_FRIENDS) == 0 
+				&& (r_ptr->flags9 & RF9_LEVEL_MASK) == 0) 
+				continue;
 			
 			/* Ensure hard minimum depth for monsters */
-			if (table[i].level < MIN(p_ptr->depth - 19, level - 18)) continue;
+			if (table[i].level < MIN(local_monster_level - 19, level - 18)) 
+				continue;
 		}
 
 		/* Accept */
@@ -3443,10 +3453,10 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		object_prep(o_ptr, ammo_kind);
 
 		/* Give uniques maximum shots */
-		if (r_ptr->flags1 & (RF1_UNIQUE)) o_ptr->number = MIN(99, (byte)r_ptr->level);
+		if (r_ptr->flags1 & (RF1_UNIQUE)) o_ptr->number = MIN(59, (byte)r_ptr->level);
 
 		/* Archers get more shots */
-		else if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)MIN(99,damroll(2, (r_ptr->level + 1) / 2));
+		else if (r_ptr->flags2 & (RF2_ARCHER)) o_ptr->number += (byte)MIN(59,damroll(2, (r_ptr->level + 1) / 2));
 
 		/* Give the monster some shots */
 		else o_ptr->number = (byte)rand_range(1, (r_ptr->level + 1) / 2);
@@ -3940,7 +3950,11 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 		}
 		
 		/* No luck -- boost */
-		if (!escort_idx) monster_level += 3;
+		if (!escort_idx) 
+			monster_level += 3;
+
+		if (monster_level > 70)
+			break;
 	}
 
 	monster_level = old_monster_level;
@@ -5653,10 +5667,10 @@ void get_monster_ecology(int r_idx)
 	/* For first few monsters on a level, we force some related monsters to appear */
 	if (cave_ecology.num_races <= 7) hack_ecology = randint(7);
 
-	/* Pick a monster if one not specified; make it strong */
+	/* Pick a monster if one not specified */
 	if (!r_idx)
 	{
-		r_idx = get_mon_num(monster_level + 2);
+		r_idx = get_mon_num(monster_level);
 	}
 
 	/* Add the monster */
@@ -5727,6 +5741,10 @@ void get_monster_ecology(int r_idx)
 		r_idx = cave_ecology.race[i];
 		r_ptr = &r_info[r_idx];
 
+		/* Try slightly lower monster level */  	 	 
+		monster_level = MAX(1, MIN(monster_level - 3, 
+								   (monster_level + r_ptr->level) / 2 - 1));
+ 
 		/* Set summoner */
 		summoner = r_idx;
 		

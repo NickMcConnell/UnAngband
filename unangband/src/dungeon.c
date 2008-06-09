@@ -2219,10 +2219,6 @@ static void process_command(void)
 		/* Go up staircase */
 		case '<':
 		{
-			/* Save the old dungeon in case something goes wrong */
-			if (autosave_backup)
-				do_cmd_save_bkp();
-
 			do_cmd_go_up();
 			break;
 		}
@@ -2230,10 +2226,6 @@ static void process_command(void)
 		/* Go down staircase */
 		case '>':
 		{
-			/* Save the old dungeon in case something goes wrong */
-			if (autosave_backup)
-				do_cmd_save_bkp();
-
 			do_cmd_go_down();
 			break;
 		}
@@ -3338,9 +3330,6 @@ static void dungeon(void)
 
 	/*** Process this dungeon level ***/
 
-	/* Reset the monster generation level */
-	monster_level = p_ptr->depth;
-
 	/* Reset the object generation level */
 	object_level = p_ptr->depth;
 
@@ -3351,6 +3340,10 @@ static void dungeon(void)
 	while (TRUE)
 	{
 		int i;
+
+		/* Reset the monster generation level; make level feeling interesting */
+		monster_level = p_ptr->depth >= 4 ? p_ptr->depth + 2 : 
+			(p_ptr->depth >= 2 ? p_ptr->depth + 1 : p_ptr->depth);
 
 		/* Hack -- Compact the monster list occasionally */
 		if (m_cnt + 32 > z_info->m_max) compact_monsters(64);

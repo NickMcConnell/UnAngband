@@ -1084,10 +1084,10 @@ static void do_cmd_wiz_jump(void)
 		char tmp_val[160];
 
 		/* Prompt */
-		sprintf(ppp, "Jump to level (0-%d): ", max_depth(p_ptr->dungeon)-min_depth(p_ptr->dungeon));
+		sprintf(ppp, "Jump to level (%d-%d): ", min_depth(p_ptr->dungeon), max_depth(p_ptr->dungeon));
 
 		/* Default */
-		sprintf(tmp_val, "%d", p_ptr->depth-min_depth(p_ptr->dungeon));
+		sprintf(tmp_val, "%d", p_ptr->depth);
 
 		/* Ask for a level */
 		if (!get_string(ppp, tmp_val, 10)) return;
@@ -1096,11 +1096,14 @@ static void do_cmd_wiz_jump(void)
 		p_ptr->command_arg = atoi(tmp_val);
 	}
 
-	/* Paranoia */
-	if (p_ptr->command_arg < 0) p_ptr->command_arg = 0;
+	/* Save the old dungeon in case something goes wrong */
+	if (autosave_backup)
+		do_cmd_save_bkp();
 
-	/* Paranoia */
-	if (p_ptr->command_arg > max_depth(p_ptr->dungeon)-min_depth(p_ptr->dungeon)) p_ptr->command_arg = max_depth(p_ptr->dungeon)-min_depth(p_ptr->dungeon);
+	if (p_ptr->command_arg < min_depth(p_ptr->dungeon))
+		p_ptr->command_arg = min_depth(p_ptr->dungeon);
+	if (p_ptr->command_arg > max_depth(p_ptr->dungeon))
+		p_ptr->command_arg = max_depth(p_ptr->dungeon);
 
 	/* Accept request */
 	msg_format("You jump to dungeon level %d.", p_ptr->command_arg);
@@ -1109,7 +1112,7 @@ static void do_cmd_wiz_jump(void)
 	p_ptr->create_stair = 0;
 
 	/* New depth */
-	p_ptr->depth = p_ptr->command_arg + min_depth(p_ptr->dungeon);
+	p_ptr->depth = p_ptr->command_arg;
 
 	/* Leaving */
 	p_ptr->leaving = TRUE;
@@ -1685,10 +1688,6 @@ void do_cmd_debug(void)
 		/* Go up or down in the dungeon */
 		case 'j':
 		{
-			/* Save the old dungeon in case something goes wrong */
-			if (autosave_backup)
-				do_cmd_save_bkp();
-
 			do_cmd_wiz_jump();
 			break;
 		}
