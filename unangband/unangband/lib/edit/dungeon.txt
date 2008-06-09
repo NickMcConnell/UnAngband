@@ -387,7 +387,7 @@ D: maps will not let you find your way back.
 
 # Goes upwards
 
-N:23:Isengard, war-ready
+N:23:Isengard war-ready
 X:37:21:22:64
 Q:28:532
 Z:66:22
@@ -501,7 +501,7 @@ L:66:56:218:216:0:20
 L:99:56:218:216:546:20
 D:You can choose to confront Sauron here, high in a tower lit by a flaming eye.
 
-N:35:Hobbiton, in ruins
+N:35:Hobbiton in ruins
 X:11:53:0:0
 Q:36:532
 Z:36:36
@@ -511,7 +511,7 @@ S:516:517:14:266:509:0:0:0
 D:Someone with a silver-tongue and guile-full words has brought fair Hobbiton to
 D: its knees in a whir of devilish industry and foul pollution.
 
-N:36:Hobbiton, rebuilt
+N:36:Hobbiton rebuilt
 X:70:0:0:0
 G:h
 L:0:0:407:153:0:0
@@ -520,7 +520,7 @@ D:One last challenge awaits, to visit Angband to defeat an ancient evil.  Or you
 D: can choose to sail from here into the West and let another take on the might of
 D: Morgoth.
 
-N:37:Fangorn, aflame
+N:37:Fangorn aflame
 X:23:48:0:0
 Q:62:249
 Z:62:62
