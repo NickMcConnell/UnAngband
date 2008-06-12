@@ -2992,8 +2992,15 @@ s16b monster_place(int y, int x, monster_type *n_ptr)
 		/* Clear flags */
 		m_ptr->mflag &= ~(MFLAG_OVER | MFLAG_HIDE);
 
+		/* Use the simple RNG to preserve seed from before save */
+		/* TODO: Perhaps eliminate the RNG roll altogether here */
+		/* Rand_quick = TRUE; */
+
 		/* Place as hidden as appropriate */
 		monster_hide(y, x, place_monster_here(y, x, m_ptr->r_idx), m_ptr);
+
+		/* Use the complex RNG again */
+		/* Rand_quick = FALSE; */
 
 		/* Update the monster */
 		update_mon(m_idx, TRUE);

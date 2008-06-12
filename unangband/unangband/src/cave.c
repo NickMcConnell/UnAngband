@@ -999,6 +999,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 	bool under = FALSE;
 
+	/* Use the simple RNG to preserve seed from before save */
+	Rand_quick = TRUE;
+
 	/* Monster/Player */
 	m_idx = cave_m_idx[y][x];
 
@@ -1585,6 +1588,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	/* Result */
 	(*ap) = a;
 	(*cp) = c;
+
+	/* Use the complex RNG again */
+	Rand_quick = FALSE;
 }
 
 
