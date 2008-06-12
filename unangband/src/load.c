@@ -2098,6 +2098,10 @@ u16b limit;
 		return (-1);
 	}
 
+	/* Use the simple RNG to preserve seed from before save */
+	/* TODO: Perhaps eliminate the RNG roll altogether in monster2.c */
+	Rand_quick = TRUE;
+
 	/* Read the monsters */
 	for (i = 1; i < limit; i++)
 	{
@@ -2118,10 +2122,14 @@ u16b limit;
 		if (monster_place(n_ptr->fy, n_ptr->fx, n_ptr) != i)
 		{
 			note(format("Cannot place monster %d", i));
+			/* Use the complex RNG again */
+			Rand_quick = FALSE;
 			return (-1);
 		}
 	}
 
+	/* Use the complex RNG again */
+	Rand_quick = FALSE;
 
 	/*** Holding ***/
 
