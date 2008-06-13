@@ -1094,8 +1094,10 @@ static byte chaos_color(void)
 	{
 		case 0: case 1: return (TERM_L_PURPLE);
 		case 2: return (TERM_VIOLET);
-		case 3: return (TERM_L_PINK);
 	}
+	
+	return (TERM_L_PINK);
+
 }
 
 /*

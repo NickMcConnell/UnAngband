@@ -1020,7 +1020,6 @@ static byte storm_color(void)
 		case 3: return (TERM_BLUE);
 		case 4: return (TERM_L_BLUE);
 		case 5: return (TERM_YELLOW);
-		case 6: return (TERM_WHITE);
 	}
 
 	return (TERM_WHITE);
@@ -1030,11 +1029,10 @@ static byte meteor_color(void)
 {
 	switch (rand_int(6))
 	{
-		case 0: case 1: return (TERM_WHITE);
-		case 2: return (TERM_L_BLUE);
-		case 3: return (TERM_RED);
-		case 4: return (TERM_ORANGE);
-		case 5: return (TERM_YELLOW);
+		case 0: return (TERM_L_BLUE);
+		case 1: return (TERM_RED);
+		case 2: return (TERM_ORANGE);
+		case 3: return (TERM_YELLOW);
 	}
 
 	return (TERM_WHITE);
@@ -1044,8 +1042,7 @@ static byte orb_color(void)
 {
 	switch (rand_int(4))
 	{
-		case 0: case 1: case 2: return (TERM_L_DARK);
-		case 3: return (TERM_SLATE);
+		case 0: return (TERM_SLATE);
 	}
 
 	return (TERM_L_DARK);
@@ -1055,8 +1052,7 @@ static byte death_color(void)
 {
 	switch (rand_int(4))
 	{
-		case 0: case 1: case 2: return (TERM_L_DARK);
-		case 3: return (TERM_VIOLET);
+		case 0: return (TERM_VIOLET);
 	}
 
 	return (TERM_L_DARK);
@@ -1066,9 +1062,8 @@ static byte mana_color(void)
 {
 	switch (rand_int(4))
 	{
-		case 0: case 1: return (TERM_VIOLET);
-		case 2: return (TERM_BLUE);
-		case 3: return (TERM_RED);
+		case 0: return (TERM_BLUE);
+		case 1: return (TERM_RED);
 	}
 
 	return (TERM_VIOLET);
@@ -1079,12 +1074,11 @@ static byte disease_color(void)
 {
 	switch (rand_int(4))
 	{
-		case 0: case 1: return (TERM_TEAL);
-		case 2: return (TERM_VIOLET);
-		case 3: return (TERM_L_PINK);
+		case 0: return (TERM_VIOLET);
+		case 1: return (TERM_L_PINK);
 	}
 
-	return (TERM_VIOLET);
+	return (TERM_TEAL);
 }
 
 
@@ -1094,8 +1088,9 @@ static byte chaos_color(void)
 	{
 		case 0: return (TERM_L_PINK);
 		case 1: return (TERM_VIOLET);
-		default: return (TERM_L_PURPLE);
 	}
+	
+	return (TERM_L_PURPLE);
 }
 
 /*
