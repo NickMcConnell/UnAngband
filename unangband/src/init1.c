@@ -4274,13 +4274,31 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
-			    &lev, &rar, &grp, &exp)) return (PARSE_ERROR_GENERIC);
+						&lev, &rar, &grp, &exp)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		r_ptr->level = lev;
 		r_ptr->rarity = rar;
 		r_ptr->grp_idx = grp;
 		r_ptr->mexp = exp;
+	}
+
+	/* Process 'C' for "Calculated Info" (one line only) */
+	else if (buf[0] == 'C')
+	{
+		int lev, rar, grp;
+		long exp;
+
+		/* There better be a current r_ptr */
+		if (!r_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
+						&lev, &rar, &grp, &exp)) return (PARSE_ERROR_GENERIC);
+		
+		/* Ignore the repeated values */
+		r_ptr->calculated_level = lev;
+		r_ptr->calculated_mexp = exp;
 	}
 
 	/* Process 'M' for "Magic Info" (one line only) */
@@ -5879,7 +5897,7 @@ static errr grab_one_town_race_flag(town_type *t_ptr, cptr what)
 static bool monster_not_unique(int monster_id)
 {
 	return monster_id && !(r_info[monster_id].name 
-								  && r_info[monster_id].flags1 & RF1_UNIQUE);
+						   && r_info[monster_id].flags1 & RF1_UNIQUE);
 }
 
 /*
@@ -8230,50 +8248,64 @@ errr eval_r_power(header *head)
 			hp = eval_hp_adjust(r_ptr);
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
-			/* Hack -- set exp */
-			if (lvl == 0) r_ptr->mexp = 0L;
-			else
 			{
-				/* Compute depths and exp of non-unique monsters.
-				   Enable occasionally even for uniques and then manually
-				   repair for the 3 Trolls, Beorn, etc. */
-				if (!(r_ptr->flags1 & (RF1_UNIQUE)))
-				{
-					long mexp = (hp * dam) / 25;
-					long threat = r_ptr->highest_threat;
-	
-					/* Compute level algorithmically */
-					for (j = 1; (mexp > j + 5) || (threat > j + 3); mexp -= j * j, threat -= (j + 4), j++);
-	
-					/* Set level */
-					lvl = MIN(( j > 160 ? 50 + (j - 160) / 20 : 	/* Level 50 and above */
-							(j > 100 ? 45 + (j - 100) / 12 :	/* Level 45 and above */
-							(j > 40 ? 35 + (j - 40) / 6 :	/* Level 35 and above */
-							(j > 30 ? 30 + (j - 30) / 2 :	/* Level 30 and above */
-							j)))), 59);
-	
-					/* Set level */
-					r_ptr->level = lvl;
+				long mexp = (hp * dam) / 25;
+				long threat = r_ptr->highest_threat;
+				long rexp;
+				
+				/* Seed with real value, if available */
+				if (r_ptr->calculated_level)
+					lvl = r_ptr->calculated_level;
 
-					/* Hack -- for Ungoliant-like monsters */
-					if (hp > 10000) r_ptr->mexp = (hp / 25) * (dam / lvl);
-					else r_ptr->mexp = (hp * dam) / (lvl * 25);
+				/* Compute level algorithmically */
+				for (j = 1; (mexp > j + 5) || (threat > j + 3); mexp -= j * j, threat -= (j + 4), j++);
 	
-					/* Round to 2 significant figures */
-					if (r_ptr->mexp > 100)
-					{
-						if (r_ptr->mexp < 1000) { r_ptr->mexp = (r_ptr->mexp + 5) / 10; r_ptr->mexp *= 10; }
-						else if (r_ptr->mexp < 10000) { r_ptr->mexp = (r_ptr->mexp + 50) / 100; r_ptr->mexp *= 100; }
-						else if (r_ptr->mexp < 100000) { r_ptr->mexp = (r_ptr->mexp + 500) / 1000; r_ptr->mexp *= 1000; }
-						else if (r_ptr->mexp < 1000000) { r_ptr->mexp = (r_ptr->mexp + 5000) / 10000; r_ptr->mexp *= 10000; }
-						else if (r_ptr->mexp < 10000000) { r_ptr->mexp = (r_ptr->mexp + 50000) / 100000; r_ptr->mexp *= 100000; }
-					}
+				/* Set level */
+				lvl = MIN(( j > 160 ? 50 + (j - 160) / 20 : 	/* Level 50 and above */
+							(j > 100 ? 45 + (j - 100) / 12 :	/* Level 45 and above */
+							 (j > 40 ? 35 + (j - 40) / 6 :	/* Level 35 and above */
+							  (j > 30 ? 30 + (j - 30) / 2 :	/* Level 30 and above */
+							   j)))), 59);
+	
+
+				/* Hack -- for Ungoliant-like monsters */
+				if (hp > 10000) rexp = (hp / 25) * (dam / lvl);
+				else rexp = (hp * dam) / (lvl * 25);
+	
+				/* Round to 2 significant figures */
+				if (rexp > 100)
+				{
+					if (rexp < 1000) { rexp = (rexp + 5) / 10; rexp *= 10; }
+					else if (rexp < 10000) { rexp = (rexp + 50) / 100; rexp *= 100; }
+					else if (rexp < 100000) { rexp = (rexp + 500) / 1000; rexp *= 1000; }
+					else if (rexp < 1000000) { rexp = (rexp + 5000) / 10000; rexp *= 10000; }
+					else if (rexp < 10000000) { rexp = (rexp + 50000) / 100000; rexp *= 100000; }
+				}
+
+				/* Set depths for non-unique, non-town monsters. */
+				if (!(r_ptr->flags1 & RF1_UNIQUE)
+					&& r_ptr->level)
+				{
+					r_ptr->level = lvl;
+					r_ptr->mexp = rexp;
+				}
+				/* For others note the true calculated values */
+				else
+				{
+					r_ptr->calculated_level = lvl;
+					r_ptr->calculated_mexp = rexp;
 				}
 			}
-	
-			if ((lvl) && (r_ptr->mexp < 1L)) 
-				r_ptr->mexp = 1L;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
+
+			/* Consistency */
+			if (r_ptr->level)
+				r_ptr->mexp = MAX(1L, r_ptr->mexp);
+			else
+				r_ptr->mexp = 0L;
+
+			/* Reset for uniques and town monsters */
+			lvl = r_ptr->level;
 
 			/*
 			 * Hack - We have to use an adjustment factor to prevent overflow.
@@ -8342,19 +8374,19 @@ errr eval_r_power(header *head)
 				/*
 				 * Hack -- provide adjustment factor to prevent overflow
 				 */
-				if ((j == 55) && (r_ptr->level < 55))
+				if ((j == 55) && (lvl < 55))
 				{
 					hp /= 10;
 					dam /= 10;
 				}
 	
-				if ((j == 50) && (r_ptr->level < 50))
+				if ((j == 50) && (lvl < 50))
 				{
 					hp /= 10;
 					dam /= 10;
 				}
 	
-				if ((j == 40) && (r_ptr->level < 40))
+				if ((j == 40) && (lvl < 40))
 				{
 					hp /= 10;
 					dam /= 10;
@@ -9193,6 +9225,11 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	/* Output 'W' for "More Info" (one line only) */
 	fprintf(fp,"W:%d:%d:%d:%ld\n",r_ptr->level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->mexp);
 
+	if ((r_ptr->calculated_level && r_ptr->calculated_level != r_ptr->level)
+		|| (r_ptr->calculated_mexp && r_ptr->calculated_mexp != r_ptr->mexp))
+		/* Output calculated 'W' values, if different (one line only) */
+		fprintf(fp,"C:%d:%d:%d:%ld\n", r_ptr->calculated_level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->calculated_mexp);
+
 	/* Output 'M' for "Magic Info" (one line only) */
 	fprintf(fp, "M:%d:%d:%d:%d\n",r_ptr->freq_innate, r_ptr->freq_spell, r_ptr->spell_power, r_ptr->mana);
 
@@ -9394,7 +9431,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'Y' for "Runes" (up to one line only) */
 	if (k_ptr->runest) fprintf(fp, "Y:%d:%d\n",k_ptr->runest, k_ptr->runesc);
-	else if (k_ptr->flavor) fprintf(fp, "# Runes needed\n");
+	else if (k_ptr->flavor) fprintf(fp, "#$ Runes needed\n");
 
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", k_ptr->flags1, k_info_flags1);
@@ -9485,7 +9522,7 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'Y' for "Runes" (up to one line only) */
 	if (e_ptr->runest) fprintf(fp, "Y:%d:%d\n",e_ptr->runest, e_ptr->runesc);
-	else fprintf(fp, "# Runes needed\n");
+	else fprintf(fp, "#$ Runes needed\n");
 
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", e_ptr->flags1, k_info_flags1);

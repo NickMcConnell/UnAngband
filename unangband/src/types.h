@@ -788,6 +788,8 @@ struct monster_race
 #if 0
 	s16b note;      /* Inscribe body parts with */
 #endif
+	byte calculated_level;     /* Calculated level of creature */
+	s32b calculated_mexp;      /* Calculated exp value for kill */
 };
 
 
