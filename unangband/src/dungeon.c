@@ -3683,66 +3683,11 @@ void play_game(bool new_game)
 	/* Flush the message */
 	Term_fresh();
 
-
 	/* Hack -- Enter wizard mode */
 	if (arg_wizard && enter_wizard_mode()) p_ptr->wizard = TRUE;
 
-
 	/* Flavor the objects */
 	flavor_init();
-
-	/* Mark the fixed monsters as quests */
-	if (adult_campaign)
-	{
-		for (i = 0; i < z_info->t_max; i++)
-		{
-			int guard, ii;
-			
-			guard = t_info[i].quest_monster;
-
-			/* Mark map quest monsters as 'unique guardians'. This allows
-			 * the map quests to be completed successfully.
-			 */
-			if (guard)
-			{
-				r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
-				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
-			}
-			
-			/*
-			 * The same for replacement guardians
-			 */
-			guard = t_info[i].replace_guardian;
-			if (guard)
-			{
-				r_info[guard].flags1 |= (RF1_GUARDIAN | RF1_UNIQUE);
-				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
-			}
-
-			/* However, we must ensure that town lockup monsters are
-			 * unique to allow the town to be unlocked later.
-			 */
-			guard = t_info[i].town_lockup_monster;
-			if (guard)
-			{
-				r_info[guard].flags1 |= (RF1_UNIQUE);
-				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
-			}
-			
-			for (ii = 0; ii < MAX_DUNGEON_ZONES; ii++)
-			{
-				/*
-				 * And we ensure dungeon mini-bosses are marked as
-				 * guardians, so that they do not appear elsewhere
-				 */
-				guard = t_info[i].zone[ii].guard;
-				if (guard)
-				{
-					r_info[guard].flags1 |= (RF1_GUARDIAN);
-				}
-			}
-		}
-	}
 
 	/* Reset visuals */
 	reset_visuals(TRUE);
@@ -3763,10 +3708,85 @@ void play_game(bool new_game)
 	if (arg_force_original) rogue_like_commands = FALSE;
 	if (arg_force_roguelike) rogue_like_commands = TRUE;
 
-
 	/* React to changes */
 	Term_xtra(TERM_XTRA_REACT, 0);
 
+	/* Mark the fixed monsters as quests; other checks */
+	if (adult_campaign)
+	{
+		for (i = 0; i < z_info->t_max; i++)
+		{
+			int guard, ii;
+			
+			guard = t_info[i].quest_monster;
+			/* Mark map quest monsters as 'unique guardians'. This allows
+			 * the map quests to be completed successfully.
+			 */
+			if (guard)
+			{
+				assert (r_info[guard].flags1 & RF1_UNIQUE);
+				r_info[guard].flags1 |= RF1_GUARDIAN;
+				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+			}
+			
+			/*
+			 * The same for replacement guardians
+			 */
+			guard = t_info[i].replace_guardian;
+			if (guard)
+			{
+				assert (r_info[guard].flags1 & RF1_UNIQUE);
+				r_info[guard].flags1 |= RF1_GUARDIAN;
+				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+			}
+
+			/* We must also ensure that town lockup monsters are
+			 * unique to allow the town to be unlocked later.
+			 * Not necessarily guardians, because they don't block dungeons.
+			 */
+			guard = t_info[i].town_lockup_monster;
+			if (guard)
+			{
+				assert (r_info[guard].flags1 & RF1_UNIQUE);
+				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+			}
+			
+			for (ii = 0; ii < MAX_DUNGEON_ZONES; ii++)
+			{
+				/*
+				 * And we ensure dungeon mini-bosses are marked as
+				 * guardians, so that they do not appear elsewhere
+				 */
+				guard = t_info[i].zone[ii].guard;
+				if (guard)
+				{
+					int zone_depth;
+
+					assert (r_info[guard].flags1 & RF1_UNIQUE);
+					r_info[guard].flags1 |= (RF1_GUARDIAN);
+					if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
+
+					/* Sane depth */
+					if (ii == MAX_DUNGEON_ZONES - 1 
+						|| t_info[i].zone[ii+1].level == 0)
+						/* last zone */
+						zone_depth = t_info[i].zone[ii].level;
+					else
+						zone_depth = t_info[i].zone[ii+1].level - 1;
+
+					if (r_info[guard].level /* Maggot */
+						&& r_info[guard].level < zone_depth)
+						fputs(format("Warning: Guardian %d (%s) wimpy.\n", guard, r_info[guard].name + r_name), stderr);
+					if (r_info[guard].calculated_level < MIN(58, zone_depth + 4))
+						fputs(format("Warning: Guardian %d (%s) really wimpy.\n", guard, r_info[guard].name + r_name), stderr);
+					if (r_info[guard].level > zone_depth + 12)
+						fputs(format("Warning: Guardian %d (%s) deadly.\n", guard, r_info[guard].name + r_name), stderr);
+					if (r_info[guard].calculated_level > zone_depth + 20)
+						fputs(format("Warning: Guardian %d (%s) really deadly.\n", guard, r_info[guard].name + r_name), stderr);
+				}
+			}
+		}
+	}
 
 	/* Generate a dungeon level if needed */
 	if (!character_dungeon) generate_cave();

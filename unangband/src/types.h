@@ -790,6 +790,7 @@ struct monster_race
 #endif
 	byte calculated_level;     /* Calculated level of creature */
 	s32b calculated_mexp;      /* Calculated exp value for kill */
+	s32b forced_mexp;          /* Exp at the level forced in monster.txt */
 };
 
 

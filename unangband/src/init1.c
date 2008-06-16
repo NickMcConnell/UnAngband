@@ -4274,7 +4274,8 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
-						&lev, &rar, &grp, &exp)) return (PARSE_ERROR_GENERIC);
+						&lev, &rar, &grp, &exp)) 
+			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		r_ptr->level = lev;
@@ -4287,18 +4288,20 @@ errr parse_r_info(char *buf, header *head)
 	else if (buf[0] == 'C')
 	{
 		int lev, rar, grp;
-		long exp;
+		long exp, fexp;
 
 		/* There better be a current r_ptr */
 		if (!r_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
-						&lev, &rar, &grp, &exp)) return (PARSE_ERROR_GENERIC);
+		if (5 != sscanf(buf+2, "%d:%d:%d:%ld:%ld",
+						&lev, &rar, &grp, &exp, &fexp)) 
+			return (PARSE_ERROR_GENERIC);
 		
 		/* Ignore the repeated values */
 		r_ptr->calculated_level = lev;
 		r_ptr->calculated_mexp = exp;
+		r_ptr->forced_mexp = fexp;
 	}
 
 	/* Process 'M' for "Magic Info" (one line only) */
@@ -8135,6 +8138,32 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	return (hp);
 }
 
+/*
+ * Calculate monster exp for a given level
+ */
+long calculate_exp_for_lvl(long hp, long dam, byte lvl)
+{
+	long rexp;
+
+	assert (lvl);
+	assert (dam);
+
+	/* Hack -- for Ungoliant-like monsters */
+	if (hp > 10000) rexp = (hp / 25) * (dam / lvl);
+	else rexp = (hp * dam) / (lvl * 25);
+	
+	/* Round to 2 significant figures */
+	if (rexp > 100)
+	{
+		if (rexp < 1000) { rexp = (rexp + 5) / 10; rexp *= 10; }
+		else if (rexp < 10000) { rexp = (rexp + 50) / 100; rexp *= 100; }
+		else if (rexp < 100000) { rexp = (rexp + 500) / 1000; rexp *= 1000; }
+		else if (rexp < 1000000) { rexp = (rexp + 5000) / 10000; rexp *= 10000; }
+		else if (rexp < 10000000) { rexp = (rexp + 50000) / 100000; rexp *= 100000; }
+	}
+
+	return rexp;
+}
 
 /*
  * Evaluate the monster power ratings to be stored in r_info.raw
@@ -8251,49 +8280,34 @@ errr eval_r_power(header *head)
 			{
 				long mexp = (hp * dam) / 25;
 				long threat = r_ptr->highest_threat;
-				long rexp;
 				
-				/* Seed with real value, if available */
-				if (r_ptr->calculated_level)
-					lvl = r_ptr->calculated_level;
-
 				/* Compute level algorithmically */
 				for (j = 1; (mexp > j + 5) || (threat > j + 3); mexp -= j * j, threat -= (j + 4), j++);
-	
+
 				/* Set level */
 				lvl = MIN(( j > 160 ? 50 + (j - 160) / 20 : 	/* Level 50 and above */
 							(j > 100 ? 45 + (j - 100) / 12 :	/* Level 45 and above */
 							 (j > 40 ? 35 + (j - 40) / 6 :	/* Level 35 and above */
 							  (j > 30 ? 30 + (j - 30) / 2 :	/* Level 30 and above */
 							   j)))), 59);
-	
-
-				/* Hack -- for Ungoliant-like monsters */
-				if (hp > 10000) rexp = (hp / 25) * (dam / lvl);
-				else rexp = (hp * dam) / (lvl * 25);
-	
-				/* Round to 2 significant figures */
-				if (rexp > 100)
-				{
-					if (rexp < 1000) { rexp = (rexp + 5) / 10; rexp *= 10; }
-					else if (rexp < 10000) { rexp = (rexp + 50) / 100; rexp *= 100; }
-					else if (rexp < 100000) { rexp = (rexp + 500) / 1000; rexp *= 1000; }
-					else if (rexp < 1000000) { rexp = (rexp + 5000) / 10000; rexp *= 10000; }
-					else if (rexp < 10000000) { rexp = (rexp + 50000) / 100000; rexp *= 100000; }
-				}
 
 				/* Set depths for non-unique, non-town monsters. */
 				if (!(r_ptr->flags1 & RF1_UNIQUE)
 					&& r_ptr->level)
 				{
 					r_ptr->level = lvl;
-					r_ptr->mexp = rexp;
+					r_ptr->mexp = calculate_exp_for_lvl(hp, dam, lvl);
 				}
 				/* For others note the true calculated values */
 				else
 				{
 					r_ptr->calculated_level = lvl;
-					r_ptr->calculated_mexp = rexp;
+					r_ptr->calculated_mexp = 
+						calculate_exp_for_lvl(hp, dam, lvl);
+
+					/* Also count true exp at the forced level */
+					r_ptr->forced_mexp = 
+						calculate_exp_for_lvl(hp, dam, MAX(1, r_ptr->level));
 				}
 			}
 #endif /* ALLOW_TEMPLATES_OUTPUT */
@@ -9226,9 +9240,10 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"W:%d:%d:%d:%ld\n",r_ptr->level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->mexp);
 
 	if ((r_ptr->calculated_level && r_ptr->calculated_level != r_ptr->level)
-		|| (r_ptr->calculated_mexp && r_ptr->calculated_mexp != r_ptr->mexp))
+		|| (r_ptr->calculated_mexp && r_ptr->calculated_mexp != r_ptr->mexp)
+		|| (r_ptr->forced_mexp && r_ptr->forced_mexp != r_ptr->mexp))
 		/* Output calculated 'W' values, if different (one line only) */
-		fprintf(fp,"C:%d:%d:%d:%ld\n", r_ptr->calculated_level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->calculated_mexp);
+		fprintf(fp,"C:%d:%d:%d:%ld:%ld\n", r_ptr->calculated_level, r_ptr->rarity, r_ptr->grp_idx, r_ptr->calculated_mexp, r_ptr->forced_mexp);
 
 	/* Output 'M' for "Magic Info" (one line only) */
 	fprintf(fp, "M:%d:%d:%d:%d\n",r_ptr->freq_innate, r_ptr->freq_spell, r_ptr->spell_power, r_ptr->mana);

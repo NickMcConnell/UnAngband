@@ -1069,8 +1069,8 @@ static errr init_r_info(void)
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 
-	/* Save a pointer to the evaluate power function*/
 	r_head.emit_info_txt_index = emit_r_info_index;
+
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 
 #endif /* ALLOW_TEMPLATES */
