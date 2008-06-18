@@ -5787,7 +5787,7 @@ void display_scores(int from, int to)
 	}
 
 	/* Compare string */
-	if (!strcmp(version, "0.6.2"))
+	if (!strcmp(version, "0.6.3"))
 	{
 		msg_print("Incompatible high score table.");
 		msg_print("Please rename lib\\apex\\scores.raw.");

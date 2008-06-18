@@ -157,7 +157,7 @@
 
 #Version information
 
-V:0.6.2
+V:0.6.3
 
 
 # TODO: play-test if the guardians are similarly powerful as uniques
