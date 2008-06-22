@@ -389,7 +389,6 @@ static void wr_xtra(int k_idx)
 
 	/* Activations */
 	wr_u16b(k_ptr->used);	
-
 }
 
 

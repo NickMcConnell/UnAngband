@@ -1232,6 +1232,12 @@ static errr rd_extra(void)
 	/* XXX Hack -- should have saved this before */
 	if (p_ptr->pschool < SV_BOOK_MAX_GOOD) p_ptr->pschool = SV_BOOK_MAX_GOOD;
 
+	if (!older_than(0, 6, 2, 20))
+	{
+		strip_bytes(1);
+		/*rd_byte(&p_ptr->sauron_forms);*/
+	}
+
 	/* Special Race/Class info */
 	rd_byte(&p_ptr->expfact);
 
@@ -2300,10 +2306,13 @@ static errr rd_savefile_new_aux(void)
 	/* Read the object memory */
 	for (i = 0; i < tmp16u; i++)
 	{
+		object_kind *k_ptr = &k_info[i];
+
 		byte tmp8u;
 
-		object_kind *k_ptr = &k_info[i];
 		rd_byte(&tmp8u);
+		if (!older_than(0, 6, 2, 20))
+			strip_bytes(1);
 
 		k_ptr->aware = (tmp8u == 1) ? TRUE: FALSE;
 		k_ptr->tried = (tmp8u >= 2) ? TRUE: FALSE;

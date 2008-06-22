@@ -387,10 +387,11 @@ static void wr_xtra(int k_idx)
 	else if (k_ptr->tried) tmp8u = 2;
 
 	wr_byte(tmp8u);
+	wr_byte(0);
+	/* wr_byte(k_ptr->guess); */
 
 	/* Activations */
 	wr_u16b(k_ptr->used);	
-
 }
 
 
@@ -592,6 +593,8 @@ static void wr_extra(void)
 	/* School */
 	wr_byte(p_ptr->pschool);
 	
+	wr_byte(0);
+	/*wr_byte(p_ptr->sauron_forms);*/
 
 	wr_byte(p_ptr->expfact);
 
