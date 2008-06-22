@@ -74,8 +74,8 @@
  */
 #define OLD_VERSION_MAJOR	0
 #define OLD_VERSION_MINOR	6
-#define OLD_VERSION_PATCH	0
-#define OLD_VERSION_EXTRA	0
+#define OLD_VERSION_PATCH	2
+#define OLD_VERSION_EXTRA	20
 
 
 /*
