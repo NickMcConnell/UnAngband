@@ -690,7 +690,7 @@ R:EVIL
 L:80:407:218:208:511:0
 
 # Redhorn is actually another name for Caradhras;
-# 'Redhorn pass' is the pass nearby
+# 'Redhorn Gate' is the pass nearby
 # East-west passage is free because orcs are on lookout from the west.
 # TODO: recycle 297
 
@@ -706,7 +706,7 @@ L:37:56:145:0:297:0:Ogre Camp beneath
 D:Legend has it that Mount Redhorn,
 D: called also Caradhras, is Morgoth's minion.
 D:  If so, it appears asleep at the moment:
-D: the Redhorn Pass, torturous and treacherous in winter,
+D: the Redhorn Gate, torturous and treacherous in winter,
 D: is clearly visible and calm.
 D:  However, you notice orcs have overrun the track
 D: and they won't let you pass while their leader stands.
