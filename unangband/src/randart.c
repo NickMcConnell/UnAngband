@@ -996,7 +996,7 @@ static s32b artifact_power(int a_idx)
 		}
 		if (a_ptr->flags1 & TR1_SEARCH)
 		{
-			p += a_ptr->pval > 5 ? 0 : a_ptr->pval; /* To preventing pumping pval with only Searching for a randart */
+			p += 1 + a_ptr->pval * a_ptr->pval / 4; /* Can't get lower */
 			LOG_PRINT2("Adding power for searching bonus %d, total is %d\n", a_ptr->pval , p);
 		}
 		if (a_ptr->flags3 & TR3_REGEN_HP)
