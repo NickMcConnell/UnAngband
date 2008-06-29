@@ -2493,8 +2493,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		/* Pick this flag with default pval? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect? */
 			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
-			(obj_pow2 <= lev) &&			/* No more than 100% */
-			(rand_int(++count) == 0))		/* Sometimes pick */
+			obj_pow2 <= lev &&			/* No more than 100% */
+			!rand_int(++count))		/* Sometimes pick */
 		{
 			x1 = 16;
 			x2 = i;
@@ -2531,7 +2531,7 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 			} while (obj_pow2 > old_pow2 && obj_pow2 < lev * 19 / 20);
 
 			/* Can find valid pval? */
-			if ((obj_pow2 > obj_pow1) && (obj_pow2 < lev) && (rand_int(++count) == 0))
+			if (obj_pow2 > obj_pow1 && obj_pow2 < lev && !rand_int(++count))
 			{
 				x1 = 16;
 				x2 = i;
@@ -2569,8 +2569,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
 			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
-			(obj_pow2 <= lev) &&			/* No more than 100% */
-			(rand_int(++count) == 0))		/* Sometimes pick */
+			obj_pow2 <= lev &&			/* No more than 100% */
+			!rand_int(++count))		/* Sometimes pick */
 		{
 			x1 = 17;
 			x2 = i;
@@ -2591,8 +2591,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
 			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
-			(obj_pow2 <= lev) &&			/* No more than 100% */
-			(rand_int(++count) == 0))		/* Sometimes pick */
+			obj_pow2 <= lev &&			/* No more than 100% */
+			!rand_int(++count))		/* Sometimes pick */
 		{
 			x1 = 18;
 			x2 = i;
@@ -2622,8 +2622,8 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect ? */
 			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
-			(obj_pow2 <= lev) &&			/* No more than 100% */
-			(rand_int(++count) == 0))		/* Sometimes pick */
+			obj_pow2 <= lev &&			/* No more than 100% */
+			!rand_int(++count))		/* Sometimes pick */
 		{
 			x1 = 19;
 			x2 = i;
@@ -3804,13 +3804,13 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 		if (limit && !weapon && (j > TR1_SPEED)) continue;
 		else if (limit && weapon && (j <= TR1_SPEED)) continue;
 
-		if ( ((f1) & (j)) && !(rand_int(++count)) ) { flag1 = 1; flag2 = j;}
+		if ( ((f1) & (j)) && !rand_int(++count) ) { flag1 = 1; flag2 = j;}
 	}
 
 	/* Check flags 2 if not weapon */
 	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
-		if (((f2) & (j)) && !(rand_int(++count))) { flag1 = 2; flag2 = j;}
+		if (((f2) & (j)) && !rand_int(++count)) { flag1 = 2; flag2 = j;}
 	}
 
 	/* Check flags 3 if not weapon */
@@ -3819,13 +3819,13 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 		/* Skip 'useless' flags */
 		if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)) continue;
 
-		if (((f3) & (j)) && !(rand_int(++count))) { flag1 = 3; flag2 = j;}
+		if (((f3) & (j)) && !rand_int(++count)) { flag1 = 3; flag2 = j;}
 	}
 
 	/* Check flags 4 if not weapon */
 	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
-		if (((f4) & (j)) && !(rand_int(++count))) { flag1 = 4; flag2 = j;}
+		if (((f4) & (j)) && !rand_int(++count)) { flag1 = 4; flag2 = j;}
 	}
 
 	switch(flag1)
@@ -4460,7 +4460,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 				if (ego_power < (lev * 3 / 2)) continue;
 
-				if (rand_int(++choice)) x2 = o_ptr->xtra2;
+				if (!rand_int(++choice)) x2 = o_ptr->xtra2;
 			}
 
 			/* Found a power */
