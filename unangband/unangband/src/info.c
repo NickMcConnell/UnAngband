@@ -6546,7 +6546,7 @@ s32b object_power(const object_type *o_ptr)
 		}
 		if (f1 & TR1_SEARCH && (!(kf1 & TR1_SEARCH) || o_ptr->pval > k_ptr->pval))
 		{
-			p += o_ptr->pval > 5 + randint(15) ? 0 : o_ptr->pval; /* To make foo of Searching rare deeper down */
+			p += 1 + o_ptr->pval * o_ptr->pval / 4; /* Can't get lower */
 		}
 		if (f3 & TR3_REGEN_HP && (!(kf3 & TR3_REGEN_HP) || o_ptr->pval > k_ptr->pval))
 		{

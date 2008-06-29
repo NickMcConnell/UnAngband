@@ -3342,8 +3342,8 @@ static void calc_bonuses(void)
 		/* Affect stealth */
 		if (f1 & (TR1_STEALTH)) p_ptr->skill_stl += o_ptr->pval;
 
-		/* Affect searching ability (factor of five) */
-		if (f1 & (TR1_SEARCH)) p_ptr->skill_srh += (o_ptr->pval * 5);
+		/* Affect searching ability (factor of ten) */
+		if (f1 & (TR1_SEARCH)) p_ptr->skill_srh += (o_ptr->pval * 10);
 
 		/* Affect infravision */
 		if (f1 & (TR1_INFRA)) p_ptr->see_infra += o_ptr->pval;
