@@ -4530,10 +4530,29 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			int x2 = -1;
 			int w1 = 10000;
 			int w2 = 0;
+			int boost = lev * 3 / 2 - ego_power;
+			int limit;
+
+			/* 4 + ego_power should give some choice.
+			   The rand_int gives a diminishing possibility 
+			   of the better choices being possible. 
+			   Tweak these two constants to balance results */
+			if (boost < 4) 
+				boost = 4; 
+			if (boost < 15) 
+			{
+				limit = ego_power + boost + rand_int(15 - boost);
+			}
+			else 
+			{
+				limit = ego_power + boost;
+			}
 
 			o_ptr->xtra1 = e_ptr->xtra;
 
-			for (o_ptr->xtra2 = 0; o_ptr->xtra2 < object_xtra_size[e_ptr->xtra]; o_ptr->xtra2++)
+			for (o_ptr->xtra2 = 0; 
+				 o_ptr->xtra2 < object_xtra_size[e_ptr->xtra]; 
+				 o_ptr->xtra2++)
 			{
 				ego_power = object_power(o_ptr);
 				if (power < 0) ego_power = -ego_power;
@@ -4544,7 +4563,7 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 					w1 = ego_power; w2 = o_ptr->xtra2;
 				}
 
-				if (ego_power < (lev * 3 / 2)) continue;
+				if (ego_power > limit) continue;
 
 				if (!rand_int(++choice)) x2 = o_ptr->xtra2;
 			}
@@ -4552,13 +4571,12 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			/* Found a power */
 			if (x2 >= 0) o_ptr->xtra2 = x2;
 
-			/* Too powerful -- choose weakest xtra ability */
+			/* Very rarely no x2 ca be chosen -- choose weakest xtra ability */
 			else o_ptr->xtra2 = w2;
 
 			/* Reset ego power */
 			ego_power = object_power(o_ptr);
 			if (power < 0) ego_power = -ego_power;
-
 		}
 
 		/* Boost under-powered ego items if possible */
