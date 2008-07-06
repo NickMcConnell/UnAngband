@@ -1163,8 +1163,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_DAMAGING_BLOW) vp[vn++] = "increases the damage of a single round of blows";
 	if (s_ptr->type == SPELL_DAMAGING_SHOT) vp[vn++] = "increases the damage of a single round of firing";
 	if (s_ptr->type == SPELL_DAMAGING_HURL) vp[vn++] = "increases the damage of a single round of thrown weapons";
-	if (s_ptr->type == SPELL_REFUEL) vp[vn++] = "fuels a torch";
-	
 
 	/* Describe miscellaneous effects */
 	if (vn)
