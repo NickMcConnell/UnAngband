@@ -1182,9 +1182,16 @@ bool player_zap_rod(int item)
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply rod effect */
-	/* Note we use two different sources to suppress messages from dispel evil, in the even the rod is known to be ineffective against non-evil monsters */
-	if (power >= 0) ident = process_spell(known && (o_ptr->sval >= SV_ROD_MIN_DIRECTION) ? SOURCE_PLAYER_ZAP_NO_TARGET : SOURCE_PLAYER_ZAP, o_ptr->k_idx, power, 0, &cancel, &known);
-	else return (TRUE);
+	/* Note we use two different sources to suppress messages 
+	   from dispel evil, in the event the rod is known 
+	   to be ineffective against non-evil monsters */
+	if (power >= 0) 
+		ident = process_spell(known && (o_ptr->sval >= SV_ROD_MIN_DIRECTION) 
+							  ? SOURCE_PLAYER_ZAP_NO_TARGET 
+							  : SOURCE_PLAYER_ZAP, 
+							  o_ptr->k_idx, power, 0, &cancel, &known);
+	else 
+		return (TRUE);
 
 	/* Time rod out */
 	o_ptr->timeout = o_ptr->charges;

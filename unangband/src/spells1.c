@@ -8473,7 +8473,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		note = " is unaffected!";
 
 		/* Pick a "new" monster race */
-		tmp = poly_r_idx(m_ptr->r_idx, y, x);
+		tmp = poly_r_idx(y, x, m_ptr->r_idx);
 
 		/* Handle polymorh */
 		if (tmp != m_ptr->r_idx)
