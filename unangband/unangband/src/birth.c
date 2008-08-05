@@ -2646,10 +2646,10 @@ static bool player_birth_aux_3(void)
 			last_round = auto_round;
 
 			/* Label count */
-			put_str("Round:", 10, col+13);
+			put_str("Round:", 12, col+13);
 
 			/* Indicate the state */
-			put_str("(Hit Enter to stop)", 12, col+13);
+			put_str("(Hit Enter to stop)", 14, col+13);
 
 			/* Auto-roll */
 			while (1)
@@ -2714,7 +2714,7 @@ static bool player_birth_aux_3(void)
 					}
 
 					/* Dump round */
-					put_str(format("%10ld", auto_round), 10, col+20);
+					put_str(format("%10ld", auto_round), 12, col+20);
 
 					/* Make sure they see everything */
 					Term_fresh();
