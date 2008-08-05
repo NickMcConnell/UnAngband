@@ -2585,7 +2585,7 @@ by Bandoras).
 
 - It is now possible to reset your recall depth (From Angband).
 
-- Line of sight effects (such as immoliation) now affect grids and items where there
+- Line of sight effects (such as immolation) now affect grids and items where there
 are monsters.
 
 - Low social status characters start with hard liquor.
