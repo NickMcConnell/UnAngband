@@ -4981,7 +4981,7 @@ C:11:37:24:75:37
 P:41:467
 B:LOS:ACID:3/1
 
-N:414:Immoliation
+N:414:Immolation
 A:70:72:1
 A:90:9:15
 A:93:13:14
@@ -5257,7 +5257,7 @@ B:ARC_20:WIND:3d10+(1d10)/4
 #- or -                                     -->  Fire Ball ---> Fire Ball II --> Fire Ball III
 #                                         ---->           ---___
 #Blast --------->  Minor Ball of Fire  ---                      ---> Fire Storm
-#                                                                               ----> Immoliation
+#                                                                               ----> Immolation
 #- or -
 #
 #Burning Hands --------------------------------> Fire Beam -------> Arc of Fire ----> Dragon's Flame

@@ -2290,7 +2290,7 @@ bool set_rest(int v)
 	/* Hack -- Force good values */
 	v = (v > PY_REST_MAX) ? PY_REST_MAX : (v < 0) ? 0 : v;
 
-	/* Fainting / Starving */
+	/* Fainting */
 	if (p_ptr->rest < PY_REST_FAINT)
 	{
 		old_aux = 0;
@@ -2302,7 +2302,7 @@ bool set_rest(int v)
 		old_aux = 1;
 	}
 
-	/* Hungry */
+	/* Tired */
 	else if (p_ptr->rest < PY_REST_ALERT)
 	{
 		old_aux = 2;
@@ -2314,7 +2314,7 @@ bool set_rest(int v)
 		old_aux = 3;
 	}
 
-	/* Fainting / Starving */
+	/* Fainting */
 	if (v < PY_REST_FAINT)
 	{
 		new_aux = 0;
@@ -2326,7 +2326,7 @@ bool set_rest(int v)
 		new_aux = 1;
 	}
 
-	/* Hungry */
+	/* Tired */
 	else if (v < PY_REST_ALERT)
 	{
 		new_aux = 2;
@@ -2366,7 +2366,7 @@ bool set_rest(int v)
 		/* Describe the state */
 		switch (new_aux)
 		{
-			/* Fainting / Starving */
+			/* Fainting */
 			case 0:
 			{
 				msg_print("You are getting faint from exhaustion!");
@@ -2380,7 +2380,7 @@ bool set_rest(int v)
 				break;
 			}
 
-			/* Hungry */
+			/* Tired */
 			case 2:
 			{
 				msg_print("You are getting short of breath.");
@@ -2405,7 +2405,7 @@ bool set_rest(int v)
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
 
-	/* Redraw hunger */
+	/* Redraw exhaustion */
 	p_ptr->redraw |= (PR_STATE);
 
 	/* Handle stuff */
