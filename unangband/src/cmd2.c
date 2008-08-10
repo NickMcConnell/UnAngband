@@ -795,6 +795,9 @@ void do_cmd_go_up(void)
 
 	/* Leaving */
 	p_ptr->leaving = TRUE;
+
+	/* Check for quest failure. */
+	while (check_quest(&event, TRUE));
 }
 
 
@@ -905,6 +908,8 @@ void do_cmd_go_down(void)
 	/* Leaving */
 	p_ptr->leaving = TRUE;
 
+	/* Check for quest failure. */
+	while (check_quest(&event, TRUE));
 }
 
 

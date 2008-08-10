@@ -564,6 +564,7 @@ extern bool player_apply_rune_or_coating(int item);
 extern bool player_apply_rune_or_coating2(int item);
 
 /* dungeon.c */
+extern void ensure_quest(void);
 extern bool dun_level_mon(int r_idx);
 extern void suffer_disease(bool allow_cure);
 extern void play_game(bool new_game);

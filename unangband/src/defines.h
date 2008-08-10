@@ -3191,11 +3191,12 @@
 #define QUEST_ACTIVE	1	/* Event describes quest */
 #define QUEST_ACTION	2	/* Event describes quest actions */
 #define	QUEST_REWARD	3	/* Event describes quest reward requirements */
-#define	QUEST_PAYOUT	4	/* Event describes quest reward requirements */
+#define	QUEST_PAYOUT	4	/* Event describes quest reward */
 #define	QUEST_FINISH	5	/* Event describes quest results after completion */
 #define	QUEST_FAILED	6	/* Event describes quest failure requirements */
-#define	QUEST_PENALTY	7	/* Event describes quest penalty after completion */
-#define MAX_QUEST_EVENTS 8	/* Maximum events in a quest */
+#define	QUEST_FORFEIT	7	/* Event describes quest penalty at completion */
+#define	QUEST_PENALTY	8	/* Event describes quest penalty after completion */
+#define MAX_QUEST_EVENTS 9	/* Maximum events in a quest */
 
 /* When stage is 0, character has not been assigned quest.
    When stage is 1, character has been assigned quest, but not completed any actions

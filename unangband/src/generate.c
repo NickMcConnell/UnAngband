@@ -10893,7 +10893,7 @@ static bool place_contents()
  */
 static bool cave_gen(void)
 {
-	int i, y, x;
+	int y, x;
 
 	int by, bx;
 
@@ -11298,44 +11298,6 @@ static bool cave_gen(void)
 
 	/* Apply illumination */
 	if ((level_flag & (LF1_SURFACE)) != 0) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
-
-	/* Ensure quest monsters */
-	if (is_quest(p_ptr->depth))
-	{
-		/* Ensure quest monsters */
-		for (i = 1; i < z_info->r_max; i++)
-		{
-			monster_race *r_ptr = &r_info[i];
-
-			/* Ensure quest monsters */
-			if ((r_ptr->flags1 & (RF1_QUESTOR)) &&
-			    (r_ptr->level == p_ptr->depth) &&
-			    (r_ptr->cur_num <= 0))
-			{
-				int y, x;
-				int count = 0;
-
-				/* Pick a location */
-				while (count++ < 1000)
-				{
-					y = rand_int(DUNGEON_HGT);
-					x = rand_int(DUNGEON_WID);
-
-					if (place_monster_here(y, x, i) > MM_FAIL) break;
-				}
-
-				if (count >= 1000)
-				{
-					if (cheat_room) message_add(format("Could not place questor (%s).", r_name + r_info[i].name), MSG_GENERIC);
-
-					return (FALSE);
-				}
-
-				/* Place the questor */
-				place_monster_aux(y, x, i, FALSE, TRUE, 0L);
-			}
-		}
-	}
 
 	/* Ensure guardian monsters */
 	if ((level_flag & (LF1_GUARDIAN)) != 0)
@@ -11789,201 +11751,6 @@ static bool town_gen(void)
 }
 
 
-#if 0
-/*
- * Ensure that the components required for any active quests are placed on the level.
- */
-void ensure_quest()
-{
-	/* Hack -- ensure quest components */
-	for (i = 0; i < MAX_Q_IDX; i++)
-	{
-		quest_type *q_ptr = &q_list[i];
-		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
-
-		/* Hack -- player's actions don't change level */
-		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]);
-
-		/* Quest occurs on this level */
-		if ((qe_ptr->dungeon == p_ptr->dungeon) && (qe_ptr->level == (p_ptr->depth - min_depth(p_ptr->dungeon))))
-			{
-			int n, j;
-
-			n = 0;
-
-			/* Hack -- quest partially completed */
-			if (q_ptr->stage == QUEST_ACTION) n = q_ptr->event[QUEST_ACTION].number;
-
-			/* Require features */
-			if (qe_ptr->feat)
-			{
-				/* Check for feature type */
-				while (n < qe_ptr->number)
-				{
-					/* Count quest features */
-					for (y = 0; y < DUNGEON_HGT; y++)
-					{
-						for (x = 0; x < DUNGEON_WID; x++)
-						{
-							/* Check if feat okay */
-							if (cave_feat[y][x] == qe_ptr->feat) n++;
-						}
-					}
-
-					/* Try placing remaining features */
-					for ( ; n < qe_ptr->number; n++)
-					{
-						/* Pick a "legal" spot */
-						while (TRUE)
-						{
-							/* Location */
-							y = rand_int(DUNGEON_HGT);
-							x = rand_int(DUNGEON_WID);
-
-							/* Require empty, clean, floor grid */
-							if (!cave_naked_bold(y, x)) continue;
-
-							/* Accept it */
-							break;
-						}
-
-						/* Create the feature */
-						cave_set_feat(y, x, qe_ptr->feat);
-
-						/* Guard the feature */
-						if (qe_ptr->race) race_near(qe_ptr->race, y, x);
-
-						/* XXX Hide item in the feature */
-					}
-				}
-
-				/* Amend quest numbers */
-				if (n > qe_ptr->number) qe_ptr->number = n;
-			}
-
-			/* Require race */
-			else if (qe_ptr->race)
-			{
-				n = 0;
-
-				/* Check for monster race */
-				while (n < qe_ptr->number)
-				{
-					/* Count quest races */
-					for (j = 0; j < z_info->m_max; j++)
-					{
-						/* Check if monster okay */
-						if (m_list[j].r_idx == qe_ptr->race) n++;
-					}
-
-					/* Try placing remaining monsters */
-					for ( ; n < qe_ptr->number; n++)
-					{
-						/* Pick a "legal" spot */
-						while (TRUE)
-						{
-							/* Location */
-							y = rand_int(DUNGEON_HGT);
-							x = rand_int(DUNGEON_WID);
-
-							/* Require empty grid */
-							if (!cave_empty_bold(y, x)) continue;
-
-							/* Require monster can pass and survive on terrain */
-							if (place_monster_here(y, x, qe_ptr->race) > MM_FAIL) continue;
-
-							/* Accept it */
-							break;
-						}
-
-						/* Create a new monster (awake, no groups) */
-						(void)place_monster_aux(y, x, qe_ptr->race, FALSE, FALSE);
-
-						/* XXX Monster should carry item */
-						/* This is done as a part of death / fear etc. routine */
-					}
-				}
-
-				/* Amend quest numbers */
-				if (n > qe_ptr->number) qe_ptr->number = n;
-			}
-
-			/* Require object */
-			else if ((qe_ptr->artifact) || (qe_ptr->ego_item_type) || (qe_ptr->kind))
-			{
-				n = 0;
-
-				/* Check for object kind */
-				while (n < qe_ptr->number)
-				{
-					/* Count quest objects */
-					for (j = 0; j < z_info->m_max; j++)
-					{
-						/* Check if feat okay */
-						if (o_list[j].k_idx)
-						{
-							if ((qe_ptr->artifact) && (o_list[j].name1 != qe_ptr->artifact)) continue;
-							if ((qe_ptr->ego_item_type) && (o_list[j].name2 != qe_ptr->ego_item_type)) continue;
-							if ((qe_ptr->kind) && (o_list[j].k_idx != qe_ptr->kind)) continue;
-
-							n++;
-						}
-					}
-
-					/* Try placing remaining objects */
-					for ( ; n < qe_ptr->number; n++)
-					{
-						object_type object_type_body;
-						object_type *o_ptr = &object_type_body;
-
-						/* Pick a "legal" spot */
-						while (TRUE)
-						{
-							/* Location */
-							y = rand_int(DUNGEON_HGT);
-							x = rand_int(DUNGEON_WID);
-
-							/* Require empty grid */
-							if (!cave_naked_bold(y, x)) continue;
-
-							/* Prepare artifact */
-							if (qe_ptr->artifact) qe_ptr->kind = lookup_kind(a_info[qe_ptr->artifact].tval, a_info[qe_ptr->artifact].sval);
-
-							/* Prepare ego item */
-							if ((qe_ptr->ego_item_type) && !(qe_ptr->kind)) qe_ptr->kind =
-								lookup_kind(e_info[qe_ptr->ego_item_type].tval[0],
-									e_info[qe_ptr->ego_item_type].min_sval[0]);
-
-							/* Prepare object */
-							object_prep(o_ptr, qe_ptr->kind);
-
-							/* Prepare artifact */
-							o_ptr->name1 = qe_ptr->artifact;
-
-							/* Prepare ego item */
-							o_ptr->name2 = qe_ptr->ego_item_type;
-
-							/* Apply magic -- hack: use player level as reward level */
-							apply_magic(o_ptr, p_ptr->max_lev * 2, FALSE, FALSE, FALSE);
-
-							/* Several objects */
-							if (o_ptr->number > 1) n += o_ptr->number -1;
-
-							/* Accept it */
-							break;
-						}
-					}
-				}
-
-				/* Amend quest numbers */
-				if (n > qe_ptr->number) qe_ptr->number = n;
-			}
-		}
-	}
-}
-#endif
-
-
 /*
  * Generate a random dungeon level
  *
@@ -11994,6 +11761,16 @@ void ensure_quest()
 void generate_cave(void)
 {
 	int i, j, y, x, num;
+
+	quest_event event;
+
+	/* Use this to allow quests to succeed or fail */
+	WIPE(&event, quest_event);
+
+	/* Set up departure event */
+	event.flags = EVENT_TRAVEL;
+	event.dungeon = p_ptr->dungeon;
+	event.level = p_ptr->depth - min_depth(p_ptr->dungeon);
 
 	/* Reset the monster generation level; make level feeling interesting */
 	monster_level = p_ptr->depth >= 4 ? p_ptr->depth + 2 :
@@ -12009,6 +11786,41 @@ void generate_cave(void)
 
 	/* Generating */
 	if (cheat_room) message_add(format("Generating new level (level %d in %s)", p_ptr->depth, t_name + t_info[p_ptr->dungeon].name), MSG_GENERIC);
+
+	/* Reset level flags */
+	level_flag = 0;
+
+	/* Initialise level flags */
+	init_level_flags();
+
+	/* Reset 'quest' status of monsters */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		r_info[i].flags1 &= ~(RF1_QUESTOR);
+	}
+
+	/* Hack -- ensure quest monsters not randomly generated */
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		quest_type *q_ptr = &q_list[i];
+		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+		/* Hack -- player's actions don't change level */
+		if (q_ptr->stage == QUEST_ACTION) continue;
+
+		/* Hack: Quest occurs anywhere - don't force quest items on the level. */
+		if (!qe_ptr->dungeon) continue;
+
+		/* Quest doesn't occur on this level */
+		else if ((qe_ptr->dungeon != p_ptr->dungeon) ||
+			(qe_ptr->level != (p_ptr->depth - min_depth(p_ptr->dungeon)))) continue;
+
+		/* Mark the level as a quest level */
+		level_flag |= (LF1_QUEST);
+
+		/* Mark questors - features take precedence */
+		if ((!qe_ptr->feat) && (qe_ptr->race)) r_info[qe_ptr->race].flags1 |= (RF1_QUESTOR);
+	}
 
 	/* Generate */
 	for (num = 0; TRUE; num++)
@@ -12088,9 +11900,6 @@ void generate_cave(void)
 		/* Nothing good here yet */
 		rating = 0;
 
-		/* Initialise level flags */
-		init_level_flags();
-
 		/* Build the town */
 		if (level_flag & (LF1_TOWN))
 		{
@@ -12111,10 +11920,9 @@ void generate_cave(void)
 			if (cheat_room) why = "defective dungeon";
 		}
 
-#if 0
 		/* Ensure quest components */
 		ensure_quest();
-#endif
+
 		/* Extract the feeling */
 		if (rating > 100) feeling = 2;
 		else if (rating > 70) feeling = 3;
@@ -12248,4 +12056,8 @@ void generate_cave(void)
 
 	/* Set the turn the player entered this level (again) */
 	old_turn = turn;
+
+	/* Check for quest failure. */
+	while (check_quest(&event, TRUE));
+
 }

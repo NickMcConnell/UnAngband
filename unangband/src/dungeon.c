@@ -18,6 +18,355 @@
 
 
 /*
+ * Ensure that the components required for any active quests are on the level.
+ */
+void ensure_quest(void)
+{
+	int i, n, j, k;
+	int idx, x_idx, y_idx;
+	int y, x;
+
+	bool used_race;
+	bool used_item;
+
+	/* Hack -- ensure quest components */
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		quest_type *q_ptr = &q_list[i];
+		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+		/* Hack -- player's actions don't change level */
+		if (q_ptr->stage == QUEST_ACTION) continue;
+
+		/* Special handling for pay out */
+		if (q_ptr->stage == QUEST_PAYOUT)
+		{
+			/* Hack -- Don't pay out while recalling */
+			if (p_ptr->word_recall || p_ptr->word_return) continue;
+		}
+
+		/* Hack: Quest occurs anywhere - don't force quest items on the level. */
+		else if (!qe_ptr->dungeon) continue;
+
+		/* Quest doesn't occur on this level */
+		else if ((qe_ptr->dungeon != p_ptr->dungeon) ||
+			(qe_ptr->level != (p_ptr->depth - min_depth(p_ptr->dungeon)))) continue;
+
+		/* Initialise count */
+		used_race = FALSE;
+		used_item = FALSE;
+
+		/* Hack -- don't generate items on the level if we need it from a store or are giving it instead. */
+		if (qe_ptr->flags & (EVENT_GET_STORE | EVENT_GIVE_STORE | EVENT_LOSE_ITEM |
+				EVENT_GIVE_RACE | EVENT_STOCK_STORE | EVENT_BUY_STORE | EVENT_SELL_STORE |
+				EVENT_GIVE_STORE)) used_item = TRUE;
+
+		/* Require features */
+		if (qe_ptr->feat)
+		{
+			n = 0;
+			y_idx = 0;
+			x_idx = 0;
+			k = 0;
+
+			/* Check for feature type */
+			while (n < qe_ptr->number)
+			{
+				/* Count quest features */
+				for (y = 0; y < DUNGEON_HGT; y++)
+				{
+					for (x = 0; x < DUNGEON_WID; x++)
+					{
+						/* Check if feat okay */
+						if (cave_feat[y][x] == qe_ptr->feat)
+							if (!rand_int(++n)) { y_idx = y; x_idx = x; }
+					}
+				}
+
+				/* Alter feat if required */
+				if ((q_ptr->stage > QUEST_ACTION) && (qe_ptr->flags & (EVENT_ALTER_FEAT)))
+				{
+					/* Alter the feature if at least one found */
+					if (n) cave_alter_feat(y_idx, x_idx, qe_ptr->action);
+
+					/* Set to number of features altered */
+					n = ++k;
+
+					continue;
+				}
+
+				/* Try placing remaining features */
+				for ( ; n < qe_ptr->number; n++)
+				{
+					int num = 0;
+
+					/* Hack -- place features close if we are paying out */
+					bool close = (q_ptr->stage == QUEST_PAYOUT) || (q_ptr->stage == QUEST_FORFEIT);
+
+					while (num++ < 2000)
+					{
+						if (!close || (num > 50))
+						{
+							/* Location */
+							y = rand_int(DUNGEON_HGT);
+							x = rand_int(DUNGEON_WID);
+						}
+						else
+						{
+							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 3, 0);
+						}
+
+						/* Require empty, clean, floor grid */
+						if (!cave_naked_bold(y, x)) continue;
+
+						/* Check for distance from player */
+						if ((num < 500) && (close != (distance(p_ptr->py, p_ptr->px, y, x) <= MAX_SIGHT))) continue;
+
+						/* Accept it */
+						break;
+					}
+
+					/* Create the feature */
+					cave_set_feat(y, x, qe_ptr->feat);
+
+					/* Guard the feature */
+					if ((qe_ptr->race) && !(qe_ptr->flags & (EVENT_DEFEND_FEAT)))
+					{
+						used_race = TRUE;
+						race_near(qe_ptr->race, y, x);
+					}
+
+					/* XXX Hide item in the feature */
+					used_item = TRUE;
+				}
+			}
+
+			/* Amend quest numbers */
+			if (n > qe_ptr->number) qe_ptr->number = n;
+		}
+
+		/* Require race */
+		if ((qe_ptr->race) && !(used_race))
+		{
+			n = 0;
+			idx = 0;
+			k = 0;
+
+			/* Check for monster race */
+			while (n < qe_ptr->number)
+			{
+				u32b flg;
+
+				/* Count quest races */
+				for (j = 0; j < z_info->m_max; j++)
+				{
+					/* Check if monster okay */
+					if (m_list[j].r_idx == qe_ptr->race)
+						if (!rand_int(++n)) idx = j;
+				}
+
+				/* Alter monster if required */
+				if ((q_ptr->stage > QUEST_ACTION) && (qe_ptr->flags & (EVENT_KILL_RACE | EVENT_BANISH_RACE)))
+				{
+					/* Alter the feature if at least one found */
+					if (n)
+					{
+						if (qe_ptr->flags & (EVENT_KILL_RACE))
+						{
+							/* Generate treasure etc */
+							monster_death(idx);
+						}
+
+						/* Delete monster */
+						delete_monster_idx(idx);
+					}
+
+					/* Set to number of monsters altered */
+					n = ++k;
+
+					continue;
+				}
+
+				/* Try placing remaining monsters */
+				for ( ; n < qe_ptr->number; n++)
+				{
+					int num = 0;
+
+					/* Hack -- place allies close if we are not questing to ally with them */
+					bool ally = (q_ptr->stage > QUEST_ACTION) && (qe_ptr->flags & (EVENT_ALLY_RACE));
+
+					/* Hack -- place features close if we are paying out */
+					bool close = (q_ptr->stage == QUEST_PAYOUT) || (q_ptr->stage == QUEST_FORFEIT) || ally;
+
+					/* Pick a "legal" spot */
+					while (num++ < 2000)
+					{
+						if (!close || (num > 50))
+						{
+							/* Location */
+							y = rand_int(DUNGEON_HGT);
+							x = rand_int(DUNGEON_WID);
+						}
+						else
+						{
+							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 2, 0);
+						}
+
+						/* Require empty grid */
+						if (!cave_empty_bold(y, x)) continue;
+
+						/* Require monster can pass and survive on terrain unless desperate */
+						if ((num < 1000) && (place_monster_here(y, x, qe_ptr->race) > MM_FAIL)) continue;
+
+						/* Check for distance from player */
+						if ((num < 500) && (close != (distance(p_ptr->py, p_ptr->px, y, x) <= MAX_SIGHT))) continue;
+
+						/* Accept it */
+						break;
+					}
+
+					/* Nothing to start with */
+					flg = 0L;
+
+					/* Mark as allies */
+					if (qe_ptr->flags & (EVENT_ALLY_RACE | EVENT_DEFEND_RACE))
+					{
+						/* Ally */
+						flg |= (MFLAG_ALLY);
+
+						/* Not a natural ally */
+						if (!ally)
+						{
+							/* Ignoring the player */
+							flg |= (MFLAG_IGNORE);
+						}
+					}
+
+					/* Create a new monster (awake, no groups) */
+					(void)place_monster_aux(y, x, qe_ptr->race, FALSE, FALSE, flg);
+
+					/* XXX Monster should carry item */
+					used_item = TRUE;
+				}
+			}
+
+			/* Amend quest numbers */
+			if (n > qe_ptr->number) qe_ptr->number = n;
+		}
+
+		/* Require object */
+		if (((qe_ptr->artifact) || (qe_ptr->ego_item_type) || (qe_ptr->kind)) && !(used_item))
+		{
+			n = 0;
+			idx = 0;
+			k = 0;
+
+			/* Check for object kind */
+			while (n < qe_ptr->number)
+			{
+				/* Count quest objects */
+				for (j = 0; j < z_info->m_max; j++)
+				{
+					/* Check if object okay */
+					if (o_list[j].k_idx)
+					{
+						if ((qe_ptr->artifact) && (o_list[j].name1 != qe_ptr->artifact)) continue;
+						if ((qe_ptr->ego_item_type) && (o_list[j].name2 != qe_ptr->ego_item_type)) continue;
+						if ((qe_ptr->kind) && (o_list[j].k_idx != qe_ptr->kind)) continue;
+
+						if (!rand_int(++n)) idx = j;
+					}
+				}
+
+				/* Alter object if required */
+				if ((q_ptr->stage > QUEST_ACTION) && (qe_ptr->flags & (EVENT_LOSE_ITEM | EVENT_DESTROY_ITEM)))
+				{
+					/* Alter the feature if at least one found */
+					if (n)
+					{
+						/* Count objects */
+						k  += o_list[idx].number - 1;
+
+						/* Delete monster */
+						delete_object_idx(idx);
+
+						/* XXX Destroy artifact */
+					}
+
+					/* Set to number of objects altered */
+					n = ++k;
+
+					continue;
+				}
+
+				/* Try placing remaining objects */
+				for ( ; n < qe_ptr->number; n++)
+				{
+					object_type object_type_body;
+					object_type *o_ptr = &object_type_body;
+
+					/* Hack -- place features close if we are paying out */
+					bool close = (q_ptr->stage == QUEST_PAYOUT) || (q_ptr->stage == QUEST_FORFEIT);
+
+					int num = 0;
+
+					/* Pick a "legal" spot */
+					while (num++ < 2000)
+					{
+						if (!close || (num > 50))
+						{
+							/* Location */
+							y = rand_int(DUNGEON_HGT);
+							x = rand_int(DUNGEON_WID);
+						}
+						else
+						{
+							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 2, 0);
+						}
+
+						/* Require empty grid */
+						if (!cave_naked_bold(y, x)) continue;
+
+						/* Check for distance from player */
+						if ((num < 500) && (close != (distance(p_ptr->py, p_ptr->px, y, x) <= MAX_SIGHT))) continue;
+
+						/* Prepare artifact */
+						if (qe_ptr->artifact) qe_ptr->kind = lookup_kind(a_info[qe_ptr->artifact].tval, a_info[qe_ptr->artifact].sval);
+
+						/* Prepare ego item */
+						if ((qe_ptr->ego_item_type) && !(qe_ptr->kind)) qe_ptr->kind =
+							lookup_kind(e_info[qe_ptr->ego_item_type].tval[0],
+								e_info[qe_ptr->ego_item_type].min_sval[0]);
+
+						/* Prepare object */
+						object_prep(o_ptr, qe_ptr->kind);
+
+						/* Prepare artifact */
+						o_ptr->name1 = qe_ptr->artifact;
+
+						/* Prepare ego item */
+						o_ptr->name2 = qe_ptr->ego_item_type;
+
+						/* Apply magic -- hack: use player level as reward level */
+						apply_magic(o_ptr, p_ptr->max_lev * 2, FALSE, FALSE, FALSE);
+
+						/* Several objects */
+						if (o_ptr->number > 1) n += o_ptr->number -1;
+
+						/* Accept it */
+						break;
+					}
+				}
+			}
+
+			/* Amend quest numbers */
+			if (n > qe_ptr->number) qe_ptr->number = n;
+		}
+	}
+}
+
+
+/*
  * Return a "feeling" (or NULL) about an item.  Method 1 (Heavy).
  * TODO: a lot of code is here duplicated with value_check_aux3 in spells2.c
  */
@@ -376,7 +725,7 @@ static void regenmana(int percent)
 	if (old_csp != p_ptr->csp)
 	{
 		/* Update mana */
-		p_ptr->update |= (PU_MANA);				
+		p_ptr->update |= (PU_MANA);
 
 		/* Redraw */
 		p_ptr->redraw |= (PR_MANA);
@@ -407,19 +756,19 @@ bool dun_level_mon(int r_idx)
 	{
 		int mon_flag = t_info[p_ptr->dungeon].r_flag-1;
 
-		if ((mon_flag < 32) && 
+		if ((mon_flag < 32) &&
 			(r_ptr->flags1 & (1L << mon_flag))) return (TRUE);
 
-		if ((mon_flag >= 32) && 
-			(mon_flag < 64) && 
+		if ((mon_flag >= 32) &&
+			(mon_flag < 64) &&
 			(r_ptr->flags2 & (1L << (mon_flag -32)))) return (TRUE);
 
-		if ((mon_flag >= 64) && 
-			(mon_flag < 96) && 
+		if ((mon_flag >= 64) &&
+			(mon_flag < 96) &&
 			(r_ptr->flags3 & (1L << (mon_flag -64)))) return (TRUE);
 
-		if ((mon_flag >= 96) && 
-			(mon_flag < 128) && 
+		if ((mon_flag >= 96) &&
+			(mon_flag < 128) &&
 			(r_ptr->flags4 & (1L << (mon_flag -96)))) return (TRUE);
 	}
 
@@ -430,10 +779,10 @@ bool dun_level_mon(int r_idx)
 
 /*
  * Suffer from a disease.
- * 
+ *
  * This now occurs whilst changing levels, and while in dungeon for
  * quick diseases only.
- * 
+ *
  * allow_cure is set to true if the disease is a result of time
  * passing, and false if it's the result of monster blows.
  */
@@ -456,7 +805,7 @@ void suffer_disease(bool allow_cure)
 		for (i = 1; i < (1 << DISEASE_BLOWS); i <<=1)
 		{
 			if (!(p_ptr->disease & i)) continue;
-		
+
 			if (!rand_int(++n)) effect = i;
 		}
 
@@ -585,7 +934,7 @@ void suffer_disease(bool allow_cure)
 					if (p_ptr->csp < 0) p_ptr->csp = 0;
 
 					/* Update mana */
-					p_ptr->update |= (PU_MANA);				
+					p_ptr->update |= (PU_MANA);
 
 					/* Redraw */
 					p_ptr->redraw |= (PR_MANA);
@@ -629,7 +978,7 @@ void suffer_disease(bool allow_cure)
 		if ((p_ptr->disease & (DISEASE_QUICK)) && !(rand_int(3)))
 		{
 			bool ecology_ready = cave_ecology.ready;
-			
+
 			/* Breakfast time... */
 			msg_print("Something pushes through your skin.");
 			msg_print("It's... hatching...");
@@ -642,7 +991,7 @@ void suffer_disease(bool allow_cure)
 
 			/* Stop using ecology */
 			cave_ecology.ready = FALSE;
-			
+
 			/* Set parasite race */
 			summon_race_type = parasite_hack[effect];
 
@@ -651,7 +1000,7 @@ void suffer_disease(bool allow_cure)
 
 			/* Start using ecology again */
 			cave_ecology.ready = ecology_ready;
-			
+
 			/* Aggravate if not light */
 			if (!(p_ptr->disease & (DISEASE_LIGHT))) aggravate_monsters(-1);
 
@@ -669,12 +1018,12 @@ void suffer_disease(bool allow_cure)
 				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES_HEAVY));
 			else if (n < 3)
 				p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
-		
+
 			if (n > 1) p_ptr->disease &= ~(1 << rand_int(DISEASE_TYPES));
 			if (!rand_int(20)) p_ptr->disease |= (DISEASE_LIGHT);
 		}
 	}
-	
+
 	/* All diseases mutate to get blows if they have no effect currently*/
 	else if ((!rand_int(3)) && ((p_ptr->disease & ((1 << DISEASE_TYPES_HEAVY) -1 )) == 0))
 	{
@@ -705,7 +1054,7 @@ void suffer_disease(bool allow_cure)
 		p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
 
 		p_ptr->redraw |= (PR_DISEASE);
-		
+
 		if (disturb_state) disturb(0, 0);
 	}
 
@@ -899,7 +1248,6 @@ static void process_world(void)
 		}
 	}
 
-
 	/*** Stastis ***/
 	if (p_ptr->stastis)
 	{
@@ -907,6 +1255,9 @@ static void process_world(void)
 
 		/* Update dynamic terrain */
 		update_dyna();
+
+		/* Check quests */
+		ensure_quest();
 
 		return;
 	}
@@ -1064,7 +1415,7 @@ static void process_world(void)
 		}
 
 		/* Getting Faint */
-		if (p_ptr->food < PY_FOOD_FAINT) 
+		if (p_ptr->food < PY_FOOD_FAINT)
 		{
 			/* Faint occasionally */
 			if (!p_ptr->paralyzed && (rand_int(100) < 10))
@@ -1079,7 +1430,7 @@ static void process_world(void)
 		}
 
 		/* Getting Faint - lack of rest */
-		if (p_ptr->rest < PY_REST_FAINT) 
+		if (p_ptr->rest < PY_REST_FAINT)
 		{
 			/* Faint occasionally */
 			if (!p_ptr->paralyzed && (rand_int(100) < 10))
@@ -1092,7 +1443,7 @@ static void process_world(void)
 				(void)set_paralyzed(p_ptr->paralyzed + 1 + rand_int(5));
 			}
 		}
-	}	
+	}
 
 	/* Searching or Resting */
 	if (p_ptr->searching || p_ptr->resting)
@@ -1342,7 +1693,7 @@ static void process_world(void)
 
 		/* Some rooms make wounds magically worse */
 		if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
-		
+
 		/* Apply some healing */
 		(void)set_cut(p_ptr->cut - adjust);
 	}
@@ -1403,10 +1754,10 @@ static void process_world(void)
 			if (p_ptr->exp <= 0) p_ptr->csp = 0;
 
 			/* Update mana */
-			p_ptr->update |= (PU_MANA);				
+			p_ptr->update |= (PU_MANA);
 
 			/* Redraw */
-			p_ptr->redraw |= (PR_MANA);		
+			p_ptr->redraw |= (PR_MANA);
 		}
 	}
 
@@ -1498,7 +1849,7 @@ static void process_world(void)
 					/* Notice things */
 					if (i < INVEN_PACK) j++;
 					else k++;
-	
+
 					/* Message */
 					if (o_ptr->timeout) msg_format("One of your %s has charged.",o_name);
 					else msg_format("Your %s %s charged.", o_name,
@@ -1573,8 +1924,8 @@ static void process_world(void)
 
 	/* Show tips */
 	if  (!p_ptr->command_rep
-		 && ((p_ptr->searching && !(turn % 1000)) 
-			 || (is_typical_town(p_ptr->dungeon, p_ptr->depth) 
+		 && ((p_ptr->searching && !(turn % 1000))
+			 || (is_typical_town(p_ptr->dungeon, p_ptr->depth)
 				 && !(turn % 100))))
 	{
 		/* Show a tip */
@@ -1597,10 +1948,10 @@ static void process_world(void)
 		{
 			/* Check for light extinguishing */
 			bool extinguish = ((o_ptr->timeout == 1) && check_object_lite(o_ptr));
-			
+
 			/* Recharge */
 			o_ptr->timeout--;
-			
+
 			/* Extinguish lite */
 			if ((extinguish) && (o_ptr->iy) && (o_ptr->ix))
 			{
@@ -1644,7 +1995,7 @@ static void process_world(void)
 
 					floor_item_optimize(i);
 				}
-		
+
 				/* Rods and activatible items charge */
 				else if ((o_ptr->tval == TV_ROD) || (f3 & (TR3_ACTIVATE)))
 				{
@@ -1652,7 +2003,7 @@ static void process_world(void)
 					if ((o_ptr->timeout) && !(o_ptr->stackc)) o_ptr->stackc = o_ptr->number -1;
 					else if (o_ptr->timeout) o_ptr->stackc--;
 					else o_ptr->stackc = 0;
-		
+
 				}
 
 				/* Bodies/mimics become a monster */
@@ -1679,41 +2030,41 @@ static void process_world(void)
 	if ((p_ptr->uncontrolled) && (rand_int(UNCONTROLLED_CHANCE) < 1))
 	{
 		int j = 0, k = 0;
-		
+
 		/* Scan inventory and pick uncontrolled item */
 		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
 		{
 			u32b f1, f2, f3, f4;
 
 			o_ptr = &inventory[i];
-			
+
 			/* Skip non-objects */
 			if (!o_ptr->k_idx) continue;
-			
+
 			object_flags(o_ptr, &f1, &f2, &f3, &f4);
-			
+
 			/* Pick item */
 			if (((f3 & (TR3_UNCONTROLLED)) != 0) && (uncontrolled_p(o_ptr)) && !(rand_int(k++)))
 			{
 				j = i;
 			}
 		}
-		
+
 		/* Apply uncontrolled power */
 		if (j)
 		{
 			bool dummy = FALSE;
-			
+
 			o_ptr = &inventory[j];
-			
+
 			/* Get power */
 			get_spell(&k, "", &inventory[j], FALSE);
-			
+
 			if (rand_int(200) < o_ptr->usage)
 			{
 				/* Process spell - involuntary effects */
 				process_spell_eaten(SOURCE_OBJECT, o_ptr->k_idx, k, 25, &dummy);
-				
+
 				/* Warn the player */
 				sound(MSG_CURSED);
 
@@ -1729,7 +2080,7 @@ static void process_world(void)
 			else if (o_ptr->usage >= UNCONTROLLED_CONTROL)
 			{
 				char o_name[80];
-				
+
 				/* Uncurse the object */
 				uncurse_object(o_ptr);
 
@@ -1741,11 +2092,11 @@ static void process_world(void)
 
 				/* Describe victory */
 				msg_format("You have mastered the %s.", o_name);
-				
+
 				/* Reveal functionality */
-				msg_print("You may now activate it when you wish.");				
+				msg_print("You may now activate it when you wish.");
 			}
-			
+
 			/* Used the object */
 			if (o_ptr->usage < MAX_SHORT) o_ptr->usage++;
 		}
@@ -1753,8 +2104,8 @@ static void process_world(void)
 		/* Always notice */
 		equip_can_flags(0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
 	}
-	
-	
+
+
 	/* Mega-Hack -- Portal room */
 	if ((room_has_flag(p_ptr->py, p_ptr->px, ROOM_PORTAL))
 			&& ((p_ptr->cur_flags4 & (TR4_ANCHOR)) == 0) && (rand_int(100)<1))
@@ -1782,7 +2133,7 @@ static void process_world(void)
 
 			/* Teleport the player back to their original location */
 			teleport_player_to(p_ptr->return_y, p_ptr->return_x);
-			
+
 			/* Clear the return coordinates */
 			p_ptr->return_y = 0;
 			p_ptr->return_x = 0;
@@ -1807,7 +2158,7 @@ static void process_world(void)
 			/* Determine the level */
 			if (p_ptr->depth > min_depth(p_ptr->dungeon))
 			{
-				msg_format("You feel yourself yanked %swards!", 
+				msg_format("You feel yourself yanked %swards!",
 					((level_flag & (LF1_TOWER)) ? "down" : "up"));
 
 				/* New depth */
@@ -1815,13 +2166,13 @@ static void process_world(void)
 
 				/* Leaving */
 				p_ptr->leaving = TRUE;
-				
+
 				/* No stairs under the player */
 				p_ptr->create_stair = 0;
 			}
 			else
 			{
-				msg_format("You feel yourself yanked %swards!", 
+				msg_format("You feel yourself yanked %swards!",
 					((level_flag & (LF1_TOWER)) ? "up" : "down"));
 
 				/* New depth */
@@ -1837,10 +2188,13 @@ static void process_world(void)
 				p_ptr->create_stair = 0;
 			}
 		}
-	}	
-	
+	}
+
 	/* Update dynamic terrain */
 	update_dyna();
+
+	/* Check quests */
+	ensure_quest();
 
 #ifdef ALLOW_BORG
 	if (count_stop)
@@ -2444,7 +2798,7 @@ static void process_command(void)
 			do_cmd_quick_help();
 			break;
 		}
-		
+
 		case '?':
 		{
 			do_cmd_help();
@@ -2612,7 +2966,7 @@ static void process_command(void)
 			int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
 			int x = KEY_GRID_X(p_ptr->command_cmd_ex);
 			int room;
-			
+
 			/* Paranoia */
 			if (!in_bounds_fully(y, x)) break;
 
@@ -2638,7 +2992,7 @@ static void process_command(void)
 				msg_print("Target set.");
 			}
 			else if (use_trackmouse && (easy_more || (auto_more && !easy_more)))
-			{				
+			{
 				target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 			}
 			break;
@@ -2651,24 +3005,24 @@ static void process_command(void)
 			break;
 		}
 	}
-	
+
 	/* If there is a transitive component to the command, process it */
 	if (p_ptr->command_trans)
 	{
 		const do_cmd_item_type *cmd = &cmd_item_list[p_ptr->command_trans];
-		
+
 		int cmd_next = cmd->next_command;
-		
+
 		/* Evaluate which command to do */
 		if (cmd->next_command_eval)
 		{
 			/* Determine new command based on item selected */
 			cmd_next = cmd->next_command_eval(p_ptr->command_trans_item);
 		}
-		
+
 		/* Process next command */
 		do_cmd_item(cmd_next);
-		
+
 		/* Processed */
 		p_ptr->command_trans = 0;
 	}
@@ -2900,7 +3254,7 @@ static void process_player(void)
 	{
 		/* Reduce blocking */
 		p_ptr->blocking--;
-		
+
 		/* Redraw the state */
 		p_ptr->redraw |= (PR_STATE);
 	}
@@ -2944,7 +3298,7 @@ static void process_player(void)
 		if (count_stop) do_cmd_borg();
 
 		/* Paralyzed or Knocked Out */
-		else 
+		else
 #endif
 		if ((p_ptr->paralyzed) || (p_ptr->stun >= 100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
 		{
@@ -3186,8 +3540,8 @@ static void process_player(void)
 	update_smell();
 
 
-	/* 
-	 * Reset character vulnerability.  Will be calculated by 
+	/*
+	 * Reset character vulnerability.  Will be calculated by
 	 * the first member of an animal pack that has a use for it.
 	 */
 	p_ptr->vulnerability = 0;
@@ -3240,7 +3594,7 @@ static void dungeon(void)
 	disturb(1, 0);
 
 	/* Track maximum dungeon level; surface does not count */
-	if (p_ptr->max_depth < p_ptr->depth 
+	if (p_ptr->max_depth < p_ptr->depth
 		&& p_ptr->depth > min_depth(p_ptr->dungeon))
 	{
 		p_ptr->max_depth = p_ptr->depth;
@@ -3325,7 +3679,7 @@ static void dungeon(void)
 	if (p_ptr->is_dead) return;
 
 	/* Announce (or repeat) the feeling */
-	if (p_ptr->depth > min_depth(p_ptr->dungeon)) 
+	if (p_ptr->depth > min_depth(p_ptr->dungeon))
 		do_cmd_feeling();
 
 	/*** Process this dungeon level ***/
@@ -3335,14 +3689,14 @@ static void dungeon(void)
 
 	/* Beginners get a tip */
 	if (birth_beginner) show_tip();
-	
+
 	/* Main loop */
 	while (TRUE)
 	{
 		int i;
 
 		/* Reset the monster generation level; make level feeling interesting */
-		monster_level = p_ptr->depth >= 4 ? p_ptr->depth + 2 : 
+		monster_level = p_ptr->depth >= 4 ? p_ptr->depth + 2 :
 			(p_ptr->depth >= 2 ? p_ptr->depth + 1 : p_ptr->depth);
 
 		/* Hack -- Compact the monster list occasionally */
@@ -3368,14 +3722,14 @@ static void dungeon(void)
 			{
 				msg_format("Object %d (%s) corrupted. Fixing.", i, k_name + k_info[o_list[i].k_idx].name);
 				o_list[i].next_o_idx = 0;
-				
+
 				if (o_list[i].held_m_idx)
 				{
 					msg_format("Was held by %d.", o_list[i].held_m_idx);
 				}
 				else
 				{
-					msg_format("Was held at (%d, %d).", o_list[i].iy, o_list[i].ix);					
+					msg_format("Was held at (%d, %d).", o_list[i].iy, o_list[i].ix);
 				}
 			}
 		}
@@ -3630,7 +3984,7 @@ void play_game(bool new_game)
 		seed_town = rand_int(0x10000000);
 
 		/* Hack -- seed for random artifacts */
-		if (adult_reseed_artifacts) 
+		if (adult_reseed_artifacts)
 			seed_randart = rand_int(0x10000000);
 
 		/* Hack -- clear artifact memory */
@@ -3639,7 +3993,7 @@ void play_game(bool new_game)
 		for (i = 0;i<z_info->a_max;i++)
 		{
 			object_info *n_ptr = &a_list[i];
-				
+
 			n_ptr->can_flags1 = 0x0L;
 			n_ptr->can_flags2 = 0x0L;
 			n_ptr->can_flags3 = 0x0L;
@@ -3717,7 +4071,7 @@ void play_game(bool new_game)
 		for (i = 0; i < z_info->t_max; i++)
 		{
 			int guard, ii;
-			
+
 			guard = t_info[i].quest_monster;
 			/* Mark map quest monsters as 'unique guardians'. This allows
 			 * the map quests to be completed successfully.
@@ -3728,7 +4082,7 @@ void play_game(bool new_game)
 				r_info[guard].flags1 |= RF1_GUARDIAN;
 				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
 			}
-			
+
 			/*
 			 * The same for replacement guardians
 			 */
@@ -3750,7 +4104,7 @@ void play_game(bool new_game)
 				assert (r_info[guard].flags1 & RF1_UNIQUE);
 				if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
 			}
-			
+
 			for (ii = 0; ii < MAX_DUNGEON_ZONES; ii++)
 			{
 				/*
@@ -3767,7 +4121,7 @@ void play_game(bool new_game)
 					if (r_info[guard].max_num > 1) r_info[guard].max_num = 1;
 
 					/* Sane depth */
-					if (ii == MAX_DUNGEON_ZONES - 1 
+					if (ii == MAX_DUNGEON_ZONES - 1
 						|| t_info[i].zone[ii+1].level == 0)
 						/* last zone */
 						zone_depth = t_info[i].zone[ii].level;

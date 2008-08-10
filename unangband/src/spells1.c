@@ -7508,11 +7508,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (seen) obvious = TRUE;
 
 			/* Hack -- no chasm/trap doors/down stairs on quest/bottom levels */
-			if (is_quest(p_ptr->depth)
-				|| (p_ptr->depth == max_depth(p_ptr->dungeon)
-					&& !(level_flag & (LF1_TOWER)))
-				|| (p_ptr->depth == min_depth(p_ptr->dungeon)
-					&& level_flag & (LF1_TOWER)))
+			if ((level_flag & (LF1_MORE)) == 0)
 			{
 				note = "falls into a chasm.";
 
@@ -10914,17 +10910,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Hack -- no chasm/trap doors on quest/bottom levels */
-			if (is_quest(p_ptr->depth)
+			if (((level_flag & (LF1_QUEST)) == 0)
 				|| (typ == GF_FALL_MORE
-					&& ((p_ptr->depth == max_depth(p_ptr->dungeon)
-						 && !(level_flag & (LF1_TOWER)))
-						|| (p_ptr->depth == min_depth(p_ptr->dungeon)
-							&& level_flag & (LF1_TOWER))))
+					&& (level_flag & (LF1_MORE)))
 				|| (typ == GF_FALL_LESS
-					&& ((p_ptr->depth == max_depth(p_ptr->dungeon)
-						 && level_flag & (LF1_TOWER))
-						|| (p_ptr->depth == min_depth(p_ptr->dungeon)
-							&& !(level_flag & (LF1_TOWER))))))
+					&& (level_flag & (LF1_MORE))))
 			{
 				/* Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);

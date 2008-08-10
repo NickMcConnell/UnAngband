@@ -2935,39 +2935,6 @@ int get_coin_type(const monster_race *r_ptr)
 }
 
 
-/*
- * Handle the quest assignment
- *
- * Getting a quest assigned.
- */
-void quest_assign(int q_idx)
-{
-	(void)q_idx;
-}
-
-
-/*
- * Handle the quest reward.
- *
- * Completing a quest
- */
-void quest_reward(int q_idx)
-{
-	(void)q_idx;
-
-}
-
-/*
- * Handle the quest reward.
- *
- * Completing a quest
- */
-void quest_penalty(int q_idx)
-{
-	(void)q_idx;
-}
-
-
 void scatter_objects_under_feat(int y, int x)
 {
   s16b this_o_idx, next_o_idx = 0;
@@ -3042,6 +3009,7 @@ bool check_quest(quest_event *qe1_ptr, bool advance)
 				case QUEST_PENALTY:
 				/* We don't do pay outs until the start of the next player turn */
 				case QUEST_PAYOUT:
+				case QUEST_FORFEIT:
 					continue;
 				/* We just advance otherwise */
 				default:

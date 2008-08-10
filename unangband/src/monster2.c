@@ -3563,6 +3563,8 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	/* Get the feature */
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 
+	int i;
+
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
@@ -3703,6 +3705,30 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 
 	/* Apply flags from caller */
 	n_ptr->mflag |= flg;
+
+	/* Hack -- ensure quest monsters are generated appropriately */
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		quest_type *q_ptr = &q_list[i];
+		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
+
+		/* Hack -- player must have ended up allying this monster */
+		if (q_ptr->stage <= QUEST_ACTION) continue;
+
+		/* Quest doesn't occur on this level */
+		if ((qe_ptr->dungeon) && ((qe_ptr->dungeon != p_ptr->dungeon) ||
+			(qe_ptr->level != (p_ptr->depth - min_depth(p_ptr->dungeon))))) continue;
+
+		/* Mark monsters with the results of various quests */
+		if ((qe_ptr->race) && (qe_ptr->race == n_ptr->r_idx))
+		{
+			if (qe_ptr->flags & (EVENT_ALLY_RACE)) n_ptr->mflag |= (MFLAG_ALLY);
+			if (qe_ptr->flags & (EVENT_HATE_RACE)) n_ptr->mflag &= ~(MFLAG_ALLY | MFLAG_IGNORE);
+			if (qe_ptr->flags & (EVENT_FEAR_RACE)) n_ptr->monfear = 100;
+			if (qe_ptr->flags & (EVENT_HEAL_RACE)) n_ptr->mflag |= (MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
+			if (qe_ptr->flags & (EVENT_BANISH_RACE | EVENT_KILL_RACE)) return (FALSE);
+		}
+	}
 
 	/* Created allies do not carry treasure */
 	if (flg & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_MADE);
