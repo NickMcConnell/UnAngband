@@ -5918,6 +5918,12 @@ bool print_quests(int min_stage, int max_stage)
 					else if (q_info[i].stage == QUEST_PENALTY) { tense = 0; }
 					else continue;
 					break;
+				case QUEST_FORFEIT:
+					if (q_info[i].stage < QUEST_ACTION) continue;
+					else if (q_info[i].stage < QUEST_REWARD) { tense = 4; prefix = ". If this happens "; }
+					else if (q_info[i].stage == QUEST_FORFEIT) { tense = 0; prefix = "causing you to fail the quest and "; }
+					else continue;
+					break;
 				case QUEST_PENALTY:
 					if (q_info[i].stage < QUEST_ACTION) continue;
 					else if (q_info[i].stage < QUEST_REWARD) { tense = 4; prefix = ". If this happens "; }

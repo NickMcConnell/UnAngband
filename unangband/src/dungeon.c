@@ -362,6 +362,10 @@ void ensure_quest(void)
 			/* Amend quest numbers */
 			if (n > qe_ptr->number) qe_ptr->number = n;
 		}
+
+		/* Transition some quests once paid out */
+		if (q_ptr->stage == QUEST_PAYOUT) q_ptr->stage = QUEST_FINISH;
+		if (q_ptr->stage == QUEST_FORFEIT) q_ptr->stage = QUEST_PENALTY;
 	}
 }
 
