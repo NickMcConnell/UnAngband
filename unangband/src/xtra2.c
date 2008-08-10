@@ -2290,7 +2290,7 @@ bool set_rest(int v)
 	/* Hack -- Force good values */
 	v = (v > PY_REST_MAX) ? PY_REST_MAX : (v < 0) ? 0 : v;
 
-	/* Fainting */
+	/* Fainting / Starving */
 	if (p_ptr->rest < PY_REST_FAINT)
 	{
 		old_aux = 0;
@@ -2302,7 +2302,7 @@ bool set_rest(int v)
 		old_aux = 1;
 	}
 
-	/* Tired */
+	/* Hungry */
 	else if (p_ptr->rest < PY_REST_ALERT)
 	{
 		old_aux = 2;
@@ -2314,7 +2314,7 @@ bool set_rest(int v)
 		old_aux = 3;
 	}
 
-	/* Fainting */
+	/* Fainting / Starving */
 	if (v < PY_REST_FAINT)
 	{
 		new_aux = 0;
@@ -2326,7 +2326,7 @@ bool set_rest(int v)
 		new_aux = 1;
 	}
 
-	/* Tired */
+	/* Hungry */
 	else if (v < PY_REST_ALERT)
 	{
 		new_aux = 2;
@@ -2366,7 +2366,7 @@ bool set_rest(int v)
 		/* Describe the state */
 		switch (new_aux)
 		{
-			/* Fainting */
+			/* Fainting / Starving */
 			case 0:
 			{
 				msg_print("You are getting faint from exhaustion!");
@@ -2380,7 +2380,7 @@ bool set_rest(int v)
 				break;
 			}
 
-			/* Tired */
+			/* Hungry */
 			case 2:
 			{
 				msg_print("You are getting short of breath.");
@@ -2405,7 +2405,7 @@ bool set_rest(int v)
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
 
-	/* Redraw exhaustion */
+	/* Redraw hunger */
 	p_ptr->redraw |= (PR_STATE);
 
 	/* Handle stuff */
@@ -2423,7 +2423,7 @@ void improve_aware(void)
 {
 	int i;
 	int awareness = -1;
-	
+
 	/* Hack -- Check for id'ed */
 	for (i=1;i<z_info->w_max;i++)
 	{
@@ -2434,7 +2434,7 @@ void improve_aware(void)
 		if (w_info[i].level > p_ptr->lev) continue;
 
 		if ((w_info[i].styles & (1L << p_ptr->pstyle)) == 0) continue;
-		
+
 		awareness = 2*(p_ptr->lev - w_info[i].level)+1;
 	}
 
@@ -2443,18 +2443,18 @@ void improve_aware(void)
 	{
 		/* Check for awareness */
 		if (k_info[i].level > awareness) continue;
-		
+
 		/* Check awareness */
 		if (k_info[i].tval == style2tval[p_ptr->pstyle])
 		{
 			/* Aware next time player sees an object */
 			k_info[i].aware |= (AWARE_CLASS);
-			
+
 			/* Recalculate bonuses */
 			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW);
 		}
 	}
-	
+
 	/* Check inventory */
 	for (i = 0; i < INVEN_TOTAL; i++)
 	{
@@ -2504,7 +2504,7 @@ void print_stats(const s16b *sn, int num, int y, int x)
 		c_prt(attr, format("  %c) ", I2A(i)), y + i + 1, x);
 
 		/* Display the stats */
-		display_player_stat_info(y + 1, x + 5, i, i + 1, attr);	
+		display_player_stat_info(y + 1, x + 5, i, i + 1, attr);
 	}
 
 	/* Display drop-shadow */
@@ -2519,23 +2519,23 @@ bool stat_commands(char choice, const s16b *sn, int i, bool *redraw)
 {
 	(void)sn;
 	(void)i;
-	
+
 	switch (choice)
 	{
 		case '?':
 		{
 			/* Save the screen */
 			if (!(*redraw)) screen_save();
-			
+
 			/* Show stats help */
 			(void)show_file("stats.txt", NULL, 0, 0);
-			
+
 			/* Load the screen */
 			screen_load();
-			
+
 			break;
 		}
-		
+
 		default:
 		{
 			return (FALSE);
@@ -2568,7 +2568,7 @@ static void improve_stat(void)
 
 	/* Flush messages */
 	if (easy_more) messages_easy(FALSE);
-	
+
 	/* Check which stats can still be improved */
 	for (i = 0; i < A_MAX; i++)
 	{
@@ -2591,7 +2591,7 @@ static void improve_stat(void)
 			/* Should be paranoid here */
 			while (TRUE)
 			{
-				sprintf(buf,"Improve which attribute%s (%d)", count > 1 ? "s" : "", count - stat_gain_selected); 
+				sprintf(buf,"Improve which attribute%s (%d)", count > 1 ? "s" : "", count - stat_gain_selected);
 
 				/* Select stat to improve */
 				if (get_list(print_stats, table, A_MAX, "Attribute", buf, ", ?=help", 1, 36, stat_commands, &(stat_gain_selection[stat_gain_selected])))
@@ -2645,7 +2645,7 @@ static void improve_stat(void)
 		/* Load screen */
 		screen_load();
 	}
-	
+
 	/* Improve how many stats with level gain */
 	for (stat_gain_selected = 0; stat_gain_selected < count; stat_gain_selected++)
 	{
@@ -2660,7 +2660,7 @@ static void improve_stat(void)
 			p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] = p_ptr->stat_max[stat_gain_selection[stat_gain_selected]];
 		}
 		else
-		{ 
+		{
 			p = "";
 			tmp = 0;
 		}
@@ -2949,7 +2949,7 @@ void quest_assign(int q_idx)
 /*
  * Handle the quest reward.
  *
- * Completing a quest 
+ * Completing a quest
  */
 void quest_reward(int q_idx)
 {
@@ -2960,7 +2960,7 @@ void quest_reward(int q_idx)
 /*
  * Handle the quest reward.
  *
- * Completing a quest 
+ * Completing a quest
  */
 void quest_penalty(int q_idx)
 {
@@ -2971,7 +2971,7 @@ void quest_penalty(int q_idx)
 void scatter_objects_under_feat(int y, int x)
 {
   s16b this_o_idx, next_o_idx = 0;
-  
+
   object_type *o_ptr;
 
   assert (in_bounds(y, x));
@@ -3008,6 +3008,231 @@ void scatter_objects_under_feat(int y, int x)
 
 
 /*
+ * Handle a quest event.
+ */
+bool check_quest(quest_event *qe1_ptr, bool advance)
+{
+	int i, j;
+	bool questor = FALSE;
+
+	for (i = 0; i < MAX_Q_IDX; i++)
+	{
+		quest_type *q_ptr = &(q_list[i]);
+
+		int next_stage = 0;
+		bool partial = FALSE;
+
+		/* Check the next possible stages */
+		for (j = 0; j < MAX_QUEST_EVENTS ; j++)
+		{
+			quest_event *qe2_ptr = &(q_ptr->event[j]);
+			quest_event *qe3_ptr = &(q_ptr->event[QUEST_ACTION]);
+
+			/* Not all quests advance */
+			switch (q_ptr->stage)
+			{
+				/* We can succeed or fail quests at any time once the player has activated them. */
+				case QUEST_ACTIVE:
+					if (j == QUEST_ACTIVE) break;
+					if (j == QUEST_FAILED) break;
+					continue;
+				/* Track what the player has done / changed in the world */
+				case QUEST_ACTION: /* A quest should never get to this stage... */
+				case QUEST_FINISH:
+				case QUEST_PENALTY:
+				/* We don't do pay outs until the start of the next player turn */
+				case QUEST_PAYOUT:
+					continue;
+				/* We just advance otherwise */
+				default:
+					if (q_ptr->stage != j) continue;
+			}
+
+			/* We support quests with blank transitions */
+			if (qe2_ptr->flags)
+			{
+				/* Check for quest match */
+				if ((qe2_ptr->flags & (qe1_ptr->flags)) == 0) continue;
+
+				/* Check for level match */
+				if ((qe2_ptr->dungeon) && ((qe2_ptr->dungeon != qe1_ptr->dungeon) ||
+						(qe2_ptr->level != qe2_ptr->level))) continue;
+
+				/* Check for race match */
+				if (qe1_ptr->flags & (EVENT_GIVE_RACE | EVENT_GET_RACE | EVENT_FIND_RACE | EVENT_KILL_RACE |
+						EVENT_ALLY_RACE | EVENT_HATE_RACE | EVENT_FEAR_RACE | EVENT_HEAL_RACE |
+						EVENT_BANISH_RACE | EVENT_DEFEND_RACE | EVENT_DEFEND_STORE | EVENT_DEFEND_FEAT))
+				{
+					/* Match any monster or specific race */
+					if ((qe2_ptr->race) && (qe2_ptr->race != qe1_ptr->race)) continue;
+
+					/* Have to check monster states? */
+					if ((qe1_ptr->flags & (EVENT_GIVE_RACE | EVENT_GET_RACE | EVENT_DEFEND_FEAT)) == 0)
+					{
+						/* Add flags */
+						qe3_ptr->flags |= qe1_ptr->flags;
+
+						/* Hack -- we accumulate banishes and kills in the QUEST_ACTION. For others,
+						 * we only check if the number provided >= the number required.
+						 */
+						if (qe1_ptr->flags & (EVENT_BANISH_RACE | EVENT_KILL_RACE | EVENT_DEFEND_RACE |
+								EVENT_DEFEND_STORE))
+							qe3_ptr->number = qe1_ptr->number;
+						else if (qe1_ptr->number + qe3_ptr->number >= qe2_ptr->number)
+							qe3_ptr->number = qe2_ptr->number;
+					}
+				}
+
+				/* Check for store match */
+				if ((qe1_ptr->flags & (EVENT_BUY_STORE | EVENT_SELL_STORE | EVENT_GIVE_STORE |
+						EVENT_STOCK_STORE | EVENT_GET_STORE | EVENT_DEFEND_STORE)) &&
+						(qe2_ptr->store != qe1_ptr->store)) continue;
+
+				/* Check for item match */
+				if (qe1_ptr->flags & (EVENT_GIVE_RACE | EVENT_GET_RACE | EVENT_BUY_STORE |
+						EVENT_SELL_STORE | EVENT_GIVE_STORE | EVENT_STOCK_STORE | EVENT_GET_STORE |
+						EVENT_GET_ITEM | EVENT_FIND_ITEM | EVENT_DESTROY_ITEM | EVENT_LOSE_ITEM))
+				{
+					/* Match artifact, ego_item_type or kind of item or any item */
+					if (((qe2_ptr->artifact) && (qe2_ptr->artifact != qe1_ptr->artifact)) ||
+					 ((qe2_ptr->ego_item_type) && (qe2_ptr->ego_item_type != qe1_ptr->ego_item_type)) ||
+					 ((qe2_ptr->kind) && (qe2_ptr->kind != qe1_ptr->kind))) continue;
+
+					/* XXX Paranoia around artifacts */
+					if ((qe2_ptr->artifact) && (qe2_ptr->number)) qe2_ptr->number = 1;
+
+					/* Hack -- we accumulate item destructions in the QUEST_ACTION. For others,
+					   we only check if the number provided >= the number required.
+					 */
+					if (qe1_ptr->flags & (EVENT_DESTROY_ITEM))
+						qe3_ptr->number = qe1_ptr->number;
+					else if	(qe1_ptr->number >= qe2_ptr->number)
+						qe3_ptr->number = qe2_ptr->number;
+				}
+
+				/* Check for feature match */
+				if (qe1_ptr->flags & (EVENT_ALTER_FEAT | EVENT_DEFEND_FEAT))
+				{
+					/* Match feature or any feature */
+					if ((qe2_ptr->feat) && (qe2_ptr->feat != qe1_ptr->feat)) continue;
+
+					/* Accumulate features */
+					qe3_ptr->number = qe1_ptr->number;
+				}
+
+				/* Check for room type match */
+				if (((qe1_ptr->flags & (EVENT_FIND_ROOM | EVENT_FLAG_ROOM | EVENT_UNFLAG_ROOM))) &&
+					(((qe2_ptr->room_type_a) && (qe2_ptr->room_type_a != qe1_ptr->room_type_a)) ||
+					((qe2_ptr->room_type_b) && (qe2_ptr->room_type_b != qe1_ptr->room_type_b))))
+						continue;
+
+				/* Check for room flag match */
+				if (((qe1_ptr->flags & (EVENT_FLAG_ROOM | EVENT_UNFLAG_ROOM))) &&
+						((qe2_ptr->room_flags & (qe1_ptr->room_flags)) == 0))
+					continue;
+
+				/* Do we have to stay on this level a set amount of time? */
+				if (qe2_ptr->flags & (EVENT_STAY | EVENT_DEFEND_RACE | EVENT_DEFEND_FEAT | EVENT_DEFEND_STORE))
+				{
+					if (old_turn + qe2_ptr->time < turn) continue;
+				}
+
+				/* Do we have to succeed at a quest? */
+				if (qe2_ptr->flags & (EVENT_PASS_QUEST))
+				{
+					if (q_info[qe2_ptr->quest].stage != QUEST_FINISH) continue;
+				}
+
+				/* Check for defensive failure */
+				if (qe1_ptr->flags & (EVENT_DEFEND_RACE | EVENT_DEFEND_FEAT))
+				{
+					/* Hack - fail the quest */
+					if (!qe1_ptr->number)
+					{
+						next_stage = QUEST_FAILED;
+						break;
+					}
+				}
+
+				/* Check for completion */
+				else if ((qe3_ptr->number) && (qe3_ptr->number < qe2_ptr->number))
+				{
+					/* We at least have a partial match */
+					partial = TRUE;
+				}
+			}
+
+			/* We have qualified for the next stage of the quest */
+			next_stage = (j == QUEST_ACTIVE ? QUEST_REWARD : j + 1);
+		}
+
+		/* Advance the quest */
+		if (next_stage)
+		{
+			const char *prefix = ( next_stage == QUEST_REWARD ? "To claim your reward, " : NULL);
+
+			/* Not advancing */
+			if (!advance)
+			{
+				/* Voluntarily fail quest? */
+				if (next_stage == QUEST_FAILED)
+				{
+					return (get_check(format("Fail %s?", q_name + q_ptr->name)));
+				}
+				else
+				{
+					return (FALSE);
+				}
+			}
+
+			/* Describe the quest if assigned it */
+			if ((next_stage == QUEST_ACTIVE) &&
+					strlen(q_text + q_ptr->text)) msg_format("%s", q_text + q_ptr->text);
+
+			/* Tell the player the next step of the quest. */
+			if ((next_stage < QUEST_PAYOUT) &&
+				(q_info[i].event[next_stage].flags))
+			{
+				/* Display the event 'You must...' */
+				print_event(&q_info[i].event[next_stage], 2, 3, prefix);
+			}
+			/* Tell the player they have succeeded */
+			else if (next_stage == QUEST_FINISH)
+			{
+				msg_format("You have completed %s!", q_name + q_ptr->name);
+			}
+			/* Tell the player they have failed */
+			else if (next_stage == QUEST_PENALTY)
+			{
+				msg_format("You have failed %s.", q_name + q_ptr->name);
+			}
+
+			/* Advance quest to the next stage */
+			q_ptr->stage = next_stage;
+
+			/* Something done? */
+			questor = TRUE;
+		}
+		/* Tell the player they have partially advanced the quest */
+		else if (partial)
+		{
+			quest_event event;
+
+			COPY(&event, &q_ptr->event[q_ptr->stage], quest_event);
+
+			/* Tell the player the action they have completed */
+			print_event(qe1_ptr, 2, 1, NULL);
+
+			/* Tell the player the action(s) they must still do */
+			print_event(&event, 2, 3, NULL);
+		}
+	}
+
+	return(questor);
+}
+
+
+/*
  * Handle the "death" of a monster.
  *
  * Disperse treasures centered at the monster location based on the
@@ -3023,7 +3248,7 @@ void scatter_objects_under_feat(int y, int x)
  */
 bool monster_death(int m_idx)
 {
-	int i, j, y, x, ny, nx;
+	int j, y, x, ny, nx;
 
 	int dump_item = 0;
 	int dump_gold = 0;
@@ -3052,6 +3277,7 @@ bool monster_death(int m_idx)
 	object_type *i_ptr;
 	object_type object_type_body;
 
+	quest_event quest_check;
 
 	/* Get the location */
 	y = m_ptr->fy;
@@ -3065,16 +3291,16 @@ bool monster_death(int m_idx)
 		{
 			/* Incur blood debt */
 			take_hit(SOURCE_BLOOD_DEBT, m_ptr->r_idx, damroll(r_ptr->level - p_ptr->csp, 3));
-			
+
 			/* No mana left */
 			p_ptr->csp = 0;
 			p_ptr->csp_frac = 0;
 		}
-		
+
 		/* Debt can be met by mana */
 		else
 		{
-			p_ptr->csp -= r_ptr->level;		
+			p_ptr->csp -= r_ptr->level;
 		}
 
 		/* Update mana */
@@ -3086,9 +3312,19 @@ bool monster_death(int m_idx)
 		if (p_ptr->is_dead) return (TRUE);
 	}
 
-	
 	/* Extinguish lite */
 	delete_monster_lite(m_idx);
+
+	/* Clear the quest */
+	WIPE(&quest_check, quest_event);
+
+	/* Set the quest */
+	quest_check.flags = EVENT_KILL_RACE;
+	quest_check.race = m_ptr->r_idx;
+	quest_check.number = 1;
+
+	/* Check quest events */
+	check_quest(&quest_check, TRUE);
 
 	/* Drop objects being carried */
 	for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
@@ -3129,7 +3365,7 @@ bool monster_death(int m_idx)
 		/* Get local object */
 		i_ptr = &object_type_body;
 
-		/* Wipe the object */ 
+		/* Wipe the object */
 		object_wipe(i_ptr);
 
 		/* Drop a body? */
@@ -3173,13 +3409,12 @@ bool monster_death(int m_idx)
 		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
 
 		/* Mark origin */
-		i_ptr->origin = ORIGIN_DROP; 
-		i_ptr->origin_depth = p_ptr->depth; 
-		i_ptr->origin_xtra = m_ptr->r_idx; 
+		i_ptr->origin = ORIGIN_DROP;
+		i_ptr->origin_depth = p_ptr->depth;
+		i_ptr->origin_xtra = m_ptr->r_idx;
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
-
 
 		/* Get local object */
 		i_ptr = &object_type_body;
@@ -3194,9 +3429,9 @@ bool monster_death(int m_idx)
 		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
 
 		/* Mark origin */
-		i_ptr->origin = ORIGIN_DROP; 
-		i_ptr->origin_depth = p_ptr->depth; 
-		i_ptr->origin_xtra = m_ptr->r_idx; 
+		i_ptr->origin = ORIGIN_DROP;
+		i_ptr->origin_depth = p_ptr->depth;
+		i_ptr->origin_xtra = m_ptr->r_idx;
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
@@ -3214,7 +3449,6 @@ bool monster_death(int m_idx)
 		msg_print("You may retire (commit suicide) when you are ready.");
 
 	}
-
 
 	/* Determine how much we can drop */
 	if ((r_ptr->flags1 & (RF1_DROP_30)) && (rand_int(100) < 30)) number++;
@@ -3238,7 +3472,7 @@ bool monster_death(int m_idx)
 
 	/* Clear monster equipment */
 	hack_monster_equip = 0L;
-	
+
 	/* Drop some objects */
 	for (j = 0; j < number; j++)
 	{
@@ -3259,7 +3493,7 @@ bool monster_death(int m_idx)
 			l_ptr->flags8 |= (RF8_DROP_CHEST);
 
 			hack_monster_equip |= (RF8_DROP_CHEST);
-			
+
 			continue;
 		}
 
@@ -3276,7 +3510,7 @@ bool monster_death(int m_idx)
 				hack_monster_equip = 0L;
 			}
 		}
-		
+
 		/* Make Gold */
 		if (do_gold && (!do_item || (rand_int(100) < 50) ))
 		{
@@ -3347,7 +3581,7 @@ bool monster_death(int m_idx)
 				case TV_SONG_BOOK:
 				{
 					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_MUSIC);
-					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_WRITING);					
+					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_WRITING);
 				}
 				case TV_INSTRUMENT:
 				{
@@ -3469,10 +3703,10 @@ bool monster_death(int m_idx)
 			dump_item++;
 		}
 
-		/* Set origin */ 
-		i_ptr->origin = visible ? ORIGIN_DROP : ORIGIN_DROP_UNKNOWN; 
-		i_ptr->origin_depth = p_ptr->depth; 
-		i_ptr->origin_xtra = m_ptr->r_idx; 
+		/* Set origin */
+		i_ptr->origin = visible ? ORIGIN_DROP : ORIGIN_DROP_UNKNOWN;
+		i_ptr->origin_depth = p_ptr->depth;
+		i_ptr->origin_xtra = m_ptr->r_idx;
 
 		/* Drop it in the dungeon */
 		drop_near(i_ptr, -1, y, x);
@@ -3480,7 +3714,7 @@ bool monster_death(int m_idx)
 
 	/* Reset monster equipment */
 	hack_monster_equip = 0L;
-	
+
 	/* Reset the object level */
 	object_level = p_ptr->depth;
 
@@ -3507,145 +3741,19 @@ bool monster_death(int m_idx)
 	if (!(r_ptr->flags1 & (RF1_QUESTOR | RF1_GUARDIAN)))
 		return (TRUE);
 
-	/* Check quests for completion */
-	for (i = 0; i < MAX_Q_IDX; i++)
-	{
-		quest_type *q_ptr = &(q_list[i]);
-		quest_event *qe_ptr = &(q_ptr->event[q_ptr->stage]);
-
-		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]);
-
-		if ((qe_ptr->dungeon != p_ptr->dungeon) ||
-			(qe_ptr->level != p_ptr->depth - min_depth(p_ptr->dungeon))) continue;
-
-		if (!(qe_ptr->race) || (qe_ptr->race != m_list[m_idx].r_idx)) continue;
-
-		/* Assign quest */
-		if (q_ptr->stage == QUEST_ASSIGN)
-		{
-			/* Wipe the structure */
-			(void)WIPE(qe_ptr, quest_event);
-
-			qe_ptr->dungeon = p_ptr->dungeon;
-			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
-			qe_ptr->race = m_list[m_idx].r_idx;
-			qe_ptr->number = 1;
-			qe_ptr->flags |= (EVENT_KILL_RACE);
-
-			quest_assign(i);
-
-			continue;
-		}
-
-		if (q_ptr->stage != QUEST_ACTION) continue;
-
-		/* If last monster killed, drop artifact */
-		if ((q_ptr->event[QUEST_ACTION].number + 1 >= qe_ptr->number) && (qe_ptr->artifact))
-		{
-			/* Get local object */
-			i_ptr = &object_type_body;
-
-			/* Wipe the object */
-			object_wipe(i_ptr);
-
-			/* Prepare artifact */
-			qe_ptr->kind = lookup_kind(a_info[qe_ptr->artifact].tval, a_info[qe_ptr->artifact].sval);
-
-			/* Prepare object */
-			object_prep(i_ptr, qe_ptr->kind);
-
-			/* Prepare artifact */
-			i_ptr->name1 = qe_ptr->artifact;
-
-			/* Apply magic */
-			apply_magic(i_ptr, object_level, FALSE, FALSE, FALSE);
-
-			/* Drop it in the dungeon */
-			drop_near(i_ptr, -1, m_list[m_idx].fy, m_list[m_idx].fx);
-		}
-
-		/* All slain quest monsters drop items */
-		else if ((qe_ptr->kind) || (qe_ptr->ego_item_type))
-		{
-			/* Get local object */
-			i_ptr = &object_type_body;
-
-			/* Wipe the object */
-			object_wipe(i_ptr);
-
-			/* Prepare ego item */
-			if ((qe_ptr->ego_item_type) && !(qe_ptr->kind)) qe_ptr->kind =
-				lookup_kind(e_info[qe_ptr->ego_item_type].tval[0],
-					e_info[qe_ptr->ego_item_type].min_sval[0]);
-
-			/* Prepare object */
-			object_prep(i_ptr, qe_ptr->kind);
-
-			/* Prepare ego item */
-			i_ptr->name2 = qe_ptr->ego_item_type;
-
-			/* Apply magic */
-			apply_magic(i_ptr, object_level, FALSE, FALSE, FALSE);
-
-			/* Drop it in the dungeon */
-			drop_near(i_ptr, -1, m_ptr->fy, m_ptr->fx);
-		}
-
-		/* Update actions */
-		qe_ptr = &(q_ptr->event[QUEST_ACTION]);
-
-		/* Fail quest because we killed someone */
-		if (q_ptr->event[QUEST_FAILED].flags & (EVENT_KILL_RACE))
-		{
-			/* Wipe the structure */
-			(void)WIPE(qe_ptr, quest_event);
-
-			/* Set action details */
-			qe_ptr->dungeon = p_ptr->dungeon;
-			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
-			qe_ptr->race = m_list[m_idx].r_idx;
-			qe_ptr->number = 1;
-			qe_ptr->flags |= (EVENT_KILL_RACE);
-
-			quest_penalty(i);
-		}
-
-		/* Get closer to success because we need to terrify someone */
-		else if ((qe_ptr->flags & (EVENT_KILL_RACE)) && (qe_ptr->number + 1 >= q_ptr->event[QUEST_ACTIVE].number))
-		{
-			/* Don't count terrified monsters if we can kill _or_ terrify them */
-			if (!m_ptr->monfear || !(qe_ptr->flags & (EVENT_FEAR_RACE))) qe_ptr->number++;
-
-			qe_ptr->flags |= (EVENT_KILL_RACE);
-
-			/* Have completed quest? */
-			if ((qe_ptr->flags == q_ptr->event[QUEST_ACTIVE].flags) && (qe_ptr->number >= q_ptr->event[QUEST_ACTIVE].number))
-			{
-				msg_print("Congratulations. You have succeeded at your quest.");
-
-				quest_reward(i);
-			}
-			/* Partially completed quest */
-			else
-			{
-				msg_print("You have xxx to go.");
-			}
-		}
-	}
-	
 	/* Sauron forms */
 	if ((m_ptr->r_idx >= SAURON_FORM) && (m_ptr->r_idx < SAURON_FORM + MAX_SAURON_FORMS))
 	{
 		/* Killing this form means there is a chance of the true form being revealed */
 		p_ptr->sauron_forms |= (1 << (m_ptr->r_idx - SAURON_FORM));
-		
+
 		/* Sauron changes form */
 		m_ptr->r_idx = sauron_shape(m_ptr->r_idx);
-		
+
 		/* And gets back his hitpoints / mana */
 		m_ptr->hp = m_ptr->maxhp;
 		m_ptr->mana = r_ptr->mana;
-		
+
 		/* Message for the player */
 		if (m_ptr->r_idx == SAURON_TRUE)
 		{
@@ -3657,7 +3765,7 @@ bool monster_death(int m_idx)
 			msg_print("Sauron's form shifts fluidly.");
 			msg_print("You have destroyed this shape, but must continue the fight!");
 		}
-		
+
 		return (FALSE);
 	}
 
@@ -3673,17 +3781,17 @@ bool monster_death(int m_idx)
 			while (!cave_valid_bold(y, x) && !cave_clean_bold(y,x))
 		    {
 				int d = 1;
-	
+
 				/* Pick a location */
 				scatter(&ny, &nx, y, x, d, 0);
-	
+
 		    	/* Stagger */
 				y = ny; x = nx;
 		    }
-	
+
 		  /* Explain the staircase */
 		  msg_print("A magical staircase appears...");
-	
+
 		  /* Create stairs */
 		  if (level_flag & (LF1_TOWER))
 			  cave_set_feat(y, x, FEAT_LESS);
@@ -3710,7 +3818,7 @@ bool monster_death(int m_idx)
 		msg_print("You have won the game!");
 		msg_print("You may retire (commit suicide) when you are ready.");
 	}
-	
+
 	return (TRUE);
 }
 
@@ -3902,7 +4010,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 
 			/* Show killer tips */
 			if (!l_ptr->tkills) queue_tip(format("kill%d.txt", m_ptr->r_idx));
-			
+
 			/* Count kills in all lives */
 			if (l_ptr->tkills < MAX_SHORT) l_ptr->tkills++;
 
@@ -3964,7 +4072,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		/*
 		 * Run (sometimes) if at 10% or less of max hit points,
 		 * or (more often) when hit for 11% or more its current hit points
-		 * 
+		 *
 		 * Percentages depend on player's charisma.
 		 */
 		if ((randint(adj_chr_fear[p_ptr->stat_ind[A_CHR]]) >= fitness) ||
@@ -4091,8 +4199,8 @@ bool change_panel(int dir)
 	return (modify_panel(wy, wx));
 }
 
-/* 
- * Hack - generate the current room description 
+/*
+ * Hack - generate the current room description
  */
 static void get_room_desc(int room, char *name, int name_s, char *text_visible, int text_visible_s, char *text_always, int text_always_s)
 {
@@ -4125,7 +4233,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 		}
 		return;
 	}
-	
+
 	/* In room */
 	switch (room_info[room].type)
 	{
@@ -4141,7 +4249,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 			/* Describe height of tower */
 			if (text_visible)
 			{
-				int height = (1 + max_depth(p_ptr->dungeon) 
+				int height = (1 + max_depth(p_ptr->dungeon)
 								  - min_depth(p_ptr->dungeon));
 				my_strcpy(text_visible, format("It looks about %d %s tall.  ", depth_in_feet ? height * 50 : height, depth_in_feet ? "feet" : "stories"), text_visible_s);
 			}
@@ -4173,7 +4281,7 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 			if (text_visible) my_strcat(text_visible, "deadly monsters and rich treasure.  ", text_visible_s);
 			beware = TRUE;
 
-			/* Fall through */	
+			/* Fall through */
 		}
 
 		case (ROOM_LESSER_VAULT):
@@ -4231,11 +4339,11 @@ static void get_room_desc(int room, char *name, int name_s, char *text_visible, 
 
 		/* Clear the name2 text */
 		buf_name2[0] = '\0';
-			
+
 		i = 0;
 
 		if (cheat_xtra && text_always) my_strcat(text_visible, format ("%s (%ld)", r_name + r_info[room_info[room].deepest_race].name, room_info[room].ecology), text_visible_s);
-		
+
 		while ((room >= 0) && (i < ROOM_DESC_SECTIONS))
 		{
 			/* Get description */
@@ -4539,7 +4647,7 @@ void describe_room(void)
 			{
 				/* Message */
 				text_out(text_visible);
-				
+
 				/* Add it to the buffer */
 				message_add(text_visible, MSG_GENERIC);
 			}
@@ -4596,20 +4704,20 @@ void describe_room(void)
 			else
 			{
 				message_flush();
-	
+
 				screen_save();
-	
+
 				/* Set text_out hook */
 				text_out_hook = text_out_to_screen;
-	
+
 				text_out_c(TERM_L_BLUE, name);
 				text_out("\n");
-	
+
 				/* Message */
 				text_out(text_always);
-	
+
 				(void)anykey();
-	
+
 				screen_load();
 			}
 		}
@@ -4962,14 +5070,14 @@ bool target_okay(void)
 
 /*
  * Get allies to adopt the player's target.
- * 
+ *
  * If order is true, we order allies to this.
  * If order is false, only allies without targets will go here.
  */
 static void player_tell_allies_target(int y, int x, bool order)
 {
 	int i;
-	
+
 	/* Get allies to target this location */
 	for (i = 1; i < m_max; i++)
 	{
@@ -4977,23 +5085,23 @@ static void player_tell_allies_target(int y, int x, bool order)
 
 		/* Skip dead monsters */
 		if (!m_ptr->r_idx) continue;
-		
+
 		/* Skip non-allies, or allies who ignore the player */
 		if ( ((m_ptr->mflag & (MFLAG_ALLY)) == 0) || ((m_ptr->mflag & (MFLAG_IGNORE)) != 0) ) continue;
-		
+
 		/* Skip unseen monsters that the player cannot speak to or telepathically communicate with */
 		if (!m_ptr->ml && ((r_info[m_ptr->r_idx].flags3 & (RF3_NONVOCAL)) == 0))
 		{
 			/* Cannot hear the player */
 			if ((m_ptr->cdis > 3) && ((play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) == 0)) continue;
-			
+
 			/* Cannot understand the player */
 			if (!player_understands(monster_language(m_ptr->r_idx))) continue;
 		}
 
 		/* Skip monsters with targets already */
 		if ((!order) && (m_ptr->ty || m_ptr->tx)) continue;
-		
+
 		/* Set the monster target */
 		m_ptr->ty = y;
 		m_ptr->tx = x;
@@ -5016,7 +5124,7 @@ void target_set_monster(int m_idx, s16b flags)
 		p_ptr->target_who = m_idx;
 		p_ptr->target_row = m_ptr->fy;
 		p_ptr->target_col = m_ptr->fx;
-		
+
 		/* Get allies to target this */
 		player_tell_allies_target(m_ptr->fy, m_ptr->fx, FALSE);
 	}
@@ -5046,7 +5154,7 @@ void target_set_location(int y, int x, s16b flags)
 		p_ptr->target_who = 0;
 		p_ptr->target_row = y;
 		p_ptr->target_col = x;
-		
+
 		/* Get allies to target this */
 		player_tell_allies_target(y,x, FALSE);
 	}
@@ -5255,7 +5363,7 @@ static void target_set_interactive_prepare(int mode)
 
 				/* Must be a targettable monster */
 				if (!target_able(cave_m_idx[y][x])) continue;
-				
+
 				/* Must not be an ally */
 				if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) continue;
 			}
@@ -5269,7 +5377,7 @@ static void target_set_interactive_prepare(int mode)
 				/* Must be an ally */
 				if ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) == 0) continue;
 			}
-			
+
 			/* If matching race, must match race */
 			if (p_ptr->target_race)
 			{
@@ -5458,7 +5566,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 							p_ptr->target_race = m_list[cave_m_idx[y][x]].r_idx;
 						}
 					}
-					
+
 					/* Normal commands */
 					if (query.key != 'r') break;
 
@@ -6231,12 +6339,12 @@ bool target_set_interactive(int mode)
 
 	/* Prepare the "temp" array */
 	target_set_interactive_prepare(mode);
-	
+
 	/* Nothing in it. Clear race filter if set and try again. */
 	if (!temp_n && (p_ptr->target_race))
 	{
 		p_ptr->target_race = 0;
-		
+
 		target_set_interactive_prepare(mode);
 	}
 
@@ -6285,7 +6393,7 @@ bool target_set_interactive(int mode)
 				p_ptr->window |= (PW_OVERHEAD);
 
 				/* Handle stuff */
-				handle_stuff();					
+				handle_stuff();
 			}
 
 			/* Allow target */
@@ -6343,7 +6451,7 @@ bool target_set_interactive(int mode)
 				{
 					y = py;
 					x = px;
-					
+
 					/* Calculate the path */
 					if (mode & (TARGET_KILL))
 					{
@@ -6356,7 +6464,7 @@ bool target_set_interactive(int mode)
 						p_ptr->window |= (PW_OVERHEAD);
 
 						/* Handle stuff */
-						handle_stuff();					
+						handle_stuff();
 					}
 
 					/* Recenter around player */
@@ -6382,10 +6490,10 @@ bool target_set_interactive(int mode)
 				{
 					/* Bounds check */
 					if (in_bounds(KEY_GRID_Y(query), KEY_GRID_X(query)))
-					{	
+					{
 						ty = y = KEY_GRID_Y(query);
 						tx = x = KEY_GRID_X(query);
-	
+
 						/* Go to if clicked with BUTTON_MOVE */
 						if (query.mousebutton == BUTTON_MOVE)
 						{
@@ -6401,21 +6509,21 @@ bool target_set_interactive(int mode)
 						else
 						{
 							flag = FALSE;
-	
+
 							/* Calculate the path */
 							if (mode & (TARGET_KILL))
 							{
 								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
-	
+
 								/* Redraw map */
 								p_ptr->redraw |= (PR_MAP);
-	
+
 								/* Hack -- Window stuff */
 								p_ptr->window |= (PW_OVERHEAD);
-	
+
 								/* Handle stuff */
-								handle_stuff();	
-	
+								handle_stuff();
+
 								/* Force an update */
 								Term_fresh();
 							}
@@ -6434,7 +6542,7 @@ bool target_set_interactive(int mode)
 				case '?':
 				{
 					screen_save();
-					
+
 					/* Help file depends on mode */
 					if (mode & (TARGET_KILL))
 					{
@@ -6444,11 +6552,11 @@ bool target_set_interactive(int mode)
 					{
 						(void)show_file("cmdlook.txt", NULL, 0, 0);
 					}
-					
+
 					screen_load();
 					break;
 				}
-				
+
 				/* Get allies to attack anything near here */
 				case 'a':
 				{
@@ -6476,7 +6584,7 @@ bool target_set_interactive(int mode)
 					}
 					break;
 				}
-				
+
 				/* Have set or changed race filter */
 				case 's':
 				{
@@ -6485,11 +6593,11 @@ bool target_set_interactive(int mode)
 
 					/* Re-prepare targets */
 					target_set_interactive_prepare(mode);
-					
+
 					/* Start near the player again and fake movement */
 					m = 0;
 					d = 5;
-					
+
 					break;
 				}
 
@@ -6597,7 +6705,7 @@ bool target_set_interactive(int mode)
 						p_ptr->window |= (PW_OVERHEAD);
 
 						/* Handle stuff */
-						handle_stuff();					
+						handle_stuff();
 					}
 
 					/* Recenter around player */
@@ -6643,7 +6751,7 @@ bool target_set_interactive(int mode)
 				{
 					/* Bounds check */
 					if (in_bounds(KEY_GRID_Y(query), KEY_GRID_X(query)))
-					{	
+					{
 						ty = y = KEY_GRID_Y(query);
 						tx = x = KEY_GRID_X(query);
 
@@ -6676,7 +6784,7 @@ bool target_set_interactive(int mode)
 								handle_stuff();
 
 								/* Force an update */
-								Term_fresh();			
+								Term_fresh();
 							}
 						}
 					}
@@ -6697,7 +6805,7 @@ bool target_set_interactive(int mode)
 					screen_load();
 					break;
 				}
-				
+
 				case 'a':
 				{
 					target_set_location(y, x, mode | (TARGET_NEAR));
@@ -6723,11 +6831,11 @@ bool target_set_interactive(int mode)
 
 					/* Re-prepare targets */
 					target_set_interactive_prepare(mode);
-					
+
 					/* Start near the player again and fake movement */
 					m = 0;
 					d = 5;
-					
+
 					break;
 				}
 
@@ -6794,7 +6902,7 @@ bool target_set_interactive(int mode)
 					p_ptr->window |= (PW_OVERHEAD);
 
 					/* Handle stuff */
-					handle_stuff();					
+					handle_stuff();
 				}
 			}
 		}
@@ -6909,9 +7017,9 @@ bool get_aim_dir(int *dp)
 				{
 					int y = KEY_GRID_Y(ke);
 					int x = KEY_GRID_X(ke);
-					
+
 					if (!in_bounds_fully(y, x)) break;
-					
+
 					target_set_location(y, x, 0);
 					dir = 5;
 					break;
@@ -7036,9 +7144,9 @@ bool get_rep_dir(int *dp)
 				int x = KEY_GRID_X(ke);
 
 				int angle;
-				
+
 				if (!in_bounds_fully(y, x)) break;
-				
+
 				/* Calculate approximate angle */
 				angle = get_angle_to_target(p_ptr->py, p_ptr->px,y, x, 0);
 
@@ -7136,7 +7244,7 @@ int max_depth(int dungeon)
 	dungeon_zone *zone = &t_ptr->zone[0];
 	int i;
 
-	/* Get the zone */	
+	/* Get the zone */
 	for (i = 0;i<MAX_DUNGEON_ZONES;i++)
 	{
 		if ((i) && (t_ptr->zone[i].level <= t_ptr->zone[i-1].level)) break;
@@ -7155,8 +7263,8 @@ bool is_typical_town(int dungeon, int depth)
 	get_zone(&zone, dungeon, depth);
 
 	return (level_flag & (LF1_SURFACE)
-			&& !zone->fill 
-			&& zone->level <= 10 
+			&& !zone->fill
+			&& zone->level <= 10
 			&& t_info[dungeon].store[3]);
 }
 
@@ -7166,7 +7274,7 @@ int town_depth(int dungeon)
 	dungeon_zone *zone = &t_ptr->zone[0];
 	int i;
 
-	/* Get the zone */	
+	/* Get the zone */
 	for (i = 0;i<MAX_DUNGEON_ZONES;i++)
 	{
 		zone = &t_info[dungeon].zone[i];
@@ -7182,7 +7290,7 @@ void get_zone(dungeon_zone **zone_handle, int dungeon, int depth)
 	dungeon_zone *zone = &t_ptr->zone[0];
 	int i;
 
-	/* Get the zone */	
+	/* Get the zone */
 	for (i = 0;i<MAX_DUNGEON_ZONES;i++)
 	{
 		if ((i) && (t_ptr->zone[i].level <= t_ptr->zone[i-1].level)) break;

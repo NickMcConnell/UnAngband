@@ -136,7 +136,7 @@
 
 /*
  * Number of rooms to attempt to generate in dungeon.
- * 
+ *
  */
 #define DUN_ROOMS       16
 
@@ -369,7 +369,7 @@
 #define ROOM_DESC_SECTIONS 50
 
 /*
- * Dungeon room types 
+ * Dungeon room types
  */
 #define ROOM_NONE				0
 #define ROOM_NORMAL				1
@@ -1399,7 +1399,7 @@
 
 #define FS_FLAGS1       0
 #define FS_SECRET       5
-#define FS_OPEN  8 
+#define FS_OPEN  8
 #define FS_CLOSE 9
 #define FS_BASH  10
 #define FS_SPIKE 11
@@ -1410,7 +1410,7 @@
 #define FS_DOOR  18
 #define FS_TRAP  19
 #define FS_STAIRS       20
-#define FS_GLYPH 21       
+#define FS_GLYPH 21
 #define FS_LESS  22
 #define FS_MORE  23
 #define FS_RUN   24
@@ -1845,7 +1845,7 @@
 /*
  * Used for uncontrolled objects
  */
-#define UNCONTROLLED_CHANCE		100	/* Chance in 1 in x chance of uncontrolled object activating */	
+#define UNCONTROLLED_CHANCE		100	/* Chance in 1 in x chance of uncontrolled object activating */
 #define UNCONTROLLED_CONTROL	200	/* Number of random activations before controlling this object */
 
 
@@ -2008,7 +2008,7 @@
 #define SV_EGG_SEED  3
 
 /* The "sval" codes for TV_SPELL */
-/* 
+/*
  * Note these probably will have to not conflict with the sval for
  * the normal item(s) in the same slot. Thus the non-contiguous svals.
  */
@@ -2987,7 +2987,7 @@
 /*
  * Special player grid flags
  */
-#define PLAY_MARK		0x01 	/* memorized feature */ 
+#define PLAY_MARK		0x01 	/* memorized feature */
 #define PLAY_SAFE		0x02 	/* detected as safe */
 #define PLAY_MAGI		0x04 	/* magical effect */
 #define PLAY_LITE		0x08 	/* lit by the player */
@@ -3121,7 +3121,7 @@
 #define ROOM_EDGED	0x00000020L	   /* room doesn't have 'outer' terrain */
 #define ROOM_LANGUAGE	0x00000040L	   /* room has language inscriptions */
 #define ROOM_FLOODED	0x00000080L	   /* room is flooded with terrain */
-#define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */ 
+#define ROOM_DAYLITE	0x00000100L	   /* room is lit during daytime */
 #define ROOM_ICKY 	0x00000200L    /* room cannot be teleport target */
 #define ROOM_BLOODY	0x00000400L    /* room causes wounds/poison to become worse */
 #define ROOM_CURSED	0x00000800L    /* room causes items to not provide bonuses (except artifacts) */
@@ -3154,27 +3154,27 @@
  */
 #define EVENT_TRAVEL		0x00000001L	/* Travels to a location */
 #define EVENT_LEAVE		0x00000002L	/* Leave a location */
-#define EVENT_STAY		0x00000004L	/* Stay in location */
-#define EVENT_PASS_QUEST	0x00000008L	/* Valid until this time */
-#define EVENT_FAIL_QUEST	0x00000010L	/* Valid after this time */
+#define EVENT_STAY		0x00000004L	/* Stay in location a minimum amount of time */
+#define EVENT_PASS_QUEST	0x00000008L	/* Valid after this quest completed */
+#define EVENT_FAIL_QUEST	0x00000010L	/* Valid after this quest failed */
 #define EVENT_FIND_ROOM		0x00000020L	/* Locate room */
 #define EVENT_FLAG_ROOM		0x00000040L	/* Add flags to room*/
 #define EVENT_UNFLAG_ROOM	0x00000080L	/* Remove flags from room */
 #define EVENT_ALTER_FEAT	0x00000100L	/* Alters a feature */
 #define EVENT_DEFEND_FEAT	0x00000200L	/* Don't alter a feat */
-#define EVENT_FIND_ITEM		0x00000400L	/* Give an item */
-#define EVENT_GET_ITEM		0x00000800L	/* Have an item */
-#define EVENT_DESTROY_ITEM	0x00001000L	/* Destroy an item */
-#define EVENT_LOSE_ITEM		0x00002000L	/* Leave an item behind */
+#define EVENT_FIND_ITEM		0x00000400L	/* Find an item */
+#define EVENT_GET_ITEM		0x00000800L	/* Get an item */
+#define EVENT_LOSE_ITEM		0x00001000L	/* Lose an item */
+#define EVENT_DESTROY_ITEM	0x00002000L	/* Destroy an item behind */
 #define EVENT_TALK_STORE	0x00004000L	/* Talks to the owner of a shop */
 #define EVENT_BUY_STORE		0x00008000L	/* Buys an item from a shop */
 #define EVENT_SELL_STORE	0x00010000L	/* Sells an item to a shop */
 #define EVENT_GIVE_STORE	0x00020000L	/* Give an item to an owner of a shop */
 #define EVENT_STOCK_STORE	0x00040000L	/* Stocks an item in a shop */
 #define EVENT_GET_STORE		0x00080000L	/* Steal an item from a shop */
-#define EVENT_DEFEND_STORE	0x00100000L	/* Get kicked out of a shop */
-#define EVENT_TALK_RACE		0x00200000L	/* Defend a shop */
-#define EVENT_GIVE_RACE		0x00400000L	/* Talks to a monster race */
+#define EVENT_DEFEND_STORE	0x00100000L	/* Defend a shop */
+#define EVENT_TALK_RACE		0x00200000L	/* Talk to a race */
+#define EVENT_GIVE_RACE		0x00400000L	/* Give an item to a race */
 #define EVENT_GET_RACE		0x00800000L	/* Give an item to a monster */
 #define EVENT_FIND_RACE		0x01000000L	/* Sees a monster race */
 #define EVENT_KILL_RACE		0x02000000L	/* Kill a monster race */
@@ -3190,11 +3190,12 @@
 #define QUEST_ASSIGN	0	/* Event describes quest assignment */
 #define QUEST_ACTIVE	1	/* Event describes quest */
 #define QUEST_ACTION	2	/* Event describes quest actions */
-#define	QUEST_REWARD	3	/* Event describes quest reward */
-#define	QUEST_FINISH	4	/* Event describes quest finish */
-#define	QUEST_FAILED	5	/* Event describes quest failure */
-#define	QUEST_PENALTY	6	/* Event describes quest penalty */
-#define MAX_QUEST_EVENTS 7	/* Maximum events in a quest */
+#define	QUEST_REWARD	3	/* Event describes quest reward requirements */
+#define	QUEST_PAYOUT	4	/* Event describes quest reward requirements */
+#define	QUEST_FINISH	5	/* Event describes quest results after completion */
+#define	QUEST_FAILED	6	/* Event describes quest failure requirements */
+#define	QUEST_PENALTY	7	/* Event describes quest penalty after completion */
+#define MAX_QUEST_EVENTS 8	/* Maximum events in a quest */
 
 /* When stage is 0, character has not been assigned quest.
    When stage is 1, character has been assigned quest, but not completed any actions
@@ -3642,7 +3643,7 @@
 
 /*
  * Hard coding for Sauron hack. Indexes into monster.txt
- * 
+ *
  * Should really replace this with shapeshifting based on group or similar.
  */
 #define SAURON_TRUE		546
@@ -4090,7 +4091,7 @@
 
 /*
  * Drop mask - used for hack_monster_equip. Note does not include DROP_CHEST or DROP_CLOTHES.
- * 
+ *
  * This ensures that a monster drops a maximum of one of each 'slot' of item.
  */
 #define RF8_DROP_MASK \
@@ -4620,7 +4621,7 @@
 
 /*
  * Uncontrolled items.
- * 
+ *
  * Note should always test for f3 & (TR3_UNCONTROLLED) in addition to this.
  */
 #define uncontrolled_p(T) \
@@ -4697,7 +4698,7 @@
 
 /*
  * Define which mouse buttons correspond to which actions
- * 
+ *
  * 1 is usually left-mouse button
  * 2 is usually right-mouse button
  */
@@ -4830,7 +4831,7 @@
 
 /*
  * Determine if a "legal" grid is an "nearly naked" grid
- * 
+ *
  * This can help for placing stairs on completely flooded levels.
  *
  * Line 1 -- forbid non-placers
@@ -4860,7 +4861,7 @@
 
 /*
  * Get the index number of the room. Return 0 if not in a valid room.
- * 
+ *
  * This should only be used once all rooms are initialised.
  */
 #define room_idx(Y,X) \
@@ -4871,7 +4872,7 @@
 
 /*
  * Get the index number of the room. Return 0 if not in a valid room.
- * 
+ *
  * This should only be used once all rooms are initialised.
  */
 #define room_idx_ignore_valid(Y,X) \
@@ -4881,10 +4882,10 @@
 
 /*
  * Determine if a "room" grid has a flag
- * 
+ *
  * Note that we don't check for flags for room 0 (e.g. the dungeon)
  * for various sanity reasons such as teleportation and so on.
- * 
+ *
  * This means dungeon room flags will never apply.
  */
 #define room_has_flag(Y,X,FLAG) \
@@ -5299,18 +5300,18 @@ enum
 	MAX_QUIVER_GROUPS
 };
 
-/*** Object origin kinds ***/ 
+/*** Object origin kinds ***/
 enum
 {
- 	ORIGIN_NONE = 0, 
- 	ORIGIN_MIXED, 
- 	ORIGIN_BIRTH, 
- 	ORIGIN_STORE, 
- 	ORIGIN_FLOOR, 
+ 	ORIGIN_NONE = 0,
+ 	ORIGIN_MIXED,
+ 	ORIGIN_BIRTH,
+ 	ORIGIN_STORE,
+ 	ORIGIN_FLOOR,
  	ORIGIN_DROP,
-	ORIGIN_DROP_UNKNOWN, 
+	ORIGIN_DROP_UNKNOWN,
 	ORIGIN_FEAT,
- 	ORIGIN_ACQUIRE, 
-	ORIGIN_CHEAT, 
-	ORIGIN_CHEST 
-}; 
+ 	ORIGIN_ACQUIRE,
+	ORIGIN_CHEAT,
+	ORIGIN_CHEST
+};

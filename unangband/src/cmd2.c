@@ -63,7 +63,7 @@ bool do_cmd_test(int y, int x, int action)
 	switch (action)
 	{
 		case FS_SECRET: break;
-		case FS_OPEN: act=" to open"; break;    
+		case FS_OPEN: act=" to open"; break;
 		case FS_CLOSE: act=" to close"; break;
 		case FS_BASH: act=" to bash"; break;
 		case FS_DISARM: act=" to disarm"; break;
@@ -90,7 +90,7 @@ bool do_cmd_test(int y, int x, int action)
 	}
 
 	else if (action < FS_FLAGS3)
-	{       
+	{
 		flag = bitzero << (action - FS_FLAGS2);
 		if (!(f_ptr->flags2 & flag))
 		{
@@ -98,9 +98,9 @@ bool do_cmd_test(int y, int x, int action)
 		 return (FALSE);
 		}
 	}
-	
+
 	else if (action < FS_FLAGS_END)
-	{       
+	{
 		flag = bitzero << (action - FS_FLAGS3);
 		if (!(f_ptr->flags3 & flag))
 		{
@@ -109,206 +109,9 @@ bool do_cmd_test(int y, int x, int action)
 		}
 	}
 
-	return (TRUE);  
-
-}
-
-/*
- * Check quests caused by travelling from the current level to another destination.
- *
- * XXX This includes travelling to the 'final' location and completely the first quest.
- *
- * Confirm indicates if the player is allowed to cancel this.
- *
- */
-static bool check_travel_quest(int dungeon, int level, bool confirm)
-{
-	int i;
-	quest_type *q_ptr;
-	quest_event *qe_ptr;
-
-	bool cancel = FALSE;
-
-	/* Check quests for cancellation */
-	if (confirm) for (i = 0; i < MAX_Q_IDX; i++)
-	{
-		q_ptr = &q_list[i];
-		qe_ptr = &(q_ptr->event[q_ptr->stage]);
-
-		/* if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]); */
-
-		/* Check destination */
-		if (q_ptr->stage == QUEST_ACTIVE)
-		{
-			if ((qe_ptr->dungeon != dungeon) ||
-				(qe_ptr->level != level - min_depth(dungeon))) continue;
-
-			/* Allow cancellation */
-			if (q_ptr->event[QUEST_FAILED].flags & (EVENT_TRAVEL))
-			{
-				/* Permit cancellation */
-				cancel = TRUE;
-			}
-
-			continue;
-		}
-
-		if (q_ptr->stage != QUEST_ACTION) continue;
-
-		if ((qe_ptr->dungeon != p_ptr->dungeon) ||
-			(qe_ptr->level != p_ptr->depth - min_depth(p_ptr->dungeon))) continue;
-
-		/* Fail quest because we left the level */
-		if (q_ptr->event[QUEST_FAILED].flags & (EVENT_LEAVE))
-		{
-			/* Permit cancellation */
-			cancel = TRUE;
-		}
-	}
-
-	/* Permit cancellation */
-	if ((cancel) && (get_check("Really fail the quest? "))) return (FALSE);
-
-	/* Check quests for completion */
-	for (i = 0; i < MAX_Q_IDX; i++)
-	{
-		q_ptr = &q_list[i];
-		qe_ptr = &(q_ptr->event[q_ptr->stage]);
-
-		if (q_ptr->stage == QUEST_ACTION) qe_ptr = &(q_ptr->event[QUEST_ACTIVE]);
-
-		/* Check quest allocation */
-		if (q_ptr->stage == QUEST_ASSIGN)
-		{
-			/* Allocate quest travelling to location */
-			if ((qe_ptr->flags & (EVENT_TRAVEL)) && 
-				(qe_ptr->dungeon == dungeon) &&
-				(qe_ptr->level == level - min_depth(dungeon)))
-			{
-				/* Wipe the structure */
-				(void)WIPE(qe_ptr, quest_event);
-
-				qe_ptr->dungeon = dungeon;
-				qe_ptr->level = level - min_depth(dungeon);
-				qe_ptr->flags |= (EVENT_TRAVEL);
-
-				quest_assign(i);
-			}
-
-			/* Allocate quest leaving location */
-			else if ((qe_ptr->flags & (EVENT_LEAVE)) && 
-				(qe_ptr->dungeon == p_ptr->dungeon) &&
-				(qe_ptr->level == p_ptr->depth - min_depth(p_ptr->dungeon)))
-			{
-				/* Wipe the structure */
-				(void)WIPE(qe_ptr, quest_event);
-
-				qe_ptr->dungeon = dungeon;
-				qe_ptr->level = level - min_depth(dungeon);
-				qe_ptr->flags |= (EVENT_LEAVE);
-
-				quest_assign(i);
-			}
-		}
-
-		if ((qe_ptr->dungeon != dungeon) ||
-			(qe_ptr->level != level - min_depth(dungeon))) continue;
-
-		/* Check destination */
-		if (q_ptr->stage == QUEST_ACTIVE)
-		{
-			/* Update actions */
-			qe_ptr = &(q_ptr->event[QUEST_ACTION]);
-
-			/* Fail quest because we travelled to the level */
-			if (q_ptr->event[QUEST_FAILED].flags & (EVENT_TRAVEL))
-			{
-				/* Wipe the structure */
-				(void)WIPE(qe_ptr, quest_event);
-
-				qe_ptr->dungeon = dungeon;
-				qe_ptr->level = level - min_depth(dungeon);
-				qe_ptr->flags |= (EVENT_TRAVEL);
-
-				/* Set quest penalty immedately */
-				q_ptr->stage = QUEST_PENALTY;
-			}
-
-			/* Get closer to success because we travelled to level */
-			else if (q_ptr->event[QUEST_ACTIVE].flags & (EVENT_TRAVEL))
-			{
-				qe_ptr->dungeon = dungeon;
-				qe_ptr->level = level - min_depth(dungeon);
-				qe_ptr->flags |= (EVENT_TRAVEL);
-
-				/* Have completed quest? */
-				if (qe_ptr->flags == q_ptr->event[QUEST_ACTIVE].flags)
-				{
-					msg_print("Congratulations. You have succeeded at your quest.");
-
-					/* XXX - Tell player next step */
-					q_ptr->stage = QUEST_REWARD;
-				}
-			}
-
-			continue;
-		}
-
-		if (q_ptr->stage != QUEST_ACTION) continue;
-
-		/* Update actions */
-		qe_ptr = &(q_ptr->event[QUEST_ACTION]);
-
-		/* Fail quest because we left the level */
-		if (q_ptr->event[QUEST_FAILED].flags & (EVENT_LEAVE))
-		{
-			/* Wipe the structure */
-			(void)WIPE(qe_ptr, quest_event);
-
-			qe_ptr->dungeon = p_ptr->dungeon;
-			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
-			qe_ptr->flags |= (EVENT_LEAVE);
-
-			/* Set quest penalty immediately */
-			q_ptr->stage = QUEST_PENALTY;
-		}
-
-		/* Get closer to success because we need to leave level */
-		else if (q_ptr->event[QUEST_ACTIVE].flags & (EVENT_LEAVE))
-		{
-			qe_ptr->dungeon = p_ptr->dungeon;
-			qe_ptr->level = p_ptr->depth - min_depth(p_ptr->dungeon);
-			qe_ptr->flags |= (EVENT_LEAVE);
-
-			/* Have completed quest? */
-			if (qe_ptr->flags == qe_ptr->flags)
-			{
-				msg_print("Congratulations. You have succeeded at your quest.");
-
-				/* XXX - Tell player next step */
-				q_ptr->stage = QUEST_REWARD;
-			}
-		}
-	}
-
-	/* Mega-hack */
-	if ((adult_campaign) && (p_ptr->dungeon == z_info->t_max -1))
-	{
-
-		p_ptr->total_winner = TRUE;
-
-		/* Redraw the "title" */
-		p_ptr->redraw |= (PR_TITLE);
-
-		/* Congratulations */
-		msg_print("*** CONGRATULATIONS ***");
-		msg_print("You have won the game!");
-		msg_print("You may retire (commit suicide) when you are ready.");
-	}
-
 	return (TRUE);
-}
 
+}
 
 
 /*
@@ -338,7 +141,7 @@ void print_routes(const s16b *route, int num, int y, int x)
 		long_level_name(str, town, 0);
 
 		line_attr = TERM_WHITE;
-		
+
 		/* Dump the route --(-- */
 		sprintf(out_val, "  %c) %-45s %2d%3s ",
 			I2A(i), str, min_depth(town), max_depth(town) > min_depth(town) ? format("-%-2d", max_depth(town)) : "");
@@ -366,16 +169,16 @@ bool route_commands(char choice, const s16b *sn, int i, bool *redraw)
 		{
 			/* Save screen */
 			if (!(*redraw)) screen_save();
-			
+
 			/* Do knowledge */
 			do_knowledge_dungeons();
 
 		    /* Load screen */
 		    screen_load();
-		    
+
 		    break;
 		}
-	
+
 		case 'M':
 		{
 			/* Save screen */
@@ -388,7 +191,7 @@ bool route_commands(char choice, const s16b *sn, int i, bool *redraw)
 
 			break;
 		}
-		
+
 		default:
 		{
 			return (FALSE);
@@ -407,7 +210,7 @@ int actual_route(int dun)
 	{
 		dun = t_info[dun].replace_with;
 	}
-	
+
 	return (dun);
 }
 
@@ -423,18 +226,18 @@ static bool auto_consume_okay(const object_type *o_ptr)
 
 	/* Inedible */
 	if (!item_tester_hook_food_edible(o_ptr)) return (FALSE);
-	
+
 	/* Hack -- normal food is fine except gorging meet, etc. */
 	/* You can inscribe them with !< to prevent this however */
 	if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)
-		 && (o_ptr->sval != SV_FOOD_WAYBREAD) 
+		 && (o_ptr->sval != SV_FOOD_WAYBREAD)
 		 && (o_ptr->sval != SV_FOOD_SPRIG_OF_ATHELAS)
 		 && (o_ptr->sval != SV_FOOD_COOKED_MEET)
 		 && (o_ptr->sval != SV_FOOD_PINT_OF_SPIRITS))
 	{
 		/* No inscription */
-		if (!o_ptr->note) return (TRUE);		
-		
+		if (!o_ptr->note) return (TRUE);
+
 		/* Find a '!' */
 		s = strchr(quark_str(o_ptr->note), '!');
 
@@ -451,7 +254,7 @@ static bool auto_consume_okay(const object_type *o_ptr)
 			/* Find another '=' */
 			s = strchr(s + 1, '!');
 		}
-		
+
 		return (TRUE);
 	}
 
@@ -512,7 +315,7 @@ int set_routes(s16b *routes, int max_num, int from)
 				routes[num++] = actual_route(t_ptr->nearby[i]);
 			}
 		}
-		
+
 		/* Add quest route if possible */
 		if ((t_ptr->quest_monster) && (!r_info[t_ptr->quest_monster].max_num) && (t_ptr->quest_opens))
 		{
@@ -549,13 +352,13 @@ int set_routes(s16b *routes, int max_num, int from)
 			}
 		}
 	}
-	
+
 	/* Always can travel back to Angband if not in campaign mode */
 	if (!adult_campaign)
 	{
 		/* Add route to Angband */
 		if (num < max_num) routes[num++] = z_info->t_max - 2;
-		
+
 		/* Paranoia - add a route back, even if out of space */
 		else if (p_ptr->dungeon != z_info->t_max - 2)
 			routes[0] = z_info->t_max - 2;
@@ -569,17 +372,17 @@ int set_routes(s16b *routes, int max_num, int from)
 	{
 		/* Only add routes from visited locations */
 		if (!t_info[routes[i]].visited) continue;
-		
+
 		/* Add nearby routes */
 		for (ii = 0; (ii < MAX_NEARBY) && (num < max_num); ii++)
 		{
 			/* Skip non-existent routes or circular roots */
 			if (!(t_info[routes[i]].nearby[ii]) || (t_info[routes[i]].nearby[ii] == p_ptr->dungeon)) continue;
-			
+
 			/* Add the route */
 			routes[num++] = actual_route(t_info[routes[i]].nearby[ii]);
 		}
-		
+
 		/* Add quest route if possible */
 		if ((num < max_num) &&
 				(t_info[routes[i]].quest_monster) && (!r_info[t_info[routes[i]].quest_monster].max_num) && (t_info[routes[i]].quest_opens))
@@ -591,7 +394,7 @@ int set_routes(s16b *routes, int max_num, int from)
 		for (ii = i + 1; ii < num; ii++)
 		{
 			if (routes[ii] == p_ptr->dungeon) routes[ii] = routes[--num];
-			
+
 			for (iii = ii; iii < num; iii++)
 			{
 				if (routes[iii] == routes[ii])
@@ -607,7 +410,7 @@ int set_routes(s16b *routes, int max_num, int from)
 	for (i = 0; i < num; i++)
 	{
 		if (routes[i] == from) routes[i] = routes[--num];
-		
+
 		for (ii = i + 1; ii < num; ii++)
 		{
 			if (routes[ii] == routes[i])
@@ -621,6 +424,8 @@ int set_routes(s16b *routes, int max_num, int from)
 	for(i = 0; i < num; i++)
 	{
 		int ii;
+		s16b temp;
+
 		max = i;
 		for(ii = i; ii < num; ii++)
 		{
@@ -629,8 +434,8 @@ int set_routes(s16b *routes, int max_num, int from)
 				max = ii;
 			}
 		}
-		
-		s16b temp = routes[max];
+
+		temp = routes[max];
 		routes[max] = routes[i];
 		routes[i] = temp;
 	}
@@ -702,7 +507,20 @@ static void do_cmd_travel(void)
 			int selection = p_ptr->dungeon;
 
 			s16b routes[24];
-			
+
+			quest_event event;
+
+			/* Use this to allow quests to succeed or fail */
+			WIPE(&event, quest_event);
+
+			/* Set up departure event */
+			event.flags = EVENT_LEAVE;
+			event.dungeon = p_ptr->dungeon;
+			event.level = p_ptr->depth - min_depth(p_ptr->dungeon);
+
+			/* Check for quest failure. Abort if requested. */
+			if (check_quest(&event, FALSE)) return;
+
 			/* Routes */
 			num = set_routes(routes, 24, p_ptr->dungeon);
 
@@ -715,11 +533,11 @@ static void do_cmd_travel(void)
 				{
 					char str[1000];
 
-					for (i = 1; i < z_info->t_max; i++) 
+					for (i = 1; i < z_info->t_max; i++)
 					{
 						if (t_info[i].replace_ifvisited == selection)
 						{
-							if (found == 0) 
+							if (found == 0)
 							{
 								sprintf(str, "If you enter %s, you will never find %s", t_info[selection].name + t_name, t_info[i].name + t_name);
 								found = -1;
@@ -735,9 +553,9 @@ static void do_cmd_travel(void)
 							}
 						}
 					}
-					if (found > 0) 
+					if (found > 0)
 						my_strcat(str, format(" and %s again!", t_info[found].name + t_name), 1000);
-					else if (found < 0) 
+					else if (found < 0)
 						my_strcat(str, " again!", 1000);
 					if (found != 0)
 						msg_print(str);
@@ -750,8 +568,8 @@ static void do_cmd_travel(void)
 					found = 1;
 				}
 
-				if (found != 0 
-					&& !get_check("Are you sure you want to travel? ")) 
+				if (found != 0
+					&& !get_check("Are you sure you want to travel? "))
 					/* Bail out */
 					return;
 
@@ -764,7 +582,7 @@ static void do_cmd_travel(void)
 				{
 					msg_print("You set about filling your stomach for the long road ahead.");
 				}
-				
+
 				/* Hack -- Consume most food not inscribed with !< */
 				while (p_ptr->food < PY_FOOD_FULL)
 				{
@@ -775,11 +593,11 @@ static void do_cmd_travel(void)
 						{
 							/* Eat the food */
 							player_eat_food(i);
-							
+
 							break;
 						}
 					}
-					
+
 					/* Escape out if no food */
 					if (i < 0) break;
 				}
@@ -792,7 +610,7 @@ static void do_cmd_travel(void)
 					msg_print("You notice you don't have enough food to fully satiate you before the travel.");
 					msg_print("You realize you will face the unforeseen dangers with a half-empty stomach!");
 
-					if (!get_check("Are you sure you want to travel? ")) 
+					if (!get_check("Are you sure you want to travel? "))
 						/* Bail out */
 						return;
 				}
@@ -805,7 +623,7 @@ static void do_cmd_travel(void)
 				{
 					if (t_info[p_ptr->dungeon].nearby[i] == selection) journey = damroll(2 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 3);
 				}
-				
+
 				if (journey < 4)
 				{
 					msg_print("You have a mild and pleasant journey.");
@@ -829,12 +647,9 @@ static void do_cmd_travel(void)
 
 				/* Hack -- Time passes (at 4* food use rate) */
 				turn += PY_FOOD_FULL/10*journey*4;
-				
+
 				/* XXX Recharges, stop temporary speed etc. */
 				/* We don't do this to e.g. allow the player to buff themselves before fighting Beorn. */
-
-				/* Check quests due to travelling - cancel if requested */
-				if (!check_travel_quest(selection, min_depth(p_ptr->dungeon), TRUE)) return;
 
 				/* Change the dungeon */
 				p_ptr->dungeon = selection;
@@ -844,9 +659,12 @@ static void do_cmd_travel(void)
 
 				/* Clear stairs */
 				p_ptr->create_stair = 0;
-				
+
 				/* Leaving */
 				p_ptr->leaving = TRUE;
+
+				/* Check for quest failure. */
+				while (check_quest(&event, TRUE));
 			}
 		}
 
@@ -866,10 +684,23 @@ void do_cmd_go_up(void)
 	int px = p_ptr->px;
 
 	feature_type *f_ptr= &f_info[cave_feat[py][px]];
-	
+
 	town_type *t_ptr = &t_info[p_ptr->dungeon];
 
 	char str[46];
+
+	quest_event event;
+
+	/* Use this to allow quests to succeed or fail */
+	WIPE(&event, quest_event);
+
+	/* Set up departure event */
+	event.flags = EVENT_LEAVE;
+	event.dungeon = p_ptr->dungeon;
+	event.level = p_ptr->depth - min_depth(p_ptr->dungeon);
+
+	/* Check for quest failure. Abort if requested. */
+	if (check_quest(&event, FALSE)) return;
 
 	current_long_level_name(str);
 
@@ -902,8 +733,8 @@ void do_cmd_go_up(void)
 	p_ptr->energy_use = 100;
 
 	/* Hack -- travel through wilderness */
-	if (adult_campaign 
-		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
+	if (adult_campaign
+		&& p_ptr->depth == max_depth(p_ptr->dungeon)
 		&& level_flag & (LF1_TOWER))
 	{
 		int guard;
@@ -914,15 +745,12 @@ void do_cmd_go_up(void)
 
 		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
-		/* Check quests due to travelling - cancel if requested */
-		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
-
 		/* Check that travel opening monster is dead and of this zone */
 		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
-		{			
+		{
 			/* Success */
 			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the sinister guardian at %s. The way forth lies open before you.", str));
-	
+
 			/* Change the dungeon */
 			p_ptr->dungeon = actual_route(t_ptr->quest_opens);
 		}
@@ -943,16 +771,6 @@ void do_cmd_go_up(void)
 	}
 	else
 	{
-		/* Check quests due to travelling - cancel if requested */
-		if (level_flag & (LF1_TOWER))
-		{
-			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
-		}
-		else
-		{
-			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
-		}
-
 		/* Success */
 		message(MSG_STAIRS_UP, 0, "You enter a maze of up staircases.");
 
@@ -994,6 +812,19 @@ void do_cmd_go_down(void)
 
 	char str[46];
 
+	quest_event event;
+
+	/* Use this to allow quests to succeed or fail */
+	WIPE(&event, quest_event);
+
+	/* Set up departure event */
+	event.flags = EVENT_LEAVE;
+	event.dungeon = p_ptr->dungeon;
+	event.level = p_ptr->depth - min_depth(p_ptr->dungeon);
+
+	/* Check for quest failure. Abort if requested. */
+	if (check_quest(&event, FALSE)) return;
+
 	current_long_level_name(str);
 
 	/* Verify stairs */
@@ -1011,8 +842,8 @@ void do_cmd_go_down(void)
 	p_ptr->energy_use = 100;
 
 	/* Hack -- travel through wilderness */
-	if (adult_campaign 
-		&& p_ptr->depth == max_depth(p_ptr->dungeon) 
+	if (adult_campaign
+		&& p_ptr->depth == max_depth(p_ptr->dungeon)
 		&& !(level_flag & (LF1_TOWER)))
 	{
 	  int guard;
@@ -1023,15 +854,12 @@ void do_cmd_go_down(void)
 
 	  guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
 
-		/* Check quests due to travelling - cancel if requested */
-		if (!check_travel_quest(t_ptr->quest_opens, min_depth(p_ptr->dungeon), TRUE)) return;
-
 		/* Check that quest opens monster is dead and of this zone */
 		if ((t_ptr->quest_opens) && (t_ptr->quest_monster == guard) && (r_info[guard].max_num == 0))
 		{
 			/* Success */
 			message(MSG_STAIRS_DOWN,0,format("You have valiantly defeated the sinister guardian at %s. The way forth lies open before you.", str));
-	
+
 			/* Change the dungeon */
 			p_ptr->dungeon = actual_route(t_ptr->quest_opens);
 		}
@@ -1046,22 +874,12 @@ void do_cmd_go_down(void)
 
 		/* Clear stairs */
 		p_ptr->create_stair = 0;
-		
+
 		/* Set the new depth */
 		p_ptr->depth = min_depth(p_ptr->dungeon);
 	}
 	else
 	{
-		/* Check quests due to travelling - cancel if requested */
-		if (level_flag & (LF1_TOWER))
-		{
-			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth + 1, TRUE)) return;
-		}
-		else
-		{
-			if (!check_travel_quest(p_ptr->dungeon, p_ptr->depth - 1, TRUE)) return;
-		}
-
 		/* Success */
 		message(MSG_STAIRS_DOWN, 0, "You enter a maze of down staircases.");
 
@@ -1152,12 +970,12 @@ void do_cmd_toggle_search(void)
 
 		/* Set the sneaking flag */
 		p_ptr->sneaking = TRUE;
-		
+
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
 
 		/* Redraw the state */
-		p_ptr->redraw |= (PR_STATE);		
+		p_ptr->redraw |= (PR_STATE);
 	}
 
 	/* Stop searching */
@@ -1237,15 +1055,15 @@ static int count_feats(int *y, int *x, int action)
 		if (action < FS_FLAGS2)
 		{
 			flag = bitzero << (action - FS_FLAGS1);
-			if (!(f_ptr->flags1 & flag)) continue;  
+			if (!(f_ptr->flags1 & flag)) continue;
 		}
 
 		else if (action < FS_FLAGS_END)
-		{       
+		{
 			flag = bitzero << (action - FS_FLAGS2);
-			if (!(f_ptr->flags2 & flag)) continue;  
+			if (!(f_ptr->flags2 & flag)) continue;
 		}
-	
+
 		/* Count it */
 		++count;
 
@@ -1675,7 +1493,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	cptr name;
 
 	int feat;
-	
+
 	feat = cave_feat[y][x];
 
 	/* Verify legality */
@@ -1683,7 +1501,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 
 	i = p_ptr->skill_dig;
 
-	j = f_info[cave_feat[y][x]].power;      
+	j = f_info[cave_feat[y][x]].power;
 
 	/* Hack - bump up power for doors */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_DOOR)) j = 30;
@@ -1720,9 +1538,9 @@ static bool do_cmd_tunnel_aux(int y, int x)
 			/* Get the name */
 			name = (f_name + f_info[feat].name);
 
-			/* Give the message */  
+			/* Give the message */
 			msg_format("You have removed the %s.",name);
-			
+
 			cave_alter_feat(y,x,FS_TUNNEL);
 
 			/* Update the visuals */
@@ -1757,9 +1575,9 @@ static bool do_cmd_tunnel_aux(int y, int x)
 			/* Get the name */
 			name = (f_name + f_info[feat].name);
 
-			/* Give the message */  
+			/* Give the message */
 			msg_print("You have finished the tunnel.");
-			
+
 			/* FIXME: how to mark the grid is altered by the player so that he cannot scum for XP by disarming pits? Perhaps add some rounded pebbles to that location? */
 			cave_alter_feat(y,x,FS_TUNNEL);
 
@@ -1984,7 +1802,7 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 			/* Disarm the grid */
 			cave_alter_feat(y, x, FS_DISARM);
 		}
-		
+
 		/* We may keep trying */
 		more = TRUE;
 	}
@@ -2806,7 +2624,7 @@ void do_cmd_set_trap_or_spike(void)
 				{
 					if (i_ptr->tval != TV_SPIKE) trap_allowed = FALSE;
 				}
-				
+
 				else if ((j_ptr->tval != i_ptr->tval) || (j_ptr->sval != i_ptr->sval))
 				{
 					/* Not allowed */
@@ -2819,7 +2637,7 @@ void do_cmd_set_trap_or_spike(void)
 			{
 				/* Hack -- use tunnelling skill to build trap */
 				p_ptr->skill_dis = p_ptr->skill_dig;
-				
+
 				/* Restrict an item */
 				item_tester_tval = TV_SPIKE;
 
@@ -2849,7 +2667,7 @@ void do_cmd_set_trap_or_spike(void)
 						/* Refer to the item */
 						o_ptr = &inventory[item];
 					}
-					
+
 					/* Structure Copy */
 					object_copy(j_ptr, o_ptr);
 
@@ -2861,14 +2679,14 @@ void do_cmd_set_trap_or_spike(void)
 				{
 					/* Hack -- no spikes. Dig a shallow pit instead. */
 					cave_set_feat(y, x, FEAT_SHALLOW_PIT);
-					
+
 					return;
 				}
 				else
 				{
 					/* Hack -- use existing floor spikes */
 					item = -cave_o_idx[y][x];
-					
+
 					/* Structure Copy */
 					object_copy(j_ptr, &o_list[cave_o_idx[y][x]]);
 
@@ -2894,7 +2712,7 @@ void do_cmd_set_trap_or_spike(void)
 
 				/* Check if we can arm it? */
 				do_cmd_disarm_aux(y,x, FALSE);
-	
+
 				/* Destroy an item in the pack */
 				if (item >= 0)
 				{
@@ -2916,7 +2734,7 @@ void do_cmd_set_trap_or_spike(void)
 			{
 				msg_print("You can't set this trap here.");
 			}
-			
+
 			/* Reset skill - hacked for pit traps */
 			p_ptr->skill_dis = tmp;
 		}
@@ -2928,7 +2746,7 @@ static bool do_cmd_walk_test(int y, int x)
 {
 	int feat;
 
-	cptr name; 
+	cptr name;
 
 	/* Get feature */
 	feat = cave_feat[y][x];
@@ -2947,7 +2765,7 @@ static bool do_cmd_walk_test(int y, int x)
 
 	/* Hack -- walking allows pickup XXX XXX */
 	if (cave_o_idx[y][x] >0) return (TRUE);
-	
+
 	/* Hack -- walking allows gathering XXX XXX */
 	if (f_info[feat].flags3 & (FF3_GET_FEAT)) return (TRUE);
 
@@ -3217,9 +3035,9 @@ void do_cmd_hold(void)
 
 		/* Hack - block for two turns. We make this 3 to allow 'blocking' to display up to the final action. */
 		p_ptr->blocking = 3;
-		
+
 		/* Redraw the state */
-		p_ptr->redraw |= (PR_STATE);		
+		p_ptr->redraw |= (PR_STATE);
 	}
 }
 
@@ -3406,7 +3224,7 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
  * You may only fire items that "match" your missile launcher
  * or a throwing weapon (see do_cmd_throw_selected).
  *
- * You must use slings + pebbles/shots/thrown objects, 
+ * You must use slings + pebbles/shots/thrown objects,
  * bows + arrows, xbows + bolts.
  *
  * See "calc_bonuses()" for more calculations and such.
@@ -3424,7 +3242,7 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
  * Note that Bows of "Extra Shots" give an extra shot.
  */
 void do_cmd_fire_or_throw_selected(int item, bool fire)
-{	
+{
 	int item2 = 0;
 	int i = 0;
 	int j, y, x, tricks, tdis;
@@ -3467,7 +3285,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		cptr q, s;
 
 		/* Allow chain for some weapons */
-		if (o_ptr->tval == TV_HAFTED || o_ptr->tval == TV_BOLT) 
+		if (o_ptr->tval == TV_HAFTED || o_ptr->tval == TV_BOLT)
 			item_tester_tval = TV_ROPE;
 
 		/* Require rope */
@@ -3554,17 +3372,17 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		ranged_skill = p_ptr->skill_tht;
 
 		/* Badly balanced big weapons waste the throwing skill.
-	 	Various junk (non-weapons) does not have to_hit, 
+	 	Various junk (non-weapons) does not have to_hit,
 	 	so don't penalize a second time. */
-		if (!throwing 
+		if (!throwing
 			&& (i_ptr->tval == TV_STAFF
-			|| i_ptr->tval == TV_BOW 
-			|| i_ptr->tval == TV_DIGGING 
-			|| i_ptr->tval == TV_HAFTED 
-			|| i_ptr->tval == TV_POLEARM 
+			|| i_ptr->tval == TV_BOW
+			|| i_ptr->tval == TV_DIGGING
+			|| i_ptr->tval == TV_HAFTED
+			|| i_ptr->tval == TV_POLEARM
 			|| i_ptr->tval == TV_SWORD))
 				ranged_skill /= 2;
-		
+
 		/* Extract a "distance multiplier" */
 		mul = throwing ? 10 : 3;
 
@@ -3575,22 +3393,22 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		tdis = (adj_str_blow[p_ptr->stat_ind[A_STR]] + 20) * mul / div;
 
 		/* Max distance of 10 */
-		if (tdis > 10) 
+		if (tdis > 10)
 		tdis = 10;
 	}
 
 	/* Coordinates of the fired/thrown object; start at the player */
 	y = p_ptr->py;
 	x = p_ptr->px;
-	
+
 	/* Test for fumble - coated weapons are riskier thrown/shot than wielded */
 	if (((p_ptr->heavy_wield) || (cursed_p(o_ptr)) || (coated_p(o_ptr))) && (!rand_int(ranged_skill)))
 	{
 		int dir;
-		
+
 		/* Fake get a direction */
 		if (!get_aim_dir(&dir)) return;
-		
+
 		fumble = TRUE;
 	}
 
@@ -3608,7 +3426,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 		/* If too far or all tricks used, return to player; no target query */
 		if (trick_throw
-		&& (!ammo_can_break 
+		&& (!ammo_can_break
 			|| tricks == num_tricks - 1))
 		{
 			tx = p_ptr->px;
@@ -3643,7 +3461,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				else
 				{
 					/* No cancel */
-			
+
 					/* Check for "target request" */
 					if (dir == 5 && target_okay())
 					{
@@ -3659,7 +3477,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 					/* Disable auto-target for the rest of trick throws */
 					use_old_target = FALSE;
-				}		
+				}
 			}
 
 			/* Sound */
@@ -3680,9 +3498,9 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		old_x = x;
 
 		/* Reset ammo_can_break */
-		if (o_ptr->tval == TV_FLASK 
-		|| o_ptr->tval == TV_POTION 
-		|| o_ptr->tval == TV_EGG) 
+		if (o_ptr->tval == TV_FLASK
+		|| o_ptr->tval == TV_POTION
+		|| o_ptr->tval == TV_EGG)
 		{
 			/* Hack -- flasks, potions, spores break as if striking a monster */
 			ammo_can_break = TRUE;
@@ -3692,7 +3510,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			/* Otherwise not breaking by default */
 			ammo_can_break = FALSE;
 		}
-		
+
 		/* Throwing/firing an item at the character's feet */
 		if (!path_n) activate = TRUE;
 
@@ -3705,7 +3523,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			int nx = GRID_X(path_g[i]);
 
 			/* Hack -- Stop before hitting walls */
-			if (!cave_project_bold(ny, nx)) 
+			if (!cave_project_bold(ny, nx))
 			{
 				/* 1st cause of failure: returning weapon hits a wall */
 			        trick_failure = trick_failure || (tdis == 256);
@@ -3727,18 +3545,18 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 				if (f_info[feat].flags2 & (FF2_CHASM))
 					chasm = TRUE;
-				else 
+				else
 					chasm = FALSE;
 
 				feat = feat_state(feat, FS_SPIKE);
-				
+
 				if (strstr(f_name + f_info[feat].name, "rope"))
 				{
 					/* Hack -- remove spike */
 					feat = feat_state(feat, FS_GET_FEAT);
 
 					/* MegaHack -- handle chain */
-					if (k_ptr->sval == SV_ROPE_CHAIN) 
+					if (k_ptr->sval == SV_ROPE_CHAIN)
 					feat++;
 
 					/* Change the feature */
@@ -3767,7 +3585,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					}
 				}
 			}
-		
+
 			/* Only do visuals if the player can "see" the missile */
 			if (panel_contains(y, x) && player_can_see_bold(y, x))
 			{
@@ -3805,7 +3623,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 				bool hit_or_near_miss;
 				bool genuine_hit;
-			
+
 				/* Ignore hidden monsters */
 				if (m_ptr->mflag & (MFLAG_HIDE)) continue;
 
@@ -3824,8 +3642,8 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					tdam *= p_ptr->ammo_mult;
 
 					/* Some monsters are great at dodging	-EZ- */
-					if (mon_evade(cave_m_idx[y][x], 
-						m_ptr->cdis + (m_ptr->confused 
+					if (mon_evade(cave_m_idx[y][x],
+						m_ptr->cdis + (m_ptr->confused
 								 || m_ptr->stunned ? 1 : 3),
 						5 + m_ptr->cdis,
 						" your shot"))
@@ -3835,21 +3653,21 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					shoot_style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
 
 					/* Get style benefits */
-					mon_style_benefits(m_ptr, shoot_style, 
+					mon_style_benefits(m_ptr, shoot_style,
 							 &style_hit, &style_dam, &style_crit);
 				}
 				else
 				{
 					/* Long throws are easier to dodge than long shots */
-					if (mon_evade(cave_m_idx[y][x], 
-						2 * m_ptr->cdis + (m_ptr->confused 
+					if (mon_evade(cave_m_idx[y][x],
+						2 * m_ptr->cdis + (m_ptr->confused
 										 || m_ptr->stunned ? 1 : 4),
 						5 + 2 * m_ptr->cdis,
 						" your throw"))
 					continue;
 
 					if (throwing)
-						mon_style_benefits(m_ptr, WS_THROWN_FLAGS, 
+						mon_style_benefits(m_ptr, WS_THROWN_FLAGS,
 								 &style_hit, &style_dam, &style_crit);
 					else
 						style_hit = style_dam = style_crit = 0;
@@ -3864,13 +3682,13 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				catch_chance = chance;
 
 				/* Test hit fire */
-				hit_or_near_miss = test_hit_fire(chance2, 
-								 calc_monster_ac(cave_m_idx[y][x], FALSE), 
+				hit_or_near_miss = test_hit_fire(chance2,
+								 calc_monster_ac(cave_m_idx[y][x], FALSE),
 							 m_ptr->ml);
 
 				/* Genuine hit */
-				genuine_hit = test_hit_fire(chance2, 
-						calc_monster_ac(cave_m_idx[y][x], TRUE), 
+				genuine_hit = test_hit_fire(chance2,
+						calc_monster_ac(cave_m_idx[y][x], TRUE),
 						m_ptr->ml);
 
 				/* Missiles bounce off resistant monsters */
@@ -3927,15 +3745,15 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 					if (fire)
 					{
 						/* Apply missile critical damage */
-						tdam += critical_shot(i_ptr->weight, 
-										bonus + style_crit * 30, 
+						tdam += critical_shot(i_ptr->weight,
+										bonus + style_crit * 30,
 										tdam);
 					}
 					else if (throwing)
 					{
 						/* Throws (with specialized throwing weapons) hit harder */
-						tdam += critical_norm(i_ptr->weight, 
-										bonus + style_crit * 30, 
+						tdam += critical_norm(i_ptr->weight,
+										bonus + style_crit * 30,
 								tdam);
 					}
 					else
@@ -3946,7 +3764,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 					/* Apply launcher, missile and style bonus */
 					tdam += i_ptr->to_d + bow_to_d + style_dam;
-			
+
 					/* No negative damage */
 					if (tdam < 0) tdam = 0;
 
@@ -3972,11 +3790,11 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 						if (!genuine_hit)
 						{
 							/* Missile was stopped */
-							if (r_ptr->flags2 & (RF2_ARMOR) 
-								|| m_ptr->shield) 
-							msg_format("%^s blocks the %s with a %sshield.", 
-										 m_name, 
-										 o_name, 
+							if (r_ptr->flags2 & (RF2_ARMOR)
+								|| m_ptr->shield)
+							msg_format("%^s blocks the %s with a %sshield.",
+										 m_name,
+										 o_name,
 										 m_ptr->shield ? "mystic " : "");
 
 							/* No normal damage */
@@ -4020,12 +3838,12 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 							m_ptr->mflag |= (MFLAG_AGGR);
 
 							/* Let allies know */
-							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, 
+							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR,
 									"& has attacked me!");
 						}
 						else if (fear)
 						{
-							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, 
+							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV,
 									"& has hurt me badly!");
 						}
 
@@ -4058,12 +3876,12 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			{
 				/* Activate item */
 				activate = TRUE;
-			}	
+			}
 		}
 
 		/* 3rd and last cause of failure: out of range, unless returning */
 		trick_failure = trick_failure || (i == path_n && tdis != 256);
-		
+
 		/* Apply effects of activation/coating */
 		if (activate)
 		{
@@ -4081,13 +3899,13 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 				/* Make item strike */
 				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
 			}
-			
+
 			/* Check usage */
 			object_usage(item);
-			
+
 			/* Chance of breakage */
 			ammo_can_break = TRUE;
-			
+
 			/* Paranoia */
 			activate = FALSE;
 		}
@@ -4111,7 +3929,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	else
 	{
 		int throws_per_round;
-		
+
 		if (trick_throw)
 			throws_per_round = 1;
 		else
@@ -4144,20 +3962,20 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
 
 			k = damroll(i_ptr->dd, i_ptr->ds);
-			
+
 			/* The third piece of fire/throw dependent code */
 			if (fire)
 			{
 				/* Apply missile critical damage */
-				k += critical_shot(i_ptr->weight, 
-								bow_to_h + i_ptr->to_h, 
+				k += critical_shot(i_ptr->weight,
+								bow_to_h + i_ptr->to_h,
 								k);
 			}
 			else if (throwing)
 			{
 				/* Throws (with specialized throwing weapons) hit harder */
-				k += critical_norm(i_ptr->weight, 
-								2 * i_ptr->to_h, 
+				k += critical_norm(i_ptr->weight,
+								2 * i_ptr->to_h,
 						k);
 			}
 
@@ -4181,7 +3999,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 			/* Apply additional effect from coating*/
 			else if (coated_p(o_ptr))
-			{				
+			{
 				/* Make item strike */
 				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
 			}
@@ -4241,12 +4059,12 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		/* Sometimes use lower stack object --- FIXME: clarify comment, search and replace similar comments */
 		if (!object_charges_p(o_ptr) && rand_int(o_ptr->number) < o_ptr->stackc)
 		{
-			if (i_ptr->charges) 
+			if (i_ptr->charges)
 			i_ptr->charges--;
 
-			if (i_ptr->timeout) 
+			if (i_ptr->timeout)
 			i_ptr->timeout = 0;
-		
+
 			o_ptr->stackc--;
 		}
 
@@ -4256,7 +4074,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			if (o_ptr->number == 1)
 			{
 				inven_drop_flags(o_ptr);
-				if (item2 > item) 
+				if (item2 > item)
 				item2--;
 			}
 
@@ -4270,19 +4088,19 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		{
 			floor_item_increase(0 - item, -1);
 			floor_item_optimize(0 - item);
-		
+
 			/* Get feat */
-			if (o_ptr->ident & (IDENT_STORE) 
+			if (o_ptr->ident & (IDENT_STORE)
 				&& scan_feat(p_ptr->py, p_ptr->px) < 0)
 			cave_alter_feat(p_ptr->py, p_ptr->px, FS_GET_FEAT);
 		}
 
 		/* Forget information on dropped object --- FIXME: say why it is needed */
 		drop_may_flags(i_ptr);
-		
+
 		/* Drop (or break) near that location */
 		drop_near(i_ptr, j, y, x);
-	
+
 		/* Rope doesn't reach other end of chasm */
 		if (chasm)
 		{
@@ -4291,18 +4109,18 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 			{
 				y = GRID_Y(path_g[i]);
 				x = GRID_X(path_g[i]);
-			
+
 				feat = cave_feat[y][x];
-			
+
 				/* Drop rope into chasm */
-				if (strstr(f_name + f_info[feat].name, "rope") 
+				if (strstr(f_name + f_info[feat].name, "rope")
 				|| strstr(f_name + f_info[feat].name, "chain"))
 				{
 					/* Hack -- drop into chasm */
 					cave_alter_feat(y, x, FS_TIMED);
 				}
 			}
-		}	
+		}
 	}
 }
 
@@ -4343,7 +4161,7 @@ void do_cmd_throw_fire(bool fire)
 	}
 
 	/* Some items and some rooms blow missiles around */
-	if (p_ptr->cur_flags4 & (TR4_WINDY) 
+	if (p_ptr->cur_flags4 & (TR4_WINDY)
 			|| room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))
 	{
 		msg_print("Its too windy around you!");
@@ -4351,32 +4169,32 @@ void do_cmd_throw_fire(bool fire)
 	}
 
 	if (fire)
-	{		
+	{
 		/* Check for valid throws */
 		if (p_ptr->num_fire <= 0)
 		{
 			msg_print("You lack the skill to fire a weapon.");
-			
+
 			return;
 		}
-		
+
 		/* Require proper missile */
 		item_tester_tval = p_ptr->ammo_tval;
 
 		/* Require throwing weapon */
-		if (!item_tester_tval) 
+		if (!item_tester_tval)
 			item_tester_hook = is_known_throwing_item;
 	}
 	else
-	{		
+	{
 		/* Check for valid throws */
 		if (p_ptr->num_throw <= 0)
 		{
 			msg_print("You lack the skill to throw a weapon.");
-			
+
 			return;
 		}
-		
+
 		/* Require an item that can be thrown at all */
 		item_tester_hook = item_tester_hook_throwable;
 	}
@@ -4408,13 +4226,13 @@ void do_cmd_throw_fire(bool fire)
 	if (o_ptr->tval == TV_BAG)
 	{
 		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) 
+		if (!get_item_from_bag(&item, q, s, o_ptr))
 		return;
 	}
 
 	if (fire && p_ptr->num_fire)
 		do_cmd_fire_or_throw_selected(item, TRUE);
-	else 
+	else
 		do_cmd_fire_or_throw_selected(item, FALSE);
 }
 
