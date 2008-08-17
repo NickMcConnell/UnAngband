@@ -797,7 +797,7 @@ cptr desc_stat_dec[] =
 	"clumsier",
 	"sicklier",
 	"uglier",
-	"more slugish",
+	"more sluggish",
 	"smaller"
 };
 
@@ -813,7 +813,7 @@ static cptr desc_stat_dec_end[] =
 	"clumsy",
 	"sickly",
 	"ugly",
-	"slugish",
+	"sluggish",
 	"small"
 };
 

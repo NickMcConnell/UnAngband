@@ -142,7 +142,7 @@ static cptr desc_stat_neg[] =
 	"clumsy",
 	"sickly",
 	"ugly",
-	"slugish",
+	"sluggish",
 	"small"
 };
 
