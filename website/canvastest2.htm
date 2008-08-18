@@ -106,7 +106,7 @@
 		{
 			// To be overridden by the particular rule set.
 			
-			return (grid.cells[x][y].state);
+			return (grid.cells[x][y]);
 		}
 		
 		Rules.prototype.Shape = function(state)
@@ -156,23 +156,6 @@
 					this.refresh[x][y] = true;
 				}
 			}			
-		}
-		
-		Grid.prototype.Tick = function(transition)
-		{
-			newGrid = new Grid(this.top, this.left, this.height, this.width, this.rows, this.cols, this.rules);
-			
-			for(x = 0; x < cols; x++)
-			{
-				for(y = 0; y < rows; y++)
-				{
-					newGrid.cells[x][y] = this.rules.Transition(x, y, transition, this);
-					
-					if (newGrid.cells[x][y] == this.cells[x][y]) newGrid.refresh[x][y] = false;
-				}
-			}
-			
-			return (newGrid);
 		}
 		
 		Grid.prototype.Fresh = function()
@@ -236,6 +219,23 @@
 				}
 			}
 		}
+		
+		Grid.prototype.Tick = function(transition)
+		{
+			newGrid = new Grid(this.top, this.left, this.height, this.width, this.rows, this.cols, this.rules);
+			
+			for(x = 0; x < cols; x++)
+			{
+				for(y = 0; y < rows; y++)
+				{
+					newGrid.cells[x][y] = this.rules.Transition(x, y, transition, this);
+					
+					if (newGrid.cells[x][y] == this.cells[x][y]) newGrid.refresh[x][y] = false;
+				}
+			}
+			
+			return (newGrid);
+		}
 
 		// Implementation of the Game of Life
 		function GameofLife()
@@ -252,15 +252,25 @@
 			neighbours = 0;
 		
 			// Count neighbours of x, y
-			for (x1 = x - 1; x1 <= x + 1; x++)
+			for (x1 = x - 1; x1 <= x + 1; x1++)
 			{
-				for (y1 = y - 1; y1 <= y + 1; y++)
+				for (y1 = y - 1; y1 <= y + 1; y1++)
 				{
 					// Skip self.
-					if ((y1 == y) && (x1 == x)) continue;
+					if ((y1 == 0) && (x1 == 0)) continue;
+					
+					// Boundaries - x
+					x0 = y1;
+					while (x0 < 0) { x0 = grid.cols + x0; }
+					while (x0 >= grid.cols) { x0 = x0 - grid.cols; }
+					
+					// Boundaries - y
+					y0 = y1;
+					while (y0 < 0) { y0 = grid.rows + y0; }
+					while (y0 >= grid.rows) { y0 = y0 - grid.rows; }
 					
 					// Count neighbours
-					if (grid.cells[x1][y1].state > 0) neighbours++;
+					if (grid.cells[x0][y0]) neighbours++;
 				}
 			}
 			
@@ -275,7 +285,17 @@
 			}
 		}
 
-		
+		function Refresh(ms)
+		{
+			// Draw Grid
+			grid.Draw(ctx);
+			
+			// Have another go
+			grid.Tick();
+			
+			// Update later
+			setTimeout( "Refresh("+ctx+", "+grid+ ", " + ms+ ");", ms);
+		}
 
       function drawShape(){
         // get the canvas element using the DOM
@@ -302,13 +322,11 @@
 			game1.SetShape(0, shape1);
 			game1.SetShape(1, shape2);
 			
-
 			// Initialise Grid
 			grid1 = new Grid(0, 0, canvas.height / rows, canvas.width / cols, rows, cols, game1);
-				
-			// Draw Grid
-			grid1.Draw(ctx);
-			
+
+			grid1 = grid1.Tick(1);
+			grid1.Draw(ctx);			
     		
         } else {
           alert('You need Safari or Firefox 1.5+ to see this demo.');
