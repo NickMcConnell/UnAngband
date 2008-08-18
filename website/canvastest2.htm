@@ -1,0 +1,338 @@
+<html>
+  <head>
+    <title>Canvas Grid</title>
+    <meta name="DC.creator" content="Andrew Doull, http://roguelikedeveloper.blogspot.com/">
+    <script type="text/javascript">
+    
+    	// A shape is an 'abstract' shape.
+    	// Default to a white circle.
+    	function Shape()
+    	{
+    		this.star = false;
+    		this.points = 0;
+    		this.filled = false;
+    		this.rotation = 0;
+    		this.inverse = false;
+    		this.color = "rgb(255,255,255)";
+    	}
+    
+    	// A 'polyhedronoid' as a regular polygon, or a polystar. If sides < 3, it is instead a circle.
+    	function Polyhedronoid()
+    	{
+			this.y = 0;
+			this.x = 0;
+			this.star = false;
+			this.points = 0;
+			this.radius = 10;
+			this.filled = false;
+			this.rotation = 0;
+			this.color = "rgb(255,165,0)";
+    	}
+    
+		Polyhedronoid.prototype.Draw = function(ctx)
+		{
+			// Draw the polyhedron
+		 	if (this.filled)
+		 	{
+		 		ctx.fillStyle = this.color;
+		 	}
+
+			// Set the stroke style
+		 	ctx.strokeStyle = this.color;
+
+			ctx.beginPath();
+		    
+		    // We degenerate to a circle if points are less than 3. Note that rotation is meaningless in this case.
+		    if (this.points < 3)
+		    {
+		    	// Don't use a wide line
+				ctx.lineWidth = 1;
+
+		       ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI, false); // Start Radians = 0, End Radians = 2*Math.PI, Anticlockwise = False
+		    }
+		    else
+		    {
+		    	// Use round edges
+		    	ctx.lineJoin = 'round';
+		    
+			 	// Set the stroke width. We use a big value to ensure that the lines are suitably round.
+			 	ctx.lineWidth = 1 + this.radius / 2;
+		 	
+				// Move to first point position
+			    ctx.moveTo(this.x + (this.radius * 0.75) * Math.sin(this.rotation),this.y + (this.radius * 0.75) * Math.cos(this.rotation))
+			    
+			    // Choose equal points on the circle. Basic trig.
+			   	// Note we only use 0.75 of radius, due to the width of the line about (0.5 times radius). This makes edges suitably round.
+			    for (i = 1; i <= this.points; i++)
+			  	{
+			    	// Draw a star instead of a polyhedron.
+			        if (this.star)
+			        {
+						ctx.lineTo(this.x + (this.radius * 0.375) * Math.sin(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation),
+							this.y + (this.radius * 0.375) * Math.cos(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation));
+					}
+
+					ctx.lineTo(this.x + (this.radius * 0.75) * Math.sin((i * 2 * Math.PI / this.points) + this.rotation),
+							this.y + (this.radius * 0.75) * Math.cos((i * 2 * Math.PI / this.points) + this.rotation));
+				}
+
+			    //Close path
+			    ctx.closePath();
+		    }
+
+			// Draw the polyhedron
+		 	if (this.filled)
+		 	{
+		 		ctx.fill();
+		 	}
+
+			// Always stroke it
+		 	ctx.stroke();
+		}
+
+
+/* The rules define what each state looks like, and how to transition from one state to the next */
+		function Rules(maxStates)
+		{
+			this.maxStates = maxStates;
+			this.shapes = new Array(maxStates);
+			for (i = 0; i < maxStates; i++)
+			{
+				this.shapes = new Shape();
+			}
+		}
+
+		Rules.prototype.Transition = function(x, y, transition, grid)
+		{
+			// To be overridden by the particular rule set.
+			
+			return (grid.cells[x][y].state);
+		}
+		
+		Rules.prototype.Shape = function(state)
+		{
+			if (state < this.maxStates)
+			{
+				return (this.shapes);
+			}
+			else
+			{
+				return (new Shape());
+			}
+		}
+		
+		Rules.prototype.SetShape = function(state, shape)
+		{
+			if (state < this.maxStates)
+			{
+				this.shapes[state] = shape;
+			}
+		}
+		
+		Rules.prototype.Generator = function(x, y, grid)
+		{
+			return (Math.floor(Math.random() * this.maxStates));
+		}
+
+		// A grid is a collection of cells.
+		function Grid(top, left, height, width, rows, cols, rules)
+		{
+			this.top = top;
+			this.left = left;
+			this.height = height;
+			this.width = width;
+			this.rows = rows;
+			this.cols = cols;
+			this.rules = rules;
+			this.cells = new Array(cols);
+			this.refresh = new Array(cols);
+			for(x = 0; x < cols; x++)
+			{
+				this.cells[x] = new Array (rows);
+				this.refresh[x] = new Array (rows);
+				for(y = 0; y < rows; y++)
+				{
+					this.cells[x][y] = rules.Generator(x, y, this);
+					this.refresh[x][y] = true;
+				}
+			}			
+		}
+		
+		Grid.prototype.Tick = function(transition)
+		{
+			newGrid = new Grid(this.top, this.left, this.height, this.width, this.rows, this.cols, this.rules);
+			
+			for(x = 0; x < cols; x++)
+			{
+				for(y = 0; y < rows; y++)
+				{
+					newGrid.cells[x][y] = this.rules.Transition(x, y, transition, this);
+					
+					if (newGrid.cells[x][y] == this.cells[x][y]) newGrid.refresh[x][y] = false;
+				}
+			}
+			
+			return (newGrid);
+		}
+		
+		Grid.prototype.Fresh = function()
+		{
+			for(x = 0; x < cols; x++)
+			{
+				for(y = 0; y < rows; y++)
+				{
+					this.refresh[x][y] = true;
+				}
+			}		
+		}
+
+		Grid.prototype.Draw = function(ctx)
+		{
+			for(x = 0; x < cols; x++)
+			{
+				for(y = 0; y < rows; y++)
+				{
+					if (!(this.refresh[x][y])) continue;
+				
+					// TODO: Draw the background
+					
+					// State 0 is always 'blank'	
+					if (this.cells[x][y] == 0) continue;
+					
+					// Use least of height and width
+					if (this.height < this.width)
+					{
+						r = this.height / 2;
+					}
+					else
+					{
+						r = this.width / 2;
+					}
+					
+					h = this.top + (y * this.height) + r;
+					w = this.left + (x * this.width) + r;
+					
+					p = new Polyhedronoid();
+					p.radius = r;
+					p.x = w;
+					p.y = h;
+					
+					i = this.cells[x][y];
+					
+					// Get shape details
+					p.star = this.rules.shapes[i].star;
+					p.points = this.rules.shapes[i].points;
+					p.filled = this.rules.shapes[i].filled;
+					p.rotation = this.rules.shapes[i].rotation;
+					p.color = this.rules.shapes[i].color;
+					
+					
+					if (this.rules.shapes[this.cells[x][y]].inverse)
+					{
+						p.color = "rgb(0,0,0)";
+					}
+					
+					p.Draw(ctx);
+				}
+			}
+		}
+
+		// Implementation of the Game of Life
+		function GameofLife()
+		{
+			this.parent = Rules;
+			this.parent(2);
+		}
+		
+		GameofLife.prototype = new Rules(2);
+		
+		GameofLife.prototype.Transition = function(x, y, transition, grid)
+		{
+			// Count of cell neighbours.
+			neighbours = 0;
+		
+			// Count neighbours of x, y
+			for (x1 = x - 1; x1 <= x + 1; x++)
+			{
+				for (y1 = y - 1; y1 <= y + 1; y++)
+				{
+					// Skip self.
+					if ((y1 == y) && (x1 == x)) continue;
+					
+					// Count neighbours
+					if (grid.cells[x1][y1].state > 0) neighbours++;
+				}
+			}
+			
+			// Decision
+			if ((neighbours < 3) || (neighbours > 4))
+			{
+				return(0);
+			}
+			else
+			{
+				return(1);
+			}
+		}
+
+		
+
+      function drawShape(){
+        // get the canvas element using the DOM
+        var canvas = document.getElementById('tutorial');
+
+		rows = 10;
+		cols = 10;
+
+        // Make sure we don't execute when canvas isn't supported
+        if (canvas.getContext){
+
+        	// use getContext to use the canvas for drawing
+       		var ctx = canvas.getContext('2d');
+
+			//  Initialise game
+			game1 = new GameofLife(2);
+			
+			// Initialise the shapes - a white circle, and a red circle.
+			shape1 = new Shape();
+			shape2 = new Shape();
+			shape2.color = "rgb(255,0,0);"
+			
+			// Set rules to use shape.
+			game1.SetShape(0, shape1);
+			game1.SetShape(1, shape2);
+			
+
+			// Initialise Grid
+			grid1 = new Grid(0, 0, canvas.height / rows, canvas.width / cols, rows, cols, game1);
+				
+			// Draw Grid
+			grid1.Draw(ctx);
+			
+    		
+        } else {
+          alert('You need Safari or Firefox 1.5+ to see this demo.');
+        }
+      }
+    </script>
+    <style type="text/css">
+      body { margin: 20px; font-family: arial,verdana,helvetica; background: #fff;}
+      h1 { font-size: 140%; font-weight:normal; color: #036; border-bottom: 1px solid #ccc; }
+      canvas { border: 2px solid #000; float: left; margin-right: 20px; margin-bottom: 20px; }
+      pre { float:left; display:block; background: rgb(238,238,238); border: 1px dashed #666; padding: 15px 20px; margin: 0 0 10px 0; }
+    </style>
+  </head>
+
+  <body onload="drawShape();">
+    <h1>Testing</h1>
+    <div>
+      <canvas id="tutorial" width="150" height="150"></canvas>
+<pre>
+
+This is just a test. Please ignore.
+
+</pre>
+    </div>
+  </body>
+
+</html>
