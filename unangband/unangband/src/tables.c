@@ -2036,7 +2036,7 @@ const u32b object_xtra_base[OBJECT_XTRA_MAX_HIDDEN] =
 	TR2_IGNORE_ACID,
 	TR2_IGNORE_FIRE,
 	TR2_IGNORE_WATER,
-        TR2_IGNORE_THEFT,
+	TR2_IGNORE_THEFT,
 	TR4_HURT_LITE,
 	1L,	/* Magic item - flag 1 */
 	1L,	/* Magic item - flag 2 */
@@ -2062,7 +2062,7 @@ const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN] =
 	1,
 	1,
 	1,
-        8,
+	4,
 	32,	/* Magic item - flag 1 */
 	32,	/* Magic item - flag 2 */
 	32,	/* Magic item - flag 3 */
