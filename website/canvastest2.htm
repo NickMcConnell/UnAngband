@@ -275,13 +275,17 @@
 			}
 			
 			// Decision
-			if ((neighbours < 3) || (neighbours > 4))
+			if ((neighbours < 2) || (neighbours > 3))
 			{
 				return(0);
 			}
+			else if (neighbours == 2)
+			{
+				return(grid.cells[y][x]);
+			}
 			else
 			{
-				return(1);
+				return (1);
 			}
 		}
 
