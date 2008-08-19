@@ -9,6 +9,7 @@
     	function Shape()
     	{
     		this.star = false;
+    		this.lined = false;
     		this.points = 0;
     		this.filled = false;
     		this.rotation = 0;
@@ -22,6 +23,7 @@
 			this.y = 0;
 			this.x = 0;
 			this.star = false;
+			this.lined = false;
 			this.points = 0;
 			this.radius = 10;
 			this.filled = false;
@@ -52,28 +54,30 @@
 		    }
 		    else
 		    {
-		    	// Use round edges
-		    	ctx.lineJoin = 'round';
-		    
-			 	// Set the stroke width. We use a big value to ensure that the lines are suitably round.
-			 	ctx.lineWidth = 1 + this.radius / 2;
+			 	// Set the stroke width.
+			 	ctx.lineWidth = 1 + this.radius / 4;
 		 	
 				// Move to first point position
-			    ctx.moveTo(this.x + (this.radius * 0.75) * Math.sin(this.rotation),this.y + (this.radius * 0.75) * Math.cos(this.rotation))
+			    ctx.moveTo(this.x + this.radius * Math.sin(this.rotation),this.y + this.radius * Math.cos(this.rotation))
 			    
 			    // Choose equal points on the circle. Basic trig.
-			   	// Note we only use 0.75 of radius, due to the width of the line about (0.5 times radius). This makes edges suitably round.
 			    for (i = 1; i <= this.points; i++)
 			  	{
+			  		// Draw a plus or partial star
+			  		if (this.lined)
+			  		{
+			  			ctx.moveTo(this.x, this.y);
+			  		}
+			  	
 			    	// Draw a star instead of a polyhedron.
 			        if (this.star)
 			        {
-						ctx.lineTo(this.x + (this.radius * 0.375) * Math.sin(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation),
-							this.y + (this.radius * 0.375) * Math.cos(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation));
+						ctx.lineTo(this.x + this.radius * Math.sin(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation),
+							this.y + this.radius * Math.cos(( (i - 0.5) * 2 * Math.PI / this.points) + this.rotation));
 					}
 
-					ctx.lineTo(this.x + (this.radius * 0.75) * Math.sin((i * 2 * Math.PI / this.points) + this.rotation),
-							this.y + (this.radius * 0.75) * Math.cos((i * 2 * Math.PI / this.points) + this.rotation));
+					ctx.lineTo(this.x + this.radius * Math.sin((i * 2 * Math.PI / this.points) + this.rotation),
+							this.y + this.radius * Math.cos((i * 2 * Math.PI / this.points) + this.rotation));
 				}
 
 			    //Close path
@@ -238,6 +242,7 @@
 					// Get shape details
 					p.star = this.rules.shapes[i].star;
 					p.points = this.rules.shapes[i].points;
+					p.lined = this.rules.shapes[i].lined;
 					p.filled = this.rules.shapes[i].filled;
 					p.rotation = this.rules.shapes[i].rotation;
 					p.color = this.rules.shapes[i].color;
@@ -334,7 +339,7 @@ game1 = new GameofLife(2);
 // Initialise the shapes - a white circle, and a red circle.
 shape1 = new Shape();
 shape2 = new Shape();
-shape2.color = "rgb(255,0,0);"
+shape2.color = "rgb(255,0,0);";
 
 // Set rules to use shape.
 game1.SetShape(0, shape1);
@@ -403,10 +408,10 @@ pause = false;
     <div>
       <canvas id="grid-canvas" width="300" height="300"></canvas>
     <FORM NAME="grid-form" ACTION="" METHOD="GET">
-<INPUT TYPE="button" NAME="faster" Value="Faster" onClick="if(delay > 1) delay = delay / 2;">
-<INPUT TYPE="button" NAME="slower" Value="Slower" onClick="delay = delay * 2;">
 <INPUT TYPE="button" NAME="restart" Value="Restart" onClick="grid1 = new Grid(0, 0, height, width, rows, cols, game1); pause = false;">
 <INPUT TYPE="button" NAME="pause" Value="Pause" onClick="pause = !pause;">
+<INPUT TYPE="button" NAME="faster" Value="Faster" onClick="if(delay > 1) delay = delay / 2;">
+<INPUT TYPE="button" NAME="slower" Value="Slower" onClick="delay = delay * 2;">
 </FORM>
     
 <pre>
