@@ -144,16 +144,20 @@
 			this.rows = rows;
 			this.cols = cols;
 			this.rules = rules;
+			this.background = "rgb(0,0,0);";
 			this.cells = new Array(cols);
 			this.refresh = new Array(cols);
+			this.damaged = new Array(cols);
 			for(x = 0; x < cols; x++)
 			{
-				this.cells[x] = new Array (rows);
-				this.refresh[x] = new Array (rows);
+				this.cells[x] = new Array(rows);
+				this.refresh[x] = new Array(rows);
+				this.damaged[x] = new Array(rows);
 				for(y = 0; y < rows; y++)
 				{
 					this.cells[x][y] = rules.Generator(x, y, this);
 					this.refresh[x][y] = true;
+					this.damaged[x][y] = true;
 				}
 			}			
 		}
@@ -171,13 +175,42 @@
 
 		Grid.prototype.Draw = function(ctx)
 		{
+			saved = false;
+			
+			// Erase the cell backgrounds first.
+			for(x = 0; x < cols; x++)
+			{
+				for(y = 0; y < rows; y++)
+				{
+					// Draw the background if display 'damaged' or needs refreshing
+					if ((this.damaged[x][y]) || (this.refresh[x][y]))
+					{
+						if (!saved)
+						{
+							ctx.save();
+							saved = true;
+						}
+						ctx.fillStyle = this.background;
+						ctx.fillRect(this.top + (y * this.height),
+							this.left + (x * this.width),
+							this.top + ((y + 1) * this.height),
+							this.left + ((x + 1) * this.width));
+					}
+					
+					// State 0 is always 'blank'	
+					if (this.cells[x][y] == 0) this.damaged[x][y] = false;
+				}
+			}
+
+			// Restore state if required
+			if (saved) ctx.restore();
+			
+			// Draw the cells
 			for(x = 0; x < cols; x++)
 			{
 				for(y = 0; y < rows; y++)
 				{
 					if (!(this.refresh[x][y])) continue;
-				
-					// TODO: Draw the background
 					
 					// State 0 is always 'blank'	
 					if (this.cells[x][y] == 0) continue;
@@ -208,14 +241,14 @@
 					p.filled = this.rules.shapes[i].filled;
 					p.rotation = this.rules.shapes[i].rotation;
 					p.color = this.rules.shapes[i].color;
-					
-					
+
 					if (this.rules.shapes[this.cells[x][y]].inverse)
 					{
 						p.color = "rgb(0,0,0)";
 					}
 					
 					p.Draw(ctx);
+					this.damaged[x][y] = true;
 				}
 			}
 		}
@@ -257,10 +290,10 @@
 				for (y1 = y - 1; y1 <= y + 1; y1++)
 				{
 					// Skip self.
-					if ((y1 == 0) && (x1 == 0)) continue;
+					if ((y1 == y) && (x1 == x)) continue;
 					
 					// Boundaries - x
-					x0 = y1;
+					x0 = x1;
 					while (x0 < 0) { x0 = grid.cols + x0; }
 					while (x0 >= grid.cols) { x0 = x0 - grid.cols; }
 					
@@ -281,7 +314,7 @@
 			}
 			else if (neighbours == 2)
 			{
-				return(grid.cells[y][x]);
+				return(grid.cells[x][y]);
 			}
 			else
 			{
@@ -289,53 +322,73 @@
 			}
 		}
 
-		function Refresh(ms)
+//Sadly these appear to need to be globals.
+rows = 30;
+cols = 30;
+height = 10;
+width = 10;
+
+//  Initialise game
+game1 = new GameofLife(2);
+
+// Initialise the shapes - a white circle, and a red circle.
+shape1 = new Shape();
+shape2 = new Shape();
+shape2.color = "rgb(255,0,0);"
+
+// Set rules to use shape.
+game1.SetShape(0, shape1);
+game1.SetShape(1, shape2);
+
+// Initialise Grid
+grid1 = new Grid(0, 0, height, width, rows, cols, game1);
+
+// Delay in milliseconds
+delay = 80;
+
+// Guard to avoid multiple updates for e.g. garbage collection
+ticked = true;
+
+// Allow pausing
+pause = false;
+
+
+  function drawGrid(update){
+    // get the canvas element using the DOM
+    var canvas = document.getElementById('grid-canvas');
+
+    // Make sure we don't execute when canvas isn't supported
+    if (canvas.getContext){
+
+		/* Delay until next update */
+		setTimeout("drawGrid(true);",delay);
+		
+		if (!ticked || pause) return;
+		ticked = false;
+		
+    	// use getContext to use the canvas for drawing
+   		var ctx = canvas.getContext('2d');
+
+		// Resize grid to fit canvas
+		grid1.height = canvas.height / rows;
+		grid1.width = canvas.width / cols;
+
+		/* Draw grid */
+		grid1.Draw(ctx);
+		
+		// Update grid one turn if required
+		if (update)
 		{
-			// Draw Grid
-			grid.Draw(ctx);
-			
-			// Have another go
-			grid.Tick();
-			
-			// Update later
-			setTimeout( "Refresh("+ctx+", "+grid+ ", " + ms+ ");", ms);
-		}
-
-      function drawShape(){
-        // get the canvas element using the DOM
-        var canvas = document.getElementById('tutorial');
-
-		rows = 10;
-		cols = 10;
-
-        // Make sure we don't execute when canvas isn't supported
-        if (canvas.getContext){
-
-        	// use getContext to use the canvas for drawing
-       		var ctx = canvas.getContext('2d');
-
-			//  Initialise game
-			game1 = new GameofLife(2);
-			
-			// Initialise the shapes - a white circle, and a red circle.
-			shape1 = new Shape();
-			shape2 = new Shape();
-			shape2.color = "rgb(255,0,0);"
-			
-			// Set rules to use shape.
-			game1.SetShape(0, shape1);
-			game1.SetShape(1, shape2);
-			
-			// Initialise Grid
-			grid1 = new Grid(0, 0, canvas.height / rows, canvas.width / cols, rows, cols, game1);
-
 			grid1 = grid1.Tick(1);
-			grid1.Draw(ctx);			
-    		
-        } else {
-          alert('You need Safari or Firefox 1.5+ to see this demo.');
-        }
-      }
+		}
+		
+		ticked = true;
+
+    } else {
+      alert('You need Safari or Firefox 1.5+ to see this demo.');
+    }
+    
+  }
     </script>
     <style type="text/css">
       body { margin: 20px; font-family: arial,verdana,helvetica; background: #fff;}
@@ -345,10 +398,17 @@
     </style>
   </head>
 
-  <body onload="drawShape();">
+  <body onload="drawGrid(false);">
     <h1>Testing</h1>
     <div>
-      <canvas id="tutorial" width="150" height="150"></canvas>
+      <canvas id="grid-canvas" width="300" height="300"></canvas>
+    <FORM NAME="grid-form" ACTION="" METHOD="GET">
+<INPUT TYPE="button" NAME="faster" Value="Faster" onClick="if(delay > 1) delay = delay / 2;">
+<INPUT TYPE="button" NAME="slower" Value="Slower" onClick="delay = delay * 2;">
+<INPUT TYPE="button" NAME="restart" Value="Restart" onClick="grid1 = new Grid(0, 0, height, width, rows, cols, game1); pause = false;">
+<INPUT TYPE="button" NAME="pause" Value="Pause" onClick="pause = !pause;">
+</FORM>
+    
 <pre>
 
 This is just a test. Please ignore.
