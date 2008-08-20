@@ -150,74 +150,40 @@
 			this.rules = rules;
 			this.background = "rgb(0,0,0);";
 			this.cells = new Array(cols);
-			this.refresh = new Array(cols);
-			this.damaged = new Array(cols);
 			for(x = 0; x < cols; x++)
 			{
 				this.cells[x] = new Array(rows);
-				this.refresh[x] = new Array(rows);
-				this.damaged[x] = new Array(rows);
 				for(y = 0; y < rows; y++)
 				{
 					this.cells[x][y] = rules.Generator(x, y, this);
-					this.refresh[x][y] = true;
-					this.damaged[x][y] = true;
 				}
 			}			
-		}
-		
-		Grid.prototype.Fresh = function()
-		{
-			for(x = 0; x < cols; x++)
-			{
-				for(y = 0; y < rows; y++)
-				{
-					this.refresh[x][y] = true;
-				}
-			}		
 		}
 
 		Grid.prototype.Draw = function(ctx)
 		{
 			saved = false;
 			
-			// Erase the cell backgrounds first.
-			for(x = 0; x < cols; x++)
-			{
-				for(y = 0; y < rows; y++)
-				{
-					// Draw the background if display 'damaged' or needs refreshing
-					if ((this.damaged[x][y]) || (this.refresh[x][y]))
-					{
-						if (!saved)
-						{
-							ctx.save();
-							saved = true;
-						}
-						ctx.fillStyle = this.background;
-						ctx.fillRect(this.top + (y * this.height),
-							this.left + (x * this.width),
-							this.top + ((y + 1) * this.height),
-							this.left + ((x + 1) * this.width));
-					}
-					
-					// State 0 is always 'blank'	
-					if (this.cells[x][y] == 0) this.damaged[x][y] = false;
-				}
-			}
+			ctx.save();
+			saved = true;
+
+			// Draw the background
+			ctx.fillStyle = this.background;
+			ctx.fillRect(this.top + (0),
+			this.left + (0),
+			this.top + ((this.rows) * this.height),
+			this.left + ((this.cols) * this.width));
 
 			// Restore state if required
 			if (saved) ctx.restore();
-			
+
 			// Draw the cells
 			for(x = 0; x < cols; x++)
 			{
 				for(y = 0; y < rows; y++)
 				{
-					if (!(this.refresh[x][y])) continue;
-					
-					// State 0 is always 'blank'	
-					if (this.cells[x][y] == 0) continue;
+					// Empty cell
+					if (this.cells[x][y] == 0) continue;		
 					
 					// Use least of height and width
 					if (this.height < this.width)
@@ -253,9 +219,9 @@
 					}
 					
 					p.Draw(ctx);
-					this.damaged[x][y] = true;
 				}
 			}
+
 		}
 		
 		Grid.prototype.Tick = function(transition)
@@ -267,8 +233,6 @@
 				for(y = 0; y < rows; y++)
 				{
 					newGrid.cells[x][y] = this.rules.Transition(x, y, transition, this);
-					
-					if (newGrid.cells[x][y] == this.cells[x][y]) newGrid.refresh[x][y] = false;
 				}
 			}
 			
