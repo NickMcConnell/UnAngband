@@ -1070,6 +1070,8 @@ extern void handle_stuff(void);
 extern bool set_blind(int v);
 extern bool set_confused(int v);
 extern bool set_poisoned(int v);
+extern bool set_slow_poison(int v);
+extern bool set_slow_digest(int v);
 extern bool set_afraid(int v);
 extern bool set_paralyzed(int v);
 extern bool set_image(int v);

@@ -1559,6 +1559,8 @@ struct player_type
 	s16b oppose_fire;       /* Timed -- oppose heat */
 	s16b oppose_cold;       /* Timed -- oppose cold */
 	s16b oppose_pois;       /* Timed -- oppose poison */
+	s16b slow_poison;       /* Timed -- slow poison */
+	s16b slow_digest;       /* Timed -- slow digestion */
 
 	s16b oppose_water;       /* Timed -- oppose water */
 	s16b oppose_lava;       /* Timed -- oppose lava */

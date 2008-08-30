@@ -806,7 +806,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		player_race *shape_ptr = &p_info[p_ptr->pshape];
 		bool intro = FALSE;
-		
+
 		/* Hack -- shape flags */
 		if ((!random) && (shape_ptr->flags1 || shape_ptr->flags2 || shape_ptr->flags3 || shape_ptr->flags4))
 		{
@@ -899,13 +899,13 @@ void self_knowledge_aux(bool spoil, bool random)
 		if (t1 || t2 || t3 || t4)
 		{
 			text_out("Your weapon has special powers.  ");
-	
+
 			list_object_flags(t1,t2,t3,t4,o_ptr->pval, 1);
 
 			if (spoil)
-			{	
+			{
 				object_can_flags(o_ptr,t1,t2,t3,t4, FALSE);
-	
+
 				object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4), FALSE);
 			}
 
@@ -959,7 +959,7 @@ void self_knowledge(bool spoil)
 
 	/* Set text_out hook */
 	text_out_hook = text_out_to_screen;
-	
+
 	/* Head the screen */
 	text_out_c(TERM_L_BLUE, "Self-knowledge\n");
 
@@ -1052,7 +1052,7 @@ void set_recall(void)
 			do_cmd_save_bkp();
 
 		/* Reset recall depth */
-		if (p_ptr->depth > min_depth(p_ptr->dungeon) 
+		if (p_ptr->depth > min_depth(p_ptr->dungeon)
 			 && p_ptr->depth != t_info[p_ptr->dungeon].attained_depth)
 		{
 			 if (get_check("Reset recall depth? "))
@@ -1309,7 +1309,7 @@ int value_check_aux3(const object_type *o_ptr)
 	}
 
 	/* Great "armor" bonus */
-	if (o_ptr->to_a > MAX(7, o_ptr->ac)) 
+	if (o_ptr->to_a > MAX(7, o_ptr->ac))
 	  return (INSCRIP_GREAT);
 
 	/* Great to_h bonus */
@@ -1398,16 +1398,16 @@ int value_check_aux4(const object_type *o_ptr)
 	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
 
 	/* Broken items */
-	if (o_ptr->feeling == INSCRIP_BROKEN) 
+	if (o_ptr->feeling == INSCRIP_BROKEN)
 		return (INSCRIP_BROKEN);
-	else if (broken_p(o_ptr)) 
+	else if (broken_p(o_ptr))
 		return (INSCRIP_UNCURSED);
 
 	/* Known to be unusual */
 	if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 
 	/* FIXME: I've added the to_* check because it was wrong without it */
-	if (o_ptr->to_h + o_ptr->to_d <= 0 
+	if (o_ptr->to_h + o_ptr->to_d <= 0
 	    && o_ptr->feeling == INSCRIP_UNCURSED)
 	  return(INSCRIP_AVERAGE);
 
@@ -1425,7 +1425,7 @@ int value_check_aux5(const object_type *o_ptr)
 	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
 		|| (o_ptr->feeling == INSCRIP_GREAT)
 		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
-		|| (o_ptr->feeling == INSCRIP_ARTIFACT) || (o_ptr->feeling == INSCRIP_EGO_ITEM)		
+		|| (o_ptr->feeling == INSCRIP_ARTIFACT) || (o_ptr->feeling == INSCRIP_EGO_ITEM)
 		|| (o_ptr->feeling == INSCRIP_TERRIBLE) || (o_ptr->feeling == INSCRIP_WORTHLESS)
 		|| (o_ptr->feeling == INSCRIP_CURSED)|| (o_ptr->feeling == INSCRIP_HIGH_EGO_ITEM)) return (0);
 
@@ -1494,13 +1494,13 @@ static bool item_tester_magic(const object_type *o_ptr)
 {
 	/* Exclude cursed or broken */
 	if (cursed_p(o_ptr) || broken_p(o_ptr)) return (FALSE);
-	
+
 	/* Include artifacts and ego items */
 	if (artifact_p(o_ptr) || ego_item_p(o_ptr)) return (TRUE);
-	
+
 	/* Include magic items */
 	if ((o_ptr->xtra1) && (o_ptr->xtra1 < OBJECT_XTRA_MIN_COATS)) return (TRUE);
-	
+
 	/* Artifacts, misc magic items, or enchanted wearables */
 	switch (o_ptr->tval)
 	{
@@ -1518,10 +1518,10 @@ static bool item_tester_magic(const object_type *o_ptr)
 		case TV_STUDY:
 			return (TRUE);
 	}
-	
-	/* Positive bonuses */		
+
+	/* Positive bonuses */
 	if ((o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0)) return (TRUE);
-	
+
 	return (FALSE);
 }
 
@@ -1532,7 +1532,7 @@ static bool item_tester_power(const object_type *o_ptr)
 {
 	/* Include cursed or broken */
 	if (cursed_p(o_ptr) || broken_p(o_ptr)) return (TRUE);
-	
+
 	/* Otherwise magic */
 	return (item_tester_magic(o_ptr));
 }
@@ -1556,7 +1556,7 @@ static bool item_tester_cursed(const object_type *o_ptr)
  * This will light up all spaces with items matching a tester function
  * as well as senses all objects in the inventory using a particular
  * type of sensing function.
- * 
+ *
  * If ignore_feeling is set, it'll treat a feeling of that value
  * as not inducing detection.
  *
@@ -1911,7 +1911,7 @@ void place_quest_stairs(int y, int x)
 	if (level_flag & (LF1_TOWER))
 	{
 		cave_set_feat(y, x, FEAT_LESS);
-	}		
+	}
 
 	/* Surface -- place entrance if outside */
 	else if (outside)
@@ -1996,13 +1996,13 @@ bool concentrate_water_hook(const int y, const int x, const bool modify)
 
 	/* Not modifying yet */
 	if (!modify) return (TRUE);
-	
+
 	/* From lower water in spells1.c */
 	if (prefix(f_name+f_ptr->name,"stone bridge"))
 	{
 		/* Hack -- change bridges to prevent exploits */
 		cave_set_feat(y, x, FEAT_BRIDGE_CHASM);
-		
+
 		/* Notice any changes */
 		if (player_can_see_bold(y,x)) return (TRUE);
 	}
@@ -2033,7 +2033,7 @@ bool concentrate_life_hook(const int y, const int x, const bool modify)
 
 	/* Not modifying yet */
 	if (!modify) return (TRUE);
-	
+
 	/* Kill it */
 	cave_alter_feat(y,x,FS_LIVING);
 
@@ -2090,10 +2090,10 @@ bool concentrate_light_hook(const int y, const int x, const bool modify)
  * Allow use by both the character and monsters.
  *
  * Adapted from Sangband implementation of concentrate_light.
- * 
+ *
  * TODO: Consider only altering the target terrain if the caster
  * is 'evil'.
- * 
+ *
  * -DarkGod-, -LM-
  */
 int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
@@ -2101,7 +2101,7 @@ int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 {
 	int power = 0;
 	int y, x, r;
-	
+
 	bool changes = FALSE;
 
 	/* Hack -- Flush any pending output */
@@ -2144,7 +2144,7 @@ int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 				}
 			}
 		}
-		
+
 #if 0
 		/* Graphics */
 		if ((for_real) && (changes) && (op_ptr->delay_factor))
@@ -2581,7 +2581,7 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 	if (!res) return (FALSE);
 
 	/* Hack --- unsense the item */
-	o_ptr->ident &= ~(IDENT_SENSE);	
+	o_ptr->ident &= ~(IDENT_SENSE);
 
 	/* Remove special inscription, if any */
 	o_ptr->feeling = 0;
@@ -2677,7 +2677,7 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac)
 
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
-	
+
 		/* Combine / Reorder the pack (later) */
 		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
@@ -2851,10 +2851,10 @@ bool brand_item(int brand, cptr act)
 			if (inven_carry_okay(o_ptr)) inven_carry(o_ptr);
 			else drop_near(o_ptr,0,p_ptr->py,p_ptr->px);
 		}
-	
+
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
-	
+
 		/* Combine / Reorder the pack (later) */
 		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
@@ -3179,13 +3179,13 @@ bool ident_spell_sense(void)
 		for (j = 0; j < INVEN_BAG_TOTAL; j++)
 		{
 			if ((bag_holds[i][j][0] == o_ptr->tval)
-				&& (bag_holds[i][j][1] == o_ptr->sval)) 
+				&& (bag_holds[i][j][1] == o_ptr->sval))
 			  {
 			    o_ptr->feeling = MAX_INSCRIP + i;
-			    feel = 1; 
+			    feel = 1;
 			  }
 		}
-	} 
+	}
 	else
 	  o_ptr->feeling = feel;
 
@@ -3448,7 +3448,7 @@ bool ident_spell_runes(void)
 	{
 		object_aware(o_ptr, item < 0);
 	}
-	
+
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
@@ -3468,13 +3468,13 @@ bool ident_spell_runes(void)
 		msg_format("On the ground: %s.",
 			   o_name);
 	}
-	
+
 	/* Aware of runes */
 	k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
-	
+
 	/* Learn kind rune recipe */
 	if (object_aware_p(o_ptr)) k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
-	
+
 	/* Add ego item rune awareness */
 	if ((object_named_p(o_ptr)) && (o_ptr->name2))
 	{
@@ -3570,8 +3570,8 @@ bool ident_spell_rumor(void)
 	/* Remove known flags */
 	f1 &= ~(o_ptr->can_flags1);
 	f2 &= ~(o_ptr->can_flags2);
-	f3 &= ~(o_ptr->can_flags3); 
-	f4 &= ~(o_ptr->can_flags4); 
+	f3 &= ~(o_ptr->can_flags3);
+	f4 &= ~(o_ptr->can_flags4);
 
 	/* We know everything? */
 	done = ((f1 | f2 | f3 | f4) ? FALSE : TRUE);
@@ -3672,7 +3672,7 @@ bool ident_spell_rumor(void)
 		list_object_flags(f1, f2, f3, f4, o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? o_ptr->pval : 0, 1);
 
 		(void)anykey();
-	
+
 		/* Load screen */
 		screen_load();
 	}
@@ -4225,7 +4225,7 @@ bool mass_banishment(int who, int what, int y, int x)
 			p_ptr->leaving = TRUE;
 		}
 	}
-	
+
 	/* Delete the (nearby) monsters */
 	for (i = 1; i < m_max; i++)
 	{
@@ -4435,7 +4435,7 @@ void destroy_area(int y1, int x1, int r, bool full)
  * Entomb a player or monster in a location known to be impassable.
  *
  * Players take a lot of damage.
- * 
+ *
  * Monsters will take damage, and "jump" into a safe grid if possible,
  * otherwise they will be "buried" in the rubble, disappearing from
  * the level in the same way that they do when banished.
@@ -4452,7 +4452,7 @@ void destroy_area(int y1, int x1, int r, bool full)
  * grid to prevent monsters getting hit twice by earthquakes.
  *
  * XXX Consider passing a damage value and/or flavor so that getting
- * stuck in ice is different from granite wall is different from 
+ * stuck in ice is different from granite wall is different from
  * (impassable) rubble. Of course, we could just pull this from the
  * feature at this location.
  *
@@ -5042,7 +5042,7 @@ static void cave_temp_room_unlite(void)
 		}
 
 		/* Hack -- Forget "boring" grids */
-		if (!(cave_info[y][x] & (CAVE_GLOW)) && 
+		if (!(cave_info[y][x] & (CAVE_GLOW)) &&
 			!(f_info[cave_feat[y][x]].flags1 & (FF1_REMEMBER)))
 		{
 			/* Forget the grid */
@@ -5722,7 +5722,7 @@ void change_shape(int shape, int level)
 
 			/* Mark as 'built-in' item */
 			inventory[i].ident |= (IDENT_STORE);
-			
+
 			/* Important - to prefent overflow of items, we must check for pack overflow after every item is wielded */
 			overflow_pack();
 		}
@@ -5740,7 +5740,7 @@ void change_shape(int shape, int level)
  * Enchant item --- a big pile of (fun) hack
  *
  * Basically we select an adjacent item of the same tval,
- * compare the difference in levels between the two, and 
+ * compare the difference in levels between the two, and
  * if randint(plev) > difference, polymorph the item.
  * Otherwise scan until we encounter a 0 value item
  * of the same tval and polymorph the item into that, or
@@ -5839,7 +5839,7 @@ static void enchant_item(byte tval, int plev)
 				i+=dirs;
 			}
 		}
-					
+
 		/* No bad items at all */
 		if (k_info[i].tval !=tval)
 		{
@@ -5882,7 +5882,7 @@ static void enchant_item(byte tval, int plev)
 			}
 		}
 	}
-	
+
 
 	/* Ta da! */
 	msg_print("There is a blinding flash!");
@@ -6093,7 +6093,7 @@ static bool curse_weapon(void)
  * Turn curses on equipped items into starbursts of nether.  -LM-
  *
  * Idea by Mikko Lehtinen.
- * 
+ *
  * Todo: Finish implementing this, once remaining Sangband projection types
  * are implemented.
  */
@@ -6104,13 +6104,13 @@ static int thaumacurse(bool verbose, int power)
 	object_type *o_ptr;
 	bool notice = FALSE;
 	u32b f1, f2, f3, f4;
-	
+
 
 	/* Count curses */
 	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
 	{
 		o_ptr = &inventory[i];
-		
+
 		object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 		/* Skip non-objects */
@@ -6226,34 +6226,34 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
-		
+
 		/* Roll out the damage */
 		if (blow_ptr->d_side)
 		{
 			damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
 		}
-		
+
 		/* Roll out level dependent damage */
 		if (blow_ptr->l_side)
 		{
 			damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
 		}
-		
+
 		/* Add constant damage */
 		damage += blow_ptr->d_plus;
-		
+
 		/* Add level dependent damage */
 		if (blow_ptr->l_plus)
 		{
 			damage += blow_ptr->l_plus * level / blow_ptr->levels;
-			
+
 			/* Mega-hack - dispel evil/undead etc. */
 			if (!level)
 			{
 				damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
 			}
 		}
-		
+
 		/* Apply spell method */
 		switch (blow_ptr->method)
 		{
@@ -6320,7 +6320,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if (!get_aim_dir(&dir)) return (!(*cancel));
-				
+
 				if (fire_bolt_or_beam(who, what, beam - 10, effect, dir, damage)) obvious = TRUE;
 				break;
 			}
@@ -6415,7 +6415,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 				/* Hack - scale damage */
 				damage += level / 2;
-				
+
 				if (fire_cloud(who, what, effect, dir, damage, rad)) obvious = TRUE;
 
 				break;
@@ -6444,12 +6444,12 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 			{
 				int py = p_ptr->py;
 				int px = p_ptr->px;
-			
+
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM | PROJECT_AREA;
 				if (project(who, what, (level / 10)+1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
 			}
-			
+
 			/* Applies same damage at all ranges */
 			case RBM_AIM_AREA:
 			{
@@ -6457,7 +6457,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 				/* Allow direction to be cancelled for free */
 				if (!get_aim_dir(&dir)) return (!(*cancel));
-				
+
 				if (fire_area(who, what, effect, dir, damage, rad)) obvious = TRUE;
 				break;
 			}
@@ -6514,7 +6514,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 			{
 				int k;
 
-									
+
 				for (k = 0; k < 8; k++) if (fire_beam(who, what, effect, ddd[k], damage)) obvious = TRUE;
 
 				break;
@@ -6524,7 +6524,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 			{
 				int py = p_ptr->py;
 				int px = p_ptr->px;
-			
+
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
 				if (project(who, what, 2, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
@@ -6534,7 +6534,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 			{
 				int py = p_ptr->py;
 				int px = p_ptr->px;
-			
+
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
 				if (project(who, what, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
@@ -6544,7 +6544,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 			{
 				int py = p_ptr->py;
 				int px = p_ptr->px;
-			
+
 				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY;
 				if (project(who, what, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
 				break;
@@ -6573,7 +6573,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 			case RBM_STRIKE:
 			{
-			        /* Allow direction to be cancelled for free */ 
+			        /* Allow direction to be cancelled for free */
 			        if (!get_aim_dir(&dir)) return (!(*cancel));
 
 				if (fire_ball(who, what, effect, dir, damage, 0)) obvious = TRUE;
@@ -6665,7 +6665,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 				if (fire_swarm(who, what, 2 + level / 20, effect, dir,
 			           	damage + level / 2, 1)) obvious = TRUE;
-			           	
+
 			    break;
 			}
 			case RBM_SCATTER:
@@ -6682,14 +6682,14 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 				{
 					/* Pick a 'nearby' location */
 	      			scatter(&y, &x, py, px, 5, 0);
-	      		
+
 	      			/* Project at the location */
 					if (project(who, what, 0, py, px, y, x, damage, effect, flg, 0, 0)) obvious = TRUE;
 				}
 
-				break;	      		
+				break;
 			}
-			
+
 			/* One adjacent target */
 			default:
 			{
@@ -6710,7 +6710,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
 	}
-	
+
 	/* Return result */
 	return (obvious);
 
@@ -6829,7 +6829,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		{
 			return (TRUE);
 		}
-		
+
 		*cancel = FALSE;
 		obvious = TRUE;
 	}
@@ -6888,7 +6888,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	/* Process the 'fake flag' -- detect minds */
 	if (s_ptr->type == SPELL_DETECT_MIND)
 	{
-		if (detect_monsters(monster_tester_hook_mental, known)) vp[vn++] = "minds";		
+		if (detect_monsters(monster_tester_hook_mental, known)) vp[vn++] = "minds";
 	}
 
 	/* Describe detected magic */
@@ -6977,7 +6977,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags2 & (SF2_INVIS)) && (set_invis(p_ptr->invis + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (set_tim_invis(p_ptr->tim_invis + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (set_protevil(p_ptr->protevil + lasts + (level== 0 ? 3 * p_ptr->lev : 0)))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (set_cursed(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (set_cursed(p_ptr->cursed / 2))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (set_cursed(0))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (set_oppose_fire(p_ptr->oppose_fire + lasts))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (set_oppose_cold(p_ptr->oppose_cold + lasts))) obvious = TRUE;
@@ -7219,14 +7219,14 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if (lasts)
 	{
   	        if (s_ptr->flags3 & (SF3_INC_STR))
-		  { 
+		  {
 		    if (set_stat_inc_tim(lasts, A_STR)) obvious = TRUE;
 		    if (set_stat_inc_tim(lasts, A_SIZ)) obvious = TRUE;
 		  }
 		if ((s_ptr->flags3 & (SF3_INC_INT)) && (set_stat_inc_tim(lasts, A_INT))) obvious = TRUE;
 		if ((s_ptr->flags3 & (SF3_INC_WIS)) && (set_stat_inc_tim(lasts, A_WIS))) obvious = TRUE;
 		if (s_ptr->flags3 & (SF3_INC_DEX))
-		  { 
+		  {
 		    if (set_stat_inc_tim(lasts, A_DEX)) obvious = TRUE;
 		    if (set_stat_inc_tim(lasts, A_AGI)) obvious = TRUE;
 		  }
@@ -7270,11 +7270,11 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (set_slow(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (set_amnesia(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_CURSE)) && (remove_curse())) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (remove_curse())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_CUTS)) && (set_cut(p_ptr->cut / 2))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_CUTS)) && (set_cut(p_ptr->cut / 2))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (set_cut(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_SLOW_STUN)) && (set_stun(p_ptr->stun / 2))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_STUN)) && (set_stun(p_ptr->stun / 2))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (set_stun(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (set_poisoned(0))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (set_confused(0))) obvious = TRUE;
@@ -7296,10 +7296,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 			equip_can_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
 		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0
-				 || p_ptr->blessed 
+				 || p_ptr->blessed
 				 || p_ptr->exp == 0)
 		{
-			if (!p_ptr->blessed && p_ptr->exp > 0) 
+			if (!p_ptr->blessed && p_ptr->exp > 0)
 				equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
 			equip_not_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
@@ -7342,7 +7342,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
  * This helper function allows the player to ensorcle a single
  * round of attacks, round of shots or round of shooting with
  * various effects.
- * 
+ *
  * Returns FALSE if cancelled
  */
 bool process_spell_blow_shot_hurl(int type)
@@ -7352,37 +7352,37 @@ bool process_spell_blow_shot_hurl(int type)
 		case SPELL_BLOW_HACK:
 		{
 			int dir;
-			
+
 			/* Allow direction to be cancelled for free */
 			if (!get_rep_dir(&dir)) return (FALSE);
-			
+
 			/* Attack */
 			py_attack(dir);
-			
+
 			break;
 		}
 		case SPELL_SHOT_HACK:
 		{
 			/* Fire */
 			do_cmd_fire();
-			
+
 			/* Cancelled */
 			if (!p_ptr->energy_use) return (FALSE);
-			
+
 			break;
 		}
 		case SPELL_HURL_HACK:
 		{
 			/* Fire */
 			do_cmd_throw();
-			
+
 			/* Cancelled */
 			if (!p_ptr->energy_use) return (FALSE);
-			
+
 			break;
 		}
 	}
-	
+
 	return (TRUE);
 }
 
@@ -7390,7 +7390,7 @@ bool process_spell_blow_shot_hurl(int type)
 
 /*
  * Process the spell types.
- * 
+ *
  * Basically a collection of hacks
  */
 bool process_spell_types(int who, int spell, int level, bool *cancel)
@@ -7507,7 +7507,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_SUMMON_GROUP_IDX:
 			{
 				summon_group_type = s_ptr->param;
-				
+
 				if (summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, SUMMON_GROUP, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
@@ -7537,7 +7537,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			{
 				u32b v;
 				u32b old_disease = p_ptr->disease;
-				
+
 				char output[1024];
 
 				/* Hack -- cure disease */
@@ -7566,7 +7566,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					if (p_ptr->disease)
 					{
 						msg_print("This cure is ineffective for what ails you.");
-						obvious = TRUE;						
+						obvious = TRUE;
 					}
 					break;
 				}
@@ -7615,16 +7615,35 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 				break;
 			}
-			case SPELL_SLOW_CONF:
+			case SPELL_PFIX_CONF:
 			{
 				*cancel = FALSE;
 				if (set_confused(p_ptr->confused / 2)) obvious = TRUE;
 				break;
 			}
-			case SPELL_SLOW_POIS:
+			case SPELL_PFIX_POIS:
 			{
 				*cancel = FALSE;
 				if (set_poisoned(p_ptr->poisoned / 2)) obvious = TRUE;
+				break;
+			}
+			case SPELL_SLOW_POIS:
+			{
+				*cancel = FALSE;
+				if (set_slow_poison(p_ptr->slow_poison + lasts)) obvious = TRUE;
+				break;
+			}
+			case SPELL_SLOW_DIGEST:
+			{
+				*cancel = FALSE;
+				if (set_slow_digest(p_ptr->slow_digest + lasts)) obvious = TRUE;
+				break;
+			}
+			case SPELL_SLOW_META:
+			{
+				*cancel = FALSE;
+				if (set_slow_poison(p_ptr->slow_poison + lasts)) obvious = TRUE;
+				if (set_slow_digest(p_ptr->slow_digest + lasts)) obvious = TRUE;
 				break;
 			}
 			case SPELL_IDENT_PACK:
@@ -7686,36 +7705,36 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					/* Refer to the item */
 					o_ptr = &inventory[item];
 				}
-	
+
 				/* Switch on light source */
 				if (o_ptr->charges)
 				{
 					o_ptr->timeout = o_ptr->charges;
 					o_ptr->charges = 0;
 				}
-				
+
 				/* Increase fuel */
 				o_ptr->timeout += s_ptr->param / o_ptr->number;
-				
+
 				/* Over-fuel message */
 				if (o_ptr->timeout >= FUEL_TORCH)
 				{
 					o_ptr->timeout = FUEL_TORCH;
 					msg_format("Your torch%s fully fueled.", o_ptr->number > 1 ? "es are" : " is");
 				}
-				
+
 				/* Lite if necessary */
 				if (item == INVEN_LITE) p_ptr->update |= (PU_TORCH);
 				*cancel = FALSE;
 				break;
 			}
-			
+
 			case SPELL_IDENT_NAME:
 			{
 				if ((!ident_spell_name()) && (*cancel)) return (TRUE);
 				*cancel = FALSE;
 				obvious = TRUE;
-				break;				
+				break;
 			}
 
 			case SPELL_USE_OBJECT:
@@ -7748,12 +7767,12 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					ty = p_ptr->target_row;
 					tx = p_ptr->target_col;
 				}
-				
+
 				/* Paranoia - ensure we have no outstanding updates before messing with
 				 * player variables. */
 				update_stuff();
 				redraw_stuff();
-				
+
 				/* Paranoia - ensure bounds */
 				if (in_bounds_fully(ty, tx))
 				{
@@ -7762,7 +7781,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					{
 						monster_type *m_ptr = &m_list[cave_m_idx[ty][tx]];
 						monster_race *r_ptr = &r_info[m_ptr->r_idx];
-					
+
 						/* Hack -- get monster light radius */
 						if (((r_ptr->flags2 & (RF2_HAS_LITE)) != 0) ||
 							((r_ptr->flags1 & (MFLAG_LITE)) != 0))
@@ -7775,20 +7794,20 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 							/* No lite */
 							p_ptr->cur_lite = 0;
 						}
-					
+
 						/* Hack - special darknes sight for monsters that don't need lite */
 						if ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0)
 						{
 							/* Get maximum sight */
 							p_ptr->see_infra = MIN(MAX_SIGHT, r_ptr->aaf);
 						}
-					
+
 						/* Hack - monsters that see invisible */
 						if ((r_ptr->flags2 & (RF2_INVISIBLE)) != 0)
 						{
 							p_ptr->cur_flags3 |= (TR3_SEE_INVIS);
 						}
-					
+
 						/* XXX Show player scent?? */
 					}
 					/* Hack -- second sight */
@@ -7797,7 +7816,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 						/* Does not have innate light */
 						p_ptr->cur_lite = 0;
 					}
-				
+
 					/* Use target location */
 					p_ptr->py = ty;
 					p_ptr->px = tx;
@@ -7810,11 +7829,11 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					/* Update display */
 					update_stuff();
 					redraw_stuff();
-				
+
 					/* Message */
 					msg_print("You cast your mind adrift.");
 					msg_print("");
-								
+
 					/* Reset hacks */
 					p_ptr->py = old_py;
 					p_ptr->px = old_px;
@@ -7830,14 +7849,14 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					/* Final update */
 					update_stuff();
 					redraw_stuff();
-					
+
 					/* Obvious */
 					*cancel = FALSE;
 					obvious = TRUE;
 					break;
 				}
 			}
-			
+
 			case SPELL_LIGHT_CHAMBERS:
 			{
 				int x, y, i;
@@ -7851,16 +7870,16 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 						if ((cave_info[y][x] & (CAVE_ROOM)) && !(room_has_flag(y, x, (ROOM_ICKY | ROOM_HIDDEN))))
 						{
 							cave_info[y][x] |= (CAVE_GLOW);
-							
+
 							/* Light spills out of windows etc. */
 							if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
 							{
 								for (i = 0; i < 8; i++)
 								{
-									cave_info[y + ddy_ddd[i]][x + ddx_ddd[i]] |= (CAVE_GLOW);								
+									cave_info[y + ddy_ddd[i]][x + ddx_ddd[i]] |= (CAVE_GLOW);
 								}
 							}
-							
+
 							*cancel = FALSE;
 							obvious = TRUE;
 						}
@@ -7874,14 +7893,14 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				msg_print("Oops. Spell not yet implemented.");
 				break;
 			}
-			
+
 			case SPELL_RELEASE_CURSE:
 			{
 				obvious |= thaumacurse(TRUE, 2 * level + level * level / 20);
 				*cancel = FALSE;
 				break;
 			}
-			
+
 			case SPELL_SET_RETURN:
 			case SPELL_SET_OR_MAKE_RETURN:
 			case SPELL_CONCENTRATE_LITE:
@@ -7891,26 +7910,26 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Implemented elsewhere */
 				break;
 			}
-			
+
 			case SPELL_REST_UNTIL_DUSK:
 			case SPELL_REST_UNTIL_DAWN:
 			{
 				feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
-				
+
 				/* Hack -- only on the surface for the moment */
 				if ((level_flag & (LF1_SURFACE | LF1_TOWN)) == 0)
 				{
 					msg_print("You cannot tell what time of day or night it is.");
 					break;
 				}
-				
+
 				/* Hack -- Vampires must be able to hide in the soil */
 				if (((f_ptr->flags1 & (FF1_ENTER)) == 0) && ((f_ptr->flags2 & (FF2_CAN_DIG)) == 0))
 				{
 					msg_print("You cannot rest here.");
 					break;
 				}
-				
+
 				/* Check that it's day or night */
 				if (((level_flag & (LF1_DAYLIGHT)) != 0) != (s_ptr->type == SPELL_REST_UNTIL_DAWN))
 				{
@@ -7921,7 +7940,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Save the old dungeon in case something goes wrong */
 				if (autosave_backup)
 					do_cmd_save_bkp();
-				
+
 				/* Hack -- Set time to one turn before sun down / sunrise */
 				turn += ((10L * TOWN_DAWN) / 2) - (turn % ((10L * TOWN_DAWN) / 2)) - 1;
 
@@ -7929,7 +7948,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 				/* Inform the player */
 				if (s_ptr->type == SPELL_REST_UNTIL_DUSK) msg_print("You sleep during the day.");
-				
+
 				/* Heroes don't sleep easy */
 				else
 				{	switch(p_ptr->lev / 10)
@@ -7945,22 +7964,22 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 				/* Hack -- regenerate level */
 				p_ptr->leaving = TRUE;
-				
+
 				*cancel = FALSE;
 				obvious = TRUE;
-				
+
 				break;
 			}
-			
+
 			case SPELL_MAGIC_BLOW:
 			case SPELL_MAGIC_SHOT:
 			case SPELL_MAGIC_HURL:
 			{
 				bool result;
-				
+
 				/* Magical blow */
 				p_ptr->branded_blows = s_ptr->param;
-				
+
 				/* Hack - try to assist a couple of things.
 				 * Note that a lot of flags don't actually work
 				 * such as e.g. stat bonuses. We hackily adjust
@@ -7999,7 +8018,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 						break;
 					}
 				}
-				
+
 				/* Allow direction to be cancelled for free */
 				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_MAGIC_BLOW);
 
@@ -8023,23 +8042,23 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 						break;
 					}
 				}
-				
+
 				if (!result) return (!(*cancel));
 
 				*cancel = FALSE;
-				obvious = TRUE;				
+				obvious = TRUE;
 				break;
 			}
-			
+
 			case SPELL_ACCURATE_BLOW:
 			case SPELL_ACCURATE_SHOT:
 			case SPELL_ACCURATE_HURL:
 			{
 				bool result;
-				
+
 				/* Accurate blow */
 				p_ptr->to_h = s_ptr->param;
-				
+
 				/* Allow direction to be cancelled for free */
 				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_ACCURATE_BLOW);
 
@@ -8058,10 +8077,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_DAMAGING_HURL:
 			{
 				bool result;
-				
+
 				/* Damaging blow */
 				p_ptr->to_d += s_ptr->param;
-				
+
 				/* Allow direction to be cancelled for free */
 				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_DAMAGING_BLOW);
 
@@ -8071,10 +8090,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				if (!result) return (!(*cancel));
 
 				*cancel = FALSE;
-				obvious = TRUE;				
+				obvious = TRUE;
 				break;
 			}
-			
+
 			default:
 			{
 				wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);
@@ -8092,34 +8111,34 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 /*
  * Some spell actions have to occur prior to processing the spell
  * proper.
- * 
+ *
  * We check the spell to see if we have to set a return point as
  * we have to set return points before processing spell blows.
- * 
+ *
  * We also concentrate spells here, in order to hackily set
  * the spell power for later processing in spell blows.
  */
 void process_spell_prepare(int spell, int level)
 {
 	spell_type *s_ptr = &s_info[spell];
-	
+
 	/* Many of these boost spell damage / power */
 	int power = 0;
-	
+
 	switch (s_info[spell].type)
 	{
 		case SPELL_SET_RETURN:
-		case SPELL_SET_OR_MAKE_RETURN:		
+		case SPELL_SET_OR_MAKE_RETURN:
 		{
 			bool return_time = FALSE;
-			
+
 			/* Set the return location if required */
 			if (!(p_ptr->return_y) && !(p_ptr->return_x))
 			{
 				/* Set return point */
 				p_ptr->return_y = p_ptr->py;
 				p_ptr->return_x = p_ptr->px;
-				
+
 				/* Set the return time */
 				if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;
 			}
@@ -8129,7 +8148,7 @@ void process_spell_prepare(int spell, int level)
 				/* Set the return time */
 				return_time = TRUE;
 			}
-			
+
 			/* Set return time */
 			if (return_time)
 			{
@@ -8143,31 +8162,31 @@ void process_spell_prepare(int spell, int level)
 					p_ptr->word_return = s_ptr->l_plus;
 				}
 			}
-			
+
 			break;
 		}
-		
+
 		case SPELL_CONCENTRATE_LITE:
 		{
 			power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, TRUE, concentrate_light_hook);
 			break;
 		}
-	
+
 		case SPELL_CONCENTRATE_LIFE:
 		{
 			power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, FALSE, concentrate_life_hook);
 			break;
 		}
-		
+
 		case SPELL_CONCENTRATE_WATER:
 		{
 			power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, FALSE, concentrate_water_hook);
 			break;
 		}
-		
+
 		case SPELL_RELEASE_CURSE:
 		{
 			power =	thaumacurse(TRUE, level + (level * level / 20));
@@ -8205,7 +8224,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 
 	/* Check for return flags */
 	process_spell_prepare(spell, level);
-	
+
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
@@ -8297,7 +8316,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 
 		/* Create a fake object */
 		object_prep(o_ptr, s_info[spell].param);
-		
+
 		/* Get a power */
 		get_spell(&spell, "use", o_ptr, FALSE);
 	}
@@ -8310,8 +8329,8 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 	}
 
 	/* Check for return flags */
-	process_spell_prepare(spell, level);	
-	
+	process_spell_prepare(spell, level);
+
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
 	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;
@@ -8338,7 +8357,7 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 
 	/* Check for return if player */
 	if (cave_m_idx[y][x] < 0) process_spell_prepare(power, 25);
-	
+
 	/* Has a power */
 	if (power > 0)
 	{
@@ -8392,18 +8411,18 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 		{
 			object_type object_type_body;
 			object_type *i_ptr = &object_type_body;
-			
+
 			int coating = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
 
 			/* Prepare object */
 			object_prep(i_ptr,coating);
-			
+
 			/* Queue tips */
 			object_aware_tips(i_ptr, FALSE);
 
 			/* Make coating aware */
 			k_info[coating].aware |= (AWARE_FLAVOR);
-			
+
 			k_info[coating].aware &= ~(AWARE_TRIED);
 
 			if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;

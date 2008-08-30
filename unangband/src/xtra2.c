@@ -138,6 +138,7 @@ bool set_confused(int v)
 bool set_poisoned(int v)
 {
 	bool notice = FALSE;
+	bool really_notice = FALSE;
 
 	/* Hack -- Force good values */
 	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
@@ -147,7 +148,17 @@ bool set_poisoned(int v)
 	{
 		if (!p_ptr->poisoned)
 		{
-			msg_print("You are poisoned!");
+			if (p_ptr->slow_poison)
+			{
+				/* Deliberately ambiguous message */
+				msg_print("Whew.");
+				msg_print("You thought you saw poison but you feel fine.");
+			}
+			else
+			{
+				msg_print("You are poisoned!");
+				really_notice = TRUE;
+			}
 			notice = TRUE;
 		}
 	}
@@ -159,6 +170,7 @@ bool set_poisoned(int v)
 		{
 			msg_print("You are no longer poisoned.");
 			notice = TRUE;
+			really_notice = TRUE;
 		}
 	}
 
@@ -178,7 +190,74 @@ bool set_poisoned(int v)
 	handle_stuff();
 
 	/* Result */
+	return (really_notice);
+}
+
+
+/*
+ * Set "p_ptr->slow_poison", notice observable changes
+ */
+bool set_slow_poison(int v)
+{
+	bool notice = FALSE;
+
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Open */
+	if (v)
+	{
+		if (p_ptr->poisoned)
+		{
+			msg_print("The poison in your veins is slowed.");
+			notice = TRUE;
+		}
+	}
+
+	/* Shut */
+	else
+	{
+		if (p_ptr->poisoned)
+		{
+			msg_print("You are poisoned!");
+			msg_print("How did you not notice?");
+			notice = TRUE;
+		}
+	}
+
+	/* Use the value */
+	p_ptr->slow_poison = v;
+
+	/* Nothing to notice */
+	if (!notice) return (FALSE);
+
+	/* Disturb */
+	if (disturb_state) disturb(0, 0);
+
+	/* Redraw the "poisoned" */
+	p_ptr->redraw |= (PR_POISONED);
+
+	/* Handle stuff */
+	handle_stuff();
+
+	/* Result */
 	return (TRUE);
+}
+
+
+/*
+ * Set "p_ptr->slow_digest", never notice changes
+ */
+bool set_slow_digest(int v)
+{
+	/* Hack -- Force good values */
+	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+
+	/* Use the value */
+	p_ptr->afraid = p_ptr->slow_digest;
+
+	/* Result */
+	return (FALSE);
 }
 
 

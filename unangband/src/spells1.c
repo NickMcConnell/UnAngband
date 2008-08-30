@@ -1107,6 +1107,8 @@ byte spell_color(int type)
 		case GF_COLD:         return (cold_color());
 		case GF_POIS:         return (pois_color());
 
+		case GF_DELAY_POISON: return (pois_color());
+
 		case GF_PLASMA:       return (plasma_color());
 		case GF_HELLFIRE:     return (hellfire_color());
 		case GF_ICE:          return (ice_color());
@@ -2561,23 +2563,37 @@ static void cold_dam(int who, int what, int dam, bool inven)
 /*
  * Hurt the player with Poison
  */
-static void poison_dam(int who, int what, int dam, bool inven)
+static void poison_dam(int who, int what, int dam, bool inven, bool delay)
 {
 	int res = p_ptr->incr_resist[INCR_RES_POIS];
 
 	(void)inven;
 
+	/* Apply delay */
+	if ((delay) && !(p_ptr->poisoned))
+	{
+		set_slow_poison(MAX(p_ptr->slow_poison, 100));
+	}
+	else if (p_ptr->slow_poison)
+	{
+		delay = TRUE;
+	}
+	else
+	{
+		delay = FALSE;
+	}
+
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_POIS)) != 0)
 	{
-		/* Always notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		/* Notice unless delayed */
+		if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 		{
-			/* Always notice */
-			(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
+			/* Notice unless delayed */
+			if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2595,9 +2611,9 @@ static void poison_dam(int who, int what, int dam, bool inven)
 	/* Total Immunity */
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
-		/* Always notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		/* Notice unless delayed */
+		if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
+		if (!delay) player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 
 		return;
 	}
@@ -2605,20 +2621,20 @@ static void poison_dam(int who, int what, int dam, bool inven)
 	/* Not vulnerable */
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
-		/* Always notice */
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		/* Notice unless delayed */
+		if (!delay) player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 	}
 
 	/* Resist the damage */
 	if ((p_ptr->cur_flags2 & (TR2_RES_POIS)) != 0)
 	{
-		/* Sometimes notice */
-		(void)player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+		/* Notice unless delayed */
+		if (!delay) player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
 	}
 	else
 	{
-		/* Sometimes notice */
-		(void)player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+		/* Notice unless delayed */
+		if (!delay) player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
@@ -3541,6 +3557,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			}
 			break;
 		}
+		case GF_DELAY_POISON:
 		case GF_POIS:
 		{
 			if ((f_ptr->flags3 & (FF3_HURT_POIS)) &&
@@ -5822,6 +5839,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Poison */
+		case GF_DELAY_POISON:
 		case GF_POIS:
 		{
 			if (seen) obvious = TRUE;
@@ -9017,10 +9035,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Standard damage -- also poisons player */
+		case GF_DELAY_POISON:
 		case GF_POIS:
 		{
 			if (fuzzy) msg_print("You are hit by poison!");
-			poison_dam(who, what, dam, TRUE);
+			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON);
 			break;
 		}
 
@@ -11002,7 +11021,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					(void)set_cut(p_ptr->cut + randint(dam));
 
 					/* Poison the player */
-					poison_dam(who, what, dam, TRUE);
+					poison_dam(who, what, dam, TRUE, FALSE);
 				}
 
 				/* Take the damage */

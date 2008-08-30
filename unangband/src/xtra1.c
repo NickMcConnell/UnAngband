@@ -127,7 +127,7 @@ static void prt_stat(int stat)
 	char tmp[32];
 
 	/* Display "injured" stat */
-	if (p_ptr->stat_use[stat] < p_ptr->stat_top[stat] 
+	if (p_ptr->stat_use[stat] < p_ptr->stat_top[stat]
 		 || (p_ptr->stat_dec_tim[stat] && !p_ptr->stat_inc_tim[stat]))
 	{
 		if (show_sidebar)
@@ -142,10 +142,10 @@ static void prt_stat(int stat)
 		else
 		{
 			if (p_ptr->stat_dec_tim[stat] && !p_ptr->stat_inc_tim[stat])
-				c_put_str(TERM_ORANGE, stat_names_reduced_short[stat], 
+				c_put_str(TERM_ORANGE, stat_names_reduced_short[stat],
 							 ROW_STAT, COL_STAT + 3 * stat);
 			else
-				c_put_str(TERM_YELLOW, stat_names_reduced_short[stat], 
+				c_put_str(TERM_YELLOW, stat_names_reduced_short[stat],
 							 ROW_STAT, COL_STAT + 3 * stat);
 		}
 	}
@@ -168,7 +168,7 @@ static void prt_stat(int stat)
 				char stat_name[4];
 				sprintf(stat_name, "%.3s", stat_names[stat]);
 
-				c_put_str(TERM_L_BLUE, stat_name, 
+				c_put_str(TERM_L_BLUE, stat_name,
 							 ROW_STAT, COL_STAT + 3 * stat);
 	      }
 			else
@@ -257,11 +257,11 @@ static void prt_exp(void)
 	{
 		attr = TERM_YELLOW;
 	}
-	
+
 	/* On the main screen print additional experience needed to advance */
 	if (p_ptr->lev < PY_MAX_LEVEL)
 	{
-		exp_display = ((player_exp[p_ptr->lev - 1] 
+		exp_display = ((player_exp[p_ptr->lev - 1]
 				* p_ptr->expfact / 100L) -
 			       p_ptr->exp);
 		/*Print experience label*/
@@ -442,7 +442,7 @@ static void prt_depth(void)
 		sprintf(depths, "%d", p_ptr->depth);
 	}
 
-	if (COL_DEPTH == 0) 
+	if (COL_DEPTH == 0)
 	  put_str("DEPTH ", ROW_DEPTH, COL_DEPTH);
 	c_put_str(TERM_L_GREEN, format("%7s", depths), ROW_DEPTH, COL_DEPTH ? COL_DEPTH : COL_DEPTH + 5);
 
@@ -726,15 +726,15 @@ static char level_depth_str[5];
 
 static void print_level_depth(void)
 {
-  Term_putstr(level_depth_start, 
-	      SECOND_FROM_BOTTOM, -1, TERM_SLATE, 
+  Term_putstr(level_depth_start,
+	      SECOND_FROM_BOTTOM, -1, TERM_SLATE,
 	      level_depth_str);
 }
 
 static void print_level_name(void)
 {
-  Term_putstr(level_name_start, 
-	      SECOND_FROM_BOTTOM, -1, TERM_L_DARK, 
+  Term_putstr(level_name_start,
+	      SECOND_FROM_BOTTOM, -1, TERM_L_DARK,
 	      level_name_str);
 
   if (p_ptr->depth > 0)
@@ -747,8 +747,8 @@ static void wipe_level_name(void)
 
   if (p_ptr->depth > 0) {
     print_level_depth();
-    Term_putstr(level_depth_start - 3, 
-		SECOND_FROM_BOTTOM, -1, TERM_L_DARK, 
+    Term_putstr(level_depth_start - 3,
+		SECOND_FROM_BOTTOM, -1, TERM_L_DARK,
 		"Lev");
   }
 }
@@ -761,7 +761,7 @@ static void init_level_name(void)
     visible = TRUE;
 
     current_long_level_name(level_name_str);
- 
+
     if (p_ptr->depth > 0)
 		if (depth_in_feet) sprintf(level_depth_str, " %4d'", 50 * p_ptr->depth);
 		else sprintf(level_depth_str, " %2d", p_ptr->depth);
@@ -924,7 +924,14 @@ static void prt_poisoned(void)
 	if (p_ptr->poisoned)
 	{
 		pre_prt(COL_POISONED);
-		c_put_str(TERM_ORANGE, (show_sidebar ? "Poisoned" : "Pois"), ROW_POISONED, COL_POISONED);
+		if (p_ptr->slow_poison)
+		{
+			c_put_str(TERM_GREEN,  (show_sidebar ? "Relieved" : "Reli"), ROW_POISONED, COL_POISONED);
+		}
+		else
+		{
+			c_put_str(TERM_ORANGE, (show_sidebar ? "Poisoned" : "Pois"), ROW_POISONED, COL_POISONED);
+		}
 	}
 	else
 	{
@@ -1133,7 +1140,7 @@ void artifact_track(int a_idx)
 	make_fake_artifact(o_ptr, a_idx);
 
 	term_obj_real = FALSE;
-	
+
 	/* Window stuff */
 	p_ptr->window |= (PW_OBJECT);
 }
@@ -1151,7 +1158,7 @@ void object_kind_track(int k_idx)
 
 	term_obj_real = FALSE;
 	object_known(o_ptr);
-	
+
 	/* Window stuff */
 	p_ptr->window |= (PW_OBJECT);
 }
@@ -1342,7 +1349,7 @@ void lookup_prettyname(char *name, size_t name_s, int class, int style, int sval
 				}
 
 				if (sval < SV_BOOK_MAX_GOOD) my_strcpy(temp, mage_sval_name[sval], sizeof(temp));
-				
+
 				else if ((sval >= 32) && (sval < 36)) my_strcpy(temp,"Wizard", sizeof(temp));
 				else if ((sval >= 36) && (sval < 39)) my_strcpy(temp,"Druid", sizeof(temp));
 				else if ((sval >= 40) && (sval < 44)) my_strcpy(temp,"Master", sizeof(temp));
@@ -1457,7 +1464,7 @@ void lookup_prettyname(char *name, size_t name_s, int class, int style, int sval
 			if (style == WS_SLAY_DRAGON) my_strcpy(temp,"Dragonslayer", sizeof(temp));
 			if (style == WS_INSTRUMENT)
 			{
-				 if (long_name) my_strcpy(temp,"Standard-bearer", sizeof(temp)); 
+				 if (long_name) my_strcpy(temp,"Standard-bearer", sizeof(temp));
 				else my_strcpy(temp,"Standard", sizeof(temp));
 			}
 			if ((style == WS_PRAYER_BOOK) && (sval >= 0))
@@ -1624,7 +1631,7 @@ static void prt_frame_basic(void)
 		 || (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
 			  && p_ptr->pstyle != WS_MAGIC_BOOK
 			  && p_ptr->pstyle != WS_PRAYER_BOOK
-			  && p_ptr->pstyle != WS_SONG_BOOK)) 
+			  && p_ptr->pstyle != WS_SONG_BOOK))
 		prt_ac();
 
 	/* Hitpoints */
@@ -2254,7 +2261,7 @@ static void fix_help(void)
  *
  * We detect characters with the old data structures for spells
  * and correct them here.
- * 
+ *
  * In the new structure, all learned bits must be set contiguous
  * from bit 0 up.
  */
@@ -2284,8 +2291,8 @@ void calc_spells(void)
 
 	/* Paranoia -- ensure class is literate */
 	if (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
-		&& p_ptr->pstyle != WS_MAGIC_BOOK 
-		&& p_ptr->pstyle != WS_PRAYER_BOOK 
+		&& p_ptr->pstyle != WS_MAGIC_BOOK
+		&& p_ptr->pstyle != WS_PRAYER_BOOK
 		&& p_ptr->pstyle != WS_SONG_BOOK)
 		return;
 
@@ -2324,7 +2331,7 @@ void calc_spells(void)
 	/* Extract total allowed spells */
 	num_allowed = adj_mag_study[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_study]];
 
-	/* Scale down if below 'maximum' spell level */	
+	/* Scale down if below 'maximum' spell level */
 	if (levels < adj_mag_study_max[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_study]])
 	{
 		num_allowed = num_allowed * levels / adj_mag_study_max[p_ptr->stat_ind[c_info[p_ptr->pclass].spell_stat_study]];
@@ -2628,8 +2635,8 @@ static void calc_mana(void)
 
 	/* Do not show mana unless it matters */
 	if (pc_ptr->spell_first > PY_MAX_LEVEL
-		&& p_ptr->pstyle != WS_MAGIC_BOOK 
-		&& p_ptr->pstyle != WS_PRAYER_BOOK 
+		&& p_ptr->pstyle != WS_MAGIC_BOOK
+		&& p_ptr->pstyle != WS_PRAYER_BOOK
 		&& p_ptr->pstyle != WS_SONG_BOOK)
 		return;
 
@@ -2662,14 +2669,14 @@ static void calc_mana(void)
 	msp = adj_mag_mana[p_ptr->stat_ind[pc_ptr->spell_stat_mana]] * levels / 50;
 
 	/* Always ensure some mana */
-	if (levels > 0) msp++;	
+	if (levels > 0) msp++;
 
 	/* Increase mana based on reserve */
 	if (levels > 0)
 	{
 		if (p_ptr->reserves)
 		{
-			if (p_ptr->csp > adj_con_reserve[p_ptr->stat_ind[A_CON]]) 
+			if (p_ptr->csp > adj_con_reserve[p_ptr->stat_ind[A_CON]])
 			{
 				p_ptr->reserves = FALSE;
 				/* Message ??? */
@@ -2869,14 +2876,14 @@ static void calc_hitpoints(void)
 	/* Calculate the weight for males */
 	if (p_ptr->psex == SEX_MALE)
 	{
-		p_ptr->wt = 2 * rp_ptr->m_b_wt / 3 
+		p_ptr->wt = 2 * rp_ptr->m_b_wt / 3
 		  + rp_ptr->m_b_wt * p_ptr->stat_use[A_SIZ] / 268;
 	}
 
 	/* Calculate the weight for females */
 	else if (p_ptr->psex == SEX_FEMALE)
 	{
-		p_ptr->wt = 2 * rp_ptr->f_b_wt / 3 
+		p_ptr->wt = 2 * rp_ptr->f_b_wt / 3
 		  + rp_ptr->f_b_wt * p_ptr->stat_use[A_SIZ] / 268;;
 	}
 }
@@ -2941,9 +2948,9 @@ static void calc_torch(void)
 #endif
 		}
 		else
-		{	     
+		{
 			p_ptr->cur_lite = 1;
-		}	     
+		}
 	}
 
 	/* Player is glowing */
@@ -3016,7 +3023,7 @@ static int weight_limit(void)
  * styles, and most other benefits.
  * Note that bonuses for hit and damage for "weapons" and hit
  * bonuses for "bows" are not calculated here, nor are "power"
- * or "critical" benefits. 
+ * or "critical" benefits.
  *
  * Also calculates what weapon styles the character is currently
  * using.
@@ -3029,8 +3036,8 @@ static int weight_limit(void)
  * In particular, "book" styles are only checked for the "power"
  * benefit and backstab styles are only checked for the weapon
  * hit and damage and critical benefit.
- * However, we also don't check cur_style in the code where 
- * these style's benefits are given, so they work, 
+ * However, we also don't check cur_style in the code where
+ * these style's benefits are given, so they work,
  * although in limited contexts.
  *
  * For example
@@ -3130,7 +3137,7 @@ static void calc_bonuses(void)
 
 	/* Clear uncontrolled status */
 	p_ptr->uncontrolled = FALSE;
-	
+
 	/*** Extract race/class info ***/
 
 	/* Base infravision (purely racial) */
@@ -3259,7 +3266,7 @@ static void calc_bonuses(void)
 		  }
 		if (f1 & (TR1_INT)) p_ptr->stat_add[A_INT] += o_ptr->pval;
 		if (f1 & (TR1_WIS)) p_ptr->stat_add[A_WIS] += o_ptr->pval;
-		if (f1 & (TR1_DEX)) 
+		if (f1 & (TR1_DEX))
 		  {
 		    p_ptr->stat_add[A_DEX] += o_ptr->pval;
 		    p_ptr->stat_add[A_AGI] += o_ptr->pval;
@@ -3421,7 +3428,7 @@ static void calc_bonuses(void)
 	if (p_ptr->stat_ind[A_SIZ] > p_ptr->stat_ind[A_STR])
 	{
 	    int use, top, ind;
-	    
+
 	    p_ptr->siz_penalty = (p_ptr->stat_ind[A_SIZ] - p_ptr->stat_ind[A_STR]) / 2;
 
 		/* Extract the new "stat_top" value for the stat */
@@ -3766,7 +3773,7 @@ static void calc_bonuses(void)
 
 			/* Extra might */
 			p_ptr->ammo_mult += extra_might;
-			
+
 			/* Paranoia */
 			if (p_ptr->num_fire < 0) p_ptr->num_fire = 0;
 		}
@@ -3893,7 +3900,7 @@ static void calc_bonuses(void)
 	{
 		p_ptr->cur_style |= (1L << WS_UNARMED);
 	}
-	else 
+	else
 	{
 		/* One-handed if less than 20 lbs */
 		if (o_ptr->weight < 200) p_ptr->cur_style |= (1L << WS_ONE_HANDED);
@@ -3932,10 +3939,10 @@ static void calc_bonuses(void)
 	}
 
 	/* Charging multiplier */
-	if (p_ptr->cur_style & (1L << WS_UNARMED) 
-	    && p_ptr->wt >= 2 * cp_ptr->chg_weight) 
+	if (p_ptr->cur_style & (1L << WS_UNARMED)
+	    && p_ptr->wt >= 2 * cp_ptr->chg_weight)
 	  p_ptr->num_charge = p_ptr->wt / cp_ptr->chg_weight;
-	else if (o_ptr->weight >= 2 * cp_ptr->chg_weight) 
+	else if (o_ptr->weight >= 2 * cp_ptr->chg_weight)
 	  p_ptr->num_charge = o_ptr->weight / cp_ptr->chg_weight;
 	else
 	  p_ptr->num_charge = 1;
@@ -3986,7 +3993,7 @@ static void calc_bonuses(void)
 			}
 		}
 	}
-	
+
 	/* Check fighting styles */
 	o_ptr = &inventory[INVEN_ARM];
 
@@ -4015,7 +4022,7 @@ static void calc_bonuses(void)
 			case TV_SWORD:
 			case TV_STAFF:
 			{
-				if (!(p_ptr->cur_style & (1L << WS_UNARMED))) 
+				if (!(p_ptr->cur_style & (1L << WS_UNARMED)))
 				{
 					p_ptr->cur_style |= (1L << WS_TWO_WEAPON);
 
@@ -4030,7 +4037,7 @@ static void calc_bonuses(void)
 	}
 
 	/* Can get as low as 0 */
-	p_ptr->num_charge = MIN(p_ptr->num_charge, 
+	p_ptr->num_charge = MIN(p_ptr->num_charge,
 				adj_charge_siz[p_ptr->stat_ind[A_SIZ]]);
 
 	/*** Handle style benefits ***/
@@ -4048,7 +4055,7 @@ static void calc_bonuses(void)
 				/* Or if the character does not have a melee/missile/thrown style,
 				 * match the none style instead */
 				((w_info[i].styles == (1L << WS_NONE)) &&
-						(((1L << p_ptr->pstyle) & (WS_NON_WIELD_FLAGS)) != 0)))				
+						(((1L << p_ptr->pstyle) & (WS_NON_WIELD_FLAGS)) != 0)))
 		{
 			switch (w_info[i].benefit)
 			{
@@ -4073,11 +4080,11 @@ static void calc_bonuses(void)
 					break;
 
 				case WB_SHOT:
-					if ( w_info[i].styles & p_ptr->cur_style 
+					if ( w_info[i].styles & p_ptr->cur_style
 						 & (1L << p_ptr->pstyle) & (WS_THROWN_FLAGS) )
 						p_ptr->num_throw++;
 					if (!p_ptr->heavy_shoot
-						&& (w_info[i].styles & p_ptr->cur_style 
+						&& (w_info[i].styles & p_ptr->cur_style
 							& (1L << p_ptr->pstyle)	& WS_LAUNCHER_FLAGS))
 						p_ptr->num_fire++;
 					break;
@@ -4381,7 +4388,7 @@ void update_stuff(void)
 void redraw_stuff(void)
 {
 	/* Hack -- recompute show status line */
-	
+
 
 	/* Redraw stuff */
 	if (!p_ptr->redraw) return;
@@ -4503,7 +4510,7 @@ void redraw_stuff(void)
 			 || (c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL
 				  && p_ptr->pstyle != WS_MAGIC_BOOK
 				  && p_ptr->pstyle != WS_PRAYER_BOOK
-				  && p_ptr->pstyle != WS_SONG_BOOK)) 
+				  && p_ptr->pstyle != WS_SONG_BOOK))
 			prt_ac();
 	}
 

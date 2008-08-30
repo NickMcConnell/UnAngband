@@ -1311,7 +1311,7 @@ static void process_world(void)
 	}
 
 	/* Take damage from poison */
-	if (p_ptr->poisoned)
+	if ((p_ptr->poisoned) && (!p_ptr->slow_poison))
 	{
 		/* Take damage */
 		take_hit(SOURCE_POISON, 0, 1);
@@ -1371,7 +1371,7 @@ static void process_world(void)
 			if (p_ptr->regen_mana > 0) i += 30 * p_ptr->regen_mana;
 
 			/* Slow digestion takes less food */
-			if ((p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
+			if ((p_ptr->slow_digest) || (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
 
 			/* Minimal digestion */
 			if (i < 1) i = 1;
@@ -1465,7 +1465,7 @@ static void process_world(void)
 
 	/* Various things interfere with healing */
 	if (p_ptr->paralyzed) regen_amount = 0;
-	if (p_ptr->poisoned) regen_amount = 0;
+	if ((p_ptr->poisoned)  && (!p_ptr->slow_poison)) regen_amount = 0;
 	if (p_ptr->stun) regen_amount = 0;
 	if (p_ptr->cut) regen_amount = 0;
 	if (p_ptr->disease & (DISEASE_DRAIN_HP)) regen_amount = 0;
@@ -1667,7 +1667,7 @@ static void process_world(void)
 	/*** Poison and Stun and Cut ***/
 
 	/* Poison */
-	if (p_ptr->poisoned)
+	if ((p_ptr->poisoned) && (!p_ptr->slow_poison))
 	{
 		int adjust = (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
 
