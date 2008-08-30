@@ -336,7 +336,7 @@ static cptr blow_info_flags2[] =
 	"",
 	"",
 	"",
-	""	
+	""
 };
 
 
@@ -488,6 +488,7 @@ static cptr r_info_blow_effect[] =
 	"TANGLE",
 	"POISON_WATER",
 	"INVISIBILITY",
+	"DELAY_POISON",
 	NULL
 };
 
@@ -1321,11 +1322,11 @@ static cptr s_info_flags3[] =
 	"CURE_EXP",
 	"FREE_ACT",
 	"CURE_MEM",
-	"SLOW_CURSE",
+	"PFIX_CURSE",
 	"CURE_CURSE",
-	"SLOW_CUTS",
+	"PFIX_CUTS",
 	"CURE_CUTS",
-	"SLOW_STUN",
+	"PFIX_STUN",
 	"CURE_STUN",
 	"CURE_POIS",
 	"CURE_CONF",
@@ -1361,8 +1362,8 @@ static cptr s_info_types[] =
 	"EARTHQUAKE",
 	"DESTRUCTION",
 	"CURE_DISEASE",
-	"SLOW_CONF",
-	"SLOW_POIS",
+	"PFIX_CONF",
+	"PFIX_POIS",
 	"IDENT_PACK",
 	"CHANGE_SHAPE",
 	"REVERT_SHAPE",
@@ -1402,6 +1403,9 @@ static cptr s_info_types[] =
 	"DAMAGING_BLOW",
 	"DAMAGING_SHOT",
 	"DAMAGING_HURL",
+	"SLOW_POIS",
+	"SLOW_DIGEST",
+	"SLOW_META",
 	NULL
 };
 
@@ -1546,7 +1550,7 @@ static bool add_text(u32b *offset, header *head, cptr buf)
 	if (*offset == 0)
 	{
 		/* Advance and save the text index */
-		*offset = ++head->text_size;	
+		*offset = ++head->text_size;
 	}
 
 	/* Append chars to the text */
@@ -1582,7 +1586,7 @@ static u32b add_name(header *head, cptr buf)
 
 	/* Advance the index */
 	head->name_size += strlen(buf);
-	
+
 	/* Return the name index */
 	return (index);
 }
@@ -2009,14 +2013,14 @@ errr parse_v_info(char *buf, header *head)
 static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 {
 	int i;
-	
+
 	/* Check flags */
 	for (i = 0; i < 32; i++)
 	{
 		if (streq(what, names[i]))
 		{
 			*flags |= (1L << i);
-			
+
 			return (0);
 		}
 	}
@@ -2039,37 +2043,37 @@ static errr grab_one_blow_flag(blow_type *blow_ptr, cptr what)
 	/* Oops */
 	msg_format("Unknown blow flag '%s'.", what);
 
-	/* Error */			
+	/* Error */
 	return (PARSE_ERROR_GENERIC);
-	
+
 	return (0);
 }
 
 
 /*
-* Grab one level scalar from a textual string 		 
-*/ 		 
-static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what) 		 
-{ 		 
-	char *s, *t, *u; 		 
-	  		 
-	/* Start at start of string */ 		 
-	s = what; 		 
-	  		 
+* Grab one level scalar from a textual string
+*/
+static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
+{
+	char *s, *t, *u;
+
+	/* Start at start of string */
+	s = what;
+
 	/* Find either a plus or slash */
 	for (t = s; *t && (*t != '+') && (*t != '/'); ++t) /* loop */;
 
 	/* Find a slash */
 	for (u = s; *u && (*u != '/'); ++u) /* loop */;
-	
+
 	/* No plus sign */
 	if (*t == '/')
 	{
 		/* Move t backwards */
 		t = s;
-		
+
 		/* Find the end of line */
-		for (; *s && (*s != '\n'); ++s) /* loop */;			
+		for (; *s && (*s != '\n'); ++s) /* loop */;
 	}
 	/* Prepare t */
 	else if (*t == '+')
@@ -2077,7 +2081,7 @@ static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
 		/* Nuke plus sign and advance */
 		*t++ = '\0';
 	}
-	
+
 	/* Prepare u */
 	if (*u == '/')
 	{
@@ -2089,8 +2093,8 @@ static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
 	scalar->base = atoi(s);
 	scalar->gain = atoi(t);
 	scalar->levels = atoi(u);
-	
-	return (0); 		 
+
+	return (0);
 }
 
 /*
@@ -2138,9 +2142,9 @@ errr parse_blow_info(char *buf, header *head)
 		/* Store the name */
 		if (!(blow_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
-		
+
 		/* Set some values */
-		blow_ptr->max_range = MAX_SIGHT;		
+		blow_ptr->max_range = MAX_SIGHT;
 	}
 
 	/* Hack -- Process 'F' for flags */
@@ -2174,7 +2178,7 @@ errr parse_blow_info(char *buf, header *head)
 	else if (buf[0] == 'T')
 	{
 		int n1;
-		
+
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -2191,11 +2195,11 @@ errr parse_blow_info(char *buf, header *head)
 		{
 			/* Nuke minus size and advance */
 			*t++ = '\0';
-			
+
 			blow_ptr->desc[n1].max = atoi(t);
-			
+
 			/* Find the colon */
-			for (; *t && (*t != ':'); ++t) /* loop */;			
+			for (; *t && (*t != ':'); ++t) /* loop */;
 		}
 		else
 		{
@@ -2211,10 +2215,10 @@ errr parse_blow_info(char *buf, header *head)
 
 		/* Hack -- allow greater than */
 		if (*s == '>') *s++;
-		
+
 		/* Parse min */
 		blow_ptr->desc[n1].min = atoi(s);
-		
+
 		/* Store the description */
 		if (!(add_text(&(blow_ptr->desc[n1].text), head, t)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
@@ -2224,7 +2228,7 @@ errr parse_blow_info(char *buf, header *head)
 	else if (buf[0] == 'I')
 	{
 		int mana, best, max;
-		
+
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -2235,16 +2239,16 @@ errr parse_blow_info(char *buf, header *head)
 		/* Save the values */
 		blow_ptr->mana_cost = mana;
 		blow_ptr->best_range = best;
-		blow_ptr->max_range = max;		
+		blow_ptr->max_range = max;
 	}
-	
+
 	/* Process 'D' for "Damage" */
 	else if (buf[0] == 'D')
 	{
 		int mult, div, var, max;
 		int n, n1;
 		char *s;
-		
+
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -2255,19 +2259,19 @@ errr parse_blow_info(char *buf, header *head)
 			s++;
 			if (*s == ':') n++;
 		}
-		
+
 		/* Nuke colon and advance */
 		*s++ = '\0';
-		
+
 		/* Analyze the effect */
 		for (n1 = 0; r_info_blow_effect[n1]; n1++)
 		{
 			if (streq(s, r_info_blow_effect[n1])) break;
 		}
-		
+
 		/* Save the value */
 		blow_ptr->d_res = n1;
-		
+
 		/* Scan for the values */
 		if (4 != sscanf(buf, "D:%d:%d:%d:%d",
 			    &mult, &div, &var, &max)) return (PARSE_ERROR_GENERIC);
@@ -2275,15 +2279,15 @@ errr parse_blow_info(char *buf, header *head)
 		/* Save the values */
 		blow_ptr->dam_mult = mult;
 		blow_ptr->dam_div = div;
-		blow_ptr->dam_var = var;		
-		blow_ptr->dam_max = max;		
+		blow_ptr->dam_var = var;
+		blow_ptr->dam_max = max;
 	}
-	
+
 	/* Process 'C' for "Choice" */
 	else if (buf[0] == 'C')
 	{
 		int base, summ, hurt, mana, esc, tact, range;
-		
+
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -2294,18 +2298,18 @@ errr parse_blow_info(char *buf, header *head)
 		/* Save the values */
 		blow_ptr->d_base = base;
 		blow_ptr->d_summ = summ;
-		blow_ptr->d_hurt = hurt;		
+		blow_ptr->d_hurt = hurt;
 		blow_ptr->d_mana = mana;
 		blow_ptr->d_esc = esc;
 		blow_ptr->d_tact = tact;
-		blow_ptr->d_range = range;		
+		blow_ptr->d_range = range;
 	}
 
 	/* Process 'A' for "Arc" */
 	else if (buf[0] == 'A')
 	{
 		int arc, dia, deg;
-		
+
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -2316,9 +2320,9 @@ errr parse_blow_info(char *buf, header *head)
 		/* Save the values */
 		blow_ptr->arc = arc;
 		blow_ptr->diameter_of_source = dia;
-		blow_ptr->degree_factor = deg;		
+		blow_ptr->degree_factor = deg;
 	}
-	
+
 	/* Process 'R' for "Radius" */
 	else if (buf[0] == 'R')
 	{
@@ -2328,7 +2332,7 @@ errr parse_blow_info(char *buf, header *head)
 		/* Get the radius information */
 		if (grab_one_level_scalar(&blow_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
-	
+
 	/* Process 'U' for "Number" */
 	else if (buf[0] == 'U')
 	{
@@ -2338,7 +2342,7 @@ errr parse_blow_info(char *buf, header *head)
 		/* Get the radius information */
 		if (grab_one_level_scalar(&blow_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
-	
+
 	else
 	{
 		/* Oops */
@@ -2347,7 +2351,7 @@ errr parse_blow_info(char *buf, header *head)
 
 	/* Success */
 	return (0);
-	
+
 }
 
 
@@ -2422,7 +2426,7 @@ static errr grab_one_place_flag(desc_type *d_ptr, cptr what)
 	/* Oops */
 	msg_format("Unknown room generate flag '%s'.", what);
 
-	/* Error */			
+	/* Error */
 	return (PARSE_ERROR_GENERIC);
 }
 
@@ -2438,7 +2442,7 @@ static errr grab_one_level_flag(desc_type *d_ptr, cptr what)
 	/* Oops */
 	msg_format("Unknown room level flag '%s'.", what);
 
-	/* Error */			
+	/* Error */
 	return (PARSE_ERROR_GENERIC);
 }
 
@@ -2707,7 +2711,7 @@ errr parse_d_info(char *buf, header *head)
 
 		/* Save the values */
 		d_ptr->feat = feat;
-		
+
 		/* Set the themes */
 		for (k = 0; k < MAX_THEMES; k++)
 		{
@@ -2722,9 +2726,9 @@ errr parse_d_info(char *buf, header *head)
 			if (f_info[d_ptr->theme[k]].flags3 & (FF3_LIVING)) d_ptr->l_flag |= LF1_LIVING;
 
 			if (f_info[d_ptr->theme[k]].flags2 & (FF2_ICE | FF2_WATER | FF2_LAVA | FF2_ACID | FF2_OIL | FF2_CHASM)) d_ptr->not_chance = 0;
-			if (f_info[d_ptr->theme[k]].flags3 & (FF3_LIVING)) d_ptr->not_chance = 0;		
+			if (f_info[d_ptr->theme[k]].flags3 & (FF3_LIVING)) d_ptr->not_chance = 0;
 		}
-		
+
 		/* Hack -- ensure we have correct level flags */
 		if (f_info[d_ptr->feat].flags2 & (FF2_ICE)) d_ptr->l_flag |= LF1_ICE;
 		if (f_info[d_ptr->feat].flags2 & (FF2_WATER)) d_ptr->l_flag |= LF1_WATER;
@@ -2733,7 +2737,7 @@ errr parse_d_info(char *buf, header *head)
 		if (f_info[d_ptr->feat].flags2 & (FF2_OIL)) d_ptr->l_flag |= LF1_OIL;
 		if (f_info[d_ptr->feat].flags2 & (FF2_CHASM)) d_ptr->l_flag |= LF1_CHASM;
 		if (f_info[d_ptr->feat].flags3 & (FF3_LIVING)) d_ptr->l_flag |= LF1_LIVING;
-	
+
 		/* Ensure that level flags must occur */
 		if (f_info[d_ptr->feat].flags2 & (FF2_ICE | FF2_WATER | FF2_LAVA | FF2_ACID | FF2_OIL | FF2_CHASM)) d_ptr->not_chance = 0;
 		if (f_info[d_ptr->feat].flags3 & (FF3_LIVING)) d_ptr->not_chance = 0;
@@ -2973,7 +2977,7 @@ errr parse_f_info(char *buf, header *head)
 		f_ptr->d_attr = tmp;
 		f_ptr->d_char = buf[2];
 	}
-	
+
 	/* Hack -- Process 'F' for flags */
 	else if (buf[0] == 'F')
 	{
@@ -3018,7 +3022,7 @@ errr parse_f_info(char *buf, header *head)
 	else if (buf[0] == 'W')
 	{
 		int level, rarity, priority,edge;
-		
+
 		/* There better be a current f_ptr */
 		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -3061,7 +3065,7 @@ errr parse_f_info(char *buf, header *head)
 		{
 			/* Reset */
 			f_ptr->state[i].action = 0;
-			
+
 			/* Parse this entry */
 			if (0 != grab_one_feat_action(f_ptr, s, i)) return (PARSE_ERROR_INVALID_FLAG);
 
@@ -3975,7 +3979,7 @@ errr parse_e_info(char *buf, header *head)
 errr parse_x_info(char *buf, header *head)
 {
 	int i;
-	
+
 	/* Current entry */
 	static flavor_type *x_ptr;
 
@@ -4206,7 +4210,7 @@ errr parse_r_info(char *buf, header *head)
 		  {
 		    int blows = 0;
 
-		    for (i = 0; i < 4; i++) 
+		    for (i = 0; i < 4; i++)
 		      if (r_ptr->blow[i].method > 0
 			  && r_ptr->blow[i].method <= RBM_MAX_NORMAL)
 			blows++;
@@ -4274,7 +4278,7 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
-						&lev, &rar, &grp, &exp)) 
+						&lev, &rar, &grp, &exp))
 			return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
@@ -4295,9 +4299,9 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Scan for the values */
 		if (5 != sscanf(buf+2, "%d:%d:%d:%ld:%ld",
-						&lev, &rar, &grp, &exp, &fexp)) 
+						&lev, &rar, &grp, &exp, &fexp))
 			return (PARSE_ERROR_GENERIC);
-		
+
 		/* Ignore the repeated values */
 		r_ptr->calculated_level = lev;
 		r_ptr->calculated_mexp = exp;
@@ -4321,7 +4325,7 @@ errr parse_r_info(char *buf, header *head)
 		r_ptr->freq_spell = spell;
 		/* No more spellcasters with no spell power */
 		r_ptr->spell_power = MAX(1 + r_ptr->level / 10, power);
-		if (mana > 250) 
+		if (mana > 250)
 			return (PARSE_ERROR_MISSING_RECORD_HEADER);
 		r_ptr->mana = mana;
 	}
@@ -4421,10 +4425,10 @@ errr parse_r_info(char *buf, header *head)
 
 		/* Catch fraudulent NEVER_BLOW monsters */
 		if (r_ptr->flags1 & RF1_NEVER_BLOW)
-		  for (i = 0; i < 4; i++) 
+		  for (i = 0; i < 4; i++)
 		    if (r_ptr->blow[i].method > 0
 			&& r_ptr->blow[i].method <= RBM_MAX_NORMAL)
-		      return (PARSE_ERROR_GENERIC);		  
+		      return (PARSE_ERROR_GENERIC);
 	}
 
 	/* Process 'S' for "Spell Flags" (multiple lines) */
@@ -4604,7 +4608,7 @@ errr parse_p_info(char *buf, header *head)
 		if (!add_text(&pr_ptr->text, head, s))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
-	
+
 	/* Process 'S' for "Stats" (one line only) */
 	else if (buf[0] == 'S')
 	{
@@ -5045,7 +5049,7 @@ errr parse_c_info(char *buf, header *head)
 		/* Store the text */
 		if (!add_text(&pc_ptr->title[cur_title], head, s))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
-		
+
 		/* Next title */
 		cur_title++;
 
@@ -5415,14 +5419,14 @@ errr parse_s_info(char *buf, header *head)
 		if (i==MAX_SPELL_APPEARS) return (PARSE_ERROR_GENERIC);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf+2, "%d:%d:%d",&tval,&sval,&slot)) return (PARSE_ERROR_GENERIC);		
+		if (3 != sscanf(buf+2, "%d:%d:%d",&tval,&sval,&slot)) return (PARSE_ERROR_GENERIC);
 
 		/* Hack to remove in the future: ignore runestones from older versions */
 		if (tval == TV_RUNESTONE)
 			return 0;
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
-		/* Debug: check if objects tval, sval exist, 
+		/* Debug: check if objects tval, sval exist,
 			except shapechanges and WIP books;
 			is slow, so only enabled if generating templates */
 		if (tval != 97 && tval != 91 && !lookup_kind(tval, sval))
@@ -5434,23 +5438,23 @@ errr parse_s_info(char *buf, header *head)
 		{
 			/* Point at the "info" */
 			spell_type *s2_ptr = (spell_type*)head->info_ptr + j;
-			
+
 			/* Find the next empty appears slot (if any) */
 			for (k = 0; k < MAX_SPELL_APPEARS; k++)
 			{
 				if (!s2_ptr->appears[k].tval) break;
-				
+
 				/* Check if same book */
 				if ((s2_ptr->appears[k].tval == tval) &&
 					(s2_ptr->appears[k].sval == sval))
 				{
 					if (last_slot < s2_ptr->appears[k].slot) last_slot = s2_ptr->appears[k].slot;
-					
+
 					if (s2_ptr->appears[k].slot == slot) collision = TRUE;
 				}
 			}
 		}
-		
+
 		/* If collision, get the next slot */
 		/* return (PARSE_ERROR_GENERIC); */
 		slot = last_slot + 1;
@@ -5577,19 +5581,19 @@ errr parse_s_info(char *buf, header *head)
 
 		/* Advance */
 		s = t;
-		
+
 		/* Find a left bracket */
 		for (; *t && (*t != '('); ++t) /* loop */;
 
 		/* Find a slash */
 		for (u = s; *u && (*u != '/'); ++u) /* loop */;
-		
+
 		/* Find a plus before a left bracket */
 		for (v = s; *v && (*v != '+') && (*v != '('); ++v) /* loop */;
 
 		/* Find a plus following t */
 		for (w = t; *w && (*w != '+'); ++w) /* loop */;
-		
+
 		/* Prepare t */
 		if (*t == '(')
 		{
@@ -5599,12 +5603,12 @@ errr parse_s_info(char *buf, header *head)
 		else if (*u == '/')
 		{
 			char *t1 = t;
-			
+
 			/* Move t backwards */
 			if (*v == '+')
 			{
 				*v++ = '\0';
-				
+
 				/* Swap around */
 				t = v;
 			}
@@ -5616,21 +5620,21 @@ errr parse_s_info(char *buf, header *head)
 				s = t1;
 			}
 		}
-		
+
 		/* Prepare u */
 		if (*u == '/')
 		{
 			/* Nuke divisor and advance */
 			*u++ = '\0';
 		}
-		
+
 		/* Prepare v */
 		if (*v == '+')
 		{
 			/* Nuke divisor and advance */
 			*v++ = '\0';
 		}
-		
+
 		/* Prepare v */
 		if (*v == '(')
 		{
@@ -5656,7 +5660,7 @@ errr parse_s_info(char *buf, header *head)
 		{
 			s_ptr->blow[i].d_dice = tmp1;
 			s_ptr->blow[i].d_side = tmp2;
-			s_ptr->blow[i].d_plus = atoi(v); 
+			s_ptr->blow[i].d_plus = atoi(v);
 		}
 		else s_ptr->blow[i].d_plus = atoi(s);
 
@@ -5665,12 +5669,12 @@ errr parse_s_info(char *buf, header *head)
 		{
 			s_ptr->blow[i].l_dice = tmp1;
 			s_ptr->blow[i].l_side = tmp2;
-			s_ptr->blow[i].l_plus = atoi(w); 
-		}	
+			s_ptr->blow[i].l_plus = atoi(w);
+		}
 		else s_ptr->blow[i].l_plus = atoi(t);
 
 		/* Get levels */
-		s_ptr->blow[i].levels = atoi(u);		
+		s_ptr->blow[i].levels = atoi(u);
 	}
 
 	/* Process 'S' for "Spell" */
@@ -5700,7 +5704,7 @@ errr parse_s_info(char *buf, header *head)
 		s_ptr->type=n1;
 
 		/* Store the parameter */
-		s_ptr->param=atoi(t); 
+		s_ptr->param=atoi(t);
 
 	}
 
@@ -5899,7 +5903,7 @@ static errr grab_one_town_race_flag(town_type *t_ptr, cptr what)
 
 static bool monster_not_unique(int monster_id)
 {
-	return monster_id && !(r_info[monster_id].name 
+	return monster_id && !(r_info[monster_id].name
 						   && r_info[monster_id].flags1 & RF1_UNIQUE);
 }
 
@@ -6015,7 +6019,7 @@ errr parse_t_info(char *buf, header *head)
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (2 != sscanf(buf+2, "%d:%d", &quest_opens, &quest_monster)) 
+		if (2 != sscanf(buf+2, "%d:%d", &quest_opens, &quest_monster))
 			return (PARSE_ERROR_GENERIC);
 
 		if (monster_not_unique(quest_monster))
@@ -6044,7 +6048,7 @@ errr parse_t_info(char *buf, header *head)
 		t_ptr->town_lockup_monster = town_lockup_monster;
 		t_ptr->town_lockup_ifvisited = town_lockup_ifvisited;
 	}
-	
+
 	/* Process 'W' for "Replace guardian by" (one line only) */
 	else if (buf[0] == 'W')
 	{
@@ -6062,8 +6066,8 @@ errr parse_t_info(char *buf, header *head)
 		/* Save the values */
 		t_ptr->replace_guardian = replace_guardian;
 		t_ptr->guardian_ifvisited = guardian_ifvisited;
-	}	
-	
+	}
+
 	/* Process 'Z' for "Replace by" (one line only) */
 	else if (buf[0] == 'Z')
 	{
@@ -6079,7 +6083,7 @@ errr parse_t_info(char *buf, header *head)
 		t_ptr->replace_with = replace_with;
 		t_ptr->replace_ifvisited = replace_ifvisited;
 	}
-	
+
 	/* Process 'L' for "Levels" (up to four lines) */
 	else if (buf[0] == 'L')
 	{
@@ -6232,7 +6236,7 @@ errr parse_u_info(char *buf, header *head)
 
 		/* Save the index into the store structure */
 		u_ptr->index = i;
-		
+
 		/* Reset the store */
 		cur_t = 0;
 		cur_w = 0;
@@ -6247,7 +6251,7 @@ errr parse_u_info(char *buf, header *head)
 		if (1 != sscanf(buf+2, "%d", &base)) return (PARSE_ERROR_GENERIC);
 
 		u_ptr->base = base;
-		
+
 		/* Switch on the store */
 		switch (u_ptr->base)
 		{
@@ -6307,7 +6311,7 @@ errr parse_u_info(char *buf, header *head)
 				u_ptr->tvals_will_buy[2] = TV_POTION;
 				u_ptr->tvals_will_buy[3] = TV_HAFTED;
 				u_ptr->tvals_will_buy[4] = TV_STATUE;
-				u_ptr->tvals_will_buy[5] = TV_SHOT;				
+				u_ptr->tvals_will_buy[5] = TV_SHOT;
 				/*u_ptr->tvals_will_buy[6] = TV_POLEARM; Was blessed only */
 				/*u_ptr->tvals_will_buy[7] = TV_SWORD; Was blessed only */
 				break;
@@ -6359,7 +6363,7 @@ errr parse_u_info(char *buf, header *head)
 		/* increase counter for 'possible tval' index */
 		cur_t++;
 	}
-	
+
 	/* Process 'B' for "Buy" (up to sixteen lines) */
 	else if (buf[0] == 'B')
 	{
@@ -6377,7 +6381,7 @@ errr parse_u_info(char *buf, header *head)
 		/* increase counter for 'possible tval' index */
 		cur_w++;
 	}
-	
+
 	else
 	{
 		/* Oops */
@@ -6684,7 +6688,7 @@ errr parse_q_info(char *buf, header *head)
 
 		/* Paranoia */
 		if (stage >= MAX_QUEST_EVENTS) return (PARSE_ERROR_TOO_MANY_ENTRIES);
-		
+
 		/* Point at the first event */
 		qe_ptr = &q_ptr->event[stage];
 
@@ -6726,7 +6730,7 @@ errr parse_q_info(char *buf, header *head)
 	else if (buf[0] == 'T')
 	{
 		int dungeon, level, store;
-		
+
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -6755,7 +6759,7 @@ errr parse_q_info(char *buf, header *head)
 		/* Save the values */
 		qe_ptr->artifact = artifact;
 	}
-	
+
 	/* Process 'Q' for "Quest" (one line per stage) */
 	else if (buf[0] == 'Q')
 	{
@@ -6792,7 +6796,7 @@ errr parse_q_info(char *buf, header *head)
 	else if (buf[0] == 'K')
 	{
 		int kind;
-		
+
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -6808,7 +6812,7 @@ errr parse_q_info(char *buf, header *head)
 	else if (buf[0] == 'E')
 	{
 		int ego_item_type;
-		
+
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -6892,7 +6896,7 @@ errr parse_q_info(char *buf, header *head)
 	else if (buf[0] == 'W')
 	{
 		int experience, power, gold;
-		
+
 		/* There better be a current q_ptr */
 		if (!q_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -7096,7 +7100,7 @@ static int threat_mod(int threat, monster_race *r_ptr, bool ranged)
 	 */
 	if (r_ptr->flags2 & (RF2_MULTIPLY))
 		threat += threat * extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 5;
-	
+
 	return (threat);
 }
 
@@ -7125,10 +7129,10 @@ static long eval_max_dam(monster_race *r_ptr)
 
 	/*clear the counters*/
 	melee_dam = atk_dam = spell_dam = spell_dam_real = 0;
-	
+
 	/* Get hitpoints for later modification */
 	hp = r_ptr->hp;
-	
+
 	/* Extract the monster level, force 1 for town monsters */
 	rlev = r_ptr->level ? r_ptr->level : 1;
 
@@ -7348,7 +7352,7 @@ static long eval_max_dam(monster_race *r_ptr)
 						/* Slight bonus for being powerful */
 						if (r_ptr->flags2 & (RF2_POWERFUL)) this_dam = this_dam * 8 / 7;
 					}
-					
+
 					real_dam = TRUE;
 				}
 
@@ -7382,9 +7386,9 @@ static long eval_max_dam(monster_race *r_ptr)
 							break;
 						}
 					}
-					
+
 					real_dam = TRUE;
-					
+
 					/* Hack - handle Wound spell differently */
 					if ((x == 2) && (i == 20))
 					{
@@ -7435,7 +7439,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					case 3:
 					{
 						bool escalate = TRUE;
-						
+
 						/*Right now all flag7 are summon spells*/
 						/* All summons are assigned arbitrary values according to their levels*/
 						if 		(flag_counter == RF7_S_KIN) 	this_dam = rlev * 2 + 20;
@@ -7531,8 +7535,8 @@ static long eval_max_dam(monster_race *r_ptr)
 
 				/* Adjust frequency for mana -
 				   -- casters that can add mana and need to do so */
-				if ((r_ptr->flags6 & (RF6_ADD_MANA)) 
-					&& need_mana 
+				if ((r_ptr->flags6 & (RF6_ADD_MANA))
+					&& need_mana
 					&& (freq > r_ptr->mana * 10 / need_mana))
 				{
 					freq = (freq + r_ptr->mana * 10 / need_mana) / 2;
@@ -7546,7 +7550,7 @@ static long eval_max_dam(monster_race *r_ptr)
 
 				/* Hack -- always get 1 shot */
 				if (freq < 10) freq = 10;
-				
+
 				/* Paranoia -- maximum of 10 shots */
 				if (freq > 100) freq = 100;
 
@@ -7558,7 +7562,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (this_dam > spell_dam)
 			{
 				spell_dam = this_dam;
-				if (this_dam > 2 * spell_dam_real) 
+				if (this_dam > 2 * spell_dam_real)
 					r_ptr->best_spell = 96 + x * 32 + i;
 			}
 
@@ -7589,8 +7593,8 @@ static long eval_max_dam(monster_race *r_ptr)
 			if (!method) continue;
 
 			/* Multiply average damage by 2 to simplify calculations */
-			atk_dam = eval_blow_effect(effect, 
-									   d_dice * (d_side + 1), 
+			atk_dam = eval_blow_effect(effect,
+									   d_dice * (d_side + 1),
 									   rlev);
 
 			switch (method)
@@ -7620,7 +7624,7 @@ static long eval_max_dam(monster_race *r_ptr)
 					shriek = TRUE;
 					break;
 				}
-				default: 
+				default:
 				{
 					if ((effect == GF_WOUND) || (effect == GF_BATTER))
 					{
@@ -7771,10 +7775,10 @@ static long eval_max_dam(monster_race *r_ptr)
 				/* Adjust frequency for ammo */
 				freq = MIN(freq, has_ammo * 5);
 
-				/* Adjust frequency for mana 
+				/* Adjust frequency for mana
 				   --- casters that can add mana and need to do so */
-				if ((r_ptr->flags6 & (RF6_ADD_MANA)) 
-					&& mana 
+				if ((r_ptr->flags6 & (RF6_ADD_MANA))
+					&& mana
 					&& freq > r_ptr->mana * 10 / mana)
 				{
 					freq = (freq + r_ptr->mana * 10 / mana) / 2;
@@ -7807,7 +7811,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			}
 
 			/* Hack -- aura is extra tough in melee */
-			if (method == RBM_AURA) 
+			if (method == RBM_AURA)
 			{
 				/* Keep a running total */
 				melee_dam += 2 * atk_dam;
@@ -7821,7 +7825,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			r_ptr->best_threat = 0;
 		}
 
-		/* 
+		/*
 		 * Apply damage over 10 rounds. We assume that the monster has to make contact first.
 		 * Hack - speed has more impact on melee as has to stay in contact with player.
 		 * Hack - this is except for pass wall and kill wall monsters which can always get to the player.
@@ -7894,7 +7898,7 @@ static long eval_max_dam(monster_race *r_ptr)
 
 	if (dam < spell_dam_real) dam = spell_dam_real;
 	if (dam < melee_dam) dam = melee_dam;
-	
+
 	/*
 	 * Limit 'unreal' spell damage boost
 	 */
@@ -7921,7 +7925,7 @@ static long eval_max_dam(monster_race *r_ptr)
 	 */
 	/* Shriek applies here */
 	if (shriek) r_ptr->highest_threat *= 2;
-		
+
 	/* Invisibility increases overall threat */
 	else if (r_ptr->flags2 & (RF2_INVISIBLE)) r_ptr->highest_threat = r_ptr->highest_threat * 3 / 2;
 
@@ -7940,10 +7944,10 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	int resists = 1;
 	int ac = 0;
 	int hide_bonus = 0;
-	
+
 	/* Get hit points for later modification */
 	raw_hp = r_ptr->hp;
-	
+
 	hp = raw_hp;
 
 	/* Never moves with no ranged attacks - high hit points count for less */
@@ -7988,9 +7992,9 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/*
  	 * Monsters that multiply are tougher to kill and each takes a blow
 	 */
-	if (r_ptr->flags2 & (RF2_MULTIPLY)) 
-		hp = (3 + hp * 3) 
-			* extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] 
+	if (r_ptr->flags2 & (RF2_MULTIPLY))
+		hp = (3 + hp * 3)
+			* extract_energy[r_ptr->speed + (r_ptr->flags6 & RF6_HASTE ? 5 : 0)]
 			/ 10;
 
 
@@ -8010,11 +8014,11 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	if (r_ptr->flags9 & RF9_IM_EDGED)	ac += 500;
 	else if (r_ptr->flags9 & RF9_RES_EDGED)	ac += 200;
 	if (r_ptr->flags9 & RF9_IM_BLUNT) 	ac += 500;
-	else if (r_ptr->flags9 & RF9_RES_BLUNT) ac += 200;	
+	else if (r_ptr->flags9 & RF9_RES_BLUNT) ac += 200;
 
 	/* Hack -- Huge = tough */
 	if (r_ptr->flags3 & RF3_HUGE) ac += 300;
-	
+
 	/* Monsters with resistances are harder to kill.
 	   Therefore effective slays / brands against them are worth more. */
 	if (r_ptr->flags3 & RF3_IM_ACID) resists += 2;
@@ -8038,7 +8042,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 
 	/* Hack -- Evasive = tough */
 	if (r_ptr->flags9 & RF9_EVASIVE) resists += 3;
- 
+
 	/* Bonus for multiple basic resists and weapon resists */
 	if (resists >= 12) resists *= 6;
 	else if (resists >= 10) resists *= 4;
@@ -8056,7 +8060,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		if (!(r_ptr->flags3 & RF3_NO_STUN))	resists -= 1;
 		if (!(r_ptr->flags9 & RF9_NO_CUTS))	resists -= 1;
 	}
-	
+
 	/* If quite resistant, bonus for high resists -- these items have weapon brands */
 	if (resists >= 3)
 	{
@@ -8081,7 +8085,7 @@ static long eval_hp_adjust(monster_race *r_ptr)
 		if (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT)) ac -= 20;
 		if (r_ptr->flags9 & RF9_MAN) ac -= 10;
 		if (r_ptr->flags9 & RF9_ELF) ac -= 10;
-		if (r_ptr->flags9 & RF9_DWARF) ac -= 10;		
+		if (r_ptr->flags9 & RF9_DWARF) ac -= 10;
 	}
 
 	/* If quite resistant, reduce resists by defense holes */
@@ -8122,15 +8126,15 @@ static long eval_hp_adjust(monster_race *r_ptr)
 	/* Monster resistances */
 	if (resists < ac)
 	{
-		hp += (hp * resists) / (150 + r_ptr->level); 	
+		hp += (hp * resists) / (150 + r_ptr->level);
 	}
 	else
 	{
-		hp += (hp * ac) / (150 + r_ptr->level); 			
+		hp += (hp * ac) / (150 + r_ptr->level);
 	}
 
 	/* Low level monsters don't gain anything above */
-	hp += (raw_hp + resists/3) / 4;			
+	hp += (raw_hp + resists/3) / 4;
 
 	/* boundary control */
 	if (hp < 1) hp = 1;
@@ -8151,7 +8155,7 @@ long calculate_exp_for_lvl(long hp, long dam, byte lvl)
 	/* Hack -- for Ungoliant-like monsters */
 	if (hp > 10000) rexp = (hp / 25) * (dam / lvl);
 	else rexp = (hp * dam) / (lvl * 25);
-	
+
 	/* Round to 2 significant figures */
 	if (rexp > 100)
 	{
@@ -8188,13 +8192,13 @@ errr eval_r_power(header *head)
 	{
 		/* Point at the "info" */
 		r_ptr = (monster_race*)head->info_ptr + i;
-		
+
 		if ((r_ptr->flags1 & (RF1_DROP_30 | RF1_DROP_60 | RF1_DROP_90 | RF1_DROP_1D2 | RF1_DROP_1D3 | RF1_DROP_1D4)) == 0)
 		{
 			r_ptr->flags1 &= ~(RF1_ONLY_GOLD | RF1_ONLY_ITEM | RF1_DROP_GOOD | RF1_DROP_GREAT | RF1_DROP_USEFUL);
 			r_ptr->flags8 &= ~(RF8_DROP_CHEST | RF8_DROP_MISSILE | RF8_DROP_TOOL | RF8_DROP_WEAPON | RF8_DROP_MUSIC |
 								RF8_DROP_CLOTHES | RF8_DROP_LITE | RF8_DROP_JEWELRY | RF8_DROP_RSW | RF8_DROP_WRITING |
-								RF8_DROP_POTION | RF8_DROP_FOOD | RF8_DROP_JUNK);			
+								RF8_DROP_POTION | RF8_DROP_FOOD | RF8_DROP_JUNK);
 		}
 	}
 #endif /* ALLOW_TEMPLATES_OUTPUT */
@@ -8210,7 +8214,7 @@ errr eval_r_power(header *head)
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 		/* Reset the sum of all monster power values */
 		tot_mon_power = 0;
-	
+
 		/* Make sure all arrays start at zero */
 		for (i = 0; i < MAX_DEPTH; i++)
 		{
@@ -8218,7 +8222,7 @@ errr eval_r_power(header *head)
 			tot_dam[i] = 0;
 			mon_count[i] = 0;
 		}
-	
+
 		/*
 		 * Go through r_info and evaluate power ratings & flows.
 		 */
@@ -8228,18 +8232,18 @@ errr eval_r_power(header *head)
 			r_ptr = (monster_race*)head->info_ptr + i;
 	#if 0
 			/*** Evaluate flows ***/
-	
+
 			/* Evaluate 'unusual' flows */
 			if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL)) r_ptr->flows |= (1L << FLOW_WALK_WALL);
 			if (r_ptr->flags2 & (RF2_MUST_FLY)) r_ptr->flows |= (1L << FLOW_FLY);
 			if (r_ptr->flags2 & (RF2_MUST_SWIM)) r_ptr->flows |= (1L << FLOW_SWIM);
-	
+
 			/* Evaluate walking flows */
 			if ((r_ptr->flags2 & (RF2_MUST_FLY | RF2_MUST_SWIM)) == 0)
 			{
 				/* Use walking */
 				r_ptr->flows |= (1L << FLOW_WALK);
-	
+
 				/* Evaluate walk + other */
 				if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_DIG) | (1L << FLOW_DIG);
 				if (r_ptr->flags2 & (RF2_CAN_FLY)) r_ptr->flows |= (1L << FLOW_WALK_FLY) | (1L << FLOW_FLY_CHASM);
@@ -8253,26 +8257,26 @@ errr eval_r_power(header *head)
 				if (r_ptr->flags3 & (RF3_IM_ACID)) r_ptr->flows |= (1L << FLOW_WALK_ACID) | (1L << FLOW_ACID);
 				if (r_ptr->flags3 & (RF3_IM_COLD)) r_ptr->flows |= (1L << FLOW_WALK_COLD);
 				if (r_ptr->flags3 & (RF3_IM_ELEC)) r_ptr->flows |= (1L << FLOW_WALK_ELEC);
-	
+
 				/* Evaluate fire immunity flows */
 				if (r_ptr->flags3 & (RF3_IM_FIRE))
 				{
 					/* Use walking + fire immunity */
 					r_ptr->flows |= (1L << FLOW_WALK_FIRE) | (1L << FLOW_FIRE);
-	
+
 					if (r_ptr->flags2 & (RF2_CAN_DIG)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_DIG) | (1L << FLOW_FIRE_DIG);
 					if (r_ptr->flags2 & (RF2_CAN_SWIM)) r_ptr->flows |= (1L << FLOW_WALK_FIRE_SWIM) | (1L << FLOW_FIRE_SWIM);
 				}
 			}
 	#endif
 			/*** Evaluate power ratings ***/
-	
+
 			/* Set the current level */
 			lvl = r_ptr->level;
-	
+
 			/* Maximum damage this monster can do in 10 game turns */
 			dam = eval_max_dam(r_ptr);
-	
+
 			/* Adjust hit points based on resistances */
 			hp = eval_hp_adjust(r_ptr);
 
@@ -8280,7 +8284,7 @@ errr eval_r_power(header *head)
 			{
 				long mexp = (hp * dam) / 25;
 				long threat = r_ptr->highest_threat;
-				
+
 				/* Compute level algorithmically */
 				for (j = 1; (mexp > j + 5) || (threat > j + 3); mexp -= j * j, threat -= (j + 4), j++);
 
@@ -8302,11 +8306,11 @@ errr eval_r_power(header *head)
 				else
 				{
 					r_ptr->calculated_level = lvl;
-					r_ptr->calculated_mexp = 
+					r_ptr->calculated_mexp =
 						calculate_exp_for_lvl(hp, dam, lvl);
 
 					/* Also count true exp at the forced level */
-					r_ptr->forced_mexp = 
+					r_ptr->forced_mexp =
 						calculate_exp_for_lvl(hp, dam, MAX(1, r_ptr->level));
 				}
 			}
@@ -8339,17 +8343,17 @@ errr eval_r_power(header *head)
 				hp /= 10;
 				dam /= 10;
 			}
-	
+
 			/* Define the power rating */
 			power[i] = hp * dam;
-	
+
 			/* Adjust for group monsters.  Average in-level group size is 5 */
 			if (r_ptr->flags1 & RF1_UNIQUE) ;
-	
+
 			else if (r_ptr->flags1 & RF1_FRIEND) power[i] *= 2;
-	
+
 			else if (r_ptr->flags1 & RF1_FRIENDS) power[i] *= 5;
-	
+
 			/* Adjust for multiplying monsters. This is modified by the speed,
 			 * as fast multipliers are much worse than slow ones. We also adjust for
 			 * ability to bypass walls or doors.
@@ -8366,7 +8370,7 @@ errr eval_r_power(header *head)
 					power[i] = MAX(power[i], power[i] * extract_energy[r_ptr->speed
 						+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2);
 			}
-	
+
 			/*
 			 * Update the running totals - these will be used as divisors later
 			 * Total HP / dam / count for everything up to the current level
@@ -8374,17 +8378,17 @@ errr eval_r_power(header *head)
 			for (j = lvl; j < (lvl == 0 ? lvl + 1: MAX_DEPTH); j++)
 			{
 				int count = 10;
-	
+
 				/*
 				 * Uniques don't count towards monster power on the level.
 				 */
 				if (r_ptr->flags1 & RF1_UNIQUE) continue;
-	
+
 				/*
 				 * Specifically placed monsters don't count towards monster power on the level.
 				 */
 				if (!(r_ptr->rarity)) continue;
-	
+
 				/*
 				 * Hack -- provide adjustment factor to prevent overflow
 				 */
@@ -8393,28 +8397,28 @@ errr eval_r_power(header *head)
 					hp /= 10;
 					dam /= 10;
 				}
-	
+
 				if ((j == 50) && (lvl < 50))
 				{
 					hp /= 10;
 					dam /= 10;
 				}
-	
+
 				if ((j == 40) && (lvl < 40))
 				{
 					hp /= 10;
 					dam /= 10;
 				}
-	
+
 				/*
-				 * Hack - if it's a group monster or multiplying monster, 
+				 * Hack - if it's a group monster or multiplying monster,
 				 * add several to the count
 				 * so that the averages don't get thrown off
 				 */
-	
+
 				if (r_ptr->flags1 & RF1_FRIEND) count = 20;
 				else if (r_ptr->flags1 & RF1_FRIENDS) count = 50;
-	
+
 				if (r_ptr->flags2 & RF2_MULTIPLY)
 				{
 					if (r_ptr->flags2 & (RF2_KILL_WALL | RF2_PASS_WALL))
@@ -8427,7 +8431,7 @@ errr eval_r_power(header *head)
 						count = MAX(1, extract_energy[r_ptr->speed
 							+ (r_ptr->flags6 & RF6_HASTE ? 5 : 0)] / 2) * count;
 				}
-	
+
 				/*
 				 * Very rare monsters count less towards total monster power on the level.
 				 */
@@ -8435,30 +8439,30 @@ errr eval_r_power(header *head)
 				{
 					hp = hp * count / r_ptr->rarity;
 					dam = dam * count / r_ptr->rarity;
-	
+
 					count = r_ptr->rarity;
 				}
-	
+
 				tot_hp[j] += hp;
 				tot_dam[j] += dam;
-	
+
 				mon_count[j] += count / r_ptr->rarity;
 			}
 		}
-	
+
 		/* Apply divisors now */
 		for (i = 0; i < z_info->r_max; i++)
 		{
 #ifdef ALLOW_TEMPLATES_OUTPUT
 			int new_power;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 			/* Point at the "info" */
 			r_ptr = (monster_race*)head->info_ptr + i;
-	
+
 			/* Extract level */
 			lvl = r_ptr->level;
-	
+
 			/* Paranoia */
 			if (tot_hp[lvl] != 0 && tot_dam[lvl] != 0)
 			{
@@ -8466,29 +8470,29 @@ errr eval_r_power(header *head)
 				/* Note we have factored in the above 'adjustment factor' */
 				av_hp = tot_hp[lvl] * 10 / mon_count[lvl];
 				av_dam = tot_dam[lvl] * 10 / mon_count[lvl];
-	
+
 				/* XXX Justifiable paranoia - avoid divide by zero errors */
 				if (av_hp > 0) power[i] = power[i] / av_hp;
 				if (av_dam > 0) power[i] = power[i] / av_dam;
-	
+
 				/* Assign monster power */
 				r_ptr->power = (s16b)power[i];
-	
+
 				/* Never less than 1 */
 				if (r_ptr->power < 1) r_ptr->power = 1;
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 				/* Get power */
 				new_power = r_ptr->power;
-	
+
 				/* Compute rarity algorithmically */
 				for (j = 1; new_power > j; new_power -= j * j, j++);
-	
+
 				/* Set rarity */
 				r_ptr->rarity = j;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 			}
-		}	
+		}
 #ifdef ALLOW_TEMPLATES_OUTPUT
 	}
 #endif /* ALLOW_TEMPLATES_OUTPUT */
@@ -8553,10 +8557,10 @@ errr eval_f_power(header *head)
 
 /*
  * Emit a "template" file.
- * 
+ *
  * This allows us to modify an existing template file by parsing it
  * in and then modifying the data structures.
- * 
+ *
  * We parse the previous "template" file to allow us to include comments.
  */
 errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
@@ -8612,7 +8616,7 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 
 			/* Output the version number */
 			fprintf(fp, "\nV:%d.%d.%d\n\n", head->v_major, head->v_minor, head->v_patch);
-			
+
 			/* Okay to proceed */
 			okay = TRUE;
 
@@ -8627,22 +8631,22 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 		if ((emit_info_txt_index) && (buf[0] == 'N'))
 		{
 			int idx;
-			
+
 			idx = atoi(buf + 2);
 
 			/* Verify index order */
 			if (idx < ++error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
-			
+
 			/* Verify information */
 			if (idx >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
-			
+
 			if (comment) fprintf(fp,"\n");
 			comment = FALSE;
 			blanklines = 0;
 
 			while (error_idx < idx)
 			{
-				fprintf(fp,"#$# %d - Unused ###\n\n",error_idx++);	
+				fprintf(fp,"#$# %d - Unused ###\n\n",error_idx++);
 			}
 
 			if ((err = (emit_info_txt_index(fp, head, idx))) != 0)
@@ -8685,7 +8689,7 @@ static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
 					len = 0;
 					intro = TRUE;
 			}
-			
+
 			/* Introduction needed */
 			if (intro)
 			{
@@ -8698,7 +8702,7 @@ static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
 				fprintf(fp," ");
 				len++;
 			}
-			
+
 			/* Output flag */
 			fprintf(fp, "%s |", names[i]);
 			len += strlen(names[i]) + 2;
@@ -8713,12 +8717,12 @@ static errr emit_flags_32(FILE *fp, cptr intro_text, u32b flags, cptr names[])
 
 /*
  * Emit description to file.
- * 
+ *
  * TODO: Consider merging with text_out_to_file in util.c,
  * where most of this came from.
  */
 static errr emit_desc(FILE *fp, cptr intro_text, cptr text)
-{	
+{
 	/* Current position on the line */
 	int pos = 0;
 
@@ -8727,7 +8731,7 @@ static errr emit_desc(FILE *fp, cptr intro_text, cptr text)
 
 	/* Current location within "str" */
 	cptr s = text;
-	
+
 	/* Process the string */
 	while (*s)
 	{
@@ -8832,14 +8836,14 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + blow_ptr->name);
-	
+
 	/* Output 'T' for "Text" */
 	for (n = 0; n < MAX_BLOW_DESCRIPTIONS; n++)
 	{
 		if ((blow_ptr->desc[n].max) && (blow_ptr->desc[n].max < 10000))
 		{
 			/* Output 'T' for "Text" */
-			fprintf(fp, "T:%d-%d:%s\n", blow_ptr->desc[n].min, blow_ptr->desc[n].max,head->text_ptr + blow_ptr->desc[n].text);			
+			fprintf(fp, "T:%d-%d:%s\n", blow_ptr->desc[n].min, blow_ptr->desc[n].max,head->text_ptr + blow_ptr->desc[n].text);
 		}
 		else if (blow_ptr->desc[n].max)
 		{
@@ -8853,14 +8857,14 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp, "I:%d:%d:%d\n",blow_ptr->mana_cost,blow_ptr->best_range, blow_ptr->max_range);
 	}
-	
+
 	/* Output 'D' for "Blow damage" */
 	if (blow_ptr->dam_mult || blow_ptr->dam_div || blow_ptr->dam_var || blow_ptr->dam_max || blow_ptr->d_res)
 	{
 		fprintf(fp, "D:%d:%d:%d:%d:%s\n",blow_ptr->dam_mult, blow_ptr->dam_div, blow_ptr->dam_var, blow_ptr->dam_max,
 			r_info_blow_effect[blow_ptr->d_res]);
 	}
-	
+
 	/* Output 'C' for "Blow choices" */
 	if (blow_ptr->d_base || blow_ptr->d_hurt || blow_ptr->d_esc
 			|| blow_ptr->d_summ || blow_ptr->d_mana || blow_ptr->d_tact || blow_ptr->d_range)
@@ -8868,19 +8872,19 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 		fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d\n",blow_ptr->d_base, blow_ptr->d_summ, blow_ptr->d_hurt, blow_ptr->d_mana,
 				blow_ptr->d_esc, blow_ptr->d_tact, blow_ptr->d_range);
 	}
-	
+
 	/* Output 'S' for "Summoning choices" */
 	if (blow_ptr->summon_type)
 	{
 		fprintf(fp, "S:%d\n",blow_ptr->summon_type);
 	}
-	
+
 	/* Output 'A' for "Arc information" */
 	if (blow_ptr->arc)
 	{
 		fprintf(fp, "A:%d:%d:%d\n", blow_ptr->arc, blow_ptr->diameter_of_source, blow_ptr->degree_factor);
 	}
-	
+
 	/* Output 'R' for "Radius information */
 	if ((blow_ptr->radius.base) || (blow_ptr->radius.gain))
 	{
@@ -8896,7 +8900,7 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 		}
 		fprintf(fp, "\n");
 	}
-	
+
 	/* Output 'U' for "Number information */
 	if ((blow_ptr->number.base) || (blow_ptr->number.gain))
 	{
@@ -8912,13 +8916,13 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 		}
 		fprintf(fp, "\n");
 	}
-	
+
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", blow_ptr->flags1, blow_info_flags1);
 	emit_flags_32(fp, "F:", blow_ptr->flags2, blow_info_flags2);
 
-	fprintf(fp, "\n");	
-	
+	fprintf(fp, "\n");
+
 	/* Success */
 	return (0);
 }
@@ -8933,44 +8937,44 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 errr emit_d_info_always(FILE *fp, header *head)
 {
 	int i, n;
-	
+
 	for (i = 0; i < z_info->d_max; i++)
 	{
 		/* Current entry */
 		desc_type *d_ptr = (desc_type*)head->info_ptr + i;
-		
-		bool introduced = FALSE;		
-		
+
+		bool introduced = FALSE;
+
 		/* Output 'N' for "New/Number/Name" */
 		fprintf(fp, "N:%d:%d:%d:%d:%d:%d:%d:%d\n", d_ptr->chart, d_ptr->next,
 				d_ptr->branch_on, d_ptr->branch, d_ptr->chance, d_ptr->not_chance,
 				d_ptr->level_min, d_ptr->level_max);
-	
+
 		/* Output 'A' for "Name (adjective)" */
 		if (strlen(head->name_ptr + d_ptr->name1)) fprintf(fp, "A:%s\n", head->name_ptr + d_ptr->name1);
-	
+
 		/* Output 'B' for "Name (noun)" */
 		if (strlen(head->name_ptr + d_ptr->name2)) fprintf(fp, "B:%s\n", head->name_ptr + d_ptr->name2);
-		
+
 		/* Output 'D' for "Description" */
 		if (strlen(head->text_ptr + d_ptr->text)) fprintf(fp, "D:%s\n", head->text_ptr + d_ptr->text);
-	
+
 		/* Output 'P' for "Placement Flags" */
 		emit_flags_32(fp, "P:", d_ptr->p_flag, d_info_pflags);
-	
+
 		/* Output 'S' for "Special Flags" */
 		emit_flags_32(fp, "S:", d_ptr->flags, d_info_sflags);
-	
+
 		/* Output 'P' for "Level Flags" */
 		emit_flags_32(fp, "L:", d_ptr->l_flag, d_info_lflags);
-	
+
 		/* Output feature */
 		if (d_ptr->feat)
 		{
 			fprintf(fp, "F:%d", d_ptr->feat);
 			introduced = TRUE;
 		}
-	
+
 		/* Not introduced yet */
 		if (!introduced)
 		{
@@ -8979,10 +8983,10 @@ errr emit_d_info_always(FILE *fp, header *head)
 				if (!d_ptr->theme[n]) continue;
 				introduced = TRUE;
 			}
-			
+
 			if (introduced) fprintf(fp, "F:0");
 		}
-		
+
 		/* Output theme features */
 		if (introduced)
 		{
@@ -8992,17 +8996,17 @@ errr emit_d_info_always(FILE *fp, header *head)
 				fprintf(fp, ":%d", d_ptr->theme[n]);
 				introduced = TRUE;
 			}
-		
+
 			/* Terminate */
 			fprintf(fp,"\n");
 		}
-	
+
 		/* Output 'K' for "Kind" */
 		if (d_ptr->tval) fprintf(fp, "K:%d:%d:%d\n", d_ptr->tval, d_ptr->min_sval, d_ptr->max_sval);
-		
+
 		/* Output 'G' for "Graphics" */
 		if (d_ptr->r_char) fprintf(fp, "G:%c\n", d_ptr->r_char);
-	
+
 		/* Output 'R' for "Race flag" */
 		if ((d_ptr->r_flag > 0) && (d_ptr->r_flag <= 32)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-1]);
 		else if ((d_ptr->r_flag > 32) && (d_ptr->r_flag <= 64)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-33]);
@@ -9013,13 +9017,13 @@ errr emit_d_info_always(FILE *fp, header *head)
 		else if ((d_ptr->r_flag > 192) && (d_ptr->r_flag <= 224)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-193]);
 		else if ((d_ptr->r_flag > 224) && (d_ptr->r_flag <= 256)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-225]);
 		else if ((d_ptr->r_flag > 256) && (d_ptr->r_flag <= 288)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-257]);
-	
+
 		fprintf(fp,"\n");
 
 	}
-	
+
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9034,26 +9038,26 @@ errr emit_v_info_index(FILE *fp, header *head, int i)
 	cptr t;
 
 	int lev;
-	
+
 	/* Current entry */
 	vault_type *v_ptr = (vault_type*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + v_ptr->name);
 
 	lev = v_ptr->max_lev;
 	if (lev > 80) lev = 55 + (lev - 80) / 4;
 	else if (lev > 30) lev = 30 +  (lev - 30) / 2;
-	
+
 	/* Output 'X' for "Extra Info" */
 	fprintf(fp, "X:%d:%d:%d:%d:%d:%d\n", v_ptr->typ, v_ptr->rat, v_ptr->hgt, v_ptr->wid,
 				v_ptr->min_lev, v_ptr->max_lev ? v_ptr->max_lev : 60);
-	
+
 	/* Output vault data */
 	for (t = head->text_ptr + v_ptr->text, n = 0; n < v_ptr->hgt; n++)
 	{
 		fprintf(fp, "D:");
-		
+
 		for (j = 0; j < v_ptr->wid; t++)
 		{
 			len = (byte)*t;
@@ -9138,14 +9142,14 @@ errr emit_v_info_index(FILE *fp, header *head, int i)
 				fprintf(fp, "%c", v);
 			}
 		}
-		
+
 		fprintf(fp, "\n");
 	}
-	
+
 	fprintf(fp, "\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9161,42 +9165,42 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	u32b chromatics = 0;
 	bool clear = FALSE;
 	bool multi = FALSE;
-	
+
 	/* Current entry */
 	monster_race *r_ptr = (monster_race*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + r_ptr->name);
 
 	/* Output 'G' for "Graphics" (one line only) */
 	fprintf(fp, "G:%c:%c\n",r_ptr->d_char,color_attr_to_char(r_ptr->d_attr));
-	
+
 	/* Show other monsters with same appearance */
 	for (n = 1; n < z_info->r_max; n++)
 	{
 		monster_race *r2_ptr = (monster_race*)head->info_ptr + n;
-		
+
 		if (r_ptr->d_char != r2_ptr->d_char) continue;
-		
+
 		if (r2_ptr->flags1 & (RF1_ATTR_CLEAR)) clear = TRUE;
 		else if (r2_ptr->flags1 & (RF1_ATTR_MULTI)) multi = TRUE;
 		else if (r2_ptr->flags9 & (RF9_ATTR_METAL)) metallics |= 1 << (r2_ptr->d_attr);
 		else chromatics |= 1 << (r2_ptr->d_attr);
-		
+
 		if (n == i) continue;
-		
+
 		/* Town monsters allowed to match dungeon monsters */
 		if ((!r2_ptr->level) && (r_ptr->level)) continue;
 		if ((!r_ptr->level) && (r2_ptr->level)) continue;
-		
-		if (((r_ptr->flags1 & (RF1_ATTR_CLEAR)) == 
+
+		if (((r_ptr->flags1 & (RF1_ATTR_CLEAR)) ==
 			(r2_ptr->flags1 & (RF1_ATTR_CLEAR))) &&
 			((r_ptr->flags1 & (RF1_ATTR_CLEAR)) ||
 					(r2_ptr->flags1 & (RF1_ATTR_CLEAR))))
 		{
 			fprintf(fp, "#$ Matches %s\n", head->name_ptr + r2_ptr->name);
 		}
-		else if (((r_ptr->flags1 & (RF1_ATTR_MULTI)) == 
+		else if (((r_ptr->flags1 & (RF1_ATTR_MULTI)) ==
 			(r2_ptr->flags1 & (RF1_ATTR_MULTI))) &&
 			((r_ptr->flags1 & (RF1_ATTR_MULTI)) ||
 					(r2_ptr->flags1 & (RF1_ATTR_MULTI))))
@@ -9204,28 +9208,28 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 			fprintf(fp, "#$ Matches %s\n", head->name_ptr + r2_ptr->name);
 		}
 		else if ((r_ptr->d_attr == r2_ptr->d_attr) &&
-				((r_ptr->flags9 & (RF9_ATTR_METAL)) == 
+				((r_ptr->flags9 & (RF9_ATTR_METAL)) ==
 								(r2_ptr->flags9 & (RF9_ATTR_METAL))) &&
-								((r_ptr->flags1 & (RF1_ATTR_MULTI)) == 
+								((r_ptr->flags1 & (RF1_ATTR_MULTI)) ==
 											(r2_ptr->flags1 & (RF1_ATTR_MULTI))) &&
-											((r_ptr->flags1 & (RF1_ATTR_CLEAR)) == 
+											((r_ptr->flags1 & (RF1_ATTR_CLEAR)) ==
 														(r2_ptr->flags1 & (RF1_ATTR_CLEAR))))
 		{
 			fprintf(fp, "#$ Matches %s\n", head->name_ptr + r2_ptr->name);
 		}
 	}
-	
+
 	/* Display free colours */
 	if (!clear) fprintf(fp, "#$ Clear available\n");
 	if (!multi) fprintf(fp, "#$ Multihued available\n");
-	
+
 	fprintf(fp, "#$ Metallics available:");
 	for (i = 0; i < MAX_COLORS; i++)
 	{
 		if ((metallics & (1 << i)) == 0) fprintf(fp, "%c",color_table[i].index_char);
 	}
 	fprintf(fp, "\n");
-	
+
 	fprintf(fp, "#$ Colors available:");
 	for (i = 0; i < MAX_COLORS; i++)
 	{
@@ -9254,21 +9258,21 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 		/* End of blows */
 		if (!r_ptr->blow[n].method) break;
 
-		/* Output blow method */		
+		/* Output blow method */
 		fprintf(fp, "B:%s", r_info_blow_method[r_ptr->blow[n].method]);
-		
+
 		/* Output blow effect */
 		if (r_ptr->blow[n].effect)
 		{
 			fprintf(fp, ":%s", r_info_blow_effect[r_ptr->blow[n].effect]);
-			
+
 			/* Output blow damage if required */
 			if ((r_ptr->blow[n].d_dice) && (r_ptr->blow[n].d_side))
 			{
 				fprintf(fp, ":%dd%d", r_ptr->blow[n].d_dice, r_ptr->blow[n].d_side);
 			}
 		}
-		
+
 		/* End line */
 		fprintf(fp, "\n");
 	}
@@ -9292,7 +9296,7 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9306,7 +9310,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	/* Current entry */
 	feature_type *f_ptr = (feature_type*)head->info_ptr + i;
 	feature_type *f2_ptr;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + f_ptr->name);
 
@@ -9341,21 +9345,21 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	if (f_ptr->blow.method)
 	{
 #if 0
-		/* Output blow method */		
+		/* Output blow method */
 		fprintf(fp, "T:%s", r_info_blow_method[f_ptr->blow.method]);
-#endif		
+#endif
 		/* Output blow effect */
 		if (f_ptr->blow.effect)
 		{
 			fprintf(fp, /*":%s"*/ "T:%s", r_info_blow_effect[f_ptr->blow.effect]);
-			
+
 			/* Output blow damage if required */
 			if ((f_ptr->blow.d_dice) && (f_ptr->blow.d_side))
 			{
 				fprintf(fp, ":%dd%d", f_ptr->blow.d_dice, f_ptr->blow.d_side);
 			}
 		}
-		
+
 		/* End line */
 		fprintf(fp, "\n");
 	}
@@ -9401,7 +9405,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9415,7 +9419,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 
 	/* Current entry */
 	object_kind *k_ptr = (object_kind*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + k_ptr->name);
 
@@ -9432,15 +9436,15 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	for (n = 0; n < 4; n++)
 	{
 		if (!k_ptr->chance[n]) continue;
-		
+
 		if (!introduced) fprintf(fp, "A");
 		fprintf(fp, ":%d/%d", k_ptr->locale[n], k_ptr->chance[n]);
 		introduced = TRUE;
 	}
-	
+
 	/* Terminate */
 	if (introduced) fprintf(fp,"\n");
-	
+
 	/* Output 'P' for "Power" (one line only) */
 	fprintf(fp,"P:%d:%dd%d:%d:%d:%d\n",k_ptr->ac, k_ptr->dd, k_ptr->ds, k_ptr->to_h, k_ptr->to_d, k_ptr->to_a);
 
@@ -9460,7 +9464,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9471,7 +9475,7 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 {
 	/* Current entry */
 	artifact_type *a_ptr = (artifact_type*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + a_ptr->name);
 
@@ -9480,7 +9484,7 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'W' for "More Info" (one line only) */
 	fprintf(fp,"W:%d:%d:%d:%ld\n",a_ptr->level, a_ptr->rarity, a_ptr->weight, a_ptr->cost);
-	
+
 	/* Output 'P' for "Power" (one line only) */
 	fprintf(fp,"P:%d:%dd%d:%d:%d:%d\n",a_ptr->ac, a_ptr->dd, a_ptr->ds, a_ptr->to_h, a_ptr->to_d, a_ptr->to_a);
 
@@ -9499,7 +9503,7 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9511,7 +9515,7 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 	int n;
 	/* Current entry */
 	ego_item_type *e_ptr = (ego_item_type*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + e_ptr->name);
 
@@ -9528,7 +9532,7 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 
 		fprintf(fp, "T:%d:%d:%d\n", e_ptr->tval[n], e_ptr->min_sval[n], e_ptr->max_sval[n]);
 	}
-	
+
 	/* Output 'C' for "Creation" (one line only) */
 	fprintf(fp,"C:%d:%d:%d:%d\n",e_ptr->max_to_h, e_ptr->max_to_d, e_ptr->max_to_a, e_ptr->max_pval);
 
@@ -9550,14 +9554,14 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "O:", e_ptr->obv_flags2, k_info_flags2);
 	emit_flags_32(fp, "O:", e_ptr->obv_flags3, k_info_flags3);
 	emit_flags_32(fp, "O:", e_ptr->obv_flags4, k_info_flags4);
-	
+
 	/* Output 'D' for "Description" */
 	/*emit_desc(fp, "D:", head->text_ptr + e_ptr->text);*/
 
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9568,7 +9572,7 @@ errr emit_x_info_index(FILE *fp, header *head, int i)
 {
 	/* Current entry */
 	flavor_type *x_ptr = (flavor_type*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%d%s\n", i,x_ptr->tval, x_ptr->sval == 255 ? "" : format(":%d", x_ptr->sval));
 
@@ -9581,7 +9585,7 @@ errr emit_x_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9593,10 +9597,10 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	int n;
 	bool introduced = FALSE;
 	bool output = FALSE;
-	
+
 	/* Current entry */
 	player_race *pr_ptr = (player_race*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + pr_ptr->name);
 
@@ -9605,28 +9609,28 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 
 	/* Start stats output */
 	fprintf(fp, "S");
-	
+
 	/* Output stats */
 	for (n = 0; n < A_MAX; n++)
 	{
 		fprintf(fp, ":%d", pr_ptr->r_adj[n]);
 	}
-	
+
 	/* Finish stats output */
 	fprintf(fp, "\n");
-	
+
 	/* Output 'R' for "Racial Skills" (one line only) */
 	fprintf(fp, "R:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
 		    pr_ptr->r_dis, pr_ptr->r_dev, pr_ptr->r_sav, pr_ptr->r_stl,
 		    pr_ptr->r_srh, pr_ptr->r_dig, pr_ptr->r_tht, pr_ptr->r_thn, pr_ptr->r_thb);
-	
+
 	/* Output 'X' for "Extra Info" (one line only) */
 	if (pr_ptr->r_exp || pr_ptr->infra || pr_ptr->r_idx || pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD])
 	{
 		fprintf(fp, "X:%d:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx, pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD]);
 	}
 
-	/* Output 'I' for "Info" (one line only) */	
+	/* Output 'I' for "Info" (one line only) */
 	if (pr_ptr->hist || pr_ptr->b_age || pr_ptr->m_age || pr_ptr->home)
 	{
 		fprintf(fp, "I:%d:%d:%d:%d\n", pr_ptr->hist, pr_ptr->b_age, pr_ptr->m_age, pr_ptr->home);
@@ -9637,7 +9641,7 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp, "H:%d:%d:%d:%d\n", pr_ptr->m_b_ht, pr_ptr->m_m_ht, pr_ptr->f_b_ht, pr_ptr->f_m_ht);
 	}
-		
+
 	/* Output 'W' for "Weight" (one line only) */
 	if (pr_ptr->m_b_wt || pr_ptr->f_b_wt)
 	{
@@ -9655,18 +9659,18 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	{
 		if (pr_ptr->slots[n]) output = TRUE;
 	}
-	
+
 	if (output)
 	{
 		/* Start object slots output */
 		fprintf(fp, "O");
-		
+
 		/* Output stats */
 		for (n = 0; n < END_EQUIPMENT - INVEN_WIELD; n++)
 		{
 			fprintf(fp, ":%d", pr_ptr->slots[n]);
 		}
-		
+
 		/* Finish object slots output */
 		fprintf(fp, "\n");
 	}
@@ -9676,10 +9680,10 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	{
 		/* Start class choices output */
 		fprintf(fp, "C:");
-		
+
 		/* Output class choices */
 		for (n = 0; n < z_info->c_max; n++)
-		{			
+		{
 			if (pr_ptr->choice & (1 << n))
 			{
 				if (introduced) fprintf(fp, "|");
@@ -9687,17 +9691,17 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 				introduced = TRUE;
 			}
 		}
-		
+
 		/* Finish class choices output */
 		fprintf(fp, "\n");
 
 	}
-	
+
 	/* Finish output */
 	fprintf(fp, "\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
@@ -9711,22 +9715,22 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 
 	/* Current entry */
 	player_class *pc_ptr = (player_class*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + pc_ptr->name);
 
 	/* Start stats output */
 	fprintf(fp, "S");
-	
+
 	/* Output stats */
 	for (n = 0; n < A_MAX; n++)
 	{
 		fprintf(fp, ":%d", pc_ptr->c_adj[n]);
 	}
-	
+
 	/* Finish stats output */
 	fprintf(fp, "\n");
-	
+
 	/* Output 'C' for "Class Skills" (one line only) */
 	fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
 		    pc_ptr->c_dis, pc_ptr->c_dev, pc_ptr->c_sav, pc_ptr->c_stl,
@@ -9736,7 +9740,7 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "X:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
 		    pc_ptr->x_dis, pc_ptr->x_dev, pc_ptr->x_sav, pc_ptr->x_stl,
 		    pc_ptr->x_srh, pc_ptr->x_dig, pc_ptr->x_tht, pc_ptr->x_thn, pc_ptr->x_thb);
-	
+
 	/* Output 'I' for "Info" (one line only) */
 	fprintf(fp, "I:%d:%ld:%d:%d:%d\n", pc_ptr->c_exp, pc_ptr->sense_base, pc_ptr->sense_div, pc_ptr->sense_type, pc_ptr->sense_squared);
 
@@ -9753,12 +9757,12 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp, "T:%s\n", head->text_ptr + pc_ptr->title[n]);
 	}
-	
+
 	/* Output starting equipment */
 	for (n = 0; n < MAX_CLASS_ITEMS; n++)
 	{
 		if (!pc_ptr->start_items[n].tval) continue;
-		
+
 		fprintf(fp, "E:%d:%d:%d:%d:%d:%d:%d:%d\n",
 			    pc_ptr->start_items[n].tval, pc_ptr->start_items[n].sval,
 			    pc_ptr->start_items[n].number_min, pc_ptr->start_items[n].number_max,
@@ -9767,7 +9771,7 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 	}
 
 	fprintf(fp,"\n");
-	
+
 	/* Success */
 	return (0);
 }
@@ -9784,7 +9788,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 
 	/* Current entry */
 	spell_type *s_ptr = (spell_type*)head->info_ptr + i;
-	
+
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + s_ptr->name);
 
@@ -9801,26 +9805,26 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	for (l = 0; l < z_info->c_max; l++)
 	{
 		bool class_spell, note_spell;
-		
+
 		class_spell = FALSE;
 		note_spell = FALSE;
-		
+
 		/* Output casters */
 		for (n = 0; n < MAX_SPELL_CASTERS; n++)
 		{
 			if (!s_ptr->cast[n].class) continue;
-			
+
 			if (s_ptr->cast[n].class != l) continue;
-	
+
 			fprintf(fp, "C:%d:%d:%d:%d:%d\n",
 					s_ptr->cast[n].class,s_ptr->cast[n].level,s_ptr->cast[n].mana,s_ptr->cast[n].fail,s_ptr->cast[n].min);
-			
+
 			class_spell = TRUE;
-			
+
 			if (s_ptr->cast[n].class == 1) mage_spell = TRUE;
 			if (s_ptr->cast[n].class == 2) priest_spell = TRUE;
 		}
-		
+
 		/* Hack -- note when sub-classes cannot cast spell */
 		if (!class_spell)
 		{
@@ -9830,7 +9834,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 				case 5: note_spell = priest_spell; break;
 				case 8: case 9: case 11: note_spell = (s_ptr->cast[0].class != 0); break;
 			}
-#if 0 /* This causes dangerous memory access on some OS'es and needs p_class initialised first. */			
+#if 0 /* This causes dangerous memory access on some OS'es and needs p_class initialised first. */
 			if (note_spell)
 			{
 				fprintf(fp, "#$ %s cannot cast this spell.\n", c_name + c_info[l].name);
@@ -9838,7 +9842,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 #endif
 		}
 	}
-	
+
 	/* Output 'P' for "Pre-requisites" (one line only) */
 	fprintf(fp,"P:%d:%d\n",s_ptr->preq[0], s_ptr->preq[1]);
 
@@ -9848,7 +9852,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 		if (!s_ptr->blow[n].method) continue;
 
 		fprintf(fp, "B:%s", r_info_blow_method[s_ptr->blow[n].method]);
-		
+
 		if (s_ptr->blow[n].effect)
 		{
 			fprintf(fp, ":%s", r_info_blow_effect[s_ptr->blow[n].effect]);
@@ -9880,27 +9884,27 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 				{
 					fprintf(fp, "+");
 				}
-				
+
 				if (((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0)) && ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0)))
 				{
 					fprintf(fp, "(");
 				}
-				
+
 				if ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0))
 				{
 					fprintf(fp, "%dd%d", s_ptr->blow[n].l_dice, s_ptr->blow[n].l_side);
-					
+
 					if (s_ptr->blow[n].l_plus != 0)
 					{
 						fprintf(fp, "+");
 					}
 				}
-				
+
 				if (s_ptr->blow[n].l_plus != 0)
 				{
 					fprintf(fp, "%d", s_ptr->blow[n].l_plus);
-				}				
-				
+				}
+
 				if (((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0)) && ((s_ptr->blow[n].l_dice != 0) || (s_ptr->blow[n].l_side != 0)))
 				{
 					fprintf(fp, ")");
@@ -9910,9 +9914,9 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 				{
 					fprintf(fp, "/%d", s_ptr->blow[n].levels);
 				}
-			}			
+			}
 		}
-		
+
 		fprintf(fp, "\n");
 	}
 
@@ -9926,21 +9930,21 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	{
 		fprintf(fp, "S:%s:%d\n", s_info_types[s_ptr->type], s_ptr->param);
 	}
-	
+
 	/* Output 'L' for lasts */
 	if (s_ptr->l_dice || s_ptr->l_side || s_ptr->l_plus)
 	{
-		fprintf(fp, "L:%dd%d+%d\n", 
+		fprintf(fp, "L:%dd%d+%d\n",
 				s_ptr->l_dice, s_ptr->l_side, s_ptr->l_plus);
 	}
-	
+
 	/* Output 'D' for "Description" */
 	emit_desc(fp, "D:", head->text_ptr + s_ptr->text);
 
 	fprintf(fp,"\n");
 
 	/* Success */
-	return (0);	
+	return (0);
 }
 
 
