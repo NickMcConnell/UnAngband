@@ -239,7 +239,7 @@ C:8:5:5:35:4
 C:10:11:9:45:3
 C:11:5:5:35:4
 P:6:0
-F:SLOW_POIS |
+S:SLOW_POIS:0
 L:1d24+24
 
 N:15:Teleport Self
@@ -1003,7 +1003,7 @@ P:64:0
 F:DETECT_DOORS | DETECT_STAIRS |
 
 N:67:Slow Poison
-A:75:26
+A:75:26:0
 A:91:32:8
 A:91:9:1
 A:92:4:2
@@ -1767,7 +1767,7 @@ F:CURE_FEAR |
 L:1d48+48
 
 N:121:Neutralize Poison
-A:75:27
+A:75:27:0
 A:91:33:5
 A:91:10:3
 A:92:13:5
@@ -3539,8 +3539,8 @@ P:0:0
 B:SCATTER:LITE_WEAK:1/1
 F:HOLD_SONG |
 
-N:272:Slow Metabolism
-I:80:23:1
+N:273:Slow Metabolism
+A:80:23:1
 A:90:45:3
 A:90:16:3
 A:90:53:2
