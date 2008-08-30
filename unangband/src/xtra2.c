@@ -3061,6 +3061,8 @@ bool check_quest(quest_event *qe1_ptr, bool advance)
 	int i, j;
 	bool questor = FALSE;
 
+	return (FALSE);
+	
 	for (i = 0; i < MAX_Q_IDX; i++)
 	{
 		quest_type *q_ptr = &(q_list[i]);
