@@ -368,7 +368,7 @@ pause = false;
   </head>
 
   <body onload="drawGrid(false);">
-    <h1>Testing</h1>
+    <h1>Conway's Game of Life</h1>
     <div>
       <canvas id="grid-canvas" width="300" height="300"></canvas>
     <FORM NAME="grid-form" ACTION="" METHOD="GET">
@@ -377,11 +377,16 @@ pause = false;
 <INPUT TYPE="button" NAME="faster" Value="Faster" onClick="if(delay > 1) delay = delay / 2;">
 <INPUT TYPE="button" NAME="slower" Value="Slower" onClick="delay = delay * 2;">
 </FORM>
-    
 <pre>
+The rules for each successive generation of Conway's
+Game of Life is to count the number of neighbouring
+cells to determine what the new state of a cell is.
 
-This is just a test. Please ignore.
-
+The new state is:
+<ol><li>empty; if there are less than two neighbours or
+more than three neighbours</li><li>occupied; if there are three neighbours</li><li>unchanged from the previous generation; if there
+are two neighbours</li>
+</ol>
 </pre>
     </div>
   </body>
