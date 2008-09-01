@@ -28007,7 +28007,7 @@ S:ADD_MANA | HEAL | BLINK | TPORT | TELE_LEVEL | FORGET | DISPEL |
 S:MIND_BLAST | WOUND | SCARE | BLIND | CONF |
 S:S_HI_DRAGON |
 D:Sauron's form as a serpent: poisonous, biting, spitting, and threatening
-D: tocrush you in its mighty coils.
+D: to crush you in its mighty coils.
 
 N:1369:Vampire-Sauron
 G:V:P
