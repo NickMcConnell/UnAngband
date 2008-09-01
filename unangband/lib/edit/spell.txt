@@ -3660,14 +3660,16 @@ S:CURE_DISEASE:27
 D:Your nerves and muscles feel weak and lifeless.
 
 N:290:Weakness
+A:45:2:1
 A:75:16:1
 P:0:0
-B:SELF:LOSE_STR:3d6
+B:LOS:LOSE_STR:3d6
 
 N:291:Stupidity
+A:45:3:1
 A:75:17:1
 P:0:0
-B:SELF:LOSE_INT:2d6
+B:LOS:LOSE_INT:2d6
 
 N:292:Naivety
 A:75:18:1

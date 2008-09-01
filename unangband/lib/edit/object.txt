@@ -1069,8 +1069,8 @@ F:SEARCH |
 N:138:Teleportation
 G:=:w
 I:45:4:0
-W:5:20:2:0
-A:5/1
+W:15:20:2:0
+A:15/1
 P:0:0d0:0:0:0
 Y:7:1
 F:UNCONTROLLED |
@@ -1132,12 +1132,12 @@ F:FREE_ACT |
 N:145:Weakness
 G:=:w
 I:45:2:-5
-W:5:0:2:0
-A:5/1
+W:15:20:2:0
+A:15/1
 P:0:0d0:0:0:0
 Y:4:1
 F:STR |
-F:LIGHT_CURSE |
+F:UNCONTROLLED | LIGHT_CURSE
 
 N:146:Flames
 G:=:w
@@ -1185,12 +1185,12 @@ F:UNCONTROLLED | LIGHT_CURSE |
 N:150:Stupidity
 G:=:w
 I:45:3:-5
-W:5:0:2:0
-A:5/1
+W:15:20:2:0
+A:15/1
 P:0:0d0:0:0:0
 Y:19:1
 F:INT |
-F:LIGHT_CURSE |
+F:UNCONTROLLED | LIGHT_CURSE |
 
 N:151:Damage
 G:=:w
@@ -1219,8 +1219,8 @@ Y:20:1
 N:154:Aggravate Monster
 G:=:w
 I:45:1:0
-W:5:0:2:0
-A:5/1
+W:30:0:2:0
+A:30/1
 P:0:1d15:0:0:0
 Y:15:1
 F:AGGRAVATE | LIGHT_CURSE |
@@ -1319,32 +1319,32 @@ Y:19:2
 F:CHR |
 F:SUST_CHR |
 
-N:165:Searching
+N:165:Sense Orcs
 G:":w
 I:40:5:2
-W:20:0:3:600
-A:20/1
+W:25:0:3:1500
+A:25/1
 P:0:0d0:0:0:0
-Y:12:1
-F:SEARCH |
+Y:10:2
+F:ESP_ORC
 
-N:166:Teleportation
+N:166:Sense Giants
 G:":w
 I:40:1:0
-W:15:20:3:0
-A:15/1
+W:25:0:3:1500
+A:25/1
 P:0:0d0:0:0:0
-Y:7:1
-F:UNCONTROLLED |
+Y:9:2
+F:ESP_GIANT
 
-N:167:Slow Digestion
+N:167:Sense Trolls
 G:":w
 I:40:3:0
-W:15:0:3:200
-A:15/1
+W:25:0:3:1500
+A:25/1
 P:0:0d0:0:0:0
-Y:19:1
-F:SLOW_DIGEST |
+Y:24:2
+F:ESP_TROLL
 
 N:168:Resist Acid
 G:":w
@@ -1853,11 +1853,16 @@ P:0:1d1:0:0:0
 Y:17:1
 F:THROWING |
 
-### 230 - Unused ###
+N:230:Slow Digestion
+G:=:w
+I:45:41:0
+W:5:0:2:200
+A:5/1
+P:0:0d0:0:0:0
+Y:19:1
+F:SLOW_DIGEST
 
 ### 231 - Unused ###
-
-#$# 230 - Unused ###
 
 #$# 231 - Unused ###
 
