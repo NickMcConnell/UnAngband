@@ -61,6 +61,7 @@ copy lib\xtra\sound\Makefile* unangband-062-src\lib\xtra\sound
 copy lib\xtra\help\Makefile* unangband-062-src\lib\xtra\help
 copy src\Makefile* unangband-062-src\src
 
+copy lib\docs\*.rtf unangband-062-src\lib\docs
 copy lib\docs\*.txt unangband-062-src\lib\docs
 copy lib\edit\*.txt unangband-062-src\lib\edit
 copy lib\file\*.txt unangband-062-src\lib\file
@@ -72,6 +73,7 @@ copy lib\todo\*.txt unangband-062-src\lib\todo
 
 copy lib\xtra\font\*.fon unangband-062-src\lib\xtra\font
 copy lib\xtra\graf\*.bmp unangband-062-src\lib\xtra\graf
+copy lib\xtra\graf\*.png unangband-062-src\lib\xtra\graf
 copy lib\xtra\sound\*.wav unangband-062-src\lib\xtra\sound
 
 copy lib\xtra\sound\sound.cfg unangband-062-src\lib\xtra\sound
