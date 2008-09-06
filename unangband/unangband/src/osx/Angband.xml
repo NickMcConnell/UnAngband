@@ -5,10 +5,10 @@
     <key>CFBundleDisplayName</key><string>$NAME$ (OS X)</string>
     <key>CFBundleExecutable</key><string>$EXECUTABLE$</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleSignature</key><string>A271</string>
+    <key>CFBundleSignature</key><string>UAng</string>
     <key>CFBundleVersion</key><string>$VERSION$</string>
     <key>CFBundleShortVersionString</key><string>$VERSION$</string>
-    <key>CFBundleIconFile</key><string>Angband</string>
+    <key>CFBundleIconFile</key><string>$NAME$</string>
     <key>CFBundleIdentifier</key><string>net.thangorodrim.$NAME$</string>
     <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
     <key>CFBundleLongVersionString</key>
@@ -22,23 +22,23 @@
     <key>CFBundleDocumentTypes</key>
       <array>
         <dict>
-          <key>CFBundleTypeExtentions</key><array><string>*</string></array>
+          <key>CFBundleTypeExtensions</key><array><string>*</string></array>
           <key>CFBundleTypeIconFile</key><string>Save</string>
-          <key>CFBundleTypeName</key><string>Angband saved game</string>
+          <key>CFBundleTypeName</key><string>$NAME$ saved game</string>
           <key>CFBundleTypeOSTypes</key><array><string>SAVE</string></array>
           <key>CFBundleTypeRole</key><string>Editor</string>
         </dict>
         <dict>
-          <key>CFBundleTypeExtentions</key><array><string>*</string></array>
+          <key>CFBundleTypeExtensions</key><array><string>*</string></array>
           <key>CFBundleTypeIconFile</key><string>Edit</string>
-          <key>CFBundleTypeName</key><string>Angband game data</string>
+          <key>CFBundleTypeName</key><string>$NAME$ game data</string>
           <key>CFBundleTypeOSTypes</key><array><string>TEXT</string></array>
           <key>CFBundleTypeRole</key><string>Editor</string>
         </dict>
         <dict>
-          <key>CFBundleTypeExtentions</key><array><string>*</string></array>
+          <key>CFBundleTypeExtensions</key><array><string>*</string></array>
           <key>CFBundleTypeIconFile</key><string>Data</string>
-          <key>CFBundleTypeName</key><string>Angband game data</string>
+          <key>CFBundleTypeName</key><string>$NAME$ game data</string>
           <key>CFBundleTypeOSTypes</key><array><string>DATA</string></array>
           <key>CFBundleTypeRole</key><string>Editor</string>
         </dict>
