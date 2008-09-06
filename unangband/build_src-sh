@@ -64,6 +64,7 @@ cp lib/xtra/help/Makefile* unangband-062-src/lib/xtra/help
 cp src/Makefile* unangband-062-src/src
 
 cp lib/docs/*.rtf unangband-062-src/lib/docs
+cp lib/docs/*.txt unangband-062-src/lib/docs
 cp lib/edit/*.txt unangband-062-src/lib/edit
 cp lib/file/*.txt unangband-062-src/lib/file
 cp lib/info/*.txt unangband-062-src/lib/info
@@ -74,6 +75,7 @@ cp lib/todo/*.txt unangband-062-src/lib/todo
 
 cp lib/xtra/font/*.fon unangband-062-src/lib/xtra/font
 cp lib/xtra/graf/*.bmp unangband-062-src/lib/xtra/graf
+cp lib/xtra/graf/*.png unangband-062-src/lib/xtra/graf
 cp lib/xtra/sound/*.wav unangband-062-src/lib/xtra/sound
 
 cp lib/xtra/sound/sound.cfg unangband-062-src/lib/xtra/sound
