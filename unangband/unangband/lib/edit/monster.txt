@@ -10468,7 +10468,7 @@ D: fire magic.
 
 #Was Saruman. Slight promotion in power here.
 
-N:514:Grimma Wormtongue, Agent of Saruman
+N:514:Grima Wormtongue, Agent of Saruman
 G:q:y
 #$ Clear available
 #$ Metallics available:dwsorbuDWGBUvtmYTVIMzZ
