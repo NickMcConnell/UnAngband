@@ -32,7 +32,7 @@
                 a shield, a one-handed specialist gets additional to hit 
                 bonuses, improved natural armour class and can cause 
                 additional critical damage at higher levels.  One-handed 
-                weapons weigh up to 15 lbs in weight.
+                weapons have up to 15 lbs in weight.
                 The rate of progress of these abilities varies with each class.
 
 ***** <Two-handed>
