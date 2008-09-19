@@ -2704,14 +2704,14 @@
 #define PROJECT_ARC          0x00000002
 #define PROJECT_STAR         0x00000004
 #define PROJECT_8WAY         0x00000008
-#define PROJECT_4WAY         0x00000010
-#define PROJECT_SCATTER      0x00000020
 
 /* What projections do */
+#define PROJECT_FORK         0x00000010  /* Has 'gaps' in it like lightning */
+#define PROJECT_EXPAND       0x00000020  /* Expands further in tight spaces */
 #define PROJECT_BOOM         0x00000040
-#define PROJECT_WALL         0x00000080
-#define PROJECT_PASS         0x00000100  /*Ignore walls*/
-#define PROJECT_MISS         0x00000200  /*Misses the first target*/
+#define PROJECT_WALL         0x00000080	 /* Include walls */
+#define PROJECT_PASS         0x00000100  /* Pass through walls*/
+#define PROJECT_MISS         0x00000200  /* Pass through the first target*/
 #define PROJECT_AREA         0x00000400  /* Applies damage evenly at all ranges */
 
 /* What projections affect */
@@ -2735,13 +2735,15 @@
 #define PROJECT_CHCK         0x01000000
 #define PROJECT_ORTH         0x02000000 /*(unused)*/
 
-/* Projections that don't use projection function, or do in an unusual way */
-#define PROJECT_LOS          0x04000000
+/* Projections that don't use projection function */
+#define PROJECT_SCATTER      0x04000000
 #define PROJECT_HOOK         0x08000000
 #define PROJECT_PANEL        0x10000000
 #define PROJECT_LEVEL        0x20000000
-#define PROJECT_FORK		 0x40000000 /* Doesn't follow a straight path */
-#define PROJECT_WIDE         0x80000000 /* Follows a wide path */
+
+/* Relax definition of grids being projectable in various ways */
+#define PROJECT_LOS		 	 0x40000000 /* Include LOS grids */
+#define PROJECT_FLOOD        0x80000000 /* Include grids that are floodable */
 
 /* Melee specific flags */
 #define PR2_MELEE        0x00000001
@@ -4770,6 +4772,14 @@
 #define cave_flag_bold(Y,X,FLG) \
 	(!(cave_info[Y][X] & (FLG)))
 
+
+/*
+ * Determine if a "legal" grid is suitable for view
+ *
+ * Note the use of the new "CAVE_XLOS" flag.
+ */
+#define cave_los_bold(Y,X) \
+	(!(cave_info[Y][X] & (CAVE_XLOS)))
 
 /*
  * Determine if a "legal" grid is suitable for projections

@@ -12246,6 +12246,9 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	/* Is the player blind? */
 	bool blind = (p_ptr->blind ? TRUE : FALSE);
 
+	/* Projection can also pass through line of sight grids */
+	bool allow_los = (flg & (PROJECT_LOS)) != 0;
+
 	/* Number of grids in the "path" */
 	int path_n = 0;
 
@@ -12361,7 +12364,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 			int nx = GRID_X(path_g[i]);
 
 			/* Hack -- Balls explode before reaching walls. */
-			if ((flg & (PROJECT_BOOM | PROJECT_8WAY)) && (!cave_project_bold(ny, nx)))
+			if ((flg & (PROJECT_BOOM | PROJECT_8WAY)) && (!cave_project_bold(ny, nx))
+					&& ((!allow_los) || !(cave_los_bold(ny, nx))))
 			{
 				break;
 			}
@@ -12492,7 +12496,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				int x = x2 + ddx_ddd[i] * k;
 
 				/* This is a non-projectable grid */
-				if (!cave_project_bold(y, x))
+				if (!cave_project_bold(y, x) &&
+						((!allow_los) || !(cave_los_bold(y, x))))
 				{
 					/* Spell with PROJECT_PASS ignore these grids */
 					if (!(flg & (PROJECT_PASS)))
@@ -12503,7 +12508,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				}
 
 				/* PROJECT_WALL or PROJECT_PASS is active or terrain is passable */
-				if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(y, x))
+				if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(y, x) ||
+						((allow_los) && (cave_los_bold(y, x))))
 				{
 					gy[grids] = y;
 					gx[grids] = x;
@@ -12577,13 +12583,14 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				if (!in_bounds(y, x)) continue;
 
 				/* This is a non-projectable grid */
-				if (!cave_project_bold(y, x))
+				if (!cave_project_bold(y, x) && ((!allow_los) || !(cave_los_bold(y, x))))
 				{
 					/* Spell with PROJECT_PASS ignore these grids */
 					if (!(flg & (PROJECT_PASS)))
 					{
 						/* PROJECT_WALL is active or terrain is passable */
-						if ((flg & (PROJECT_WALL)) || cave_project_bold(y, x))
+						if ((flg & (PROJECT_WALL)) || cave_project_bold(y, x) ||
+								((allow_los) && (cave_los_bold(y, x))))
 						{
 							/* Allow grids next to grids in LOS of explosion center */
 							for (i = 0, k = 0; i < 8; i++)
@@ -12594,7 +12601,9 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 								/* Stay within dungeon */
 								if (!in_bounds(yy, xx)) continue;
 
-								if (generic_los(y2, x2, yy, xx, CAVE_XLOF))
+								/* Check if projectable from source grid */
+								if ((generic_los(y2, x2, yy, xx, CAVE_XLOF)) ||
+										((allow_los) && (generic_los(y2, x2, yy, xx, CAVE_XLOS))))
 								{
 									k++;
 									break;
@@ -12691,7 +12700,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				/* Standard ball spell -- accept all grids in LOS. */
 				else
 				{
-					if (flg & (PROJECT_PASS) || generic_los(y2, x2, y, x, CAVE_XLOF))
+					if ((flg & (PROJECT_PASS)) || generic_los(y2, x2, y, x, CAVE_XLOF) ||
+							((allow_los) && (generic_los(y2, x2, y, x, CAVE_XLOS))))
 					{
 						gy[grids] = y;
 						gx[grids] = x;
@@ -12705,6 +12715,132 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 
 	/* Clear the "temp" array  XXX */
 	clear_temp_array();
+
+	/* Flood out from existing grids up to radius.
+	 * Reduce flood from any existing square by radius.
+	 */
+	if (flg & (PROJECT_FLOOD))
+	{
+		/*
+		 * If the center of the explosion hasn't been
+		 * saved already, save it now.
+		 */
+		if (grids == 0)
+		{
+			gy[grids] = y2;
+			gx[grids] = x2;
+			gd[grids++] = 0;
+		}
+
+		for (i = 0; i < grids; i++)
+		{
+			/* Mark the grid */
+			play_info[gy[i]][gx[i]] |= (PLAY_TEMP);
+		}
+
+		/* Hack to allow wide beams */
+		if (flg & (PROJECT_BEAM)) rad = 1;
+
+		/* Spread the flood */
+		for (i = 0; i < grids; i++)
+		{
+			/* Skip grids at edge of flood */
+			if (gd[i] >= rad) continue;
+
+			/* Passable grid */
+			if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
+					((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+			{
+				/* Check adjacent grids */
+				for (j = 0; j < 8; j++)
+				{
+					int yy = gy[i] + ddy_ddd[j];
+					int xx = gx[i] + ddx_ddd[j];
+
+					/* Stay within dungeon */
+					if (!in_bounds(yy, xx)) continue;
+
+					/* Skip already added grids */
+					if (play_info[yy][xx] & (PLAY_TEMP)) continue;
+
+					/* Must be within maximum distance. */
+					dist = (distance(y2, x2, yy, xx));
+					if (dist > rad) continue;
+
+					/* Passable grid */
+					if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
+							((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+					{
+						/* Justifiable paranoia */
+						if (grids < N_ELEMENTS(gy))
+						{
+							/* Add grid */
+							gy[grids]=yy;
+							gx[grids]=xx;
+							gd[grids]=gd[i]+1;
+							grids++;
+
+							/* Mark as added */
+							play_info[yy][xx] |= (PLAY_TEMP);
+						}
+					}
+				}
+			}
+		}
+
+		/* Clear temp grids */
+		for (i = 0; i < grids; i++)
+		{
+			/* Mark the grid */
+			play_info[gy[i]][gx[i]] &= ~(PLAY_TEMP);
+		}
+
+		/* Once flooding finished, sort the grids by effective
+		 * distance. This hand written implementation may be
+		 * inefficient. */
+		i = 0;
+
+		/* Scan through grids */
+		for (j = 0; j < grids; j++)
+		{
+			/* Swapped? */
+			bool swapped;
+
+			swapped = FALSE;
+
+			/* Sorted */
+			if (gd[j] <= i) continue;
+
+			/* Find first grid at this radius */
+			for (k = j + 1; k < grids; k++)
+			{
+				int temp_y, temp_x, temp_d;
+
+				/* No match */
+				if (gd[k] > i) continue;
+
+				/* Swap */
+				temp_y = gy[j];
+				temp_x = gx[j];
+				temp_d = gd[j];
+
+				gy[j] = gy[k];
+				gx[j] = gx[k];
+				gd[j] = gd[k];
+
+				gy[k] = temp_y;
+				gy[k] = temp_x;
+				gd[k] = temp_d;
+
+				swapped = TRUE;
+
+				break;
+			}
+
+			/* Increase sorted values */
+			if (!swapped) i++;
+		}
+	}
 
 	/* Calculate and store the actual damage at each distance. */
 	for (i = 0; i <= MAX_RANGE; i++)

@@ -5917,6 +5917,7 @@ void cave_alter_feat(int y, int x, int action)
  *    PROJECT_THRU:  projection extends past destination grid
  *    PROJECT_PASS:  projection passes through walls
  *    PROJECT_MISS:  projection misses the first monster or player.
+ *    PROJECT_LOS:   allow line of sight grids as well as projectable ones.
  *
  * This function returns the number of grids (if any) in the path.  This
  * may be zero if no grids are legal except for the starting one.
@@ -5947,6 +5948,7 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 
 	/* Require projections to be strictly LOF when possible  XXX XXX */
 	bool require_strict_lof = FALSE;
+	bool allow_los = (flg & (PROJECT_LOS)) != 0;
 
 	/* Count of grids in LOF, storage of LOF grids */
 	u16b tmp_grids[80];
@@ -6171,7 +6173,8 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			}
 
 			/* Optionally, require strict line of fire */
-			if ((!require_strict_lof) || (play_info[y][x] & (PLAY_FIRE)))
+			if ((!require_strict_lof) || (play_info[y][x] & (PLAY_FIRE))
+				|| ((allow_los) && (play_info[y][x] & (PLAY_VIEW))))
 			{
 				/* Store grid value */
 				tmp_grids[grids++] = g;
@@ -6186,7 +6189,8 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 		 * Handle wall (unless ignored).  Walls can be in a projection path,
 		 * but the path cannot pass through them.
 		 */
-		if (!(flg & (PROJECT_PASS)) && !cave_project_bold(y, x))
+		if (!(flg & (PROJECT_PASS)) && !cave_project_bold(y, x)
+				&& ((!allow_los) || !(cave_los_bold(y, x))))
 		{
 			/* Clear any lines of sight passing through this grid */
 			bits0 &= ~(p->bits_0);
@@ -6255,7 +6259,11 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			/* Usually stop at wall grids */
 			if (!(flg & (PROJECT_PASS)))
 			{
-				if (!cave_project_bold(y, x)) blockage[i] = 2;
+				if ((!cave_project_bold(y, x))
+						&& ((!allow_los) || !(cave_los_bold(y, x))))
+				{
+					blockage[i] = 2;
+				}
 			}
 
 			/* If we don't stop at wall grids, we must explicitly check legality */
@@ -6349,8 +6357,16 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 				/* Usually stop at wall grids */
 				if (!(flg & (PROJECT_PASS)))
 				{
-					if (!cave_project_bold(y_c, x_c)) blockage[0] = 2;
-					if (!cave_project_bold(y_d, x_d)) blockage[1] = 2;
+					if ((!cave_project_bold(y_c, x_c))
+						&& ((!allow_los) || !(cave_los_bold(y_c, x_c))))
+					{
+						blockage[0] = 2;
+					}
+					if ((!cave_project_bold(y_d, x_d))
+							&& ((!allow_los) || !(cave_los_bold(y_d, x_d))))
+					{
+						blockage[1] = 2;
+					}
 				}
 
 				/* Try to avoid non-initial monsters/players */
@@ -6420,6 +6436,9 @@ byte projectable(int y1, int x1, int y2, int x2, u32b flg)
 	int old_y2 = y2;
 	int old_x2 = x2;
 
+	bool allow_los = (flg & (PROJECT_LOS)) != 0;
+
+
 	/* We do not have permission to pass through walls */
 	if (!(flg & (PROJECT_WALL | PROJECT_PASS)))
 	{
@@ -6427,14 +6446,16 @@ byte projectable(int y1, int x1, int y2, int x2, u32b flg)
 		if ((y1 == py) && (x1 == px))
 		{
 			/* Require that destination be in line of fire */
-			if (!(play_info[y2][x2] & (PLAY_FIRE))) return (PROJECT_NO);
+			if (!(play_info[y2][x2] & (PLAY_FIRE)) || (allow_los &&
+					(play_info[y2][x2] & (PLAY_VIEW)))) return (PROJECT_NO);
 		}
 
 		/* The character is the target of the projection */
 		else if ((y2 == py) && (x2 == px))
 		{
 			/* Require that source be in line of fire */
-			if (!(play_info[y1][x1] & (PLAY_FIRE))) return (PROJECT_NO);
+			if (!(play_info[y1][x1] & (PLAY_FIRE)) || (allow_los &&
+					(play_info[y1][x1] & (PLAY_VIEW)))) return (PROJECT_NO);
 		}
 	}
 
@@ -6452,7 +6473,8 @@ byte projectable(int y1, int x1, int y2, int x2, u32b flg)
 	if ((y != old_y2) || (x != old_x2)) return (PROJECT_NO);
 
 	/* May not end in a wall */
-	if (!cave_project_bold(y, x)) return (PROJECT_NO);
+	if (!cave_project_bold(y, x)
+			&& ((!allow_los) || !(cave_los_bold(y, x)))) return (PROJECT_NO);
 
 	/* Promise a clear bolt shot if we have verified that there is one */
 	if ((flg & (PROJECT_STOP)) || (flg & (PROJECT_CHCK)))
