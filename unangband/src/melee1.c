@@ -71,7 +71,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	int d1, d2, scale;
 	int i, boost;
 	int n = 0;
-	
+
 	u32b flag[4];
 
 	/* Paranoia */
@@ -82,7 +82,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 
 	/* Hack -- leader monsters */
 	if (m_ptr->mflag & (MFLAG_LEADER)) depth += 5;
-	
+
 	/* Hack -- maximum power increase */
 	if (depth > r_ptr->level + 15) depth = r_ptr->level + 15;
 
@@ -94,14 +94,14 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 
 	/* Compute effective power for monsters at this depth */
 	d1 = (depth <= 30 ? depth :
-			(depth <= 35 ? depth * 2 - 30 : 
+			(depth <= 35 ? depth * 2 - 30 :
 			(depth <= 45 ? depth * 6 - 170:
 			(depth <= 50 ? depth * 12 - 440 :
 			  depth * 20 - 840))));
 
 	/* Compute effective power for monster's old depth */
 	d2 = (r_ptr->level == 0 ? 1 : (r_ptr->level <= 30 ? r_ptr->level :
-			(r_ptr->level <= 35 ? r_ptr->level * 2 - 30 : 
+			(r_ptr->level <= 35 ? r_ptr->level * 2 - 30 :
 			(r_ptr->level <= 45 ? r_ptr->level * 6 - 170 :
 			(r_ptr->level <= 50 ? r_ptr->level * 12 - 440 :
 			  r_ptr->level * 20 - 840)))));
@@ -130,11 +130,11 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	{
 		/* Clear all flags */
 		n_ptr->flags9 &= ~RF9_LEVEL_MASK;
-		
+
 		/* Add one back in based on m_idx */
 		n_ptr->flags9 |= flag[m_idx % n];
 	}
-	
+
 	/* Set level to depth */
 	n_ptr->level = depth;
 
@@ -144,7 +144,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 		int fake_m_idx = m_idx / n;
 		bool add_ranged = FALSE;
 		n = 0;
-		
+
 		if (!(fake_m_idx % 2) && (r_ptr->level <= depth - (++n * 5)))
 		{
 			n_ptr->flags2 |= (RF2_ARMOR);
@@ -159,10 +159,10 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].effect = i > 0 ? n_ptr->blow[0].effect : GF_HURT;
 					n_ptr->blow[i].d_dice = MAX(d1 < 50 ? d1 / 5 : d1 / (d1 / 10), 1);
 					n_ptr->blow[i].d_side = d1 < 50 ? 5 : (d1 / 10);
-					
+
 					n_ptr->freq_innate = MAX(n_ptr->freq_innate, 25 + depth / 10);
 					add_ranged = TRUE;
-					
+
 					break;
 				}
 				else if ((n_ptr->blow[i].method >= RBM_ARROW) && (n_ptr->blow[i].method < RBM_ARROW + 5))
@@ -171,31 +171,31 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].d_side = MAX(d1 < 50 ? 5 : (d1 / 10), n_ptr->blow[i].d_side);
 					break;
 				}
-				
+
 				if (n_ptr->blow[i].effect == GF_HURT)
 				{
 					if ((m_idx % 11) < 4) n_ptr->blow[i].effect = GF_BATTER;
 					else n_ptr->blow[i].effect = GF_WOUND;
 				}
 			}
-			
+
 			scale = scale * 4 / 5;
 		}
 		if (!(fake_m_idx % 3) && (r_ptr->level <= depth - (++n * 5)))
 		{
 			n_ptr->flags2 |= (RF2_PRIEST);
-			
+
 			/* Give priest some power */
 			n_ptr->mana = MAX(n_ptr->mana, d1 / 10);
 			n_ptr->spell_power = MAX(n_ptr->spell_power, depth / 4);
 			n_ptr->freq_spell = MAX(n_ptr->freq_spell, 25 + depth / 10);
-			
+
 			/* Give priest some basic spells */
 			if ((m_ptr->r_idx % 7) < (depth / 15)) n_ptr->flags6 |= (RF6_HEAL);
 			if ((m_ptr->r_idx % 9) < (depth / 12)) n_ptr->flags6 |= (RF6_CURE);
 			if ((m_ptr->r_idx % 11) < (depth / 10)) n_ptr->flags6 |= (RF6_BLESS);
 			if ((m_ptr->r_idx % 13) < (depth / 8)) n_ptr->flags6 |= (RF6_BLINK);
-			
+
 			/* Pick a 'priestly' attack spell */
 			switch(m_ptr->r_idx % 5)
 			{
@@ -205,7 +205,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 				case 3: n_ptr->flags5 |= (RF5_BOLT_ELEC); break;
 				case 4: n_ptr->flags5 |= (RF5_BALL_LITE); break;
 			}
-			
+
 			/* And maybe another */
 			if (depth > 40) switch((m_ptr->r_idx * 7) % 5)
 			{
@@ -215,24 +215,24 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 				case 3: n_ptr->flags5 |= (RF5_BOLT_ELEC); break;
 				case 4: n_ptr->flags5 |= (RF5_BALL_LITE); break;
 			}
-			
+
 			scale = scale * 2 / 3;
 		}
 		if (!(fake_m_idx % 5) && (r_ptr->level <= depth - (++n * 5)))
 		{
 			n_ptr->flags2 |= (RF2_MAGE);
-			
+
 			/* Give priest some power */
 			n_ptr->mana = MAX(n_ptr->mana, d1 / 12);
 			n_ptr->spell_power = MAX(n_ptr->spell_power, depth / 3);
 			n_ptr->freq_spell = MAX(n_ptr->freq_spell, 25 + depth / 10);
-			
+
 			/* Give mage some basic spells */
 			if (((m_ptr->r_idx * 11) % 7) < (depth / 15)) n_ptr->flags6 |= (RF6_BLINK);
 			if (((m_ptr->r_idx * 13) % 9) < (depth / 12)) n_ptr->flags6 |= (RF6_ADD_MANA);
 			if (((m_ptr->r_idx * 17) % 11) < (depth / 10)) n_ptr->flags6 |= (RF6_TPORT);
 			if (((m_ptr->r_idx * 19) % 13) < (depth / 8)) n_ptr->flags6 |= (RF6_SHIELD);
-			
+
 			/* Pick a 'magely' attack spell */
 			switch((m_ptr->r_idx * 13) % 12)
 			{
@@ -249,7 +249,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 				case 10: if ((n_ptr->flags6 & (RF6_SLOW)) && (depth > 60)) { n_ptr->flags5 |= (RF5_BALL_SOUND); break; }
 				case 11: n_ptr->flags5 |= (RF5_BOLT_MANA); break;
 			}
-			
+
 			/* And another one */
 			if (depth > 30) switch((m_ptr->r_idx * 17) % 12)
 			{
@@ -266,7 +266,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 				case 10: if ((n_ptr->flags5 & (RF5_BOLT_MANA)) && (depth > 60)) { n_ptr->flags5 |= (RF5_BALL_MANA); break; }
 				case 11: n_ptr->flags5 |= (RF5_BOLT_MANA); break;
 			}
-			
+
 			/* And maybe one more */
 			if (depth > 50) switch((m_ptr->r_idx * 19) % 15)
 			{
@@ -303,7 +303,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].effect = i > 0 ? n_ptr->blow[0].effect : GF_HURT;
 					n_ptr->blow[i].d_dice = MAX(d1 < 50 ? d1 / 5 : d1 / (d1 / 10), 1);
 					n_ptr->blow[i].d_side = d1 < 50 ? 5 : (d1 / 10);
-					
+
 					n_ptr->freq_innate = MAX(n_ptr->freq_innate, 25 + depth / 10);
 					add_ranged = TRUE;
 				}
@@ -312,12 +312,12 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].method = RBM_TOUCH;
 					if (((m_idx + (i * 13)) % 11) < 4)
 					{
-						n_ptr->blow[i].effect = depth < 20 ? GF_EAT_GOLD : GF_EAT_ITEM;					
+						n_ptr->blow[i].effect = depth < 20 ? GF_EAT_GOLD : GF_EAT_ITEM;
 					}
 					else n_ptr->blow[i].effect = GF_POIS;
-					
+
 					n_ptr->blow[i].d_dice = MAX(d1 < 50 ? d1 / 5 : d1 / (d1 / 10), 1);
-					n_ptr->blow[i].d_side = d1 < 50 ? 5 : (d1 / 10);					
+					n_ptr->blow[i].d_side = d1 < 50 ? 5 : (d1 / 10);
 				}
 				else if ((n_ptr->blow[i].method >= RBM_DAGGER) && (n_ptr->blow[i].method < RBM_DAGGER + 3))
 				{
@@ -325,24 +325,24 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].d_side = MAX(d1 < 50 ? 5 : (d1 / 10), n_ptr->blow[i].d_side);
 				}
 			}
-			
+
 			/* Give thief some power */
 			n_ptr->mana = MAX(n_ptr->mana, d1 / 20);
 			n_ptr->spell_power = MAX(n_ptr->spell_power, depth / 6);
 			n_ptr->freq_spell = MAX(n_ptr->freq_spell, 25 + depth / 10);
-			
+
 			/* Give thief some basic spells */
 			if (((m_ptr->r_idx * 13) % 7) < (depth / 15)) n_ptr->flags6 |= (RF6_BLINK);
 			if (((m_ptr->r_idx * 17) % 9) < (depth / 12)) n_ptr->flags6 |= (RF6_TPORT);
 			if (((m_ptr->r_idx * 19) % 11) < (depth / 10)) n_ptr->flags6 |= (RF6_INVIS);
-			
+
 			scale = scale * 4 / 5;
 		}
-		
+
 		if ((!(fake_m_idx % 11) && (r_ptr->level <= depth - (++n * 5))) || (!n))
 		{
 			n_ptr->flags2 |= (RF2_ARCHER);
-			
+
 			/* Increase effectiveness of some blows */
 			for (i = 0; i < 4; i++)
 			{
@@ -353,7 +353,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].effect = i > 0 ? n_ptr->blow[0].effect : GF_HURT;
 					n_ptr->blow[i].d_dice = MAX(d1 < 50 ? d1 / 5 : d1 / (d1 / 10), 1);
 					n_ptr->blow[i].d_side = d1 < 50 ? 5 : (d1 / 10);
-					
+
 					n_ptr->freq_innate = MAX(n_ptr->freq_innate, 25 + depth / 10);
 					add_ranged = TRUE;
 				}
@@ -363,11 +363,11 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 					n_ptr->blow[i].d_side = MAX(d1 < 50 ? 5 : (d1 / 10), n_ptr->blow[i].d_side);
 				}
 			}
-			
+
 			scale = scale * 4 / 5;
 		}
 	}
-	
+
 	/* Recheck scale */
 	if (scale < 100) return (TRUE);
 
@@ -397,7 +397,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 		else if (n_ptr->mana && (boost > 10)) n_ptr->flags6 |= RF6_ADD_MANA;
 
 	}
-	
+
 	/* Recheck scale */
 	if (scale < 100) return (TRUE);
 
@@ -460,7 +460,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 		/* Boost power */
 		if (scale > 100)
 		{
-			scale = (scale - 100) / 2 + 100; 
+			scale = (scale - 100) / 2 + 100;
 			n_ptr->power = (r_ptr->power * scale) / 100;
 		}
 	}
@@ -511,7 +511,7 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 		/* Boost power */
 		if (scale > 100)
 		{
-			scale = (scale - 100) / 2 + 100; 
+			scale = (scale - 100) / 2 + 100;
 			n_ptr->power = (r_ptr->power * scale) / 100;
 
 			/* Not done? */
@@ -574,7 +574,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		if (!p_ptr->heavy_wield)
 		{
 			int i;
-			
+
 			for (i = 0; i < z_info->w_max; i++)
 			{
 				if (w_info[i].class != p_ptr->pclass) continue;
@@ -582,7 +582,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 				if (w_info[i].level > p_ptr->lev) continue;
 
 				/* Check for styles */
-				if (w_info[i].styles==0 
+				if (w_info[i].styles==0
 					|| w_info[i].styles & (p_ptr->cur_style & (WS_WIELD_FLAGS)) & (1L << p_ptr->pstyle))
 				{
 					switch (w_info[i].benefit)
@@ -595,7 +595,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 				}
 			}
 		}
-		
+
 		/* Player condition */
 		if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image) || (p_ptr->shero))
 			blocking /= 2;
@@ -1168,7 +1168,7 @@ bool mon_check_hit(int m_idx, int effect, int level, int who, bool ranged)
 
 	int k, ac;
 	int power = attack_power(effect);
-	
+
 	/* Monster never misses */
 	if (r_ptr->flags9 & (RF9_NEVER_MISS)) return (TRUE);
 
@@ -1187,8 +1187,8 @@ bool mon_check_hit(int m_idx, int effect, int level, int who, bool ranged)
 	if ((ranged) && (n_ptr->blind)) power /= 10;
 
 	/* Monsters can evade */
-	if (mon_evade(m_idx, 
-		(ranged ? 5 : 3) + (m_ptr->confused 
+	if (mon_evade(m_idx,
+		(ranged ? 5 : 3) + (m_ptr->confused
 				 || m_ptr->stunned ? 1 : 3),
 		9, "")) return (FALSE);
 
@@ -1216,7 +1216,7 @@ bool mon_check_hit(int m_idx, int effect, int level, int who, bool ranged)
 
 	/* Total armor */
 	ac = calc_monster_ac(m_idx, ranged);
-	
+
 	/* Power and Level compete against Armor */
 	if (power > 0)
 	{
@@ -1286,7 +1286,7 @@ bool make_attack_normal(int m_idx)
 		int method = r_ptr->blow[ap_cnt].method;
 		int d_dice = r_ptr->blow[ap_cnt].d_dice;
 		int d_side = r_ptr->blow[ap_cnt].d_side;
-	
+
 		if (cheat_xtra) msg_format("base dice in this blow: dice %d, sides %d", d_dice, d_side);
 
 		/* Hack -- no more attacks */
@@ -1814,7 +1814,7 @@ int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
 			PROJECT_PLAY | PROJECT_WALL | PROJECT_MAGIC)
 #define FLG_MON_AREA (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
 			PROJECT_PLAY | PROJECT_WALL | PROJECT_AREA | PROJECT_MAGIC)
-#define FLG_MON_8WAY (PROJECT_8WAY | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
+#define FLG_MON_8WAY (PROJECT_4WAY | PROJECT_4WAX | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
 			PROJECT_PLAY | PROJECT_WALL | PROJECT_AREA | PROJECT_MAGIC)
 #define FLG_MON_CLOUD (PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_PLAY | \
 			PROJECT_HIDE | PROJECT_WALL | PROJECT_MAGIC)
@@ -2146,7 +2146,7 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 	bool obvious, known;
 
 	int i;
-			
+
 	if (who > SOURCE_MONSTER_START)
 	{
 		monster_type *m_ptr = &m_list[who];
@@ -2168,7 +2168,7 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 
 		fy = m_ptr->fy;
 		fx = m_ptr->fx;
-	}	
+	}
 	else if (who == SOURCE_PLAYER_EAT_MONSTER)
 	{
 		r_ptr = &r_info[what];
@@ -2176,7 +2176,7 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 
 		fy = p_ptr->py;
 		fx = p_ptr->px;
-		
+
 		known = TRUE;
 	}
 	else
@@ -2219,12 +2219,12 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 
 /*
  * Monsters can concentrate light or conjure up darkness.
- * 
+ *
  * Also, druidic type monsters use water and trees to boost
  * their recovery of hit points and mana.
  *
  * Return TRUE if the monster did anything.
- * 
+ *
  * Note we force 'destroy' to FALSE to keep druidic monsters
  * more interesting. This means they don't destroy the
  * resources that they concentrate - forcing the player to
@@ -2233,7 +2233,7 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 static int mon_concentrate_power(int y, int x, int spower, bool use_los, bool destroy, bool concentrate_hook(const int y, const int x, const bool modify))
 {
 	int damage, radius, lit_grids;
-	
+
 	/* Radius of darkness-creation varies depending on spower */
 	radius = MIN(6, 3 + spower / 20);
 
@@ -2269,14 +2269,14 @@ static int mon_concentrate_power(int y, int x, int spower, bool use_los, bool de
 int sauron_shape(int old_form)
 {
 	int i, k = 0;
-	
+
 	int r_idx = SAURON_TRUE;
-	
+
 	for (i = SAURON_FORM; i < SAURON_FORM + MAX_SAURON_FORMS; i++)
 	{
 		/* Never pick old shape */
 		if (i == old_form) continue;
-		
+
 		/* Previously killed this shape on this level allows the 'true' form to be fought. */
 		if ((p_ptr->sauron_forms & (1 << (i - SAURON_FORM))) && one_in_(++k))
 		{
@@ -2290,7 +2290,7 @@ int sauron_shape(int old_form)
 		/* Pick the shape */
 		if (one_in_(++k)) r_idx = i;
 	}
-	
+
 	return (r_idx);
 }
 
@@ -2306,10 +2306,10 @@ int sauron_shape(int old_form)
  *
  * Perhaps monsters should breathe at locations *near* the player,
  * since this would allow them to inflict "partial" damage.
- * 
+ *
  * XXX We currently only call this routine with the following values of
  * 'who'.
- * 
+ *
  * who > SOURCE_MONSTER_START: 	source is monster
  * who == SOURCE_FEATURE:		source is feature
  * who == SOURCE_PLAYER_TRAP:	source is player trap
@@ -2335,7 +2335,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 	/* Summoner */
 	int summoner = 0;
-	
+
 	/* Summon count */
 	int count = 0;
 
@@ -2350,7 +2350,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	bool powerful;
 	bool normal;
 	bool direct;
-	
+
 	u32b allies = 0L;
 
 	/* Some summons override cave ecology */
@@ -2455,7 +2455,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		my_strcat(t_poss,f_name + f_info[cave_feat[y][x]].name, sizeof(t_poss));
 		my_strcat(t_poss,"'s",sizeof(t_poss));
 	}
-		
+
 	/* Describe caster - player traps and features only */
 	if (who < SOURCE_MONSTER_START)
 	{
@@ -2464,7 +2464,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		r_ptr = &r_info[0];
 
 		what = cave_feat[y][x];
-		
+
 		/* Feature is seen */
 		if (play_info[y][x] & (PLAY_SEEN))
 		{
@@ -2478,7 +2478,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			my_strcpy(m_name,"it", sizeof(m_name));
 			my_strcpy(m_poss,"its", sizeof(m_poss));
 		}
-		
+
 		/* Hack -- Message text depends on feature description */
 		seen = FALSE;
 
@@ -2502,7 +2502,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 		/* No summoner */
 		summoner = 0;
-		
+
 		/* Fake the summoning level */
 		summon_lev = p_ptr->depth + 3;
 	}
@@ -2532,7 +2532,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 		/* Extract the powerfulness */
 		powerful = (r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE);
-		
+
 		/* Extract the summoner */
 		summoner = m_list[who].r_idx;
 
@@ -2581,8 +2581,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		else if (m_ptr->mflag & (MFLAG_SMART)) failrate /= 2;
 
 		/* Check for spell failure (breath/shot attacks never fail) */
-		if (attack >= 128 
-			&& rand_int(100) < failrate 
+		if (attack >= 128
+			&& rand_int(100) < failrate
 			&& !(m_ptr->mflag & MFLAG_ALLY))
 		{
 			/* Message */
@@ -2636,7 +2636,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			what = who;
 			who = SOURCE_PLAYER_ALLY;
 		}
-		
+
 		/* Notice attack */
 		else
 		{
@@ -2705,7 +2705,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			result = NULL;
 
 			/* For most, only do if damage */
-			if (dam || method == RBM_SHRIEK) 
+			if (dam || method == RBM_SHRIEK)
 				switch (method)
 				{
 				case RBM_SPIT:	mon_shot(who, what, y, x, effect, dam, hit, result); break;
@@ -2896,7 +2896,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				y = m_ptr->fy;
 				x = m_ptr->fx;
-				
+
 				what = who;
 				who = SOURCE_SELF;
 			}
@@ -3381,7 +3381,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 128+5:
 		{
 			if (target < 0) disturb(1, 0);
-			
+
 			/* Sometimes try to concentrate light */
 			if ((rand_int(100) < 50) && ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF))))
 			{
@@ -3402,7 +3402,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					break;
 				}
 			}
-			
+
 			if (spower < 10)
 			{
 				if (blind) result = format("%^s mumbles.", m_name);
@@ -3429,7 +3429,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 128+6:
 		{
 			if (target < 0) disturb(1, 0);
-			
+
 			/* Sometimes try to concentrate light */
 			if ((rand_int(100) < 50) && ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF))))
 			{
@@ -4028,7 +4028,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 			else if (target < 0)
 			{
-				if (p_ptr->stastis) /* No effect */ ; 
+				if (p_ptr->stastis) /* No effect */ ;
 				else if (p_ptr->fast) set_fast(p_ptr->fast + rand_int(rlev/3));
 				else set_fast(p_ptr->fast + rlev);
 			}
@@ -4048,28 +4048,28 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					/* Check to see if doing so would be worthwhile */
 					int power = mon_concentrate_power(y, x, spower, FALSE, FALSE, concentrate_water_hook);
-	
+
 					/* We decided to concentrate light */
 					if (power)
 					{
 						/* Message */
 						if (blind) msg_format("%^s mumbles.", m_name);
 						else msg_format("%^s absorbs mana from the surrounding water.", m_name);
-	
+
 						/* Big boost to mana */
 						n_ptr->mana = MIN(255, n_ptr->mana + power / 5 + 1);
-						if (n_ptr->mana > s_ptr->mana) 
+						if (n_ptr->mana > s_ptr->mana)
 							n_ptr->mana = s_ptr->mana;
-	
+
 						/* Done */
 						break;
 					}
 				}
-				
+
 				/* Benefit less from gaining mana any other way */
 				spower /= 2;
 			}
-			
+
 			if (known)
 			{
 				disturb(1,0);
@@ -4082,13 +4082,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* Increase current mana.  Do not exceed maximum. */
 				n_ptr->mana = MIN(255, n_ptr->mana + spower / 15 + 1);
-				if (n_ptr->mana > s_ptr->mana) 
+				if (n_ptr->mana > s_ptr->mana)
 					n_ptr->mana = s_ptr->mana;
 			}
 			else if (target < 0)
 			{
 				/* Player mana is worth more */
-				if (p_ptr->stastis) /* No effect */ ; 
+				if (p_ptr->stastis) /* No effect */ ;
 				else if (p_ptr->csp < p_ptr->msp)
 				{
 					p_ptr->csp = p_ptr->csp + damroll((spower / 15) + 1,5);
@@ -4120,7 +4120,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 				if (blind) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s shits %s shape.", m_name, t_poss);
-				
+
 				/* Get the new Sauron Shape */
 				m_ptr->r_idx = sauron_shape(m_ptr->r_idx);
 			}
@@ -4154,7 +4154,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				/* We regain lost hitpoints (up to spower * 3) */
 				gain = MIN(n_ptr->maxhp - n_ptr->hp, spower * 3);
-	
+
 				/* We do not gain more than mana * 15 HPs at a time */
 				gain = MIN(gain, m_ptr->mana * 15);
 
@@ -4344,7 +4344,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Stastis */
-				if (p_ptr->stastis) /* No effect */ ; 
+				if (p_ptr->stastis) /* No effect */ ;
 
 				/* Pick a random ailment */
 				else if (k)
@@ -4395,8 +4395,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 * If it comes into view from around a corner (unlikely)
 				 * give a message and learn about the casting
 				 */
-				if (!direct 
-					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+				if (!direct
+					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx)
 					&& m_ptr->ml)
 				{
 					msg_format("%^s blinks into view.", t_nref);
@@ -4438,8 +4438,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				 * If it comes into view from around a corner (unlikely)
 				 * give a message and learn about the casting
 				 */
-				if (!direct 
-					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+				if (!direct
+					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx)
 					&& m_ptr->ml)
 				{
 					msg_format("%^s teleports into view.", t_nref);
@@ -4513,7 +4513,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 				/* Monster is now directly visible, but wasn't before. */
 				if (!direct
-					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx) 
+					&& !blind && player_can_see_bold(m_ptr->fy, m_ptr->fx)
 					&& m_ptr->ml)
 				{
 					/* Get the name (using "A"/"An") again. */
@@ -4629,7 +4629,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (rand_int(100) < p_ptr->skill_sav)
 				{
 					msg_print("You resist the effects!");
-					
+
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
@@ -4734,17 +4734,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			msg_format("%^s tries to blank your mind.", m_name);
 
-			if (p_ptr->stastis) /* No effect */ ; 
+			if (p_ptr->stastis) /* No effect */ ;
 			else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 			{
 				msg_print("You resist the effects!");
-				
+
 				if (who > 0) update_smart_save(who, TRUE);
 			}
 			else
 			{
 				(void)set_amnesia(p_ptr->amnesia + rlev / 8 + 4 + rand_int(4));
-				
+
 				msg_print("Your memories fade.");
 
 				if (who > 0) update_smart_save(who, FALSE);
@@ -4763,16 +4763,16 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((target < 0) && !(p_ptr->stastis))
 			{
 				if (p_ptr->csp)
-				{	
+				{
 					/* Disturb if legal */
 					disturb(1, 0);
-	
+
 					/* Basic message */
 					msg_format("%^s draws psychic energy from you!", m_name);
-	
+
 					/* Attack power */
 					r1 = (randint(spower) / 20) + 1;
-	
+
 					/* Full drain */
 					if (r1 >= p_ptr->csp)
 					{
@@ -4780,16 +4780,16 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						p_ptr->csp = 0;
 						p_ptr->csp_frac = 0;
 					}
-	
+
 					/* Partial drain */
 					else
 					{
 						p_ptr->csp -= r1;
 					}
-	
+
 					/* Redraw mana */
 					p_ptr->redraw |= (PR_MANA);
-	
+
 					/* Window stuff */
 					p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 				}
@@ -4801,12 +4801,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					/* Basic message */
 					msg_format("%^s draws psychic energy from %s.", m_name, t_name);
-	
+
 					r1 = (randint(spower) / 20) + 1;
-	
+
 					/* Full drain */
 					r1 = MIN(r1, n_ptr->mana);
-					
+
 					n_ptr->mana -= r1;
 				}
 				else break;
@@ -4843,7 +4843,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_format("%^s appears healthier.", m_name);
 				}
 			}
-			
+
 			/* Inform allies of new player mana */
 			if ((who > 0) && (target > 0))
 			{
@@ -4905,7 +4905,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (rand_int(100) < p_ptr->skill_sav)
 				{
 					msg_print("You resist the effects!");
-					
+
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
@@ -4926,7 +4926,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 							update_smart_save(who, FALSE);
 						}
 					}
-					
+
 					/* Apply damage directly */
 					project_p(who, what, y, x, get_dam(spower, attack), GF_HURT);
 				}
@@ -4985,7 +4985,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					msg_print("You refuse to be deceived.");
 
-					if (who > 0) update_smart_save(who, TRUE);				
+					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
 				{
@@ -5053,7 +5053,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_format("You resist the effects%c",
 					      (spower < 30 ?  '.' : '!'));
 
-					if (who > 0) update_smart_save(who, TRUE);				
+					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
 				{
@@ -5069,7 +5069,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (k == 3) (void)set_cut(p_ptr->cut + 46 + damroll(4, 12));
 					if (k == 4) (void)set_cut(p_ptr->cut + 95 + damroll(8, 15));
 					if (k == 5) (void)set_cut(1200);
-					
+
 					if (who > 0) update_smart_save(who, FALSE);
 				}
 			}
@@ -5273,7 +5273,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				{
 					/* Reduce food abruptly.  */
 					(void)set_food(p_ptr->food - (p_ptr->food/4));
-					
+
 					if (who > 0) update_smart_save(who, FALSE);
 				}
 				else
@@ -5335,7 +5335,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
 						(void)set_afraid(p_ptr->afraid + rand_int(4) + 1);
-						
+
 						/* Always notice */
 						if (!player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L) && who)
 						{
@@ -5408,7 +5408,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else
 					{
 						msg_print("You are unaffected!");
-	
+
 						/* Always notice */
 						if (!player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L) && who)
 						{
@@ -5419,7 +5419,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
 				{
 					msg_print("You resist the effects!");
-					
+
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
@@ -5474,7 +5474,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else
 					{
 						msg_print("You disbelieve the feeble spell.");
-	
+
 						/* Always notice */
 						if (!player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
 						{
@@ -5543,7 +5543,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else
 					{
 						msg_print("You are unaffected!");
-						
+
 						/* Player is temporarily resistant */
 						if (p_ptr->free_act)
 						{
@@ -5612,12 +5612,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						else if (!player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
-						}						
+						}
 					}
 					else
 					{
 						msg_print("You are unaffected!");
-						
+
 						/* Player is temporarily resistant */
 						if (p_ptr->free_act)
 						{
@@ -5820,7 +5820,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 
 			/* All in line of sight */
-			
+
 			break;
 		}
 
@@ -5891,7 +5891,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					summon_flag_type |= RF8_HAS_FUR;
 
 					/* Surface dwellers like birds */
-					if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK))) 
+					if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK)))
 						summon_flag_type |= RF8_HAS_FEATHER;
 
 					/* Dungeon dwellers like reptiles, fish and worse */
@@ -6583,11 +6583,11 @@ bool mon_evade(int m_idx, int chance, int out_of, cptr r)
 	cptr p;
 
 	int roll;
-	
+
 	if ((r_ptr->flags9 & (RF9_EVASIVE)) == 0) return (FALSE);
 
 	roll = rand_int(out_of);
-	
+
 	/* Get "the monster" or "it" */
 	monster_desc(m_name, sizeof(m_name), m_idx, 0x40);
 
@@ -6989,7 +6989,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 					project_p(SOURCE_PLAYER_TRAP, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
 					project_t(SOURCE_PLAYER_TRAP, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
 				}
-				
+
 				/* Drop through to use a charge */
 			}
 
@@ -7004,7 +7004,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 					/* XXX Hack -- new unstacking code */
 					o_ptr->stackc++;
 
-					/* No spare charges */	
+					/* No spare charges */
 					if (o_ptr->stackc >= o_ptr->number)
 					{
 						/* Use a charge off the stack */
@@ -7034,7 +7034,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 						/* Reset stack counter */
 						i_ptr->stackc = 0;
- 
+
 				 		/* Unstack the used item */
 				 		o_ptr->number--;
 
@@ -7191,7 +7191,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 				else
 				{
 					/* Trap description */
-					if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);					
+					if (m_ptr->ml) msg_format("%^s narrowly misses %s.",o_name, m_name);
 				}
 
 				/* Get local object */
@@ -7212,7 +7212,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 				/* Apply additional effect from coating*/
 				else if (coated_p(o_ptr))
-				{				
+				{
 					/* Make item strike */
 					process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
 				}
@@ -7229,7 +7229,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 				break;
 			}
-			
+
 			case TV_SPIKE:
 			{
 				/* Oozes just ooze around it */
@@ -7237,13 +7237,13 @@ void mon_hit_trap(int m_idx, int y, int x)
 				{
 					/* Apply damage directly */
 					project_m(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, damroll(6, 6), GF_FALL_SPIKE);
-					
+
 					if (rand_int(100) < 50)
-					{					
+					{
 						/* Decrease the item */
 						floor_item_increase(cave_o_idx[y][x], -1);
 						floor_item_optimize(cave_o_idx[y][x]);
-		
+
 						/* Disarm if runs out */
 						if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
 					}
@@ -7328,7 +7328,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 		else if (f_ptr->blow.method)
 		{
 			int damage = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
-   
+
 			/* Apply the blow */
 			project_m(SOURCE_FEATURE, feat, y, x, damage, f_ptr->blow.effect);
 

@@ -268,9 +268,9 @@ static cptr blow_info_flags1[] =
 	"BEAM",
 	"ARC",
 	"STAR",
-	"8WAY",
-	"FORK",
-	"EXPAND",
+	"4WAY",
+	"4WAX",
+	"FLOW",
 	"BOOM",
 	"WALL",
 	"PASS",
@@ -291,12 +291,12 @@ static cptr blow_info_flags1[] =
 	"THRU",
 	"CHCK",
 	"ORTH",
-	"SCATTER",
-	"HOOK",
-	"PANEL",
-	"LEVEL",
 	"LOS",
-	"FLOOD"
+	"EXPAND",
+	"FORK",
+	"MYST",
+	"SCATTER",
+	"OUT2"
 };
 
 
@@ -314,7 +314,7 @@ static cptr blow_info_flags2[] =
 	"SHRIEK",
 	"SLIME",
 	"TOUCH",
-	"",
+	"HOOK",
 	"",
 	"",
 	"",

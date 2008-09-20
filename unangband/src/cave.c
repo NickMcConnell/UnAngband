@@ -5981,7 +5981,7 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 		require_strict_lof = TRUE;
 
 		/* Hack in a hack for trick throws */
-		if (range == 256)
+		if ((range == 256) || (flg & (PROJECT_SCATTER)))
 		require_strict_lof = FALSE;
 	}
 

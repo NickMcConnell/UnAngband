@@ -2703,11 +2703,11 @@
 #define PROJECT_BEAM         0x00000001
 #define PROJECT_ARC          0x00000002
 #define PROJECT_STAR         0x00000004
-#define PROJECT_8WAY         0x00000008
+#define PROJECT_4WAY         0x00000008 /* + */
+#define PROJECT_4WAX         0x00000010 /* x */
 
 /* What projections do */
-#define PROJECT_FORK         0x00000010  /* Has 'gaps' in it like lightning */
-#define PROJECT_EXPAND       0x00000020  /* Expands further in tight spaces */
+#define PROJECT_FLOW	     0x00000020  /* Flows around corners */
 #define PROJECT_BOOM         0x00000040
 #define PROJECT_WALL         0x00000080	 /* Include walls */
 #define PROJECT_PASS         0x00000100  /* Pass through walls*/
@@ -2720,7 +2720,7 @@
 #define PROJECT_KILL         0x00002000
 #define PROJECT_PLAY         0x00004000
 #define PROJECT_SELF         0x00008000
-#define PROJECT_LITE         0x00010000
+#define PROJECT_LITE         0x00010000 /* Temporarily lites up grids */
 #define PROJECT_MAGIC        0x00020000 /* Resistable by monsters with resist magic */
 
 /* Graphics */
@@ -2734,16 +2734,17 @@
 #define PROJECT_THRU         0x00800000
 #define PROJECT_CHCK         0x01000000
 #define PROJECT_ORTH         0x02000000 /*(unused)*/
+#define PROJECT_LOS		     0x04000000 /* Travel through LOS grids */
+#define PROJECT_EXPAND       0x08000000 /* Spreads further in tight spaces */
+
+/* Random projections */
+#define PROJECT_FORK         0x10000000 /* Forks like lightning, 33% grids affected */
+#define PROJECT_MYST         0x20000000 /* 66% grids affected */
 
 /* Projections that don't use projection function */
-#define PROJECT_SCATTER      0x04000000
-#define PROJECT_HOOK         0x08000000
-#define PROJECT_PANEL        0x10000000
-#define PROJECT_LEVEL        0x20000000
+#define PROJECT_SCATTER		 0x40000000 /* Scatter up to x2 radius */
+#define PROJECT_OUT2         0x80000000 /* Only affect outmost 2 radius bands*/
 
-/* Relax definition of grids being projectable in various ways */
-#define PROJECT_LOS		 	 0x40000000 /* Include LOS grids */
-#define PROJECT_FLOOD        0x80000000 /* Include grids that are floodable */
 
 /* Melee specific flags */
 #define PR2_MELEE        0x00000001

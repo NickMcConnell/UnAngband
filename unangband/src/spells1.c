@@ -12223,6 +12223,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	int i, j, k;
 	int dist = 0;
 
+	int rad_temp = rad; /* Original radius of the explosion boosted using PROJECT_EXPAND */
+
 	u32b dam_temp;
 	int centerline = 0;
 
@@ -12347,7 +12349,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	else if (!(flg & (PROJECT_ARC | PROJECT_STAR)))
 	{
 		/* Determine maximum length of projection path */
-		if (flg & (PROJECT_BOOM | PROJECT_8WAY)) dist = MAX_RANGE;
+		if (flg & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX)) dist = MAX_RANGE;
 		else if (rad <= 0)        dist = MAX_RANGE;
 		else                      dist = rad;
 
@@ -12364,7 +12366,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 			int nx = GRID_X(path_g[i]);
 
 			/* Hack -- Balls explode before reaching walls. */
-			if ((flg & (PROJECT_BOOM | PROJECT_8WAY)) && (!cave_project_bold(ny, nx))
+			if ((flg & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX |
+					PROJECT_FLOW)) && (!cave_project_bold(ny, nx))
 					&& ((!allow_los) || !(cave_los_bold(ny, nx))))
 			{
 				break;
@@ -12469,11 +12472,17 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		/* No special actions */
 	}
 
-	/* Handle 8-way projections */
-	else if (flg & (PROJECT_8WAY))
+	/* Handle 4-way projections */
+	else if (flg & (PROJECT_4WAY | PROJECT_4WAX))
 	{
 		/* Unblocked directions */
-		byte dirs = 0xFF;
+		byte dirs = 0;
+
+		/* Allow cardinals */
+		if (flg & (PROJECT_4WAY)) dirs |= (0x0F);
+
+		/* Allow diagonals */
+		if (flg & (PROJECT_4WAX)) dirs |= (0xF0);
 
 		/*
 		 * If the center of the explosion hasn't been
@@ -12566,6 +12575,16 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		}
 
 		/*
+		 * Allow PROJECT_EXPAND to expand out to twice normal radius
+		 */
+		if (flg & (PROJECT_EXPAND))
+		{
+			rad_temp = rad;
+			rad *= 2;
+			if (rad > MAX_RANGE) rad = MAX_RANGE;
+		}
+
+		/*
 		 * Scan every grid that might possibly
 		 * be in the blast radius.
 		 */
@@ -12622,7 +12641,6 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				/* Must be within maximum distance. */
 				dist = (distance(y2, x2, y, x));
 				if (dist > rad) continue;
-
 
 				/* Projection is a starburst */
 				if (flg & (PROJECT_STAR))
@@ -12687,7 +12705,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 					 */
 					if (diff < (degrees + 6) / 4)
 					{
-						if (generic_los(y2, x2, y, x, CAVE_XLOF))
+						if ((flg & (PROJECT_PASS)) || generic_los(y2, x2, y, x, CAVE_XLOF) ||
+								((allow_los) && (generic_los(y2, x2, y, x, CAVE_XLOS))))
 						{
 							gy[grids] = y;
 							gx[grids] = x;
@@ -12719,8 +12738,28 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	/* Flood out from existing grids up to radius.
 	 * Reduce flood from any existing square by radius.
 	 */
-	if (flg & (PROJECT_FLOOD))
+	if (flg & (PROJECT_FLOW))
 	{
+		/* Pre-calculate some things for arcs. */
+		if (flg & (PROJECT_ARC))
+		{
+			/* The radius of arcs cannot be more than 20 */
+			if (rad > 20) rad = 20;
+
+			/* Reorient the grid forming the end of the arc's centerline. */
+			n1y = y1 - y0 + 20;
+			n1x = x1 - x0 + 20;
+
+			/* Correct overly large or small values */
+			if (n1y > 40) n1y = 40;
+			if (n1x > 40) n1x = 40;
+			if (n1y <  0) n1y =  0;
+			if (n1x <  0) n1x =  0;
+
+			/* Get the angle of the arc's centerline */
+			centerline = 90 - get_angle_to_grid[n1y][n1x];
+		}
+
 		/*
 		 * If the center of the explosion hasn't been
 		 * saved already, save it now.
@@ -12747,15 +12786,18 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 			/* Skip grids at edge of flood */
 			if (gd[i] >= rad) continue;
 
-			/* Passable grid */
-			if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
+			/* Passable grid. Note PROJECT_WALL does not pass thru walls. */
+			if ((flg & (PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
 					((allow_los) && (cave_los_bold(gy[i], gx[i]))))
 			{
 				/* Check adjacent grids */
-				for (j = 0; j < 8; j++)
+				for (j = 0; (j < 8); j++)
 				{
 					int yy = gy[i] + ddy_ddd[j];
 					int xx = gx[i] + ddx_ddd[j];
+
+					/* Ensure grids left */
+					if (grids >= N_ELEMENTS(gy)) break;
 
 					/* Stay within dungeon */
 					if (!in_bounds(yy, xx)) continue;
@@ -12767,12 +12809,50 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 					dist = (distance(y2, x2, yy, xx));
 					if (dist > rad) continue;
 
-					/* Passable grid */
-					if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
-							((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+					/* Use angle comparison to delineate an arc. */
+					else if (flg & (PROJECT_ARC))
 					{
-						/* Justifiable paranoia */
-						if (grids < N_ELEMENTS(gy))
+						int n2y, n2x, tmp, diff;
+
+						/* Reorient current grid for table access. */
+						n2y = y - y2 + 20;
+						n2x = x - x2 + 20;
+
+						/*
+						 * Find the angular difference (/2) between
+						 * the lines to the end of the arc's center-
+						 * line and to the current grid.
+						 */
+						tmp = ABS(get_angle_to_grid[n2y][n2x] + centerline) % 180;
+						diff = ABS(90 - tmp);
+
+						/*
+						 * If difference is not greater then that
+						 * allowed, and the grid is in LOS, accept it.
+						 */
+						if (diff < (degrees + 6) / 4)
+						{
+							/* Passable grid */
+							if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
+									((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+							{
+								/* Add grid */
+								gy[grids] = yy;
+								gx[grids] = xx;
+								gd[grids] = gd[i]+1;
+								grids++;
+
+								/* Mark as added */
+								play_info[yy][xx] |= (PLAY_TEMP);
+							}
+						}
+					}
+
+					else
+					{
+						/* Passable grid */
+						if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
+								((allow_los) && (cave_los_bold(gy[i], gx[i]))))
 						{
 							/* Add grid */
 							gy[grids]=yy;
@@ -12841,6 +12921,45 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 			if (!swapped) i++;
 		}
 	}
+
+	/*
+	 * Fix up PROJECT_EXPAND grids.
+	 *
+	 * We trim the boosted radius back to the original radius
+	 * by removing all grids where gd > rad_temp unless there are less
+	 * than rad_temp^2 grids, in which case we keep the grids.
+	 *
+	 * We ensure that the first k^2 grids are always have a gd of no
+	 * than (k-1).
+	 *
+	 */
+	if (flg & (PROJECT_EXPAND))
+	{
+		/* Trim grids outside original radius */
+		for (i = rad_temp * rad_temp; i < grids; i++)
+		{
+			/* Grid is outside original radius */
+			if (gd[i] > rad_temp)
+			{
+				grids = i;
+				break;
+			}
+		}
+
+		/* Boost damage */
+		for (i = 0, k = 1; (i < grids) && (k < rad_temp); i++)
+		{
+			/* Increase k */
+			if (i >= k*k) k++;
+
+			/* Distance is too high */
+			if (gd[i] > k - 1)
+			{
+				gd[i] = k - 1;
+			}
+		}
+	}
+
 
 	/* Calculate and store the actual damage at each distance. */
 	for (i = 0; i <= MAX_RANGE; i++)

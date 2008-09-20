@@ -409,7 +409,7 @@ F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
 N:57:los
 T:0:call~ down *
 I:0:0:20
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | LOS |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | HOOK |
 
 N:58:line
 T:0:creat|es| a path of *
@@ -432,7 +432,7 @@ N:61:star
 T:0:create~ * in eight directions
 I:0:0:20
 R:10
-F:8WAY | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
 F:SAFE |
 
 N:62:sphere
@@ -444,19 +444,19 @@ F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 N:63:panel
 T:0:call~ down * on all nearby
 I:0:0:20
-F:PANEL |
+#F:PANEL |
 
 N:64:level
 T:0:call~ down * across this level
 I:0:0:20
-F:LEVEL |
+#F:LEVEL |
 
 N:65:cross
 T:0:create~ a cross of *
 I:0:0:20
 R:3
 F:BEAM | 
-#F:4WAY |
+F:4WAY |
 
 N:66:strike
 T:0:strike~ at & with *
@@ -497,19 +497,19 @@ N:72:8 way i
 T:0:throw~ a ragged ball of * at & 
 I:0:0:20
 R:2
-F:8WAY | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 
 N:73:8 way ii
 T:0:throw~ a large jagged ball of * at &
 I:0:0:20
 R:3
-F:8WAY | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 
 N:74:8 way iii
 T:0:throw~ a huge forked ball of * at &
 I:0:0:20
 R:4
-F:8WAY | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 
 N:75:swarm
 T:0:throw~ a swarm of * at &

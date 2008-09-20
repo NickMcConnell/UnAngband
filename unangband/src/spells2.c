@@ -5235,7 +5235,7 @@ static bool fire_8way(int who, int what, int typ, int dir, int dam, int rad)
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_8WAY | PROJECT_AREA | PROJECT_MAGIC;
+	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_4WAY | PROJECT_4WAX | PROJECT_AREA | PROJECT_MAGIC;
 
 
 	/* Use the given direction */

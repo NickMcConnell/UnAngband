@@ -4756,7 +4756,7 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg)
 	/* Certain monsters created in giant spider webs */
 	if (r_ptr->flags2 & (RF2_HAS_WEB))
 	{
-		int flg = PROJECT_BOOM | PROJECT_8WAY | PROJECT_GRID | PROJECT_THRU | PROJECT_HIDE;
+		int flg = PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX | PROJECT_GRID | PROJECT_THRU | PROJECT_HIDE;
 
 		/* Shoot web out in 8 directions when placed */
 		(void)project(SOURCE_BIRTH, r_idx, (r_ptr->level / 10) + 2, y, x, y, x, 0, GF_WEB, flg, 0, 0);
