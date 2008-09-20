@@ -12925,41 +12925,60 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	/*
 	 * Fix up PROJECT_EXPAND grids.
 	 *
-	 * We trim the boosted radius back to the original radius
-	 * by removing all grids where gd > rad_temp unless there are less
-	 * than rad_temp^2 grids, in which case we keep the grids.
-	 *
-	 * We ensure that the first k^2 grids are always have a gd of no
-	 * than (k-1).
-	 *
+	 * Somewhat weird trimming calculation.
 	 */
 	if (flg & (PROJECT_EXPAND))
 	{
-		/* Trim grids outside original radius */
-		for (i = rad_temp * rad_temp; i < grids; i++)
+		/* Always adjust damage */
+		if (!source_diameter) source_diameter = 10;
+
+		/* Could not fill enough grids */
+		if (grids < rad_temp * rad_temp)
 		{
-			/* Grid is outside original radius */
-			if (gd[i] > rad_temp)
+			i = grids;
+
+			/* Paranoia */
+			if (i)
 			{
-				grids = i;
-				break;
+				/* Don't lose much damage in completely enclosed area */
+				dam_temp = source_diameter * rad_temp * rad_temp / i;
+
+				/* Hack - for type safety */
+				if (dam_temp > 100) source_diameter = 100;
+				else source_diameter = dam_temp;
+
+				/* Reduce damage drop off again if area is long and narrow */
+				if ((rad_temp) && (gd[i-1] >= rad_temp))
+				{
+					source_diameter = source_diameter * gd[i-1] / rad_temp;
+				}
 			}
 		}
 
-		/* Boost damage */
-		for (i = 0, k = 1; (i < grids) && (k < rad_temp); i++)
+		/* Grid is outside original radius */
+		else if (gd[rad_temp * rad_temp] >= rad_temp)
 		{
-			/* Increase k */
-			if (i >= k*k) k++;
+			for (i = rad_temp * rad_temp + 1; (i < grids) && (gd[rad_temp * rad_temp] == gd[i]); i++) ;
 
-			/* Distance is too high */
-			if (gd[i] > k - 1)
+			/* Reduce damage drop off if area is long and narrow */
+			if (rad_temp)
 			{
-				gd[i] = k - 1;
+				source_diameter = source_diameter * gd[rad_temp * rad_temp] / rad_temp;
 			}
 		}
+		else
+		{
+			for (i = 0; i < grids; i++)
+			{
+				if (gd[i] == rad_temp) break;
+			}
+
+			/* No damage boost */
+		}
+
+		/* Trim grids */
+		grids = i;
 	}
-
 
 	/* Calculate and store the actual damage at each distance. */
 	for (i = 0; i <= MAX_RANGE; i++)
@@ -12984,7 +13003,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		 */
 		else
 		{
-			dam_temp = (source_diameter * dam) / ((i + 1) * 10);
+			dam_temp = (source_diameter * (dam + i)) / ((i + 1) * 10);
 			if (dam_temp > (u32b)dam) dam_temp = dam;
 		}
 
