@@ -12980,6 +12980,37 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		grids = i;
 	}
 
+	/*
+	 * Remove all but the outermost two range bands if requested
+	 */
+	if (flg & (PROJECT_OUT2))
+	{
+		if (grids)
+		{
+			j = 0;
+			k = gd[grids-1];
+
+			if (k >= 2)
+			{
+				for (i = 0; i < grids; i++)
+				{
+					if (j)
+					{
+						gy[i-j] = gy[i];
+						gx[i-j] = gx[i];
+						gd[i-j] = gd[i] - k + 1;
+					}
+					else if (gd[i] >= k-1)
+					{
+						j = i;
+					}
+				}
+			}
+
+			grids -= j;
+		}
+	}
+
 	/* Calculate and store the actual damage at each distance. */
 	for (i = 0; i <= MAX_RANGE; i++)
 	{
