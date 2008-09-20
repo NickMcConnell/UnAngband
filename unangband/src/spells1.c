@@ -12983,7 +12983,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	/*
 	 * Remove all but the outermost two range bands if requested
 	 */
-	if (flg & (PROJECT_OUT2))
+	if (flg & (PROJECT_EDGE))
 	{
 		if (grids)
 		{

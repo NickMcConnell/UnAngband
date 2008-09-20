@@ -6285,7 +6285,7 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 				{
 					if (n == 2)
 					{
-						*flg |= (PROJECT_OUT2 | PROJECT_BOOM);
+						*flg |= (PROJECT_EDGE | PROJECT_BOOM);
 						*flg &= ~(PROJECT_BEAM);
 					}
 				}
@@ -6361,8 +6361,8 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 	/* Hack -- project fork is weaker */
 	if (*flg & (PROJECT_FORK)) pow = pow/3;
 
-	/* Hack -- project outer 2 is weaker */
-	if ((*flg & (PROJECT_OUT2)) && (rad > 2)) pow = (pow * 2)/3;
+	/* Hack -- project edge is weaker */
+	if ((*flg & (PROJECT_EDGE)) && (rad > 2)) pow = (pow * 2)/3;
 
 	/* Hack -- project area is powerful */
 	if (*flg & (PROJECT_AREA)) pow *= (*rng + 1);

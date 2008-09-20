@@ -296,7 +296,7 @@ static cptr blow_info_flags1[] =
 	"FORK",
 	"MYST",
 	"SCATTER",
-	"OUT2"
+	"EDGE"
 };
 
 

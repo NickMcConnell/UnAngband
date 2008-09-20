@@ -2743,7 +2743,7 @@
 
 /* Projections that don't use projection function */
 #define PROJECT_SCATTER		 0x40000000 /* Scatter up to x2 radius */
-#define PROJECT_OUT2         0x80000000 /* Only affect outmost 2 radius bands*/
+#define PROJECT_EDGE         0x80000000 /* Only affect outmost 2 radius bands*/
 
 
 /* Melee specific flags */
