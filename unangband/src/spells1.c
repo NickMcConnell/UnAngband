@@ -12944,7 +12944,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 				dam_temp = source_diameter * rad_temp * rad_temp / i;
 
 				/* Hack - for type safety */
-				if (dam_temp > 100) source_diameter = 100;
+				if (dam_temp > 60) source_diameter = 60;
 				else source_diameter = dam_temp;
 
 				/* Reduce damage drop off again if area is long and narrow */
