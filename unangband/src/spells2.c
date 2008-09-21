@@ -19,13 +19,15 @@
 
 
 /*
- * Apply a "project()" directly to all viewable monsters
+ * Apply a "project()" directly to all monsters.
  *
  * Note that affected monsters are NOT auto-tracked by this usage.
  *
- * We try to honour relevent PROJECT_ flags.
+ * PROJECT_PANEL limits the monsters to those within 2 * MAX_SIGHT
+ * PROJECT_ALL_IN_LOS limits monsters to those within line of fire and/or
+ *  line of sight if PROJECT_LOS is enabled.
  */
-bool project_all_in_los(int who, int what, int y0, int x0, int dam, int typ, u32b flg)
+bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg, u32b flg2)
 {
 	int i, x, y;
 
@@ -37,7 +39,7 @@ bool project_all_in_los(int who, int what, int y0, int x0, int dam, int typ, u32
 	bool allow_los = (flg & (PROJECT_LOS)) != 0;
 
 	/* Origin is player */
-	if ((y0 == p_ptr->py) && (x0 == p_ptr->px)) player_hack = TRUE;
+	if ((flg2 & (PR2_ALL_IN_LOS)) && (y0 == p_ptr->py) && (x0 == p_ptr->px)) player_hack = TRUE;
 
 	/* Affect all (nearby) monsters */
 	for (i = 1; i < m_max; i++)
@@ -51,6 +53,9 @@ bool project_all_in_los(int who, int what, int y0, int x0, int dam, int typ, u32
 		y = m_ptr->fy;
 		x = m_ptr->fx;
 
+		/* Only affect nearby monsters */
+		if ((flg2 & (PR2_PANEL)) && (distance(y0, x0, y, x) > 2 * MAX_SIGHT)) continue;
+
 		/* Require line of fire - from player */
 		if (player_hack)
 		{
@@ -58,7 +63,7 @@ bool project_all_in_los(int who, int what, int y0, int x0, int dam, int typ, u32
 				((!allow_los) || !player_has_los_bold(y, x))) continue;
 		}
 		/* Require line of fire - from origin */
-		else
+		else if (flg2 & (PR2_ALL_IN_LOS))
 		{
 			if ((!generic_los(y0, x0, y, x, CAVE_XLOF)) &&
 				((!allow_los) || !generic_los(y0, x0, y, x, CAVE_XLOS))) continue;
@@ -79,83 +84,6 @@ bool project_all_in_los(int who, int what, int y0, int x0, int dam, int typ, u32
 	/* Result */
 	return (notice);
 }
-
-
-/*
- * Apply a "project()" directly to all monsters on 'current panel'
- *
- * Note that affected monsters are NOT auto-tracked by this usage.
- */
-bool project_level(int who, int what, int dam, int typ, u32b flg)
-{
-	int i, x, y;
-
-	bool notice = FALSE;
-
-	/* Affect all (nearby) monsters */
-	for (i = 1; i < m_max; i++)
-	{
-		monster_type *m_ptr = &m_list[i];
-
-		/* Paranoia -- Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Location */
-		y = m_ptr->fy;
-		x = m_ptr->fx;
-
-		/* Jump directly to the target monster */
-		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
-	}
-
-	/* Jump directly to the player */
-	if (project(who, what, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
-
-	/* Result */
-	return (notice);
-}
-
-
-/*
- * Apply a "project()" directly to all monsters in a given radius
- *
- * Note that affected monsters are NOT auto-tracked by this usage.
- */
-bool project_panel(int who, int what, int y0, int x0, int dam, int typ, u32b flg)
-{
-	int i, x, y;
-
-	bool notice = FALSE;
-
-	/* Affect all (nearby) monsters */
-	for (i = 1; i < m_max; i++)
-	{
-		monster_type *m_ptr = &m_list[i];
-
-		/* Paranoia -- Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Location */
-		y = m_ptr->fy;
-		x = m_ptr->fx;
-
-		/* Only affect nearby monsters */
-		if (distance(y0, x0, y, x) > 2 * MAX_SIGHT) continue;
-
-		/* Jump directly to the target monster */
-		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
-	}
-
-	/* Only affect nearby monsters */
-	if (distance(y0, x0, p_ptr->py, p_ptr->px) <= 2 * MAX_SIGHT)
-	{
-		/* Jump directly to the player */
-		if (project(who, what, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
-	}
-
-	return notice;
-}
-
 
 
 /*
@@ -5278,24 +5206,12 @@ static bool fire_projection(int who, int what, int typ, int shape, int dir, int 
 		int x = tx;
 
 		/* Pick a 'nearby' location */
-		if (blow_ptr->flags2 & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
+		if (flg & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
 
-		/* Affect level */
-		if (blow_ptr->flags2 & (PR2_LEVEL))
+		/* Affect distant monsters */
+		if (blow_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
 		{
-			if (project_level(who, what, dam, typ, flg)) noticed =  TRUE;
-		}
-
-		/* Affect panel */
-		else if (blow_ptr->flags2 & (PR2_PANEL))
-		{
-			if (project_panel(who, what, y, x, dam, typ, flg)) noticed = TRUE;
-		}
-
-		/* Affect panel */
-		else if (blow_ptr->flags2 & (PR2_ALL_IN_LOS))
-		{
-			if (project_panel(who, what, y, x, dam, typ, flg)) noticed = TRUE;
+			if (project_dist(who, what, y, x, dam, typ, flg, blow_ptr->flags2)) noticed = TRUE;
 		}
 
 		/* Analyze the "dir" and the "target". */

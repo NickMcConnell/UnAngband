@@ -12797,7 +12797,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 					int xx = gx[i] + ddx_ddd[j];
 
 					/* Ensure grids left */
-					if (grids >= N_ELEMENTS(gy)) break;
+					if (grids >= 255) break;
 
 					/* Stay within dungeon */
 					if (!in_bounds(yy, xx)) continue;
@@ -12875,51 +12875,6 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 			play_info[gy[i]][gx[i]] &= ~(PLAY_TEMP);
 		}
 
-		/* Once flooding finished, sort the grids by effective
-		 * distance. This hand written implementation may be
-		 * inefficient. */
-		i = 0;
-
-		/* Scan through grids */
-		for (j = 0; j < grids; j++)
-		{
-			/* Swapped? */
-			bool swapped;
-
-			swapped = FALSE;
-
-			/* Sorted */
-			if (gd[j] <= i) continue;
-
-			/* Find first grid at this radius */
-			for (k = j + 1; k < grids; k++)
-			{
-				int temp_y, temp_x, temp_d;
-
-				/* No match */
-				if (gd[k] > i) continue;
-
-				/* Swap */
-				temp_y = gy[j];
-				temp_x = gx[j];
-				temp_d = gd[j];
-
-				gy[j] = gy[k];
-				gx[j] = gx[k];
-				gd[j] = gd[k];
-
-				gy[k] = temp_y;
-				gy[k] = temp_x;
-				gd[k] = temp_d;
-
-				swapped = TRUE;
-
-				break;
-			}
-
-			/* Increase sorted values */
-			if (!swapped) i++;
-		}
 	}
 
 	/*
@@ -12994,6 +12949,35 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	 */
 	if (flg & (PROJECT_FORK | PROJECT_MYST))
 	{
+		/* This algorithm requires grids be sorted by distance */
+		/* Sort the blast grids by distance, starting at the origin. */
+		for (i = 0, k = 0; i < rad; i++)
+		{
+			int tmp_y, tmp_x, tmp_d;
+
+			/* Collect all the grids of a given distance together. */
+			for (j = k; j < grids; j++)
+			{
+				if (gd[j] == i)
+				{
+					tmp_y = gy[k];
+					tmp_x = gx[k];
+					tmp_d = gd[k];
+
+					gy[k] = gy[j];
+					gx[k] = gx[j];
+					gd[k] = gd[j];
+
+					gy[j] = tmp_y;
+					gx[j] = tmp_x;
+					gd[j] = tmp_d;
+
+					/* Write to next slot */
+					k++;
+				}
+			}
+		}
+
 		for (i = grids -1; i > 0; )
 		{
 			int c, g = 0, l, m;
@@ -13112,11 +13096,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		}
 
 		/* Remove grids except first grid and saved grids */
-		for (i = 1; i < grids; i++)
+		for (i = 1, j = 0; i < grids; i++)
 		{
-			/* Zero out offset */
-			j = 0;
-
 			/* Save grid? */
 			if ((j) && (play_info[gy[i]][gx[i]] & (PLAY_TEMP)))
 			{
@@ -13148,21 +13129,37 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 		if (grids)
 		{
 			j = 0;
-			k = gd[grids-1];
 
+			/* Get maximum range affected */
+			for (i = 0, k = 0; i < grids; i++)
+			{
+				if (k < gd[i]) k = gd[i];
+			}
+
+			/* If expanded, widen the range */
+			if (flg & (PROJECT_EXPAND))
+			{
+				/* Widen proportionately */
+				k = (rad_temp - 1) * rad / rad_temp;
+			}
+
+			/* Minimum range required */
 			if (k >= 2)
 			{
-				for (i = 0; i < grids; i++)
+				/* Remove grids except grids in last two range bands */
+				for (i = 0, j = 0; i < grids; i++)
 				{
-					if (j)
+					/* Save grid? */
+					if ((j) && (gd[i] >= k - 1))
 					{
 						gy[i-j] = gy[i];
 						gx[i-j] = gx[i];
-						gd[i-j] = gd[i] - k + 1;
+						gd[i-j] = gd[i];
 					}
-					else if (gd[i] >= k-1)
+					/* Skip grid */
+					else
 					{
-						j = i;
+						j++;
 					}
 				}
 			}
