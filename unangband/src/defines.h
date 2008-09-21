@@ -2729,7 +2729,7 @@
 
 /* How projections travel */
 #define PROJECT_SAFE         0x00100000 /* Projection doesn't affect caster */
-#define PROJECT_STOP         0x00200000
+#define PROJECT_STOP         0x00200000 /* Stop at first target */
 #define PROJECT_JUMP         0x00400000
 #define PROJECT_THRU         0x00800000
 #define PROJECT_CHCK         0x01000000
@@ -2746,6 +2746,9 @@
 #define PROJECT_EDGE         0x80000000 /* Only affect outmost 2 radius bands*/
 
 
+
+
+
 /* Melee specific flags */
 #define PR2_MELEE        0x00000001
 #define PR2_RANGED       0x08000002
@@ -2755,7 +2758,14 @@
 #define PR2_STUN         0x00000020
 #define PR2_SHRIEK       0x00000040
 #define PR2_SLIME        0x00000080
-#define PR2_TOUCH        0x00000080
+#define PR2_TOUCH        0x00000100
+
+/* Nonstandard projections */
+#define PR2_ALL_IN_LOS   0x00000200
+#define PR2_DIR_STOP     0x00000400 /* If fired in a direction, stop at the first target */
+#define PR2_PANEL		 0x00000800
+#define PR2_LEVEL		 0x00001000
+
 
 
 

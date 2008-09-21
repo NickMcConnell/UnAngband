@@ -5117,21 +5117,39 @@ void unlite_room(int y, int x)
 	cave_temp_room_unlite();
 }
 
-
 /*
- * Cast a minor ball spell
- * Stop if we hit a monster, act as a "ball"
- * Note that this does not allow "target" mode to pass over monsters
- * Affect grids, objects, and monsters
+ * Cast a projection
  */
-static bool fire_ball_minor(int who, int what, int typ, int dir, int dam, int rad)
+static bool fire_projection(int who, int what, int typ, int shape, int dir, int dam, int level)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
 	int ty, tx;
 
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM | PROJECT_MAGIC;
+	blow_type *blow_ptr = &blow_info[shape];
+
+	int rad = blow_ptr->radius.base;
+	int num = blow_ptr->number.base;
+
+	int degrees_of_arc = blow_ptr->arc;
+	int diameter_of_source = blow_ptr->diameter_of_source;
+
+	u32b flg = blow_info[shape].flags1;
+
+	bool noticed = FALSE;
+
+	/* Scale radius up */
+	if (blow_ptr->radius.levels) rad += blow_ptr->radius.gain * level / blow_ptr->radius.levels;
+
+	/* Scale number up */
+	if (blow_ptr->number.levels) num += blow_ptr->number.gain * level / blow_ptr->number.levels;
+
+	/* Hack -- fix number */
+	if (num < 1) num = 1;
+
+	/* Hack -- fix diameter of source */
+	if (!diameter_of_source) diameter_of_source = 10;
 
 	/* Use the given direction */
 	ty = py + 99 * ddy[dir];
@@ -5143,410 +5161,27 @@ static bool fire_ball_minor(int who, int what, int typ, int dir, int dam, int ra
 		ty = p_ptr->target_row;
 		tx = p_ptr->target_col;
 	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
-}
-
-
-
-/*
- * Cast multiple non-jumping ball spells at the same target.
- *
- * Targets absolute coordinates instead of a specific monster, so that
- * the death of the monster doesn't change the target's location.
- */
-static bool fire_swarm(int who, int what, int num, int typ, int dir, int dam, int rad)
-{
-	bool noticed = FALSE;
-
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM | PROJECT_MAGIC;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" (early detonation) */
-	if ((dir == 5) && target_okay())
+	/* Stop at first target if we're firing in a direction */
+	else if (blow_ptr->flags2 & (PR2_DIR_STOP))
 	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
+		flg |= (PROJECT_STOP);
 	}
 
+	/* Create one or more projections */
 	while (num--)
 	{
-		/* Analyze the "dir" and the "target".  Hurt items on floor. */
-		if (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10)) noticed = TRUE;
+		int y = ty;
+		int x = tx;
+
+		/* Pick a 'nearby' location */
+		if (flg & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
+
+		/* Analyze the "dir" and the "target". */
+		if (project(who, what, rad, py, px, y, x, dam, typ, flg, degrees_of_arc,
+				(byte)diameter_of_source)) noticed = TRUE;
 	}
 
 	return noticed;
-}
-
-
-/*
- * Cast a ball spell
- * Stop if we hit a monster, act as a "ball"
- * Allow "target" mode to pass over monsters
- * Affect grids, objects, and monsters
- */
-static bool fire_ball(int who, int what, int typ, int dir, int dam, int rad)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM | PROJECT_MAGIC;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		flg &= ~(PROJECT_STOP);
-
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
-}
-
-
-/*
- * Cast a 8-way beam spell
- * Stop if we hit a monster, act as a beam in 8 directions
- * Allow "target" mode to pass over monsters
- * Affect grids, objects, and monsters
- * Do not decrease damage with range
- */
-static bool fire_8way(int who, int what, int typ, int dir, int dam, int rad)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_4WAY | PROJECT_4WAX | PROJECT_AREA | PROJECT_MAGIC;
-
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		flg &= ~(PROJECT_STOP);
-
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
-}
-
-
-/*
- * Cast a cloud spell
- * Stop if we hit a monster, act as a "ball"
- * However damages all targets in area of effect equally
- * Allow "target" mode to pass over monsters
- * Affect monsters only
- */
-static bool fire_cloud(int who, int what, int typ, int dir, int dam, int rad)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_AREA | PROJECT_MAGIC;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		flg &= ~(PROJECT_STOP);
-
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
-}
-
-
-/*
- * Cast an area spell
- * Stop if we hit a monster, act as a "ball"
- * However damages all targets in area of effect equally
- * Allow "target" mode to pass over monsters
- * Affect monsters only
- */
-static bool fire_area(int who, int what, int typ, int dir, int dam, int rad)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_GRID | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY | PROJECT_AREA | PROJECT_MAGIC;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		flg &= ~(PROJECT_STOP);
-
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, 0, 10));
-}
-
-/*
- * Hack -- apply a "projection()" in a direction (or at the target)
- */
-static bool project_hook(int who, int what, int typ, int dir, int dam, int flg)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	/* Pass through the target if needed */
-	flg |= (PROJECT_THRU | PROJECT_MAGIC);
-
-	/* Use the given direction */
-	ty = py + ddy[dir];
-	tx = px + ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target", do NOT explode */
-	return (project(who, what, 0, py, px, ty, tx, dam, typ, flg, 0, 0));
-}
-
-/*
- * Apply an arc in a direction
- */
-static bool fire_arc(int who, int what, int typ, int dir, int dam, int rad, int degrees_of_arc)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_ARC | PROJECT_BOOM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_PLAY | PROJECT_WALL | PROJECT_MAGIC;
-
-	/* Diameter of source of energy is at least 20. */
-	int diameter_of_source = 20;
-
-	int degree_factor = 60;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Narrow arcs lose relatively little energy over distance. */
-	if (degrees_of_arc < degree_factor)
-	{
-		if (degrees_of_arc <= 6) diameter_of_source = rad * 10;
-		else diameter_of_source = diameter_of_source * degree_factor /
-			degrees_of_arc;
-	}
-
-	/* Radius of zero means no fixed limit. */
-	if (rad == 0) rad = MAX_SIGHT;
-
-	/* Analyze the "dir" and the "target" */
-	return (project(who, what, rad, py, px, ty, tx, dam, typ, flg, degrees_of_arc,
-			(byte)diameter_of_source));
-}
-
-
-
-/*
- * Cast a bolt spell
- * Stop if we hit a monster, as a "bolt"
- * Affect monsters (not grids or objects)
- */
-static bool fire_bolt(int who, int what, int typ, int dir, int dam)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY | PROJECT_MAGIC;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, 0, py, px, ty, tx, dam, typ, flg, 0, 0));
-}
-
-/*
- * Cast a beam spell
- * Pass through monsters, as a "beam"
- * Affect monsters (not grids or objects)
- * Now only range 10.
- */
-static bool fire_beam(int who, int what, int typ, int dir, int dam)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_GRID | PROJECT_THRU | PROJECT_MAGIC;
-
-	int range = 10;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, range, py, px, ty, tx, dam, typ, flg, 0, 0));
-}
-
-/*
- * Cast a bolt spell, or rarely, a beam spell
- */
-static bool fire_bolt_or_beam(int who, int what, int prob, int typ, int dir, int dam)
-{
-	if (rand_int(100) < prob)
-	{
-		return (fire_beam(who, what, typ, dir, dam));
-	}
-	else
-	{
-		return (fire_bolt(who, what, typ, dir, dam));
-	}
-}
-
-
-/*
- * Cast a blast spell
- * A blast spell is a radius 1 ball spell that only fires to adjacent
- * squares. Used for a couple of alchemy spells.
- */
-static bool fire_blast(int who, int what, int typ, int dir, int dam)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty = p_ptr->py+ddy[dir];
-	int tx = p_ptr->px+ddx[dir];
-
-	int flg = PROJECT_KILL | PROJECT_GRID | PROJECT_ITEM | PROJECT_BOOM | PROJECT_PLAY | PROJECT_MAGIC;
-
-	return (project(who, what, 1, py, px, ty, tx, dam, typ, flg, 0, 15));
-
-}
-
-/*
- * Hands is now a range 3 beam, similar to lightening spark from Sangband.
- * It does not affect the grid however.
- */
-static bool fire_hands(int who, int what, int typ, int dir, int dam)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_BEAM | PROJECT_KILL | PROJECT_THRU | PROJECT_MAGIC;
-	int range = 3;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, range, py, px, ty, tx, dam, typ, flg, 0, 0));
-}
-
-/*
- * Minor bolts are a limited range bolt.
- */
-static bool fire_bolt_minor(int who, int what, int typ, int dir, int dam, int range)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	int flg = PROJECT_STOP | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY | PROJECT_MAGIC;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-
-	/* Analyze the "dir" and the "target".  Hurt items on floor. */
-	return (project(who, what, range, py, px, ty, tx, dam, typ, flg, 0, 0));
 }
 
 
@@ -6212,7 +5847,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 
 	bool obvious = FALSE;
 	int ap_cnt;
-	int dir;
+	int dir = 0;
 
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
@@ -6227,484 +5862,56 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
 
-		/* Roll out the damage */
-		if (blow_ptr->d_side)
+		/* Use player hit points */
+		if (blow_info[blow_ptr->method].flags2 & (PR2_BREATH))
 		{
-			damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
+			/* Damage uses current hit points */
+			damage = p_ptr->chp * damage / 300;
 		}
-
-		/* Roll out level dependent damage */
-		if (blow_ptr->l_side)
+		/* Damage uses dice roll */
+		else
 		{
-			damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
-		}
-
-		/* Add constant damage */
-		damage += blow_ptr->d_plus;
-
-		/* Add level dependent damage */
-		if (blow_ptr->l_plus)
-		{
-			damage += blow_ptr->l_plus * level / blow_ptr->levels;
-
-			/* Mega-hack - dispel evil/undead etc. */
-			if (!level)
+			/* Roll out the damage */
+			if (blow_ptr->d_side)
 			{
-				damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
+				damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
 			}
+
+			/* Roll out level dependent damage */
+			if (blow_ptr->l_side)
+			{
+				damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
+			}
+
+			/* Add constant damage */
+			damage += blow_ptr->d_plus;
+
+			/* Add level dependent damage */
+			if (blow_ptr->l_plus)
+			{
+				damage += blow_ptr->l_plus * level / blow_ptr->levels;
+
+				/* Mega-hack - dispel evil/undead etc. */
+				if (!level)
+				{
+					damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
+				}
+			}
+		}
+
+		/* Allow direction to be cancelled for free */
+		if ((!(blow_info[blow_ptr->method].flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
+
+		/* Affect all in line of sight */
+		if (blow_info[blow_ptr->method].flags2 & (PR2_ALL_IN_LOS))
+		{
+			if (project_hack(who, what, effect, damage)) obvious = TRUE;
 		}
 
 		/* Apply spell method */
-		switch (blow_ptr->method)
+		else
 		{
-			/* Affect self directly */
-			case RBM_SELF:
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				/* Apply damage */
-				if (project_p(who, what, py, px, damage, effect)) obvious = TRUE;
-
-				/* Apply teleport and other effects */
-				if (project_t(who, what, py, px, damage, effect)) obvious = TRUE;
-				break;
-			}
-
-			/* Radius 1, centred on self */
-			case RBM_ADJACENT:
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM | PROJECT_MAGIC;
-				if (project(who, what, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
-				break;
-			}
-
-			case RBM_HANDS:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_hands(who, what, effect, dir, damage)) obvious = TRUE;
-				break;
-			}
-
-			case RBM_MISSILE:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_bolt(who, what, effect, dir, damage)) obvious = TRUE;
-				break;
-			}
-
-			case RBM_BOLT_MINOR:
-			{
-				int range = 4;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_bolt_minor(who, what, effect, dir, damage, range)) obvious = TRUE;
-				break;
-			}
-
-			case RBM_BOLT_10:
-			{
-				int beam;
-
-				if (c_info[p_ptr->pclass].spell_power) beam = level;
-				else beam = level/2;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_bolt_or_beam(who, what, beam - 10, effect, dir, damage)) obvious = TRUE;
-				break;
-			}
-
-			case RBM_BOLT:
-			{
-				int beam;
-
-				if (c_info[p_ptr->pclass].spell_power) beam = level;
-				else beam = level/2;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-				if (fire_bolt_or_beam(who, what, beam, effect, dir, damage)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_BEAM:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_beam(who, what, effect, dir, damage)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_BLAST:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				/* Hack - scale damage */
-				damage += level;
-
-				if (fire_blast(who, what, effect, dir, damage)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_WALL:
-			{
-				int flg = PROJECT_BEAM | PROJECT_GRID | PROJECT_KILL | PROJECT_ITEM;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (project_hook(who, what, effect, dir, damage, flg)) obvious = TRUE;
-				break;
-			}
-			case RBM_BALL:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball(who, what, effect, dir, damage, 2)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_BALL_II:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball(who, what, effect, dir, damage, 3)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_BALL_III:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball(who, what, effect, dir, damage, 4)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_BALL_MINOR:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball_minor(who, what, effect, dir, damage, 1)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_CLOUD:
-			{
-				int rad = 2;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				/* Hack - scale damage */
-				damage += level / 2;
-
-				if (fire_cloud(who, what, effect, dir, damage, rad)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_STORM:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_cloud(who, what, effect, dir, damage, 3)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_BREATH:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_arc(who, what, effect, dir, p_ptr->chp * damage / 300, 0, (effect == GF_SOUND) || (effect == GF_POIS) ? 30 : 20)) obvious = TRUE;
-
-				break;
-			}
-
-			/* Applies same damage at all ranges */
-			case RBM_AREA:
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM | PROJECT_AREA;
-				if (project(who, what, (level / 10)+1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
-				break;
-			}
-
-			/* Applies same damage at all ranges */
-			case RBM_AIM_AREA:
-			{
-				int rad = (level / 10)+1;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_area(who, what, effect, dir, damage, rad)) obvious = TRUE;
-				break;
-			}
-			case RBM_LOS:
-			{
-				if (project_hack(who, what, effect, damage)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_LINE:
-			{
-				int flg = PROJECT_BEAM | PROJECT_GRID | PROJECT_KILL;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-				if (project_hook(who, what, effect, dir, damage, flg)) obvious = TRUE;
-				break;
-			}
-			case RBM_AIM:
-			{
-				int flg = PROJECT_STOP | PROJECT_KILL;
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (project_hook(who, what, effect, dir, damage, flg)) obvious = TRUE;
-				break;
-			}
-			case RBM_ORB:
-			{
-				int rad = (level < 30 ? 2 : 3);
-
-				if (c_info[p_ptr->pclass].spell_power) damage += level + level/2;
-				else damage += level + level/4;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball(who, what, effect, dir, damage, rad)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_CROSS:
-			{
-				int k;
-
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				for (k = 0; k < 4; k++) if (fire_beam(who, what, effect, ddd[k], damage)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_STAR:
-			{
-				int k;
-
-
-				for (k = 0; k < 8; k++) if (fire_beam(who, what, effect, ddd[k], damage)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_AURA:
-			/* Radius 2, centred on self */
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
-				if (project(who, what, 2, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
-				break;
-			}
-			case RBM_AURA_MINOR:
-			/* Radius 1, centred on self */
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_HIDE | PROJECT_KILL | PROJECT_BOOM;
-				if (project(who, what, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
-				break;
-			}
-			case RBM_EXPLODE:
-			/* Radius 1, centred on self -- affects self */
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | PROJECT_BOOM | PROJECT_PLAY;
-				if (project(who, what, 1, py, px, py, px, damage, effect, flg, 0, 0)) obvious = TRUE;
-				break;
-			}
-			case RBM_SPHERE:
-			/* Variable radius */
-			{
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball(who, what, effect, dir, damage, (level/10)+1)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_PANEL:
-			{
-				if (project_hack(who, what, effect, damage)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_LEVEL:
-			{
-				if (project_hack(who, what, effect, damage)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_STRIKE:
-			{
-			        /* Allow direction to be cancelled for free */
-			        if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_ball(who, what, effect, dir, damage, 0)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_ARC_20:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_arc(who, what, effect, dir, damage, 0, 20)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_ARC_30:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_arc(who, what, effect, dir, damage, 0, 30)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_ARC_40:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_arc(who, what, effect, dir, damage, 0, 40)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_ARC_50:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_arc(who, what, effect, dir, damage, 0, 50)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_ARC_60:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_arc(who, what, effect, dir, damage, 0, 60)) obvious = TRUE;
-
-				break;
-			}
-
-			case RBM_8WAY:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_8way(who, what, effect, dir, damage, 2)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_8WAY_II:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_8way(who, what, effect, dir, damage, 3)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_8WAY_III:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_8way(who, what, effect, dir, damage, 4)) obvious = TRUE;
-
-				break;
-			}
-			case RBM_SWARM:
-			{
-				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
-
-				if (fire_swarm(who, what, 2 + level / 20, effect, dir,
-			           	damage + level / 2, 1)) obvious = TRUE;
-
-			    break;
-			}
-			case RBM_SCATTER:
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-				int y = py;
-				int x = px;
-				int i;
-
-				int flg = PROJECT_KILL | PROJECT_MAGIC | PROJECT_GRID | PROJECT_PLAY | PROJECT_ITEM;
-
-				for (i = 0; i < (p_ptr->lev / 10) + 3; i++)
-				{
-					/* Pick a 'nearby' location */
-	      			scatter(&y, &x, py, px, 5, 0);
-
-	      			/* Project at the location */
-					if (project(who, what, 0, py, px, y, x, damage, effect, flg, 0, 0)) obvious = TRUE;
-				}
-
-				break;
-			}
-
-			/* One adjacent target */
-			default:
-			{
-				int py = p_ptr->py;
-				int px = p_ptr->px;
-
-				int flg = PROJECT_KILL | PROJECT_MAGIC;
-
-				/* Allow direction to be cancelled for free */
-				if ((!get_rep_dir(&dir)) && (*cancel)) return (FALSE);
-
-				if (project(who, what, 0, py, px, py + ddy[dir], px + ddx[dir], damage, effect, flg, 0, 0)) obvious = TRUE;
-
-				break;
-			}
+			if (fire_projection(who, what, effect, blow_ptr->method, dir, damage, level)) obvious = TRUE;
 		}
 
 		/* Hack -- haven't cancelled */
@@ -8266,12 +7473,12 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 		/* Hack -- breath weapons act like a normal spell */
 		if ((method == RBM_BREATH) && (get_aim_dir(&dir)))
 		{
-			if (fire_ball(who, what, effect, dir, MIN(p_ptr->chp,damage), 2)) obvious = TRUE;
+			if (fire_projection(who, what, effect, 52, dir, damage, level)) obvious = TRUE;
 		}
 		/* Hack -- spitting acts like a normal spell */
 		else if ((method == RBM_SPIT) && (get_rep_dir(&dir)))
 		{
-			if (fire_hands(who, what, effect, dir, damage)) obvious = TRUE;
+			if (fire_projection(who, what, effect, 39, dir, damage, level)) obvious = TRUE;
 		}
 		/* Hack -- vomit in a random direction */
 		else if (method == RBM_VOMIT)
@@ -8279,7 +7486,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 			/* Random direction */
 			dir = ddd[rand_int(8)];
 
-			if (fire_hands(who, what, effect, dir, damage)) obvious = TRUE;
+			if (fire_projection(who, what, effect, 39, dir, damage, level)) obvious = TRUE;
 		}
 		else
 		{

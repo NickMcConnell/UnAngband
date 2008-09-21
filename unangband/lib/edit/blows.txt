@@ -30,6 +30,8 @@
 # M:max range + max range / levels
 # U:number + number / levels
 
+# Note need to move diameter of source to I:, as this applies
+# to any attack with a radius, not just arcs.
 
 # MISS - Check to see if this blow hits or not.
 # TOUCH - Report misses and disturb the character.
@@ -350,25 +352,25 @@ N:48:ball
 T:0:throw~ a ball of * at &
 I:0:0:20
 R:2
-F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:49:ball II
 T:0:throw~ a large ball of * at &
 I:0:0:20
 R:3
-F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:50:ball III
 T:0:throw~ a huge ball of * at &
 I:0:0:20
 R:4
-F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:51:storm
 T:0:hurls a storm of * at &
 I:0:0:20
 R:3
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:52:breath 20
 T:0:breathe~ * at &
@@ -404,12 +406,12 @@ T:0:summon~ * around &
 T:0:create~ * around &
 I:0:0:20
 R:1+1/10
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC | SAFE |
 
 N:57:los
 T:0:call~ down *
 I:0:0:20
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | HOOK |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | ALL_IN_LOS |
 
 N:58:line
 T:0:creat|es| a path of *
@@ -426,7 +428,7 @@ N:60:orb
 T:0:hurl~ an orb of * at &
 I:0:0:20
 R:2+1/30
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:61:star
 T:0:create~ * in eight directions
@@ -439,7 +441,7 @@ N:62:sphere
 T:0:create~ a sphere of * around &
 I:0:0:20
 R:4
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:63:panel
 T:0:call~ down * on all nearby
@@ -455,13 +457,13 @@ N:65:cross
 T:0:create~ a cross of *
 I:0:0:20
 R:3
-F:BEAM | 
+F:BEAM | DIR_STOP | KILL | PLAY
 F:4WAY |
 
 N:66:strike
 T:0:strike~ at & with *
 I:0:0:20
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:67:arc 20
 T:0:create~ a narrow arc of * at &
@@ -497,19 +499,19 @@ N:72:8 way i
 T:0:throw~ a ragged ball of * at & 
 I:0:0:20
 R:2
-F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:73:8 way ii
 T:0:throw~ a large jagged ball of * at &
 I:0:0:20
 R:3
-F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:74:8 way iii
 T:0:throw~ a huge forked ball of * at &
 I:0:0:20
 R:4
-F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:75:swarm
 T:0:throw~ a swarm of * at &
@@ -522,7 +524,7 @@ N:76:scatter
 T:0:scatter~ * around &
 I:0:0:20
 U:3+1/10
-F:SCATTER |
+F:SCATTER | KILL | MAGIC | GRID | PLAY | ITEM | SELF
 
 N:77:howl
 T:0:howls~ at &
@@ -542,7 +544,7 @@ N:79:cloud
 T:0:surround~ & with a cloud of *
 I:0:0:20
 R:2
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:80:forked bolt
 T:0:shoot~ a forked bolt of * at &
@@ -556,7 +558,7 @@ T:0:summon~ * around &
 T:0:create~ * around &
 I:0:0:20
 R:1+1/10
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 
 N:96:BLOW_1
 C:40:0:0:5:0:0:100
