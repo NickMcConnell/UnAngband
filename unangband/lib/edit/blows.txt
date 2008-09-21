@@ -411,7 +411,7 @@ F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC | SAFE |
 N:57:los
 T:0:call~ down *
 I:0:0:20
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | ALL_IN_LOS |
+F:GRID | ITEM | KILL | PLAY | MAGIC | ALL_IN_LOS | SELF | SAFE
 
 N:58:line
 T:0:creat|es| a path of *
@@ -446,12 +446,12 @@ F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | DIR_STOP |
 N:63:panel
 T:0:call~ down * on all nearby
 I:0:0:20
-#F:PANEL |
+F:PANEL | KILL | GRID | ITEM | KILL | PLAY | SAFE | SELF
 
 N:64:level
 T:0:call~ down * across this level
 I:0:0:20
-#F:LEVEL |
+F:LEVEL | KILL | GRID | ITEM | KILL | PLAY | SAFE | SELF
 
 N:65:cross
 T:0:create~ a cross of *

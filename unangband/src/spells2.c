@@ -19,6 +19,146 @@
 
 
 /*
+ * Apply a "project()" directly to all viewable monsters
+ *
+ * Note that affected monsters are NOT auto-tracked by this usage.
+ *
+ * We try to honour relevent PROJECT_ flags.
+ */
+bool project_all_in_los(int who, int what, int y0, int x0, int dam, int typ, u32b flg)
+{
+	int i, x, y;
+
+	bool notice = FALSE;
+
+	bool player_hack = FALSE;
+
+	/* Projection can also pass through line of sight grids */
+	bool allow_los = (flg & (PROJECT_LOS)) != 0;
+
+	/* Origin is player */
+	if ((y0 == p_ptr->py) && (x0 == p_ptr->px)) player_hack = TRUE;
+
+	/* Affect all (nearby) monsters */
+	for (i = 1; i < m_max; i++)
+	{
+		monster_type *m_ptr = &m_list[i];
+
+		/* Paranoia -- Skip dead monsters */
+		if (!m_ptr->r_idx) continue;
+
+		/* Location */
+		y = m_ptr->fy;
+		x = m_ptr->fx;
+
+		/* Require line of fire - from player */
+		if (player_hack)
+		{
+			if ((!player_can_fire_bold(y, x)) &&
+				((!allow_los) || !player_has_los_bold(y, x))) continue;
+		}
+		/* Require line of fire - from origin */
+		else
+		{
+			if ((!generic_los(y0, x0, y, x, CAVE_XLOF)) &&
+				((!allow_los) || !generic_los(y0, x0, y, x, CAVE_XLOS))) continue;
+		}
+
+		/* Jump directly to the target monster */
+		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+	}
+
+	/* Affect player? */
+	if ((player_hack) || (generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOF)) ||
+			((allow_los) && generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOS)))
+	{
+		/* Jump directly to the player */
+		if (project(who, what, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
+	}
+
+	/* Result */
+	return (notice);
+}
+
+
+/*
+ * Apply a "project()" directly to all monsters on 'current panel'
+ *
+ * Note that affected monsters are NOT auto-tracked by this usage.
+ */
+bool project_level(int who, int what, int dam, int typ, u32b flg)
+{
+	int i, x, y;
+
+	bool notice = FALSE;
+
+	/* Affect all (nearby) monsters */
+	for (i = 1; i < m_max; i++)
+	{
+		monster_type *m_ptr = &m_list[i];
+
+		/* Paranoia -- Skip dead monsters */
+		if (!m_ptr->r_idx) continue;
+
+		/* Location */
+		y = m_ptr->fy;
+		x = m_ptr->fx;
+
+		/* Jump directly to the target monster */
+		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+	}
+
+	/* Jump directly to the player */
+	if (project(who, what, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
+
+	/* Result */
+	return (notice);
+}
+
+
+/*
+ * Apply a "project()" directly to all monsters in a given radius
+ *
+ * Note that affected monsters are NOT auto-tracked by this usage.
+ */
+bool project_panel(int who, int what, int y0, int x0, int dam, int typ, u32b flg)
+{
+	int i, x, y;
+
+	bool notice = FALSE;
+
+	/* Affect all (nearby) monsters */
+	for (i = 1; i < m_max; i++)
+	{
+		monster_type *m_ptr = &m_list[i];
+
+		/* Paranoia -- Skip dead monsters */
+		if (!m_ptr->r_idx) continue;
+
+		/* Location */
+		y = m_ptr->fy;
+		x = m_ptr->fx;
+
+		/* Only affect nearby monsters */
+		if (distance(y0, x0, y, x) > 2 * MAX_SIGHT) continue;
+
+		/* Jump directly to the target monster */
+		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+	}
+
+	/* Only affect nearby monsters */
+	if (distance(y0, x0, p_ptr->py, p_ptr->px) <= 2 * MAX_SIGHT)
+	{
+		/* Jump directly to the player */
+		if (project(who, what, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
+	}
+
+	return notice;
+}
+
+
+
+/*
  * Increase players hit points, notice effects
  */
 bool hp_player(int num)
@@ -4069,42 +4209,6 @@ bool recharge(int num)
 }
 
 
-/*
- * Apply a "project()" directly to all viewable monsters
- *
- * Note that affected monsters are NOT auto-tracked by this usage.
- */
-static bool project_hack(int who, int what, int typ, int dam)
-{
-	int i, x, y;
-
-	int flg = PROJECT_JUMP | PROJECT_KILL | PROJECT_HIDE | PROJECT_PLAY | PROJECT_ITEM | PROJECT_GRID;
-
-	bool obvious = FALSE;
-
-
-	/* Affect all (nearby) monsters */
-	for (i = 1; i < m_max; i++)
-	{
-		monster_type *m_ptr = &m_list[i];
-
-		/* Paranoia -- Skip dead monsters */
-		if (!m_ptr->r_idx) continue;
-
-		/* Location */
-		y = m_ptr->fy;
-		x = m_ptr->fx;
-
-		/* Require line of sight */
-		if (!player_has_los_bold(y, x)) continue;
-
-		/* Jump directly to the target monster */
-		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) obvious = TRUE;
-	}
-
-	/* Result */
-	return (obvious);
-}
 
 
 
@@ -5174,10 +5278,28 @@ static bool fire_projection(int who, int what, int typ, int shape, int dir, int 
 		int x = tx;
 
 		/* Pick a 'nearby' location */
-		if (flg & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
+		if (blow_ptr->flags2 & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
+
+		/* Affect level */
+		if (blow_ptr->flags2 & (PR2_LEVEL))
+		{
+			if (project_level(who, what, dam, typ, flg)) noticed =  TRUE;
+		}
+
+		/* Affect panel */
+		else if (blow_ptr->flags2 & (PR2_PANEL))
+		{
+			if (project_panel(who, what, y, x, dam, typ, flg)) noticed = TRUE;
+		}
+
+		/* Affect panel */
+		else if (blow_ptr->flags2 & (PR2_ALL_IN_LOS))
+		{
+			if (project_panel(who, what, y, x, dam, typ, flg)) noticed = TRUE;
+		}
 
 		/* Analyze the "dir" and the "target". */
-		if (project(who, what, rad, py, px, y, x, dam, typ, flg, degrees_of_arc,
+		else if (project(who, what, rad, py, px, y, x, dam, typ, flg, degrees_of_arc,
 				(byte)diameter_of_source)) noticed = TRUE;
 	}
 
@@ -5902,17 +6024,8 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		/* Allow direction to be cancelled for free */
 		if ((!(blow_info[blow_ptr->method].flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
 
-		/* Affect all in line of sight */
-		if (blow_info[blow_ptr->method].flags2 & (PR2_ALL_IN_LOS))
-		{
-			if (project_hack(who, what, effect, damage)) obvious = TRUE;
-		}
-
 		/* Apply spell method */
-		else
-		{
-			if (fire_projection(who, what, effect, blow_ptr->method, dir, damage, level)) obvious = TRUE;
-		}
+		if (fire_projection(who, what, effect, blow_ptr->method, dir, damage, level)) obvious = TRUE;
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
