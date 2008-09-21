@@ -12981,6 +12981,166 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	}
 
 	/*
+	 * Remove random parts of the projection.
+	 *
+	 * For this process, we try to ensure that we have a minimum
+	 * number of grids per range band to keep the overall shape
+	 * of the projection intact.
+	 *
+	 * PROJECT_FORK tries to ensure that no part of the projection
+	 * is disconnected and will remove empty grids ahead of grids
+	 * which contain monsters. This should make lightning like
+	 * shapes. PROJECT_MYST is doesn't have these restrictions.
+	 */
+	if (flg & (PROJECT_FORK | PROJECT_MYST))
+	{
+		for (i = grids -1; i > 0; )
+		{
+			int c, g = 0, l, m;
+
+			/*
+			 * Compute how many grids we should have at the
+			 * current range band, assuming a square projection
+			 * area.
+			 */
+			k = 2 * gd[i] + 1;
+
+			/* Myst is thicker */
+			if (flg & (PROJECT_MYST)) k *= 2;
+
+			/* Reduce based on the diameter */
+			if (flg & (PROJECT_ARC | PROJECT_STAR))
+			{
+				k = k * (degrees+6) / 180;
+			}
+
+			/* Random reduction of grids */
+			k = k / (rand_int(5) + 2);
+
+			/* Ensure a minimum for forking*/
+			if ((flg & (PROJECT_FORK)) && (k < 1)) k = 1;
+
+			/* Ensure more distant grids are connected if forking */
+			if (flg & (PROJECT_FORK))
+			{
+				/* Prefer grids with monsters in them first */
+				for (m = 0; m < 2; m++)
+				{
+					/* Check each more distant grid */
+					for (j = i + 1; (j < grids) && (gd[i] == gd[j]); j++)
+					{
+						/* Skip if not saving it */
+						if (!(play_info[gy[j]][gx[j]] & (PLAY_TEMP))) continue;
+
+						/* No connections found yet */
+						c = 0;
+
+						/* Check grids at the current level */
+						for (l = i - 1; (l >= 0) && (gd[i] == gd[l]); l--)
+						{
+							/* Don't count monster-less grids on first iteration through */
+							if ((!m) && !(cave_m_idx[gy[l]][gx[l]]) && !(play_info[gy[l]][gx[l]] & (PLAY_TEMP))) continue;
+
+							/* Check adjacency */
+							if (distance(gy[j], gx[j], gy[l], gx[l]) == 1)
+							{
+								/* Count and maybe note a grid, preferring already saved grids */
+								if ((!rand_int(++c)) || (play_info[gy[l]][gx[l]] & (PLAY_TEMP))) g = l;
+							}
+						}
+
+						/* At least one grid found */
+						if (c > 0)
+						{
+							/* Have we already saved it? */
+							if (!(play_info[gy[g]][gx[g]] & (PLAY_TEMP)))
+							{
+								/* Save it */
+								play_info[gy[g]][gx[g]] |= (PLAY_TEMP);
+								k--;
+							}
+						}
+					}
+				}
+			}
+
+			/* Grids left to 'save' */
+			while (k > 0)
+			{
+				/* Prefer grids with monsters in them first - when forking */
+				for (m = (flg & (PROJECT_FORK)) ? 0 : 1; m < 2; m++)
+				{
+					/* No candidates found yet */
+					c = 0;
+
+					/* Check grids at the current level */
+					for (l = i - 1; (l >= 0) && (gd[i] == gd[l]); l--)
+					{
+						/* Don't count monster-less grids on first iteration through */
+						if ((!m) && !(cave_m_idx[gy[l]][gx[l]])) continue;
+
+						/* Not already saved */
+						if (!(play_info[gy[l]][gx[l]] & (PLAY_TEMP)))
+						{
+							/* Count and maybe note a grid */
+							if (!rand_int(++c)) g = l;
+						}
+					}
+
+					/* At least one grid found */
+					if (c > 0)
+					{
+						/* Save it */
+						play_info[gy[g]][gx[g]] |= (PLAY_TEMP);
+						k--;
+					}
+					/* No grids left */
+					else
+					{
+						k = 0;
+						break;
+					}
+				}
+			}
+
+			/* Look back for next lower radius */
+			for (l = i - 1; (l >= 0) && (gd[i] == gd[l]); l--) ;
+
+			/* And adjust i. Note paranoia to ensure i is decreasing. */
+			if (l < i) i = l;
+			else i--;
+		}
+
+		/* Remove grids except first grid and saved grids */
+		for (i = 1; i < grids; i++)
+		{
+			/* Zero out offset */
+			j = 0;
+
+			/* Save grid? */
+			if ((j) && (play_info[gy[i]][gx[i]] & (PLAY_TEMP)))
+			{
+				gy[i-j] = gy[i];
+				gx[i-j] = gx[i];
+				gd[i-j] = gd[i];
+			}
+			/* Skip grid */
+			else
+			{
+				j++;
+			}
+		}
+
+		/* Clear temp grids */
+		for (i = 0; i < grids; i++)
+		{
+			/* Mark the grid */
+			play_info[gy[i]][gx[i]] &= ~(PLAY_TEMP);
+		}
+	}
+
+
+	/*
 	 * Remove all but the outermost two range bands if requested
 	 */
 	if (flg & (PROJECT_EDGE))
