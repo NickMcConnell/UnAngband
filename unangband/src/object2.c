@@ -6362,7 +6362,7 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 	if (*flg & (PROJECT_FORK)) pow = pow/3;
 
 	/* Hack -- project edge is weaker */
-	if ((*flg & (PROJECT_EDGE)) && (rad > 2)) pow = (pow * 2)/3;
+	if ((*flg & (PROJECT_EDGE)) && (*rad > 2)) pow = (pow * 2)/3;
 
 	/* Hack -- project area is powerful */
 	if (*flg & (PROJECT_AREA)) pow *= (*rng + 1);
