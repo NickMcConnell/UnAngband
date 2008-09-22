@@ -171,14 +171,14 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 
 	/* Extract the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-	
+
 	/* Hack -- apply player branding */
 	if (!p_ptr->branded_blows) /* Nothing */ ;
 	else if (p_ptr->branded_blows < 33) f1 |= 1L << (p_ptr->branded_blows - 1);
 	else if (p_ptr->branded_blows < 65) f2 |= 1L << (p_ptr->branded_blows - 33);
 	else if (p_ptr->branded_blows < 97) f3 |= 1L << (p_ptr->branded_blows - 65);
 	else if (p_ptr->branded_blows < 129) f4 |= 1L << (p_ptr->branded_blows - 97);
-	
+
 	/* Some "weapons" and "ammo" do extra damage */
 	switch (o_ptr->tval)
 	{
@@ -673,7 +673,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 /*
  * Find a secret at the specified location and change it according to
  * the state.
- * 
+ *
  * TODO: It's very repetitive having to walk up a corridor and find
  * every square is dusty. We should flow out from the initial secret
  * and find all other nearby squares that have the same feature, and
@@ -773,7 +773,7 @@ bool quiver_combine(object_type *o_ptr, int o_idx)
 	char name[80];
 
 	/* Must be ammo. */
-	if (!ammo_p(o_ptr) 
+	if (!ammo_p(o_ptr)
 	    && !(is_known_throwing_item(o_ptr)
 		 && wield_slot(o_ptr) >= INVEN_WIELD))
 	  return (FALSE);
@@ -894,7 +894,7 @@ bool quiver_combine(object_type *o_ptr, int o_idx)
  * Objects get picked
  * up, placed in the quiver, and combined automatically.
  *
- * FIXME: make a function with this name that will behave 
+ * FIXME: make a function with this name that will behave
  * similarly as inven_carry; then use it in do_cmd_apply_rune_or_coating
  * Now, this is just a very ugly copy of the code above,
  * with slight hackish changes.
@@ -908,7 +908,7 @@ bool quiver_carry(object_type *o_ptr, int o_idx)
 	char name[80];
 
 	/* Must be ammo. */
-	if (!ammo_p(o_ptr) 
+	if (!ammo_p(o_ptr)
 	    && !(is_known_throwing_item(o_ptr)
 		 && wield_slot(o_ptr) >= INVEN_WIELD))
 	  return (FALSE);
@@ -1026,17 +1026,17 @@ static void py_pickup_gold(int py, int px)
 		next_o_idx = o_ptr->next_o_idx;
 
 		/* Ignore if not legal treasure */
-		if (o_ptr->tval < TV_GOLD) 
+		if (o_ptr->tval < TV_GOLD)
 			continue;
 
 		value = o_ptr->number * o_ptr->charges - o_ptr->stackc;
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
 
 		/* Message */
-		if (o_ptr->tval == TV_GOLD) 
+		if (o_ptr->tval == TV_GOLD)
 			msg_format("You have found %ld gold pieces worth of %s.",
 						  value, o_name);
-		else msg_format("You have found %s worth %ld gold pieces.", 
+		else msg_format("You have found %s worth %ld gold pieces.",
 							 o_name, value);
 
 		/* Collect the gold */
@@ -1151,10 +1151,10 @@ static bool auto_pickup_never(const object_type *o_ptr)
 
 
 /*
- * Determine if the object can be picked up and has "=g" in its inscription 
+ * Determine if the object can be picked up and has "=g" in its inscription
  * or options determine it should be picked up.
  *
- * If "=g" is followed by a number, pick up if the player has 
+ * If "=g" is followed by a number, pick up if the player has
  * less than this number of similar objects in their inventory.
  */
 static bool auto_pickup_okay(const object_type *o_ptr)
@@ -1424,7 +1424,7 @@ static void py_pickup_aux(int o_idx, bool msg)
 
 	/* Get the object again */
 	o_ptr = &inventory[slot];
-	
+
 	/* No longer 'stored' */
 	o_ptr->ident &= ~(IDENT_STORE);
 
@@ -1483,7 +1483,7 @@ byte py_pickup(int py, int px, int pickup)
 	/* Objects picked up.  Used to determine time cost of command. */
 	byte objs_picked_up = 0;
 
-	int floor_num = 0, feature_num = 0, 
+	int floor_num = 0, feature_num = 0,
 		floor_list[MAX_FLOOR_STACK + 1], floor_o_idx = 0;
 
 	int can_pickup = 0;
@@ -1493,19 +1493,19 @@ byte py_pickup(int py, int px, int pickup)
 	bool msg = TRUE;
 
 	feature_type *f_ptr = &f_info[cave_feat[py][px]];
-	
+
 	/* Hack -- gather features from walls */
-	if (!(f_ptr->flags1 & (FF1_MOVE)) 
-		 && !(f_ptr->flags3 & (FF3_EASY_CLIMB)) 
+	if (!(f_ptr->flags1 & (FF1_MOVE))
+		 && !(f_ptr->flags3 & (FF3_EASY_CLIMB))
 		 && (f_ptr->flags3 & (FF3_GET_FEAT)))
 	{
 		gather = TRUE;
 	}
 
 	/* Are we allowed to pick up anything here? */
-	if (!(f_ptr->flags1 & (FF1_DROP)) 
-		 && (f_ptr->flags1 & (FF1_MOVE)) 
-		 && !gather) 
+	if (!(f_ptr->flags1 & (FF1_DROP))
+		 && (f_ptr->flags1 & (FF1_MOVE))
+		 && !gather)
 		return 0;
 
 	/* Always pickup gold, effortlessly */
@@ -1515,14 +1515,14 @@ byte py_pickup(int py, int px, int pickup)
 	for (this_o_idx = cave_o_idx[py][px]; this_o_idx || gather; this_o_idx = next_o_idx)
 	{
 		bool gathered = FALSE;
-		
+
 		/* Gathering? */
 		if (gather)
 		{
 			object_type object_type_body;
-			
+
 			o_ptr = &object_type_body;
-			
+
 			/* Hack -- gather once only XXX */
 			/* Note that this occurs before make_feat or scan_feat below, as otherwise we end up looking at (nothing)s */
 			next_o_idx = cave_o_idx[py][px];
@@ -1530,14 +1530,14 @@ byte py_pickup(int py, int px, int pickup)
 			gathered = TRUE;
 
 			/* Get the feature */
-			if (!make_feat(o_ptr, py, px)) 
+			if (!make_feat(o_ptr, py, px))
 				return 1;
 
 			/* Find the feature */
 			this_o_idx = scan_feat(py, px);
-			
+
 			/* And we have to be doubly paranoid */
-			if (this_o_idx == next_o_idx) 
+			if (this_o_idx == next_o_idx)
 				next_o_idx = o_list[this_o_idx].next_o_idx;
 		}
 		else
@@ -1547,10 +1547,10 @@ byte py_pickup(int py, int px, int pickup)
 			next_o_idx = o_ptr->next_o_idx;
 
 			/* Ignore, but count, 'store' items */
-			if (o_ptr->ident & (IDENT_STORE)) 
+			if (o_ptr->ident & (IDENT_STORE))
 			{
 				feature_num++;
-				continue;		
+				continue;
 			}
 
 			/* Ignore all hidden objects and non-objects */
@@ -1577,7 +1577,7 @@ byte py_pickup(int py, int px, int pickup)
 		}
 
 		/* Hack -- disturb */
-		if (!auto_pickup_never(o_ptr) 
+		if (!auto_pickup_never(o_ptr)
 			 && !auto_pickup_ignore(o_ptr))
 			disturb(0, 0);
 
@@ -1586,9 +1586,9 @@ byte py_pickup(int py, int px, int pickup)
 		{
 			/* Destroy the object */
 			py_destroy_aux(this_o_idx);
-			
+
 			/* Gathering? */
-			if (gathered && (scan_feat(py,px) < 0)) 
+			if (gathered && (scan_feat(py,px) < 0))
 				cave_alter_feat(py,px,FS_GET_FEAT);
 
 			/* Check the next object */
@@ -1599,7 +1599,7 @@ byte py_pickup(int py, int px, int pickup)
 		if (quiver_combine(o_ptr, this_o_idx))
 		{
 			/* Gathering? */
-			if (gathered && (scan_feat(py,px) < 0)) 
+			if (gathered && (scan_feat(py,px) < 0))
 				cave_alter_feat(py,px,FS_GET_FEAT);
 
 			continue;
@@ -1613,7 +1613,7 @@ byte py_pickup(int py, int px, int pickup)
 			objs_picked_up++;
 
 			/* Gathering? */
-			if (gathered && (scan_feat(py,px) < 0)) 
+			if (gathered && (scan_feat(py,px) < 0))
 				cave_alter_feat(py,px,FS_GET_FEAT);
 
 			continue;
@@ -1633,7 +1633,7 @@ byte py_pickup(int py, int px, int pickup)
 	}
 
 	/* There are no objects left */
-	if ((pickup != 1 && floor_num == 0) 
+	if ((pickup != 1 && floor_num == 0)
 		 || floor_num + feature_num == 0)
 		return objs_picked_up;
 
@@ -1718,7 +1718,7 @@ byte py_pickup(int py, int px, int pickup)
 		/* Scan floor (again) */
 		floor_num = scan_floor(floor_list, N_ELEMENTS(floor_list), py, px, 0x0B);
 
-		/* Use a menu interface for multiple objects or feature objects, 
+		/* Use a menu interface for multiple objects or feature objects,
 			or pickup single objects */
 		if (floor_num == 1)
 			this_o_idx = floor_o_idx;
@@ -1735,7 +1735,7 @@ byte py_pickup(int py, int px, int pickup)
 		/* Hack for player */
 		int oy = p_ptr->py;
 		int ox = p_ptr->px;
-			
+
 		bool done = FALSE;
 
 		p_ptr->py = py;
@@ -1750,7 +1750,7 @@ byte py_pickup(int py, int px, int pickup)
 		/* Get an object or exit. */
 		q = "Get which item?";
 		s = "You see nothing there.";
-		if (!get_item(&item, q, s, (USE_FLOOR | USE_FEATG))) 
+		if (!get_item(&item, q, s, (USE_FLOOR | USE_FEATG)))
 			done = TRUE;
 
 		/* Fix player position */
@@ -1785,7 +1785,7 @@ byte py_pickup(int py, int px, int pickup)
 		py_pickup_aux(this_o_idx, msg);
 
 		/* Get the feature */
-		if (gathered2 && (scan_feat(py,px) < 0)) 
+		if (gathered2 && (scan_feat(py,px) < 0))
 			cave_alter_feat(py,px,FS_GET_FEAT);
 
 		/* Indicate an object picked up. */
@@ -1796,7 +1796,7 @@ byte py_pickup(int py, int px, int pickup)
 	 * If requested, call this function recursively.  Count objects picked
 	 * up.  Force the display of a menu in all cases.
 	 */
-	if (call_function_again) 
+	if (call_function_again)
 		objs_picked_up += py_pickup(py, px, 2);
 
 	/* Indicate how many objects have been picked up. */
@@ -1926,7 +1926,7 @@ void hit_trap(int y, int x)
 
 							/* Apply damage directly */
 							project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, k, GF_HURT);
-							
+
 							/* Apply additional effect from coating or sometimes activate */
 							if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
 							{
@@ -1941,7 +1941,7 @@ void hit_trap(int y, int x)
 						{
 							/* Trap description */
 							msg_format("%^s narrowly misses you.",o_name);
-							
+
 							/* No effect */
 							power = 0;
 						}
@@ -2018,9 +2018,9 @@ void hit_trap(int y, int x)
 				{
 					/* Trap description */
 					msg_format("%^s narrowly misses you.",o_name);
-					
+
 					/* No effect */
-					power = 0;			
+					power = 0;
 				}
 
 				/* Get local object */
@@ -2084,7 +2084,7 @@ void hit_trap(int y, int x)
 					/* XXX Hack -- new unstacking code */
 					o_ptr->stackc++;
 
-					/* No spare charges */	
+					/* No spare charges */
 					if (o_ptr->stackc >= o_ptr->number)
 					{
 						/* Use a charge off the stack */
@@ -2095,7 +2095,7 @@ void hit_trap(int y, int x)
 					}
 
 					/* XXX Hack -- unstack if necessary */
-					if ((o_ptr->number > 1) &&					 
+					if ((o_ptr->number > 1) &&
 					((!object_charges_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
 					  (!object_charges_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
 					  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
@@ -2114,7 +2114,7 @@ void hit_trap(int y, int x)
 
 						/* Reset stack counter */
 						i_ptr->stackc = 0;
- 
+
 				 		/* Unstack the used item */
 				 		o_ptr->number--;
 
@@ -2217,7 +2217,7 @@ void hit_trap(int y, int x)
 				if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD))
 				{
 					/* Trap description */
-					msg_print("Hmm... there was something under this rock.");					
+					msg_print("Hmm... there was something under this rock.");
 
 					/* Disarm */
 					cave_alter_feat(y,x,FS_DISARM);
@@ -2242,14 +2242,14 @@ void hit_trap(int y, int x)
 			{
 				/* Apply damage directly */
 				project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, damroll(6, 6), GF_FALL_SPIKE);
-				
+
 				/* Hack -- should really check if we get spiked somehow */
 				if (((p_ptr->cur_flags3 & (TR3_FEATHER)) == 0) && (rand_int(100) < 25))
 				{
 					/* Decrease the item */
 					floor_item_increase(cave_o_idx[y][x], -1);
 					floor_item_optimize(cave_o_idx[y][x]);
-	
+
 					/* Disarm if runs out */
 					if (!cave_o_idx[y][x]) cave_alter_feat(y,x,FS_DISARM);
 				}
@@ -2260,7 +2260,7 @@ void hit_trap(int y, int x)
 			default:
 			{
 				/* Trap description */
-				msg_print("Hmm... there was something under this rock.");					
+				msg_print("Hmm... there was something under this rock.");
 
 				/* Disarm */
 				cave_alter_feat(y,x,FS_DISARM);
@@ -2337,7 +2337,7 @@ void hit_trap(int y, int x)
 		else if (f_ptr->blow.method)
 		{
 			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
-   
+
 			/* Apply the blow */
 			project_p(SOURCE_FEATURE, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
 			project_t(SOURCE_FEATURE, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
@@ -2381,9 +2381,9 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 	   Leter we will check if we actually have picked one of those at birth. */
 
 	/* Check backstab if monster sleeping or fleeing */
-	if ( (m_ptr->csleep || m_ptr->monfear) 
+	if ( (m_ptr->csleep || m_ptr->monfear)
 		 && style & (1L<<WS_SWORD) /* works only for melee */
-		 && inventory[INVEN_WIELD].weight < 100 ) 
+		 && inventory[INVEN_WIELD].weight < 100 )
 		style |= (1L <<WS_BACKSTAB);
 
 	/* Check slay orc if monster is an orc; works also for ranged attacks */
@@ -2439,7 +2439,7 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 	}
 
 	/* Only allow criticals against living opponents */
-	if (r_ptr && (r_ptr->flags3 & (RF3_NONLIVING) 
+	if (r_ptr && (r_ptr->flags3 & (RF3_NONLIVING)
 				  || r_ptr->flags2 & (RF2_STUPID)))
 	{
 		*to_crit = 0;
@@ -2499,7 +2499,7 @@ bool auto_activate(const object_type *o_ptr)
 
 	/* Extract the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-	
+
 	/* Check if can activate */
 	if ((f3 & (TR3_ACTIVATE)) == 0) return (FALSE);
 
@@ -2537,7 +2537,7 @@ bool auto_activate(const object_type *o_ptr)
 void py_attack(int dir)
 {
 	int y = p_ptr->py + ddy[dir];
-	int x = p_ptr->px + ddx[dir];	
+	int x = p_ptr->px + ddx[dir];
 
 	int k, bonus, chance;
 
@@ -2550,11 +2550,12 @@ void py_attack(int dir)
 	int blows = 0; /* Number of blows actually delivered */
 	int slot;
 
-	int i;
+	int i, c, crit;
 	int num_blows = 0;
 	int do_cuts = 0;
 	int do_stun = 0;
-	
+	int do_trip = 0;
+
 	monster_type *m_ptr;
 	monster_race *r_ptr;
 	monster_lore *l_ptr;
@@ -2577,7 +2578,7 @@ void py_attack(int dir)
 
 	bool charging = FALSE;
 
-	if (cave_m_idx[y][x] <= 0) 
+	if (cave_m_idx[y][x] <= 0)
 	{
 		/* Oops */
 		msg_print("You spin around.");
@@ -2653,19 +2654,19 @@ void py_attack(int dir)
 	{
 		/* Charging decreases number of blows */
 		num_blows = (num_blows + 1) / 2;
-		
+
 		/* Ensure at least one blow with each weapon */
 		if ((melee_style & (1L << WS_TWO_WEAPON)) && (num_blows > 0))
 		  num_blows = MAX(2, num_blows);
 	}
-	
+
 	/* Hack -- no blows */
 	if (num_blows <= 0)
 	{
 /*		msg_print("You lack the skill to attack.");
-		
+
 		return; */
-		
+
 		/* Always get one blow */
 		num_blows = 1;
 	}
@@ -2699,7 +2700,7 @@ void py_attack(int dir)
 		/* Calculate the "attack quality" */
 		if (o_ptr->k_idx) bonus = p_ptr->to_h + o_ptr->to_h + style_hit;
 		else bonus = p_ptr->to_h + style_hit;
-		
+
 		/*
 		 * Blocking - the player gets a big to-hit bonus on the riposte
 		 */
@@ -2734,15 +2735,15 @@ void py_attack(int dir)
 		else
 		{
 			bool fumble = FALSE;
-			
+
 			/* Test for fumble */
-			if (((p_ptr->heavy_wield) 
-				  || (o_ptr->k_idx && o_ptr->ident & (IDENT_CURSED))) 
+			if (((p_ptr->heavy_wield)
+				  || (o_ptr->k_idx && o_ptr->ident & (IDENT_CURSED)))
 				 && (!rand_int(chance)))
 			{
 				/* Hack -- use the player for the attack */
 				my_strcpy(m_name, "yourself", sizeof(m_name));
-				
+
 				/* Hack -- use the 'fake' player */
 				r_ptr = &r_info[0];
 
@@ -2753,12 +2754,12 @@ void py_attack(int dir)
 				/* Notice fumbling later */
 				fumble = TRUE;
 			}
-			
+
 			/* Handle normal weapon/gauntlets/boots */
 			if (o_ptr->k_idx)
 			{
 				k = damroll(o_ptr->dd, o_ptr->ds);
-				
+
 				/* Hack -- get brands/slays from artifact/ego item/magic item type */
 				if ((o_ptr->name1) || (o_ptr->name2) || (o_ptr->xtra1) || (o_ptr->ident & (IDENT_FORGED)))
 				{
@@ -2780,30 +2781,48 @@ void py_attack(int dir)
 					k = tot_dam_aux(&inventory[INVEN_LEFT], k, m_ptr, FALSE);
 				}
 
-				switch (o_ptr->tval)
+				/* Haven't got an critical type yet */
+				c = 0;
+				crit = 0L;
+
+				/* Choose critical type */
+				for (i = TR5_DO_CUTS; i <= TR5_DO_TRIP; i <<= 1)
 				{
-					case TV_POLEARM:
+					/* Weapon doesn't have this critical type */
+					if (!(k_info[o_ptr->k_idx].flags5 & i)) continue;
+
+					if (!rand_int(++c)) crit = i;
+				}
+
+				/* Get critical effect */
+				i = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+
+				/* Apply critical */
+				switch (crit)
+				{
+					case TR5_DO_CUTS:
 					{
-						/* Hack -- spears do damaging criticals, axes stun or cut */ 
-						if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Axe"))
-							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Halberd"))
-							&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
-							k += critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
-						else if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe"))
-							&& (rand_int(100) < 50))
-							do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
-						else
-							do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+						do_cuts = i;
 						break;
 					}
-					case TV_SWORD:
+					case TR5_DO_STUN:
 					{
-						do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+						do_stun = i;
+						break;
+					}
+					case TR5_DO_CRIT:
+					{
+						k += i;
+						break;
+					}
+					case TR5_DO_TRIP:
+					{
+						do_trip = i;
 						break;
 					}
 					default:
 					{
-						do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+						/* Weapon never does criticals */
 						break;
 					}
 				}
@@ -2815,21 +2834,21 @@ void py_attack(int dir)
 				object_usage(slot);
 
 				/* Note -- must happen after above flags updated */
-				if (((p_ptr->cur_flags3 & (TR3_IMPACT)) != 0) && (k > 50))
+				if (((p_ptr->cur_flags3 & (TR3_ACT_ON_BLOW)) != 0) && (k > 50))
 				{
 					do_quake = TRUE;
 
 					/* Always notice */
-					equip_can_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
+					equip_can_flags(0x0L,0x0L,TR3_ACT_ON_BLOW,0x0L);
 				}
-				else if ((p_ptr->cur_flags3 & (TR3_IMPACT)) == 0)
+				else if ((p_ptr->cur_flags3 & (TR3_ACT_ON_BLOW)) == 0)
 				{
 					/* Sometimes notice */
-					equip_not_flags(0x0L,0x0L,TR3_IMPACT,0x0L);
+					equip_not_flags(0x0L,0x0L,TR3_ACT_ON_BLOW,0x0L);
 				}
 
 				/* Adjust for equipment/stats to_d bounded by dice */
-				k += MIN(p_ptr->to_d, 
+				k += MIN(p_ptr->to_d,
 							o_ptr->dd * o_ptr->ds + 5);
 			}
 			/* Handle bare-hand/bare-foot attack */
@@ -2858,6 +2877,8 @@ void py_attack(int dir)
 			/* Some monsters resist cuts */
 			if (r_ptr->flags9 & (RF9_NO_CUTS)) do_cuts = 0;
 
+			/* TODO: Some monsters resist tripping */
+
 			/* Hack --- backstab. Weapon of 10 lbs or less */
 			if (melee_style & (1L << WS_BACKSTAB))
 			{
@@ -2873,6 +2894,11 @@ void py_attack(int dir)
 			{
 				/* Message */
 				p = "You wound %s!";
+			}
+			else if (do_trip)
+			{
+				/* Message */
+				p = "You slam %s!";
 			}
 			else if (charging && blows == 1)
 			{
@@ -2897,7 +2923,7 @@ void py_attack(int dir)
 
 			/* Message */
 			message_format(MSG_HIT, m_ptr->r_idx, p, m_name);
-			
+
 			/* Complex message */
 			if (p_ptr->wizard)
 			{
@@ -2949,11 +2975,11 @@ void py_attack(int dir)
 			/* Fumble - damage self */
 			if (fumble)
 			{
-				project_p(SOURCE_PLAYER_ATTACK, o_ptr->k_idx, y, x, k, GF_HURT);	
+				project_p(SOURCE_PLAYER_ATTACK, o_ptr->k_idx, y, x, k, GF_HURT);
 			}
 
 			/* Damage, check for fear and death */
-			else if (o_ptr->k_idx 
+			else if (o_ptr->k_idx
 						&& mon_take_hit(cave_m_idx[y][x], k, &fear, NULL))
 			{
 				u32b f1, f2, f3, f4;
@@ -3018,14 +3044,14 @@ void py_attack(int dir)
 				{
 					y = p_ptr->py;
 					x = p_ptr->px;
-					
+
 					fumble = TRUE;
 				}
-				
+
 				/* Make item strike */
 				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
 			}
-			
+
 			/* Fumbling or coating backfiring */
 			if (fumble) break;
 		}
@@ -3130,7 +3156,7 @@ bool stuck_player(int *dir)
 
 /*
  * Move player in the given direction.
- * 
+ *
  * This routine should only be called when energy has been expended.
  *
  * Note that this routine handles monsters in the destination grid,
@@ -3148,7 +3174,7 @@ void move_player(int dir)
 	int mimic;
 
 	cptr name;
-	
+
 	/* Move is a climb? -- force boolean */
 	bool climb = FALSE;
 
@@ -3160,7 +3186,7 @@ void move_player(int dir)
 
 	climb = ((!(f_ptr->flags1 & (FF1_MOVE))
 		&& (f_ptr->flags3 & (FF3_EASY_CLIMB)))
-		|| (!(f_ptr->flags3 & (FF3_MUST_CLIMB)) 
+		|| (!(f_ptr->flags3 & (FF3_MUST_CLIMB))
 		&& (f_info[cave_feat[py][px]].flags3 & (FF3_MUST_CLIMB)))) != 0;
 
 	/* Hack -- pickup objects from locations you can't move to but can see */
@@ -3168,7 +3194,7 @@ void move_player(int dir)
 	{
 		/* Get item from the destination */
 		p_ptr->energy_use = py_pickup(y, x, 1) * 10;
-		
+
 		/* Disturb the player */
 		disturb(0, 0);
 
@@ -3194,7 +3220,7 @@ void move_player(int dir)
 	 (play_info[y][x] & (PLAY_MARK)) &&
 		 ( (f_ptr->flags1 & (FF1_DISARM)) ||
 		 ( !(f_ptr->flags1 & (FF1_MOVE)) &&
-		 !(f_ptr->flags3 & (FF3_EASY_CLIMB)) && 
+		 !(f_ptr->flags3 & (FF3_EASY_CLIMB)) &&
 		 (f_ptr->flags1 & (FF1_OPEN)))))
 	{
 		/* Not already repeating */
@@ -3224,13 +3250,13 @@ void move_player(int dir)
 	/* Player can not walk through "walls" */
 	/* Also cannot climb over unknown "trees/rubble" */
 	else if (!(f_ptr->flags1 & (FF1_MOVE))
-				&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB)) 
+				&& (!(f_ptr->flags3 & (FF3_EASY_CLIMB))
 					 || !(play_info[y][x] & (PLAY_MARK))))
 	{
 		if (disturb_detect && (play_info[p_ptr->py][p_ptr->px] & (PLAY_SAFE)) && !(play_info[y][x] & (PLAY_SAFE)))
 		{
 			disturb(1,0);
-			msg_print("This doesn't feel safe."); 
+			msg_print("This doesn't feel safe.");
 
 			if (!get_check("Are you sure you want to enter undetected territory?")) return;
 		}
@@ -3278,7 +3304,7 @@ void move_player(int dir)
 			msg_format("There is %s%s blocking your way.",
 				((f_ptr->flags2 & (FF2_FILLED)) ? "" :
 				(is_a_vowel(name[0]) ? "an " : "a ")),name);
-			
+
 			/* If the mimiced feature appears movable, reveal secret */
 			if (((((f_info[mimic].flags1 & (FF1_MOVE)) != 0) ||
 				((f_info[mimic].flags3 & (FF3_EASY_CLIMB)) != 0))
@@ -3354,10 +3380,10 @@ void move_player(int dir)
 				int dy = n_ptr->fy - y;
 				int dx = n_ptr->fx - x;
 				int count = 0;
-				
+
 				n_ptr->ty = n_ptr->fy;
 				n_ptr->tx = n_ptr->fx;
-				
+
 				/* Hack -- get new target as far as the monster can move in the direction
 				 * pushed. We do this with a walking stick approach to prevent us getting
 				 * invalid target locations like (0,0) */
@@ -3368,7 +3394,7 @@ void move_player(int dir)
 					n_ptr->ty = n_ptr->ty + dy;
 					n_ptr->tx = n_ptr->tx + dx;
 				}
-				
+
 				/* Clear target if none available */
 				if ((n_ptr->ty == n_ptr->fy) && (n_ptr->tx == n_ptr->fx))
 				{
@@ -3376,7 +3402,7 @@ void move_player(int dir)
 					n_ptr->tx = 0;
 				}
 			}
-			
+
 			/* The other monster cannot switch places */
 			else if (!cave_exist_mon(n_ptr->r_idx, p_ptr->py, p_ptr->px, TRUE))
 			{
@@ -3387,18 +3413,18 @@ void move_player(int dir)
 					if (!get_check("Are you sure?")) return;
 				}
 			}
-			
+
 			/* Hack -- we clear the target if we move over a monster */
 			else
 			{
 				n_ptr->ty = 0;
-				n_ptr->tx = 0;				
+				n_ptr->tx = 0;
 			}
 
 			/* Mark monsters as pushed */
 			n_ptr->mflag |= (MFLAG_PUSH);
 		}
-		
+
 		/* Move player */
 		monster_swap(py, px, y, x);
 
@@ -3938,7 +3964,7 @@ static bool run_test(void)
 			{
 				/* Ignore unusual floors; don't run if you want to inspect them */
 				if (f_info[feat].flags1 & (FF1_FLOOR))
-					notice = FALSE;				
+					notice = FALSE;
 			}
 
 			/* Interesting feature */
@@ -4169,7 +4195,7 @@ void run_step(int dir)
 			{
 				/* Disturb */
 				disturb(0, 0);
-	
+
 				/* Done */
 				return;
 			}

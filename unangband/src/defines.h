@@ -3444,14 +3444,14 @@
 #define TR3_DRAIN_EXP    0x00040000L     /* Experience drain */
 #define TR3_AGGRAVATE    0x00080000L     /* Aggravate monsters */
 #define TR3_UNCONTROLLED 0x00100000L     /* Item activates spontaneously if cursed */
-#define TR3_RANDOM       0x00200000L 	/* Item has random activation */
+#define TR3_ACT_ON_BLOW  0x00200000L 	 /* Item activates on powerful blows */
 #define TR3_ACTIVATE     0x00400000L     /* Item can be activated */
 #define TR3_BLESSED      0x00800000L     /* Item has been blessed */
-#define TR3_INSTA_ART    0x01000000L     /* Item makes an artifact */
+#define TR3_FREE_HANDS   0x01000000L     /* Item does not inhibit hands */
 #define TR3_HUNGER       0x02000000L     /* Item makes the user more hungry */
-#define TR3_IMPACT       0x04000000L     /* Earthquake blows */
-#define TR3_HAS_ROPE     0x08000000L     /* Item has rope attached */
-#define TR3_THROWING	 0x10000000L     /* Item gets shots/might bonus when thrown */
+#define TR3_CHARGE       0x04000000L     /* Charging += "pval" */
+#define TR3_HURL_NUM	 0x08000000L     /* Hurls += "pval" */
+#define TR3_HURL_DAM	 0x10000000L     /* Throwing damage multiplier += "pval" */
 #define TR3_LIGHT_CURSE  0x20000000L     /* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
@@ -3471,7 +3471,7 @@
 #define TR4_ANCHOR  	0x00001000L     /* Item prevents teleportation */
 #define TR4_SILENT  	0x00002000L     /* Item prevents spell casting*/
 #define TR4_STATIC  	0x00004000L     /* Item prevents item activation */
-#define TR4_WINDY  	0x00008000L     /* Item prevents missiles / thrown items */
+#define TR4_WINDY  		0x00008000L     /* Item prevents missiles / thrown items */
 #define TR4_ANIMAL  	0x00010000L     /* Item makes wielder animal */
 #define TR4_EVIL    	0x00020000L     /* Item makes wielder evil */
 #define TR4_UNDEAD  	0x00040000L     /* Item makes wielder undead */
@@ -3489,30 +3489,31 @@
 #define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerable to fire */
 #define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
 
-#define TR5_SHOW_DD	0x00000001L	/* Show damage dice */
-#define TR5_SHOW_MODS   0x00000002L     /* Show "to-hit" and "to-dam" bonus */
+#define TR5_SHOW_DD		0x00000001L	/* Show damage dice */
+#define TR5_SHOW_MODS   0x00000002L /* Show "to-hit" and "to-dam" bonus */
 #define TR5_SHOW_CHARGE 0x00000004L	/* Show charges */
 #define TR5_SHOW_TURNS	0x00000008L	/* Show turns (of light) */
-#define TR5_HAS_PVAL	0x00000010L	/* Item has varying pval */
-#define TR5_HAS_BONUS	0x00000020L	/* Item has varying to-hit/to-dam/to-ac */
-#define TR5_HAS_CHARGES 0x00000040L	/* Item has varying charges */
-#define TR5_RANDOM      0x00000080L 	/* Item has random activation */
-#define TR5_INSTA_ART   0x00000100L     /* Item makes an artifact */
+#define TR5_SHOW_AC		0x00000010L	/* Show armour class */
+#define TR5_HAS_PVAL	0x00000020L	/* Item has varying pval */
+#define TR5_HAS_BONUS	0x00000040L	/* Item has varying to-hit/to-dam/to-ac */
+#define TR5_HAS_CHARGES 0x00000080L	/* Item has varying charges */
+#define TR5_INSTA_ART   0x00000100L /* Item makes an artifact */
 #define TR5_EXTRA_DAM	0x00000200L	/* Item can do extra damage from brands/slays (cmd1.c) */
-#define TR5_EDGED	0x00000400L	/* Item does edged damage */
-#define TR5_BLUNT	0x00000800L	/* Item does blunt damage */
-#define TR5_DO_CUTS	0x00001000L	/* Item can do extra damage from cuts (cmd1.c) */
-#define TR5_DO_STUN	0x00002000L	/* Item can do extra damage from stun (cmd1.c) */
-#define TR5_IS_JUNK	0x00004000L	/* Item is junk (cmd1.c) */
-#define TR5_HAS_ROPE    0x00008000L	/* Item has rope attached (cmd2.c) */
+#define TR5_EDGED		0x00000400L	/* Item does edged damage */
+#define TR5_BLUNT		0x00000800L	/* Item does blunt damage */
+#define TR5_DO_CUTS		0x00001000L	/* Item can do extra damage from cuts (cmd1.c) */
+#define TR5_DO_STUN		0x00002000L	/* Item can do extra damage from stun (cmd1.c) */
+#define TR5_DO_CRIT		0x00004000L	/* Item does extra damage */
+#define TR5_DO_TRIP		0x00008000L	/* Item robs enemy of energy */
 #define TR5_BREAK_100	0x00010000L	/* Breakage change 100% (cmd2.c) */
 #define TR5_BREAK_50	0x00020000L	/* Breakage change 50% (cmd2.c) */
 #define TR5_BREAK_25	0x00040000L	/* Breakage change 25% (cmd2.c) */
 #define TR5_BREAK_10	0x00080000L	/* Breakage change 10% (cmd2.c) */
-
-
-#define TR5_GLOW	0x00800000L	/* Item glows if timed */
-#define TR5_EXHAUST	0x01000000L	/* Item is destroyed at timeout */
+#define TR5_IS_JUNK		0x00100000L	/* Item is junk (cmd1.c) */
+#define TR5_THROWING    0x00200000L	/* Item is hurl-able (gets throwing bonuses) */
+#define TR5_AMMO    	0x00400000L	/* Item is branded in stacks */
+#define TR5_GLOW		0x00800000L	/* Item glows if timed */
+#define TR5_EXHAUST		0x01000000L	/* Item is destroyed at timeout */
 #define TR5_RECHARGE	0x02000000L	/* Item recharges at timeout */
 #define TR5_HURT_ACID	0x04000000L	/* Item can be destroyed by acid */
 #define TR5_HURT_COLD	0x08000000L	/* Item can be destroyed by cold */
@@ -3521,38 +3522,27 @@
 #define TR5_HURT_WATER	0x40000000L	/* Item can be destroyed by water */
 #define TR5_HURT_XXXX	0x80000000L	/* Item can be destroyed by XXXX */
 
-#define TR6_WEAPON	0x00000000L	/* Item is a weapon */
-#define TR6_ARMOUR	0x00000000L	/* Item is an armour */
-#define TR6_FLAVOR			/* Item is "flavoured" */
-#define TR6_NAMED			/* Item is "named" after monster */
-#define TR5_1_HANDED	0x00040000L	/* Item can be wielded 1-handed. (cmd3.c) */
-#define TR5_2_HANDED	0x00080000L	/* Item can be wielded 2-handed. (cmd3.c) */
-#define TR5_OFF_HAND	0x00100000L	/* Item can be wielded in off-hand (cmd3.c) */
-#define TR5_W_SHIELD	0x00200000L	/* Item can be wielded with shield (cmd3.c) */
-#define TR6_ASSEMBLE
-#define TR6_BROWSE
-#define TR6_REFUEL
-#define TR6_APPLY
-#define TR6_QUAFF
-#define TR6_WIELD	0x00000000L	/* Item can be wielded */
-#define TR6_STUDY
-#define TR6_CAST
-#define TR6_FIRE
-#define TR6_FILL
-#define TR6_READ
-#define TR6_AIM
-#define TR6_EAT
-#define TR6_MIX
-#define TR6_USE
-#define TR6_ZAP
-#define TR6_AMMO			/* Item is branded in stacks */
-#define TR6_GOLD	0x00000000L	/* Item picked up for money only (cmd1.c) */
-#define TR6_EAT_BODY			/* Monster eats if has 'eat body' */
-#define TR6_EAT_INSECT			/* Monster eats if an insect */
-#define TR6_EAT_ANIMAL			/* Monster eats if an animal */
-#define TR6_EAT_CURE			/* Monster eats if looking for a cure */
-#define TR6_EAT_HEAL			/* Monster eats if looking for healing */
-#define TR6_EAT_MANA			/* Monster eats if looking for mana */
+#define TR6_WEAPON		0x00000001L	/* Item is a weapon */
+#define TR6_ARMOUR		0x00000002L	/* Item is an armour */
+#define TR6_FLAVOR		0x00000004L	/* Item is "flavoured" */
+#define TR6_NAMED		0x00000008L	/* Item is "named" after monster */
+#define TR6_1_HANDED	0x00000100L	/* Item can be wielded 1-handed. (cmd3.c) */
+#define TR6_2_HANDED	0x00000200L	/* Item can be wielded 2-handed. (cmd3.c) */
+#define TR6_OFF_HAND	0x00000400L	/* Item can be wielded in off-hand (cmd3.c) */
+#define TR6_W_SHIELD	0x00000800L	/* Item can be wielded with shield (cmd3.c) */
+#define TR6_BACKSTAB	0x00001000L	/* Item can backstab opponents */
+#define TR6_GOLD		0x00002000L	/* Item picked up for money only (cmd1.c) */
+#define TR6_EAT_BODY	0x00004000L	/* Monster eats if has 'eat body' */
+#define TR6_EAT_INSECT	0x00008000L	/* Monster eats if an insect */
+#define TR6_EAT_ANIMAL	0x00010000L	/* Monster eats if an animal */
+#define TR6_EAT_CURE	0x00020000L	/* Monster eats if looking for a cure */
+#define TR6_EAT_HEAL	0x00040000L	/* Monster eats if looking for healing */
+#define TR6_EAT_MANA	0x00080000L	/* Monster eats if looking for mana */
+#define TR6_HAS_ROPE    0x00100000L	/* Item has rope attached (cmd2.c) */
+#define TR6_HAS_CHAIN	0x00200000L	/* Item has randomly picked effect */
+#define TR6_RANDOM		0x00400000L	/* Item has randomly picked effect */
+#define TR6_BAD_THROW	0x00400000L	/* Item is hard to throw */
+#define TR6_BREAK_THROW	0x00400000L	/* Item breaks when thrown */
 
 
 
@@ -3617,7 +3607,7 @@
 
 #define TR2_WEAPON_FLAGS 0x0L
 
-#define TR3_WEAPON_FLAGS (TR3_IMPACT | TR3_BLESSED | TR3_THROWING | TR3_HAS_ROPE)
+#define TR3_WEAPON_FLAGS (TR3_ACT_ON_BLOW | TR3_BLESSED | TR3_FREE_HANDS)
 
 #define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_MANA |\
 			  TR4_BRAND_LITE | TR4_BRAND_DARK | TR4_SLAY_MAN | TR4_SLAY_ELF |\
@@ -3630,7 +3620,7 @@
 
 #define TR2_IGNORE_FLAGS (TR2_WEAPON_FLAGS | TR2_IGNORE_MASK)
 
-#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)
+#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE)
 
 #define TR4_IGNORE_FLAGS (TR4_WEAPON_FLAGS)
 

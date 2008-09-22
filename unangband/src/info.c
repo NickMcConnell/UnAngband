@@ -84,10 +84,6 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 			*f3 |= o_ptr->can_flags3;
 			*f4 |= o_ptr->can_flags4;
 
-			/* Hack: throwing is always obvious */
-			if (k_info[o_ptr->k_idx].flags3 & TR3_THROWING)
-			  *f3 |= TR3_THROWING;
-
 			return;
 		}
 
@@ -467,13 +463,6 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
 								  ~(o_ptr->can_flags4), floor);
 		}
 	}
-
-	/* Throwing is always obvious */
-	if (f3 & TR3_THROWING)
-	{
-		object_can_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L, floor);
-	}
-	else object_not_flags(o_ptr,0x0L,0x0L,TR3_THROWING,0x0L, floor);
 }
 
 
@@ -1244,12 +1233,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		{
 			/* Message */
 			text_out(format("It increases your charging by x%d.  ", pval));
-		}
-		/* Hack - shots for throws modifies number of throws */
-		else if ((f1 == TR1_SHOTS) && (s_ptr->type == SPELL_MAGIC_HURL))
-		{
-			/* Message */
-			text_out(format("It increases your hurls by %d.  ", pval));
 		}
 		else
 		{
@@ -2113,6 +2096,7 @@ static const o_flag_desc pval_flags3_desc[] =
 	{ TR3_LITE,       "light radius" },
 	{ TR3_REGEN_HP,       "hitpoint regeneration" },
 	{ TR3_REGEN_MANA,     "mana regeneration" },
+	{ TR3_HURL_NUM,		"hurls"}
 };
 
 
@@ -2179,15 +2163,6 @@ static const o_flag_desc brandx3_flags4_desc[] =
 {
 	{ TR4_BRAND_LITE,   "light" },
 	{ TR4_BRAND_DARK,   "darkness" }
-};
-
-
-/*
- * Brands(extra damage unspecified) for weapons
- */
-static const o_flag_desc brand_flags3_desc[] =
-{
-	{ TR3_IMPACT,   "earthquakes" }
 };
 
 
@@ -2735,32 +2710,6 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 		}
 	}
 
-	/* Brands - extra damage */
-	if (f3)
-	{
-		list_ptr = list;
-
-		list_ptr = spoiler_flag_aux(f3, brand_flags3_desc, list_ptr, N_ELEMENTS(brand_flags3_desc));
-
-		/* Terminate the description list */
-		*list_ptr = NULL;
-
-		switch (mode)
-		{
-			case LIST_FLAGS_CAN:
-				anything |= outlist("It does extra damage from", list, TERM_WHITE);
-				break;
-			case LIST_FLAGS_MAY:
-				anything |= outlist("It may do extra damage from", list, TERM_L_WHITE);
-				break;
-			case LIST_FLAGS_NOT:
-				anything |= outlist("It does no extra damage from", list, TERM_SLATE);
-				break;
-		}
-
-	}
-
-
 	/* Vampirism */
 	if (f4)
 	{
@@ -3036,24 +2985,25 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			}
 			anything = TRUE;
 		}
-
-		/* Note that throwing weapons have special treatment */
-		if (f3 & TR3_THROWING)
+#if 0
+		/* Note that blessed weapons have special treatment */
+		if (f3 & TR3_FREE_HANDS)
 		{
 			switch (mode)
 			{
 				case LIST_FLAGS_CAN:
-					text_out_c(TERM_WHITE, "It is balanced for throwing.  ");
+					text_out_c(TERM_WHITE, "It allows free movement in the fingers, allowing mages to wear it.  ");
 					break;
 				case LIST_FLAGS_MAY:
-					text_out_c(TERM_L_WHITE, "It might be balanced for throwing.  ");
+					text_out_c(TERM_L_WHITE, "It might allow free movement in the fingers.  ");
 					break;
 				case LIST_FLAGS_NOT:
-					text_out_c(TERM_SLATE, "It is not balanced for throwing.  ");
+					text_out_c(TERM_SLATE, "It has no effect on free movement in the fingers.  ");
 					break;
 			}
 			anything = TRUE;
 		}
+#endif
 	}
 
 	/* Miscellenious Abilities */
@@ -3187,6 +3137,102 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 
 	return (anything);
 
+}
+
+
+
+/*
+ * Ways item can be damaged.
+ */
+static const o_flag_desc hurt_flags5_desc[] =
+{
+		{ TR5_HURT_ACID,  "acid" },
+		{ TR5_HURT_ELEC,  "electricity" },
+		{ TR5_HURT_FIRE,  "fire" },
+		{ TR5_HURT_COLD,  "cold" },
+		{ TR5_HURT_WATER,	"water"}
+};
+
+
+/*
+ * Ways item can be damaged.
+ */
+static const o_flag_desc wield_flags6_desc[] =
+{
+		{ TR6_1_HANDED,  "one-handed" },
+		{ TR6_2_HANDED,  "two-handed" },
+		{ TR6_OFF_HAND,  "in your off-hand" },
+		{ TR6_W_SHIELD,  "with a shield" }
+};
+
+
+
+/*
+ * Create a spoiler file entry for an artifact.
+ * We use this to list the flags.
+ */
+bool list_kind_flags(u32b f5, u32b f6, int mode)
+{
+	bool anything = FALSE; /* Printed anything at all */
+
+	cptr list[40];
+	cptr *list_ptr;
+
+	/* Miscellenious Abilities */
+	if (f5)
+	{
+		list_ptr = list;
+
+		/*
+		 * Special flags
+		 */
+		list_ptr = spoiler_flag_aux(f5, hurt_flags5_desc, list_ptr, N_ELEMENTS(hurt_flags5_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It can normally be damaged by", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It might be damaged by", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It is not damaged by", list, TERM_SLATE);
+				break;
+		}
+	}
+
+	/* Miscellenious Abilities */
+	if (f6)
+	{
+		list_ptr = list;
+
+		/*
+		 * Special flags
+		 */
+		list_ptr = spoiler_flag_aux(f6, wield_flags6_desc, list_ptr, N_ELEMENTS(wield_flags6_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It can be wielded", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It might be wielded", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It is not able to be wielded", list, TERM_SLATE);
+				break;
+		}
+	}
+
+	return (anything);
 }
 
 
@@ -3347,7 +3393,7 @@ void list_object(const object_type *o_ptr, int mode)
 {
 	int i, n;
 
-	u32b f1, f2, f3, f4;
+	u32b f1, f2, f3, f4, f5, f6;
 
 	bool anything = FALSE;
 	bool charge = FALSE;
@@ -3522,6 +3568,10 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Extract the flags */
 	object_flags_aux(mode, o_ptr, &f1, &f2, &f3, &f4);
 
+	/* Extract kind flags */
+	f5 = k_info[o_ptr->k_idx].flags5;
+	f6 = k_info[o_ptr->k_idx].flags6;
+
 	/* Display the flags */
 	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN | IDENT_STORE)) ? o_ptr->pval : 0, LIST_FLAGS_CAN);
 
@@ -3562,7 +3612,7 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_HAFTED:
 			case TV_POLEARM:
 			case TV_DIGGING:
-				text_out(format("When attacking or %sthrown, it ", (f3 & TR3_THROWING) ? "easily " : ""));
+				text_out(format("When attacking or %sthrown, it ", (f5 & TR5_THROWING) ? "easily " : ""));
 				break;
 			case TV_LITE:
 			case TV_POTION:
@@ -3575,7 +3625,7 @@ void list_object(const object_type *o_ptr, int mode)
 				throw = FALSE;
 				break;
 			default:
-				text_out(format("When %sthrown, it ", (f3 & TR3_THROWING) ? "easily " : ""));
+				text_out(format("When %sthrown, it ", (f5 & TR5_THROWING) ? "easily " : ""));
 				break;
 		}
 
@@ -3594,6 +3644,13 @@ void list_object(const object_type *o_ptr, int mode)
 			text_out(" damage.  ");
 			anything = TRUE;
 		}
+	}
+
+	/* Basic abilities */
+	if (!random)
+	{
+		/* Display the flags */
+		anything |= list_kind_flags(f5, f6, LIST_FLAGS_CAN);
 	}
 
 	/* Bows */
@@ -3678,7 +3735,7 @@ void list_object(const object_type *o_ptr, int mode)
 				case TV_HAFTED:
 				case TV_DIGGING:
 				{
-					if (f3 & (TR3_THROWING)) vp[vn] = vp_activate_throw;
+					if (f5 & (TR5_THROWING)) vp[vn] = vp_activate_throw;
 					else vp[vn] = vp_activate_attack;
 					vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED; break;
 				}
@@ -3831,6 +3888,13 @@ void list_object(const object_type *o_ptr, int mode)
 							case TV_SHOT:
 								text_out(" times the sling multiplier");
 								break;
+						}
+					}
+					else
+					{
+						if (f3 & (TR3_HURL_DAM))
+						{
+							text_out(format(". It does x%d damage when thrown", o_ptr->pval));
 						}
 					}
 					anything = TRUE;
@@ -4589,9 +4653,6 @@ void object_guess_name(object_type *o_ptr)
 		f3 &= ~(k_info[o_ptr->k_idx].flags3);
 		f4 &= ~(k_info[o_ptr->k_idx].flags4);
 	}
-
-	/* Hack -- remove throwing flag */
-	f3 &= ~(TR3_THROWING);
 
 	/* No properties beyond base kind */
 	if (!f1 && !f2 && !f3 && !f4) return;
@@ -6144,13 +6205,17 @@ s32b object_power(const object_type *o_ptr)
 	int low_resists = 0;
 	int high_resists = 0;
 	u32b kf1, kf2, kf3, kf4;
-	u32b f1, f2, f3, f4;
+	u32b f1, f2, f3, f4, f5, f6;
 
 	/* If artifact, already computed */
 	if (o_ptr->name1) return (a_info[o_ptr->name1].power);
 
 	/* Get the flags */
 	object_flags(o_ptr,&f1,&f2,&f3,&f4);
+
+	/* Extract kind flags */
+	f5 = k_info[o_ptr->k_idx].flags5;
+	f6 = k_info[o_ptr->k_idx].flags6;
 
 	/* Lookup the item if not yet cached */
 	k_idx = o_ptr->k_idx;
@@ -6384,6 +6449,36 @@ s32b object_power(const object_type *o_ptr)
 				}
 			}
 
+			if (f3 & TR3_HURL_NUM)
+			{
+				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+				}
+				else if (o_ptr->pval > 0)
+				{
+					p = sign(p) * ((ABS(p) * (5 + o_ptr->pval)) / 5);
+					/* Add an extra +5 per blow to account for damage rings */
+					/* (The +5 figure is a compromise here - could be adjusted) */
+					p += 5 * o_ptr->pval;
+				}
+			}
+
+			if (f3 & TR3_HURL_DAM)
+			{
+				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+				}
+				else if (o_ptr->pval > 0)
+				{
+					p = sign(p) * ((ABS(p) * (5 + o_ptr->pval)) / 5);
+					/* Add an extra +5 per blow to account for damage rings */
+					/* (The +5 figure is a compromise here - could be adjusted) */
+					p += 5 * o_ptr->pval;
+				}
+			}
+
 			if (o_ptr->to_h > 9)
 			{
 				p += (o_ptr->to_h) * 2 / 3;
@@ -6399,8 +6494,8 @@ s32b object_power(const object_type *o_ptr)
 			else
 				p = 0;
 
-			/* Hack -- throwing weapons can be used as secondary weapons */
-			if (p > 0 && (f3 & (TR3_THROWING)))
+			/* Hack -- secondary weapons are more useful */
+			if (p > 0 && (f6 & (TR6_OFF_HAND)))
 				p++;
 
 			if (o_ptr->ac != k_ptr->ac)
@@ -6421,10 +6516,6 @@ s32b object_power(const object_type *o_ptr)
 			/* Bonuses as we may choose to use a swap weapon */
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)) p++;
 			if (((f2 & (TR2_IGNORE_THEFT)) != 0) && ((kf2 & (TR2_IGNORE_THEFT)) == 0)) p++;
-
-			/* Bonus for an extra throwing flag */
-			if (((f3 & (TR3_THROWING)) != 0) && ((kf3 & (TR3_THROWING)) == 0))
-				p += 2;
 
 			/* Add some specific powers here only */
 			ADD_POWER("blessed",		 1, TR3_BLESSED, 3,);

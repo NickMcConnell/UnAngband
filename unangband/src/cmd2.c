@@ -3284,13 +3284,17 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	bool trick_throw = !fire && item == INVEN_WIELD && throwing;
 	int num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
 
+	/* Get kind flags */
+	u32b f5 = k_info[o_ptr->k_idx].flags5;
+	u32b f6 = k_info[o_ptr->k_idx].flags6;
+
 	/* Need a rope? (No rope for trick throws) */
-	if (o_ptr->sval == SV_AMMO_GRAPPLE && !trick_throw)
+	if ((f6 & (TR6_HAS_ROPE | TR6_HAS_CHAIN)) && !trick_throw)
 	{
 		cptr q, s;
 
 		/* Allow chain for some weapons */
-		if (o_ptr->tval == TV_HAFTED || o_ptr->tval == TV_BOLT)
+		if (f6 & (TR6_HAS_CHAIN))
 			item_tester_tval = TV_ROPE;
 
 		/* Require rope */
@@ -3380,12 +3384,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	 	Various junk (non-weapons) does not have to_hit,
 	 	so don't penalize a second time. */
 		if (!throwing
-			&& (i_ptr->tval == TV_STAFF
-			|| i_ptr->tval == TV_BOW
-			|| i_ptr->tval == TV_DIGGING
-			|| i_ptr->tval == TV_HAFTED
-			|| i_ptr->tval == TV_POLEARM
-			|| i_ptr->tval == TV_SWORD))
+			&& (f6 & (TR6_BAD_THROW)))
 				ranged_skill /= 2;
 
 		/* Extract a "distance multiplier" */
@@ -3503,9 +3502,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		old_x = x;
 
 		/* Reset ammo_can_break */
-		if (o_ptr->tval == TV_FLASK
-		|| o_ptr->tval == TV_POTION
-		|| o_ptr->tval == TV_EGG)
+		if (f6 & (TR6_BREAK_THROW))
 		{
 			/* Hack -- flasks, potions, spores break as if striking a monster */
 			ammo_can_break = TRUE;
@@ -4169,7 +4166,7 @@ void do_cmd_throw_fire(bool fire)
 	if (p_ptr->cur_flags4 & (TR4_WINDY)
 			|| room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))
 	{
-		msg_print("Its too windy around you!");
+		msg_print("It is too windy around you!");
 		return;
 	}
 

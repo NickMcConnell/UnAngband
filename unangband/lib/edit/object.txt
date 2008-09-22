@@ -2478,7 +2478,7 @@ W:35:0:50:350
 A:35/1
 P:0:2d6:0:0:0
 Y:25:3
-F:IMPACT |
+F:ACT_ON_BLOW |
 
 N:305:Summoning
 G:_:w

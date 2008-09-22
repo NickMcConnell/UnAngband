@@ -878,7 +878,7 @@ static s32b artifact_power(int a_idx)
 		{
 			if (a_ptr->weight >= 50)
 			{
-				p -= a_ptr->weight / 50; 
+				p -= a_ptr->weight / 50;
 
 				LOG_PRINT2("Reducing power for armour weight of %d, total is %d\n", a_ptr->weight, p);
 			}
@@ -911,7 +911,7 @@ static s32b artifact_power(int a_idx)
 		default:
 			if (a_ptr->weight >= 100)
 			{
-				p -= a_ptr->weight / 100; 
+				p -= a_ptr->weight / 100;
 
 				LOG_PRINT2("Reducing power for swap item weight of %d, total is %d\n", a_ptr->weight, p);
 
@@ -1766,7 +1766,7 @@ static void parse_frequencies ()
 				artprobs[ART_IDX_BOW_RESTRICT] += temp;
 
 				LOG_PRINT1("Adding %d restrictions for bows\n", temp);
-			}		
+			}
 		}
 
 		/* Handle hit / dam ratings - are they higher than normal? */
@@ -3341,7 +3341,7 @@ static bool add_sense_demon(artifact_type *a_ptr)
 	a_ptr->flags3 |= TR3_ESP_DEMON;
 	LOG_PRINT("Adding ability: sense demon\n");
 	return (TRUE);
-}		     
+}
 
 static bool add_sense_undead(artifact_type *a_ptr)
 {
@@ -3597,7 +3597,7 @@ static bool add_slay_man(artifact_type *a_ptr)
 
 static bool add_slay_elf(artifact_type *a_ptr)
 {
-	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE; 
+	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE;
 	if (a_ptr->flags4 & TR4_SLAY_ELF) return FALSE;
 	a_ptr->flags4 |= TR4_SLAY_ELF;
 	if (rand_int(3) == 0) a_ptr->flags4 |= TR4_EVIL;
@@ -3608,7 +3608,7 @@ static bool add_slay_elf(artifact_type *a_ptr)
 
 static bool add_slay_dwarf(artifact_type *a_ptr)
 {
-	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE; 
+	if (a_ptr->flags1 & TR1_BRAND_HOLY) return FALSE;
 	if (a_ptr->flags4 & TR4_SLAY_DWARF) return FALSE;
 	a_ptr->flags4 |= TR4_SLAY_DWARF;
 	LOG_PRINT("Adding ability: slay dwarf\n");
@@ -4728,7 +4728,6 @@ static void scramble_artifact(int a_idx)
 
 	/* Restore some flags */
 	if (activates) a_ptr->flags3 |= TR3_ACTIVATE;
-	if (a_idx < ART_MIN_NORMAL) a_ptr->flags3 |= TR3_INSTA_ART;
 
 	/* Store artifact power */
 	a_ptr->power = ap;

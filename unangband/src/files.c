@@ -2345,14 +2345,28 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 
 		/* MegaHack -- Check throwing */
 		else if ((y == 9) &&
-			(f[3] & (TR3_THROWING)))
+			(f[3] & (TR3_HURL_NUM | TR3_HURL_DAM)) == (TR3_HURL_NUM | TR3_HURL_DAM))
+		{
+			c_put_str(TERM_WHITE, "*", row, col);
+		}
+
+		/* MegaHack -- Check throwing */
+		else if ((y == 9) &&
+			(f[3] & (TR3_HURL_NUM)))
 		{
 			c_put_str(TERM_WHITE, "+", row, col);
 		}
 
+		/* MegaHack -- Check throwing */
+		else if ((y == 9) &&
+			(f[3] & (TR3_HURL_DAM)))
+		{
+			c_put_str(TERM_WHITE, "x", row, col);
+		}
+
 		/* MegaHack -- Skip throwing */
 		else if ((y == 9) &&
-			!(f[3] & (TR3_THROWING)))
+			!(f[3] & (TR3_HURL_DAM | TR3_HURL_NUM)))
 		{
 			c_put_str(TERM_SLATE, ".", row, col);
 		}

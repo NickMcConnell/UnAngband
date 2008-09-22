@@ -1107,18 +1107,19 @@ static cptr k_info_flags3[] =
 	"DRAIN_EXP",
 	"AGGRAVATE",
 	"UNCONTROLLED",
-	"RANDOM",
+	"ACT_ON_BLOW",
 	"ACTIVATE",
 	"BLESSED",
-	"INSTA_ART",
+	"FREE_HANDS",
 	"HUNGER",
-	"IMPACT",
-	"HAS_ROPE",
-	"THROWING",
+	"CHARGE",
+	"HURL_NUM",
+	"HURL_DAM",
 	"LIGHT_CURSE",
 	"HEAVY_CURSE",
 	"PERMA_CURSE"
 };
+
 
 /*
  * Object flags
@@ -1157,6 +1158,86 @@ static cptr k_info_flags4[] =
 	"HURT_ELEC",
 	"HURT_FIRE",
 	"HURT_COLD"
+};
+
+/*
+ * Object flags
+ */
+static cptr k_info_flags5[] =
+{
+	"SHOW_DD",
+	"SHOW_MODS",
+	"SHOW_CHARGE",
+	"SHOW_TURNS",
+	"SHOW_AC",
+	"HAS_PVAL",
+	"HAS_BONUS",
+	"HAS_CHARGES",
+	"INSTA_ART",
+	"EXTRA_DAM",
+	"EDGED",
+	"BLUNT",
+	"DO_CUTS",
+	"DO_STUN",
+	"DO_CRIT",
+	"DO_TRIP",
+	"BREAK_100",
+	"BREAK_50",
+	"BREAK_25",
+	"BREAK_10",
+	"IS_JUNK",
+	"THROWING",
+	"AMMO",
+	"GLOW",
+	"EXHAUST",
+	"RECHARGE",
+	"HURT_ACID",
+	"HURT_COLD",
+	"HURT_ELEC",
+	"HURT_FIRE",
+	"HURT_WATER",
+	"HURT_XXXX"
+};
+
+/*
+ * Object flags
+ */
+static cptr k_info_flags6[] =
+{
+	"WEAPON",
+	"ARMOUR",
+	"FLAVOR",
+	"NAMED",
+	"1_HANDED",
+	"2_HANDED",
+	"OFF_HAND",
+	"W_SHIELD",
+	"BACKSTAB",
+	"GOLD",
+	"EAT_BODY",
+	"EAT_INSECT",
+	"EAT_ANIMAL",
+	"EAT_CURE",
+	"EAT_HEAL",
+	"EAT_MANA",
+	"HAS_ROPE",
+	"HAS_CHAIN",
+	"RANDOM",
+	"BAD_THROW",
+	"BREAK_THROW",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	""
 };
 
 
@@ -3168,6 +3249,12 @@ static errr grab_one_kind_flag(object_kind *k_ptr, cptr what)
 	if (grab_one_flag(&k_ptr->flags4, k_info_flags4, what) == 0)
 		return (0);
 
+	if (grab_one_flag(&k_ptr->flags5, k_info_flags5, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&k_ptr->flags6, k_info_flags6, what) == 0)
+		return (0);
+
 	/* Oops */
 	msg_format("Unknown object flag '%s'.", what);
 
@@ -3268,6 +3355,72 @@ errr parse_k_info(char *buf, header *head)
 		k_ptr->tval = tval;
 		k_ptr->sval = sval;
 		k_ptr->pval = pval;
+
+		if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_ROPE);
+
+		switch (tval)
+		{
+			case TV_FLASK:
+				k_ptr->flags6 |= (TR6_BREAK_THROW);
+				break;
+
+			case TV_POTION:
+					k_ptr->flags6 |= (TR6_BREAK_THROW);
+					break;
+
+			case TV_EGG:
+					k_ptr->flags6 |= (TR6_BREAK_THROW);
+					break;
+
+			case TV_BOLT:
+				if (k_ptr->flags6 & (TR6_HAS_ROPE))
+				{
+					k_ptr->flags6 &= ~(TR6_HAS_ROPE);
+					k_ptr->flags6 |= (TR6_HAS_CHAIN);
+				}
+			break;
+
+			case TV_BOW:
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+			break;
+
+			case TV_DIGGING:
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+			break;
+
+			case TV_STAFF:
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+			break;
+
+			case TV_SWORD:
+				k_ptr->flags5 |= (TR5_DO_CUTS);
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+				break;
+
+			case TV_HAFTED:
+				k_ptr->flags5 |= (TR5_DO_STUN);
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+				break;
+
+			case TV_POLEARM:
+				k_ptr->flags5 |= (TR5_DO_CUTS);
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+				break;
+#if 0
+				/* Hack -- spears do damaging criticals, axes stun or cut */
+				if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Axe"))
+					&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Halberd"))
+					&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
+					k += critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+				else if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe"))
+					&& (rand_int(100) < 50))
+					do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+				else
+					do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+				break;
+#endif
+		}
+
 	}
 
 	/* Process 'W' for "More Info" (one line only) */
@@ -9457,6 +9610,8 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "F:", k_ptr->flags2, k_info_flags2);
 	emit_flags_32(fp, "F:", k_ptr->flags3, k_info_flags3);
 	emit_flags_32(fp, "F:", k_ptr->flags4, k_info_flags4);
+	emit_flags_32(fp, "F:", k_ptr->flags5, k_info_flags5);
+	emit_flags_32(fp, "F:", k_ptr->flags6, k_info_flags6);
 
 	/* Output 'D' for "Description" */
 	emit_desc(fp, "D:", head->text_ptr + k_ptr->text);

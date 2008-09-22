@@ -3903,7 +3903,7 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 	if (!limit || !weapon) for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
 	{
 		/* Skip 'useless' flags */
-		if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)) continue;
+		if (j & (TR3_ACTIVATE | TR3_ACT_ON_BLOW)) continue;
 
 		if (((f3) & (j)) && !rand_int(++count)) { flag1 = 3; flag2 = j;}
 	}
@@ -5611,7 +5611,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		}
 		default:
 		{
-			if ((k_info[j_ptr->k_idx].flags3 & (TR3_THROWING))
+			if ((k_info[j_ptr->k_idx].flags5 & (TR5_THROWING))
 				&& (object_level > k_info[j_ptr->k_idx].level + 4)) j_ptr->number = damroll(3, 4);
 			break;
 		}
@@ -9978,7 +9978,9 @@ bool is_throwing_item(const object_type *o_ptr)
 
   object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-  return (f3 & TR3_THROWING ? TRUE : FALSE);
+  if (f3 & (TR3_HURL_NUM | TR3_HURL_DAM)) return (TRUE);
+
+  return (k_info[o_ptr->k_idx].flags5 & (TR5_THROWING) ? TRUE : FALSE);
 }
 
 
@@ -9991,7 +9993,9 @@ bool is_known_throwing_item(const object_type *o_ptr)
 
   object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
 
-  return (f3 & TR3_THROWING ? TRUE : FALSE);
+  if (f3 & (TR3_HURL_NUM | TR3_HURL_DAM)) return (TRUE);
+
+  return (k_info[o_ptr->k_idx].flags5 & (TR5_THROWING) ? TRUE : FALSE);
 }
 
 

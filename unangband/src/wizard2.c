@@ -352,7 +352,7 @@ static int wiz_create_itemtype(void)
 		if (k_ptr->tval == tval)
 		{
 			/* Hack -- Skip instant artifacts */
-			if (k_ptr->flags3 & (TR3_INSTA_ART)) continue;
+			if (k_ptr->flags5 & (TR5_INSTA_ART)) continue;
 
 			/* Prepare it */
 			row = 2 + (num % 26);
@@ -494,9 +494,9 @@ static void wiz_reroll_item(object_type *o_ptr)
 	/* Notice change */
 	if (changed)
 	{
-		/* Mark as cheat */ 
-		i_ptr->origin = ORIGIN_CHEAT; 
-		
+		/* Mark as cheat */
+		i_ptr->origin = ORIGIN_CHEAT;
+
 		/* Restore the position information */
 		i_ptr->iy = o_ptr->iy;
 		i_ptr->ix = o_ptr->ix;
@@ -905,7 +905,7 @@ static void wiz_create_item(void)
 
 	/* Mark as cheat */
 	i_ptr->origin = ORIGIN_CHEAT;
-	
+
 	/* Apply obvious flags */
 	object_obvious_flags(i_ptr, TRUE);
 
@@ -962,9 +962,9 @@ static void wiz_create_artifact(int a_idx)
 	i_ptr->to_d = a_ptr->to_d;
 	i_ptr->weight = a_ptr->weight;
 
-	/* Mark as cheat */ 
-	i_ptr->origin = ORIGIN_CHEAT; 
-	
+	/* Mark as cheat */
+	i_ptr->origin = ORIGIN_CHEAT;
+
 	/* Drop the artifact from heaven */
 	drop_near(i_ptr, -1, p_ptr->py, p_ptr->px);
 
@@ -1328,7 +1328,7 @@ static void do_cmd_wiz_detect(void)
 		/* Memorize */
 		o_ptr->ident |= (IDENT_MARKED);
 	}
-	
+
 	/* Scan all normal grids */
 	for (y = 1; y < DUNGEON_HGT-1; y++)
 	{
@@ -1375,8 +1375,8 @@ static void do_cmd_wiz_detect(void)
 		/* Update the monster */
 		update_mon(i, FALSE);
 	}
-	
-	
+
+
 	/* Fully update the visuals */
 	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
 
@@ -1496,27 +1496,27 @@ static void do_cmd_wiz_query(void)
 void do_cmd_wiz_ecology(void)
 {
 	int num, row, col, i;
-	
+
 	/* No ecology */
 	if (!cave_ecology.get_mon)
 	{
 		msg_print("No ecology on this level.");
-		
+
 		return;
 	}
-	
+
 	/* Save screen */
 	screen_save();
-	
+
 	/* Print all members of the ecology and their descriptions */
         for (num = 0; num < cave_ecology.num_races; num++)
 	{
 		row = 2 + (num % 26);
 		col = 30 * (num / 26);
 		prt(r_name + r_info[cave_ecology.race[num]].name, row, col);
-		
+
 		col += 20;
-		
+
 		for (i = 0; i <= cave_ecology.num_ecologies; i++)
 		{
 			if (cave_ecology.race_ecologies[num] & (1L << i))
@@ -1525,12 +1525,12 @@ void do_cmd_wiz_ecology(void)
 			}
 		}
 	}
-	
+
 	/* Total monsters */
 	msg_format("Ecology has %d races and %d sub-ecologies.", cave_ecology.num_races, cave_ecology.num_ecologies);
 
 	anykey();
-	
+
 	/* Screen_load */
 	screen_load();
 }
@@ -1633,12 +1633,12 @@ void do_cmd_debug(void)
 			process_spell_flags(SOURCE_PLAYER_WIZARD, 0, 92, 100, &cancel, &known);
 			break;
 		}
-		
+
 		/* Wizard detect */
 		case 'D':
 		{
 			do_cmd_wiz_detect();
-			break;			
+			break;
 		}
 
 		/* Edit character */
@@ -1647,14 +1647,14 @@ void do_cmd_debug(void)
 			do_cmd_wiz_change();
 			break;
 		}
-		
+
 		/* Show ecology */
 		case 'E':
 		{
 			do_cmd_wiz_ecology();
 			break;
 		}
-		
+
 
 		/* View item info */
 		case 'f':

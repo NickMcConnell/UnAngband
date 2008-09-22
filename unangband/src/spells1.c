@@ -3118,8 +3118,7 @@ bool apply_disenchant(int mode)
 			   o_name, index_to_label(t),
 			   ((o_ptr->number != 1) ? "" : "s"));
 
-		/* Always notice */
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,TR3_INSTA_ART,0x0L, FALSE);
+		/* TODO: Sense as an artifact */
 
 		/* Notice */
 		return (TRUE);
@@ -10249,10 +10248,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				{
 					feed_monster(who);
 				}
-			}
-			else if (artifact_p(o_ptr))
-			{
-				if (rand_int(100)<30) object_can_flags(o_ptr,0x0L,0x0L,TR3_INSTA_ART,0x0L, FALSE);
 			}
 			break;
 		}

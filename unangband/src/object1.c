@@ -122,7 +122,7 @@ static void flavor_assign_random(byte tval)
 
 		/* Select a flavor */
 		choice = rand_int(flavor_count);
-	
+
 		/* Find and store the flavor */
 		for (j = 0; j < z_info->x_max; j++)
 		{
@@ -649,7 +649,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	{
 		char *s, *t;
 		int state = 0;
-	
+
 		/* Save the monster name */
 		my_strcpy(mon_buf, r_name + r_info[o_ptr->name3].name, sizeof(mon_buf));
 
@@ -666,7 +666,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 				*t++ = *s;
 			}
 		}
-		
+
 		/* Terminate */
 		*t = '\0';
 	}
@@ -969,7 +969,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			else if (r_info[o_ptr->name3].flags1 & (RF1_UNIQUE))
 			{
 				if (o_ptr->tval != TV_STATUE) my_strcat(mon_buf, "'s", sizeof(mon_buf));
-				
+
 				/* Use the mod string */
 				modstr = mon_buf;
 
@@ -1279,9 +1279,6 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 				f4 &= ~(k_info[o_ptr->k_idx].flags4);
 			}
 
-			/* Hack -- remove throwing flag */
-			f3 &= ~(TR3_THROWING);
-			
 			x1 = 0;
 			x2 = 0;
 
@@ -1317,7 +1314,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 			{
 				/* Skip 'useless' flags */
-				if (j & (TR3_ACTIVATE | TR3_RANDOM | TR3_INSTA_ART)) continue;
+				if (j & (TR3_ACTIVATE | TR3_ACT_ON_BLOW | TR3_UNCONTROLLED)) continue;
 
 				/* Found a flag */
 				if ((j & f3) != 0)
@@ -1350,7 +1347,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 				if (*(magic_name[x1-1][x2]) == '(')
 				{
 					object_desc_str_macro(t, (magic_name[x1-1][x2]) + 1);
-					*(t)-- = '\0';			
+					*(t)-- = '\0';
 				}
 				else
 				{
@@ -1358,7 +1355,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 				}
 
 				object_desc_str_macro(t, "?)");
-			}	
+			}
 		}
 	}
 
@@ -1369,15 +1366,15 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 		if (named)
 		{
-	
+
 			if (!(r_info[o_ptr->name3].flags1 & (RF1_UNIQUE)))
 			{
 				cptr name = mon_buf;
-	
+
 				if (is_a_vowel(name[0])) object_desc_str_macro(t, "an ");
 				else object_desc_str_macro(t, "a ");
 			}
-	
+
 			object_desc_str_macro(t, mon_buf);
 		}
 		else
@@ -1391,7 +1388,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
          */
 	if (o_ptr->ident & (IDENT_VALUE))
 	{
-		
+
 
 		object_desc_str_macro(t, " worth ");
 		object_desc_num_macro(t,object_value_real(o_ptr));
@@ -1668,7 +1665,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			}
 			object_desc_str_macro(t, y_name+y_info[e_info[o_ptr->name2].runest].name);
 			if (e_info[o_ptr->name2].runesc > 1) object_desc_chr_macro(t,'s');
-			object_desc_chr_macro(t, '>');		
+			object_desc_chr_macro(t, '>');
 		}
 		else if (k_info[o_ptr->k_idx].runest)
 		{
@@ -1680,7 +1677,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			}
 			object_desc_str_macro(t, y_name+y_info[k_info[o_ptr->k_idx].runest].name);
 			if (k_info[o_ptr->k_idx].runesc > 1) object_desc_chr_macro(t,'s');
-			object_desc_chr_macro(t, '>');		
+			object_desc_chr_macro(t, '>');
 		}
 		else if ((o_ptr->name2) || (o_ptr->xtra1))
 		{
@@ -1909,8 +1906,8 @@ bool two_weapons_balanced(const object_type *o_ptr, const object_type *i_ptr)
 	   && i_ptr->weight < 200)
     return TRUE;
   /* ...or both are identical. */
-  else if (i_ptr->tval == o_ptr->tval 
-	   && ((i_ptr->sval == o_ptr->sval 
+  else if (i_ptr->tval == o_ptr->tval
+	   && ((i_ptr->sval == o_ptr->sval
 		&& (i_ptr->weight < 150)
 		&& (o_ptr->weight < 150))
 	       /* (All staffs are "identical".) */
@@ -1925,7 +1922,7 @@ bool two_weapons_balanced(const object_type *o_ptr, const object_type *i_ptr)
 /*
  * Determine which equipment slot (if any) an item likes.
  * Prefer empty slots, then prefer INVEN_WIELD.
- * For compatibility with do_cmd_wield assure 
+ * For compatibility with do_cmd_wield assure
  * that if we propose INVEN_ARM then also INVEN_WIELD is legal.
  * It's possible to off-hand wield Ringil and fight unarmed,
  * but let people discover how to do that instead of making it
@@ -1936,10 +1933,10 @@ s16b wield_slot(const object_type *o_ptr)
   /* Slot for equipment */
   switch (o_ptr->tval)
     {
-    case TV_HAFTED: 
+    case TV_HAFTED:
     case TV_POLEARM:
     case TV_SWORD:
-    case TV_STAFF:  
+    case TV_STAFF:
       {
 	object_type *w_ptr = &inventory[INVEN_WIELD];
 	object_type *a_ptr = &inventory[INVEN_ARM];
@@ -1951,21 +1948,21 @@ s16b wield_slot(const object_type *o_ptr)
 	    return INVEN_WIELD;
 	  else
 	    /* Arm slot precludes dual-wield; for do_cmd_wield
-	       compatiblity we do not offer to replace arm slot */ 
+	       compatiblity we do not offer to replace arm slot */
 	    return -1;
 	else if (!a_ptr->k_idx)
 	  /* else if arm slot free, try to take it */
 	  if (two_weapons_balanced(o_ptr, w_ptr))
 	    /* Main wield slot does not cause problems;
 	       this single choice can be overriden in do_cmd_wield;
-	       freeing the off-hand slot is also only the only way 
+	       freeing the off-hand slot is also only the only way
 	       to get a weapon to the off-hand slot */
 	    return INVEN_ARM;
 	  else
-	    /* Main wield slot precludes dual-wield; replace it */ 
+	    /* Main wield slot precludes dual-wield; replace it */
 	    return INVEN_WIELD;
 	else
-	  /* else both slots are taken; try to replace 
+	  /* else both slots are taken; try to replace
 	     only the main wield slot to reduce the UI annoyance factor
 	     --- now the off-hand weapon behaves much as a shield */
 	  if (two_weapons_balanced(o_ptr, a_ptr))
@@ -1979,7 +1976,7 @@ s16b wield_slot(const object_type *o_ptr)
     case TV_DIGGING:
       {
 	/* Diggers only go into the main wield slot,
-	   but they coexist peacefully with everything, so that two-weapon 
+	   but they coexist peacefully with everything, so that two-weapon
 	   specialists do not have to unwield off-hand weapons all the time;
 	   if there is systematic abuse, tone down digger attack power */
 	return INVEN_WIELD;
@@ -1993,10 +1990,10 @@ s16b wield_slot(const object_type *o_ptr)
 
     case TV_RING:
       {
-	if (!inventory[INVEN_RIGHT].k_idx) 
+	if (!inventory[INVEN_RIGHT].k_idx)
 	  /* Use the right hand first */
 	  return INVEN_RIGHT;
-	else if (!inventory[INVEN_LEFT].k_idx) 
+	else if (!inventory[INVEN_LEFT].k_idx)
 	  /* Use the right hand second */
 	  return INVEN_LEFT;
 	else if (!inventory[INVEN_ARM].k_idx
@@ -2010,7 +2007,7 @@ s16b wield_slot(const object_type *o_ptr)
 
     case TV_AMULET:
       {
-	if (!inventory[INVEN_NECK].k_idx) 
+	if (!inventory[INVEN_NECK].k_idx)
 	  return INVEN_NECK;
 	else if (!inventory[INVEN_ARM].k_idx
 		 && p_ptr->pstyle == WS_AMULET)
@@ -2339,7 +2336,7 @@ bool item_tester_okay(const object_type *o_ptr)
 			  {
 			    if (!(item_tester_tval == bag_holds[o_ptr->sval][i][0]))
 			      continue;
-			    else 
+			    else
 			      break;
 			  }
 
@@ -2351,11 +2348,11 @@ bool item_tester_okay(const object_type *o_ptr)
 			  {
 			    if (!(*item_tester_hook)(i_ptr))
 			      continue;
-			    else 
+			    else
 			      break;
 			  }
 		}
-		
+
 		if (i < INVEN_BAG_TOTAL) return (TRUE);
 	}
 
@@ -3345,7 +3342,7 @@ static bool get_item_allow(int item)
 				/* Verify the choice */
 				if ((o_ptr->number < n) && (!verify_item("Really try", item))) return (FALSE);
 			}
-			
+
 		}
 
 		/* Find another '!' */
@@ -3380,7 +3377,7 @@ static bool get_item_allow(int item)
 				/* Verify the choice */
 				if ((o_ptr->number > n) && (!verify_item("Really try", item))) return (FALSE);
 			}
-			
+
 		}
 
 		/* Find another '!' */
@@ -3613,7 +3610,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	bool use_floor = ((mode & (USE_FLOOR)) ? TRUE : FALSE);
 	bool use_featg = ((mode & (USE_FEATG)) ? TRUE : FALSE);
 	bool use_featu = ((mode & (USE_FEATU)) ? TRUE : FALSE);
-	bool use_feath = ((mode & (USE_FEATH)) ? TRUE : FALSE);	
+	bool use_feath = ((mode & (USE_FEATH)) ? TRUE : FALSE);
 	bool use_quiver = ((mode & (USE_QUIVER)) ? TRUE: FALSE);
 	bool use_self = ((mode & (USE_SELF)) ? TRUE: FALSE);
 
@@ -3737,27 +3734,27 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 		if ((make_feat(i_ptr,p_ptr->py,p_ptr->px)) && item_tester_okay(i_ptr)) allow_feats = TRUE;
 	}
-	
+
 	/* Scan the feature -- this is a big hack.  We allow the feature to be set on fire. */
 	if ((use_feath) && (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags2 & (FF2_HURT_FIRE))) allow_feats = TRUE;
-	
-	/* Scan the feature -- this is a big hack.  If we have burnable objects on the floor, we allow the feature to be set on fire. */	
+
+	/* Scan the feature -- this is a big hack.  If we have burnable objects on the floor, we allow the feature to be set on fire. */
 	if ((use_feath) && !(allow_feats))
 	{
 		int b1, b2;
-		
+
 		b1 = 0;
 		b2 = floor_num - 1;
 
 		/* Restrict floor indexes */
 		while ((b1 <= b2) && (!hates_fire(&o_list[floor_list[b1]]))) b1++;
 		while ((b1 <= b2) && (!hates_fire(&o_list[floor_list[b2]]))) b2--;
-		
+
 		if (b1 <= b2) allow_feats = TRUE;
 	}
 
 	/* Scan oneself */
-	if ((use_self) && (item_tester_okay(&inventory[INVEN_SELF]))) 
+	if ((use_self) && (item_tester_okay(&inventory[INVEN_SELF])))
 		allow_self = TRUE;
 
 	/* Require at least one legal choice */
@@ -3785,8 +3782,8 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		}
 
 		/* Hack -- Start on equipment if shooting, throwing or fueling */
-		if ((p_ptr->command_cmd == 'f' 
-		     || p_ptr->command_cmd == 'v' 
+		if ((p_ptr->command_cmd == 'f'
+		     || p_ptr->command_cmd == 'v'
 		     || (p_ptr->command_wrk != (USE_INVEN) && p_ptr->command_cmd == 'F'))
 			&& allow_equip)
 		{
@@ -4301,13 +4298,13 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 					bell("Cannot select feature!");
 					break;
 				}
-				
+
 				/* Mega-Hack -- we are setting the floor alight with a torch */
 				if (use_feath)
 				{
 					project_o(0, 0, p_ptr->py, p_ptr->px, 1, GF_FIRE);
 					project_f(0, 0, p_ptr->py, p_ptr->px, 1, GF_FIRE);
-					
+
 					done = TRUE;
 					break;
 				}
@@ -4519,7 +4516,7 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		charges = bag_contents[sval + 1][slot];
 
 		/* Real object */
-		if (number)		
+		if (number)
 		{
 			/* Get bag charges */
 			i_ptr->charges = charges / number;
@@ -4587,16 +4584,13 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 		/* Apply obvious flags, e.g. for throwing items. XXX
 		 * This is, of course, *really dangerous* due to the calls in object_obvious_flags */
 		/* object_obvious_flags(i_ptr); */
-		
+
 		/* Hack -- instead apply kind flags */
 		i_ptr->can_flags1 = k_info[i_ptr->k_idx].flags1;
 		i_ptr->can_flags2 = k_info[i_ptr->k_idx].flags2;
 		i_ptr->can_flags3 = k_info[i_ptr->k_idx].flags3;
-		i_ptr->can_flags4 = k_info[i_ptr->k_idx].flags4;		
+		i_ptr->can_flags4 = k_info[i_ptr->k_idx].flags4;
 	}
-	
-	/* Hack - Always allow throwable from bags */
-	if (k_info[i_ptr->k_idx].flags3 & (TR3_THROWING)) i_ptr->can_flags3 |= (TR3_THROWING);
 }
 
 

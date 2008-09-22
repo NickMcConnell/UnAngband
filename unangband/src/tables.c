@@ -45,16 +45,16 @@ const s16b ddy_ddd[9] =
 
 
 /*
- * Given a central direction at position [dir #][0], return a series 
- * of directions radiating out on both sides from the central direction 
+ * Given a central direction at position [dir #][0], return a series
+ * of directions radiating out on both sides from the central direction
  * all the way back to its rear.
- * 
- * Side directions come in pairs; for example, directions '1' and '3' 
- * flank direction '2'.  The code should know which side to consider 
- * first.  If the left, it must add 10 to the central direction to 
+ *
+ * Side directions come in pairs; for example, directions '1' and '3'
+ * flank direction '2'.  The code should know which side to consider
+ * first.  If the left, it must add 10 to the central direction to
  * access the second part of the table.
- */ 
-const byte side_dirs[20][8] = 
+ */
+const byte side_dirs[20][8] =
 {
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },	/* bias right */
 	{ 1, 4, 2, 7, 3, 8, 6, 9 },
@@ -76,7 +76,7 @@ const byte side_dirs[20][8] =
 	{ 6, 9, 3, 8, 2, 7, 1, 4 },
 	{ 7, 4, 8, 1, 9, 2, 6, 3 },
 	{ 8, 7, 9, 4, 6, 1, 3, 2 },
-	{ 9, 8, 6, 7, 3, 4, 2, 1 } 
+	{ 9, 8, 6, 7, 3, 4, 2, 1 }
 };
 
 
@@ -96,7 +96,7 @@ const char hexsym[16] =
  * Global array for number of stats to increase at each level.
  * Ensure that no number here is greater than PY_MAX_STAT_GAIN.
  */
-const byte stat_gains[PY_MAX_LEVEL] = 
+const byte stat_gains[PY_MAX_LEVEL] =
 {
 /* This spreads the stat gains better at lower levels and
 	gives bigger increases at higher levels. */
@@ -110,7 +110,7 @@ const byte stat_gains[PY_MAX_LEVEL] =
 
 /*
  * Stat Table -- One less than number of spells at adj_mag_study_max (see below).
- * 
+ *
  * This attempts to balance out the maximum number of spells available, which we
  * do not want to be too high at high levels, as this is unbalancing, against
  * the rate of spells learnt, which is important at low levels.
@@ -213,7 +213,7 @@ const byte adj_mag_study_max[] =
 
 /*
  * Stat Table -- one (or 4 for mages) less than the amount of mana at level 50
- * 
+ *
  * Now also used for 'reach' with size.
  */
 const s16b adj_mag_mana[] =
@@ -2225,11 +2225,11 @@ const cptr magic_name[4][32] =
 		"", /* Random activation */
 		"", /* Activates */
 		"(Blessed)",
-		"", /* Artifact */
+		"(Quickfingered)",
 		"of Hunger",
-		"of Impact",
-		"(Rope-attached)",
+		"of Charging",
 		"of Throwing",
+		"of Penetrating",
 		"",	/* Light curse */
 		"",	/* Heavy curse */
 		""	/* Permanently cursed */
@@ -2268,7 +2268,7 @@ const cptr magic_name[4][32] =
 		"of Acid Vulnerability",
 		"of Lightning Vulnerability",
 		"of Fire Vulnerability",
-		"of Frost Vulnerability"	
+		"of Frost Vulnerability"
 	}
 };
 
@@ -2322,7 +2322,7 @@ const cptr disease_name[33] =
  *
  * This range is considered a preference if d_range in spell_desire is > 0.
  * It is a hard limit if d_range = 0.
- * 
+ *
  * Note that _RF4 tables are non-constant due to updating the blow effects
  * for each monster type.
  */
@@ -2854,7 +2854,7 @@ const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2] =
 	{ {75, 4}, {75, 5}, {75, 7}, {75, 9},
 	  {75, 11}, {75, 13}, {75, 15}, {75, 16},
 	  {75, 17}, {75, 18}, {75, 19}, {75, 20},
-	  {75, 21}, {75, 22}, {75, 73},	{75, 74}, 
+	  {75, 21}, {75, 22}, {75, 73},	{75, 74},
 	  {75, 76}, {75, 77}, {75, 78}, {75, 79},
 	  {75, 80}, {75, 81}, {0, 0} },
 	/* Bag of Harmful Mushrooms - holds harmful mushrooms */
@@ -3146,9 +3146,9 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"an untreated scratch", "a nasty cut", "a fatal wound", "poor bandaging"},	/* SOURCE_CUTS */
 	{"poison", "venom", "toxin", "unnatural swelling"},	/* SOURCE_POISON */
 	{"hunger", "starvation", "lack of food", "poor management"},	/* SOURCE_HUNGER */
-	{"an ancient curse", "a perpetual weakness", "a black pact", "the spoor of Morgoth"},	/* SOURCE_CURSED_ITEM */	
+	{"an ancient curse", "a perpetual weakness", "a black pact", "the spoor of Morgoth"},	/* SOURCE_CURSED_ITEM */
 	{"being entombed by ", "being crushed by ", "being buried under ", "a falling cask of Amontillado stored by "},	/* SOURCE_ENTOMB */
-	{"blood debt for a slain ", "backlash for summoning a ", "a dark pact claimed by a dying ", "unearthly powers seeking vengeance on behalf of a "}, /* SOURCE_BLOOD_DEBT */ 
+	{"blood debt for a slain ", "backlash for summoning a ", "a dark pact claimed by a dying ", "unearthly powers seeking vengeance on behalf of a "}, /* SOURCE_BLOOD_DEBT */
 	{"misjudging ", "treachery of ", "a knife in the back from ", "walking in front of the line of fire of "}, /* SOURCE_PLAYER_ALLY */
 	{"a swing, and a miss", "overenthusiasm", "a hellavu shaving cut", "hmmm... you're not quite sure how you hit that part of you"}, /* SOURCE_PLAYER_ATTACK */
 	{"a misfire","an unintended discharge","shooting your own foot","hmmm... you're not quite sure how you shot that part of you"}, /* SOURCE_PLAYER_SHOT */
@@ -3156,23 +3156,23 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"walking headfirst into a ","walking backwards into a ","stumbling into a ","forgetting where you put a "}, /* SOURCE_PLAYER_TRAP */
 	{"breaking ", "smashing ", "cracking open ", "shattering "}, /* SOURCE_PLAYER_BREAK */
 	{"sniffing ", "inhaling ", "snorting ", "getting addicted to "}, /* SOURCE_PLAYER_SPORE */
-	{"a nick from a weapon coated with ", "extract of ", "toxic ", "fumes reeking of "		}, /* SOURCE_PLAYER_COATING */ 
+	{"a nick from a weapon coated with ", "extract of ", "toxic ", "fumes reeking of "		}, /* SOURCE_PLAYER_COATING */
 	{"over cooking ", "undercooking ", "having a taste for ", "not cutting out the poisonous bits off "}, /* SOURCE_PLAYER_EAT_MONSTER */
-	{"trying to draw health from ", "the eldritch power of ", "taking the place of ", "connecting to the Negative Plane through "}, /* SOURCE_PLAYER_VAMP_DRAIN */	
+	{"trying to draw health from ", "the eldritch power of ", "taking the place of ", "connecting to the Negative Plane through "}, /* SOURCE_PLAYER_VAMP_DRAIN */
 	{"nibbling ", "tasting ", "trying ", "an unknown allergy to "}, /* SOURCE_PLAYER_EAT_UNKNOWN */
-	{"sipping ", "sniffing ", "fumes from ", "not spitting out "}, /* SOURCE_PLAYER_QUAFF_UNKNOWN */ 
-	{"glancing at ", "casting your eyes over ", "browsing ", "looking sideways at "}, /* SOURCE_PLAYER_READ_UNKNOWN */ 
+	{"sipping ", "sniffing ", "fumes from ", "not spitting out "}, /* SOURCE_PLAYER_QUAFF_UNKNOWN */
+	{"glancing at ", "casting your eyes over ", "browsing ", "looking sideways at "}, /* SOURCE_PLAYER_READ_UNKNOWN */
 	{"eating ", "chewing ", "choking on ", "indigestion from "}, /* SOURCE_PLAYER_EAT */
-	{"quaffing ", "drinking ", "slurping ", "guzzling "}, /* SOURCE_PLAYER_QUAFF */ 
+	{"quaffing ", "drinking ", "slurping ", "guzzling "}, /* SOURCE_PLAYER_QUAFF */
 	{"aiming ", "waving ", "pointing ", "holding the wrong end of "}, /* SOURCE_PLAYER_AIM */
-	{"zapping ", "plughing ", "xyzzying ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP */ 
-	{"rubbing ", "wondering how to zap ", "seeing which end glows of ", "pressing a hidden stud on "}, /* SOURCE_PLAYER_ZAP_NO_TARGET */ 
-	{"reading ", "misreading ", "reciting ", "holding upside down "}, /* SOURCE_PLAYER_READ */ 
-	{"using ", "misusing ", "abusing ", "badly using "}, /* SOURCE_PLAYER_USE */ 
-	{"activating ", "relying too heavily on ", "mistrusting the power of ", "chancing the gods with "}, /* SOURCE_PLAYER_ACT_ARTIFACT */ 
-	{"activating ", "relying on ", "having an argument with ", "chancing fate with "}, /* SOURCE_PLAYER_ACT_EGO_ITEM */ 
-	{"activating ", "calling on ", "discharging ", "misusing "}, /* SOURCE_PLAYER_ACTIVATE */ 
-	{"buying ", "acquiring ", "purchasing ", "the ill-judged purchase of "}, /* SOURCE_PLAYER_SERVICE */ 
+	{"zapping ", "plughing ", "xyzzying ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP */
+	{"rubbing ", "wondering how to zap ", "seeing which end glows of ", "pressing a hidden stud on "}, /* SOURCE_PLAYER_ZAP_NO_TARGET */
+	{"reading ", "misreading ", "reciting ", "holding upside down "}, /* SOURCE_PLAYER_READ */
+	{"using ", "misusing ", "abusing ", "badly using "}, /* SOURCE_PLAYER_USE */
+	{"activating ", "relying too heavily on ", "mistrusting the power of ", "chancing the gods with "}, /* SOURCE_PLAYER_ACT_ARTIFACT */
+	{"activating ", "relying on ", "having an argument with ", "chancing fate with "}, /* SOURCE_PLAYER_ACT_EGO_ITEM */
+	{"activating ", "calling on ", "discharging ", "misusing "}, /* SOURCE_PLAYER_ACTIVATE */
+	{"buying ", "acquiring ", "purchasing ", "the ill-judged purchase of "}, /* SOURCE_PLAYER_SERVICE */
 	{"if you died here, you shouldn't be using wizard commands", "are you reading the source again?", "hmmph", "i'm going to ROT13 this table"}, /* SOURCE_PLAYER_WIZARD */
 	{"bad luck casting ", "badly casting ", "slurring a syllable casting ", "magical feedback whilst casting "} /* SOURCE_PLAYER_CAST */
 };
@@ -3180,7 +3180,7 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 
 /*
  * Item manipulation commands.
- * 
+ *
  * TODO: We could combine player_eat_food & player_quaff potion to a 'player_consume'
  * function and player_use_staff and player_aim_wand to a 'player_use_charge' function etc.
  */
@@ -3188,46 +3188,46 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 {
 	{ NULL, '\0', " which ? ", "You have nothing to .",
 			NULL, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, 0, NULL},
-			
+
 	{ player_eat_food, 'E', "Eat which item? ", "You have nothing to eat.",
 			item_tester_hook_food_edible, 0, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), 0L, 0, NULL},
-			
+
 	{ player_quaff_potion, 'q', "Quaff which potion? ", "You have nothing to quaff.",
 			NULL, TV_POTION, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), 0L, 0, NULL},
-			
+
 	{ player_read_scroll, 'r', "Read which scroll? ", "You have no scrolls to read.",
 			NULL, TV_SCROLL, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), (CONDITION_NOT_BLIND | CONDITION_LITE | CONDITION_NOT_BERSERK), 0, NULL},
-	
+
 	{ player_use_staff, 'u', "Use which staff? ", "You have no staffs to use.",
 			NULL, TV_STAFF, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
-			
+
 	{ player_aim_wand, 'u', "Aim which wand? ", "You have no wands to aim.",
 			NULL, TV_WAND, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), (CONDITION_NOT_BERSERK), 0, NULL},
 
 	{ player_zap_rod, 'z', "Zap which rod? ", "You have no rods to zap.",
 			item_tester_hook_rod_charged, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), (CONDITION_NOT_BERSERK), 0, NULL},
-	
+
 	{ player_assemble, 'Y', "Assemble which item? ", "You have no items to assemble.",
 			item_tester_hook_assemble, 0, (USE_INVEN | USE_FLOOR | USE_FEATU), 0L, COMMAND_ITEM_ASSEMBLY, NULL},
-	
+
 	{ player_assembly, 'Y', "Assemble with which item? ", "You have no items to assemble it with.",
 			item_tester_hook_assembly, 0, (USE_INVEN | USE_FLOOR), 0L, 0, NULL},
 
 	{ player_activate, 'A', "Activate which item? ", "You have no items you know how to activate.",
 			item_tester_hook_activate, 0, (USE_EQUIP), 0L, 0, NULL},
-			
+
 	{ player_apply_rune_or_coating, 'y', "Apply which runestone, mushroom, flask or potion? ", "You have no runestones, mushrooms, flasks or potions.",
 			item_tester_hook_apply, 0, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), 0L, 0, cmd_tester_rune_or_coating},
-	
+
 	{ player_apply_rune_or_coating2, 'y', "Apply rune to which item? ", "You have nothing to apply runes to.",
 			NULL, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR), 0L, 0, NULL},
 
 	{ player_apply_rune_or_coating2, 'y', "Coat which item? ", "You have nothing which will hold a coating.",
 			item_tester_hook_coating, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR), 0L, 0, NULL},
-			
+
 	{ player_wield, 'w', "Wear/Wield which item? ", "You have nothing you can wear or wield.",
 			item_tester_hook_wear, 0, (USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGC), 0L, 0, NULL},
- 
+
 	{ player_wield /*_offhand*/, 'o', "Wear/Wield which item into your off-hand? ", "You have nothing you can wear or wield in your off-hand.",
 			item_tester_hook_wear /*_offhand */, 0, (USE_EQUIP | USE_FLOOR | USE_FEATG), 0L, 0, NULL},
 
@@ -3236,34 +3236,34 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 
 	{ player_takeoff, 't', "Take off which item? ", "You are not wearing anything to take off.",
 			item_tester_hook_removable, 0, (USE_EQUIP), 0L, 0, NULL},
-	
+
 	{ player_drop, 'd', "Drop which item? ", "You have nothing to drop.",
 			item_tester_hook_droppable, 0, (USE_EQUIP | USE_INVEN | USE_BAGC | USE_BAGS), 0L, 0, NULL},
-			
+
 	{ player_destroy, 'k', "Destroy which item? ", "You have nothing to destroy.",
 			NULL, 0, (USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGC | USE_BAGS), 0L, 0, NULL},
-			
+
 	{ player_observe, 'x', "Examine which item? ", "You have nothing to examine.",
 			NULL, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGC | USE_BAGS), 0L, 0, NULL},
-			
+
 	{ player_uninscribe, '}', "Un-inscribe which item? ", "You have nothing to un-inscribe.",
 			NULL, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR), 0L, 0, NULL},
-			
+
 	{ player_inscribe, '{', "Inscribe which item? ", "You have nothing to inscribe.",
 			NULL, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR), 0L, 0, NULL},
-			
+
 	{ player_refill, 'F', "Fill/Fuel which item? ", "You have nothing to fill or fuel.",
 			item_tester_empty_flask_or_lite, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, cmd_tester_fill_or_fuel},
-			
+
 	{ player_refill2, '!', "Fill it from where? ", "You have nothing to fill it with.",
 			item_tester_refill_flask, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC | USE_FEATU), 0L, 0, NULL},
-			
+
 	{ player_refill2, '~', "Refuel with which torch? ", "You have no torches.",
 			item_tester_refill_torch, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, NULL},
-			
+
 	{ player_refill2, '`', "Refill with which source of oil? ", "You have no sources of oil.",
 			item_tester_refill_lantern, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_BAGC), 0L, 0, NULL},
-	
+
 	{ player_light_and_douse, '|', "Light/Douse which light source? ", "You have nothing to light or douse.",
 			item_tester_light_source, 0, (USE_EQUIP | USE_FLOOR | USE_FEATH), 0L, 0, NULL},
 };

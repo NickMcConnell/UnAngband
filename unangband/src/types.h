@@ -496,6 +496,9 @@ struct object_kind
 	u32b flags3;    /* Flags, set 3 */
 	u32b flags4;    /* Flags, set 4 */
 
+	u32b flags5;	/* Flags, set 5 (kind only) */
+	u32b flags6;	/* Flags, set 6 (kind only) */
+
 	byte locale[4]; /* Allocation level(s) */
 	byte chance[4]; /* Allocation chance(s) */
 
