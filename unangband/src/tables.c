@@ -2221,15 +2221,15 @@ const cptr magic_name[4][32] =
 		"(Drains Mana)",
 		"(Drains Experience)",
 		"of Aggravation",
-		"of Teleportation",
-		"", /* Random activation */
+		"", /* Uncontrolled */
+		"", /* Activates on blow */
 		"", /* Activates */
 		"(Blessed)",
 		"(Quickfingered)",
 		"of Hunger",
 		"of Charging",
 		"of Throwing",
-		"of Penetrating",
+		"of Hurling",
 		"",	/* Light curse */
 		"",	/* Heavy curse */
 		""	/* Permanently cursed */

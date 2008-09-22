@@ -660,6 +660,10 @@ static bool check_hit(int power, int level, int who, bool ranged)
 
 		/* Shield counts for double */
 		if (p_ptr->shield) ac += 50;
+
+		/* Ill winds help a lot */
+		if ((p_ptr->cur_flags4 & (TR4_WINDY)) ||
+				room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY)) ac += 100;
 	}
 
 	/* Some rooms make the player vulnerable */
