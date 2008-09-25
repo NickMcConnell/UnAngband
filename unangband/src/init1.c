@@ -2425,13 +2425,10 @@ errr parse_blow_info(char *buf, header *head)
 			*t++ = '\0';
 
 			blow_ptr->desc[n1].max = atoi(t);
+			if (!blow_ptr->desc[n1].max) 
 
 			/* Find the colon */
 			for (; *t && (*t != ':'); ++t) /* loop */;
-		}
-		else
-		{
-			blow_ptr->desc[n1].max = last_min - 1;
 		}
 
 		/* No colon */
@@ -2445,6 +2442,14 @@ errr parse_blow_info(char *buf, header *head)
 
 		/* Parse min */
 		blow_ptr->desc[n1].min = atoi(s);
+
+		/* Default max */
+		if (!blow_ptr->desc[n1].max)
+		{
+			if (blow_ptr->desc[n1].min < last_min) blow_ptr->desc[n1].max = last_min - 1;
+			else if (n1 > 0) blow_ptr->desc[n1].max = blow_ptr->desc[n1-1].max;
+			else blow_ptr->desc[n1].max = 9999;
+		}
 
 		/* Store the description */
 		if (!(add_text(&(blow_ptr->desc[n1].text), head, t)))

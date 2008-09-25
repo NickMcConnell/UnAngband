@@ -401,7 +401,7 @@ F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:RANGED | BREATH |
 
 N:56:area
-T:0:calls~ * around &
+T:0:call~ * around &
 T:0:summon~ * around &
 T:0:create~ * around &
 I:0:0:20
@@ -553,7 +553,7 @@ R:10
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 
 N:81:aim area
-T:0:calls~ * around &
+T:0:call~ * around &
 T:0:summon~ * around &
 T:0:create~ * around &
 I:0:0:20

@@ -761,18 +761,26 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	/* Pick the appropriate attack description */
 	for (i = 0, k = 0, c = -1; i < MAX_BLOW_DESCRIPTIONS; i++)
 	{
+		/* Skip empty blows */
+		if (blow_ptr->desc[i].max == 0) continue;
+		
 		/* Skip seen and/or direct blows as required */
-		if ((i > 1) && (i % div != mod)) continue;
+		if ((div > 1) && (i % div != mod)) continue;
 
 		/* Check blow damage */
 		if ((damage >= blow_ptr->desc[i].min) &&
 				(damage <= blow_ptr->desc[i].max))
 		{
 			/* Pick a description that qualifies */
-			if ((flg & (ATK_DESC_LAST)) || (rand_int(++k))) c = i;
+			if ((flg & (ATK_DESC_LAST)) || (!rand_int(++k))) c = i;
 		}
 	}
+	
+	msg_format("pick %d", c);
 
+	/* No valid description */
+	if (c < 0) return (c);
+	
 	/* Start dumping the result */
 	t = tmp_buf;
 
@@ -1175,7 +1183,7 @@ bool make_attack_normal(int m_idx)
 			result = attack_desc(atk_desc, -1, method, effect, damage, flg);
 
 			/* Describe the attack */
-			msg_format("%^s %s", m_name, atk_desc);
+			if (result >= 0) msg_format("%^s %s", m_name, atk_desc);
 
 			/* Slime */
 			if (blow_ptr->flags2 & (PR2_SLIME))
@@ -2355,7 +2363,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Any effect? */
-	if (result > 0)
+	if (result >= 0)
 	{
 		/* Describe the attack */
 		msg_format("%^s %s", m_name, atk_desc);
