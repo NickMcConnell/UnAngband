@@ -5152,14 +5152,14 @@ void unlite_room(int y, int x)
 /*
  * Cast a projection
  */
-static bool fire_projection(int who, int what, int typ, int shape, int dir, int dam, int level)
+static bool fire_projection(int who, int what, int typ, int method, int dir, int dam, int level)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
 	int ty, tx;
 
-	blow_type *blow_ptr = &blow_info[shape];
+	blow_type *blow_ptr = &blow_info[method];
 
 	int rad = blow_ptr->radius.base;
 	int num = blow_ptr->number.base;
@@ -5167,7 +5167,7 @@ static bool fire_projection(int who, int what, int typ, int shape, int dir, int 
 	int degrees_of_arc = blow_ptr->arc;
 	int diameter_of_source = blow_ptr->diameter_of_source;
 
-	u32b flg = blow_info[shape].flags1;
+	u32b flg = blow_info[method].flags1;
 
 	bool noticed = FALSE;
 

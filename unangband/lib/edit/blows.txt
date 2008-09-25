@@ -49,29 +49,25 @@
 V:0.6.3
 
 N:0:miss
-T:0:miss|es| &
+T:0:miss||es| &
 I:0:0:20
 
-N:1:hit cut
+N:1:hit
 T:30:gouge~ &
-T:20:slash||es| &
-T:5:cut~ &
-T:0:scratch|es| &
-I:0:0:20
-F:MISS |
-F:MELEE | CUTS | TOUCH |
-
-N:2:hit stun
 T:30:bludgeon~ &
+T:20:slash||es| &
 T:20:batter~ &
+T:5:cut~ &
 T:5:bash||es| &
+T:0:scratch||es| &
 T:0:hit~ &
 I:0:0:20
 F:MISS |
-F:MELEE | STUN | TOUCH |
+F:MELEE | CUTS | STUN | TOUCH |
+F:ALTERNATE
 
 N:3:punch
-T:0:punch|es| &
+T:0:punch||es| &
 I:0:0:20
 F:MISS |
 F:MELEE | STUN | TOUCH |
@@ -85,7 +81,7 @@ F:MELEE | STUN | TOUCH |
 N:5:claw
 T:25:slash||es| &
 T:5:claw~ &
-T:0:scratch|es| &
+T:0:scratch||es| &
 I:0:0:20
 F:MISS |
 F:MELEE | CUTS | TOUCH |
@@ -176,7 +172,7 @@ F:BOOM | WALL | MISS | KILL | PLAY | STOP |
 F:MELEE | RANGED |
 
 N:19:lash
-T:0:lash|es| & with a whip
+T:0:lash||es| & with a whip
 I:0:0:20
 R:2
 F:BEAM | MISS | GRID | ITEM | KILL | PLAY | MAGIC |
@@ -233,7 +229,9 @@ F:RANGED |
 
 N:27:explode
 T:0:explodes!
+R:2
 I:0:0:20
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 F:RANGED |
 
 N:28:arrow
@@ -276,8 +274,10 @@ F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
 N:35:aura
 T:0:intensif|y|ies| % aura
 I:0:0:20
-R:2
+R:1
+#R:2 if powerful
 F:BOOM | WALL | GRID | ITEM | PLAY | SELF | MAGIC | HIDE | SAFE |
+F:SPECIAL_CASE
 
 N:36:aura minor
 T:0:intensify|y|ies| % aura
@@ -337,7 +337,7 @@ R:1
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 
 N:46:wall
-T:0:rais|es| a wall of *
+T:0:rais||es| a wall of *
 I:0:0:20
 R:12
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
@@ -414,7 +414,7 @@ I:0:0:20
 F:GRID | ITEM | KILL | PLAY | MAGIC | ALL_IN_LOS | SELF | SAFE
 
 N:58:line
-T:0:creat|es| a path of *
+T:0:creat||es| a path of *
 I:0:0:20
 R:8
 F:BEAM |
@@ -572,25 +572,47 @@ C:40:0:0:5:0:0:100
 N:99:BLOW_4
 C:40:0:0:5:0:0:100
 
+#Note these messages are based on the tval of the ammo being added.
+
 N:100:ADD_AMMO
 I:0:20:0
+T:22:grows more darts.
+T:18:grows more bolts.
+T:17:grows more arrows.
+T:16:grows more shots.
+T:9:grows more spores.
+T:3:grows more rocks.
+T:5:grows more spikes.
 C:60:0:0:5:0:0:100
+F:ADD_AMMO
 
 N:101:QUAKE
 I:0:8:0
 C:40:0:0:5:0:0:100
+F:SPECIAL_CASE
 
 N:102:EXPLODE
+T:0:explodes!
+R:2
 I:0:1:0
 D:0:0:0:0:EXPLODE
 C:20:0:0:5:0:0:100
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:RANGED
 
 N:103:AURA
 I:0:1:0
 C:40:0:0:0:0:0:100
+R:1
+#R:2 if powerful
+F:BOOM | WALL | GRID | ITEM | PLAY | SELF | MAGIC | HIDE | SAFE |
+F:SPECIAL_CASE
 
 N:104:BRTH_ACID
 A:20:20:60
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 #Powerful: 40:20:120
 D:0:3:0:1600:ACID
 C:75:0:0:5:0:0:90
@@ -600,6 +622,9 @@ F:BREATH
 N:105:BRTH_ELEC
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:1600:ELEC
 C:75:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -608,6 +633,9 @@ F:BREATH
 N:106:BRTH_FIRE
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:1600:FIRE
 C:75:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -616,6 +644,9 @@ F:BREATH
 N:107:BRTH_COLD
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:1600:COLD
 C:75:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -624,6 +655,9 @@ F:BREATH
 N:108:BRTH_POIS
 A:30:20:60
 #Powerful: 50:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:800:POISON
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -632,6 +666,9 @@ F:BREATH
 N:109:BRTH_PLAS
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:150:PLASMA
 C:65:0:0:5:0:0:90
 #If powerful: D:0:3:0:400:PLASMA
@@ -641,6 +678,9 @@ F:BREATH
 N:110:BRTH_LITE
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:400:LITE
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -649,6 +689,9 @@ F:BREATH
 N:111:BRTH_DARK
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:400:DARK
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -657,6 +700,9 @@ F:BREATH
 N:112:BRTH_CONFU
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:400:CONFUSE
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -665,6 +711,9 @@ F:BREATH
 N:113:BRTH_SOUND
 A:30:20:60
 #Powerful: 50:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:9:0:150:SOUND
 C:65:0:0:5:0:0:90
 #If powerful: D:0:4:0:500:SOUND
@@ -674,6 +723,9 @@ F:BREATH
 N:114:BRTH_SHARD
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:500:SHARD
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -682,6 +734,9 @@ F:BREATH
 N:115:BRTH_INERT
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:8:0:150:INERTIA
 C:65:0:0:5:0:0:90
 #If powerful: D:0:4:0:400:INERTIA
@@ -691,6 +746,9 @@ F:BREATH
 N:116:BRTH_GRAV
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:8:0:150:GRAVITY
 C:65:0:0:5:0:0:90
 #If powerful: D:0:4:0:300:GRAVITY
@@ -700,6 +758,9 @@ F:BREATH
 N:117:BRTH_WIND
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:9:0:150:WIND
 C:65:0:0:5:0:0:90
 #If powerful: D:0:4:0:500:WIND
@@ -709,6 +770,9 @@ F:BREATH
 N:118:BRTH_FORCE
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:150:FORCE
 C:65:0:0:5:0:0:90
 #If powerful: D:0:3:0:400:WIND
@@ -718,6 +782,9 @@ F:BREATH
 N:119:BRTH_NEXUS
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:450:NEXUS
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -726,6 +793,9 @@ F:BREATH
 N:120:BRTH_NETHR
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:550:NETHER
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -734,6 +804,9 @@ F:BREATH
 N:121:BRTH_CHAOS
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:550:CHAOS
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -742,6 +815,9 @@ F:BREATH
 N:122:BRTH_DISEN
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:550:DISENCHANT
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -750,6 +826,9 @@ F:BREATH
 N:123:BRTH_TIME
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:150:TIME
 C:65:0:0:5:0:0:90
 #If powerful: D:0:3:0:400:TIME
@@ -759,6 +838,9 @@ F:BREATH
 N:124:BRTH_MANA
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:250:MANA
 C:65:0:0:5:0:0:90
 #If powerful: D:0:3:0:400:TIME
@@ -768,6 +850,9 @@ F:BREATH
 N:125:BRTH_HOLY
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:550:HOLY_ORB
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -776,6 +861,9 @@ F:BREATH
 N:126:BRTH_FEAR
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:6:0:400:TERRIFY
 C:65:0:0:5:0:0:90
 F:ARC | BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -784,6 +872,9 @@ F:BREATH
 N:127:BRTH_DISEA
 A:20:20:60
 #Powerful: 40:20:120
+T:0:breathe~ * at &
+T:0:breathe~
+F:HEARD
 D:0:3:0:150:DISEASE
 C:65:0:0:5:0:0:90
 #If powerful: D:0:3:0:400:DISEASE
@@ -792,444 +883,813 @@ F:BREATH
 
 N:128:BALL_ACID
 I:4:6:0
+T:80:invoke~ a storm of * around &
+T:80:intones in caustic breath
+T:40:invoke~ a storm of * around &
+T:40:chant~ powerfully
+T:10:cast~ @ * ball at &
+T:10:murmur~ deeply
+T:0:cast~ @ * ball at &
+T:0:mumble~ sarcastically
 D:4:1:6:0:ACID
+R:4
 C:50:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:129:BALL_ELEC
 I:4:6:0
+T:40-:calls a massive stroke of lightning down upon &!
+T:80:intones in a booming voice
+T:80:invoke~ a storm of * around &
+T:80:intones in a booming voice
+T:40:invoke~ a storm of * around &
+T:40:chant~ powerfully
+T:10:cast~ @ * ball at &
+T:10:murmur~ deeply
+T:0:cast~ @ * ball at &
+T:0:mumble~
+R:4
 D:4:1:6:0:ELEC
 C:50:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS | LIGHTNING_STROKE
+F:HEARD
 
 N:130:BALL_FIRE
 I:4:6:0
+T:80:conjure~ up a maelstrom of fire upon &!
+T:80:intones in rising wrath
+T:40:invoke~ @ *storm around &
+T:40:chant~ powerfully
+T:10:cast~ @ * ball at &
+T:10:murmur~ deeply
+T:0:cast~ @ * ball at &
+T:0:mumble~ angrily
+R:4
 D:4:1:6:0:FIRE
 C:50:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:131:BALL_COLD
 I:4:6:0
+T:80:invoke~ a storm of * around &
+T:80:intones in frosty cadences
+T:40:invoke~ @ storm of * around &
+T:40:chant~ powerfully
+T:10:cast~ @ * ball at &
+T:10:murmur~ deeply
+T:0:cast~ @ * ball at &
+T:0:mumble~ coldly
+R:4
 D:4:1:6:0:COLD
 C:50:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:132:BALL_POIS
 I:4:6:0
+T:80:invoke~ a storm of * around &
+T:80:intones in a venomous tongue
+T:40:invoke~ a storm of * around &
+T:40:chant~ powerfully
+T:10:cast~ a venmous cloud at &
+T:10:murmur~ deeply
+T:0:cast~ a stinking cloud at &
+T:0:mumble~ bitterly
+R:4
 D:3:1:6:0:POISON
 C:50:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:133:BALL_LITE
 I:5:6:0
+T:0-:concentrates *... and releases it
+T:0-:mumble~
+T:40:invoke~ a powerful explosion of * around &
+T:40:intones in a celestial timbre
+T:10:cast~ an explosion of * around &
+T:10:murmur~ deeply
+T:0:cast~ a sphere of * around &
+T:0:mumble~ lightly
+R:4
 D:3:1:6:0:LITE
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS | CONCENTRATE_LITE
+F:HEARD
 
 N:134:BALL_DARK
 I:5:6:0
+T:0-:concentrate~ *... and release~ it
+T:0-:mumble~
+T:110:invoke~ a powerful explosion of * around &
+T:110:intones in dark echoes
+T:70:invoke~ a powerful explosion of * around &
+T:70:chant~ powerfully
+T:20:cast~ a storm of * at &
+T:20:murmur~ deeply
+T:0:cast~ a ball of * at &
+T:0:mumble~ darkly
+R:4
 D:3:1:6:0:DARK
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS | CONCENTRATE_DARK
+F:HEARD
 
 N:135:BALL_CONFU
 I:6:6:0
+T:40:invoke~ a powerful explosion of * around &
+T:40:chant~ powerfully
+T:10:cast~ a storm of * at &
+T:10:murmur~ deeply
+T:0:cast~ a ball of * at &
+T:0:mumble~
+R:3
 D:3:1:6:0:CONFUSE
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:136:BALL_SOUND
 I:4:6:0
+T:40:unleash||es| a cacophony of * around &
+T:40:chant~ powerfully
+T:10:invoke~ a thunderclap around &
+T:10:murmur~ deeply
+T:0:call~ up a blast of * around &
+T:0:mumble~
+R:3
 D:2:1:6:0:SOUND
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:137:BALL_SHARD
 I:4:6:0
+T:40:invoke~ a storm of knives around &!
+T:40:chant~ powerfully
+T:10:call~ up a whirlwind of * around &
+T:10:murmur~ deeply
+T:0:call~ up a blast of * around &
+T:0:mumble~
+R:3
 D:3:1:6:0:SHARD
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS
+F:HEARD
 
 N:138:BALL_WIND
 I:4:6:0
 D:2:1:6:0:WIND
+T:40:gesture~ fluidly. & $ lost in a raging tornado!
+T:40:chant~ powerfully
+T:22:gesture~ fluidly. & $ engulfed in a twister.
+T:22:murmur~ deeply
+T:0:gesture~ fluidly. & $ surrounded by a dust devil.
+T:0:mumble~
+R:4
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS | LARGE_RADIUS
+F:HEARD
 
 N:139:BALL_STORM
 I:5:4:0
+T:40:gesture~ fluidly. & $ lost in a raging tempest of wind and water!
+T:40:chant~ powerfully
+T:22:gesture~ fluidly. & $ engulfed in a whirlpool.
+T:22:murmur~ deeply
+T:0:gesture~ fluidly. & $ surrounded by a little storm.
+T:0:mumble~
+R:4
 D:3:1:4:0:STORM
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:SCALE_RADIUS | LARGE_RADIUS
+F:HEARD
 
 N:140:BALL_NETHR
 I:6:6:0
 D:3:1:6:0:NETHER
+T:40:call~ up a storm of * magics around & 
+T:40:intones with deadly menace
+T:10:cast~ @ * ball at &
+T:10:murmur~ a deadly word
+T:0:cast~ an orb of * at & 
+T:0:whisper~ nastily
+R:3
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:HEARD
 
 N:141:BALL_CHAOS
 I:7:4:0
+T:40:call~ up a storm of * around & 
+T:40:chant~ powerfully
+T:13:cast~ casts an exlosion of raw * at &
+T:13:murmur~ deeply
+T:0:cast~ an orb of * at & 
+T:0:mumble~
 D:3:1:4:0:CHAOS
+R:3
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:HEARD
 
 N:142:BALL_MANA
 I:7:8:0
+T:50:call~ up a storm of * around & 
+T:50:chant~ powerfully
+T:25:cast~ @ * ball at &
+T:25:murmur~ deeply
+T:0:cast~ @ * burst at & 
+T:0:mumble~
 D:3:1:8:0:MANA
+R:3
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:HEARD
 
 N:143:BALL_WATER
 I:7:6:0
+T:120:invoke~ a storm of * around & 
+T:120:chant~ powerfully
+T:40:invoke~ a storm of * around & 
+T:40:chant~ powerfully
+T:15:cast~ @ * ball at &
+T:15:murmur~ deeply
+T:0:cast~ a small * ball at & 
+T:0:mumble~
+R:4
 D:3:1:6:0:WATER
 C:40:0:0:0:0:0:100
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:HEARD
 
 N:144:BOLT_ACID
 I:4:6:0
+T:50:cast~ @ bolt of * at &
+T:50:murmur~ deeply
+T:0:cast~ @ * bolt at & 
+T:0:mumble~
 D:4:1:6:0:ACID
 C:40:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:145:BOLT_ELEC
 I:4:6:0
+T:50:cast~ @ bolt of * at &
+T:50:murmur~ deeply
+T:0:cast~ @ bolt of electricity at & 
+T:0:mumble~
 D:4:1:6:0:ELEC
 C:40:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:146:BOLT_FIRE
 I:4:6:0
+T:50:cast~ @ fiery sphere at &
+T:50:murmur~ deeply
+T:0:cast~ @ * bolt at & 
+T:0:mumble~
 D:4:1:6:0:FIRE
 C:40:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:147:BOLT_COLD
 I:4:6:0
+T:50:cast~ @ * bolt at &
+T:50:murmur~ deeply
+T:0:cast~ @ * bolt at & 
+T:0:mumble~
 D:4:1:6:0:COLD
 C:40:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:148:BOLT_POIS
 I:4:6:0
+T:50:cast~ @ bolt of venom at &
+T:50:murmur~ deeply
+T:0:cast~ @ * bolt at & 
+T:0:mumble~
 D:3:1:6:0:POISON
 C:40:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:149:BOLT_PLAS
 I:5:6:0
+T:50:cast~ @ bolt of * at &
+T:50:murmur~ deeply
+T:0:cast~ @ * bolt at & 
+T:0:mumble~
 D:3:1:6:0:PLASMA
 C:50:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:150:BOLT_ICE
 I:5:6:0
+T:50:cast~ @ bolt of * at &
+T:50:murmur~ deeply
+T:0:cast~ a * bolt at & 
+T:0:mumble~
 D:3:1:6:0:ICE
 C:50:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:151:BOLT_WATER
 I:5:6:0
+T:50:cast~ @ * bolt at &
+T:50:murmur~ deeply
+T:0:cast~ @ * bolt at & 
+T:0:mumble~
 D:3:1:6:0:WATER
 C:35:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:152:BOLT_NETHR
 I:5:6:0
+T:50:hurls a black bolt of * at & 
+T:50:murmur~ a deadly word
+T:0:cast~ @ * bolt at & 
+T:0:whisper~ nastily
 D:3:1:6:0:NETHER
 C:35:0:0:0:0:0:100
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:153:BOLT_MANA
 I:5:6:0
+T:50:cast~ @ * bolt at & 
+T:50:murmur~ deeply
+T:0:cast~ @ magic missile at &
+T:0:mumble~
 D:2:1:6:0:MANA
 C:30:0:0:0:0:0:100
+F:MAGIC_MISSILE
+F:STOP | KILL | PLAY | GRID | MAGIC
+F:HEARD
 
 N:154:HOLY_ORB
 I:5:8:0
 D:5:2:8:0:HOLY_ORB
 C:60:0:0:0:0:0:100
+T:40:cast~ a large orb of holy might at &
+T:40:chant~ powerfully
+T:15:cast~ a powerful orb of draining at &
+T:15:murmur~ deeply
+T:0:cast~ an orb of draining at & 
+T:0:mumble~
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:HEARD
 
 N:155:BEAM_ELEC
 I:6:6:0
 D:3:1:6:0:ELEC
+R:10
+T:0:shoot~ a spark of * at &
+T:0:You feel a crackling in the air.
 C:50:0:0:0:0:0:90
+F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC
+F:HEARD
 
 N:156:BEAM_ICE
 I:6:6:0
+R:12
+T:50:cast~ an icy lance at &
+T:50:murmur~ deeply
+T:0:cast~ an icy lance at & 
+T:0:mumble~
 D:4:1:6:0:ICE
 C:50:0:0:0:0:0:90
+F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC
+F:HEARD
 
 N:157:BEAM_NETHR
 I:7:6:0
+R:10
 D:3:1:6:0:NETHER
+T:50:unleash||es| a ray of death at & 
+T:50:intones with deadly menace
+T:25:hurl~ a * lance at 
+T:25:murmur~ a deadly word
+T:0:cast~ a beam of * at & 
+T:0:whisper~ nastily
 C:50:0:0:0:0:0:90
+F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC
+F:HEARD
 
 N:158:ARC_HFIRE
 I:7:6:0
-D:0:0:0:0:HELLFIRE
+T:50:invoke~ a hellfire blast around &!
+T:50:speak~ a word of peril
+T:0:gesture~, and & $ enveloped in hellfire
+T:0:mutter~ darkly
+A:60:20:60
+R:3
+D:5:6:0:0:HELLFIRE
 C:50:0:0:0:0:0:80
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
+F:HEARD
+F:POWER_ARC
 
 N:159:ARC_FORCE
 I:5:8:0
-D:0:0:0:0:FORCE
+T:0:call~ up a wall of force around &
+T:0:mutters
+A:60:20:60
+R:8
+D:3:0:0:0:FORCE
 C:40:0:0:0:0:0:90
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:HEARD
 
 N:160:HASTE
 I:6:0:0
 C:50:0:0:0:5:5:100
+F:SPECIAL_CASE
 
 N:161:ADD_MANA
 C:15:0:0:25:0:0:100
+F:SPECIAL_CASE
 
 N:162:HEAL
 I:3:0:0
 C:10:0:30:0:0:0:100
+F:SPECIAL_CASE
 
 N:163:CURE
 I:3:0:0
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:164:BLINK
 I:3:0:0
 C:27:0:0:0:10:15:100
+F:SPECIAL_CASE
 
 N:165:TPORT
 I:8:0:0
 C:3:0:0:0:20:10:100
+F:SPECIAL_CASE
 
 N:166:INVIS
 I:3:0:0
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:167:TELE_SELF_TO
 I:4:0:0
 C:30:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:168:TELE_TO
 I:4:0:0
 C:30:0:0:0:0:10:100
+F:SPECIAL_CASE
 
 N:169:TELE_AWAY
 I:8:0:0
 C:3:0:0:0:20:10:100
+F:SPECIAL_CASE
 
 N:170:TELE_LEVEL
 I:8:0:0
 C:3:0:0:0:20:10:100
+F:SPECIAL_CASE
 
 N:171:WRAITHFORM
 I:4:0:0
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:172:DARKNESS
 I:1:0:0
 C:20:0:0:0:5:0:100
+F:SPECIAL_CASE
 
 N:173:TRAPS
 I:2:0:0
 C:25:0:0:0:5:0:100
+F:SPECIAL_CASE
 
 N:174:FORGET
 I:6:0:0
 C:45:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:175:DRAIN_MANA
 I:2:0:0
 D:0:0:0:0:LOSE_MANA
 C:25:0:0:15:0:0:100
+F:SPECIAL_CASE
 
 N:176:CURSE
 I:4:6:0
 D:3:2:6:0:
 C:45:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:177:DISPEL
 I:4:0:0
 C:45:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:178:MIND_BLAST
 I:3:6:0
 D:3:2:6:0:
 C:30:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:179:ILLUSION
 I:4:0:0
 D:0:0:0:0:HALLU
 C:30:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:180:WOUND
 I:4:6:0
 D:5:2:6:0:HURT
 C:40:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:181:BLESS
 I:2:0:0
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:182:BERSERK
 I:3:0:0
 C:35:0:0:10:0:0:100
+F:SPECIAL_CASE
 
 N:183:SHIELD
 I:4:0:0
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:184:OPPOSE_ELEM
 I:3:0:0
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:185:HUNGER
 I:2:0:0
 D:0:0:0:0:HUNGER
 C:25:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:186:PROBE
 I:1:0:0
 D:0:0:0:0:PROBE
 C:50:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:187:SCARE
 I:1:0:0
 D:0:0:0:0:FEAR_WEAK
 C:25:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:188:BLIND
 I:3:0:0
 D:0:0:0:0:BLIND_WEAK
 C:30:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:189:CONF
 I:4:0:0
 D:0:0:0:0:CONFUSE_WEAK
 C:30:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:190:SLOW
 I:5:0:0
 D:0:0:0:0:SLOW_WEAK
 C:40:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:191:HOLD
 I:6:0:0
 D:0:0:0:0:SLEEP
 C:35:0:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:192:S_KIN
 I:12:0:0
+T:0:magically summon~ $ kin
+T:0:cr|y|ies| out for help
+T:0:You hear distant cries for help.
+U:6
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE | HEARD | INDIRECT
+F:SUMMON_CHAR | SELF
 
 N:193:R_KIN
 I:4:0:0
+T:0:magically reanimate~ $ kin from death
+T:0:whisper~
+T:0:You hear distant whispering.
 C:0:15:0:0:0:0:100
+D:0:0:0:0:GF_RAISE_DEAD
+R:3
+F:SPECIAL_CASE | HEARD | INDIRECT
+F:SUMMON_CHAR
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 
 N:194:A_DEAD
 I:8:0:0
 C:0:15:0:0:0:0:100
+D:0:0:0:0:GF_ANIM_DEAD
+R:3
+T:0:animates dead bodies near &
+T:0:whisper~
+T:0:You hear distant whispering.
+F:SPECIAL_CASE | HEARD | INDIRECT
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 
 N:195:S_MONSTER
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:196:S_MONSTERS
 I:15:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:197:R_MONSTER
 I:5:0:0
 C:0:15:0:0:0:0:100
+T:0:magically reanimate~ monsters
+T:0:chant~
+T:0:You hear distant chanting.
+D:0:0:0:0:GF_RAISE_DEAD
+R:3
+F:SPECIAL_CASE | HEARD | INDIRECT
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 
 N:198:R_MONSTERS
 I:6:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
+T:0:magically reanimate~ many monsters
+T:0:chant~
+T:0:You hear distant chanting.
+D:0:0:0:0:GF_RAISE_DEAD
+R:10
+F:SPECIAL_CASE | HEARD | INDIRECT | SELF
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 
 N:199:S_PLANT
 I:8:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:200:S_INSECT
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:201:S_ANIMAL
 I:12:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:202:S_HOUND
 I:14:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:203:S_SPIDER
 I:15:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:204:S_CLASS
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:205:S_RACE
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:206:S_GROUP
 I:15:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:207:S_FRIEND
 I:5:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:208:S_FRIENDS
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:209:S_ORC
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:210:S_TROLL
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:211:S_GIANT
 I:10:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:212:S_DRAGON
 I:14:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:213:S_HI_DRAGON
 I:20:0:0
 C:0:17:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:214:A_ELEMENT
 I:6:0:0
 C:0:15:0:0:0:0:100
+T:0:magically animate~ the elements around &
+T:0:chant~ in a rumbling voice
+T:0:You hear distant rumbling.
+D:0:0:0:0:GF_ANIM_ELEMENT
+R:10
+F:SPECIAL_CASE | HEARD | INDIRECT | SELF
+F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 
 N:215:A_OBJECT
 I:6:0:0
+T:0:magically animate~ the objects around &
+T:0:chant~ in a clanking voice
+T:0:You hear distant clanking.
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:216:S_DEMON
 I:14:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:217:S_HI_DEMON
 I:20:0:0
 C:0:17:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:218:R_UNIQUE
 I:25:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:219:S_UNIQUE
 I:15:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:220:S_HI_UNIQUE
 I:20:0:0
 C:0:18:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:221:S_UNDEAD
 I:12:0:0
 C:0:15:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:222:S_HI_UNDEAD
 I:20:0:0
 C:0:17:0:0:0:0:100
+F:SPECIAL_CASE
 
 N:223:S_WRAITH
 I:20:0:0
 C:0:18:0:0:0:0:100
+F:SPECIAL_CASE
 

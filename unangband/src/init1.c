@@ -318,22 +318,22 @@ static cptr blow_info_flags2[] =
 	"DIR_STOP",
 	"PANEL",
 	"LEVEL",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
+	"ALTERNATE",
+	"HEARD",
+	"INDIRECT",
+	"LIGHTNING_STROKE",
+	"CONCENTRATE_LITE",
+	"CONCENTRATE_DARK",
+	"SCALE_RADIUS",
+	"LARGE_RADIUS",
+	"MAGIC_MISSILE",
+	"POWER_ARC",
+	"ADD_AMMO",
+	"FAIL",
+	"NEED_MANA",
+	"NEED_AMMO",
+	"SPECIAL_CASE",
+	"SUMMON_CHAR",
 	"",
 	"",
 	""
@@ -2226,6 +2226,147 @@ errr parse_blow_info(char *buf, header *head)
 
 		/* Set some values */
 		blow_ptr->max_range = MAX_SIGHT;
+
+#if 0
+		/* RF4_BRTH_ACID */
+		case 96+8:
+		{
+			sound(MSG_BR_ACID);
+			break;
+		}
+
+		/* RF4_BRTH_ELEC */
+		case 96+9:
+		{
+			sound(MSG_BR_ELEC);
+			break;
+		}
+
+		/* RF4_BRTH_FIRE */
+		case 96+10:
+		{
+			sound(MSG_BR_FIRE);
+			break;
+		}
+
+		/* RF4_BRTH_COLD */
+		case 96+11:
+		{
+			sound(MSG_BR_FROST);
+			break;
+		}
+
+		/* RF4_BRTH_POIS */
+		case 96+12:
+		{
+			sound(MSG_BR_GAS);
+			break;
+		}
+
+		/* RF4_BRTH_PLAS */
+		case 96+13:
+		{
+			sound(MSG_BR_PLASMA);
+			break;
+		}
+
+		/* RF4_BRTH_LITE */
+		case 96+14:
+		{
+			sound(MSG_BR_LIGHT);
+			break;
+		}
+
+		/* RF4_BRTH_DARK */
+		case 96+15:
+		{
+			sound(MSG_BR_DARK);
+			break;
+		}
+
+		/* RF4_BRTH_CONFU */
+		case 96+16:
+		{
+			sound(MSG_BR_CONF);
+			break;
+		}
+
+		/* RF4_BRTH_SOUND */
+		case 96+17:
+		{
+			sound(MSG_BR_SOUND);
+			break;
+		}
+
+		/* RF4_BRTH_SHARD */
+		case 96+18:
+		{
+			sound(MSG_BR_SHARDS);
+			break;
+		}
+
+		/* RF4_BRTH_INERT */
+		case 96+19:
+		{
+			sound(MSG_BR_INERTIA);
+			break;
+		}
+
+		/* RF4_BRTH_GRAV */
+		case 96+20:
+		{
+			sound(MSG_BR_GRAVITY);
+			break;
+		}
+
+		/* RF4_BRTH_WIND */
+		case 96+21:
+		{
+			break;
+		}
+
+		/* RF4_BRTH_FORCE */
+		case 96+22:
+		{
+			sound(MSG_BR_FORCE);
+			break;
+		}
+
+		/* RF4_BRTH_NEXUS */
+		case 96+23:
+		{
+			sound(MSG_BR_NEXUS);
+			break;
+		}
+
+		/* RF4_BRTH_NETHR */
+		case 96+24:
+		{
+			sound(MSG_BR_NETHER);
+			break;
+		}
+
+		/* RF4_BRTH_CHAOS */
+		case 96+25:
+		{
+			sound(MSG_BR_CHAOS);
+			break;
+		}
+
+		/* RF4_BRTH_DISEN */
+		case 96+26:
+		{
+			sound(MSG_BR_DISENCHANT);
+			break;
+		}
+
+		/* RF4_BRTH_TIME */
+		case 96+27:
+		{
+			sound(MSG_BR_TIME);
+			break;
+		}
+#endif
 	}
 
 	/* Hack -- Process 'F' for flags */
@@ -2260,11 +2401,17 @@ errr parse_blow_info(char *buf, header *head)
 	{
 		int n1;
 
+		/* TODO: Define a MAX_DAMAGE and start using it */
+		int last_min = 10000;
+
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Analyze effect */
-		for (n1 = 0; blow_ptr->desc[n1].max > 0; n1++) /* loop */ ;
+		for (n1 = 0; blow_ptr->desc[n1].max > 0; n1++)
+		{
+			if (blow_ptr->desc[n1].min >  0) last_min = blow_ptr->desc[n1].min;
+		}
 
 		if (n1 >= MAX_BLOW_DESCRIPTIONS) return (PARSE_ERROR_GENERIC);
 
@@ -2284,8 +2431,7 @@ errr parse_blow_info(char *buf, header *head)
 		}
 		else
 		{
-			/* TODO: Define a MAX_DAMAGE and start using it */
-			blow_ptr->desc[n1].max = 10000;
+			blow_ptr->desc[n1].max = last_min - 1;
 		}
 
 		/* No colon */

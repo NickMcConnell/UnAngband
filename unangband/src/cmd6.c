@@ -69,7 +69,7 @@ void do_cmd_item(int command)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
-	
+
 	/* Flags we can use the item from */
 	u16b flags = cmd_item_list[command].use_from;
 
@@ -79,13 +79,13 @@ void do_cmd_item(int command)
 		msg_print("You can't see anything.");
 		return;
 	}
-	
+
 	if ((cmd_item_list[command].conditions & (CONDITION_LITE)) && (no_lite()))
 	{
 		msg_print("You have no light to read by.");
 		return;
 	}
-	
+
 	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BERSERK)) && (p_ptr->shero))
 	{
 		msg_print("You are too enraged!");
@@ -111,13 +111,13 @@ void do_cmd_item(int command)
 		/* Hack -- set sval */
 		inventory[INVEN_SELF].sval = p_ptr->pshape;
 	}
-	
+
 	/* Hack --- fuel equipment from inventory */
-	if (command == COMMAND_ITEM_FUEL) 
+	if (command == COMMAND_ITEM_FUEL)
 		p_ptr->command_wrk = (USE_EQUIP); /* TODO: this one does not work here */
-	if (command == COMMAND_ITEM_FUEL_TORCH || command == COMMAND_ITEM_FUEL_LAMP) 
+	if (command == COMMAND_ITEM_FUEL_TORCH || command == COMMAND_ITEM_FUEL_LAMP)
 		p_ptr->command_wrk = (USE_INVEN);
-	
+
 	/* Restrict choices to tval */
 	item_tester_hook = cmd_item_list[command].item_tester_hook;
 
@@ -143,7 +143,7 @@ void do_cmd_item(int command)
 		{
 			o_ptr = &o_list[0 - item];
 		}
-		
+
 		/* In a bag? */
 		if (o_ptr->tval == TV_BAG)
 		{
@@ -154,7 +154,7 @@ void do_cmd_item(int command)
 			}
 		}
 	}
-	
+
 	/* Auxiliary function */
 	cancel = !(cmd_item_list[command].player_command)(item);
 }
@@ -168,7 +168,7 @@ static bool kind_is_harmful_shroom(int k_idx)
 	for (i = 0; i < INVEN_BAG_TOTAL; i++)
 	{
 		if (bag_holds[SV_BAG_HARMFUL_MUSHROOMS][i][0] == k_ptr->tval
-			&& bag_holds[SV_BAG_HARMFUL_MUSHROOMS][i][1] == k_ptr->sval) 
+			&& bag_holds[SV_BAG_HARMFUL_MUSHROOMS][i][1] == k_ptr->sval)
 			return TRUE;
 	}
 	return FALSE;
@@ -186,7 +186,7 @@ bool item_tester_hook_food_edible(const object_type *o_ptr)
 		case TV_FOOD:
 			/* Undead cannot eat food, except harmful mushrooms */
 			if (!(p_ptr->cur_flags4 & TR4_UNDEAD)
-				|| kind_is_harmful_shroom(o_ptr->k_idx)) 
+				|| kind_is_harmful_shroom(o_ptr->k_idx))
 				return (TRUE);
 
 			break;
@@ -313,10 +313,10 @@ bool player_eat_food(int item)
 			/* First, apply breath weapon attack */
 
 			/* Then apply touch attack */
-			mon_blow_ranged(SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, RBM_TOUCH, 0, PROJECT_HIDE | PROJECT_PLAY, NULL);
+			mon_blow_ranged(SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, RBM_TOUCH, 0, PROJECT_HIDE | PROJECT_PLAY);
 
 			/* Then apply spore attack */
-			mon_blow_ranged(SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, RBM_SPORE, 0, PROJECT_HIDE | PROJECT_PLAY, NULL);
+			mon_blow_ranged(SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, RBM_SPORE, 0, PROJECT_HIDE | PROJECT_PLAY);
 
 			break;
 		}
@@ -346,7 +346,7 @@ bool player_eat_food(int item)
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
-	
+
 	/* Eaten */
 	return (!cancel);
 }
@@ -443,7 +443,7 @@ bool player_quaff_potion(int item)
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
-	
+
 	return (!cancel);
 }
 
@@ -547,7 +547,7 @@ bool player_read_scroll(int item)
 		floor_item_optimize(0 - item);
 		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
-	
+
 	return (!cancel);
 }
 
@@ -713,7 +713,7 @@ bool player_use_staff(int item)
 	/* XXX Hack -- new unstacking code */
 	o_ptr->stackc++;
 
-	/* No spare charges */	
+	/* No spare charges */
 	if (o_ptr->stackc >= o_ptr->number)
 	{
 		/* Use a charge off the stack */
@@ -724,7 +724,7 @@ bool player_use_staff(int item)
 	}
 
 	/* XXX Hack -- unstack if necessary */
-	if ((o_ptr->number > 1) && 
+	if ((o_ptr->number > 1) &&
 	((!object_charges_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
 	  (!object_charges_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
 	  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
@@ -743,7 +743,7 @@ bool player_use_staff(int item)
 
 		/* Reset stack counter */
 		i_ptr->stackc = 0;
- 
+
  		/* Unstack the used item */
  		o_ptr->number--;
 
@@ -788,7 +788,7 @@ bool player_use_staff(int item)
 	{
 		floor_item_charges(0 - item);
 	}
-	
+
 	return (!cancel);
 }
 
@@ -968,7 +968,7 @@ bool player_aim_wand(int item)
 	/* XXX Hack -- new unstacking code */
 	o_ptr->stackc++;
 
-	/* No spare charges */	
+	/* No spare charges */
 	if (o_ptr->stackc >= o_ptr->number)
 	{
 		/* Use a charge off the stack */
@@ -979,7 +979,7 @@ bool player_aim_wand(int item)
 	}
 
 	/* XXX Hack -- unstack if necessary */
-	if ((o_ptr->number > 1) && 
+	if ((o_ptr->number > 1) &&
 	((!object_charges_p(o_ptr) && (o_ptr->charges == 2) && (o_ptr->stackc > 1)) ||
 	  (!object_charges_p(o_ptr) && (rand_int(o_ptr->number) <= o_ptr->stackc) &&
 	  (o_ptr->stackc != 1) && (o_ptr->charges > 2))))
@@ -998,7 +998,7 @@ bool player_aim_wand(int item)
 
 		/* Reset stack counter */
 		i_ptr->stackc = 0;
- 
+
  		/* Unstack the used item */
  		o_ptr->number--;
 
@@ -1042,7 +1042,7 @@ bool player_aim_wand(int item)
 	{
 		floor_item_charges(0 - item);
 	}
-	
+
 	return (!cancel);
 }
 
@@ -1182,15 +1182,15 @@ bool player_zap_rod(int item)
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply rod effect */
-	/* Note we use two different sources to suppress messages 
-	   from dispel evil, in the event the rod is known 
+	/* Note we use two different sources to suppress messages
+	   from dispel evil, in the event the rod is known
 	   to be ineffective against non-evil monsters */
-	if (power >= 0) 
-		ident = process_spell(known && (o_ptr->sval >= SV_ROD_MIN_DIRECTION) 
-							  ? SOURCE_PLAYER_ZAP_NO_TARGET 
-							  : SOURCE_PLAYER_ZAP, 
+	if (power >= 0)
+		ident = process_spell(known && (o_ptr->sval >= SV_ROD_MIN_DIRECTION)
+							  ? SOURCE_PLAYER_ZAP_NO_TARGET
+							  : SOURCE_PLAYER_ZAP,
 							  o_ptr->k_idx, power, 0, &cancel, &known);
-	else 
+	else
 		return (TRUE);
 
 	/* Time rod out */
@@ -1311,22 +1311,22 @@ static void assemble_parts(int *src_sval, int *tgt_sval, const int r_idx)
 			else if (*tgt_sval == SV_ASSEMBLY_PART_HAND_L)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			break;
 		case SV_ASSEMBLY_HAND_L:
-			if (*tgt_sval == SV_ASSEMBLY_HAND_R) {*tgt_sval = SV_ASSEMBLY_HANDS;} 
-			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L;} 
+			if (*tgt_sval == SV_ASSEMBLY_HAND_R) {*tgt_sval = SV_ASSEMBLY_HANDS;}
+			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_HAND_L;}
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_L) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
 			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) &&!(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_R;}
 			break;
 		case SV_ASSEMBLY_HAND_R:
-			if (*tgt_sval == SV_ASSEMBLY_HAND_L) {*tgt_sval = SV_ASSEMBLY_HANDS;} 
-			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R;} 
+			if (*tgt_sval == SV_ASSEMBLY_HAND_L) {*tgt_sval = SV_ASSEMBLY_HANDS;}
+			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_HAND_R;}
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARMS)  {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
-			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;} 
+			else if (*tgt_sval == SV_ASSEMBLY_MISS_HAND_R) {*tgt_sval = SV_ASSEMBLY_PART_HANDS;}
 			else if ((*tgt_sval == SV_ASSEMBLY_NONE) && (r_idx) && !(r_info[r_idx].flags8 & (RF8_HAS_ARM))) {*tgt_sval = SV_ASSEMBLY_MISS_HAND_L;}
 			break;
 		case SV_ASSEMBLY_ARMS:
-			if (*tgt_sval == SV_ASSEMBLY_NONE) {*tgt_sval = SV_ASSEMBLY_PART_ARMS;} 
-			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_ARMS; *src_sval = SV_ASSEMBLY_ARM_L; } 
+			if (*tgt_sval == SV_ASSEMBLY_NONE) {*tgt_sval = SV_ASSEMBLY_PART_ARMS;}
+			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_R) {*tgt_sval = SV_ASSEMBLY_PART_ARMS; *src_sval = SV_ASSEMBLY_ARM_L; }
 			else if (*tgt_sval == SV_ASSEMBLY_PART_ARM_L) {*tgt_sval = SV_ASSEMBLY_PART_ARMS; *src_sval = SV_ASSEMBLY_ARM_R; }
 			break;
 		case SV_ASSEMBLY_HANDS:
@@ -1397,7 +1397,7 @@ bool item_tester_hook_assembly(const object_type *o_ptr)
 {
 	object_type *j_ptr;
 	int item2 = p_ptr->command_trans_item;
-	
+
 	/* Paranoia */
 	if (p_ptr->command_trans != COMMAND_ITEM_ASSEMBLE) return (FALSE);
 
@@ -1412,9 +1412,9 @@ bool item_tester_hook_assembly(const object_type *o_ptr)
 	{
 		j_ptr = &o_list[0 - item2];
 	}
-	
+
 	/* Make sure the same type */
-	if (o_ptr->name3 != j_ptr->name3) return (FALSE);	
+	if (o_ptr->name3 != j_ptr->name3) return (FALSE);
 
 	/* Re-attached assemblies to assemblies */
 	if (o_ptr->tval == TV_ASSEMBLY)
@@ -1441,7 +1441,7 @@ bool player_assembly(int item2)
 	int src_sval, tgt_sval = 0;
 
 	object_type *o_ptr, *j_ptr;
-	
+
 	int item = p_ptr->command_trans_item;
 
 	/* Paranoia */
@@ -1458,7 +1458,7 @@ bool player_assembly(int item2)
 	{
 		o_ptr = &o_list[0 - item];
 	}
-	
+
 	/* Get the item (in the pack) */
 	if (item2 >= 0)
 	{
@@ -1581,7 +1581,7 @@ bool player_assembly(int item2)
 			}
 		}
 	}
-	
+
 	return (TRUE);
 }
 
@@ -1639,11 +1639,11 @@ bool player_assemble(int item)
 		msg_print("You failed to understand it properly.");
 		return (FALSE);
 	}
-	
+
 	/* Initialise stuff for the second part of the command */
 	p_ptr->command_trans = COMMAND_ITEM_ASSEMBLE;
 	p_ptr->command_trans_item = item;
-	
+
 	return (TRUE);
 }
 
@@ -1786,7 +1786,7 @@ bool player_activate(int item)
 	{
 		if (flush_failure) flush();
 		msg_print("You failed to activate it properly.");
-		
+
 		/* Clear styles */
 		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
 
@@ -1795,7 +1795,7 @@ bool player_activate(int item)
 
 		return (TRUE);
 	}
-	
+
 	/* Item is broken */
 	if (o_ptr->ident & (IDENT_BROKEN))
 	{
@@ -1826,7 +1826,7 @@ bool player_activate(int item)
 
 	/* Paranoia */
 	if (power < 0) return (TRUE);
-	
+
 	/* Apply object effect */
 	(void)process_spell(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
 			o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), power, 0, &cancel, &known);
@@ -2021,7 +2021,7 @@ bool player_apply_rune_or_coating(int item)
 	/* Set up for second command */
 	p_ptr->command_trans = COMMAND_ITEM_APPLY;
 	p_ptr->command_trans_item = item;
-	
+
 	return (TRUE);
 }
 
@@ -2032,7 +2032,7 @@ bool player_apply_rune_or_coating(int item)
 int cmd_tester_rune_or_coating(int item)
 {
 	object_type *o_ptr;
-	
+
 	/* Get the item (in the pack) */
 	if (item >= 0)
 	{
@@ -2043,8 +2043,8 @@ int cmd_tester_rune_or_coating(int item)
 	else
 	{
 		o_ptr = &o_list[0 - item];
-	}	
-	
+	}
+
 	/* Check command */
 	if (o_ptr->tval == TV_RUNESTONE)
 		return (COMMAND_ITEM_APPLY_RUNE);
@@ -2069,7 +2069,7 @@ bool player_apply_rune_or_coating2(int item2)
 
 	int rune;
 	int tval, sval;
-	
+
 	bool aware = FALSE;
 	bool use_feat = FALSE;
 	bool brand_ammo = FALSE;
@@ -2104,7 +2104,7 @@ bool player_apply_rune_or_coating2(int item2)
 	{
 		j_ptr = &o_list[0 - item2];
 	}
-	
+
 	/* Remove coating */
 	if ((coated_p(j_ptr)) && ((j_ptr->xtra1 != o_ptr->tval) || (j_ptr->xtra2 != o_ptr->sval)))
 	{
@@ -2468,7 +2468,7 @@ bool player_apply_rune_or_coating2(int item2)
 	      floor_item_describe(item);
 	    }
 	}
-	
+
 	return (TRUE);
 }
 

@@ -2418,7 +2418,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 			PROJECT_HIDE | PROJECT_WALL);
 
 			/* The target is attacked by a ball attack */
-			(void)mon_blow_ranged(m1, 96 + 7, y2, x2, RBM_AURA, 2, flg, NULL);
+			(void)mon_blow_ranged(m1, 96 + 7, y2, x2, RBM_AURA, 2, flg);
 		}
 
 		/* Some monsters trail damage when moving */
@@ -2428,7 +2428,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 			PROJECT_HIDE | PROJECT_WALL);
 
 			/* The target is attacked by a ball attack */
-			(void)mon_blow_ranged(m1, 96 + 7, y2, x2, RBM_TRAIL, 0, flg, NULL);
+			(void)mon_blow_ranged(m1, 96 + 7, y2, x2, RBM_TRAIL, 0, flg);
 		}
 
 		/* Update monster */
@@ -2472,7 +2472,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 			PROJECT_HIDE | PROJECT_WALL);
 
 			/* The target is attacked by a ball attack */
-			(void)mon_blow_ranged(m2, 96 + 7, y1, x1, RBM_AURA, 2, flg, NULL);
+			(void)mon_blow_ranged(m2, 96 + 7, y1, x1, RBM_AURA, 2, flg);
 		}
 
 		/* Some monsters trail damage when moving */
@@ -2482,7 +2482,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
 			PROJECT_HIDE | PROJECT_WALL);
 
 			/* The target is attacked by a ball attack */
-			(void)mon_blow_ranged(m2, 96 + 7, y1, x1, RBM_TRAIL, 0, flg, NULL);
+			(void)mon_blow_ranged(m2, 96 + 7, y1, x1, RBM_TRAIL, 0, flg);
 		}
 
 		/* Update monster */

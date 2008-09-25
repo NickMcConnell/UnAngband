@@ -2579,7 +2579,7 @@
 /*
  * Maximum number of blow descriptions
  */
-#define MAX_BLOW_DESCRIPTIONS	8
+#define MAX_BLOW_DESCRIPTIONS	10
 
 /*
  * New monster blow methods
@@ -2746,9 +2746,6 @@
 #define PROJECT_EDGE         0x80000000 /* Only affect outmost 2 radius bands*/
 
 
-
-
-
 /* Melee specific flags */
 #define PR2_MELEE        0x00000001
 #define PR2_RANGED       0x08000002
@@ -2766,7 +2763,47 @@
 #define PR2_PANEL		 0x00000800
 #define PR2_LEVEL		 0x00001000
 
+/* Attack text modifiers */
+#define PR2_ALTERNATE			0x00002000
+#define PR2_HEARD				0x00004000
+#define PR2_INDIRECT			0x00008000
 
+/* Attack special effects */
+#define PR2_LIGHTNING_STRIKE	0x00010000
+#define PR2_CONCENTRATE_LITE	0x00020000
+#define PR2_CONCENTRATE_DARK	0x00040000
+#define PR2_SCALE_RADIUS		0x00080000
+#define PR2_LARGE_RADIUS		0x00100000
+#define PR2_MAGIC_MISSILE		0x00200000
+#define PR2_POWER_ARC			0x00400000
+#define PR2_ADD_AMMO	 		0x00800000
+
+/* Attack can fail */
+#define PR2_FAIL				0x01000000
+#define PR2_NEED_MANA			0x02000000
+#define PR2_NEED_AMMO			0x04000000
+#define PR2_SPECIAL_CASE		0x08000000	/* Special case in the code */
+
+/* Summoning flags to set */
+#define PR2_SUMMON_CHAR			0x10000000
+
+
+/* Actual projections */
+#define PR1_PROJECT 0xFFFFFFFF & (PROJECT_SELF)
+#define PR2_PROJECT	(PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL)
+
+
+/*
+ * Flags for attack descriptions.
+ */
+#define ATK_DESC_PRIMARY	0x01
+#define ATK_DESC_ALTERNATE	0x02
+#define ATK_DESC_HEARD		0x04
+#define ATK_DESC_INDIRECT	0x08
+#define ATK_DESC_SELF		0x10
+#define ATK_DESC_TENSE		0x20
+#define ATK_DESC_LAST		0x40
+#define ATK_DESC_EXCLAIM	0x80
 
 
 
