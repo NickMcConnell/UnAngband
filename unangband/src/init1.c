@@ -9300,7 +9300,7 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 	/* Output 'M' for "Maximum range */
 	if ((blow_ptr->max_range.base) || (blow_ptr->max_range.gain))
 	{
-		fprintf(fp, "R:");
+		fprintf(fp, "M:");
 		if (blow_ptr->max_range.base)
 		{
 			fprintf(fp,"%d", blow_ptr->max_range.base);

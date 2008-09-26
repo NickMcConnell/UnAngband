@@ -1526,7 +1526,7 @@ T:0:magically reanimate~ $ kin from death
 T:0:whisper~
 T:0:You hear distant whispering.
 C:0:15:0:0:0:0:100
-D:0:0:0:0:GF_RAISE_DEAD
+D:0:0:0:0:RAISE_DEAD
 R:3
 F:SPECIAL_CASE | HEARD | INDIRECT
 F:SUMMON_CHAR
@@ -1535,7 +1535,7 @@ F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
 N:194:A_DEAD
 I:8:0:0
 C:0:15:0:0:0:0:100
-D:0:0:0:0:GF_ANIM_DEAD
+D:0:0:0:0:ANIM_DEAD
 R:3
 T:0:animates dead bodies near &
 T:0:whisper~
@@ -1559,7 +1559,7 @@ C:0:15:0:0:0:0:100
 T:0:magically reanimate~ monsters
 T:0:chant~
 T:0:You hear distant chanting.
-D:0:0:0:0:GF_RAISE_DEAD
+D:0:0:0:0:RAISE_DEAD
 R:3
 F:SPECIAL_CASE | HEARD | INDIRECT
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -1571,7 +1571,7 @@ F:SPECIAL_CASE
 T:0:magically reanimate~ many monsters
 T:0:chant~
 T:0:You hear distant chanting.
-D:0:0:0:0:GF_RAISE_DEAD
+D:0:0:0:0:RAISE_DEAD
 R:10
 F:SPECIAL_CASE | HEARD | INDIRECT | SELF
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
@@ -1657,7 +1657,7 @@ C:0:15:0:0:0:0:100
 T:0:magically animate~ the elements around &
 T:0:chant~ in a rumbling voice
 T:0:You hear distant rumbling.
-D:0:0:0:0:GF_ANIM_ELEMENT
+D:0:0:0:0:ANIM_ELEMENT
 R:10
 F:SPECIAL_CASE | HEARD | INDIRECT | SELF
 F:BOOM | GRID | ITEM | KILL | PLAY | WALL | MAGIC
