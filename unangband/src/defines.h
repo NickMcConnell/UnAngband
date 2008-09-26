@@ -2780,8 +2780,8 @@
 
 /* Attack can fail */
 #define PR2_FAIL				0x01000000
-#define PR2_NEED_MANA			0x02000000
-#define PR2_NEED_AMMO			0x04000000
+#define PR2_EYESIGHT			0x02000000
+#define PR2_SCALE_AMMO			0x04000000
 #define PR2_SPECIAL_CASE		0x08000000	/* Special case in the code */
 
 /* Summoning flags to set */

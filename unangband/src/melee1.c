@@ -763,7 +763,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	{
 		/* Skip empty blows */
 		if (blow_ptr->desc[i].max == 0) continue;
-		
+
 		/* Skip seen and/or direct blows as required */
 		if ((div > 1) && (i % div != mod)) continue;
 
@@ -775,12 +775,12 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			if ((flg & (ATK_DESC_LAST)) || (!rand_int(++k))) c = i;
 		}
 	}
-	
+
 	msg_format("pick %d", c);
 
 	/* No valid description */
 	if (c < 0) return (c);
-	
+
 	/* Start dumping the result */
 	t = tmp_buf;
 
@@ -2190,7 +2190,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Attack needs mana to cast */
-		if (blow_ptr->flags2 & (PR2_NEED_MANA))
+		if (blow_ptr->mana_cost)
 		{
 			/* Determine mana cost */
 			int manacost = blow_ptr->mana_cost;
@@ -2200,7 +2200,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Attack needs ammunition to use */
-		if (blow_ptr->flags2 & (PR2_NEED_AMMO))
+		if (blow_ptr->ammo_tval)
 		{
 			/* Use ammunition */
 			int ammo = find_monster_ammo(who, attack - 96, FALSE);

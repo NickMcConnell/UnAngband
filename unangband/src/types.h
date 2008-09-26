@@ -279,14 +279,18 @@ struct blow_type
 
 	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
 
+	u16b sound;
+	u16b ammo_kind;	/* Ammunition kind - lookup is cached for efficiency */
+
+	byte ammo_tval;
+	byte ammo_sval;
+
 	byte arc;
 	byte diameter_of_source;
 	byte degree_factor;
-	byte sound;
 
 	byte mana_cost;
 	byte best_range;
-	byte max_range;
 	byte summon_type;
 
 	/* Monster spell/breath damage  */
@@ -308,6 +312,7 @@ struct blow_type
 
 	blow_level_scalar_type radius;
 	blow_level_scalar_type number;
+	blow_level_scalar_type max_range;
 };
 
 

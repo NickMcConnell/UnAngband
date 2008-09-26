@@ -330,8 +330,8 @@ static cptr blow_info_flags2[] =
 	"POWER_ARC",
 	"ADD_AMMO",
 	"FAIL",
-	"NEED_MANA",
-	"NEED_AMMO",
+	"EYESIGHT",
+	"SCALE_AMMO",
 	"SPECIAL_CASE",
 	"SUMMON_CHAR",
 	"",
@@ -2225,11 +2225,83 @@ errr parse_blow_info(char *buf, header *head)
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 
 		/* Set some values */
-		blow_ptr->max_range = MAX_SIGHT;
+		blow_ptr->max_range.base = MAX_SIGHT;
 
 		switch(i)
 		{
-		/* RF4_BRTH_ACID */
+			case RBM_SPORE:
+			{
+				blow_ptr->ammo_kind = 596;
+				blow_ptr->ammo_tval = TV_EGG;
+				blow_ptr->ammo_sval = SV_EGG_SPORE;
+				break;
+			}
+			case RBM_BOULDER:
+			{
+				blow_ptr->ammo_kind = 598;
+				blow_ptr->ammo_tval = TV_JUNK;
+				blow_ptr->ammo_sval = SV_JUNK_ROCK;
+				break;
+			}
+			case RBM_ARROW:
+			{
+				blow_ptr->ammo_tval = TV_ARROW;
+				blow_ptr->flags2 |= (PR2_SCALE_AMMO);
+				break;
+			}
+			case RBM_XBOLT:
+			{
+				blow_ptr->ammo_tval = TV_BOLT;
+				blow_ptr->flags2 |= (PR2_SCALE_AMMO);
+				break;
+			}
+			case RBM_SPIKE:
+			{
+				blow_ptr->ammo_kind = 345;
+				blow_ptr->ammo_tval = TV_SPIKE;
+				blow_ptr->ammo_sval = 0;
+				break;
+			}
+			case RBM_DART:
+			{
+				blow_ptr->ammo_kind = 434;
+				blow_ptr->ammo_tval = TV_POLEARM;
+				blow_ptr->ammo_sval = SV_DART;
+				break;
+			}
+			case RBM_SHOT:
+			{
+				blow_ptr->ammo_tval = TV_SHOT;
+				blow_ptr->flags2 |= (PR2_SCALE_AMMO);
+				break;
+			}
+			case RBM_FLASK:
+			{
+				blow_ptr->ammo_tval = TV_FLASK;
+				blow_ptr->ammo_sval = SV_FLASK_OIL;
+#if 0
+				if (d_dice < 7)
+				{
+					blow_ptr->ammo_tval = TV_FLASK;
+					blow_ptr->ammo_sval = SV_FLASK_OIL;
+				}
+				else
+				{
+					blow_ptr->ammo_tval = TV_POTION;
+					blow_ptr->ammo_sval = SV_POTION_DETONATIONS;
+				}
+				break;
+#endif
+			}
+			case RBM_DAGGER:
+			{
+				blow_ptr->ammo_kind = 43;
+				blow_ptr->ammo_tval = TV_SWORD;
+				blow_ptr->ammo_sval = SV_DAGGER;
+				break;
+			}
+
+			/* RF4_BRTH_ACID */
 		case 96+8:
 		{
 			blow_ptr->sound = MSG_BR_ACID;
@@ -2472,7 +2544,7 @@ errr parse_blow_info(char *buf, header *head)
 		/* Save the values */
 		blow_ptr->mana_cost = mana;
 		blow_ptr->best_range = best;
-		blow_ptr->max_range = max;
+		blow_ptr->max_range.base = max;
 	}
 
 	/* Process 'D' for "Damage" */
@@ -9171,10 +9243,15 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 	}
 
 	/* Output 'I' for "Blow information" */
-	if (blow_ptr->mana_cost || blow_ptr->best_range || blow_ptr->max_range || blow_ptr->sound || blow_ptr->diameter_of_source)
+	if (blow_ptr->best_range || blow_ptr->sound || (blow_ptr->diameter_of_source))
 	{
-		fprintf(fp, "I:%d:%d:%d:%d:%d\n",blow_ptr->mana_cost, blow_ptr->sound, blow_ptr->best_range, blow_ptr->max_range,
-				blow_ptr->diameter_of_source);
+		fprintf(fp, "I:%d:%d:%d\n",blow_ptr->sound, blow_ptr->best_range, blow_ptr->diameter_of_source);
+	}
+
+	/* Output 'W' for "Blow requirements */
+	if (blow_ptr->mana_cost || blow_ptr->ammo_tval || blow_ptr->ammo_sval)
+	{
+		fprintf(fp, "W:%d:%d:%d\n",blow_ptr->mana_cost, blow_ptr->ammo_tval, blow_ptr->ammo_sval);
 	}
 
 	/* Output 'D' for "Blow damage" */
@@ -9216,6 +9293,22 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 		if (blow_ptr->radius.gain)
 		{
 			fprintf(fp,"%d/%d", blow_ptr->radius.gain, blow_ptr->radius.levels);
+		}
+		fprintf(fp, "\n");
+	}
+
+	/* Output 'M' for "Maximum range */
+	if ((blow_ptr->max_range.base) || (blow_ptr->max_range.gain))
+	{
+		fprintf(fp, "R:");
+		if (blow_ptr->max_range.base)
+		{
+			fprintf(fp,"%d", blow_ptr->max_range.base);
+			if (blow_ptr->max_range.gain) fprintf(fp, "+");
+		}
+		if (blow_ptr->max_range.gain)
+		{
+			fprintf(fp,"%d/%d", blow_ptr->max_range.gain, blow_ptr->max_range.levels);
 		}
 		fprintf(fp, "\n");
 	}

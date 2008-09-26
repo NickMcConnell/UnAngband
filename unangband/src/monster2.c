@@ -3360,6 +3360,8 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 	{
 		int method, effect, d_dice, d_side;
 
+		blow_type *blow_ptr;
+
 		/* Skip non-attacks */
 		if (!r_ptr->blow[i].method) continue;
 
@@ -3369,90 +3371,31 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		d_dice = r_ptr->blow[i].d_dice;
 		d_side = r_ptr->blow[i].d_side;
 
-		/* Ranged? */
-		if (method < RBM_MIN_RANGED) continue;
+		/* Get the blow pointer */
+		blow_ptr  = &blow_info[method];
+		ammo_tval = blow_ptr->ammo_tval;
 
-		switch (method)
+		/* No ammo requirement */
+		if (!ammo_tval) continue;
+
+		/* Pick an item kind */
+		if (blow_ptr->flags2 & (PR2_SCALE_AMMO))
 		{
-			case RBM_SPORE:
-			{
-				ammo_kind = 596;
-				ammo_tval = TV_EGG;
-				ammo_sval = SV_EGG_SPORE;
-				break;
-			}
-			case RBM_BOULDER:
-			{
-				ammo_kind = 598;
-				ammo_tval = TV_JUNK;
-				ammo_sval = SV_JUNK_ROCK;
-				break;
-			}
-			case RBM_ARROW:
-			{
-				ammo_tval = TV_ARROW;
-				if (d_dice <= 3)  ammo_sval = SV_AMMO_NORMAL;
-				else if (d_dice <= 12) ammo_sval = SV_AMMO_STEEL;
-				else if (d_dice <= 27) ammo_sval = SV_AMMO_SPECIAL;
-				else ammo_sval = SV_AMMO_HEAVY;
-				break;
-			}
-			case RBM_XBOLT:
-			{
-				ammo_tval = TV_BOLT;
-				if (d_dice <= 4)  ammo_sval = SV_AMMO_NORMAL;
-				else if (d_dice <= 16) ammo_sval = SV_AMMO_STEEL;
-				else if (d_dice <= 36) ammo_sval = SV_AMMO_SPECIAL;
-				else ammo_sval = SV_AMMO_HEAVY;
-				break;
-			}
-			case RBM_SPIKE:
-			{
-				ammo_kind = 345;
-				ammo_tval = TV_SPIKE;
-				ammo_sval = 0;
-				break;
-			}
-			case RBM_DART:
-			{
-				ammo_kind = 434;
-				ammo_tval = TV_POLEARM;
-				ammo_sval = SV_DART;
-				break;
-			}
-			case RBM_SHOT:
-			{
-				ammo_tval = TV_SHOT;
-				if (d_dice < 2)  ammo_sval = SV_AMMO_LIGHT;
-				else if (d_dice < 8) ammo_sval = SV_AMMO_NORMAL;
-				else if (d_dice < 18) ammo_sval = SV_AMMO_STEEL;
-				else ammo_sval = SV_AMMO_HEAVY;
-				break;
-			}
-			case RBM_FLASK:
-			{
-				if (d_dice < 7)
-				{
-					ammo_tval = TV_FLASK;
-					ammo_sval = SV_FLASK_OIL;
-				}
-				else
-				{
-					ammo_tval = TV_POTION;
-					ammo_sval = SV_POTION_DETONATIONS;
-				}
-				break;
-			}
-			case RBM_DAGGER:
-			{
-				ammo_kind = 43;
-				ammo_tval = TV_SWORD;
-				ammo_sval = SV_DAGGER;
-				break;
-			}
+			/* Scale damage dice */
+			if (ammo_tval == TV_ARROW) d_dice = d_dice * 4 / 3;
+			else if (ammo_tval == TV_SHOT) d_dice = d_dice * 2;
 
-			default:
-				continue;
+			/* Get the ammunition */
+			if (d_dice <= 4)  ammo_sval = SV_AMMO_NORMAL;
+			else if (d_dice <= 16) ammo_sval = SV_AMMO_STEEL;
+			else if (d_dice <= 36) ammo_sval = SV_AMMO_SPECIAL;
+			else ammo_sval = SV_AMMO_HEAVY;
+		}
+		else
+		{
+			/* Get sval and kind */
+			ammo_sval = blow_ptr->ammo_sval;
+			ammo_kind = blow_ptr->ammo_kind;
 		}
 
 		/* Scan monster inventory */
