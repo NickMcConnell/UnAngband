@@ -96,11 +96,11 @@ static void describe_monster_desc(const monster_race *r_ptr)
 	char buf[2048];
 
 	char *s, *t;
-	
+
 	int match = (r_ptr->flags1 & (RF1_FEMALE)) ? 2 : 1;
-	
+
 	int state = 0;
-	
+
 #ifdef DELAY_LOAD_R_TEXT
 
 	int fd;
@@ -181,7 +181,7 @@ static void describe_monster_desc(const monster_race *r_ptr)
 
 	/* Terminate buffer */
 	*t = '\0';
-	
+
 	/* Dump it */
 	text_out(buf);
 
@@ -735,7 +735,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case RBM_BREATH: p = "breathes"; break;
 			case RBM_AREA: p = "affect an area"; break;
 			case RBM_LOS: p = "affect all in line of sight"; break;
-			case RBM_LINE: p = "creats a line"; break;
+			case RBM_LINE: p = "creates a line"; break;
 			case RBM_AIM: p = "affect a target"; break;
 			case RBM_ORB: p = "create an orb"; break;
 			case RBM_STAR: p = "create a star"; break;
@@ -784,7 +784,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case GF_STORM: p= "lash with wind, rain and lightning"; break;
 			case GF_WIND: p= "blast with wind"; break;
 			case GF_HELLFIRE: q="blast with hellfire";break;
-			case GF_MANA: q="blast with magic";break;       
+			case GF_MANA: q="blast with magic";break;
 			case GF_HOLY_ORB: q="blast with holy magic";break;
 			case GF_LITE_WEAK: q="light up";break;
 			case GF_DARK_WEAK: q="darken";break;
@@ -900,7 +900,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case GF_AWAY_DARK: q = "teleport away only in darkness";break;
 			case GF_AWAY_NATURE: q = "teleport away only adjacent to water or nature";break;
 			case GF_AWAY_FIRE: q = "teleport away only adjacent to fire or lava";break;
-			case GF_AWAY_JUMP: q = "jump away"; break;			
+			case GF_AWAY_JUMP: q = "jump away"; break;
 			case GF_ANIM_TREE:	q = "animate trees"; break;
 			case GF_CHARM_INSECT:	q = "charm insects"; break;
 			case GF_CHARM_REPTILE:	q = "charm reptiles or amphibians"; break;
@@ -1457,7 +1457,7 @@ static void describe_monster_toughness(const monster_race *r_ptr, const monster_
 	/* Extract a gender (if applicable) */
 	if (r_ptr->flags1 & RF1_FEMALE) msex = 2;
 	else if (r_ptr->flags1 & RF1_MALE) msex = 1;
-	
+
 	/* Describe monster "toughness" */
 	if (know_armour(r_ptr, l_ptr))
 	{
@@ -1648,7 +1648,7 @@ static void describe_monster_movement(const monster_race *r_ptr, const monster_l
 			text_out(" is found ");
 		else
 			text_out(" is normally found ");
-		
+
 		if (depth_in_feet)
 		{
 			text_out(format("at depths of %d feet",
@@ -1927,13 +1927,13 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 	char c1, c2;
 
 	char desc[80];
-	
+
 	/* Describe the monster */
 	if (m_idx)
 	{
 		/* Describe the monster */
 		monster_desc(desc, sizeof(desc), m_idx, 0x80);
-		
+
 		/* Capitalise the first letter */
 		if (islower(desc[0])) desc[0] = toupper(desc[0]);
 	}
@@ -1952,10 +1952,10 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 		{
 			my_strcpy(desc, "The ", sizeof(desc));
 		}
-		
+
 		/* Start with the name (thus nominative and objective) */
 		my_strcat(desc, r_name + r_ptr->name, sizeof(desc));
-		
+
 		/* Fix up genderised descriptions manually */
 		for (t = s = desc; *s; s++)
 		{
@@ -1969,11 +1969,11 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 				*t++ = *s;
 			}
 		}
-		
+
 		/* Terminate */
 		*t = '\0';
 	}
-	
+
 	/* Get the chars */
 	c1 = r_ptr->d_char;
 	c2 = r_ptr->x_char;
@@ -2069,7 +2069,7 @@ void screen_monster_look(const int m_idx)
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_race race;
-		
+
 	/* Scale monster */
 	if (((r_ptr->flags9 & RF9_LEVEL_MASK) == 0)
 			&& monster_scale(&race, m_idx, p_ptr->depth))
@@ -2081,7 +2081,7 @@ void screen_monster_look(const int m_idx)
 	{
 		COPY(&race, r_ptr, monster_race);
 	}
-	
+
 	/* Remove genders */
 	if ((race.flags1 & (RF1_FEMALE)) && (m_idx % 2)) race.flags1 &= ~(RF1_MALE);
 	else if (race.flags1 & (RF1_MALE)) race.flags1 &= ~(RF1_FEMALE);

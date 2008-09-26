@@ -282,7 +282,7 @@ struct blow_type
 	byte arc;
 	byte diameter_of_source;
 	byte degree_factor;
-	byte unused;
+	byte sound;
 
 	byte mana_cost;
 	byte best_range;
