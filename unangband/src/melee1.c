@@ -835,11 +835,9 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 		/* Handle effect */
 		else if (*s == '*')
 		{
-#if 0
 			/* Append the name */
-			cptr u = effect_text + effect_info[effect].text;
+			cptr u = effect_text + effect_info[effect].desc[0];
 			while (*u) *t++ = *u++;
-#endif
 		}
 
 		/* Handle participle */

@@ -1,0 +1,449 @@
+# File: effect.txt
+
+
+# This file is used to initialize the "lib/data/effect.raw" file, which
+# is used to initialize the "effect" information for the Angband game.
+
+# Do not modify this file unless you know exactly what you are doing,
+# unless you wish to risk possible system crashes and broken savefiles.
+# After modifying this file, delete the "lib/data/effect.raw" file.
+
+# See "lib/docs/modding.rtf" to understand this file and how to modify
+# it and related files.
+
+# Version stamp (required)
+
+
+V:0.6.3
+
+N:0:NOTHING
+D:do:::nothing::
+
+N:1:STORM
+D:lash:::with wind, rain and lightning::
+
+N:2:WIND
+D:blast:::with wind::
+
+N:3:HELLFIRE
+D:blast:::with hellfire::
+
+N:4:MANA
+D:blast:::with magic::
+
+N:5:HOLY_ORB
+D:blast:::with holy magic::
+
+N:6:LITE_WEAK
+D:light:up::::
+
+N:7:DARK_WEAK
+D:plunge:into darkness::::
+
+N:8:WATER_WEAK
+D:soak:::with water::
+
+N:9:PLASMA
+D:blast:::with plasma::
+
+N:10:METEOR
+D:blast:::with meteors::
+
+N:11:ICE
+D:cover:::with ice::
+
+N:12:GRAVITY
+D:crush:::with gravity::
+
+N:13:INERTIA
+D:slow:::with inertia::
+
+N:14:FORCE
+D:impact:::with force::
+
+N:15:TIME
+D:take:::back in time::
+
+N:16:ACID
+D:dissolve:::::
+
+N:17:ELEC
+D:electrify:::::
+
+N:18:FIRE
+D:burn:::::
+
+N:19:COLD
+D:freeze:::::
+
+N:20:POISON
+D:poison:::::
+
+N:21:ANIM_DEAD
+D:animate::dead:::
+
+N:22:LITE
+D:blast:::with powerful light::
+
+N:23:DARK
+D:blast:::with powerful darkness::
+
+N:24:WATER
+D:blast:::with water::
+
+N:25:CONFUSE
+D:confuse:::::
+
+N:26:SOUND
+D:deafen:::::
+
+N:27:SHARD
+D:blast:::with shards::
+
+N:28:NEXUS
+D:blast:::with nexus::
+
+N:29:NETHER
+D:blast:::with nether::
+
+N:30:CHAOS
+D:blast:::with chaos::
+
+N:31:DISENCHANT
+D:blast:::with disenchantment::
+
+N:32:EXPLODE
+D:explode:::::
+
+N:33:KILL_WALL
+D:remove:rock from::::
+
+N:34:KILL_DOOR
+D:remove:doors from::::
+
+N:35:KILL_TRAP
+D:remove:traps from::::
+
+N:36:MAKE_WALL
+D:create:walls around::::
+
+N:37:MAKE_DOOR
+D:create:doors around::::
+
+N:38:MAKE_TRAP
+D:create:traps around::::
+
+N:39:BRIDGE
+D:create:a stone bridge under::::
+
+N:40:ANIM_ELEMENT
+D:animate::elements:::
+
+N:41:AWAY_UNDEAD
+D:teleport:::away if undead::
+
+N:42:AWAY_EVIL
+D:teleport:::away if evil::
+
+N:43:AWAY_ALL
+D:teleport:::away::
+
+N:44:TURN_UNDEAD
+D:turn:::if undead::
+
+N:45:TURN_EVIL
+D:turn:::if evil::
+
+N:46:FEAR_WEAK
+D:scare:::::
+
+N:47:DISPEL_UNDEAD
+D:dispel:::if undead::
+
+N:48:DISPEL_EVIL
+D:dispel:::if evil::
+
+N:49:DISPEL_ALL
+D:dispel:::::
+
+N:50:ANIM_OBJECT
+D:animate::objects:::
+
+N:51:CLONE
+D:clone:::::
+
+N:52:POLYMORPH
+D:polymorph:::::
+
+N:53:HEAL
+D:heal:::::
+
+N:54:HASTE
+D:hasten:::::
+
+N:55:SLOW_WEAK
+D:slow:::::
+
+N:56:CONFUSE_WEAK
+D:confuse:::::
+
+N:57:SLEEP
+D:send:::to sleep::
+
+N:58:DRAIN_LIFE
+D:drain:life from::::
+
+N:59:BWATER
+D:scald:::with boiling water::
+
+N:60:BMUD
+D:splash:::with boiling mud::
+
+N:61:HURT
+D:attack:::::
+
+N:62:LAVA
+D:burn:::with lava::
+
+N:63:UN_BONUS
+D:disenchant:::::
+
+N:64:UN_POWER
+D:drain::charges from:::
+
+N:65:EAT_GOLD
+D:steal::gold from:::
+
+N:66:EAT_ITEM
+D:steal::items from:::
+
+N:67:EAT_FOOD
+D:eat:::r food::
+
+N:68:EAT_LITE
+D:absorb::light from:::
+
+N:69:FALL
+D:drop:::into a pit::
+
+N:70:FALL_MORE
+D:drop:::through the floor::
+
+N:71:FALL_SPIKE
+D:drop:::into a spiked pit::
+
+N:72:FALL_POISON
+D:drop:::into a poison spiked pit::
+
+N:73:BLIND
+D:blind:::::
+
+N:74:SLOW
+D::::::
+
+N:75:TERRIFY
+D:terrify:::::
+
+N:76:PARALYZE
+D:paralyze:::::
+
+N:77:LOSE_STR
+D:reduce:strength and size from::::
+
+N:78:LOSE_INT
+D:reduce:intelligence from::::
+
+N:79:LOSE_WIS
+D:reduce:wisdom from::::
+
+N:80:LOSE_DEX
+D:reduce:dexterity and agility from::::
+
+N:81:LOSE_CON
+D:reduce:constitution from::::
+
+N:82:LOSE_CHR
+D:reduce:charisma from::::
+
+N:83:LOSE_ALL
+D:reduce:all stats from::::
+
+N:84:SHATTER
+D:shatter:::::
+
+N:85:EXP_10
+D:drain:experience (by 10d6+) from::::
+
+N:86:EXP_20
+D:drain:experience (by 20d6+) from::::
+
+N:87:EXP_40
+D:drain:experience (by 40d6+) from::::
+
+N:88:EXP_80
+D:drain:experience (by 80d6+) from::::
+
+N:89:RAISE
+D:raise:water around::::
+
+N:90:LOWER
+D:lower:water around::::
+
+N:91:PROBE
+D::::::
+
+N:92:LOCK_DOOR
+D:magically lock:doors on::::
+
+N:93:SALT_WATER
+D:soak:::with salt water::
+
+N:94:HALLU
+D:space out:::::
+
+N:95:FEATURE
+D::::::
+
+N:96:STEAM
+D:scald:::with steam::
+
+N:97:VAPOUR
+D:dissolve:::with acidic vapour::
+
+N:98:SMOKE
+D:burn:::with smoke::
+
+N:99:SUFFOCATE
+D:suffocate:::::
+
+N:100:HUNGER
+D:starve:::::
+
+N:101:DISEASE
+D:infect:::with disease::
+
+N:102:LOSE_MANA
+D:drain:mana from::::
+
+N:103:WOUND
+D:wound:::::
+
+N:104:BATTER
+D:batter:::::
+
+N:105:BLIND_WEAK
+D:blind:::::
+
+N:106:RAISE_DEAD
+D:raise::dead:::
+
+N:107:GAIN_MANA
+D:return:mana to::::
+
+N:108:FORGET
+D:forget:::::
+
+N:109:CURSE
+D:curse:::::
+
+N:110:DISPEL
+D:remove:enchantments from::::
+
+N:111:STASTIS
+D:trap:::in time loops::
+
+N:112:PETRIFY
+D:petrify:::::
+
+N:113:WEB
+D:build:webs around::::
+
+N:114:BLOOD
+D:cover:::in blood::
+
+N:115:SLIME
+D:cover:::in slime::
+
+N:116:RESIST_MAGIC
+D::::::
+
+N:117:FALL_LESS
+D:rise:::through the ceiling::
+
+N:118:AWAY_DARK
+D:teleport:::away only in darkness::
+
+N:119:AWAY_JUMP
+D:jump:::away to a location still in line of fire::
+
+N:120:HURT_WOOD
+D:warp::wood out of shape:::
+
+N:121:AWAY_NATURE
+D:teleport:::away if adjacent to water or nature::
+
+N:122:AWAY_FIRE
+D:teleport:::away if adjacent to fire, smoke or lava::
+
+N:123:ANIM_TREE
+D:animate::trees:::
+
+N:124:CHARM_INSECT
+D:charm::insects:::
+
+N:125:CHARM_ANIMAL
+D:charm::birds or mammals:::
+
+N:126:CHARM_REPTILE
+D:charm::reptiles or amphibians:::
+
+N:127:CHARM_MONSTER
+D:charm::living monsters other than dragons:::
+
+N:128:CHARM_PERSON
+D:charm::elves, dwarves, humans, orcs, trolls or giants:::
+
+N:129:BIND_DEMON
+D:bind::demons to a cursed item:::
+
+N:130:BIND_UNDEAD
+D:bind::undead to a cursed item:::
+
+N:131:BIND_DRAGON
+D:bind::dragons to a cursed item:::
+
+N:132:BIND_FAMILIAR
+D:bind::a familiar to you:::
+
+N:133:VAMP_DRAIN
+D:drain:health from::::
+
+N:134:MANA_DRAIN
+D:drain:mana from::::
+
+N:135:MENTAL
+D:blast:::with mental energy::
+
+N:136:SNUFF
+D:snuff:the life from::if they have less than a maximum:of:
+
+N:137:RAGE
+D:enrage:::::
+
+N:138:HEAL_PERC
+D:heal:::::
+
+N:139:GAIN_MANA_PERC
+D:return:mana to::::
+
+N:140:TANGLE
+D:entangle:::with nearby plants or waterweeds::
+
+N:141:POISON_WATER
+D:soak:::with poisonous water::
+
+N:142:INVISIBILITY
+D::::::
+
+N:143:DELAY_POISON
+D::::::

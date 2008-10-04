@@ -1926,6 +1926,18 @@ errr parse_z_info(char *buf, header *head)
 		z_info->blow_max = max;
 	}
 
+	/* Process 'e' for "Maximum effect_info[] subindex" */
+	else if (buf[2] == 'e')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->effect_max = max;
+	}
+
 	/* Process 'Q' for "Maximum q_info[] subindex" */
 	else if (buf[2] == 'Q')
 	{
@@ -2177,6 +2189,7 @@ static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
 
 	return (0);
 }
+
 
 /*
  * Initialize the "project_info" array, by parsing an ascii "template" file
@@ -2585,7 +2598,7 @@ errr parse_blow_info(char *buf, header *head)
 		blow_ptr->dam_mult = mult;
 		blow_ptr->dam_div = div;
 		blow_ptr->dam_var = var;
-		blow_ptr->dam_max = max;
+		(void)max;
 	}
 
 	/* Process 'C' for "Choice" */
@@ -2658,6 +2671,166 @@ errr parse_blow_info(char *buf, header *head)
 	return (0);
 
 }
+
+
+/*
+ * Grab one effect flag in a effect_type from a textual string
+ */
+static errr grab_one_effect_flag(effect_type *effect_ptr, cptr what)
+{
+	if (grab_one_flag(&effect_ptr->flags1, blow_info_flags1, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown effect flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+
+	return (0);
+}
+
+
+/*
+ * Initialize the "project_info" array, by parsing an ascii "template" file
+ */
+errr parse_effect_info(char *buf, header *head)
+{
+	int i;
+
+	char *s, *t;
+
+	/* Current entry */
+	static effect_type *effect_ptr = NULL;
+
+	/* Process 'N' for "New/Number/Name" */
+	if (buf[0] == 'N')
+	{
+		/* Find the colon before the name */
+		s = strchr(buf+2, ':');
+
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
+
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the index */
+		i = atoi(buf+2);
+
+		/* Verify information */
+		if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+
+		/* Verify information */
+		if (i >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+
+		/* Save the index */
+		error_idx = i;
+
+		/* Point at the "info" */
+		effect_ptr = (effect_type*)head->info_ptr + i;
+
+		/* Store the name */
+		if (!(effect_ptr->name = add_name(head, s)))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+
+	}
+
+	/* Process 'D' for "Description" */
+	else if (buf[0] == 'D')
+	{
+		int j;
+
+		/* There better be a current effect_ptr */
+		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Loop through string */
+		for (j = 0, s = buf+2; (j < 6) && s; s = t, j++)
+		{
+			/* Find the colon before the description */
+			t = strchr(s, ':');
+
+			/* Verify that colon */
+			if (t)
+			{
+				/* Nuke the colon, advance to the name */
+				*t++ = '\0';
+			}
+
+			/* Store the text */
+			if (!add_text(&(effect_ptr->info[j]),head, s))
+				return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+	}
+
+	/* Process 'T' for "Text" */
+	else if (buf[0] == 'T')
+	{
+		int j;
+
+		/* There better be a current effect_ptr */
+		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Loop through string */
+		for (j = 0, s = buf+2; (j < 2) && s; s = t, j++)
+		{
+			/* Find the colon before the description */
+			t = strchr(s, ':');
+
+			/* Verify that colon */
+			if (t)
+			{
+				/* Nuke the colon, advance to the name */
+				*t++ = '\0';
+			}
+
+			/* Store the text */
+			if (!add_text(&(effect_ptr->desc[j]),head, s))
+				return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+	}
+
+	/* Hack -- Process 'F' for flags */
+	else if (buf[0] == 'F')
+	{
+		/* There better be a current effect_ptr */
+		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_effect_flag(effect_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	else
+	{
+		/* Oops */
+		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
+	}
+
+	/* Success */
+	return (0);
+
+}
+
 
 
 /*
@@ -9210,6 +9383,10 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 
 	cptr s;
 
+	cptr p = NULL;
+	cptr t = NULL;
+
+
 	/* Point at the "info" */
 	blow_type *blow_ptr = (blow_type*)head->info_ptr + i;
 
@@ -9254,10 +9431,10 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 		fprintf(fp, "W:%d:%d:%d\n",blow_ptr->mana_cost, blow_ptr->ammo_tval, blow_ptr->ammo_sval);
 	}
 
-	/* Output 'D' for "Blow damage" */
-	if (blow_ptr->dam_mult || blow_ptr->dam_div || blow_ptr->dam_var || blow_ptr->dam_max || blow_ptr->d_res)
+	/* Output 'X' for "Extra damage" */
+	if (blow_ptr->dam_mult || blow_ptr->dam_div || blow_ptr->dam_var || blow_ptr->d_res)
 	{
-		fprintf(fp, "D:%d:%d:%d:%d:%s\n",blow_ptr->dam_mult, blow_ptr->dam_div, blow_ptr->dam_var, blow_ptr->dam_max,
+		fprintf(fp, "X:%d:%d:%d:%s\n",blow_ptr->dam_mult, blow_ptr->dam_div, blow_ptr->dam_var,
 			r_info_blow_effect[blow_ptr->d_res]);
 	}
 
@@ -9332,6 +9509,81 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", blow_ptr->flags1, blow_info_flags1);
 	emit_flags_32(fp, "F:", blow_ptr->flags2, blow_info_flags2);
+
+	/* Get the method */
+	switch (i)
+	{
+		case RBM_HIT: p = "hit~"; t = "one target"; break;
+		case RBM_SPIT: p = "spit~"; t = "one target"; break;
+		case RBM_GAZE: p = "gaze~"; t = "one target"; break;
+		case RBM_WAIL: p = "wail~"; t = "one target"; break;
+		case RBM_SPORE: t = "one adjacent target"; break;
+		case RBM_LASH: t = "one adjacent target"; break;
+	case RBM_BEG: t = "one adjacent target"; break;
+	case RBM_INSULT: t = "one adjacent target"; break;
+	case RBM_MOAN: t = "one adjacent target"; break;
+	case RBM_SING: t = "one adjacent target"; break;
+	case RBM_TRAP: t = "one adjacent target"; break;
+	case RBM_BOULDER: t = "one adjacent target"; break;
+		case RBM_AURA: p = "surround~ & with an aura";  t = "$ enemies"; break;
+		case RBM_SELF: t = "&"; break;
+		case RBM_ADJACENT: t = "all enemies adjacent to &"; break;
+		case RBM_HANDS: t = "a beam"; break;
+		case RBM_MISSILE: p = "create~ a missile"; t = "$ enemies"; break;
+		case RBM_BOLT_10: p = "create~ a bolt"; t = "$ enemies"; break;
+		case RBM_BOLT: p = "create~ a powerful bolt";  t = "$ enemies"; break;
+		case RBM_BEAM: p = "create~ a beam"; t = "$ enemies";break;
+		case RBM_BLAST: p = "create~ an adjacent blast"; t = "$ enemies"; break;
+		case RBM_WALL: p = "create~ a wall"; t = "$ enemies"; break;
+		case RBM_BALL: p = "create~ a ball"; t = "$ enemies"; break;
+		case RBM_CLOUD: p = "create~ a cloud"; t = "$ enemies"; break;
+		case RBM_STORM: p = "create~ a storm"; t = "$ enemies"; break;
+		case RBM_BREATH: p = "breathe~";  t = "$ enemies"; break;
+		case RBM_AREA: p = "surround~ & with magic"; break;
+		case RBM_LOS: t = "all $ enemies in line of sight"; break;
+		case RBM_LINE: t = "one direction"; break;
+		case RBM_AIM: t = "one target"; break;
+		case RBM_ORB: p = "create~ an orb"; t = "$ enemies"; break;
+		case RBM_STAR: p = "surround~ & with a star"; t = "$ enemies"; break;
+		case RBM_SPHERE: p = "create~ a sphere";  t = "$ enemies"; break;
+		case RBM_PANEL: t = "the current panel"; break;
+		case RBM_LEVEL: t = "the current level"; break;
+		case RBM_CROSS: p = "surround~ & with a cross"; t = "$ enemies"; break;
+		case RBM_STRIKE: p = "strike~"; t = "$ enemy"; break;
+		case RBM_EXPLODE: t = "& and all enemies adjacent to &"; break;
+		case RBM_ARROW: p = "create~ an arrow"; t="one target"; break;
+		case RBM_XBOLT: p = "create~ a crossbow bolt"; t="one target"; break;
+		case RBM_DAGGER: p = "create~ a dagger"; t="one target"; break;
+		case RBM_DART: p = "create~ a dart"; t="one target"; break;
+		case RBM_SHOT: p = "create~ a shot"; t="one target"; break;
+		case RBM_ARC_20: p = "create~ an arc"; break;
+		case RBM_ARC_30: p = "create~ an arc"; break;
+		case RBM_ARC_40: p = "create~ an arc"; break;
+		case RBM_ARC_50: p = "create~ an arc"; break;
+		case RBM_ARC_60: p = "create~ an arc"; break;
+		case RBM_FLASK: p = "create~ a ball"; t = "$ enemies"; break;
+	case RBM_TRAIL: t = "one adjacent target"; break;
+	case RBM_SHRIEK: t = "one adjacent target"; break;
+		case RBM_BOLT_MINOR: p = "create~ a bolt"; t = "$ enemies"; break;
+		case RBM_BALL_MINOR: p = "throw~ a ball"; t = "$ enemies"; break;
+		case RBM_BALL_II: p = "create~ a ball"; t = "$ enemies"; break;
+		case RBM_BALL_III: p = "create~ a ball"; t = "$ enemies"; break;
+		case RBM_AURA_MINOR: p = "surround~ & with an aura";  t = "$ enemies"; break;
+		case RBM_8WAY: p = "create~ a beam in 8 directions"; t = "$ enemies"; break;
+		case RBM_8WAY_II: p = "create~ a beam in 8 directions"; t = "$ enemies"; break;
+		case RBM_8WAY_III: p = "create~ a beam in 8 directions"; t = "$ enemies"; break;
+		case RBM_SWARM: p = "create~ multiple balls"; t = "$ enemies"; break;
+		case RBM_SPIKE: p = "create~ a spike"; t="one target"; break;
+		case RBM_AIM_AREA: p = "affect~ an area"; break;
+		case RBM_SCATTER: p = "scatter~ magic around &"; t = "$ enemies"; break;
+	}
+
+	/* Output 'D' for Description */
+	fprintf(fp, "D:");
+	if (p) fprintf(fp, "%s:", p);
+	else fprintf(fp, ":");
+	if (t) fprintf(fp, "%s", t);
+	fprintf(fp, "\n");
 
 	fprintf(fp, "\n");
 
@@ -10362,165 +10614,35 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 }
 
 
-#if 0
 /*
  * Emit the "o_info" array into an ascii "template" file
  */
 errr emit_effect_info_index(FILE *fp, header *head, int i)
 {
 	/* Current entry */
-	spell_type *s_ptr = (spell_type*)head->info_ptr + i;
+	effect_type *effect_ptr = (effect_type*)head->info_ptr + i;
+
+	int j;
 
 	/* Output 'N' for "New/Number/Name" */
-	fprintf(fp, "N:%d:%s\n", i,r_info_blow_effect[i]);
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + effect_ptr->name);
 
-	/* Get the effect */
-	switch (effect)
+	/* Output 'D' for Description */
+	fprintf(fp, "D");
+	for (j = 0; j < 6; j++)
 	{
-		case GF_NOTHING: q = "do"; u = "nothing"; break;
-		case GF_STORM: q= "lash"; u = "with wind, rain and lightning"; break;
-		case GF_WIND: q= "blast"; u = "with wind"; break;
-		case GF_HELLFIRE: q="blast"; u = "with hellfire";break;
-		case GF_MANA: q="blast"; u = "with magic";break;
-		case GF_HOLY_ORB: q="blast"; u = "with holy magic";break;
-		case GF_LITE_WEAK: q="light"; s ="up";break;
-		case GF_DARK_WEAK: q="plunge"; s ="into darkness"; break;
-		case GF_WATER_WEAK: q="soak"; u = "with water";break;
-		case GF_POISON_WATER: q="soak"; u = "with poisonous water";break;
-		case GF_SALT_WATER: q="soak"; u = "with salt water";break;
-		case GF_PLASMA: q="blast"; u = "with plasma";break;
-		case GF_METEOR: q="blast"; u = "with meteors";break;
-		case GF_ICE: q="cover"; u = "with ice";break;
-		case GF_GRAVITY: q="crush"; u = "with gravity";break;
-		case GF_INERTIA: q="slow"; u = "with inertia";break;
-		case GF_FORCE: q="impact"; u = "with force";break;
-		case GF_TIME: q="take"; u = "back in time";break;
-		case GF_ACID:   q = "dissolve"; break;
-		case GF_ELEC:   q = "electrify"; break;
-		case GF_FIRE:   q = "burn"; break;
-		case GF_COLD:   q = "freeze"; break;
-		case GF_POIS: q = "poison"; break;
-		case GF_ANIM_DEAD: q = "animate"; t = "dead"; break;
-		case GF_LITE: q = "blast"; u = "with powerful light";break;
-		case GF_DARK: q = "blast"; u = "with powerful darkness";break;
-		case GF_WATER: q="blast"; u = "with water";break;
-	        case GF_CONFUSION:      q = "confuse"; break;
-		case GF_SOUND: q = "deafen";break;
-		case GF_SHARD: q = "blast"; u = "with shards";break;
-		case GF_NEXUS: q = "blast"; u = "with nexus";break;
-		case GF_NETHER: q = "blast"; u = "with nether";break;
-		case GF_CHAOS: q = "blast"; u = "with chaos";break;
-		case GF_DISENCHANT: q = "blast"; u = "with disenchantment";break;
-		case GF_KILL_WALL: q = "remove"; s = "rock from"; break;
-		case GF_KILL_DOOR: q = "remove"; s = "doors from"; break;
-		case GF_KILL_TRAP: q = "remove"; s = "traps from"; break;
-		case GF_MAKE_WALL: q = "create"; s = "walls around"; break;
-		case GF_MAKE_DOOR: q = "create"; s = "doors around"; break;
-		case GF_MAKE_TRAP: q = "create"; s = "traps around"; break;
-		case GF_BRIDGE: q = "create"; s = "a stone bridge under"; break;
-		case GF_ANIM_ELEMENT: q = "animate"; t = "elements"; break;
-		case GF_AWAY_UNDEAD: q = "teleport"; u="away if undead";break;
-		case GF_AWAY_EVIL: q = "teleport"; u="away if evil";break;
-		case GF_AWAY_ALL: q = "teleport"; u = "away";break;
-		case GF_AWAY_DARK: q = "teleport"; u = "away only in darkness";break;
-		case GF_AWAY_NATURE: q = "teleport"; u = "away if adjacent to water or nature"; break;
-		case GF_AWAY_FIRE: q = "teleport"; u = "away if adjacent to fire, smoke or lava"; break;
-		case GF_AWAY_JUMP: q = "jump"; u = "away to a location still in line of fire"; break;
-		case GF_TURN_UNDEAD: q = "turn"; u="if undead"; break;
-		case GF_TURN_EVIL: q = "turn"; u="if evil"; break;
-		case GF_FEAR_WEAK: q = "scare";break;
-		case GF_DISP_UNDEAD: q = "dispel"; u="if undead"; break;
-		case GF_DISP_EVIL: q = "dispel"; u="if evil"; break;
-		case GF_DISP_ALL: q = "dispel";break;
-		case GF_ANIM_OBJECT: q = "animate"; t = "objects"; break;
-		case GF_CLONE: q = "clone";break;
-		case GF_POLY: q = "polymorph";break;
-		case GF_HEAL: case GF_HEAL_PERC: q = "heal";break;
-		case GF_HASTE: q = "hasten";break;
-		case GF_SLOW_WEAK: q = "slow";break;
-		case GF_CONF_WEAK: q = "confuse";break;
-		case GF_SLEEP: q = "send"; u="to sleep";break;
-		case GF_DRAIN_LIFE: q = "drain"; s="life from";break;
-		case GF_LAVA: q = "burn"; u="with lava";break;
-		case GF_BWATER: q = "scald"; u="with boiling water";break;
-		case GF_BMUD: q = "splash"; u="with boiling mud";break;
-		case GF_HURT:   q = "attack"; break;
-		case GF_UN_BONUS:       q = "disenchant"; break;
-		case GF_UN_POWER:       q = "drain"; t = "charges from"; break;
-		case GF_EAT_GOLD:       q = "steal"; t = "gold from"; break;
-		case GF_EAT_ITEM:       q = "steal"; t = "items from"; break;
-		case GF_EAT_FOOD:       q = "eat"; u="r food"; break;
-		case GF_EAT_LITE:       q = "absorb"; t = "light from"; break;
-		case GF_FALL: q = "drop"; u="into a pit";break;
-		case GF_FALL_MORE: q = "drop"; u="through the floor";break;
-		case GF_FALL_LESS: q = "rise"; u="through the ceiling";break;
-		case GF_FALL_SPIKE: q = "drop"; u="into a spiked pit";break;
-		case GF_FALL_POIS: q = "drop"; u="into a poison spiked pit";break;
-		case GF_BLIND:  q = "blind"; break;
-		case GF_TERRIFY:	q = "terrify"; break;
-		case GF_PARALYZE:       q = "paralyze"; break;
-		case GF_LOSE_STR:       q = "reduce"; s="strength and size from"; break;
-		case GF_LOSE_INT:       q = "reduce"; s="intelligence from"; break;
-		case GF_LOSE_WIS:       q = "reduce"; s="wisdom from"; break;
-		case GF_LOSE_DEX:       q = "reduce"; s="dexterity and agility from"; break;
-		case GF_LOSE_CON:       q = "reduce"; s="constitution from"; break;
-		case GF_LOSE_CHR:       q = "reduce"; s="charisma from"; break;
-		case GF_LOSE_ALL:       q = "reduce"; s="all stats from"; break;
-		case GF_SHATTER:	q = "shatter"; break;
-		case GF_EXP_10: q = "drain"; s="experience (by 10d6+) from"; break;
-		case GF_EXP_20: q = "drain"; s="experience (by 20d6+) from"; break;
-		case GF_EXP_40: q = "drain"; s="experience (by 40d6+) from"; break;
-		case GF_EXP_80: q = "drain"; s="experience (by 80d6+) from"; break;
-		case GF_RAISE:      q = "raise"; s = "water around"; break;
-		case GF_LOWER:		q = "lower"; s = "water around"; break;
-		case GF_PROBE: q = "probe"; q = NULL; break;
-		case GF_LOCK_DOOR: q = "magically lock"; s = "doors on"; break;
-		case GF_HALLU: q = "space out"; break;
-		case GF_STEAM:	q = "scald"; u="with steam"; break;
-		case GF_VAPOUR:	q = "dissolve"; u="with acidic vapour"; break;
-		case GF_SMOKE:	q = "burn"; u="with smoke"; break;
-		case GF_SUFFOCATE:	q = "suffocate"; break;
-		case GF_HUNGER:		q = "starve"; break;
-		case GF_DISEASE:	q = "infect"; u="with disease"; break;
-		case GF_LOSE_MANA:	q = "drain"; s= "mana from"; break;
-		case GF_WOUND:		q = "wound"; break;
-		case GF_BATTER:		q = "batter"; break;
-		case GF_BLIND_WEAK:		q = "blind"; break;
-		case GF_RAISE_DEAD: q = "raise"; t = "dead"; break;
-		case GF_GAIN_MANA: case GF_GAIN_MANA_PERC:	q = "return"; s= "mana to"; break;
-		case GF_FORGET:		q = "forget"; break;
-		case GF_CURSE:		q = "curse"; break;
-		case GF_DISPEL:		q = "remove"; s = "enchantments from"; break;
-		case GF_STASTIS:	q = "trap"; u= "in time loops"; break;
-		case GF_PETRIFY:	q = "petrify"; break;
-		case GF_WEB:		q = "build"; s = "webs around"; break;
-		case GF_BLOOD:		q = "cover"; u = "in blood"; break;
-		case GF_SLIME:		q = "cover"; u = "in slime"; break;
-		case GF_HURT_WOOD:	q = "warp"; t = "wood out of shape"; break;
-		case GF_ANIM_TREE:	q = "animate"; t = "trees"; break;
-		case GF_CHARM_INSECT:	q = "charm"; t = "insects"; break;
-		case GF_CHARM_REPTILE:	q = "charm"; t = "reptiles or amphibians"; break;
-		case GF_CHARM_ANIMAL:	q = "charm"; t = "birds or mammals"; break;
-		case GF_CHARM_MONSTER:	q = "charm"; t = "living monsters other than dragons"; break;
-		case GF_CHARM_PERSON:	q = "charm"; t = "elves, dwarves, humans, orcs, trolls or giants"; break;
-		case GF_BIND_DEMON:		q = "bind"; t = "demons to a cursed item"; break;
-		case GF_BIND_DRAGON:	q = "bind"; t = "dragons to a cursed item"; break;
-		case GF_BIND_UNDEAD:	q = "bind"; t = "undead to a cursed item"; break;
-		case GF_BIND_FAMILIAR:	q = "bind"; t = "a familiar to you"; break;
-		case GF_VAMP_DRAIN:	q = "drain"; s = "health from"; break;
-		case GF_MANA_DRAIN:	q = "drain"; s = "mana from"; break;
-		case GF_SNUFF:		q = "snuff"; s = "the life from"; u ="if they have less than a maximum"; v="of";break;
-		case GF_RAGE:		q = "enrage"; break;
-		case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
-		case GF_TANGLE:		q = "entangle"; u = "with nearby plants or waterweeds"; break;
-		case GF_EXPLODE: q="explode"; t = 0; break;
+		fprintf(fp,":%s",head->text_ptr + effect_ptr->info[j]);
+	}
+	fprintf(fp,"\n");
 
+	/* Output 'F' for "Flags" */
+	emit_flags_32(fp, "F:", effect_ptr->flags1, blow_info_flags1);
 
-		/* Output 'F' for "Flags" */
-		emit_flags_32(fp, "F:", effect_ptr->flags1, project_info_flags1);
+	/* Success */
+	return (0);
 
 }
-#endif
+
 
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 

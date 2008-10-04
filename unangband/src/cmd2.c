@@ -3285,7 +3285,6 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 	int num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
 
 	/* Get kind flags */
-	u32b f5 = k_info[o_ptr->k_idx].flags5;
 	u32b f6 = k_info[o_ptr->k_idx].flags6;
 
 	/* Need a rope? (No rope for trick throws) */

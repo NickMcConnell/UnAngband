@@ -88,6 +88,7 @@ typedef struct town_type town_type;
 typedef struct blow_desc_type blow_desc_type;
 typedef struct blow_level_scalar_type blow_level_scalar_type;
 typedef struct blow_type blow_type;
+typedef struct effect_type effect_type;
 typedef struct desc_type desc_type;
 typedef struct room_info_type room_info_type;
 typedef struct feature_state feature_state;
@@ -180,6 +181,7 @@ struct maxima
 
 	u16b w_max;	/* Max size per element of "w_info[]" */
 	u16b blow_max;	/* Max size per element of "blow_info[]" */
+	u16b effect_max;	/* Max size per element of "effect_info[]" */
 
 	u16b o_max;     /* Max size for "o_list[]" */
 	u16b m_max;     /* Max size for "m_list[]" */
@@ -278,6 +280,7 @@ struct blow_type
 	u32b flags2;	/* Melee and spell flags */
 
 	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
+	u32b *info[2];	/* Partial text strings to provide info about blow */
 
 	u16b sound;
 	u16b ammo_kind;	/* Ammunition kind - lookup is cached for efficiency */
@@ -291,13 +294,15 @@ struct blow_type
 
 	byte mana_cost;
 	byte best_range;
+
+	/* Monter summoning */
 	byte summon_type;
+	char summon_char;
 
 	/* Monster spell/breath damage  */
 	byte dam_mult;
 	byte dam_div;
 	byte dam_var;
-	byte dam_max;
 
 	/* Monster spell desirability */
 	byte d_base;
@@ -313,6 +318,23 @@ struct blow_type
 	blow_level_scalar_type radius;
 	blow_level_scalar_type number;
 	blow_level_scalar_type max_range;
+};
+
+
+/*
+ * Information about effect types.
+ */
+struct effect_type
+{
+	u32b name;     /* Name (offset) */
+
+	u32b info[6];     /* Info (offset) */
+	u32b desc[2];     /* Description (offset) */
+
+	u32b flags1;	/* Projection flags */
+
+	s16b dam_max;
+	s16b dam_max_powerful;
 };
 
 

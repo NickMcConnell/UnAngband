@@ -6,7 +6,7 @@
 
 # Do not modify this file unless you know exactly what you are doing,
 # unless you wish to risk possible system crashes and broken savefiles.
-# After modifying this file, delete the "lib/data/spell.raw" file.
+# After modifying this file, delete the "lib/data/blow.raw" file.
 
 # Note that all monster blows and projection effects are specified
 # in this file.
