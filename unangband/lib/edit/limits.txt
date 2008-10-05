@@ -13,8 +13,8 @@
 
 V:0.6.3
 
-# Maximum number of blow types
-M:b:225
+# Maximum number of method types
+M:m:225
 
 # Maximum number of effect types
 M:e:145

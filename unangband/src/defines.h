@@ -2579,7 +2579,7 @@
 /*
  * Maximum number of blow descriptions
  */
-#define MAX_BLOW_DESCRIPTIONS	10
+#define MAX_METHOD_DESCRIPTIONS	10
 
 /*
  * New monster blow methods

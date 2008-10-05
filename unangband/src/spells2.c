@@ -5159,23 +5159,23 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 
 	int ty, tx;
 
-	blow_type *blow_ptr = &blow_info[method];
+	method_type *method_ptr = &method_info[method];
 
-	int rad = blow_ptr->radius.base;
-	int num = blow_ptr->number.base;
+	int rad = method_ptr->radius.base;
+	int num = method_ptr->number.base;
 
-	int degrees_of_arc = blow_ptr->arc;
-	int diameter_of_source = blow_ptr->diameter_of_source;
+	int degrees_of_arc = method_ptr->arc;
+	int diameter_of_source = method_ptr->diameter_of_source;
 
-	u32b flg = blow_info[method].flags1;
+	u32b flg = method_info[method].flags1;
 
 	bool noticed = FALSE;
 
 	/* Scale radius up */
-	if (blow_ptr->radius.levels) rad += blow_ptr->radius.gain * level / blow_ptr->radius.levels;
+	if (method_ptr->radius.levels) rad += method_ptr->radius.gain * level / method_ptr->radius.levels;
 
 	/* Scale number up */
-	if (blow_ptr->number.levels) num += blow_ptr->number.gain * level / blow_ptr->number.levels;
+	if (method_ptr->number.levels) num += method_ptr->number.gain * level / method_ptr->number.levels;
 
 	/* Hack -- fix number */
 	if (num < 1) num = 1;
@@ -5194,7 +5194,7 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 		tx = p_ptr->target_col;
 	}
 	/* Stop at first target if we're firing in a direction */
-	else if (blow_ptr->flags2 & (PR2_DIR_STOP))
+	else if (method_ptr->flags2 & (PR2_DIR_STOP))
 	{
 		flg |= (PROJECT_STOP);
 	}
@@ -5209,9 +5209,9 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 		if (flg & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
 
 		/* Affect distant monsters */
-		if (blow_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
+		if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
 		{
-			if (project_dist(who, what, y, x, dam, typ, flg, blow_ptr->flags2)) noticed = TRUE;
+			if (project_dist(who, what, y, x, dam, typ, flg, method_ptr->flags2)) noticed = TRUE;
 		}
 
 		/* Analyze the "dir" and the "target". */
@@ -5890,18 +5890,18 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
-		spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
+		spell_blow *method_ptr = &s_ptr->blow[ap_cnt];
 		int damage = 0;
-		int effect = blow_ptr->effect;
+		int effect = method_ptr->effect;
 
 		/* Hack -- no more attacks */
-		if (!blow_ptr->method) break;
+		if (!method_ptr->method) break;
 
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
 
 		/* Use player hit points */
-		if (blow_info[blow_ptr->method].flags2 & (PR2_BREATH))
+		if (method_info[method_ptr->method].flags2 & (PR2_BREATH))
 		{
 			/* Damage uses current hit points */
 			damage = p_ptr->chp * damage / 300;
@@ -5910,38 +5910,38 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		else
 		{
 			/* Roll out the damage */
-			if (blow_ptr->d_side)
+			if (method_ptr->d_side)
 			{
-				damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
+				damage += damroll(method_ptr->d_dice, method_ptr->d_side);
 			}
 
 			/* Roll out level dependent damage */
-			if (blow_ptr->l_side)
+			if (method_ptr->l_side)
 			{
-				damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
+				damage += damroll(method_ptr->l_dice * level / method_ptr->levels, method_ptr->l_side);
 			}
 
 			/* Add constant damage */
-			damage += blow_ptr->d_plus;
+			damage += method_ptr->d_plus;
 
 			/* Add level dependent damage */
-			if (blow_ptr->l_plus)
+			if (method_ptr->l_plus)
 			{
-				damage += blow_ptr->l_plus * level / blow_ptr->levels;
+				damage += method_ptr->l_plus * level / method_ptr->levels;
 
 				/* Mega-hack - dispel evil/undead etc. */
 				if (!level)
 				{
-					damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
+					damage += method_ptr->l_plus * 25 / method_ptr->levels;
 				}
 			}
 		}
 
 		/* Allow direction to be cancelled for free */
-		if ((!(blow_info[blow_ptr->method].flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
+		if ((!(method_info[method_ptr->method].flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
 
 		/* Apply spell method */
-		if (fire_projection(who, what, effect, blow_ptr->method, dir, damage, level)) obvious = TRUE;
+		if (fire_projection(who, what, effect, method_ptr->method, dir, damage, level)) obvious = TRUE;
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;

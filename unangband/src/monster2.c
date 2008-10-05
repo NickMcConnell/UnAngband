@@ -3360,7 +3360,7 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 	{
 		int method, effect, d_dice, d_side;
 
-		blow_type *blow_ptr;
+		method_type *method_ptr;
 
 		/* Skip non-attacks */
 		if (!r_ptr->blow[i].method) continue;
@@ -3372,14 +3372,14 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		d_side = r_ptr->blow[i].d_side;
 
 		/* Get the blow pointer */
-		blow_ptr  = &blow_info[method];
-		ammo_tval = blow_ptr->ammo_tval;
+		method_ptr  = &method_info[method];
+		ammo_tval = method_ptr->ammo_tval;
 
 		/* No ammo requirement */
 		if (!ammo_tval) continue;
 
 		/* Pick an item kind */
-		if (blow_ptr->flags2 & (PR2_SCALE_AMMO))
+		if (method_ptr->flags2 & (PR2_SCALE_AMMO))
 		{
 			/* Scale damage dice */
 			if (ammo_tval == TV_ARROW) d_dice = d_dice * 4 / 3;
@@ -3394,8 +3394,8 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		else
 		{
 			/* Get sval and kind */
-			ammo_sval = blow_ptr->ammo_sval;
-			ammo_kind = blow_ptr->ammo_kind;
+			ammo_sval = method_ptr->ammo_sval;
+			ammo_kind = method_ptr->ammo_kind;
 		}
 
 		/* Scan monster inventory */

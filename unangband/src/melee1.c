@@ -702,7 +702,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 
 	cptr s;
 
-	blow_type *blow_ptr = &blow_info[method];
+	method_type *method_ptr = &method_info[method];
 
 	int i, c, k;
 
@@ -735,7 +735,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	}
 
 	/* Check for blows which are of alternate type - the attack is stunning as opposed to cutting */
-	if ((blow_ptr->flags2 & (PR2_ALTERNATE)) && (flg & (ATK_DESC_PRIMARY | ATK_DESC_ALTERNATE)))
+	if ((method_ptr->flags2 & (PR2_ALTERNATE)) && (flg & (ATK_DESC_PRIMARY | ATK_DESC_ALTERNATE)))
 	{
 		div++;
 
@@ -743,7 +743,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	}
 
 	/* Check for blows which are heard as opposed to seen because the player is blind */
-	if (blow_ptr->flags2 & (PR2_HEARD))
+	if (method_ptr->flags2 & (PR2_HEARD))
 	{
 		div++;
 
@@ -751,7 +751,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	}
 
 	/* Check for blows which are indirect - the caster/attacker is out of line of sight */
-	if (blow_ptr->flags2 & (PR2_INDIRECT))
+	if (method_ptr->flags2 & (PR2_INDIRECT))
 	{
 		div++;
 
@@ -759,17 +759,17 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	}
 
 	/* Pick the appropriate attack description */
-	for (i = 0, k = 0, c = -1; i < MAX_BLOW_DESCRIPTIONS; i++)
+	for (i = 0, k = 0, c = -1; i < MAX_METHOD_DESCRIPTIONS; i++)
 	{
 		/* Skip empty blows */
-		if (blow_ptr->desc[i].max == 0) continue;
+		if (method_ptr->desc[i].max == 0) continue;
 
 		/* Skip seen and/or direct blows as required */
 		if ((div > 1) && (i % div != mod)) continue;
 
 		/* Check blow damage */
-		if ((damage >= blow_ptr->desc[i].min) &&
-				(damage <= blow_ptr->desc[i].max))
+		if ((damage >= method_ptr->desc[i].min) &&
+				(damage <= method_ptr->desc[i].max))
 		{
 			/* Pick a description that qualifies */
 			if ((flg & (ATK_DESC_LAST)) || (!rand_int(++k))) c = i;
@@ -785,7 +785,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	t = tmp_buf;
 
 	/* Begin */
-	s = blow_text + blow_ptr->desc[c].text;
+	s = method_text + method_ptr->desc[c].text;
 
 	/* Copy the string */
 	for (; *s; s++)
@@ -1097,13 +1097,13 @@ bool make_attack_normal(int m_idx)
 		int d_dice = r_ptr->blow[ap_cnt].d_dice;
 		int d_side = r_ptr->blow[ap_cnt].d_side;
 
-		blow_type *blow_ptr = &blow_info[method];
+		method_type *method_ptr = &method_info[method];
 
 		/* Get whether attack cuts, stuns, touches */
-		do_cut = (blow_ptr->flags2 & (PR2_CUTS)) != 0;
-		do_stun = (blow_ptr->flags2 & (PR2_STUN)) != 0;
-		shrieked |= (blow_ptr->flags2 & (PR2_SHRIEK)) != 0;
-		touched |= (blow_ptr->flags2 & (PR2_TOUCH)) != 0;
+		do_cut = (method_ptr->flags2 & (PR2_CUTS)) != 0;
+		do_stun = (method_ptr->flags2 & (PR2_STUN)) != 0;
+		shrieked |= (method_ptr->flags2 & (PR2_SHRIEK)) != 0;
+		touched |= (method_ptr->flags2 & (PR2_TOUCH)) != 0;
 
 		if (cheat_xtra) msg_format("base dice in this blow: dice %d, sides %d", d_dice, d_side);
 
@@ -1184,7 +1184,7 @@ bool make_attack_normal(int m_idx)
 			if (result >= 0) msg_format("%^s %s", m_name, atk_desc);
 
 			/* Slime */
-			if (blow_ptr->flags2 & (PR2_SLIME))
+			if (method_ptr->flags2 & (PR2_SLIME))
 			{
 				/* Slime player */
 				if (f_info[cave_feat[p_ptr->py][p_ptr->px]].flags1 & (FF1_FLOOR))
@@ -1885,10 +1885,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 {
 	int k, rlev, spower, rad, what;
 
-	blow_type *blow_ptr = &blow_info[attack];
+	method_type *method_ptr = &method_info[attack];
 
 	int method = attack;
-	int effect = blow_ptr->d_res;
+	int effect = method_ptr->d_res;
 	int dam = 0;
 	bool hit = TRUE;
 
@@ -2092,7 +2092,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		summon_lev = p_ptr->depth + 3;
 
 		/* Get damage for breath weapons */
-		if (blow_ptr->flags2 & (PR2_BREATH))
+		if (method_ptr->flags2 & (PR2_BREATH))
 		{
 			dam = get_breath_dam(p_ptr->depth * 10, effect, powerful);
 			dam_desc = dam;
@@ -2155,11 +2155,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			dam_desc = dam;
 
 			/* Get the new blow info */
-			blow_ptr = &blow_info[method];
+			method_ptr = &method_info[method];
 		}
 
 		/* Get damage for spell attacks */
-		else if (!(blow_ptr->flags2 & (PR2_BREATH)))
+		else if (!(method_ptr->flags2 & (PR2_BREATH)))
 		{
 			dam = get_dam(spower, attack);
 
@@ -2167,7 +2167,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Get damage for breath weapons */
-		if (blow_ptr->flags2 & (PR2_BREATH))
+		if (method_ptr->flags2 & (PR2_BREATH))
 		{
 			dam = get_breath_dam(m_ptr->hp, effect, powerful);
 
@@ -2175,7 +2175,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Player has chance of being missed by various ranged attacks */
-		if (blow_ptr->flags1 & (PROJECT_MISS))
+		if (method_ptr->flags1 & (PROJECT_MISS))
 		{
 			if (target < 0)
 			{
@@ -2188,17 +2188,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Attack needs mana to cast */
-		if (blow_ptr->mana_cost)
+		if (method_ptr->mana_cost)
 		{
 			/* Determine mana cost */
-			int manacost = blow_ptr->mana_cost;
+			int manacost = method_ptr->mana_cost;
 
 			/* Adjust monster mana */
 			m_ptr->mana -= MIN(manacost, m_ptr->mana);
 		}
 
 		/* Attack needs ammunition to use */
-		if (blow_ptr->ammo_tval)
+		if (method_ptr->ammo_tval)
 		{
 			/* Use ammunition */
 			int ammo = find_monster_ammo(who, attack - 96, FALSE);
@@ -2220,7 +2220,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Check for spell failure (breath/shot attacks never fail) */
-		if (blow_ptr->flags2 & (PR2_FAIL))
+		if (method_ptr->flags2 & (PR2_FAIL))
 		{
 			/* Calculate spell failure rate */
 			int failrate = 25 - (rlev + 3) / 4;
@@ -2296,7 +2296,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Centre on caster */
-	if (blow_ptr->flags1 & (PROJECT_SELF))
+	if (method_ptr->flags1 & (PROJECT_SELF))
 	{
 		if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY))
 		{
@@ -2324,7 +2324,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	if (effect == GF_BATTER) atk_flg |= (ATK_DESC_ALTERNATE);
 
 	/* Add ammunition */
-	if (blow_ptr->flags2 & (PR2_ADD_AMMO))
+	if (method_ptr->flags2 & (PR2_ADD_AMMO))
 	{
 		int ammo = 0;
 
@@ -2344,7 +2344,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Weak attack */
-	if (blow_ptr->flags2 & (PR2_MAGIC_MISSILE))
+	if (method_ptr->flags2 & (PR2_MAGIC_MISSILE))
 	{
 		/* Weaker magic missile */
 		if (spower <= rlev / 10) atk_flg |= (ATK_DESC_LAST);
@@ -2354,7 +2354,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	result = attack_desc(atk_desc, target, method, effect, dam_desc, atk_flg);
 
 	/* Weaken powerful lightning */
-	if (blow_ptr->flags2 & (PR2_LIGHTNING_STRIKE))
+	if (method_ptr->flags2 & (PR2_LIGHTNING_STRIKE))
 	{
 		/* Weaken damage */
 		if ((result) && (spower >= 40)) dam = dam * 3 / 4;
@@ -2367,25 +2367,25 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		msg_format("%^s %s", m_name, atk_desc);
 
 		/* Blow projects something? */
-		if ((blow_ptr->flags1 & (PR1_PROJECT)) ||
-				(blow_ptr->flags2 & (PR2_PROJECT)))
+		if ((method_ptr->flags1 & (PR1_PROJECT)) ||
+				(method_ptr->flags2 & (PR2_PROJECT)))
 		{
-			int rad = blow_ptr->radius.base;
-			int num = blow_ptr->number.base;
+			int rad = method_ptr->radius.base;
+			int num = method_ptr->number.base;
 
-			int degrees_of_arc = blow_ptr->arc;
-			int diameter_of_source = blow_ptr->diameter_of_source;
+			int degrees_of_arc = method_ptr->arc;
+			int diameter_of_source = method_ptr->diameter_of_source;
 
-			u32b flg = blow_info[method].flags1;
+			u32b flg = method_info[method].flags1;
 
 			/* Scale radius up */
-			if (blow_ptr->radius.levels) rad += blow_ptr->radius.gain * rlev / blow_ptr->radius.levels;
+			if (method_ptr->radius.levels) rad += method_ptr->radius.gain * rlev / method_ptr->radius.levels;
 
 			/* Scale number up */
-			if (blow_ptr->number.levels) num += blow_ptr->number.gain * rlev / blow_ptr->number.levels;
+			if (method_ptr->number.levels) num += method_ptr->number.gain * rlev / method_ptr->number.levels;
 
 			/* Hack -- scale radius up more */
-			if (blow_ptr->flags2 & (PR2_SCALE_RADIUS))
+			if (method_ptr->flags2 & (PR2_SCALE_RADIUS))
 			{
 				rad = rad - result;
 			}
@@ -2394,22 +2394,22 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!result)
 			{
 				/* Increase radius */
-				if (blow_ptr->flags2 & (PR2_LARGE_RADIUS))
+				if (method_ptr->flags2 & (PR2_LARGE_RADIUS))
 				{
 					rad++;
 				}
 
 				/* Apply a massive powerful stroke */
-				if (blow_ptr->flags2 & (PR2_LIGHTNING_STRIKE))
+				if (method_ptr->flags2 & (PR2_LIGHTNING_STRIKE))
 				{
 					dam = dam * 3 / 2;
 					rad = 0;
 				}
 
 				/* Turn into a powerful arc */
-				if (blow_ptr->flags2 & (PR2_POWER_ARC))
+				if (method_ptr->flags2 & (PR2_POWER_ARC))
 				{
-					flg = blow_info[71].flags1;
+					flg = method_info[71].flags1;
 					rad = 6;
 					degrees_of_arc = 60;
 					diameter_of_source = 10;
@@ -2417,7 +2417,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Concentrate light or darkness */
-				if (blow_ptr->flags2 & (PR2_CONCENTRATE_LITE | PR2_CONCENTRATE_DARK))
+				if (method_ptr->flags2 & (PR2_CONCENTRATE_LITE | PR2_CONCENTRATE_DARK))
 				{
 					/* Check if we can hit target */
 					if ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF)))
@@ -2431,7 +2431,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 							/* Fire bolt */
 							dam = damage;
 							rad = 0;
-							flg = blow_info[43].flags1;
+							flg = method_info[43].flags1;
 						}
 					}
 				}
@@ -2453,9 +2453,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (flg & (PROJECT_SCATTER)) scatter(&ty, &tx, y, x, 5, 0);
 
 				/* Affect distant monsters */
-				if (blow_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
+				if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
 				{
-					project_dist(who, what, ty, tx, dam, effect, flg, blow_ptr->flags2);
+					project_dist(who, what, ty, tx, dam, effect, flg, method_ptr->flags2);
 				}
 
 				/* Analyze the "dir" and the "target". */
@@ -2469,7 +2469,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Handle special case attacks */
-	if (blow_ptr->flags2 & (PR2_SPECIAL_CASE))
+	if (method_ptr->flags2 & (PR2_SPECIAL_CASE))
 	{
 	switch (attack)
 	{

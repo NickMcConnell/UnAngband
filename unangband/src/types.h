@@ -85,9 +85,9 @@ typedef void (*modify_attribute_func)(int y, int x);
 typedef struct maxima maxima;
 typedef struct dungeon_zone dungeon_zone;
 typedef struct town_type town_type;
-typedef struct blow_desc_type blow_desc_type;
-typedef struct blow_level_scalar_type blow_level_scalar_type;
-typedef struct blow_type blow_type;
+typedef struct method_desc_type method_desc_type;
+typedef struct method_level_scalar_type method_level_scalar_type;
+typedef struct method_type method_type;
 typedef struct effect_type effect_type;
 typedef struct desc_type desc_type;
 typedef struct room_info_type room_info_type;
@@ -180,7 +180,7 @@ struct maxima
 	u16b y_max;     /* Max size per element of "y_info[]" */
 
 	u16b w_max;	/* Max size per element of "w_info[]" */
-	u16b blow_max;	/* Max size per element of "blow_info[]" */
+	u16b method_max;	/* Max size per element of "blow_info[]" */
 	u16b effect_max;	/* Max size per element of "effect_info[]" */
 
 	u16b o_max;     /* Max size for "o_list[]" */
@@ -248,7 +248,7 @@ struct town_type
 /*
  * Text used for blow descriptions
  */
-struct blow_desc_type
+struct method_desc_type
 {
 	s16b min;
 	s16b max;
@@ -261,7 +261,7 @@ struct blow_desc_type
  *
  * Returned value is value + gain * actual_level / levels;
  */
-struct blow_level_scalar_type
+struct method_level_scalar_type
 {
 	s16b base;
 	s16b gain;
@@ -272,14 +272,14 @@ struct blow_level_scalar_type
 /*
  * Information about blow and projection types.
  */
-struct blow_type
+struct method_type
 {
 	u32b name;     /* Name (offset) */
 
 	u32b flags1;	/* Projection flags */
 	u32b flags2;	/* Melee and spell flags */
 
-	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
+	method_desc_type desc[MAX_METHOD_DESCRIPTIONS];	/* Possible text strings describing blow */
 	u32b info[2];	/* Partial text strings to provide info about blow */
 
 	u16b sound;
@@ -315,9 +315,9 @@ struct blow_type
 	byte d_tact;
 	byte d_range;
 
-	blow_level_scalar_type radius;
-	blow_level_scalar_type number;
-	blow_level_scalar_type max_range;
+	method_level_scalar_type radius;
+	method_level_scalar_type number;
+	method_level_scalar_type max_range;
 };
 
 

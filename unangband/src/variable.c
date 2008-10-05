@@ -890,9 +890,9 @@ char *v_text;
 /*
  * The blow arrays
  */
-blow_type *blow_info;
-char *blow_name;
-char *blow_text;
+method_type *method_info;
+char *method_name;
+char *method_text;
 
 /*
  * The effect arrays

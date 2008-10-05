@@ -115,7 +115,7 @@ extern errr parse_z_info(char *buf, header *head);
 extern errr parse_v_info(char *buf, header *head);
 extern errr parse_f_info(char *buf, header *head);
 extern errr parse_d_info(char *buf, header *head);
-extern errr parse_blow_info(char *buf, header *head);
+extern errr parse_method_info(char *buf, header *head);
 extern errr parse_effect_info(char *buf, header *head);
 extern errr parse_k_info(char *buf, header *head);
 extern errr parse_a_info(char *buf, header *head);
@@ -135,14 +135,14 @@ extern errr parse_g_info(char *buf, header *head);
 extern errr parse_q_info(char *buf, header *head);
 extern errr parse_n_info(char *buf, header *head);
 extern errr parse_flavor_info(char *buf, header *head);\
-extern errr eval_blow_power(header *head);
+extern errr eval_method_power(header *head);
 extern errr eval_r_power(header *head);
 extern errr eval_e_power(header *head);
 
 #ifdef ALLOW_TEMPLATES_OUTPUT
 extern errr emit_d_info_always(FILE *fp, header *head);
 
-extern errr emit_blow_info_index(FILE *fp, header *head, int i);
+extern errr emit_method_info_index(FILE *fp, header *head, int i);
 extern errr emit_effect_info_index(FILE *fp, header *head, int i);
 extern errr emit_v_info_index(FILE *fp, header *head, int i);
 extern errr emit_r_info_index(FILE *fp, header *head, int i);
@@ -174,7 +174,8 @@ extern int error_line;
 extern header z_head;
 extern header v_head;
 extern header d_head;
-extern header blow_head;
+extern header method_head;
+extern header effect_head;
 extern header f_head;
 extern header k_head;
 extern header a_head;

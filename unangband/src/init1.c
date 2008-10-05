@@ -263,7 +263,7 @@ static cptr r_info_blow_method[] =
 /*
  * Blow and projection flags
  */
-static cptr blow_info_flags1[] =
+static cptr method_info_flags1[] =
 {
 	"BEAM",
 	"ARC",
@@ -303,7 +303,7 @@ static cptr blow_info_flags1[] =
 /*
  * Blow and projection flags
  */
-static cptr blow_info_flags2[] =
+static cptr method_info_flags2[] =
 {
 	"MELEE",
 	"RANGED",
@@ -1914,8 +1914,8 @@ errr parse_z_info(char *buf, header *head)
 		z_info->b_max = max;
 	}
 
-	/* Process 'b' for "Maximum blow_info[] subindex" */
-	else if (buf[2] == 'b')
+	/* Process 'm' for "Maximum blow_info[] subindex" */
+	else if (buf[2] == 'm')
 	{
 		int max;
 
@@ -1923,7 +1923,7 @@ errr parse_z_info(char *buf, header *head)
 		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the value */
-		z_info->blow_max = max;
+		z_info->method_max = max;
 	}
 
 	/* Process 'e' for "Maximum effect_info[] subindex" */
@@ -2125,16 +2125,16 @@ static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
 /*
  * Grab one blow flag in a blow_type from a textual string
  */
-static errr grab_one_blow_flag(blow_type *blow_ptr, cptr what)
+static errr grab_one_method_flag(method_type *method_ptr, cptr what)
 {
-	if (grab_one_flag(&blow_ptr->flags1, blow_info_flags1, what) == 0)
+	if (grab_one_flag(&method_ptr->flags1, method_info_flags1, what) == 0)
 		return (0);
 
-	if (grab_one_flag(&blow_ptr->flags2, blow_info_flags2, what) == 0)
+	if (grab_one_flag(&method_ptr->flags2, method_info_flags2, what) == 0)
 		return (0);
 
 	/* Oops */
-	msg_format("Unknown blow flag '%s'.", what);
+	msg_format("Unknown method flag '%s'.", what);
 
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
@@ -2146,7 +2146,7 @@ static errr grab_one_blow_flag(blow_type *blow_ptr, cptr what)
 /*
 * Grab one level scalar from a textual string
 */
-static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
+static errr grab_one_level_scalar(method_level_scalar_type *scalar, char *what)
 {
 	char *s, *t, *u;
 
@@ -2194,14 +2194,14 @@ static errr grab_one_level_scalar(blow_level_scalar_type *scalar, char *what)
 /*
  * Initialize the "project_info" array, by parsing an ascii "template" file
  */
-errr parse_blow_info(char *buf, header *head)
+errr parse_method_info(char *buf, header *head)
 {
 	int i;
 
 	char *s, *t;
 
 	/* Current entry */
-	static blow_type *blow_ptr = NULL;
+	static method_type *method_ptr = NULL;
 
 	/* Process 'N' for "New/Number/Name" */
 	if (buf[0] == 'N')
@@ -2231,10 +2231,10 @@ errr parse_blow_info(char *buf, header *head)
 		error_idx = i;
 
 		/* Point at the "info" */
-		blow_ptr = (blow_type*)head->info_ptr + i;
+		method_ptr = (method_type*)head->info_ptr + i;
 
 		/* Store the name */
-		if (!(blow_ptr->name = add_name(head, s)))
+		if (!(method_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
@@ -2242,7 +2242,7 @@ errr parse_blow_info(char *buf, header *head)
 	else if (buf[0] == 'F')
 	{
 		/* There better be a current f_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Parse every entry textually */
 		for (s = buf + 2; *s; )
@@ -2258,7 +2258,7 @@ errr parse_blow_info(char *buf, header *head)
 			}
 
 			/* Parse this entry */
-			if (0 != grab_one_blow_flag(blow_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+			if (0 != grab_one_method_flag(method_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Start the next entry */
 			s = t;
@@ -2273,16 +2273,16 @@ errr parse_blow_info(char *buf, header *head)
 		/* TODO: Define a MAX_DAMAGE and start using it */
 		int last_min = 10000;
 
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Analyze effect */
-		for (n1 = 0; blow_ptr->desc[n1].max > 0; n1++)
+		for (n1 = 0; method_ptr->desc[n1].max > 0; n1++)
 		{
-			if (blow_ptr->desc[n1].min >  0) last_min = blow_ptr->desc[n1].min;
+			if (method_ptr->desc[n1].min >  0) last_min = method_ptr->desc[n1].min;
 		}
 
-		if (n1 >= MAX_BLOW_DESCRIPTIONS) return (PARSE_ERROR_GENERIC);
+		if (n1 >= MAX_METHOD_DESCRIPTIONS) return (PARSE_ERROR_GENERIC);
 
 		/* Find either a minus sign or colon */
 		for (t = s = buf + 2; *t && (*t != '-') && (*t != '<') && (*t != ':'); ++t) /* loop */;
@@ -2293,8 +2293,8 @@ errr parse_blow_info(char *buf, header *head)
 			/* Nuke minus size and advance */
 			*t++ = '\0';
 
-			blow_ptr->desc[n1].max = atoi(t);
-			if (!blow_ptr->desc[n1].max)
+			method_ptr->desc[n1].max = atoi(t);
+			if (!method_ptr->desc[n1].max)
 
 			/* Find the colon */
 			for (; *t && (*t != ':'); ++t) /* loop */;
@@ -2310,18 +2310,18 @@ errr parse_blow_info(char *buf, header *head)
 		if (*s == '>') *s++;
 
 		/* Parse min */
-		blow_ptr->desc[n1].min = atoi(s);
+		method_ptr->desc[n1].min = atoi(s);
 
 		/* Default max */
-		if (!blow_ptr->desc[n1].max)
+		if (!method_ptr->desc[n1].max)
 		{
-			if (blow_ptr->desc[n1].min < last_min) blow_ptr->desc[n1].max = last_min - 1;
-			else if (n1 > 0) blow_ptr->desc[n1].max = blow_ptr->desc[n1-1].max;
-			else blow_ptr->desc[n1].max = 9999;
+			if (method_ptr->desc[n1].min < last_min) method_ptr->desc[n1].max = last_min - 1;
+			else if (n1 > 0) method_ptr->desc[n1].max = method_ptr->desc[n1-1].max;
+			else method_ptr->desc[n1].max = 9999;
 		}
 
 		/* Store the description */
-		if (!(add_text(&(blow_ptr->desc[n1].text), head, t)))
+		if (!(add_text(&(method_ptr->desc[n1].text), head, t)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
@@ -2331,7 +2331,7 @@ errr parse_blow_info(char *buf, header *head)
 		int j;
 
 		/* There better be a current effect_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Loop through string */
 		for (j = 0, s = buf+2; (j < 2) && s; s = t, j++)
@@ -2347,7 +2347,7 @@ errr parse_blow_info(char *buf, header *head)
 			}
 
 			/* Store the text */
-			if (!add_text(&(blow_ptr->info[j]),head, s))
+			if (!add_text(&(method_ptr->info[j]),head, s))
 				return (PARSE_ERROR_OUT_OF_MEMORY);
 		}
 	}
@@ -2357,17 +2357,17 @@ errr parse_blow_info(char *buf, header *head)
 	{
 		int sound, range, dia;
 
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (3 != sscanf(buf, "I:%d:%d:%d",
 			    &sound, &range, &dia)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		blow_ptr->sound = sound;
-		blow_ptr->best_range = range;
-		blow_ptr->diameter_of_source = dia;
+		method_ptr->sound = sound;
+		method_ptr->best_range = range;
+		method_ptr->diameter_of_source = dia;
 	}
 
 	/* Process 'W' for "Blow Requirements" */
@@ -2375,17 +2375,17 @@ errr parse_blow_info(char *buf, header *head)
 	{
 		int mana, tval, sval;
 
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (3 != sscanf(buf, "W:%d:%d:%d",
 			    &mana, &tval, &sval)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		blow_ptr->mana_cost = mana;
-		blow_ptr->ammo_tval = tval;
-		blow_ptr->ammo_sval = sval;
+		method_ptr->mana_cost = mana;
+		method_ptr->ammo_tval = tval;
+		method_ptr->ammo_sval = sval;
 	}
 
 	/* Process 'X' for "Damage" */
@@ -2395,8 +2395,8 @@ errr parse_blow_info(char *buf, header *head)
 		int n, n1;
 		char *s;
 
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* TODO: This is bound to cause memory problems. Should have effect listed first */
 		/* Scan for 4th colon */
@@ -2416,16 +2416,16 @@ errr parse_blow_info(char *buf, header *head)
 		}
 
 		/* Save the value */
-		blow_ptr->d_res = n1;
+		method_ptr->d_res = n1;
 
 		/* Scan for the values */
 		if (3 != sscanf(buf, "X:%d:%d:%d",
 			    &mult, &div, &var)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		blow_ptr->dam_mult = mult;
-		blow_ptr->dam_div = div;
-		blow_ptr->dam_var = var;
+		method_ptr->dam_mult = mult;
+		method_ptr->dam_div = div;
+		method_ptr->dam_var = var;
 	}
 
 	/* Process 'C' for "Choice" */
@@ -2433,21 +2433,21 @@ errr parse_blow_info(char *buf, header *head)
 	{
 		int base, summ, hurt, mana, esc, tact, range;
 
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (7 != sscanf(buf, "C:%d:%d:%d:%d:%d:%d:%d",
 				&base, &summ, &hurt, &mana, &esc, &tact, &range)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		blow_ptr->d_base = base;
-		blow_ptr->d_summ = summ;
-		blow_ptr->d_hurt = hurt;
-		blow_ptr->d_mana = mana;
-		blow_ptr->d_esc = esc;
-		blow_ptr->d_tact = tact;
-		blow_ptr->d_range = range;
+		method_ptr->d_base = base;
+		method_ptr->d_summ = summ;
+		method_ptr->d_hurt = hurt;
+		method_ptr->d_mana = mana;
+		method_ptr->d_esc = esc;
+		method_ptr->d_tact = tact;
+		method_ptr->d_range = range;
 	}
 
 	/* Process 'A' for "Arc" */
@@ -2455,46 +2455,46 @@ errr parse_blow_info(char *buf, header *head)
 	{
 		int arc, deg;
 
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (2 != sscanf(buf, "A:%d:%d",
 			    &arc, &deg)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		blow_ptr->arc = arc;
-		blow_ptr->degree_factor = deg;
+		method_ptr->arc = arc;
+		method_ptr->degree_factor = deg;
 	}
 
 	/* Process 'M' for "Maximum Range" */
 	else if (buf[0] == 'M')
 	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the radius information */
-		if (grab_one_level_scalar(&blow_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
+		if (grab_one_level_scalar(&method_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
 	/* Process 'R' for "Radius" */
 	else if (buf[0] == 'R')
 	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the radius information */
-		if (grab_one_level_scalar(&blow_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
+		if (grab_one_level_scalar(&method_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
 	/* Process 'U' for "Number" */
 	else if (buf[0] == 'U')
 	{
-		/* There better be a current blow_ptr */
-		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the radius information */
-		if (grab_one_level_scalar(&blow_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
+		if (grab_one_level_scalar(&method_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
 	else
@@ -2514,7 +2514,7 @@ errr parse_blow_info(char *buf, header *head)
  */
 static errr grab_one_effect_flag(effect_type *effect_ptr, cptr what)
 {
-	if (grab_one_flag(&effect_ptr->flags1, blow_info_flags1, what) == 0)
+	if (grab_one_flag(&effect_ptr->flags1, method_info_flags1, what) == 0)
 		return (0);
 
 	/* Oops */
@@ -2580,7 +2580,7 @@ errr parse_effect_info(char *buf, header *head)
 	{
 		int power, max, max_power;
 
-		/* There better be a current blow_ptr */
+		/* There better be a current method_ptr */
 		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
@@ -9229,126 +9229,126 @@ static char color_attr_to_char(int a)
 
 
 /*
- * Emit the "blow_info" array into an ascii "template" file
+ * Emit the "method_info" array into an ascii "template" file
  */
-errr emit_blow_info_index(FILE *fp, header *head, int i)
+errr emit_method_info_index(FILE *fp, header *head, int i)
 {
 	int n;
 
 	/* Point at the "info" */
-	blow_type *blow_ptr = (blow_type*)head->info_ptr + i;
+	method_type *method_ptr = (method_type*)head->info_ptr + i;
 
 	/* Output 'N' for "New/Number/Name" */
-	fprintf(fp,"N:%d:%s\n", i,head->name_ptr + blow_ptr->name);
+	fprintf(fp,"N:%d:%s\n", i,head->name_ptr + method_ptr->name);
 
 	/* Output 'T' for "Text" */
-	for (n = 0; n < MAX_BLOW_DESCRIPTIONS; n++)
+	for (n = 0; n < MAX_METHOD_DESCRIPTIONS; n++)
 	{
-		if ((blow_ptr->desc[n].max) && (blow_ptr->desc[n].max < 10000))
+		if ((method_ptr->desc[n].max) && (method_ptr->desc[n].max < 10000))
 		{
 			/* Output 'T' for "Text" */
-			fprintf(fp, "T:%d-%d:%s\n", blow_ptr->desc[n].min, blow_ptr->desc[n].max,head->text_ptr + blow_ptr->desc[n].text);
+			fprintf(fp, "T:%d-%d:%s\n", method_ptr->desc[n].min, method_ptr->desc[n].max,head->text_ptr + method_ptr->desc[n].text);
 		}
-		else if (blow_ptr->desc[n].max)
+		else if (method_ptr->desc[n].max)
 		{
 			/* Output 'T' for "Text" */
-			fprintf(fp, "T:%d:%s\n", blow_ptr->desc[n].min, head->text_ptr + blow_ptr->desc[n].text);
+			fprintf(fp, "T:%d:%s\n", method_ptr->desc[n].min, head->text_ptr + method_ptr->desc[n].text);
 		}
 	}
 
 	/* Output 'I' for "Blow information" */
-	if (blow_ptr->best_range || blow_ptr->sound || (blow_ptr->diameter_of_source))
+	if (method_ptr->best_range || method_ptr->sound || (method_ptr->diameter_of_source))
 	{
-		fprintf(fp, "I:%d:%d:%d\n",blow_ptr->sound, blow_ptr->best_range, blow_ptr->diameter_of_source);
+		fprintf(fp, "I:%d:%d:%d\n",method_ptr->sound, method_ptr->best_range, method_ptr->diameter_of_source);
 	}
 
 	/* Output 'W' for "Blow requirements */
-	if (blow_ptr->mana_cost || blow_ptr->ammo_tval || blow_ptr->ammo_sval)
+	if (method_ptr->mana_cost || method_ptr->ammo_tval || method_ptr->ammo_sval)
 	{
-		fprintf(fp, "W:%d:%d:%d\n",blow_ptr->mana_cost, blow_ptr->ammo_tval, blow_ptr->ammo_sval);
+		fprintf(fp, "W:%d:%d:%d\n",method_ptr->mana_cost, method_ptr->ammo_tval, method_ptr->ammo_sval);
 	}
 
 	/* Output 'X' for "Extra damage" */
-	if (blow_ptr->dam_mult || blow_ptr->dam_div || blow_ptr->dam_var || blow_ptr->d_res)
+	if (method_ptr->dam_mult || method_ptr->dam_div || method_ptr->dam_var || method_ptr->d_res)
 	{
-		fprintf(fp, "X:%d:%d:%d:%s\n",blow_ptr->dam_mult, blow_ptr->dam_div, blow_ptr->dam_var,
-			r_info_blow_effect[blow_ptr->d_res]);
+		fprintf(fp, "X:%d:%d:%d:%s\n",method_ptr->dam_mult, method_ptr->dam_div, method_ptr->dam_var,
+			r_info_blow_effect[method_ptr->d_res]);
 	}
 
 	/* Output 'C' for "Blow choices" */
-	if (blow_ptr->d_base || blow_ptr->d_hurt || blow_ptr->d_esc
-			|| blow_ptr->d_summ || blow_ptr->d_mana || blow_ptr->d_tact || blow_ptr->d_range)
+	if (method_ptr->d_base || method_ptr->d_hurt || method_ptr->d_esc
+			|| method_ptr->d_summ || method_ptr->d_mana || method_ptr->d_tact || method_ptr->d_range)
 	{
-		fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d\n",blow_ptr->d_base, blow_ptr->d_summ, blow_ptr->d_hurt, blow_ptr->d_mana,
-				blow_ptr->d_esc, blow_ptr->d_tact, blow_ptr->d_range);
+		fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d\n",method_ptr->d_base, method_ptr->d_summ, method_ptr->d_hurt, method_ptr->d_mana,
+				method_ptr->d_esc, method_ptr->d_tact, method_ptr->d_range);
 	}
 
 	/* Output 'S' for "Summoning choices" */
-	if (blow_ptr->summon_type)
+	if (method_ptr->summon_type)
 	{
-		fprintf(fp, "S:%d\n",blow_ptr->summon_type);
+		fprintf(fp, "S:%d\n",method_ptr->summon_type);
 	}
 
 	/* Output 'A' for "Arc information" */
-	if ((blow_ptr->arc) || (blow_ptr->degree_factor))
+	if ((method_ptr->arc) || (method_ptr->degree_factor))
 	{
-		fprintf(fp, "A:%d:%d\n", blow_ptr->arc, blow_ptr->degree_factor);
+		fprintf(fp, "A:%d:%d\n", method_ptr->arc, method_ptr->degree_factor);
 	}
 
 	/* Output 'R' for "Radius information */
-	if ((blow_ptr->radius.base) || (blow_ptr->radius.gain))
+	if ((method_ptr->radius.base) || (method_ptr->radius.gain))
 	{
 		fprintf(fp, "R:");
-		if (blow_ptr->radius.base)
+		if (method_ptr->radius.base)
 		{
-			fprintf(fp,"%d", blow_ptr->radius.base);
-			if (blow_ptr->radius.gain) fprintf(fp, "+");
+			fprintf(fp,"%d", method_ptr->radius.base);
+			if (method_ptr->radius.gain) fprintf(fp, "+");
 		}
-		if (blow_ptr->radius.gain)
+		if (method_ptr->radius.gain)
 		{
-			fprintf(fp,"%d/%d", blow_ptr->radius.gain, blow_ptr->radius.levels);
+			fprintf(fp,"%d/%d", method_ptr->radius.gain, method_ptr->radius.levels);
 		}
 		fprintf(fp, "\n");
 	}
 
 	/* Output 'M' for "Maximum range */
-	if ((blow_ptr->max_range.base) || (blow_ptr->max_range.gain))
+	if ((method_ptr->max_range.base) || (method_ptr->max_range.gain))
 	{
 		fprintf(fp, "M:");
-		if (blow_ptr->max_range.base)
+		if (method_ptr->max_range.base)
 		{
-			fprintf(fp,"%d", blow_ptr->max_range.base);
-			if (blow_ptr->max_range.gain) fprintf(fp, "+");
+			fprintf(fp,"%d", method_ptr->max_range.base);
+			if (method_ptr->max_range.gain) fprintf(fp, "+");
 		}
-		if (blow_ptr->max_range.gain)
+		if (method_ptr->max_range.gain)
 		{
-			fprintf(fp,"%d/%d", blow_ptr->max_range.gain, blow_ptr->max_range.levels);
+			fprintf(fp,"%d/%d", method_ptr->max_range.gain, method_ptr->max_range.levels);
 		}
 		fprintf(fp, "\n");
 	}
 
 	/* Output 'U' for "Number information */
-	if ((blow_ptr->number.base) || (blow_ptr->number.gain))
+	if ((method_ptr->number.base) || (method_ptr->number.gain))
 	{
 		fprintf(fp, "U:");
-		if (blow_ptr->number.base)
+		if (method_ptr->number.base)
 		{
-			fprintf(fp,"%d", blow_ptr->number.base);
-			if (blow_ptr->number.gain) fprintf(fp, "+");
+			fprintf(fp,"%d", method_ptr->number.base);
+			if (method_ptr->number.gain) fprintf(fp, "+");
 		}
-		if (blow_ptr->number.gain)
+		if (method_ptr->number.gain)
 		{
-			fprintf(fp,"%d/%d", blow_ptr->number.gain, blow_ptr->number.levels);
+			fprintf(fp,"%d/%d", method_ptr->number.gain, method_ptr->number.levels);
 		}
 		fprintf(fp, "\n");
 	}
 
 	/* Output 'F' for "Flags" */
-	emit_flags_32(fp, "F:", blow_ptr->flags1, blow_info_flags1);
-	emit_flags_32(fp, "F:", blow_ptr->flags2, blow_info_flags2);
+	emit_flags_32(fp, "F:", method_ptr->flags1, method_info_flags1);
+	emit_flags_32(fp, "F:", method_ptr->flags2, method_info_flags2);
 
 	/* Output 'D' for Description */
-	fprintf(fp, "D:%s:%s\n", head->text_ptr + blow_ptr->info[0], head->text_ptr + blow_ptr->info[1]);
+	fprintf(fp, "D:%s:%s\n", head->text_ptr + method_ptr->info[0], head->text_ptr + method_ptr->info[1]);
 
 	fprintf(fp, "\n");
 
@@ -10401,7 +10401,7 @@ errr emit_effect_info_index(FILE *fp, header *head, int i)
 	fprintf(fp,"\n");
 
 	/* Output 'F' for "Flags" */
-	emit_flags_32(fp, "F:", effect_ptr->flags1, blow_info_flags1);
+	emit_flags_32(fp, "F:", effect_ptr->flags1, method_info_flags1);
 
 	/* Success */
 	return (0);

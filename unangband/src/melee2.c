@@ -5302,10 +5302,10 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					int d_dice = r_ptr->blow[ap_cnt].d_dice;
 					int d_side = r_ptr->blow[ap_cnt].d_side;
 
-					blow_type *blow_ptr = &blow_info[method];
+					method_type *method_ptr = &method_info[method];
 
-					bool do_cut = (blow_ptr->flags2 & (PR2_CUTS)) != 0;
-					bool do_stun = (blow_ptr->flags2 & (PR2_STUN)) != 0;
+					bool do_cut = (method_ptr->flags2 & (PR2_CUTS)) != 0;
+					bool do_stun = (method_ptr->flags2 & (PR2_STUN)) != 0;
 
 					int who = m_ptr->mflag & (MFLAG_ALLY) ? SOURCE_PLAYER_ALLY : m_idx;
 					int what = m_ptr->mflag & (MFLAG_ALLY) ? m_idx : ap_cnt;
