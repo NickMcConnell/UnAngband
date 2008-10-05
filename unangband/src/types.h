@@ -280,7 +280,7 @@ struct blow_type
 	u32b flags2;	/* Melee and spell flags */
 
 	blow_desc_type desc[MAX_BLOW_DESCRIPTIONS];	/* Possible text strings describing blow */
-	u32b *info[2];	/* Partial text strings to provide info about blow */
+	u32b info[2];	/* Partial text strings to provide info about blow */
 
 	u16b sound;
 	u16b ammo_kind;	/* Ammunition kind - lookup is cached for efficiency */
@@ -335,6 +335,9 @@ struct effect_type
 
 	s16b dam_max;
 	s16b dam_max_powerful;
+
+	byte power;		/* Attack power */
+	byte unused;
 };
 
 

@@ -851,7 +851,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 
 			/* Is a vowel -- note hacks to guess vowelness of other string substitutions */
 			if (is_a_vowel(*v) || (*v == '$') ||
-					((*v == '*') /* && is_a_vowel((effect_text + effect_info[effect].text)[0]) */))
+					((*v == '*') && is_a_vowel((effect_text + effect_info[effect].desc[0])[0])))
 			{
 				u = "an";
 			}

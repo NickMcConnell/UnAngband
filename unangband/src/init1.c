@@ -2236,223 +2236,6 @@ errr parse_blow_info(char *buf, header *head)
 		/* Store the name */
 		if (!(blow_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
-
-		/* Set some values */
-		blow_ptr->max_range.base = MAX_SIGHT;
-
-		switch(i)
-		{
-			case RBM_SPORE:
-			{
-				blow_ptr->ammo_kind = 596;
-				blow_ptr->ammo_tval = TV_EGG;
-				blow_ptr->ammo_sval = SV_EGG_SPORE;
-				break;
-			}
-			case RBM_BOULDER:
-			{
-				blow_ptr->ammo_kind = 598;
-				blow_ptr->ammo_tval = TV_JUNK;
-				blow_ptr->ammo_sval = SV_JUNK_ROCK;
-				break;
-			}
-			case RBM_ARROW:
-			{
-				blow_ptr->ammo_tval = TV_ARROW;
-				blow_ptr->flags2 |= (PR2_SCALE_AMMO);
-				break;
-			}
-			case RBM_XBOLT:
-			{
-				blow_ptr->ammo_tval = TV_BOLT;
-				blow_ptr->flags2 |= (PR2_SCALE_AMMO);
-				break;
-			}
-			case RBM_SPIKE:
-			{
-				blow_ptr->ammo_kind = 345;
-				blow_ptr->ammo_tval = TV_SPIKE;
-				blow_ptr->ammo_sval = 0;
-				break;
-			}
-			case RBM_DART:
-			{
-				blow_ptr->ammo_kind = 434;
-				blow_ptr->ammo_tval = TV_POLEARM;
-				blow_ptr->ammo_sval = SV_DART;
-				break;
-			}
-			case RBM_SHOT:
-			{
-				blow_ptr->ammo_tval = TV_SHOT;
-				blow_ptr->flags2 |= (PR2_SCALE_AMMO);
-				break;
-			}
-			case RBM_FLASK:
-			{
-				blow_ptr->ammo_tval = TV_FLASK;
-				blow_ptr->ammo_sval = SV_FLASK_OIL;
-#if 0
-				if (d_dice < 7)
-				{
-					blow_ptr->ammo_tval = TV_FLASK;
-					blow_ptr->ammo_sval = SV_FLASK_OIL;
-				}
-				else
-				{
-					blow_ptr->ammo_tval = TV_POTION;
-					blow_ptr->ammo_sval = SV_POTION_DETONATIONS;
-				}
-				break;
-#endif
-			}
-			case RBM_DAGGER:
-			{
-				blow_ptr->ammo_kind = 43;
-				blow_ptr->ammo_tval = TV_SWORD;
-				blow_ptr->ammo_sval = SV_DAGGER;
-				break;
-			}
-
-			/* RF4_BRTH_ACID */
-		case 96+8:
-		{
-			blow_ptr->sound = MSG_BR_ACID;
-			break;
-		}
-
-		/* RF4_BRTH_ELEC */
-		case 96+9:
-		{
-			blow_ptr->sound = MSG_BR_ELEC;
-			break;
-		}
-
-		/* RF4_BRTH_FIRE */
-		case 96+10:
-		{
-			blow_ptr->sound = MSG_BR_FIRE;
-			break;
-		}
-
-		/* RF4_BRTH_COLD */
-		case 96+11:
-		{
-			blow_ptr->sound = MSG_BR_FROST;
-			break;
-		}
-
-		/* RF4_BRTH_POIS */
-		case 96+12:
-		{
-			blow_ptr->sound = MSG_BR_GAS;
-			break;
-		}
-
-		/* RF4_BRTH_PLAS */
-		case 96+13:
-		{
-			blow_ptr->sound = MSG_BR_PLASMA;
-			break;
-		}
-
-		/* RF4_BRTH_LITE */
-		case 96+14:
-		{
-			blow_ptr->sound = MSG_BR_LIGHT;
-			break;
-		}
-
-		/* RF4_BRTH_DARK */
-		case 96+15:
-		{
-			blow_ptr->sound = MSG_BR_DARK;
-			break;
-		}
-
-		/* RF4_BRTH_CONFU */
-		case 96+16:
-		{
-			blow_ptr->sound = MSG_BR_CONF;
-			break;
-		}
-
-		/* RF4_BRTH_SOUND */
-		case 96+17:
-		{
-			blow_ptr->sound = MSG_BR_SOUND;
-			break;
-		}
-
-		/* RF4_BRTH_SHARD */
-		case 96+18:
-		{
-			blow_ptr->sound = MSG_BR_SHARDS;
-			break;
-		}
-
-		/* RF4_BRTH_INERT */
-		case 96+19:
-		{
-			blow_ptr->sound = MSG_BR_INERTIA;
-			break;
-		}
-
-		/* RF4_BRTH_GRAV */
-		case 96+20:
-		{
-			blow_ptr->sound = MSG_BR_GRAVITY;
-			break;
-		}
-
-		/* RF4_BRTH_WIND */
-		case 96+21:
-		{
-			break;
-		}
-
-		/* RF4_BRTH_FORCE */
-		case 96+22:
-		{
-			blow_ptr->sound = MSG_BR_FORCE;
-			break;
-		}
-
-		/* RF4_BRTH_NEXUS */
-		case 96+23:
-		{
-			blow_ptr->sound = MSG_BR_NEXUS;
-			break;
-		}
-
-		/* RF4_BRTH_NETHR */
-		case 96+24:
-		{
-			blow_ptr->sound = MSG_BR_NETHER;
-			break;
-		}
-
-		/* RF4_BRTH_CHAOS */
-		case 96+25:
-		{
-			blow_ptr->sound = MSG_BR_CHAOS;
-			break;
-		}
-
-		/* RF4_BRTH_DISEN */
-		case 96+26:
-		{
-			blow_ptr->sound = MSG_BR_DISENCHANT;
-			break;
-		}
-
-		/* RF4_BRTH_TIME */
-		case 96+27:
-		{
-			blow_ptr->sound = MSG_BR_TIME;
-			break;
-		}
-		}
 	}
 
 	/* Hack -- Process 'F' for flags */
@@ -2542,28 +2325,73 @@ errr parse_blow_info(char *buf, header *head)
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
+	/* Process 'D' for "Description" */
+	else if (buf[0] == 'D')
+	{
+		int j;
+
+		/* There better be a current effect_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Loop through string */
+		for (j = 0, s = buf+2; (j < 2) && s; s = t, j++)
+		{
+			/* Find the colon before the description */
+			t = strchr(s, ':');
+
+			/* Verify that colon */
+			if (t)
+			{
+				/* Nuke the colon, advance to the name */
+				*t++ = '\0';
+			}
+
+			/* Store the text */
+			if (!add_text(&(blow_ptr->info[j]),head, s))
+				return (PARSE_ERROR_OUT_OF_MEMORY);
+		}
+	}
+
 	/* Process 'I' for "Info" */
 	else if (buf[0] == 'I')
 	{
-		int mana, best, max;
+		int sound, range, dia;
 
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (3 != sscanf(buf, "I:%d:%d:%d",
-			    &mana, &best, &max)) return (PARSE_ERROR_GENERIC);
+			    &sound, &range, &dia)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		blow_ptr->sound = sound;
+		blow_ptr->best_range = range;
+		blow_ptr->diameter_of_source = dia;
+	}
+
+	/* Process 'W' for "Blow Requirements" */
+	else if (buf[0] == 'W')
+	{
+		int mana, tval, sval;
+
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf, "W:%d:%d:%d",
+			    &mana, &tval, &sval)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		blow_ptr->mana_cost = mana;
-		blow_ptr->best_range = best;
-		blow_ptr->max_range.base = max;
+		blow_ptr->ammo_tval = tval;
+		blow_ptr->ammo_sval = sval;
 	}
 
-	/* Process 'D' for "Damage" */
-	else if (buf[0] == 'D')
+	/* Process 'X' for "Damage" */
+	else if (buf[0] == 'X')
 	{
-		int mult, div, var, max;
+		int mult, div, var;
 		int n, n1;
 		char *s;
 
@@ -2571,7 +2399,7 @@ errr parse_blow_info(char *buf, header *head)
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* TODO: This is bound to cause memory problems. Should have effect listed first */
-		/* Scan for 5th colon */
+		/* Scan for 4th colon */
 		for (s = buf, n = 0; *s && (n < 5);)
 		{
 			s++;
@@ -2591,14 +2419,13 @@ errr parse_blow_info(char *buf, header *head)
 		blow_ptr->d_res = n1;
 
 		/* Scan for the values */
-		if (4 != sscanf(buf, "D:%d:%d:%d:%d",
-			    &mult, &div, &var, &max)) return (PARSE_ERROR_GENERIC);
+		if (3 != sscanf(buf, "X:%d:%d:%d",
+			    &mult, &div, &var)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		blow_ptr->dam_mult = mult;
 		blow_ptr->dam_div = div;
 		blow_ptr->dam_var = var;
-		(void)max;
 	}
 
 	/* Process 'C' for "Choice" */
@@ -2626,19 +2453,28 @@ errr parse_blow_info(char *buf, header *head)
 	/* Process 'A' for "Arc" */
 	else if (buf[0] == 'A')
 	{
-		int arc, dia, deg;
+		int arc, deg;
 
 		/* There better be a current blow_ptr */
 		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf, "A:%d:%d:%d",
-			    &arc, &dia, &deg)) return (PARSE_ERROR_GENERIC);
+		if (2 != sscanf(buf, "A:%d:%d",
+			    &arc, &deg)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		blow_ptr->arc = arc;
-		blow_ptr->diameter_of_source = dia;
 		blow_ptr->degree_factor = deg;
+	}
+
+	/* Process 'M' for "Maximum Range" */
+	else if (buf[0] == 'M')
+	{
+		/* There better be a current blow_ptr */
+		if (!blow_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the radius information */
+		if (grab_one_level_scalar(&blow_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
 	/* Process 'R' for "Radius" */
@@ -2737,6 +2573,24 @@ errr parse_effect_info(char *buf, header *head)
 		if (!(effect_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 
+	}
+
+	/* Process 'I' for "Info" */
+	else if (buf[0] == 'I')
+	{
+		int power, max, max_power;
+
+		/* There better be a current blow_ptr */
+		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (3 != sscanf(buf, "I:%d:%d:%d",
+				&power, &max, &max_power)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		effect_ptr->power = power;
+		effect_ptr->dam_max = max;
+		effect_ptr->dam_max_powerful = max_power;
 	}
 
 	/* Process 'D' for "Description" */
@@ -9381,28 +9235,11 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 {
 	int n;
 
-	cptr s;
-
-	cptr p = NULL;
-	cptr t = NULL;
-
-
 	/* Point at the "info" */
 	blow_type *blow_ptr = (blow_type*)head->info_ptr + i;
 
 	/* Output 'N' for "New/Number/Name" */
-	fprintf(fp,"N:%d:"/* "N:%d:%s\n" */, i /*,head->name_ptr + blow_ptr->name*/);
-
-	/* Output name in upper case */
-	for ( s = head->name_ptr + blow_ptr->name; (*s); s++)
-	{
-		if ((*s >= 'a') && (*s <= 'z')) fprintf(fp, "%c", (*s) - 32);
-		else if (*s == ' ') fprintf(fp, "_");
-		else fprintf(fp, "%c", (*s));
-	}
-
-	/* Terminate line */
-	fprintf(fp, "\n");
+	fprintf(fp,"N:%d:%s\n", i,head->name_ptr + blow_ptr->name);
 
 	/* Output 'T' for "Text" */
 	for (n = 0; n < MAX_BLOW_DESCRIPTIONS; n++)
@@ -9510,89 +9347,14 @@ errr emit_blow_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "F:", blow_ptr->flags1, blow_info_flags1);
 	emit_flags_32(fp, "F:", blow_ptr->flags2, blow_info_flags2);
 
-	/* Get the method */
-	switch (i)
-	{
-		case RBM_HIT: p = "hit~"; t = "one target"; break;
-		case RBM_SPIT: p = "spit~"; t = "one target"; break;
-		case RBM_GAZE: p = "gaze~"; t = "one target"; break;
-		case RBM_WAIL: p = "wail~"; t = "one target"; break;
-		case RBM_SPORE: t = "one adjacent target"; break;
-		case RBM_LASH: t = "one adjacent target"; break;
-	case RBM_BEG: t = "one adjacent target"; break;
-	case RBM_INSULT: t = "one adjacent target"; break;
-	case RBM_MOAN: t = "one adjacent target"; break;
-	case RBM_SING: t = "one adjacent target"; break;
-	case RBM_TRAP: t = "one adjacent target"; break;
-	case RBM_BOULDER: t = "one adjacent target"; break;
-		case RBM_AURA: p = "surround~ & with an aura";  t = "$ enemies"; break;
-		case RBM_SELF: t = "&"; break;
-		case RBM_ADJACENT: t = "all enemies adjacent to &"; break;
-		case RBM_HANDS: t = "a beam"; break;
-		case RBM_MISSILE: p = "create~ a missile"; t = "$ enemies"; break;
-		case RBM_BOLT_10: p = "create~ a bolt"; t = "$ enemies"; break;
-		case RBM_BOLT: p = "create~ a powerful bolt";  t = "$ enemies"; break;
-		case RBM_BEAM: p = "create~ a beam"; t = "$ enemies";break;
-		case RBM_BLAST: p = "create~ an adjacent blast"; t = "$ enemies"; break;
-		case RBM_WALL: p = "create~ a wall"; t = "$ enemies"; break;
-		case RBM_BALL: p = "create~ a ball"; t = "$ enemies"; break;
-		case RBM_CLOUD: p = "create~ a cloud"; t = "$ enemies"; break;
-		case RBM_STORM: p = "create~ a storm"; t = "$ enemies"; break;
-		case RBM_BREATH: p = "breathe~";  t = "$ enemies"; break;
-		case RBM_AREA: p = "surround~ & with magic"; break;
-		case RBM_LOS: t = "all $ enemies in line of sight"; break;
-		case RBM_LINE: t = "one direction"; break;
-		case RBM_AIM: t = "one target"; break;
-		case RBM_ORB: p = "create~ an orb"; t = "$ enemies"; break;
-		case RBM_STAR: p = "surround~ & with a star"; t = "$ enemies"; break;
-		case RBM_SPHERE: p = "create~ a sphere";  t = "$ enemies"; break;
-		case RBM_PANEL: t = "the current panel"; break;
-		case RBM_LEVEL: t = "the current level"; break;
-		case RBM_CROSS: p = "surround~ & with a cross"; t = "$ enemies"; break;
-		case RBM_STRIKE: p = "strike~"; t = "$ enemy"; break;
-		case RBM_EXPLODE: t = "& and all enemies adjacent to &"; break;
-		case RBM_ARROW: p = "create~ an arrow"; t="one target"; break;
-		case RBM_XBOLT: p = "create~ a crossbow bolt"; t="one target"; break;
-		case RBM_DAGGER: p = "create~ a dagger"; t="one target"; break;
-		case RBM_DART: p = "create~ a dart"; t="one target"; break;
-		case RBM_SHOT: p = "create~ a shot"; t="one target"; break;
-		case RBM_ARC_20: p = "create~ an arc"; break;
-		case RBM_ARC_30: p = "create~ an arc"; break;
-		case RBM_ARC_40: p = "create~ an arc"; break;
-		case RBM_ARC_50: p = "create~ an arc"; break;
-		case RBM_ARC_60: p = "create~ an arc"; break;
-		case RBM_FLASK: p = "create~ a ball"; t = "$ enemies"; break;
-	case RBM_TRAIL: t = "one adjacent target"; break;
-	case RBM_SHRIEK: t = "one adjacent target"; break;
-		case RBM_BOLT_MINOR: p = "create~ a bolt"; t = "$ enemies"; break;
-		case RBM_BALL_MINOR: p = "throw~ a ball"; t = "$ enemies"; break;
-		case RBM_BALL_II: p = "create~ a ball"; t = "$ enemies"; break;
-		case RBM_BALL_III: p = "create~ a ball"; t = "$ enemies"; break;
-		case RBM_AURA_MINOR: p = "surround~ & with an aura";  t = "$ enemies"; break;
-		case RBM_8WAY: p = "create~ a beam in 8 directions"; t = "$ enemies"; break;
-		case RBM_8WAY_II: p = "create~ a beam in 8 directions"; t = "$ enemies"; break;
-		case RBM_8WAY_III: p = "create~ a beam in 8 directions"; t = "$ enemies"; break;
-		case RBM_SWARM: p = "create~ multiple balls"; t = "$ enemies"; break;
-		case RBM_SPIKE: p = "create~ a spike"; t="one target"; break;
-		case RBM_AIM_AREA: p = "affect~ an area"; break;
-		case RBM_SCATTER: p = "scatter~ magic around &"; t = "$ enemies"; break;
-	}
-
 	/* Output 'D' for Description */
-	fprintf(fp, "D:");
-	if (p) fprintf(fp, "%s:", p);
-	else fprintf(fp, ":");
-	if (t) fprintf(fp, "%s", t);
-	fprintf(fp, "\n");
+	fprintf(fp, "D:%s:%s\n", head->text_ptr + blow_ptr->info[0], head->text_ptr + blow_ptr->info[1]);
 
 	fprintf(fp, "\n");
 
 	/* Success */
 	return (0);
 }
-
-
-
 
 
 /*
@@ -10626,6 +10388,9 @@ errr emit_effect_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'N' for "New/Number/Name" */
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + effect_ptr->name);
+
+	/* Output 'I' for "Info" (one line only) */
+	fprintf(fp,"I:%d:%d:%d\n",effect_ptr->power, effect_ptr->dam_max, effect_ptr->dam_max_powerful);
 
 	/* Output 'D' for Description */
 	fprintf(fp, "D");
