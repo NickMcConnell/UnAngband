@@ -309,11 +309,11 @@ M:20
 F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
 D:create~ a missile:$ enemies
 
-N:32:BOLT
+N:32:BOLT_10
 T:0-9999:shoot~ a bolt of * at &
 W:4:0:0
 M:20
-F:GRID | KILL | PLAY | MAGIC | STOP |
+F:GRID | KILL | PLAY | MAGIC | STOP | BEAM_CHANCE
 D:create~ a bolt:$ enemies
 
 N:33:BOLT
@@ -631,7 +631,7 @@ M:1
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | HIDE | SAFE |
 D:surround~ & with an aura:$ enemies
 
-N:71:8_WAY_I
+N:71:8WAY
 T:0-9999:throw~ a ragged ball of * at & 
 W:4:0:0
 R:2
@@ -640,7 +640,7 @@ F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 F:DIR_STOP |
 D:create~ a beam in 8 directions:$ enemies
 
-N:72:8_WAY_II
+N:72:8WAY_II
 T:0-9999:throw~ a large jagged ball of * at &
 W:5:0:0
 R:3
@@ -649,7 +649,7 @@ F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 F:DIR_STOP |
 D:create~ a beam in 8 directions:$ enemies
 
-N:73:8_WAY_III
+N:73:8WAY_III
 T:0-9999:throw~ a huge forked ball of * at &
 W:6:0:0
 R:4
@@ -1294,7 +1294,7 @@ X:3:1:6:DARK
 C:40:0:0:0:0:0:100
 R:4
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
-F:HEARD | CONCENTRATE_DARK | SCALE_RADIUS |
+F:HEARD | CONCENTRATE_LITE | SCALE_RADIUS |
 D::
 
 N:135:BALL_CONFU

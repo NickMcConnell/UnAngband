@@ -1145,6 +1145,7 @@ extern int town_depth(int dungeon);
 extern void get_zone(dungeon_zone **zone_handle, int dungeon, int depth);
 extern void long_level_name(char* str, int town, int depth);
 extern void current_long_level_name(char* str);
+extern int scale_method(method_level_scalar_type scalar, int level);
 
 
 /*

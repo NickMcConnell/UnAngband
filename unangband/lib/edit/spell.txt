@@ -4255,7 +4255,7 @@ A:38:6:1
 A:38:13:1
 A:75:70:1
 P:0:0
-B:BREATH:ELEC:4/1
+B:BREATH_20::ELEC:4/1
 F:OPP_ELEC |
 L:1d20+20
 D:You breathe lightning.
@@ -4267,7 +4267,7 @@ A:38:6:2
 A:38:15:1
 A:75:70:2
 P:0:0
-B:BREATH:COLD:15+4/1
+B:BREATH_20:COLD:15+4/1
 F:OPP_COLD |
 L:1d20+20
 D:You breathe frost.
@@ -4279,7 +4279,7 @@ A:38:6:3
 A:38:17:1
 A:75:70:3
 P:0:0
-B:BREATH:ACID:30+4/1
+B:BREATH_20:ACID:30+4/1
 F:OPP_ACID |
 L:1d20+20
 D:You breathe acid.
@@ -4291,7 +4291,7 @@ A:38:6:4
 A:38:16:1
 A:75:70:4
 P:0:0
-B:BREATH:POISON:25+5/1
+B:BREATH_30:POISON:25+5/1
 F:OPP_POIS |
 L:1d20+20
 D:You breathe poison.
@@ -4304,7 +4304,7 @@ A:38:14:1
 A:75:69:1
 A:75:70:5
 P:0:0
-B:BREATH:FIRE:75+5/1
+B:BREATH_20:FIRE:75+5/1
 F:OPP_FIRE |
 L:1d20+20
 D:You breathe fire.
@@ -4313,7 +4313,7 @@ N:372:Breathe Confusion
 A:38:14:2
 A:38:10:1
 P:0:0
-B:BREATH:CONFUSE:45+3/1
+B:BREATH_20:CONFUSE:45+3/1
 F:CURE_CONF |
 D:You breathe confusion.
 
@@ -4322,14 +4322,14 @@ A:38:16:2
 A:38:12:1
 A:38:20:1
 P:0:0
-B:BREATH:SOUND:55+3/1
+B:BREATH_30:SOUND:55+3/1
 F:CURE_STUN |
 D:You breathe sound.
 
 N:374:Breathe Fear
 A:38:15:2
 P:0:0
-B:BREATH:TERRIFY:35+3/1
+B:BREATH_20:TERRIFY:35+3/1
 F:CURE_FEAR |
 D:You breathe fear.
 
@@ -4338,20 +4338,20 @@ A:38:17:2
 A:38:18:1
 A:38:20:2
 P:0:0
-B:BREATH:DISENCHANT:25+3/1
+B:BREATH_20:DISENCHANT:25+3/1
 D:You breathe disenchantment.
 
 N:376:Breathe Nexus
 A:38:13:2
 P:0:0
-B:BREATH:NEXUS:15+3/1
+B:BREATH_20:NEXUS:15+3/1
 D:You breathe nexus.
 
 N:377:Breathe Chaos
 A:38:18:2
 A:38:20:3
 P:0:0
-B:BREATH:CHAOS:145+3/1
+B:BREATH_20:CHAOS:145+3/1
 F:CURE_IMAGE |
 D:You breathe chaos.
 
@@ -4359,14 +4359,14 @@ N:378:Breathe Shards
 A:38:12:2
 A:38:20:4
 P:0:0
-B:BREATH:SHARD:155+3/1
+B:BREATH_20:SHARD:155+3/1
 F:CURE_CUTS |
 D:You breathe shards.
 
 N:379:Breathe Darkness
 A:38:10:2
 P:0:0
-B:BREATH:DARK:125+3/1
+B:BREATH_20:DARK:125+3/1
 F:BLIND |
 L:1d20+20
 D:You breathe darkness.
@@ -4374,14 +4374,14 @@ D:You breathe darkness.
 N:380:Breathe Light
 A:38:10:3
 P:0:0
-B:BREATH:LITE:75+3/1
+B:BREATH_20:LITE:75+3/1
 F:CURE_BLIND |
 D:You breathe light.
 
 N:381:Breathe Power
 A:38:30:1
 P:0:0
-B:BREATH:MANA:225+3/1
+B:BREATH_20:MANA:225+3/1
 D:You breathe the elements.
 
 # Elemental ring activations

@@ -172,93 +172,6 @@ static cptr d_info_lflags[] =
 	"MORE"
 };
 
-/*
- * Monster/Trap/Spell Blow Methods
- */
-static cptr r_info_blow_method[] =
-{
-	"",
-	"HIT",
-	"TOUCH",
-	"PUNCH",
-	"KICK",
-	"CLAW",
-	"BITE",
-	"STING",
-	"VOMIT",
-	"BUTT",
-	"CRUSH",
-	"ENGULF",
-	"PECK",
-	"CRAWL",
-	"DROOL",
-	"SLIME",
-	"SPIT",
-	"GAZE",
-	"WAIL",
-	"SPORE",
-	"LASH",
-	"BEG",
-	"INSULT",
-	"MOAN",
-	"SING",
-	"TRAP",
-	"BOULDER",
-	"AURA",
-	"SELF",
-	"ADJACENT",
-	"HANDS",
-	"MISSILE",
-	"BOLT_10",
-	"BOLT",
-	"BEAM",
-	"BLAST",
-	"WALL",
-	"BALL",
-	"CLOUD",
-	"STORM",
-	"BREATH",
-	"AREA",
-	"LOS",
-	"LINE",
-	"AIM",
-	"ORB",
-	"STAR",
-	"SPHERE",
-	"PANEL",
-	"LEVEL",
-	"CROSS",
-	"STRIKE",
-	"EXPLODE",
-	"ARROW",
-	"XBOLT",
-	"DAGGER",
-	"DART",
-	"SHOT",
-	"ARC_20",
-	"ARC_30",
-	"ARC_40",
-	"ARC_50",
-	"ARC_60",
-	"FLASK",
-	"TRAIL",
-	"SHRIEK",
-	"BOLT_MINOR",
-	"BALL_MINOR",
-	"BALL_II",
-	"BALL_III",
-	"AURA_MINOR",
-	"8WAY",
-	"8WAY_II",
-	"8WAY_III",
-	"SWARM",
-	"SPIKE",
-	"AIM_AREA",
-	"SCATTER",
-	"HOWL",
-	NULL
-};
-
 
 /*
  * Blow and projection flags
@@ -323,7 +236,7 @@ static cptr method_info_flags2[] =
 	"INDIRECT",
 	"LIGHTNING_STROKE",
 	"CONCENTRATE_LITE",
-	"CONCENTRATE_DARK",
+	"BEAM_CHANCE",
 	"SCALE_RADIUS",
 	"LARGE_RADIUS",
 	"MAGIC_MISSILE",
@@ -339,158 +252,6 @@ static cptr method_info_flags2[] =
 	""
 };
 
-
-/*
- * Monster/Trap/Spell Blow Effects
- */
-static cptr r_info_blow_effect[] =
-{
-	"",
-	"STORM",
-	"WIND",
-	"HELLFIRE",
-	"MANA",
-	"HOLY_ORB",
-	"LITE_WEAK",
-	"DARK_WEAK",
-	"WATER_WEAK",
-	"PLASMA",
-	"METEOR",
-	"ICE",
-	"GRAVITY",
-	"INERTIA",
-	"FORCE",
-	"TIME",
-	"ACID",
-	"ELEC",
-	"FIRE",
-	"COLD",
-	"POISON",
-	"ANIM_DEAD",
-	"LITE",
-	"DARK",
-	"WATER",
-	"CONFUSE",
-	"SOUND",
-	"SHARD",
-	"NEXUS",
-	"NETHER",
-	"CHAOS",
-	"DISENCHANT",
-	"EXPLODE",
-	"KILL_WALL",
-	"KILL_DOOR",
-	"KILL_TRAP",
-	"MAKE_WALL",
-	"MAKE_DOOR",
-	"MAKE_TRAP",
-	"BRIDGE",
-	"ANIM_ELEMENT",
-	"AWAY_UNDEAD",
-	"AWAY_EVIL",
-	"AWAY_ALL",
-	"TURN_UNDEAD",
-	"TURN_EVIL",
-	"FEAR_WEAK",
-	"DISPEL_UNDEAD",
-	"DISPEL_EVIL",
-	"DISPEL_ALL",
-	"ANIM_OBJECT",
-	"CLONE",
-	"POLYMORPH",
-	"HEAL",
-	"HASTE",
-	"SLOW_WEAK",
-	"CONFUSE_WEAK",
-	"SLEEP",
-	"DRAIN_LIFE",
-	"BWATER",
-	"BMUD",
-	"HURT",
-	"LAVA",
-	"UN_BONUS",
-	"UN_POWER",
-	"EAT_GOLD",
-	"EAT_ITEM",
-	"EAT_FOOD",
-	"EAT_LITE",
-	"FALL",
-	"FALL_MORE",
-	"FALL_SPIKE",
-	"FALL_POISON",
-	"BLIND",
-	"SLOW",
-	"TERRIFY",
-	"PARALYZE",
-	"LOSE_STR",
-	"LOSE_INT",
-	"LOSE_WIS",
-	"LOSE_DEX",
-	"LOSE_CON",
-	"LOSE_CHR",
-	"LOSE_ALL",
-	"SHATTER",
-	"EXP_10",
-	"EXP_20",
-	"EXP_40",
-	"EXP_80",
-	"RAISE",
-	"LOWER",
-	"PROBE",
-	"LOCK_DOOR",
-	"SALT_WATER",
-	"HALLU",
-	"FEATURE",
-	"STEAM",
-	"VAPOUR",
-	"SMOKE",
-	"SUFFOCATE",
-	"HUNGER",
-	"DISEASE",
-	"LOSE_MANA",
-	"WOUND",
-	"BATTER",
-	"BLIND_WEAK",
-	"RAISE_DEAD",
-	"GAIN_MANA",
-	"FORGET",
-	"CURSE",
-	"DISPEL",
-	"STASTIS",
-	"PETRIFY",
-	"WEB",
-	"BLOOD",
-	"SLIME",
-	"RESIST_MAGIC",
-	"FALL_LESS",
-	"AWAY_DARK",
-	"AWAY_JUMP",
-	"HURT_WOOD",
-	"AWAY_NATURE",
-	"AWAY_FIRE",
-	"ANIM_TREE",
-	"CHARM_INSECT",
-	"CHARM_ANIMAL",
-	"CHARM_REPTILE",
-	"CHARM_MONSTER",
-	"CHARM_PERSON",
-	"BIND_DEMON",
-	"BIND_UNDEAD",
-	"BIND_DRAGON",
-	"BIND_FAMILIAR",
-	"VAMP_DRAIN",
-	"MANA_DRAIN",
-	"MENTAL",
-	"SNUFF",
-	"RAGE",
-	"HEAL_PERC",
-	"GAIN_MANA_PERC",
-	"TANGLE",
-	"POISON_WATER",
-	"INVISIBILITY",
-	"DELAY_POISON",
-	NULL
-};
 
 /*
  * Feature info flags
@@ -2400,7 +2161,7 @@ errr parse_method_info(char *buf, header *head)
 
 		/* TODO: This is bound to cause memory problems. Should have effect listed first */
 		/* Scan for 4th colon */
-		for (s = buf, n = 0; *s && (n < 5);)
+		for (s = buf, n = 0; *s && (n < 4);)
 		{
 			s++;
 			if (*s == ':') n++;
@@ -2410,10 +2171,13 @@ errr parse_method_info(char *buf, header *head)
 		*s++ = '\0';
 
 		/* Analyze the effect */
-		for (n1 = 0; r_info_blow_effect[n1]; n1++)
+		for (n1 = 0; n1 < z_info->effect_max; n1++)
 		{
-			if (streq(s, r_info_blow_effect[n1])) break;
+			if (streq(s, effect_name + effect_info[n1].name)) break;
 		}
+
+		/* Invalid effect */
+		if (n1 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Save the value */
 		method_ptr->d_res = n1;
@@ -3420,14 +3184,14 @@ errr parse_f_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze effect */
-		for (n1 = 0; r_info_blow_effect[n1]; n1++)
+		/* Analyze the method */
+		for (n1 = 0; n1 < z_info->effect_max; n1++)
 		{
-			if (streq(s, r_info_blow_effect[n1])) break;
+			if (streq(s, effect_name + effect_info[n1].name)) break;
 		}
 
-		/* Invalid effect */
-		if (!r_info_blow_effect[n1]) return (PARSE_ERROR_GENERIC);
+		/* Invalid method */
+		if (n1 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the third field */
 		for (s = t; *t && (*t != 'd'); t++) /* loop */;
@@ -4755,13 +4519,13 @@ errr parse_r_info(char *buf, header *head)
 		if (*t == ':') *t++ = '\0';
 
 		/* Analyze the method */
-		for (n1 = 0; r_info_blow_method[n1]; n1++)
+		for (n1 = 0; n1 < z_info->method_max; n1++)
 		{
-			if (streq(s, r_info_blow_method[n1])) break;
+			if (streq(s, method_name + method_info[n1].name)) break;
 		}
 
 		/* Invalid method */
-		if (!r_info_blow_method[n1]) return (PARSE_ERROR_GENERIC);
+		if (n1 == z_info->method_max) return (PARSE_ERROR_GENERIC);
 
 		/* Update the rf4 flags */
 		if (n1 >= RBM_MIN_RANGED) r_ptr->flags4 |= (RF4_BLOW_1 << i);
@@ -4772,14 +4536,14 @@ errr parse_r_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze effect */
-		for (n2 = 0; r_info_blow_effect[n2]; n2++)
+		/* Analyze the method */
+		for (n2 = 0; n2 < z_info->effect_max; n2++)
 		{
-			if (streq(s, r_info_blow_effect[n2])) break;
+			if (streq(s, effect_name + effect_info[n2].name)) break;
 		}
 
-		/* Invalid effect */
-		if (!r_info_blow_effect[n2]) return (PARSE_ERROR_GENERIC);
+		/* Invalid method */
+		if (n2 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the third field */
 		for (s = t; *t && (*t != 'd'); t++) /* loop */;
@@ -5960,13 +5724,13 @@ errr parse_s_info(char *buf, header *head)
 		if (*t == ':') *t++ = '\0';
 
 		/* Analyze the method */
-		for (n1 = 0; r_info_blow_method[n1]; n1++)
+		for (n1 = 0; n1 < z_info->method_max; n1++)
 		{
-			if (streq(s, r_info_blow_method[n1])) break;
+			if (streq(s, method_name + method_info[n1].name)) break;
 		}
 
 		/* Invalid method */
-		if (!r_info_blow_method[n1]) return (PARSE_ERROR_GENERIC);
+		if (n1 == z_info->method_max) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the second field */
 		for (s = t; *t && (*t != ':'); t++) /* loop */;
@@ -5974,14 +5738,14 @@ errr parse_s_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze effect */
-		for (n2 = 0; r_info_blow_effect[n2]; n2++)
+		/* Analyze the method */
+		for (n2 = 0; n2 < z_info->effect_max; n2++)
 		{
-			if (streq(s, r_info_blow_effect[n2])) break;
+			if (streq(s, effect_name + effect_info[n2].name)) break;
 		}
 
-		/* Invalid effect */
-		if (!r_info_blow_effect[n2]) return (PARSE_ERROR_GENERIC);
+		/* Invalid method */
+		if (n2 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Advance */
 		s = t;
@@ -7993,6 +7757,8 @@ static long eval_max_dam(monster_race *r_ptr)
 			int d_dice = r_ptr->blow[i].d_dice;
 			int d_side = r_ptr->blow[i].d_side;
 
+			method_type *method_ptr = &method_info[method];
+
 			/* Hack -- no more attacks */
 			if (!method) continue;
 
@@ -8001,56 +7767,44 @@ static long eval_max_dam(monster_race *r_ptr)
 									   d_dice * (d_side + 1),
 									   rlev);
 
-			switch (method)
+			/* Stun definitely dangerous */
+			if (method_ptr->flags2 & (PR2_STUN))
 			{
-				/*stun definitely most dangerous*/
-				case RBM_PUNCH:
-				case RBM_KICK:
-				case RBM_BUTT:
-				case RBM_CRUSH:
+				/* Less dangerous if less frequent */
+				if (method_ptr->flags2 & (PR2_CUTS))
+				{
+					atk_dam *= 5;
+					atk_dam /= 4;
+				}
+				/* More dangerous */
+				else
 				{
 					atk_dam *= 4;
 					atk_dam /= 3;
-					break;
 				}
-				/*cut*/
-				case RBM_CLAW:
-				case RBM_BITE:
-				case RBM_PECK:
-				{
-					atk_dam *= 7;
-					atk_dam /= 5;
-					break;
-				}
-				/* shriek */
-				case RBM_SHRIEK:
-				{
-					shriek = TRUE;
-					break;
-				}
-				default:
-				{
-					if ((effect == GF_WOUND) || (effect == GF_BATTER))
-					{
-						atk_dam *= 5;
-						atk_dam /= 4;
-					}
-					break;
-				}
+			}
+			/* Cuts moderately dangerous */
+			else
+			{
+				atk_dam *= 7;
+				atk_dam /= 5;
 			}
 
 			/* Normal melee or ranged attack */
-			if ((method <= RBM_MAX_NORMAL) && !(r_ptr->flags1 & (RF1_NEVER_BLOW)))
+			if ((method_ptr->flags2 & (PR2_MELEE)) && !(r_ptr->flags1 & (RF1_NEVER_BLOW)))
 			{
 				/* Keep a running total */
 				melee_dam += atk_dam;
 			}
 
 			/* Ranged attacks can also apply spell dam */
-			if (method >= RBM_MIN_RANGED)
+			if (method_ptr->flags2 & (PR2_RANGED))
 			{
-				int range = MAX_SIGHT, mana = 0, has_ammo = 0, freq;
-				bool must_hit = FALSE;
+				int range = scale_method(method_ptr->max_range, rlev);
+				int mana = method_ptr->mana_cost;
+				int has_ammo = method_ptr->ammo_tval ? rlev : 0;
+				int freq;
+				bool must_hit = (method_ptr->flags1 & (PROJECT_MISS)) != 0;
 
 				/* handle elemental breaths*/
 				switch (effect)
@@ -8073,75 +7827,6 @@ static long eval_max_dam(monster_race *r_ptr)
 				{
 					r_ptr->highest_threat = threat_mod(atk_dam, r_ptr, TRUE);
 					r_ptr->best_threat = 96 + i;
-				}
-
-				/* Some ranged blows can miss */
-				switch(method)
-				{
-					case RBM_SPIT:	mana = 0; range = 3; must_hit = TRUE; break;
-					case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf);break;
-					case RBM_WAIL:  mana = 5; range = 4; break;
-					case RBM_SPORE:	mana = 0; range = 3; must_hit = TRUE; has_ammo = rlev; break;
-					case RBM_LASH:  mana = 0; range = 3; break;
-					case RBM_BEG:	mana = 0; range = 4; break;
-					case RBM_INSULT: mana = 0; range = 4; break;
-					case RBM_MOAN: mana = 0; range = 2; break;
-					case RBM_SING:  mana = 0; range = 4; break;
-					case RBM_TRAP:  mana = 0; range = 1; break;
-					case RBM_BOULDER: mana = 0; range = 8; must_hit = TRUE; has_ammo = (rlev + 1) / 2; break;
-					case RBM_AURA:	mana = 4; range = 2; break;
-					case RBM_SELF:	mana = 3; range = 0; break;
-					case RBM_ADJACENT: mana = 3; range = 1; break;
-					case RBM_HANDS: mana = 2; range = 3; break;
-					case RBM_MISSILE: mana = 2; range = MAX_RANGE; break;
-					case RBM_BOLT_10: mana = 5; range = MAX_RANGE; break;
-					case RBM_BOLT: mana = 4; range = MAX_RANGE; break;
-					case RBM_BEAM: mana = 6; range = 10; break;
-					case RBM_BLAST: mana = 3; range = 1; break;
-					case RBM_WALL: mana = 6; range = MAX_RANGE; break;
-					case RBM_BALL: mana = 4; range = MAX_RANGE; break;
-					case RBM_CLOUD: mana = 5; range = MAX_RANGE; break;
-					case RBM_STORM: mana = 6; range = MAX_RANGE; break;
-					case RBM_BREATH: mana = 0; range = 6; break;
-					case RBM_AREA: mana = 3; range = (rlev / 10) + 1; break;
-					case RBM_LOS: mana = 6; range = MAX_SIGHT; break;
-					case RBM_LINE: mana = 4; range = MAX_RANGE; break;
-					case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
-					case RBM_ORB: mana = 5; range = MAX_RANGE; break;
-					case RBM_STAR: mana = 5; range = MAX_RANGE; break;
-					case RBM_SPHERE: mana = 6; range = MAX_RANGE; break;
-					case RBM_PANEL: mana = 6; range = MAX_SIGHT; break;
-					case RBM_LEVEL: mana = 8; range = 255; break;
-					case RBM_CROSS: mana = 4; range = MAX_RANGE; break;
-					case RBM_STRIKE: mana = 5; range = MAX_RANGE; break;
-					case RBM_EXPLODE: mana = 0; range = 1; break;
-					case RBM_ARROW: mana = 0; range = 10; must_hit = TRUE; has_ammo = rlev; break;
-					case RBM_XBOLT: mana = 0; range = 12; must_hit = TRUE; has_ammo = rlev; break;
-					case RBM_DAGGER: mana = 0; range = 6; must_hit = TRUE; has_ammo = rlev; break;
-					case RBM_DART: mana = 0; range = 6; must_hit = TRUE; has_ammo = rlev; break;
-					case RBM_SHOT: mana = 0; range = 8; must_hit = TRUE; break;
-					case RBM_ARC_20: mana = 6; range = 8; break;
-					case RBM_ARC_30: mana = 5; range = 6; break;
-				   case RBM_ARC_40: mana = 5; range = 6; break;
-				   case RBM_ARC_50: mana = 6; range = 6; break;
-				   case RBM_ARC_60: mana = 6; range = 6; break;
-					case RBM_FLASK:	mana = 0; range = 6; must_hit = TRUE; has_ammo = (rlev + 1) / 2; break;
-				case RBM_TRAIL: mana = 1; range = 3; break;
-				case RBM_SHRIEK: mana = 1; range = MAX_SIGHT; break;
-				   case RBM_BOLT_MINOR: mana = 2; range = 4; break;
-			      case RBM_BALL_MINOR: mana = 3; range = MAX_RANGE; break;
-				  case RBM_BALL_II: mana = 5; range = MAX_RANGE; break;
-				   case RBM_BALL_III: mana = 6; range = MAX_RANGE; break;
-			      case RBM_AURA_MINOR:	mana = 3; range = 1; break;
-				   case RBM_8WAY: mana = 4; range = MAX_RANGE; break;
-				   case RBM_8WAY_II: mana = 5; range = MAX_RANGE; break;
-				   case RBM_8WAY_III: mana = 6; range = MAX_RANGE; break;
-				   case RBM_SWARM: mana = 6; range = MAX_RANGE; break;
-					case RBM_SPIKE: mana = 0; range = 4; must_hit = TRUE; has_ammo = rlev; break;
-					case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; break;
-				   case RBM_SCATTER:  mana = 4; range = MAX_SIGHT; break;
-				   case RBM_HOWL:  mana = 2; range = 2; break;
-				default: assert (FALSE);
 				}
 
 				/* Archers get more shots */
@@ -9272,7 +8957,7 @@ errr emit_method_info_index(FILE *fp, header *head, int i)
 	if (method_ptr->dam_mult || method_ptr->dam_div || method_ptr->dam_var || method_ptr->d_res)
 	{
 		fprintf(fp, "X:%d:%d:%d:%s\n",method_ptr->dam_mult, method_ptr->dam_div, method_ptr->dam_var,
-			r_info_blow_effect[method_ptr->d_res]);
+			effect_name + effect_info[method_ptr->d_res].name);
 	}
 
 	/* Output 'C' for "Blow choices" */
@@ -9685,12 +9370,12 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 		if (!r_ptr->blow[n].method) break;
 
 		/* Output blow method */
-		fprintf(fp, "B:%s", r_info_blow_method[r_ptr->blow[n].method]);
+		fprintf(fp, "B:%s", method_name + method_info[r_ptr->blow[n].method].name);
 
 		/* Output blow effect */
 		if (r_ptr->blow[n].effect)
 		{
-			fprintf(fp, ":%s", r_info_blow_effect[r_ptr->blow[n].effect]);
+			fprintf(fp, ":%s", effect_name + effect_info[r_ptr->blow[n].effect].name);
 
 			/* Output blow damage if required */
 			if ((r_ptr->blow[n].d_dice) && (r_ptr->blow[n].d_side))
@@ -9772,12 +9457,12 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	{
 #if 0
 		/* Output blow method */
-		fprintf(fp, "T:%s", r_info_blow_method[f_ptr->blow.method]);
+		fprintf(fp, "T:%s", method_head->name_ptr + method_info[f_ptr->blow.method].name);
 #endif
 		/* Output blow effect */
 		if (f_ptr->blow.effect)
 		{
-			fprintf(fp, /*":%s"*/ "T:%s", r_info_blow_effect[f_ptr->blow.effect]);
+			fprintf(fp, /*":%s"*/ "T:%s", effect_name + effect_info[f_ptr->blow.effect].name);
 
 			/* Output blow damage if required */
 			if ((f_ptr->blow.d_dice) && (f_ptr->blow.d_side))
@@ -10279,11 +9964,11 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	{
 		if (!s_ptr->blow[n].method) continue;
 
-		fprintf(fp, "B:%s", r_info_blow_method[s_ptr->blow[n].method]);
+		fprintf(fp, "B:%s", method_name + method_info[s_ptr->blow[n].method].name);
 
 		if (s_ptr->blow[n].effect)
 		{
-			fprintf(fp, ":%s", r_info_blow_effect[s_ptr->blow[n].effect]);
+			fprintf(fp, ":%s", effect_name + effect_info[s_ptr->blow[n].effect].name);
 
 			if ((s_ptr->blow[n].d_dice != 0) || (s_ptr->blow[n].d_side != 0))
 			{

@@ -7352,3 +7352,22 @@ void get_zone(dungeon_zone **zone_handle, int dungeon, int depth)
 	*zone_handle = zone;
 
 }
+
+
+
+
+/*
+ * Use scalar
+ */
+int scale_method(method_level_scalar_type scalar, int level)
+{
+	int result = scalar.base;
+
+	/* Scale radius up */
+	if (scalar.levels)
+	{
+		result += scalar.gain * level / scalar.levels;
+	}
+
+	return (result);
+}

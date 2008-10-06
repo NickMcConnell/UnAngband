@@ -2417,7 +2417,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Concentrate light or darkness */
-				if (method_ptr->flags2 & (PR2_CONCENTRATE_LITE | PR2_CONCENTRATE_DARK))
+				if (method_ptr->flags2 & (PR2_CONCENTRATE_LITE))
 				{
 					/* Check if we can hit target */
 					if ((who <= 0) || (generic_los(y, x, m_ptr->fy, m_ptr->fx, CAVE_XLOF)))

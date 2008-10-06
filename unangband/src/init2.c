@@ -2226,12 +2226,12 @@ void init_angband(void)
 	if (init_z_info()) quit("Cannot initialize sizes");
 
 	/* Initialize feature info */
-	note("[Initializing arrays... (blows)]");
-	if (init_method_info()) quit("Cannot initialize blows");
-
-	/* Initialize feature info */
 	note("[Initializing arrays... (effects)]");
 	if (init_effect_info()) quit("Cannot initialize effects");
+
+	/* Initialize feature info */
+	note("[Initializing arrays... (blows)]");
+	if (init_method_info()) quit("Cannot initialize blows");
 
 	/* Initialize feature info */
 	note("[Initializing arrays... (features)]");

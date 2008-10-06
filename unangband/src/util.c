@@ -2304,7 +2304,7 @@ void message_add(cptr str, u16b type)
 		{
 			/* Update the 'message__easy', wrap if needed */
 			if ((message__last == message__easy) && (++message__last == MESSAGE_MAX)) message__easy = 0;
-			
+
 			/* Advance 'message__last', wrap if needed */
 			if (++message__last == MESSAGE_MAX) message__last = 0;
 		}
@@ -2326,7 +2326,7 @@ void message_add(cptr str, u16b type)
 	if (message__head + (n + 1) >= MESSAGE_BUF)
 	{
 		bool update_easy = FALSE;
-		
+
 		/* Kill all "dead" messages */
 		for (i = message__last; TRUE; i++)
 		{
@@ -2335,7 +2335,7 @@ void message_add(cptr str, u16b type)
 
 			/* Stop before the new message */
 			if (i == message__next) break;
-			
+
 			/* Update message__easy if required */
 			if (i == message__easy) update_easy = TRUE;
 
@@ -2347,7 +2347,7 @@ void message_add(cptr str, u16b type)
 			{
 				/* Track oldest message */
 				message__last = i + 1;
-				
+
 				/* Update easy if required */
 				if (update_easy) message__easy = i + 1;
 			}
@@ -2367,7 +2367,7 @@ void message_add(cptr str, u16b type)
 	if (message__head + (n + 1) > message__tail)
 	{
 		bool update_easy = FALSE;
-		
+
 		/* Advance to new "tail" location */
 		message__tail += (MESSAGE_BUF / 4);
 
@@ -2391,7 +2391,7 @@ void message_add(cptr str, u16b type)
 			{
 				/* Track oldest message */
 				message__last = i + 1;
-				
+
 				/* Update easy if required */
 				if (update_easy) message__easy = i + 1;
 			}
@@ -2412,7 +2412,7 @@ void message_add(cptr str, u16b type)
 	{
 		/* Update the 'message__easy', wrap if needed */
 		if ((message__last == message__easy) && (++message__last == MESSAGE_MAX)) message__easy = 0;
-		
+
 		/* Advance 'message__last', wrap if needed */
 		if (++message__last == MESSAGE_MAX) message__last = 0;
 	}
@@ -2440,7 +2440,7 @@ void message_add(cptr str, u16b type)
  * This displays all the messages on the screen, trying to
  * minimise the amount of times the -more- key has to be
  * pressed, by using all the available screen space.
- * 
+ *
  * If command is set to true, we re-display the command
  * prompt once this is done, and pass back the last key
  * press as a command.
@@ -2453,15 +2453,15 @@ void messages_easy(bool command)
 
 	char *t;
 	char buf[1024];
-	
+
 	/* Easy more option not selected. */
 	if (!easy_more)
 	{
 		message__easy = message__next;
-		
+
 		return;
 	}
-	
+
 	/* Nothing to display. */
 	else if (!must_more)
 	{
@@ -2473,16 +2473,16 @@ void messages_easy(bool command)
 	{
 		return;
 	}
-	
+
 	/* Don't display if character is dead or not yet generated */
 	else if (!character_generated || p_ptr->is_dead)
 	{
 		return;
 	}
-	
+
 	/* Save the screen */
 	screen_save();
-	
+
 	/* Obtain the size */
 	(void)Term_get_size(&w, &h);
 
@@ -2499,19 +2499,19 @@ void messages_easy(bool command)
 		byte color = message_type_color(message__type[message__easy]);
 
 		int n = strlen(msg);
-		
+
 		bool long_line = FALSE;
-		
+
 		if ((x) && (x + n) > (w))
 		{
 			/* Go to next row if required */
 			x = 0;
 			y++;
 		}
-		
-		/* Improve legibility of long entries */		
+
+		/* Improve legibility of long entries */
 		if (n > (w - 8)) long_line = TRUE;
-		
+
 		/* Copy it */
 		strncpy(buf, msg, sizeof(buf));
 		buf[sizeof(buf)-1] = '\0';
@@ -2544,25 +2544,25 @@ void messages_easy(bool command)
 
 			/* Display part of the message */
 			Term_putstr(x, y, split, color, t);
-			
+
 			/* Erase to end of line to improve legibility */
 			if (long_line)
 			{
 				/* Clear top line */
-				Term_erase(x + split, y, 255);			
+				Term_erase(x + split, y, 255);
 			}
 			else
 			{
 				/* Add a space for legibility */
 				Term_putstr(x + split, y, -1, TERM_WHITE, " ");
 			}
-			
+
 			/* Restore the split character */
 			t[split] = oops;
 
 			/* Prepare to recurse on the rest of "buf" */
 			t += split; n -= split;
-			
+
 			/* Reset column and line */
 			x = 0;
 			y++;
@@ -2579,7 +2579,7 @@ void messages_easy(bool command)
 
 		/* Get next position */
 		x += n + 1;
-		
+
 		/* Display more prompt if reached near end of page */
 		if ((y >= (h < 12 ? h - (show_sidebar ? 3 : 2) : (h > 23 ? (h / 2) - (show_sidebar ? 2 : 1) : 11 - (show_sidebar ? 3 : 2))))
 				/* Display more prompt if out of messages */
@@ -2587,12 +2587,12 @@ void messages_easy(bool command)
 		{
 			/* Pause for response */
 			Term_putstr(0, y + 1, -1, a, message__easy == message__next ? "-end-" : "-more-");
-	
+
 			/* Get an acceptable keypress. */
 			while (1)
 			{
 				ke = inkey_ex();
-	
+
 				if ((ke.key == '\xff') && !(ke.mousebutton))
 				{
 					int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
@@ -2600,7 +2600,7 @@ void messages_easy(bool command)
 					int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
 					if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
-					
+
 					continue;
 				}
 		#if 0
@@ -2612,24 +2612,24 @@ void messages_easy(bool command)
 				if ((ke.key == '\xff') && (ke.mousebutton == 1)) break;
 				bell("Illegal response to a 'more' prompt!");
 			}
-			
+
 			/* Refresh screen */
 			screen_load();
-			
+
 			/* Tried a command - avoid rest of messages */
 			if (ke.key != ' ') break;
-			
+
 			if (message__easy != message__next) screen_save();
-			
+
 			/* Start at top left hand side */
 			y = (use_trackmouse ? 1 : 0);
 			x = 0;
 		}
 	}
-	
+
 	/* Allow 1 line messages again */
 	must_more = FALSE;
-	
+
 	/* Clear the message flag */
 	msg_flag = FALSE;
 
@@ -2640,10 +2640,10 @@ void messages_easy(bool command)
 	if (command)
 	{
 		Term_putstr(0, 0, -1, TERM_WHITE, "Command:");
-		
+
 		/* Requeue command just pressed */
 		p_ptr->command_new = ke;
-		
+
 		/* Hack -- Process "Escape"/"Spacebar"/"Return" */
 		if ((p_ptr->command_new.key == ESCAPE) ||
 			(p_ptr->command_new.key == ' ') ||
@@ -2675,7 +2675,7 @@ errr messages_init(void)
 
 	/* Hack -- No messages for easy_more */
 	message__easy = MESSAGE_BUF;
-	
+
 	/* Success */
 	return (0);
 }
@@ -2713,8 +2713,8 @@ static void msg_flush(int x)
 	byte a = TERM_L_BLUE;
 
 	/* Handle easy_more */
-	if (easy_more) return;	
-	
+	if (easy_more) return;
+
 #if 0
 	int warning = (p_ptr->mhp * op_ptr->hitpoint_warn / 10);
 
@@ -2809,7 +2809,7 @@ static void msg_print_aux(u16b type, cptr msg)
 	{
 		bool hack_use_first_line = (easy_more && !must_more && !message_column && msg && !use_trackmouse);
 		bool hack_flush = (easy_more && message_column && !use_trackmouse && ((message_column + n) <= (w)) && !must_more && !msg);
-		
+
 		/* Handle easy_more */
 		if (easy_more && msg && !must_more)
 		{
@@ -2819,10 +2819,10 @@ static void msg_print_aux(u16b type, cptr msg)
 			/* Delay displaying remaining messages */
 			must_more = TRUE;
 		}
-		
+
 		/* Hack -- allow single line '-more-' */
 		if (hack_flush) easy_more = FALSE;
-		
+
 		/* Flush */
 		msg_flush(message_column);
 
@@ -3001,7 +3001,7 @@ void message_format(u16b message_type, s16b extra, cptr fmt, ...)
 
 /*
  * Print the queued messages.
- * 
+ *
  * Note we'd like to call messages_easy here but can't
  * because this causes an infinite loop between here,
  * messages_easy and screen_save.
@@ -3329,13 +3329,13 @@ void text_out_to_file(byte a, cptr str)
 		else
 		{
 			/* Wrap at the newline */
-			if ((s[n] == '\n') || (s[n] == '\0')) 
+			if ((s[n] == '\n') || (s[n] == '\0'))
 			{
 				len = n;
 				wrapped = FALSE;
 			}
 			/* Wrap at the last space */
-			else 
+			else
 			{
 				len = l_space;
 				wrapped = TRUE;
@@ -4496,12 +4496,12 @@ int color_char_to_attr(char c)
 int color_text_to_attr(cptr name)
 {
 	int a;
-	
+
 	for (a = 0; a < MAX_COLORS; a++)
 	{
 		if (my_stricmp(name, color_table[a].name) == 0) return (a);
 	}
-	
+
 	/* Default to white */
 	return (TERM_WHITE);
 }
@@ -4513,7 +4513,7 @@ int color_text_to_attr(cptr name)
 cptr attr_to_text(byte a)
 {
 	if (a < MAX_COLORS) return (color_table[a].name);
-	
+
 	/* Oops */
 	return ("Icky");
 }
@@ -4848,7 +4848,7 @@ bool is_valid_pf(int y, int x)
 	if ((easy_alter)
 		 && ( (f_info[feat].flags1 & (FF1_DISARM)) ||
 		 ( !(f_info[feat].flags1 & (FF1_MOVE)) &&
-		 !(f_info[feat].flags3 & (FF3_EASY_CLIMB)) && 
+		 !(f_info[feat].flags3 & (FF3_EASY_CLIMB)) &&
 		 (f_info[feat].flags1 & (FF1_OPEN)))))
 	{
 		return (TRUE);
@@ -4876,7 +4876,7 @@ static void fill_terrain_info(void)
 
 	ex = MIN(p_ptr->px + MAX_PF_RADIUS / 2 - 1,DUNGEON_WID);
 	ey = MIN(p_ptr->py + MAX_PF_RADIUS / 2 - 1,DUNGEON_HGT);
-	
+
 	for (i=0;i<MAX_PF_RADIUS*MAX_PF_RADIUS;i++)
 		terrain[0][i] = -1;
 
@@ -4926,8 +4926,8 @@ bool findpath(int y, int x)
 	}
 
 
-	/* 
-	 * And now starts the very naive and very 
+	/*
+	 * And now starts the very naive and very
 	 * inefficient pathfinding algorithm
 	 */
 	do
@@ -4963,7 +4963,7 @@ bool findpath(int y, int x)
 	j = y;
 
 	pf_result_index = 0;
-	
+
 	while ((i != p_ptr->px) || (j != p_ptr->py))
 	{
 		cur_distance = terrain[j-oy][i-ox] - 1;
@@ -4983,7 +4983,7 @@ bool findpath(int y, int x)
 			bell("Heyyy !");
 			return (FALSE);
 		}
-		
+
 		pf_result[pf_result_index++] = '0' + (char)(10-dir);
 		i += ddx[dir];
 		j += ddy[dir];
@@ -5092,7 +5092,7 @@ bool get_list(print_list_func print_list, const s16b *sn, int num, cptr p, cptr 
 	key_event ke;
 
 	char out_val[160];
-	
+
 	/* Clear messages */
 	if (easy_more) messages_easy(FALSE);
 
