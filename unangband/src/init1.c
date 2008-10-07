@@ -10085,6 +10085,8 @@ errr emit_effect_info_index(FILE *fp, header *head, int i)
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", effect_ptr->flags1, method_info_flags1);
 
+	fprintf(fp,"\n");
+
 	/* Success */
 	return (0);
 

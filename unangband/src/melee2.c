@@ -1237,7 +1237,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	/* Always permit huge blows */
 	if (r_ptr->flags3 & (RF3_HUGE))
 	{
-		for (i = 0; i < 4; i++) if (r_ptr->blow[i].method < RBM_MIN_RANGED) f4 |= (1L << i);
+		for (i = 0; i < 4; i++) if ((method_info[r_ptr->blow[i].method].flags2 & (PR2_RANGED)) == 0) f4 |= (1L << i);
 	}
 
 	/* Eliminate innate spells if not set */

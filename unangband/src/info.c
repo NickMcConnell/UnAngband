@@ -1257,12 +1257,9 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
  */
 static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target, bool introduced)
 {
-	int m,n,r;
+	int i, m,n,r;
 
-	cptr p, q, s, t, u, v;
-
-	/* Preposition */
-	v = "for";
+	cptr p[7];
 
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
@@ -1279,6 +1276,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 	{
 		int method, effect, d1, d2, d3, rad, arc, rng;
 
+		method_type *method_ptr;
+		effect_type *effect_ptr;
+
 		/* Skip non-attacks */
 		if (!s_ptr->blow[m].method) continue;
 
@@ -1288,9 +1288,6 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		d1 = s_ptr->blow[m].d_dice;
 		d2 = s_ptr->blow[m].d_side;
 		d3 = s_ptr->blow[m].d_plus;
-		rad = 0;
-		arc = 0;
-		rng = 0;
 
 		/* Hack -- use level as modifier */
 		if ((!d2) && (!level))
@@ -1302,15 +1299,6 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		{
 			d3 += level * d1;
 		}
-
-		/* No method yet */
-		p = NULL;
-
-		/* No method yet */
-		s = NULL;
-
-		/* No target yet */
-		t = NULL;
 
 		/* Hack -- potions and food */
 		switch(target)
@@ -1330,250 +1318,67 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			case SPELL_TARGET_EXPLODE:
 				method = RBM_FLASK;
 				break;
-
 		}
 
-		/* Get the method */
-		switch (method)
-		{
-			case RBM_HIT: p = "hits"; t = "one target"; break;
+		/* Get method details */
+		method_ptr = &method_info[method];
+		effect_ptr = &effect_info[effect];
 
-			case RBM_SPIT: p = "spits"; t = "one target"; break;
-			case RBM_GAZE: p = "gazes"; t = "one target"; break;
-			case RBM_WAIL: p = "wails"; t = "one target"; break;
-			case RBM_SPORE: t = "one adjacent target"; break;
-			case RBM_LASH: t = "one adjacent target"; break;
-		case RBM_BEG: t = "one adjacent target"; break;
-		case RBM_INSULT: t = "one adjacent target"; break;
-		case RBM_MOAN: t = "one adjacent target"; break;
-		case RBM_SING: t = "one adjacent target"; break;
-		case RBM_TRAP: t = "one adjacent target"; break;
-		case RBM_BOULDER: t = "one adjacent target"; break;
-			case RBM_AURA: p = "surrounds you with an aura";  t = "your enemies"; rad = 2; break;
-			case RBM_SELF: t = "you"; break;
-			case RBM_ADJACENT: t = "all enemies adjacent to you"; break;
-			case RBM_HANDS: t = "a beam"; rng = 3; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
-			case RBM_MISSILE: p = "creates a missile"; t = "your enemies"; if ((level > 5) && (d2)) d1+= (level-1)/5;break;
-			case RBM_BOLT_10: p = "creates a bolt"; t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BOLT: p = "creates a powerful bolt";  t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BEAM: p = "creates a beam"; t = "your enemies";if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BLAST: p = "creates an adjacent blast"; t = "your enemies"; d3 += level;break;
-			case RBM_WALL: p = "creates a wall"; t = "your enemies"; if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BALL: p = "creates a ball"; t = "your enemies"; rad = 2; break;
-			case RBM_CLOUD: p = "creates a cloud"; t = "your enemies"; rad = 2; d3 += level/2; break;
-			case RBM_STORM: p = "creates a storm"; t = "your enemies"; rad = 3; break;
-			case RBM_BREATH: p = "breathes";  t = "your enemies"; d3 = p_ptr->chp * d3 / 300; break;
-			case RBM_AREA: p = "surrounds you with magic"; rad = (level/10)+1; break;
-			case RBM_LOS: t = "all your enemies in line of sight"; break;
-			case RBM_LINE: t = "one direction"; break;
-			case RBM_AIM: t = "one target"; break;
-			case RBM_ORB: p = "creates an orb"; t = "your enemies"; rad = (level < 30 ? 2 : 3); d3 += level/2; break;
-			case RBM_STAR: p = "surrounds you with a star"; t = "your enemies"; break;
-			case RBM_SPHERE: p = "creates a sphere";  t = "your enemies";  rad = (level/10)+2; break;
-			case RBM_PANEL: t = "the current panel"; break;
-			case RBM_LEVEL: t = "the current level"; break;
-			case RBM_CROSS: p = "surrounds you with a cross"; t = "your enemies"; break;
-			case RBM_STRIKE: p = "strikes"; t = "your enemy"; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
-			case RBM_EXPLODE: t = "you and all enemies adjacent to you"; break;
-			case RBM_ARROW: p = "creates an arrow"; t="one target"; break;
-			case RBM_XBOLT: p = "creates a crossbow bolt"; t="one target"; break;
-			case RBM_DAGGER: p = "creates a dagger"; t="one target"; break;
-			case RBM_DART: p = "creates a dart"; t="one target"; break;
-			case RBM_SHOT: p = "creates a shot"; t="one target"; break;
-			case RBM_ARC_20: p = "creates an arc"; arc = 20; break;
-			case RBM_ARC_30: p = "creates an arc"; arc = 30; break;
-			case RBM_ARC_40: p = "creates an arc"; arc = 40; break;
-			case RBM_ARC_50: p = "creates an arc"; arc = 50; break;
-			case RBM_ARC_60: p = "creates an arc"; arc = 60; break;
-			case RBM_FLASK: p = "creates a ball"; t = "your enemies"; rad = 1; break;
-		case RBM_TRAIL: t = "one adjacent target"; break;
-		case RBM_SHRIEK: t = "one adjacent target"; break;
-			case RBM_BOLT_MINOR: p = "creates a bolt"; t = "your enemies"; rng = 4; if ((level > 5) && (d2)) d1+= (level-1)/5; break;
-			case RBM_BALL_MINOR: p = "throws a ball"; t = "your enemies"; rad = 1; break;
-			case RBM_BALL_II: p = "creates a ball"; t = "your enemies"; rad = 3; break;
-			case RBM_BALL_III: p = "creates a ball"; t = "your enemies"; rad = 4; break;
-			case RBM_AURA_MINOR: p = "surrounds you with an aura";  t = "your enemies"; rad = 1; break;
-			case RBM_8WAY: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 2; break;
-			case RBM_8WAY_II: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 3; break;
-			case RBM_8WAY_III: p = "creates a beam in 8 directions"; t = "your enemies"; rad = 4; break;
-			case RBM_SWARM: p = "creates multiple balls"; t = "your enemies"; rad = 1; d3 += level / 2; break;
-			case RBM_SPIKE: p = "creates a spike"; t="one target"; break;
-			case RBM_AIM_AREA: p = "affects an area"; rad = (level/10)+1; break;
-			case RBM_SCATTER: p = "scatters magic around you"; t = "your enemies"; break;
-		case RBM_HOWL: t = "one adjacent target"; break;
-		default: t = "one adjacent target"; if ((level > 8) && (d2)) d1+= (level-5)/4;break; /* ? */
+		rad = scale_method(method_ptr->radius, level);
+		arc = method_ptr->arc;
+		rng = scale_method(method_ptr->max_range, level);
+
+		/* Initilise the output string */
+		for (i = 0; i < 5; i++)
+		{
+			p[i] = NULL;
 		}
 
-		/* Default technique */
-		q = NULL;
+		/* Initialise more output string */
+		p[5] = "for";
+		p[6] = "damage";
 
-		/* Default flavor */
-		u = NULL;
+		/* Get method info text */
+		p[0] = method_text + method_ptr->info[0];
+		p[3] = method_text + method_ptr->info[1];
 
-		/* Get the effect */
-		switch (effect)
+		/* Get effect info text */
+		for (i = 0; i < 6; i++)
 		{
-			case GF_NOTHING: q = "do"; u = "nothing"; break;
-			case GF_STORM: q= "lash"; u = "with wind, rain and lightning"; break;
-			case GF_WIND: q= "blast"; u = "with wind"; break;
-			case GF_HELLFIRE: q="blast"; u = "with hellfire";break;
-			case GF_MANA: q="blast"; u = "with magic";break;
-			case GF_HOLY_ORB: q="blast"; u = "with holy magic";break;
-			case GF_LITE_WEAK: q="light"; s ="up";break;
-			case GF_DARK_WEAK: q="plunge"; s ="into darkness"; break;
-			case GF_WATER_WEAK: q="soak"; u = "with water";break;
-			case GF_POISON_WATER: q="soak"; u = "with poisonous water";break;
-			case GF_SALT_WATER: q="soak"; u = "with salt water";break;
-			case GF_PLASMA: q="blast"; u = "with plasma";break;
-			case GF_METEOR: q="blast"; u = "with meteors";break;
-			case GF_ICE: q="cover"; u = "with ice";break;
-			case GF_GRAVITY: q="crush"; u = "with gravity";break;
-			case GF_INERTIA: q="slow"; u = "with inertia";break;
-			case GF_FORCE: q="impact"; u = "with force";break;
-			case GF_TIME: q="take"; u = "back in time";break;
-			case GF_ACID:   q = "dissolve"; break;
-			case GF_ELEC:   q = "electrify"; break;
-			case GF_FIRE:   q = "burn"; break;
-			case GF_COLD:   q = "freeze"; break;
-			case GF_POIS: q = "poison"; break;
-			case GF_ANIM_DEAD: q = "animate"; t = "dead"; break;
-			case GF_LITE: q = "blast"; u = "with powerful light";break;
-			case GF_DARK: q = "blast"; u = "with powerful darkness";break;
-			case GF_WATER: q="blast"; u = "with water";break;
-		        case GF_CONFUSION:      q = "confuse"; break;
-			case GF_SOUND: q = "deafen";break;
-			case GF_SHARD: q = "blast"; u = "with shards";break;
-			case GF_NEXUS: q = "blast"; u = "with nexus";break;
-			case GF_NETHER: q = "blast"; u = "with nether";break;
-			case GF_CHAOS: q = "blast"; u = "with chaos";break;
-			case GF_DISENCHANT: q = "blast"; u = "with disenchantment";break;
-			case GF_KILL_WALL: q = "remove"; s = "rock from"; break;
-			case GF_KILL_DOOR: q = "remove"; s = "doors from"; break;
-			case GF_KILL_TRAP: q = "remove"; s = "traps from"; break;
-			case GF_MAKE_WALL: q = "create"; s = "walls around"; break;
-			case GF_MAKE_DOOR: q = "create"; s = "doors around"; break;
-			case GF_MAKE_TRAP: q = "create"; s = "traps around"; break;
-			case GF_BRIDGE: q = "create"; s = "a stone bridge under"; break;
-			case GF_ANIM_ELEMENT: q = "animate"; t = "elements"; break;
-			case GF_AWAY_UNDEAD: q = "teleport"; u="away if undead";break;
-			case GF_AWAY_EVIL: q = "teleport"; u="away if evil";break;
-			case GF_AWAY_ALL: q = "teleport"; u = "away";break;
-			case GF_AWAY_DARK: q = "teleport"; u = "away only in darkness";break;
-			case GF_AWAY_NATURE: q = "teleport"; u = "away if adjacent to water or nature"; break;
-			case GF_AWAY_FIRE: q = "teleport"; u = "away if adjacent to fire, smoke or lava"; break;
-			case GF_AWAY_JUMP: q = "jump"; u = "away to a location still in line of fire"; break;
-			case GF_TURN_UNDEAD: q = "turn"; u="if undead"; break;
-			case GF_TURN_EVIL: q = "turn"; u="if evil"; break;
-			case GF_FEAR_WEAK: q = "scare";break;
-			case GF_DISP_UNDEAD: q = "dispel"; u="if undead"; break;
-			case GF_DISP_EVIL: q = "dispel"; u="if evil"; break;
-			case GF_DISP_ALL: q = "dispel";break;
-			case GF_ANIM_OBJECT: q = "animate"; t = "objects"; break;
-			case GF_CLONE: q = "clone";break;
-			case GF_POLY: q = "polymorph";break;
-			case GF_HEAL: case GF_HEAL_PERC: q = "heal";break;
-			case GF_HASTE: q = "hasten";break;
-			case GF_SLOW_WEAK: q = "slow";break;
-			case GF_CONF_WEAK: q = "confuse";break;
-			case GF_SLEEP: q = "send"; u="to sleep";break;
-			case GF_DRAIN_LIFE: q = "drain"; s="life from";break;
-			case GF_LAVA: q = "burn"; u="with lava";break;
-			case GF_BWATER: q = "scald"; u="with boiling water";break;
-			case GF_BMUD: q = "splash"; u="with boiling mud";break;
-			case GF_HURT:   q = "attack"; break;
-			case GF_UN_BONUS:       q = "disenchant"; break;
-			case GF_UN_POWER:       q = "drain"; t = "charges from"; break;
-			case GF_EAT_GOLD:       q = "steal"; t = "gold from"; break;
-			case GF_EAT_ITEM:       q = "steal"; t = "items from"; break;
-			case GF_EAT_FOOD:       q = "eat"; u="r food"; break;
-			case GF_EAT_LITE:       q = "absorb"; t = "light from"; break;
-			case GF_FALL: q = "drop"; u="into a pit";break;
-			case GF_FALL_MORE: q = "drop"; u="through the floor";break;
-			case GF_FALL_LESS: q = "rise"; u="through the ceiling";break;
-			case GF_FALL_SPIKE: q = "drop"; u="into a spiked pit";break;
-			case GF_FALL_POIS: q = "drop"; u="into a poison spiked pit";break;
-			case GF_BLIND:  q = "blind"; break;
-			case GF_TERRIFY:	q = "terrify"; break;
-			case GF_PARALYZE:       q = "paralyze"; break;
-			case GF_LOSE_STR:       q = "reduce"; s="strength and size from"; break;
-			case GF_LOSE_INT:       q = "reduce"; s="intelligence from"; break;
-			case GF_LOSE_WIS:       q = "reduce"; s="wisdom from"; break;
-			case GF_LOSE_DEX:       q = "reduce"; s="dexterity and agility from"; break;
-			case GF_LOSE_CON:       q = "reduce"; s="constitution from"; break;
-			case GF_LOSE_CHR:       q = "reduce"; s="charisma from"; break;
-			case GF_LOSE_ALL:       q = "reduce"; s="all stats from"; break;
-			case GF_SHATTER:	q = "shatter"; break;
-			case GF_EXP_10: q = "drain"; s="experience (by 10d6+) from"; break;
-			case GF_EXP_20: q = "drain"; s="experience (by 20d6+) from"; break;
-			case GF_EXP_40: q = "drain"; s="experience (by 40d6+) from"; break;
-			case GF_EXP_80: q = "drain"; s="experience (by 80d6+) from"; break;
-			case GF_RAISE:      q = "raise"; s = "water around"; break;
-			case GF_LOWER:		q = "lower"; s = "water around"; break;
-			case GF_PROBE: q = "probe"; q = NULL; break;
-			case GF_LOCK_DOOR: q = "magically lock"; s = "doors on"; break;
-			case GF_HALLU: q = "space out"; break;
-			case GF_STEAM:	q = "scald"; u="with steam"; break;
-			case GF_VAPOUR:	q = "dissolve"; u="with acidic vapour"; break;
-			case GF_SMOKE:	q = "burn"; u="with smoke"; break;
-			case GF_SUFFOCATE:	q = "suffocate"; break;
-			case GF_HUNGER:		q = "starve"; break;
-			case GF_DISEASE:	q = "infect"; u="with disease"; break;
-			case GF_LOSE_MANA:	q = "drain"; s= "mana from"; break;
-			case GF_WOUND:		q = "wound"; break;
-			case GF_BATTER:		q = "batter"; break;
-			case GF_BLIND_WEAK:		q = "blind"; break;
-			case GF_RAISE_DEAD: q = "raise"; t = "dead"; break;
-			case GF_GAIN_MANA: case GF_GAIN_MANA_PERC:	q = "return"; s= "mana to"; break;
-			case GF_FORGET:		q = "forget"; break;
-			case GF_CURSE:		q = "curse"; break;
-			case GF_DISPEL:		q = "remove"; s = "enchantments from"; break;
-			case GF_STASTIS:	q = "trap"; u= "in time loops"; break;
-			case GF_PETRIFY:	q = "petrify"; break;
-			case GF_WEB:		q = "build"; s = "webs around"; break;
-			case GF_BLOOD:		q = "cover"; u = "in blood"; break;
-			case GF_SLIME:		q = "cover"; u = "in slime"; break;
-			case GF_HURT_WOOD:	q = "warp"; t = "wood out of shape"; break;
-			case GF_ANIM_TREE:	q = "animate"; t = "trees"; break;
-			case GF_CHARM_INSECT:	q = "charm"; t = "insects"; break;
-			case GF_CHARM_REPTILE:	q = "charm"; t = "reptiles or amphibians"; break;
-			case GF_CHARM_ANIMAL:	q = "charm"; t = "birds or mammals"; break;
-			case GF_CHARM_MONSTER:	q = "charm"; t = "living monsters other than dragons"; break;
-			case GF_CHARM_PERSON:	q = "charm"; t = "elves, dwarves, humans, orcs, trolls or giants"; break;
-			case GF_BIND_DEMON:		q = "bind"; t = "demons to a cursed item"; break;
-			case GF_BIND_DRAGON:	q = "bind"; t = "dragons to a cursed item"; break;
-			case GF_BIND_UNDEAD:	q = "bind"; t = "undead to a cursed item"; break;
-			case GF_BIND_FAMILIAR:	q = "bind"; t = "a familiar to you"; break;
-			case GF_VAMP_DRAIN:	q = "drain"; s = "health from"; break;
-			case GF_MANA_DRAIN:	q = "drain"; s = "mana from"; break;
-			case GF_SNUFF:		q = "snuff"; s = "the life from"; u ="if they have less than a maximum"; v="of";break;
-			case GF_RAGE:		q = "enrage"; break;
-			case GF_MENTAL:		q = "blast"; u = "with mental energy"; break;
-			case GF_TANGLE:		q = "entangle"; u = "with nearby plants or waterweeds"; break;
-			case GF_EXPLODE: q="explode"; t = 0; break;
-
-			/* Hack -- handle features */
-			case GF_FEATURE:
+			/* Something to write */
+			if (strlen(effect_text + effect_ptr->info[i]))
 			{
-				char buf[80];
-				cptr name = f_name + f_info[f_info[d3].mimic].name;
-
-				q = "magically create";
-				s = buf;
-				sprintf(buf,"%ss %s",name,f_info[f_info[d3].mimic].flags1 & (FF1_MOVE) ? "under" : "around" );
-				if ((f_info[d3].flags1 & (FF1_MOVE)) == 0)
+				/* Hack -- allow effect text to blank out method text */
+				if ((effect_text + effect_ptr->info[i])[0] == '/')
 				{
-					d1 = 4;
-					d2 = 8;
+					p[i+1] = NULL;
 				}
 				else
 				{
-					d1 = 0;
-					d2 = 0;
+					p[i+1] = effect_text + effect_ptr->info[i];
 				}
-				d3 = 0;
-
 			}
+		}
 
+		/* Hack -- handle features */
+		if (effect == GF_FEATURE)
+		{
+			char buf[80];
+			cptr name = f_name + f_info[f_info[d3].mimic].name;
+
+			p[2] = buf;
+			sprintf(buf,"%ss %s",name,f_info[f_info[d3].mimic].flags1 & (FF1_MOVE) ? "under" : "around" );
+			if ((f_info[d3].flags1 & (FF1_MOVE)) == 0)
+			{
+				d1 = 4;
+				d2 = 8;
+			}
+			else
+			{
+				d1 = 0;
+				d2 = 0;
+			}
+			d3 = 0;
 		}
 
 		/* Introduce the attack description */
@@ -1598,9 +1403,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		}
 
 		/* Describe the method */
-		if (p)
+		if (p[0])
 		{
-			text_out(p);
+			text_out(p[0]);
 			if (rng || arc || rad) text_out(" of ");
 			if (rng) text_out (format( "range %d",rng));
 			if (rng && (arc || rad)) text_out(" and ");
@@ -1609,50 +1414,50 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			if (rad) text_out (format( "radius %d",rad));
 
 			text_out(" to");
-			if (q)
+			if (p[1])
 			{
 				text_out(" ");
-				text_out(q);
+				text_out(p[1]);
 			}
-			if (s)
+			if (p[2])
 			{
 				text_out(" ");
-				text_out(s);
+				text_out(p[2]);
 			}
-			if (t)
+			if (p[3])
 			{
 				text_out(" ");
-				text_out(t);
+				text_out(p[3]);
 			}
 		}
 		else
 		{
-			if (q)
+			if (p[1])
 			{
-				text_out(q);
+				text_out(p[1]);
 				text_out("s");
 			}
 			else text_out("affects");
 
 			if (rng) text_out (format( " at up to range %d",rng));
 
-			if (s)
+			if (p[2])
 			{
 				text_out(" ");
-				text_out(s);
+				text_out(p[2]);
 			}
-			if (t)
+			if (p[3])
 			{
 				text_out(" ");
-				text_out(t);
+				text_out(p[3]);
 			}
 			if (rad) text_out (format( " of radius %d",rad));
 		}
 
-		if (u)
+		if (p[4])
 		{
 			text_out(" ");
-			text_out(u);
+			text_out(p[4]);
 		}
 
 		/* Display the damage */
@@ -1669,8 +1474,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			if (max)
 			{
 				/* End */
-				if (max != min) text_out(format(" %s %d-%d ", v, min, max));
-				else text_out(format(" %s %d ", v, max));
+				if (max != min) text_out(format(" %s %d-%d ", p[5], min, max));
+				else text_out(format(" %s %d ", p[5], max));
 			}
 			else
 			{
@@ -1681,91 +1486,30 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		else if ((d1) && (d2) && (d3))
 		{
 			/* End */
-			text_out(format(" %s %dd%d+%d ",v, d1,d2,d3));
+			text_out(format(" %s %dd%d+%d ",p[5], d1,d2,d3));
 		}
 		else if ((d1) && (d2) && (d2 == 1))
 		{
 			/* End */
-			text_out(format(" %s %d ",v, d1));
+			text_out(format(" %s %d ",p[5], d1));
 		}
 		else if ((d1) && (d2))
 		{
 			/* End */
-			text_out(format(" %s %dd%d ",v, d1,d2));
+			text_out(format(" %s %dd%d ",p[5], d1,d2));
 		}
 		else if (d3)
 		{
 			/* End */
-			text_out(format(" %s %d ",v, d3));
+			text_out(format(" %s %d ",p[5], d3));
 		}
 
-		/* Get the effect */
-		if ((d1 || d2 || d3) && (detail)) switch (effect)
+		/* Get the effect text */
+		if ((d1 || d2 || d3) && (detail))
 		{
-			case GF_FEATURE: text_out("damage, destroying living monsters that cannot escape to an adjacent grid"); break;
-			case GF_WIND: text_out("damage against flying or climbing monsters, less against others"); break;
-			case GF_LITE_WEAK: text_out("damage to monsters vulnerable to light"); break;
-			case GF_KILL_WALL: text_out("damage to monsters made from rock"); break;
-			case GF_HURT_WOOD: text_out("damage to monsters made from wood"); break;
-			case GF_RAISE: case GF_LOWER: text_out("damage to monsters made from water"); break;
-			case GF_HOLY_ORB: text_out("damage, doubled against evil monsters"); break;
-			case GF_BLIND: text_out("damage, doubled against eye monsters"); break;
-			case GF_HASTE:
-			case GF_SLOW_WEAK:
-			case GF_CONF_WEAK:
-			case GF_SLEEP:
-			case GF_BLIND_WEAK:
-			case GF_TURN_UNDEAD:
-			case GF_TURN_EVIL:
-			case GF_FEAR_WEAK:
-			case GF_CLONE:
-			case GF_POLY:
-			case GF_CHARM_INSECT:
-			case GF_CHARM_REPTILE:
-			case GF_CHARM_ANIMAL:
-			case GF_CHARM_MONSTER:
-			case GF_CHARM_PERSON:
-			case GF_BIND_DEMON:
-			case GF_BIND_DRAGON:
-			case GF_BIND_UNDEAD:
-			case GF_BIND_FAMILIAR:
-			case GF_RAGE:
-			case GF_DARK_WEAK:
-			case GF_TANGLE:
-								text_out("power"); break;
-			case GF_HEAL_PERC: text_out("percent of ");
-			case GF_SNUFF:
-			case GF_HEAL: text_out("hit points"); break;
-			case GF_AWAY_ALL:
-			case GF_AWAY_EVIL:
-			case GF_AWAY_UNDEAD:
-							text_out("distance on average"); break;
-			case GF_AWAY_JUMP:
-			case GF_AWAY_DARK:
-			case GF_AWAY_NATURE:
-			case GF_AWAY_FIRE:
-			{
-				text_out("distance on average");
-
-				/* Hack for questionable efficiency */
-				if (strstr(u, " "))
-				{
-					/* Skip two words */
-					u = strstr(u, " ");
-					u++;
-					u = strstr(u, " ");
-					u++;
-
-					text_out(format(".  The destination will also be %s", u));
-				}
-				break;
-			}
-			case GF_GAIN_MANA_PERC: text_out("percent of ");
-			case GF_LOSE_MANA:
-			case GF_MANA_DRAIN:
-			case GF_GAIN_MANA: text_out("spell points"); break;
-			default: text_out("damage"); break;
+			text_out(format("%s", p[6]));
 		}
+
 		r++;
 	}
 
