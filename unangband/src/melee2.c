@@ -24,6 +24,18 @@
 
 
 /*
+ *  Fake RF4_ masks to be used for ranged melee attacks;
+ */
+
+static u32b rf4_ball_mask;
+static u32b rf4_no_player_mask;
+static u32b rf4_beam_mask;
+static u32b rf4_bolt_mask;
+static u32b rf4_archery_mask;
+
+
+
+/*
  * Calculate minimum and desired combat ranges.  -BR-
  */
 void find_range(int m_idx)
@@ -161,10 +173,11 @@ void find_range(int m_idx)
 		m_ptr->best_range = 6;
 	}
 
-	/* Innate magic users with mana (or with 0 max mana) want to sit back */
+	/* Innate magic users with mana (or with 0 max mana), and archers want to sit back */
 	else if (r_ptr->freq_innate > ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_HIDE)) != 0 ? 0 : 24)
-			 && m_ptr->mana >= r_ptr->mana / 6
-			 && (r_ptr->flags4 & (RF4_ATTACK_MASK)) != 0)
+			 && ((m_ptr->mana >= r_ptr->mana / 6)
+			 || (((r_ptr->flags4 & (rf4_archery_mask)) != 0)
+			 && (find_monster_ammo(m_idx, -1, FALSE) >= 0))))
 	{
 		m_ptr->best_range = 6 + ((m_ptr->mflag & (MFLAG_AGGR)) != 0 ? 2 : 0);
 	}
@@ -1016,16 +1029,6 @@ static int choose_attack_spell_fast(int m_idx, int target_m_idx, u32b *f4p, u32b
 
 
 /*
- *  Fake RF4_ masks to be used for ranged melee attacks;
- */
-
-static u32b rf4_ball_mask;
-static u32b rf4_no_player_mask;
-static u32b rf4_beam_mask;
-static u32b rf4_bolt_mask;
-static u32b rf4_archery_mask;
-
-/*
  * Choose the "real" ty, tx for the spell.
  *
  * At the moment, we either leave the ty, tx as is, or
@@ -1118,111 +1121,58 @@ static void init_ranged_attack(monster_race *r_ptr)
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
-		/* This hack servers to fire a ball spell just short of the player
-			For simplicity we assume the ball spells have at least
-			radius 1 and that it's a waste of mana to extend range beyond 1 */
-		int extend_range = 1;
-
-		int hack = ap_cnt;
 		int mana = 0;
 		int range = 0;
 
-		/* Extract the attack infomation */
+		/* Extract the attack information */
 		int effect = r_ptr->blow[ap_cnt].effect;
 		int method = r_ptr->blow[ap_cnt].method;
 		int d_dice = r_ptr->blow[ap_cnt].d_dice;
 		int d_side = r_ptr->blow[ap_cnt].d_side;
 
+		method_type *method_ptr = &method_info[method];
+
 		/* Skip 'tricky' attacks */
-		if ((method < RBM_MIN_RANGED) && !(r_ptr->flags3 & (RF3_HUGE))) continue;
+		if (((method_ptr->flags2 & (PR2_RANGED)) == 0) && !(r_ptr->flags3 & (RF3_HUGE))) continue;
 
 		/* Should have already initialised blows */
 		/* r_ptr->flags4 |= (RF4_BLOW_1 << ap_cnt); */
 
 		/* Initialise mana cost and range based on blow type.
 		   Also apply hack for explode and aura if required. */
-		switch(method)
+		mana = method_ptr->mana_cost;
+		range = scale_method(method_ptr->max_range, r_ptr->level);
+
+		/* Hack -- huge attacks */
+		if ((method_ptr->flags2 & (PR2_RANGED)) == 0)
 		{
-			case RBM_SPIT:	mana = 0; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_GAZE:	mana = 3; range = MIN(MAX_SIGHT, r_ptr->aaf); break;
-			case RBM_WAIL:  mana = 5; range = 4; break;
-			case RBM_SPORE:	mana = 0; range = 3; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_LASH:  mana = 0; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BEG:	mana = 0; range = 4; break;
-			case RBM_INSULT: mana = 0; range = 4; break;
-			case RBM_MOAN: mana = 0; range = 2; break;
-			case RBM_SING:  mana = 0; range = 4; break;
-			case RBM_TRAP:  mana = 0; range = 1; break;
-			case RBM_BOULDER: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_AURA:	mana = 4; range = 2; hack = 7; break;
-			case RBM_SELF:	mana = 3; range = 0; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_ADJACENT: mana = 3; range = 1; break;
-			case RBM_HANDS: mana = 2; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_MISSILE: mana = 2; range = MAX_RANGE; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BOLT_10: mana = 5; range = MAX_RANGE; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BOLT: mana = 4; range = MAX_RANGE; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BEAM: mana = 6; range = 10; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BLAST: mana = 3; range = 1; break;
-			case RBM_WALL: mana = 6; range = MAX_RANGE; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BALL: mana = 4; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_CLOUD: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_STORM: mana = 6; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BREATH: mana = 0; range = 6; break;
-			case RBM_AREA: mana = 3; range = (r_ptr->level / 10) + 1; break;
-			case RBM_LOS: mana = 6; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_LINE: mana = 4; range = MAX_RANGE; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_AIM: mana = 4; range = MAX_SIGHT; break;
-			case RBM_ORB: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_STAR: mana = 5; range = MAX_RANGE; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_SPHERE: mana = 6; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_PANEL: mana = 6; range = MAX_SIGHT; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_LEVEL: mana = 8; range = 255; rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_CROSS: mana = 4; range = MAX_RANGE; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_STRIKE: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_EXPLODE: mana = 0; range = 1; hack = 6; break;
-			case RBM_ARROW: mana = 0; range = 10; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_XBOLT: mana = 0; range = 12; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_DAGGER: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_DART: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_SHOT: mana = 0; range = 8; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_ARC_20: mana = 6; range = 8; break;
-			case RBM_ARC_30: mana = 5; range = 6; break;
-			case RBM_ARC_40: mana = 5; range = 6; break;
-			case RBM_ARC_50: mana = 6; range = 6; break;
-			case RBM_ARC_60: mana = 6; range = 6; break;
-			case RBM_FLASK: mana = 0; range = 6; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_TRAIL: mana = 1; range = 3; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_SHRIEK: mana = 1; range = MAX_SIGHT; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BOLT_MINOR: mana = 2; range = 4; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BALL_MINOR: mana = 3; range = MAX_RANGE + extend_range; rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt);break;
-			case RBM_BALL_II: mana = 5; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_BALL_III: mana = 6; range = MAX_RANGE + extend_range; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_AURA_MINOR:	mana = 3; range = 1; hack = 7; break;
-			case RBM_8WAY: mana = 4; range = MAX_RANGE; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_8WAY_II: mana = 5; range = MAX_RANGE; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_8WAY_III: mana = 6; range = MAX_RANGE; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
-			case RBM_SWARM: mana = 6; range = MAX_RANGE + extend_range; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
- 			case RBM_SPIKE: mana = 0; range = 4; rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt); break;
- 			case RBM_AIM_AREA: mana = 5; range = MAX_SIGHT; rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt); break;
- 		    case RBM_SCATTER:  mana = 1; range = MAX_SIGHT; break;
-			case RBM_HOWL:  mana = 2; range = 2; break;
-			default: mana = 0; range = 2; rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt); break; /* For all hurt huge attacks */
+			range = 2;
+			rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt);
+		}
+		/* Hack -- initialise ball / beam / archery flags */
+		else
+		{
+			if (method_ptr->flags1 & (PROJECT_BOOM)) rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt);
+			if (method_ptr->flags1 & (PROJECT_SELF)) rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt);
+			if (method_ptr->flags1 & (PROJECT_BEAM)) rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt);
+			if (method_ptr->flags1 & (PROJECT_STOP)) rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt);
+			if ((method_ptr->ammo_tval) && (range > 5)) rf4_archery_mask |= (RF4_BLOW_1 << ap_cnt);
 		}
 
 		/* Initialise the table */
-		spell_info_RF4[hack][COL_SPELL_MANA_COST] = mana;
-		spell_info_RF4[hack][COL_SPELL_DAM_MULT] = d_dice * (d_side + 1) / 2;
-		spell_info_RF4[hack][COL_SPELL_DAM_DIV] = r_ptr->spell_power;
-		spell_info_RF4[hack][COL_SPELL_DAM_VAR] = d_side;
-		spell_info_RF4[hack][COL_SPELL_BEST_RANGE] = range;
-		spell_desire_RF4[hack][D_BASE] = (mana ? 40 : 50);	/* Hack -- 40 for all blows, 50 for spells */
-		spell_desire_RF4[hack][D_SUMM] = 0;
-		spell_desire_RF4[hack][D_HURT] = 0;
-		spell_desire_RF4[hack][D_MANA] = (mana ? 0 : 5);
-		spell_desire_RF4[hack][D_ESC] = 0;
-		spell_desire_RF4[hack][D_TACT] = 0;
-		spell_desire_RF4[hack][D_RES] = effect;
-		spell_desire_RF4[hack][D_RANGE] = 0;
+		spell_info_RF4[ap_cnt][COL_SPELL_MANA_COST] = mana;
+		spell_info_RF4[ap_cnt][COL_SPELL_DAM_MULT] = d_dice * (d_side + 1) / 2;
+		spell_info_RF4[ap_cnt][COL_SPELL_DAM_DIV] = r_ptr->spell_power;
+		spell_info_RF4[ap_cnt][COL_SPELL_DAM_VAR] = d_side;
+		spell_info_RF4[ap_cnt][COL_SPELL_BEST_RANGE] = range;
+		spell_desire_RF4[ap_cnt][D_BASE] = (mana ? 40 : 50);	/* Hack -- 40 for all blows, 50 for spells */
+		spell_desire_RF4[ap_cnt][D_SUMM] = 0;
+		spell_desire_RF4[ap_cnt][D_HURT] = 0;
+		spell_desire_RF4[ap_cnt][D_MANA] = (mana ? 0 : 5);
+		spell_desire_RF4[ap_cnt][D_ESC] = 0;
+		spell_desire_RF4[ap_cnt][D_TACT] = 0;
+		spell_desire_RF4[ap_cnt][D_RES] = effect;
+		spell_desire_RF4[ap_cnt][D_RANGE] = 0;
 	}
 }
 

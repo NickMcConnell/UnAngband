@@ -1117,7 +1117,7 @@ bool make_attack_normal(int m_idx)
 		if (m_ptr->ml) visible = TRUE;
 
 		/* Skip 'tricky' attacks */
-		if (method > RBM_MAX_NORMAL) continue;
+		if ((method_ptr->flags2 & (PR2_MELEE)) == 0) continue;
 
 		if (cheat_xtra) msg_format("dice (2) in this blow: dice %d, sides %d", d_dice, d_side);
 

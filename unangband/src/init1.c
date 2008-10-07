@@ -4379,9 +4379,7 @@ errr parse_r_info(char *buf, header *head)
 		    int blows = 0;
 
 		    for (i = 0; i < 4; i++)
-		      if (r_ptr->blow[i].method > 0
-			  && r_ptr->blow[i].method <= RBM_MAX_NORMAL)
-			blows++;
+		      if (method_info[r_ptr->blow[i].method].flags2 & (PR2_MELEE)) blows++;
 
 		    if (!blows)
 		      return (PARSE_ERROR_GENERIC);
@@ -4528,7 +4526,7 @@ errr parse_r_info(char *buf, header *head)
 		if (n1 == z_info->method_max) return (PARSE_ERROR_GENERIC);
 
 		/* Update the rf4 flags */
-		if (n1 >= RBM_MIN_RANGED) r_ptr->flags4 |= (RF4_BLOW_1 << i);
+		if (method_info[n1].flags2 & (PR2_RANGED)) r_ptr->flags4 |= (RF4_BLOW_1 << i);
 
 		/* Analyze the second field */
 		for (s = t; *t && (*t != ':'); t++) /* loop */;
@@ -4562,7 +4560,7 @@ errr parse_r_info(char *buf, header *head)
 		r_ptr->blow[i].d_side = atoi(t);
 
 		/* Catch fraudulent NEVER_BLOW monsters */
-		if (n1 <= RBM_MAX_NORMAL && r_ptr->flags1 & RF1_NEVER_BLOW)
+		if ((method_info[n1].flags2 & (PR2_MELEE)) && (r_ptr->flags1 & (RF1_NEVER_BLOW)))
 		  return (PARSE_ERROR_GENERIC);
 	}
 	/* Process 'F' for "Basic Flags" (multiple lines) */
@@ -4594,8 +4592,7 @@ errr parse_r_info(char *buf, header *head)
 		/* Catch fraudulent NEVER_BLOW monsters */
 		if (r_ptr->flags1 & RF1_NEVER_BLOW)
 		  for (i = 0; i < 4; i++)
-		    if (r_ptr->blow[i].method > 0
-			&& r_ptr->blow[i].method <= RBM_MAX_NORMAL)
+		    if (method_info[r_ptr->blow[i].method].flags1 & (PR2_MELEE))
 		      return (PARSE_ERROR_GENERIC);
 	}
 
