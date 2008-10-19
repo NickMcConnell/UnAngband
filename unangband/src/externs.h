@@ -894,7 +894,7 @@ extern bool project_o(int who, int what, int y, int x, int dam, int typ);
 extern bool project_m(int who, int what, int y, int x, int dam, int typ);
 extern bool project_p(int who, int what, int y, int x, int dam, int typ);
 extern bool project_t(int who, int what, int y, int x, int dam, int typ);
-extern bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
+extern bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);
 
 /* spells2.c */

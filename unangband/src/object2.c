@@ -6552,7 +6552,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					}
 
 					/* Hit with projection */
-					obvious |= project(SOURCE_PLAYER_BREAK, j_ptr->k_idx, rad, y, x, rand_spread(y, rng), rand_spread(x, rng),
+					obvious |= project(SOURCE_PLAYER_BREAK, j_ptr->k_idx, rad, 0, y, x, rand_spread(y, rng), rand_spread(x, rng),
 						damage * j_ptr->number * dam, effect, flg, deg, dia);
 
 					/* Object is used */
@@ -6596,7 +6596,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					flg = PROJECT_KILL | PROJECT_PLAY | PROJECT_BOOM;
 
 					/* Hit with radiate attack */
-					obvious = project(SOURCE_PLAYER_SPORE, j_ptr->name3, 1, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
+					obvious = project(SOURCE_PLAYER_SPORE, j_ptr->name3, 1, 0, y, x, y, x, damroll(d_side, d_dice) * j_ptr->number,
 						 effect, flg, 0, 0);
 
 					/* Count "obvious" attacks */

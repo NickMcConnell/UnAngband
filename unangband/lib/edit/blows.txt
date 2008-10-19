@@ -62,28 +62,24 @@ T:5-19:cut~ &
 T:5-19:bash||es| &
 T:0-4:scratch||es| &
 T:0-4:hit~ &
-M:20
 F:MISS |
 F:MELEE | CUTS | STUN | TOUCH | ALTERNATE |
 D:hit~:one target
 
 N:2:TOUCH
 T:0-9999:touch||es| &
-M:20
 F:MISS |
 F:MELEE | TOUCH |
 D::
 
 N:3:PUNCH
 T:0-9999:punch||es| &
-M:20
 F:MISS |
 F:MELEE | STUN | TOUCH |
 D::
 
 N:4:KICK
 T:0-9999:kick~ &
-M:20
 F:MISS |
 F:MELEE | STUN | TOUCH |
 D::
@@ -92,7 +88,6 @@ N:5:CLAW
 T:25-9999:slash||es| &
 T:5-24:claw~ &
 T:0-4:scratch||es| &
-M:20
 F:MISS |
 F:MELEE | CUTS | TOUCH |
 D::
@@ -100,21 +95,18 @@ D::
 N:6:BITE
 T:5-9999:bite~ &
 T:0-4:nip~ &
-M:20
 F:MISS |
 F:MELEE | CUTS | TOUCH |
 D::
 
 N:7:STING
 T:0-9999:sting~ &
-M:20
 F:MISS |
 F:MELEE | TOUCH |
 D::
 
 N:8:VOMIT
 T:0-9999:vomits on &
-M:20
 F:MISS |
 F:MELEE | TOUCH |
 D::
@@ -122,7 +114,6 @@ D::
 N:9:BUTT
 T:10-20:0:trample~ &
 T:0-9:butt~ &
-M:20
 F:MISS |
 F:MELEE | STUN | TOUCH |
 D::
@@ -130,7 +121,6 @@ D::
 N:10:CRUSH
 T:10-9999:crush||es| &
 T:0-9:squeeze~ &
-M:20
 F:MISS |
 F:MELEE | CUTS | TOUCH |
 D::
@@ -138,35 +128,30 @@ D::
 N:11:ENGULF
 T:0-50:0:envelope~ &
 T:0-9999:engulf~ &
-M:20
 F:MISS |
 F:MELEE | TOUCH |
 D::
 
 N:12:PECK
 T:0-9999:peck~ &
-M:20
 F:MISS |
 F:MELEE | STUN | TOUCH |
 D::
 
 N:13:CRAWL
 T:0-9999:crawl~ on &
-M:20
 F:MISS |
 F:MELEE | TOUCH |
 D::
 
 N:14:DROOL
 T:0-9999:drool~ on &
-M:20
 F:MISS |
 F:MELEE | TOUCH |
 D::
 
 N:15:SLIME
 T:0-9999:slime~ &!
-M:20
 F:MISS |
 F:MELEE | SLIME | TOUCH |
 D::
@@ -185,14 +170,13 @@ T:0-4:gaze~ at &
 W:3:0:0
 M:20
 F:MISS | KILL | PLAY | MAGIC | JUMP |
-F:MELEE | RANGED |
+F:MELEE | RANGED | EYESIGHT
 D:gaze~:one target
 
 N:18:WAIL
 T:0-9999:wail~ horribly
 W:5:0:0
 R:4
-M:4
 F:SELF | SAFE |
 F:MELEE | RANGED |
 D:wail~:one target
@@ -208,7 +192,6 @@ D::one adjacent target
 
 N:20:LASH
 T:0-9999:lash||es| & with a whip
-R:3
 M:3
 F:BEAM | MISS | GRID | ITEM | KILL | PLAY | MAGIC |
 F:MELEE | RANGED | TOUCH |
@@ -257,10 +240,9 @@ D::one adjacent target
 
 N:25:TRAP
 T:0-9999:trap~ &
-M:1
 F:MISS | KILL | PLAY | MAGIC | JUMP |
 F:MELEE | RANGED |
-D::one adjacent target
+D::one target
 
 N:26:BOULDER
 T:0-9999:throw~ a boulder at &
@@ -274,7 +256,6 @@ N:27:AURA
 T:0-9999:intensif|y|ies| % aura
 W:4:0:0
 R:2
-M:2
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | HIDE | SAFE |
 F:SPECIAL_CASE |
 D:surround~ & with an aura:$ enemies
@@ -282,7 +263,6 @@ D:surround~ & with an aura:$ enemies
 N:28:SELF
 T:0-9999:concentrate~ on &
 W:3:0:0
-M:20
 F:KILL | PLAY | SELF |
 D::&
 
@@ -290,14 +270,12 @@ N:29:ADJACENT
 T:0-9999:surround & with *
 W:3:0:0
 R:1
-M:1
 F:SELF | SAFE |
 D::all enemies adjacent to &
 
 N:30:HANDS
 T:0-9999:shoot~ * from % fingers at &
 W:2:0:0
-R:3
 M:3
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 D::a beam
@@ -325,7 +303,6 @@ D:create~ a powerful bolt:$ enemies
 
 N:34:BEAM
 T:0-9999:shoot~ a beam of * at &
-R:10
 M:10
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ a beam:$ enemies
@@ -341,7 +318,6 @@ D:create~ an adjacent blast:$ enemies
 N:36:WALL
 T:0-9999:rais||es| a wall of *
 W:6:0:0
-R:12
 M:12
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ a wall:$ enemies
@@ -377,7 +353,7 @@ N:40:BREATH_20
 T:0-9999:breathe~ * at &
 I:0:0:20
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:RANGED | BREATH |
 D:breathe~:$ enemies
@@ -403,7 +379,6 @@ D::all $ enemies in line of sight
 N:43:LINE
 T:0-9999:creat||es| a path of *
 W:4:0:0
-R:8
 M:8
 F:BEAM |
 D::one direction
@@ -428,7 +403,6 @@ N:46:STAR
 T:0-9999:create~ * in eight directions
 W:5:0:0
 R:10
-M:10
 F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF |
 F:MAGIC | SAFE |
 D:surround~ & with a star:$ enemies
@@ -478,8 +452,7 @@ D:strike~:$ enemy
 N:52:EXPLODE
 T:0-9999:explodes!
 R:2
-M:2
-F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC | SELF |
 F:RANGED |
 D::& and all enemies adjacent to &
 
@@ -526,7 +499,7 @@ T:0-9999:create~ a narrow arc of * at &
 I:0:0:20
 W:4:0:0
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ an arc:
 
@@ -535,7 +508,7 @@ T:0-9999:create~ an arc of * at &
 I:0:0:20
 W:5:0:0
 A:30:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ an arc:
 
@@ -544,7 +517,7 @@ T:0-9999:create~ a broad arc of * at &
 I:0:0:20
 W:5:0:0
 A:40:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ an arc:
 
@@ -553,7 +526,7 @@ T:0-9999:create~ a wide arc of * at &
 I:0:0:20
 W:6:0:0
 A:50:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ an arc:
 
@@ -562,7 +535,7 @@ T:0-9999:create~ a sweeping arc of * at &
 I:0:0:20
 W:6:0:0
 A:60:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ an arc:
 
@@ -576,12 +549,11 @@ F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
 D:create~ a ball:$ enemies
 
 N:64:TRAIL
-T:0-9999:intensif|y|ies| % aura
+T:0-9999:spray~ around &
 W:4:0:0
-R:2
-M:2
-F:BOOM | WALL | GRID | ITEM | SELF | MAGIC | HIDE | SAFE |
-F:SPECIAL_CASE |
+M:1
+F:BEAM | MISS | GRID | ITEM | KILL | PLAY | MAGIC |
+F:MELEE | RANGED | TOUCH | SPECIAL_CASE
 D::one adjacent target
 
 N:65:SHRIEK
@@ -696,7 +668,6 @@ N:78:HOWL
 T:0-9999:howls~ at &
 W:2:0:0
 R:4
-M:4
 F:SELF | SAFE |
 F:MELEE | RANGED |
 D::
@@ -730,8 +701,7 @@ D::
 
 N:82:FORKED_BOLT
 T:0-9999:shoot~ a forked bolt of * at &
-R:10
-M:20
+M:10
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 D::
 
@@ -829,7 +799,7 @@ I:93:0:20
 X:0:3:0:ACID
 C:75:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -843,7 +813,7 @@ I:92:0:20
 X:0:3:0:ELEC
 C:75:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -857,7 +827,7 @@ I:95:0:20
 X:0:3:0:FIRE
 C:75:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -871,7 +841,7 @@ I:91:0:20
 X:0:3:0:COLD
 C:75:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -885,7 +855,7 @@ I:94:0:20
 X:0:3:0:POISON
 C:65:0:0:5:0:0:90
 A:30:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -899,7 +869,7 @@ I:108:0:20
 X:0:6:0:PLASMA
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -914,7 +884,7 @@ I:101:0:20
 X:0:6:0:LITE
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -928,7 +898,7 @@ I:102:0:20
 X:0:6:0:DARK
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -942,7 +912,7 @@ I:96:0:20
 X:0:6:0:CONFUSE
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -956,7 +926,7 @@ I:100:0:20
 X:0:9:0:SOUND
 C:65:0:0:5:0:0:90
 A:30:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -971,7 +941,7 @@ I:99:0:20
 X:0:6:0:SHARD
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -985,7 +955,7 @@ I:106:0:20
 X:0:8:0:INERTIA
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1000,7 +970,7 @@ I:107:0:20
 X:0:8:0:GRAVITY
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1015,7 +985,7 @@ I:0:0:20
 X:0:9:0:WIND
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1030,7 +1000,7 @@ I:109:0:20
 X:0:6:0:FORCE
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1045,7 +1015,7 @@ I:104:0:20
 X:0:6:0:NEXUS
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1059,7 +1029,7 @@ I:103:0:20
 X:0:6:0:NETHER
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1073,7 +1043,7 @@ I:98:0:20
 X:0:6:0:CHAOS
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1087,7 +1057,7 @@ I:97:0:20
 X:0:6:0:DISENCHANT
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1101,7 +1071,7 @@ I:105:0:20
 X:0:3:0:TIME
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1116,7 +1086,7 @@ I:0:0:20
 X:0:3:0:MANA
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1131,7 +1101,7 @@ I:0:0:20
 X:0:6:0:HOLY_ORB
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1145,7 +1115,7 @@ I:0:0:20
 X:0:6:0:TERRIFY
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1159,7 +1129,7 @@ I:0:0:20
 X:0:3:0:DISEASE
 C:65:0:0:5:0:0:90
 A:20:60
-M:20
+R:20
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:BREATH | HEARD |
 D::
@@ -1595,7 +1565,7 @@ I:0:6:0
 W:6:0:0
 X:3:1:6:ELEC
 C:50:0:0:0:0:0:90
-R:10
+M:10
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 F:HEARD |
 D::
@@ -1609,7 +1579,7 @@ I:0:6:0
 W:6:0:0
 X:4:1:6:ICE
 C:50:0:0:0:0:0:90
-R:12
+M:12
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 F:HEARD |
 D::
@@ -1625,7 +1595,7 @@ I:0:6:0
 W:7:0:0
 X:3:1:6:NETHER
 C:50:0:0:0:0:0:90
-R:10
+M:10
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 F:HEARD |
 D::
@@ -1640,7 +1610,7 @@ W:7:0:0
 X:5:6:0:HELLFIRE
 C:50:0:0:0:0:0:80
 A:60:60
-R:3
+R:6
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:HEARD | POWER_ARC |
 D::

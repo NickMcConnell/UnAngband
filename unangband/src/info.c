@@ -1251,6 +1251,148 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 }
 
 
+/*
+ * Writes the spell damage dice string into a buffer.
+ *
+ * Note the reckless use of a global for breath weapons.
+ *
+ */
+bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char buf[40])
+{
+	int method = blow_ptr->method;
+	method_type *method_ptr = &method_info[method];
+	int d1 = blow_ptr->d_dice;
+	int d2 = blow_ptr->d_side;
+	int d3 = blow_ptr->d_plus;
+	int d4 = 0;
+	int d5 = 0;
+	int buf_s = sizeof(buf);
+
+	/* Initialise the buffer */
+	buf[0] = '\0';
+
+	/* Use player hit points */
+	if (method_ptr->flags2 & (PR2_BREATH))
+	{
+		/* Damage uses current hit points */
+		d3 = p_ptr->chp * d3 / 300;
+		d1 = 0;
+		d2 = 0;
+	}
+	/* Damage uses dice roll */
+	else
+	{
+		/* Add in level dependent damage */
+		if (blow_ptr->l_side == blow_ptr->d_side)
+		{
+			d1 += blow_ptr->l_dice * level / blow_ptr->levels;
+		}
+		else if (blow_ptr->l_side)
+		{
+			if (d1 || d2 || d3)
+			{
+				d4 = blow_ptr->l_dice * level / blow_ptr->levels;
+				d5 = blow_ptr->l_side;
+			}
+			else
+			{
+				d1 = blow_ptr->l_dice * level / blow_ptr->levels;
+				d2 = blow_ptr->l_side;
+			}
+		}
+
+		/* Add level dependent damage */
+		if (blow_ptr->l_plus)
+		{
+			/* Mega-hack - dispel evil/undead etc. */
+			if (!level)
+			{
+				d3 += blow_ptr->l_plus * 25 / blow_ptr->levels;
+			}
+			else
+			{
+				d3 += blow_ptr->l_plus * level / blow_ptr->levels;
+			}
+		}
+	}
+
+	/* Consolidation */
+	if (d2 == 1)
+	{
+		d3 += d1;
+		d1 = 0;
+		d2 = 0;
+	}
+
+	/* Consolidation */
+	if (d5 == 1)
+	{
+		d3 += d4;
+		d4 = 0;
+		d5 = 0;
+	}
+
+	/*
+	 * Hack -- coatings do 20% damage, so have a completely different
+	 * damage output routine.
+	 */
+	if (target == SPELL_TARGET_COATED)
+	{
+		int min = (d1 + d3 + d5) / 5;
+		int max = (d1 * d2 + d3 + d4 * d5) / 5;
+
+		if (max)
+		{
+			/* End */
+			if (max != min) my_strcpy(buf, format("%d-%d", min, max), buf_s);
+			else my_strcpy(buf, format("%d", max), buf_s);
+		}
+
+		/* We are done */
+		return (TRUE);
+	}
+
+	/* Display the damage dice */
+	if ((d1) && (d2))
+	{
+		/* End */
+		my_strcpy(buf,format("%dd%d",d1,d2), buf_s);
+	}
+	else if (d3)
+	{
+		/* End */
+		my_strcpy(buf,format("%d",d3), buf_s);
+
+		/* We are done */
+		return (TRUE);
+	}
+
+	/* Display the damage dice */
+	if ((d4) && (d5))
+	{
+		/* End */
+		my_strcat(buf,format("+%dd%d",d1,d2), buf_s);
+	}
+
+	/* Add the damage plus */
+	if (d3)
+	{
+		/* End */
+		my_strcat(buf,format("+%d",d3), buf_s);
+
+		/* We are done */
+		return (TRUE);
+	}
+
+	/* Anything output? */
+	if (d1 || d2 || d4 || d5) return (TRUE);
+
+	return (FALSE);
+}
+
+
+
+
 
 /*
  * Hack -- Get spell description for effects on target based on blow.
@@ -1274,31 +1416,20 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 	/* Examine (and count) the actual attacks */
 	for (r = 0, m = 0; m < 4; m++)
 	{
-		int method, effect, d1, d2, d3, rad, arc, rng;
+		int method, effect, rad, arc, rng;
 
 		method_type *method_ptr;
 		effect_type *effect_ptr;
 
+		const spell_blow *blow_ptr = &s_ptr->blow[m];
+
+		feature_type *f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
+
+		method  = blow_ptr->method;
+		effect  = blow_ptr->effect;
+
 		/* Skip non-attacks */
-		if (!s_ptr->blow[m].method) continue;
-
-		/* Extract the attack info */
-		method = s_ptr->blow[m].method;
-		effect = s_ptr->blow[m].effect;
-		d1 = s_ptr->blow[m].d_dice;
-		d2 = s_ptr->blow[m].d_side;
-		d3 = s_ptr->blow[m].d_plus;
-
-		/* Hack -- use level as modifier */
-		if ((!d2) && (!level))
-		{
-			d3 += 25 * d1;
-		}
-		/* Hack -- use level as modifier */
-		else if (!d2)
-		{
-			d3 += level * d1;
-		}
+		if (!method) continue;
 
 		/* Hack -- potions and food */
 		switch(target)
@@ -1308,15 +1439,15 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				break;
 
 			case SPELL_TARGET_AIMED:
-				method = RBM_AIM;
+				method = RBM_TRAP;
 				break;
 
 			case SPELL_TARGET_COATED:
-				method = RBM_HIT;
+				method = RBM_TRAP;
 				break;
 
 			case SPELL_TARGET_EXPLODE:
-				method = RBM_FLASK;
+				method = RBM_EXPLODE;
 				break;
 		}
 
@@ -1342,6 +1473,10 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		p[0] = method_text + method_ptr->info[0];
 		p[3] = method_text + method_ptr->info[1];
 
+		/* Hack -- nothing */
+		if (!strlen(p[0])) p[0] = NULL;
+		if (!strlen(p[3])) p[3] = NULL;
+
 		/* Get effect info text */
 		for (i = 0; i < 6; i++)
 		{
@@ -1364,21 +1499,12 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		if (effect == GF_FEATURE)
 		{
 			char buf[80];
-			cptr name = f_name + f_info[f_info[d3].mimic].name;
+			cptr name;
+
+			name = f_name + f_ptr->name;
 
 			p[2] = buf;
-			sprintf(buf,"%ss %s",name,f_info[f_info[d3].mimic].flags1 & (FF1_MOVE) ? "under" : "around" );
-			if ((f_info[d3].flags1 & (FF1_MOVE)) == 0)
-			{
-				d1 = 4;
-				d2 = 8;
-			}
-			else
-			{
-				d1 = 0;
-				d2 = 0;
-			}
-			d3 = 0;
+			sprintf(buf,"%ss %s",name,f_ptr->flags1 & (FF1_MOVE) ? "under" : "around" );
 		}
 
 		/* Introduce the attack description */
@@ -1439,8 +1565,6 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			}
 			else text_out("affects");
 
-			if (rng) text_out (format( " at up to range %d",rng));
-
 			if (p[2])
 			{
 				text_out(" ");
@@ -1451,7 +1575,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				text_out(" ");
 				text_out(p[3]);
 			}
-			if (rad) text_out (format( " of radius %d",rad));
+			if (rng) text_out (format( " of range %d",rng));
+
+			if (rad) text_out (format( " %s radius %d",rng ? "and" : "of", rad));
 		}
 
 		if (p[4])
@@ -1462,54 +1588,25 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 
 		/* Display the damage */
 		/* Roll out the damage */
-		if (!detail)
+		if (detail)
 		{
-			/* Nothing */
-		}
-		else if (target == SPELL_TARGET_COATED)
-		{
-			int min = (d1 + d3) / 5;
-			int max = (d1 * d2 + d3) / 5;
+			char buf[40];
 
-			if (max)
+			/* Hack -- feature */
+			if (effect == GF_FEATURE)
 			{
-				/* End */
-				if (max != min) text_out(format(" %s %d-%d ", p[5], min, max));
-				else text_out(format(" %s %d ", p[5], max));
+				if (!(f_ptr->flags1 & (FF1_MOVE)))
+				{
+					text_out(format(" %s 4d8 %s", p[5], p[6]));
+				}
 			}
-			else
+			/* Get the description */
+			else if (spell_desc_damage(blow_ptr, target, level, buf))
 			{
-				/* Hack */
-				d1 = d2 = d3 = 0;
+				text_out(format(" %s %s %s", p[5], buf, p[6]));
 			}
-		}
-		else if ((d1) && (d2) && (d3))
-		{
-			/* End */
-			text_out(format(" %s %dd%d+%d ",p[5], d1,d2,d3));
-		}
-		else if ((d1) && (d2) && (d2 == 1))
-		{
-			/* End */
-			text_out(format(" %s %d ",p[5], d1));
-		}
-		else if ((d1) && (d2))
-		{
-			/* End */
-			text_out(format(" %s %dd%d ",p[5], d1,d2));
-		}
-		else if (d3)
-		{
-			/* End */
-			text_out(format(" %s %d ",p[5], d3));
-		}
 
-		/* Get the effect text */
-		if ((d1 || d2 || d3) && (detail))
-		{
-			text_out(format("%s", p[6]));
 		}
-
 		r++;
 	}
 
@@ -1596,11 +1693,9 @@ bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int
  */
 void spell_info(char *p, int p_s, int spell, bool use_level)
 {
-	cptr q;
-
 	spell_type *s_ptr = &s_info[spell];
 
-	int m,n,rad;
+	int m;
 
 	int level = spell_power(spell);
 
@@ -1634,149 +1729,39 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 		my_strcpy(p,format(" dur %d",s_ptr->l_plus), p_s);
 	}
 
-	rad = 0;
-
-	/* Count the number of "known" attacks */
-	for (n = 0, m = 0; m < 4; m++)
-	{
-		/* Skip non-attacks */
-		if (!s_ptr->blow[m].method) continue;
-
-		/* Count known attacks */
-		n++;
-	}
-
 	/* Examine (and count) the actual attacks */
 	for (m = 0; m < 4; m++)
 	{
-		int method, effect, d1, d2, d3, rad;
+		spell_blow *blow_ptr = &s_ptr->blow[m];
+		int method = blow_ptr->method;
+		int effect = blow_ptr->effect;
+		char buf[40];
+		const char *q = effect_text + effect_info[effect].info[6];
 
 		/* Skip non-attacks */
-		if (!s_ptr->blow[m].method) continue;
-
-		/* Extract the attack info */
-		method = s_ptr->blow[m].method;
-		effect = s_ptr->blow[m].effect;
-		d1 = s_ptr->blow[m].d_dice;
-		d2 = s_ptr->blow[m].d_side;
-		d3 = s_ptr->blow[m].d_plus;
-		rad = 0;
+		if (!method) continue;
 
 		/* Hack -- heroism/berserk strength */
-		if (((s_ptr->l_dice) || (s_ptr->l_side) || (s_ptr->l_plus)) && (effect == GF_HEAL)) continue;
-
-		/* Hack -- use level as modifier */
-		if ((!d2) && (!level))
-		{
-			d3 += 25 * d1;
-		}
-
-		/* Hack -- use level as modifier */
-		else if (!d2)
-		{
-			d3 += level * d1;
-		}
-
-		/* Get the method */
-		switch (method)
-		{
-			case RBM_TOUCH: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_HANDS: if ((level > 5) && (d2)) d1+= (level-1)/5;break;
-			case RBM_MISSILE: if ((level > 5) && (d2)) d1+= (level-1)/5;break;
-			case RBM_BOLT_10: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BOLT: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BOLT_MINOR: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BEAM: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BLAST: d3 += level;break;
-			case RBM_WALL: if ((level > 8) && (d2)) d1+= (level-5)/4;break;
-			case RBM_BALL_MINOR: rad = 2; break;
-			case RBM_BALL: rad = 2; break;
-			case RBM_BALL_II: rad = 3; break;
-			case RBM_BALL_III: rad = 4; break;
-			case RBM_8WAY: rad = 2; break;
-			case RBM_8WAY_II: rad = 3; break;
-			case RBM_8WAY_III: rad = 4; break;
-			case RBM_CLOUD: rad = 2; d3 += level/2; break;
-			case RBM_STORM: rad = 3; break;
-			case RBM_AREA: rad = (level/10)+2; break;
-			case RBM_ORB: rad = (level < 30 ? 2 : 3); d3 += level/2; break;
-			case RBM_SWARM: d3 += level / 2; rad = 1; break;
-			case RBM_BREATH: d3 = p_ptr->chp * d3 / 300; break;
-			case RBM_STRIKE: if ((level > 5) && (d2)) d1+= (level-1)/5; break;
-			case RBM_SPHERE: rad = (level/10)+2;break;
-			case RBM_FLASK: rad = 1; break;
-		}
+		if (((s_ptr->l_dice) || (s_ptr->l_side) || (s_ptr->l_plus)) && (effect == GF_HEAL_PERC)) continue;
 
 		/* Default */
-		q = NULL;
+		if (!strlen(q)) q = "dam";
 
-		/* Get the effect */
-		if (d1 || d2 || d3) switch (effect)
+		/* Hack -- feature */
+		if (effect == GF_FEATURE)
 		{
-			case GF_HASTE:
-			case GF_SLOW_WEAK:
-			case GF_CONF_WEAK:
-			case GF_SLEEP:
-			case GF_BLIND_WEAK:
-			case GF_TURN_UNDEAD:
-			case GF_TURN_EVIL:
-			case GF_FEAR_WEAK:
-			case GF_CLONE:
-			case GF_POLY:
-			case GF_CHARM_INSECT:
-			case GF_CHARM_REPTILE:
-			case GF_CHARM_ANIMAL:
-			case GF_CHARM_MONSTER:
-			case GF_CHARM_PERSON:
-			case GF_BIND_DEMON:
-			case GF_BIND_DRAGON:
-			case GF_BIND_UNDEAD:
-			case GF_BIND_FAMILIAR:
-			case GF_RAGE:
-			case GF_DARK_WEAK:
-			case GF_TANGLE:
-								q = "pow"; break;
-			case GF_SNUFF: q = "max hp"; break;
-			case GF_HEAL: q = "heal"; break;
-			case GF_HEAL_PERC: q = "heal %"; break;
-			case GF_AWAY_ALL:
-			case GF_AWAY_JUMP:
-			case GF_AWAY_DARK:
-			case GF_AWAY_NATURE:
-			case GF_AWAY_FIRE:
-			case GF_AWAY_EVIL:
-			case GF_AWAY_UNDEAD:
-								q = "range"; break;
-			case GF_LOSE_MANA:
-			case GF_MANA_DRAIN:
-			case GF_GAIN_MANA: q = "mana"; break;
-			case GF_GAIN_MANA_PERC: q = "mana %"; break;
-			default: q="dam"; break;
-		}
+			feature_type *f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
 
-		/* Display the damage */
-		/* Roll out the damage */
-		if ((d1) && (d2) && (d3))
-		{
-			/* End */
-			my_strcpy(p,format(" %s %dd%d+%d ",q,d1,d2,d3), p_s);
+			if (!(f_ptr->flags1 & (FF1_MOVE)))
+			{
+				my_strcpy(p,format(" 4d8 %s", q), p_s);
+			}
 		}
-		else if ((d1) && (d2) && (d2 == 1))
+		/* Get the description */
+		else if (spell_desc_damage(blow_ptr, SPELL_TARGET_NORMAL, level, buf))
 		{
-			/* End */
-			my_strcpy(p,format(" %s %d ",q,d1), p_s);
+			my_strcpy(p, format(" %s %s", buf, q), p_s);
 		}
-		else if ((d1) && (d2))
-		{
-			/* End */
-			my_strcpy(p,format(" %s %dd%d ",q,d1,d2), p_s);
-		}
-		else if (d3)
-		{
-			/* End */
-			my_strcpy(p,format(" %s %d ",q,d3), p_s);
-		}
-
 	}
 
 }

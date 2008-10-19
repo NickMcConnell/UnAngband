@@ -776,8 +776,6 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 		}
 	}
 
-	msg_format("pick %d", c);
-
 	/* No valid description */
 	if (c < 0) return (c);
 
@@ -1642,59 +1640,6 @@ int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
 #define FLG_MON_DIRECT (PROJECT_JUMP | PROJECT_KILL | PROJECT_PLAY | PROJECT_MAGIC)
 
 
-/*
- * Cast a ball spell at the target
- * Pass over any monsters that may be in the way
- * Affect grids, objects, monsters, and (specifically) the player
- * Can miss the first target
- */
-static void mon_ball(int who, int what, int y, int x, int typ, int dam, int rad, bool hit)
-{
-	if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY))
-	{
-		monster_type *m_ptr = &m_list[who > SOURCE_MONSTER_START ? who : what];
-		int fy = m_ptr->fy;
-		int fx = m_ptr->fx;
-
-		/* Aim at target with a ball attack */
-		(void)project(who, what, rad, fy, fx, y, x, dam, typ, FLG_MON_BALL | (hit ? 0L : PROJECT_MISS), 0, 0);
-	}
-	else
-	{
-		/* Affect grids in radius with a ball attack */
-		(void)project(who, what, rad, y, x, y, x, dam, typ, FLG_MON_BALL, 0, 0);
-	}
-}
-
-
-/*
- * Release a cloud, which is a ball centered on the monster that does not
- * affect other monsters (mostly to avoid annoying messages).
- *
- * Consider being less graphics-intensive.
- */
-void mon_cloud(int who, int what, int y, int x, int typ, int dam, int rad, cptr result)
-{
-	/* Message */
-	if (result) msg_print(result);
-
-	if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY))
-	{
-		monster_type *m_ptr = &m_list[who > SOURCE_MONSTER_START ? who : what];
-		int fy = m_ptr->fy;
-		int fx = m_ptr->fx;
-
-		/* Surround the target with a cloud */
-		(void)project(who, what, rad, fy, fx, fy, fx, dam, typ, FLG_MON_CLOUD, 0, 0);
-	}
-	else
-	{
-		/* Affect grids in radius with a cloud */
-		(void)project(who, what, rad, y, x, y, x, dam, typ, FLG_MON_CLOUD, 0, 0);
-	}
-}
-
-
 
 
 
@@ -1763,7 +1708,7 @@ void mon_blow_ranged(int who, int what, int x, int y, int method, int range, int
 		if (r_ptr->blow[i].method != method) continue;
 
 		/* Target the player with a ranged attack */
-		obvious = project(who, what, range, fy, fx, y, x, damroll(r_ptr->blow[i].d_side,
+		obvious = project(who, what, range, range, fy, fx, y, x, damroll(r_ptr->blow[i].d_side,
 					r_ptr->blow[i].d_dice),r_ptr->blow[i].effect, flg, 0, 0);
 
 		/* Analyze "visible" monsters only */
@@ -2370,19 +2315,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		if ((method_ptr->flags1 & (PR1_PROJECT)) ||
 				(method_ptr->flags2 & (PR2_PROJECT)))
 		{
-			int rad = method_ptr->radius.base;
-			int num = method_ptr->number.base;
+			int rad = scale_method(method_ptr->radius, rlev);
+			int rng = scale_method(method_ptr->max_range, rlev);
+			int num = scale_method(method_ptr->number, rlev);
 
 			int degrees_of_arc = method_ptr->arc;
 			int diameter_of_source = method_ptr->diameter_of_source;
 
 			u32b flg = method_info[method].flags1;
-
-			/* Scale radius up */
-			if (method_ptr->radius.levels) rad += method_ptr->radius.gain * rlev / method_ptr->radius.levels;
-
-			/* Scale number up */
-			if (method_ptr->number.levels) num += method_ptr->number.gain * rlev / method_ptr->number.levels;
 
 			/* Hack -- scale radius up more */
 			if (method_ptr->flags2 & (PR2_SCALE_RADIUS))
@@ -2461,7 +2401,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Analyze the "dir" and the "target". */
 				else
 				{
-					project(who, what, rad, fy, fx, ty, tx, dam, effect, flg, degrees_of_arc,
+					project(who, what, rad, rng, fy, fx, ty, tx, dam, effect, flg, degrees_of_arc,
 							(byte)diameter_of_source);
 				}
 			}
@@ -3178,7 +3118,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 
 			/* Hook into the "project()" function */
-			(void)project(who, what, 3, y, x, y, x, 0, GF_DARK_WEAK, FLG_MON_BALL, 0, 0);
+			(void)project(who, what, 3, 0, y, x, y, x, 0, GF_DARK_WEAK, FLG_MON_BALL, 0, 0);
 
 			/* Lite up the room */
 			unlite_room(y, x);
@@ -3202,7 +3142,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s casts a spell at %s and cackles evilly.",m_name,t_name);
 			}
 
-			(void)project(who, what, 1, y, x, y, x, 0, GF_MAKE_TRAP, flg, 0, 0);
+			(void)project(who, what, 1, 0, y, x, y, x, 0, GF_MAKE_TRAP, flg, 0, 0);
 
 			break;
 		}
@@ -3349,7 +3289,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((blind) && (known)) msg_format("%^s curses %s.", m_name, t_name);
 			else msg_format("%^s points at %s and curses.", m_name, t_name);
 
-			(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, get_dam(spower, attack), GF_CURSE, FLG_MON_DIRECT, 0, 0);
+			(void)project(who, what, 0, 0, m_ptr->fy, m_ptr->fx, y, x, get_dam(spower, attack), GF_CURSE, FLG_MON_DIRECT, 0, 0);
 
 			break;
 		}
@@ -3368,7 +3308,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				msg_format("%^s dispels %s magic.", m_name, t_name);
 			}
 
-			(void)project(who, what, 0, m_ptr->fy, m_ptr->fx, y, x, rlev, GF_DISPEL, FLG_MON_DIRECT, 0, 0);
+			(void)project(who, what, 0, 0, m_ptr->fy, m_ptr->fx, y, x, rlev, GF_DISPEL, FLG_MON_DIRECT, 0, 0);
 
 			break;
 		}
@@ -4194,10 +4134,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* MegaHack -- Determine letter later */
 				summon_char_type = '\0';
 			}
-#endif
 			/* Raise the dead */
 			mon_ball(who, what, y, x, GF_RAISE_DEAD, 0, 3, TRUE);
 			break;
+#endif
 		}
 
 

@@ -328,7 +328,7 @@ struct effect_type
 {
 	u32b name;     /* Name (offset) */
 
-	u32b info[6];     /* Info (offset) */
+	u32b info[7];     /* Info (offset) */
 	u32b desc[2];     /* Description (offset) */
 
 	u32b flags1;	/* Projection flags */

@@ -2336,7 +2336,6 @@ errr parse_effect_info(char *buf, header *head)
 		/* Store the name */
 		if (!(effect_ptr->name = add_name(head, s)))
 			return (PARSE_ERROR_OUT_OF_MEMORY);
-
 	}
 
 	/* Process 'I' for "Info" */
@@ -2366,7 +2365,7 @@ errr parse_effect_info(char *buf, header *head)
 		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Loop through string */
-		for (j = 0, s = buf+2; (j < 6) && s; s = t, j++)
+		for (j = 0, s = buf+2; (j < 7) && s; s = t, j++)
 		{
 			/* Find the colon before the description */
 			t = strchr(s, ':');
@@ -10076,7 +10075,7 @@ errr emit_effect_info_index(FILE *fp, header *head, int i)
 
 	/* Output 'D' for Description */
 	fprintf(fp, "D");
-	for (j = 0; j < 6; j++)
+	for (j = 0; j < 7; j++)
 	{
 		fprintf(fp,":%s",head->text_ptr + effect_ptr->info[j]);
 	}

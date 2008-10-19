@@ -18,577 +18,577 @@ V:0.6.3
 
 N:0:NOTHING
 I:0:0:0
-D:do:::nothing::
+D:do||es|:::nothing:::
 
 N:1:STORM
 I:0:0:0
-D:lash:::with wind, rain and lightning::
+D:lash||es|:::with wind, rain and lightning:::
 
 N:2:WIND
 I:0:0:0
-D:blast:::with wind::damage against flying or climbing monsters, less against others
+D:blast~:::with wind::damage against flying or climbing monsters, less against others:
 
 N:3:HELLFIRE
 I:0:0:0
-D:blast:::with hellfire::
+D:blast~:::with hellfire:::
 
 N:4:MANA
 I:0:0:0
-D:blast:::with magic::
+D:blast~:::with magic:::
 
 N:5:HOLY_ORB
 I:0:0:0
-D:blast:::with holy magic::damage, doubled against evil monsters
+D:blast~:::with holy magic::damage, doubled against evil monsters:
 
 N:6:LITE_WEAK
 I:0:0:0
-D:light:up::::damage to monsters vulnerable to light
+D:light~:up::::damage to monsters vulnerable to light:
 
 N:7:DARK_WEAK
 I:0:0:0
-D:plunge:into darkness::::power
+D:plunge~:into darkness::::power:pow
 
 N:8:WATER_WEAK
 I:0:0:0
-D:soak:::with water::
+D:soak~:::with water:::
 
 N:9:PLASMA
 I:0:0:0
-D:blast:::with plasma::
+D:blast~:::with plasma:::
 
 N:10:METEOR
 I:0:0:0
-D:blast:::with meteors::
+D:blast~:::with meteors:::
 
 N:11:ICE
 I:0:0:0
-D:cover:::with ice::
+D:cover~:::with ice:::
 
 N:12:GRAVITY
 I:0:0:0
-D:crush:::with gravity::
+D:crush||es|:::with gravity:::
 
 N:13:INERTIA
 I:0:0:0
-D:slow:::with inertia::
+D:slow~:::with inertia:::
 
 N:14:FORCE
 I:0:0:0
-D:impact:::with force::
+D:impact~:::with force:::
 
 N:15:TIME
 I:0:0:0
-D:take:::back in time::
+D:take~:::back in time:::
 
 N:16:ACID
 I:0:0:0
-D:dissolve:::::
+D:dissolve~::::::
 
 N:17:ELEC
 I:0:0:0
-D:electrify:::::
+D:electrif|y|ies|::::::
 
 N:18:FIRE
 I:0:0:0
-D:burn:::::
+D:burn~::::::
 
 N:19:COLD
 I:0:0:0
-D:freeze:::::
+D:freeze~::::::
 
 N:20:POISON
 I:0:0:0
-D:poison:::::
+D:poison~::::::
 
 N:21:ANIM_DEAD
 I:0:0:0
-D:animate::dead:::
+D:animate~::dead::::
 
 N:22:LITE
 I:0:0:0
-D:blast:::with powerful light::
+D:blast~:::with powerful light:::
 
 N:23:DARK
 I:0:0:0
-D:blast:::with powerful darkness::
+D:blast~:::with powerful darkness:::
 
 N:24:WATER
 I:0:0:0
-D:blast:::with water::
+D:blast~:::with water:::
 
 N:25:CONFUSE
 I:0:0:0
-D:confuse:::::
+D:confuse~::::::
 
 N:26:SOUND
 I:0:0:0
-D:deafen:::::
+D:deafen~::::::
 
 N:27:SHARD
 I:0:0:0
-D:blast:::with shards::
+D:blast~:::with shards:::
 
 N:28:NEXUS
 I:0:0:0
-D:blast:::with nexus::
+D:blast~:::with nexus:::
 
 N:29:NETHER
 I:0:0:0
-D:blast:::with nether::
+D:blast~:::with nether:::
 
 N:30:CHAOS
 I:0:0:0
-D:blast:::with chaos::
+D:blast~:::with chaos:::
 
 N:31:DISENCHANT
 I:0:0:0
-D:blast:::with disenchantment::
+D:blast~:::with disenchantment:::
 
 N:32:EXPLODE
 I:0:0:0
-D:explode:::/::
+D:explode~:::/:::
 
 N:33:KILL_WALL
 I:0:0:0
-D:remove:rock from::::damage to monsters made from rock
+D:remove~:rock from::::damage to monsters made from rock:
 
 N:34:KILL_DOOR
 I:0:0:0
-D:remove:doors from::::
+D:remove~:doors from:::::
 
 N:35:KILL_TRAP
 I:0:0:0
-D:remove:traps from::::
+D:remove~:traps from:::::
 
 N:36:MAKE_WALL
 I:0:0:0
-D:create:walls around::::
+D:create~:walls around:::::
 
 N:37:MAKE_DOOR
 I:0:0:0
-D:create:doors around::::
+D:create~:doors around:::::
 
 N:38:MAKE_TRAP
 I:0:0:0
-D:create:traps around::::
+D:create~:traps around:::::
 
 N:39:BRIDGE
 I:0:0:0
-D:create:a stone bridge under::::
+D:create~:a stone bridge under:::::
 
 N:40:ANIM_ELEMENT
 I:0:0:0
-D:animate::elements:::
+D:animate~::elements::::
 
 N:41:AWAY_UNDEAD
 I:0:0:0
-D:teleport:::away if undead::distance on average
+D:teleport~:::away if undead::distance on average:range
 
 N:42:AWAY_EVIL
 I:0:0:0
-D:teleport:::away if evil::distance on average
+D:teleport~:::away if evil::distance on average:range
 
 N:43:AWAY_ALL
 I:0:0:0
-D:teleport:::away::distance on average
+D:teleport~:::away::distance on average:range
 
 N:44:TURN_UNDEAD
 I:0:0:0
-D:turn:::if undead::power
+D:turn~:::if undead::power:pow
 
 N:45:TURN_EVIL
 I:0:0:0
-D:turn:::if evil::power
+D:turn~:::if evil::power:pow
 
 N:46:FEAR_WEAK
 I:0:0:0
-D:scare:::::power
+D:scare~:::::power:pow
 
 N:47:DISPEL_UNDEAD
 I:0:0:0
-D:dispel:::if undead::
+D:dispel~:::if undead:::
 
 N:48:DISPEL_EVIL
 I:0:0:0
-D:dispel:::if evil::
+D:dispel~:::if evil:::
 
 N:49:DISPEL_ALL
 I:0:0:0
-D:dispel:::::
+D:dispel~::::::
 
 N:50:ANIM_OBJECT
 I:0:0:0
-D:animate::objects:::
+D:animate~::objects::::
 
 N:51:CLONE
 I:0:0:0
-D:clone:::::power
+D:clone~:::::power:pow
 
 N:52:POLYMORPH
 I:0:0:0
-D:polymorph:::::power
+D:polymorph~:::::power:pow
 
 N:53:HEAL
 I:0:0:0
-D:heal:::::hit points
+D:heal~:::::hit points:heal
 
 N:54:HASTE
 I:0:0:0
-D:hasten:::::power
+D:hasten~:::::power:pow
 
 N:55:SLOW_WEAK
 I:0:0:0
-D:slow:::::power
+D:slow~:::::power:pow
 
 N:56:CONFUSE_WEAK
 I:0:0:0
-D:confuse:::::power
+D:confuse~:::::power:pow
 
 N:57:SLEEP
 I:0:0:0
-D:send:::to sleep::power
+D:send~:::to sleep::power:pow
 
 N:58:DRAIN_LIFE
 I:0:0:0
-D:drain:life from::::
+D:drain~:life from:::::
 
 N:59:BWATER
 I:0:0:0
-D:scald:::with boiling water::
+D:scald~:::with boiling water:::
 
 N:60:BMUD
 I:0:0:0
-D:splash:::with boiling mud::
+D:splash||es|:::with boiling mud:::
 
 N:61:HURT
 I:0:0:0
-D:attack:::::
+D:attack~::::::
 
 N:62:LAVA
 I:0:0:0
-D:burn:::with lava::
+D:burn~:::with lava:::
 
 N:63:UN_BONUS
 I:0:0:0
-D:disenchant:::::
+D:disenchant~::::::
 
 N:64:UN_POWER
 I:0:0:0
-D:drain::charges from:::
+D:drain~::charges from::::
 
 N:65:EAT_GOLD
 I:0:0:0
-D:steal::gold from:::
+D:steal~::gold from::::
 
 N:66:EAT_ITEM
 I:0:0:0
-D:steal::items from:::
+D:steal~::items from::::
 
 N:67:EAT_FOOD
 I:0:0:0
-D:eat:::r food::
+D:eat~:::$ food:::
 
 N:68:EAT_LITE
 I:0:0:0
-D:absorb::light from:::
+D:absorb~::light from::::
 
 N:69:FALL
 I:0:0:0
-D:drop:::into a pit::
+D:drop~:::into a pit:::
 
 N:70:FALL_MORE
 I:0:0:0
-D:drop:::through the floor::
+D:drop~:::through the floor:::
 
 N:71:FALL_SPIKE
 I:0:0:0
-D:drop:::into a spiked pit::
+D:drop~:::into a spiked pit:::
 
 N:72:FALL_POISON
 I:0:0:0
-D:drop:::into a poison spiked pit::
+D:drop~:::into a poison spiked pit:::
 
 N:73:BLIND
 I:0:0:0
-D:blind:::::damage, doubled against eye monsters
+D:blind~:::::damage, doubled against eye monsters:
 
 N:74:SLOW
 I:0:0:0
-D::::::
+D:slow~::::::
 
 N:75:TERRIFY
 I:0:0:0
-D:terrify:::::
+D:terrif|y|ies|::::::
 
 N:76:PARALYZE
 I:0:0:0
-D:paralyze:::::
+D:paralyze~::::::
 
 N:77:LOSE_STR
 I:0:0:0
-D:reduce:strength and size from::::
+D:reduce~:strength and size from:::::
 
 N:78:LOSE_INT
 I:0:0:0
-D:reduce:intelligence from::::
+D:reduce~:intelligence from:::::
 
 N:79:LOSE_WIS
 I:0:0:0
-D:reduce:wisdom from::::
+D:reduce~:wisdom from:::::
 
 N:80:LOSE_DEX
 I:0:0:0
-D:reduce:dexterity and agility from::::
+D:reduce~:dexterity and agility from:::::
 
 N:81:LOSE_CON
 I:0:0:0
-D:reduce:constitution from::::
+D:reduce~:constitution from:::::
 
 N:82:LOSE_CHR
 I:0:0:0
-D:reduce:charisma from::::
+D:reduce~:charisma from:::::
 
 N:83:LOSE_ALL
 I:0:0:0
-D:reduce:all stats from::::
+D:reduce~:all stats from:::::
 
 N:84:SHATTER
 I:0:0:0
-D:shatter:::::
+D:shatter~::::::
 
 N:85:EXP_10
 I:0:0:0
-D:drain:experience (by 10d6+) from::::
+D:drain~:experience (by 10d6+) from:::::
 
 N:86:EXP_20
 I:0:0:0
-D:drain:experience (by 20d6+) from::::
+D:drain~:experience (by 20d6+) from:::::
 
 N:87:EXP_40
 I:0:0:0
-D:drain:experience (by 40d6+) from::::
+D:drain~:experience (by 40d6+) from:::::
 
 N:88:EXP_80
 I:0:0:0
-D:drain:experience (by 80d6+) from::::
+D:drain~:experience (by 80d6+) from:::::
 
 N:89:RAISE
 I:0:0:0
-D:raise:water around::::damage to monsters made from water
+D:raise~:water around::::damage to monsters made from water:
 
 N:90:LOWER
 I:0:0:0
-D:lower:water around::::damage to monsters made from water
+D:lower~:water around::::damage to monsters made from water:
 
 N:91:PROBE
 I:0:0:0
-D:probe:the weaknesses of::::
+D:probe~:the weaknesses of:::::
 
 N:92:LOCK_DOOR
 I:0:0:0
-D:magically lock:doors on::::
+D:magically lock~:doors on:::::
 
 N:93:SALT_WATER
 I:0:0:0
-D:soak:::with salt water::
+D:soak~:::with salt water:::
 
 N:94:HALLU
 I:0:0:0
-D:space out:::::
+D:space~ out::::::
 
 N:95:FEATURE
 I:0:0:0
-D:magically create:::::damage, destroying living monsters that cannot escape to an adjacent grid
+D:magically create~:::::damage, destroying living monsters that cannot escape to an adjacent grid:
 
 N:96:STEAM
 I:0:0:0
-D:scald:::with steam::
+D:scald~:::with steam:::
 
 N:97:VAPOUR
 I:0:0:0
-D:dissolve:::with acidic vapour::
+D:dissolve~:::with acidic vapour:::
 
 N:98:SMOKE
 I:0:0:0
-D:burn:::with smoke::
+D:burn~:::with smoke:::
 
 N:99:SUFFOCATE
 I:0:0:0
-D:suffocate:::::
+D:suffocate~::::::
 
 N:100:HUNGER
 I:0:0:0
-D:starve:::::
+D:starve~::::::
 
 N:101:DISEASE
 I:0:0:0
-D:infect:::with disease::
+D:infect~:::with disease:::
 
 N:102:LOSE_MANA
 I:0:0:0
-D:drain:mana from::::spell points
+D:drain~:mana from::::spell points:mana
 
 N:103:WOUND
 I:0:0:0
-D:wound:::::
+D:wound~::::::
 
 N:104:BATTER
 I:0:0:0
-D:batter:::::
+D:batter~::::::
 
 N:105:BLIND_WEAK
 I:0:0:0
-D:blind:::::power
+D:blind~:::::power:pow
 
 N:106:RAISE_DEAD
 I:0:0:0
-D:raise::dead:::
+D:raise~::dead::::
 
 N:107:GAIN_MANA
 I:0:0:0
-D:return:mana to::::spell points
+D:return~:mana to::::spell points:mana
 
 N:108:FORGET
 I:0:0:0
-D:forget:::::
+D:cause~:::to forget:::
 
 N:109:CURSE
 I:0:0:0
-D:curse:::::
+D:curse~::::::
 
 N:110:DISPEL
 I:0:0:0
-D:remove:enchantments from::::
+D:remove~:enchantments from:::::
 
 N:111:STASTIS
 I:0:0:0
-D:trap:::in time loops::
+D:trap~:::in time loops:::
 
 N:112:PETRIFY
 I:0:0:0
-D:petrify:::::
+D:petrif|y|ies|::::::
 
 N:113:WEB
 I:0:0:0
-D:build:webs around::::
+D:build~:webs around:::::
 
 N:114:BLOOD
 I:0:0:0
-D:cover:::in blood::
+D:cover~:::in blood:::
 
 N:115:SLIME
 I:0:0:0
-D:cover:::in slime::
+D:cover~:::in slime:::
 
 N:116:RESIST_MAGIC
 I:0:0:0
-D::::::
+D:::::::
 
 N:117:FALL_LESS
 I:0:0:0
-D:rise:::through the ceiling::
+D:rise~:::through the ceiling:::
 
 N:118:AWAY_DARK
 I:0:0:0
-D:teleport:::away only in darkness::distance on average
+D:teleport~:::away only in darkness::distance on average:range
 
 N:119:AWAY_JUMP
 I:0:0:0
-D:jump:::away to a location still in line of fire::distance on average
+D:jump~:::away to a location still in line of fire::distance on average:range
 
 N:120:HURT_WOOD
 I:0:0:0
-D:warp::wood out of shape:::damage to monsters made from wood
+D:warp~::wood out of shape:::damage to monsters made from wood:
 
 N:121:AWAY_NATURE
 I:0:0:0
-D:teleport:::away if adjacent to water or nature::distance on average
+D:teleport~:::away if adjacent to water or nature::distance on average:range
 
 N:122:AWAY_FIRE
 I:0:0:0
-D:teleport:::away if adjacent to fire, smoke or lava::distance on average
+D:teleport~:::away if adjacent to fire, smoke or lava::distance on average:range
 
 N:123:ANIM_TREE
 I:0:0:0
-D:animate::trees:::
+D:animate~::trees::::
 
 N:124:CHARM_INSECT
 I:0:0:0
-D:charm::insects:::power
+D:charm~::insects:::power:pow
 
 N:125:CHARM_ANIMAL
 I:0:0:0
-D:charm::birds or mammals:::power
+D:charm~::birds or mammals:::power:pow
 
 N:126:CHARM_REPTILE
 I:0:0:0
-D:charm::reptiles or amphibians:::power
+D:charm~::reptiles or amphibians:::power:pow
 
 N:127:CHARM_MONSTER
 I:0:0:0
-D:charm::living monsters other than dragons:::power
+D:charm~::living monsters other than dragons:::power:pow
 
 N:128:CHARM_PERSON
 I:0:0:0
-D:charm::elves, dwarves, humans, orcs, trolls or giants:::power
+D:charm~::elves, dwarves, humans, orcs, trolls or giants:::power:pow
 
 N:129:BIND_DEMON
 I:0:0:0
-D:bind::demons to a cursed item:::power
+D:bind~::demons to a cursed item:::power:pow
 
 N:130:BIND_UNDEAD
 I:0:0:0
-D:bind::undead to a cursed item:::power
+D:bind~::undead to a cursed item:::power:pow
 
 N:131:BIND_DRAGON
 I:0:0:0
-D:bind::dragons to a cursed item:::power
+D:bind~::dragons to a cursed item:::power:pow
 
 N:132:BIND_FAMILIAR
 I:0:0:0
-D:bind::a familiar to you:::power
+D:bind~::a familiar to you:::power:pow
 
 N:133:VAMP_DRAIN
 I:0:0:0
-D:drain:health from::::
+D:drain~:health from:::::
 
 N:134:MANA_DRAIN
 I:0:0:0
-D:drain:mana from::::spell points
+D:drain~:mana from::::spell points:mana
 
 N:135:MENTAL
 I:0:0:0
-D:blast:::with mental energy::
+D:blast~:::with mental energy:::
 
 N:136:SNUFF
 I:0:0:0
-D:snuff:the life from::if they have less than a maximum:of:hit points
+D:snuff~:the life from::if they have less than a maximum:of:hit points:max hp
 
 N:137:RAGE
 I:0:0:0
-D:enrage:::::power
+D:enrage~:::::power:pow
 
 N:138:HEAL_PERC
 I:0:0:0
-D:heal:::::percent of hit points
+D:heal~:::::percent of hit points:heal %
 
 N:139:GAIN_MANA_PERC
 I:0:0:0
-D:return:mana to::::percent of spell points
+D:return~:mana to::::percent of spell points:mana %
 
 N:140:TANGLE
 I:0:0:0
-D:entangle:::with nearby plants or waterweeds::power
+D:entangle~:::with nearby plants or waterweeds::power:pow
 
 N:141:POISON_WATER
 I:0:0:0
-D:soak:::with poisonous water::
+D:soak~:::with poisonous water:::
 
 N:142:INVISIBILITY
 I:0:0:0
-D::::::
+D:::::::
 
 N:143:DELAY_POISON
 I:0:0:0
-D::::::
+D:poison~:::with delayed effect:::
 

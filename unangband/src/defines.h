@@ -3578,8 +3578,8 @@
 #define TR6_HAS_ROPE    0x00100000L	/* Item has rope attached (cmd2.c) */
 #define TR6_HAS_CHAIN	0x00200000L	/* Item has randomly picked effect */
 #define TR6_RANDOM		0x00400000L	/* Item has randomly picked effect */
-#define TR6_BAD_THROW	0x00400000L	/* Item is hard to throw */
-#define TR6_BREAK_THROW	0x00400000L	/* Item breaks when thrown */
+#define TR6_BAD_THROW	0x00800000L	/* Item is hard to throw */
+#define TR6_BREAK_THROW	0x01000000L	/* Item breaks when thrown */
 
 
 

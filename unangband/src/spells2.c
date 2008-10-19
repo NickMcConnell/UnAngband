@@ -70,7 +70,7 @@ bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg,
 		}
 
 		/* Jump directly to the target monster */
-		if (project(who, what, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+		if (project(who, what, 0, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
 	}
 
 	/* Affect player? */
@@ -78,7 +78,7 @@ bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg,
 			((allow_los) && generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOS)))
 	{
 		/* Jump directly to the player */
-		if (project(who, what, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
+		if (project(who, what, 0, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
 	}
 
 	/* Result */
@@ -5161,8 +5161,9 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 
 	method_type *method_ptr = &method_info[method];
 
-	int rad = method_ptr->radius.base;
-	int num = method_ptr->number.base;
+	int rad = scale_method(method_ptr->radius, level);
+	int rng = scale_method(method_ptr->max_range, level);
+	int num = scale_method(method_ptr->number, level);
 
 	int degrees_of_arc = method_ptr->arc;
 	int diameter_of_source = method_ptr->diameter_of_source;
@@ -5170,12 +5171,6 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 	u32b flg = method_info[method].flags1;
 
 	bool noticed = FALSE;
-
-	/* Scale radius up */
-	if (method_ptr->radius.levels) rad += method_ptr->radius.gain * level / method_ptr->radius.levels;
-
-	/* Scale number up */
-	if (method_ptr->number.levels) num += method_ptr->number.gain * level / method_ptr->number.levels;
 
 	/* Hack -- fix number */
 	if (num < 1) num = 1;
@@ -5215,7 +5210,7 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 		}
 
 		/* Analyze the "dir" and the "target". */
-		else if (project(who, what, rad, py, px, y, x, dam, typ, flg, degrees_of_arc,
+		else if (project(who, what, rad, rng, py, px, y, x, dam, typ, flg, degrees_of_arc,
 				(byte)diameter_of_source)) noticed = TRUE;
 	}
 
@@ -5878,7 +5873,6 @@ static int thaumacurse(bool verbose, int power)
  *      We should make summoned monsters friendly if plev is > 0. XXX
  *
  */
-
 bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 {
 	spell_type *s_ptr = &s_info[spell];
@@ -5890,18 +5884,19 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
-		spell_blow *method_ptr = &s_ptr->blow[ap_cnt];
+		spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
+		method_type *method_ptr = &method_info[blow_ptr->method];
 		int damage = 0;
-		int effect = method_ptr->effect;
+		int effect = blow_ptr->effect;
 
 		/* Hack -- no more attacks */
-		if (!method_ptr->method) break;
+		if (!blow_ptr->method) break;
 
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
 
 		/* Use player hit points */
-		if (method_info[method_ptr->method].flags2 & (PR2_BREATH))
+		if (method_ptr->flags2 & (PR2_BREATH))
 		{
 			/* Damage uses current hit points */
 			damage = p_ptr->chp * damage / 300;
@@ -5910,38 +5905,40 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		else
 		{
 			/* Roll out the damage */
-			if (method_ptr->d_side)
+			if (blow_ptr->d_side)
 			{
-				damage += damroll(method_ptr->d_dice, method_ptr->d_side);
+				damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
 			}
 
 			/* Roll out level dependent damage */
-			if (method_ptr->l_side)
+			if (blow_ptr->l_side)
 			{
-				damage += damroll(method_ptr->l_dice * level / method_ptr->levels, method_ptr->l_side);
+				damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
 			}
 
 			/* Add constant damage */
-			damage += method_ptr->d_plus;
+			damage += blow_ptr->d_plus;
 
 			/* Add level dependent damage */
-			if (method_ptr->l_plus)
+			if (blow_ptr->l_plus)
 			{
-				damage += method_ptr->l_plus * level / method_ptr->levels;
-
 				/* Mega-hack - dispel evil/undead etc. */
 				if (!level)
 				{
-					damage += method_ptr->l_plus * 25 / method_ptr->levels;
+					damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
+				}
+				else
+				{
+					damage += blow_ptr->l_plus * level / blow_ptr->levels;
 				}
 			}
 		}
 
 		/* Allow direction to be cancelled for free */
-		if ((!(method_info[method_ptr->method].flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
+		if ((!(method_ptr->flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
 
 		/* Apply spell method */
-		if (fire_projection(who, what, effect, method_ptr->method, dir, damage, level)) obvious = TRUE;
+		if (fire_projection(who, what, effect, blow_ptr->method, dir, damage, level)) obvious = TRUE;
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
@@ -7638,7 +7635,7 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 			}
 
 			/* Hack -- apply damage as projection */
-			obvious |= project(who, what, 0, y, x, y, x,
+			obvious |= project(who, what, 0, 0, y, x, y, x,
 				(coated_p(o_ptr) ? damage / 5 : damage), effect, flg, 0, 0);
 		}
 

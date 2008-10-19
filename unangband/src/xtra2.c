@@ -7354,8 +7354,6 @@ void get_zone(dungeon_zone **zone_handle, int dungeon, int depth)
 }
 
 
-
-
 /*
  * Use scalar
  */

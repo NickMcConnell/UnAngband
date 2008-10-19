@@ -12212,7 +12212,7 @@ static void calc_starburst(int height, int width, byte *arc_first,
  * in the blast radius, in case the illumination of the grid was changed,
  * and "update_view()" and "update_monsters()" need to be called.
  */
-bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam, int typ,
+bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter)
 {
 	int i, j, k;
@@ -12281,6 +12281,7 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 
 	/* Make certain that the radius is not too large */
 	if (rad > MAX_RANGE) rad = MAX_RANGE;
+	if (rng > MAX_RANGE) rng = MAX_RANGE;
 
 	/* Some projection types always PROJECT_WALL. */
 	if ((typ == GF_KILL_WALL) || (typ == GF_KILL_DOOR))
@@ -12343,13 +12344,8 @@ bool project(int who, int what, int rad, int y0, int x0, int y1, int x1, int dam
 	/* Otherwise, unless an arc or a star, travel along the projection path. */
 	else if (!(flg & (PROJECT_ARC | PROJECT_STAR)))
 	{
-		/* Determine maximum length of projection path */
-		if (flg & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX)) dist = MAX_RANGE;
-		else if (rad <= 0)        dist = MAX_RANGE;
-		else                      dist = rad;
-
 		/* Calculate the projection path */
-		path_n = project_path(path_g, dist, y0, x0, &y1, &x1, flg);
+		path_n = project_path(path_g, rng, y0, x0, &y1, &x1, flg);
 
 		/* Project along the path */
 		for (i = 0; i < path_n; ++i)
