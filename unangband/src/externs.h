@@ -368,6 +368,8 @@ extern quiver_group_type quiver_group[MAX_QUIVER_GROUPS];
 extern s16b bag_kinds_cache[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL];
 extern ecology_type cave_ecology;
 extern u32b hack_monster_equip;
+extern int target_path_n;
+extern u16b target_path_g[512];
 
 
 /*
@@ -949,9 +951,9 @@ extern bool concentrate_light_hook(const int y, const int x, const bool modify);
 extern int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 		bool concentrate_hook(const int y, const int x, const bool modify));
 extern bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, bool *known);
-extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel);
+extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_spell_types(int who, int spell, int level, bool *cancel);
-extern bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel);
+extern bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x);
 
@@ -1134,8 +1136,8 @@ extern bool target_okay(void);
 extern void target_set_monster(int m_idx, s16b flags);
 extern void target_set_location(int y, int x, s16b flags);
 extern key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info);
-extern bool target_set_interactive(int mode);
-extern bool get_aim_dir(int *dp);
+extern bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc, byte diameter_of_source);
+extern bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diameter_of_source);
 extern bool get_rep_dir(int *dp);
 extern bool confuse_dir(int *dp);
 extern int min_depth(int dungeon);

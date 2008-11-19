@@ -11968,7 +11968,6 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 }
 
 
-
 /*
  * Calculate and store the arcs used to make starbursts.
  */
@@ -12052,7 +12051,6 @@ static void calc_starburst(int height, int width, byte *arc_first,
 		}
 	}
 }
-
 
 
 /*
@@ -12216,17 +12214,11 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			 u32b flg, int degrees, byte source_diameter)
 {
 	int i, j, k;
-	int dist = 0;
-
-	int rad_temp = rad; /* Original radius of the explosion boosted using PROJECT_EXPAND */
 
 	u32b dam_temp;
-	int centerline = 0;
 
 	int y = y0;
 	int x = x0;
-	int n1y = 0;
-	int n1x = 0;
 	int y2, x2;
 
 	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
@@ -12256,13 +12248,21 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	int grids = 0;
 
 	/* Coordinates of the affected grids */
-	byte gx[256], gy[256];
+	u16b grid[256];
 
 	/* Distance to each of the affected grids. */
 	byte gd[256];
 
 	/* Precalculated damage values for each distance. */
 	int dam_at_dist[MAX_RANGE+1];
+
+	int n1y = 0;
+	int n1x = 0;
+	int centerline = 0;
+
+	int dist = 0;
+
+	int rad_temp = rad; /* Original radius of the explosion boosted using PROJECT_EXPAND */
 
 	/*
 	 * Starburst projections only --
@@ -12317,6 +12317,13 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		if (!blind) notice = TRUE;
 	}
 
+	/* Hack -- paranoia for checking */
+	if (flg & (PROJECT_CHCK))
+	{
+		flg &= ~(PROJECT_LITE);
+		flg |= (PROJECT_HIDE);
+	}
+
 	/* Hack -- Jump to target, but require a valid target */
 	if ((flg & (PROJECT_JUMP)) && (y1) && (x1))
 	{
@@ -12336,8 +12343,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* If a single grid is both source and destination, store it. */
 	if ((x1 == x0) && (y1 == y0))
 	{
-		gy[grids] = y0;
-		gx[grids] = x0;
+		grid[grids] = GRID(y0, x0);
 		gd[grids++] = 0;
 	}
 
@@ -12377,16 +12383,14 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			/* If a beam, collect all grids in the path. */
 			if (flg & (PROJECT_BEAM))
 			{
-				gy[grids] = y;
-				gx[grids] = x;
+				grid[grids] = GRID(y, x);
 				gd[grids++] = 0;
 			}
 
 			/* Otherwise, collect only the final grid in the path. */
 			else if (i == path_n - 1)
 			{
-				gy[grids] = y;
-				gx[grids] = x;
+				grid[grids] = GRID(y, x);
 				gd[grids++] = 0;
 			}
 
@@ -12481,8 +12485,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		 */
 		if (grids == 0)
 		{
-			gy[grids] = y2;
-			gx[grids] = x2;
+			grid[grids] = GRID(y2, x2);
 			gd[grids++] = 0;
 		}
 
@@ -12511,8 +12514,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 				if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(y, x) ||
 						((allow_los) && (cave_los_bold(y, x))))
 				{
-					gy[grids] = y;
-					gx[grids] = x;
+					grid[grids] = GRID(y, x);
 					gd[grids++] = k;
 				}
 			}
@@ -12560,8 +12562,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		 */
 		if (grids == 0)
 		{
-			gy[grids] = y2;
-			gx[grids] = x2;
+			grid[grids] = GRID(y2, x2);
 			gd[grids++] = 0;
 		}
 
@@ -12660,10 +12661,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 								/* Must be within effect range. */
 								if (max_dist >= dist)
 								{
-									gy[grids] = y;
-									gx[grids] = x;
-									gd[grids] = 0;
-									grids++;
+									grid[grids] = GRID(y, x);
+									gd[grids++] = 0;
 								}
 
 								/* Arc found.  End search */
@@ -12699,9 +12698,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 						if ((flg & (PROJECT_PASS)) || generic_los(y2, x2, y, x, CAVE_XLOF) ||
 								((allow_los) && (generic_los(y2, x2, y, x, CAVE_XLOS))))
 						{
-							gy[grids] = y;
-							gx[grids] = x;
-							gd[grids] = dist;
+							grid[grids] = GRID(y, x);
+							gd[grids++] = dist;
 							grids++;
 						}
 					}
@@ -12713,10 +12711,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					if ((flg & (PROJECT_PASS)) || generic_los(y2, x2, y, x, CAVE_XLOF) ||
 							((allow_los) && (generic_los(y2, x2, y, x, CAVE_XLOS))))
 					{
-						gy[grids] = y;
-						gx[grids] = x;
-						gd[grids] = dist;
-						grids++;
+						grid[grids] = GRID(y, x);
+						gd[grids++] = dist;
 					}
 				}
 			}
@@ -12757,15 +12753,14 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		 */
 		if (grids == 0)
 		{
-			gy[grids] = y2;
-			gx[grids] = x2;
+			grid[grids] = GRID(y2, x2);
 			gd[grids++] = 0;
 		}
 
 		for (i = 0; i < grids; i++)
 		{
 			/* Mark the grid */
-			play_info[gy[i]][gx[i]] |= (PLAY_TEMP);
+			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] |= (PLAY_TEMP);
 		}
 
 		/* Hack to allow wide beams */
@@ -12778,14 +12773,14 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			if (gd[i] >= rad) continue;
 
 			/* Passable grid. Note PROJECT_WALL does not pass thru walls. */
-			if ((flg & (PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
-					((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+			if ((flg & (PROJECT_PASS)) || cave_project_bold(GRID_Y(grid[i]), GRID_X(grid[i])) ||
+					((allow_los) && (cave_los_bold(GRID_Y(grid[i]), GRID_X(grid[i])))))
 			{
 				/* Check adjacent grids */
 				for (j = 0; (j < 8); j++)
 				{
-					int yy = gy[i] + ddy_ddd[j];
-					int xx = gx[i] + ddx_ddd[j];
+					int yy = GRID_Y(grid[i]) + ddy_ddd[j];
+					int xx = GRID_X(grid[i]) + ddx_ddd[j];
 
 					/* Ensure grids left */
 					if (grids >= 255) break;
@@ -12824,14 +12819,12 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 						if (diff < (degrees + 6) / 4)
 						{
 							/* Passable grid */
-							if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
-									((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+							if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(GRID_Y(grid[i]), GRID_X(grid[i])) ||
+									((allow_los) && (cave_los_bold(GRID_Y(grid[i]), GRID_X(grid[i])))))
 							{
 								/* Add grid */
-								gy[grids] = yy;
-								gx[grids] = xx;
-								gd[grids] = gd[i]+1;
-								grids++;
+								grid[grids] = GRID(yy, xx);
+								gd[grids++] = gd[i]+1;
 
 								/* Mark as added */
 								play_info[yy][xx] |= (PLAY_TEMP);
@@ -12842,14 +12835,12 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					else
 					{
 						/* Passable grid */
-						if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(gy[i], gx[i]) ||
-								((allow_los) && (cave_los_bold(gy[i], gx[i]))))
+						if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(GRID_Y(grid[i]), GRID_X(grid[i])) ||
+								((allow_los) && (cave_los_bold(GRID_Y(grid[i]), GRID_X(grid[i])))))
 						{
 							/* Add grid */
-							gy[grids]=yy;
-							gx[grids]=xx;
-							gd[grids]=gd[i]+1;
-							grids++;
+							grid[grids]= GRID(yy, xx);
+							gd[grids++]=gd[i]+1;
 
 							/* Mark as added */
 							play_info[yy][xx] |= (PLAY_TEMP);
@@ -12863,7 +12854,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		for (i = 0; i < grids; i++)
 		{
 			/* Mark the grid */
-			play_info[gy[i]][gx[i]] &= ~(PLAY_TEMP);
+			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] &= ~(PLAY_TEMP);
 		}
 
 	}
@@ -12944,23 +12935,20 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		/* Sort the blast grids by distance, starting at the origin. */
 		for (i = 0, k = 0; i < rad; i++)
 		{
-			int tmp_y, tmp_x, tmp_d;
+			int tmp_grid, tmp_d;
 
 			/* Collect all the grids of a given distance together. */
 			for (j = k; j < grids; j++)
 			{
 				if (gd[j] == i)
 				{
-					tmp_y = gy[k];
-					tmp_x = gx[k];
+					tmp_grid = grid[k];
 					tmp_d = gd[k];
 
-					gy[k] = gy[j];
-					gx[k] = gx[j];
+					grid[k] = grid[j];
 					gd[k] = gd[j];
 
-					gy[j] = tmp_y;
-					gx[j] = tmp_x;
+					grid[j] = tmp_grid;
 					gd[j] = tmp_d;
 
 					/* Write to next slot */
@@ -13005,7 +12993,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					for (j = i + 1; (j < grids) && (gd[i] == gd[j]); j++)
 					{
 						/* Skip if not saving it */
-						if (!(play_info[gy[j]][gx[j]] & (PLAY_TEMP))) continue;
+						if (!(play_info[GRID_Y(grid[j])][GRID_X(grid[j])] & (PLAY_TEMP))) continue;
 
 						/* No connections found yet */
 						c = 0;
@@ -13014,13 +13002,13 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 						for (l = i - 1; (l >= 0) && (gd[i] == gd[l]); l--)
 						{
 							/* Don't count monster-less grids on first iteration through */
-							if ((!m) && !(cave_m_idx[gy[l]][gx[l]]) && !(play_info[gy[l]][gx[l]] & (PLAY_TEMP))) continue;
+							if ((!m) && !(cave_m_idx[GRID_Y(grid[l])][GRID_X(grid[l])]) && !(play_info[GRID_Y(grid[l])][GRID_X(grid[l])] & (PLAY_TEMP))) continue;
 
 							/* Check adjacency */
-							if (distance(gy[j], gx[j], gy[l], gx[l]) == 1)
+							if (distance(GRID_Y(grid[j]), GRID_X(grid[j]), GRID_Y(grid[l]), GRID_X(grid[l])) == 1)
 							{
 								/* Count and maybe note a grid, preferring already saved grids */
-								if ((!rand_int(++c)) || (play_info[gy[l]][gx[l]] & (PLAY_TEMP))) g = l;
+								if ((!rand_int(++c)) || (play_info[GRID_Y(grid[l])][GRID_X(grid[l])] & (PLAY_TEMP))) g = l;
 							}
 						}
 
@@ -13028,10 +13016,10 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 						if (c > 0)
 						{
 							/* Have we already saved it? */
-							if (!(play_info[gy[g]][gx[g]] & (PLAY_TEMP)))
+							if (!(play_info[GRID_Y(grid[g])][GRID_X(grid[g])] & (PLAY_TEMP)))
 							{
 								/* Save it */
-								play_info[gy[g]][gx[g]] |= (PLAY_TEMP);
+								play_info[GRID_Y(grid[g])][GRID_X(grid[g])] |= (PLAY_TEMP);
 								k--;
 							}
 						}
@@ -13052,10 +13040,10 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					for (l = i - 1; (l >= 0) && (gd[i] == gd[l]); l--)
 					{
 						/* Don't count monster-less grids on first iteration through */
-						if ((!m) && !(cave_m_idx[gy[l]][gx[l]])) continue;
+						if ((!m) && !(cave_m_idx[GRID_Y(grid[l])][GRID_X(grid[l])])) continue;
 
 						/* Not already saved */
-						if (!(play_info[gy[l]][gx[l]] & (PLAY_TEMP)))
+						if (!(play_info[GRID_Y(grid[l])][GRID_X(grid[l])] & (PLAY_TEMP)))
 						{
 							/* Count and maybe note a grid */
 							if (!rand_int(++c)) g = l;
@@ -13066,7 +13054,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					if (c > 0)
 					{
 						/* Save it */
-						play_info[gy[g]][gx[g]] |= (PLAY_TEMP);
+						play_info[GRID_Y(grid[g])][GRID_X(grid[g])] |= (PLAY_TEMP);
 						k--;
 					}
 					/* No grids left */
@@ -13090,10 +13078,9 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		for (i = 1, j = 0; i < grids; i++)
 		{
 			/* Save grid? */
-			if ((j) && (play_info[gy[i]][gx[i]] & (PLAY_TEMP)))
+			if ((j) && (play_info[GRID_Y(grid[i])][GRID_X(grid[i])] & (PLAY_TEMP)))
 			{
-				gy[i-j] = gy[i];
-				gx[i-j] = gx[i];
+				grid[i-j] = grid[i];
 				gd[i-j] = gd[i];
 			}
 			/* Skip grid */
@@ -13107,7 +13094,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		for (i = 0; i < grids; i++)
 		{
 			/* Mark the grid */
-			play_info[gy[i]][gx[i]] &= ~(PLAY_TEMP);
+			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] &= ~(PLAY_TEMP);
 		}
 	}
 
@@ -13143,8 +13130,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					/* Save grid? */
 					if ((j) && (gd[i] >= k - 1))
 					{
-						gy[i-j] = gy[i];
-						gx[i-j] = gx[i];
+						grid[i-j] = grid[i];
 						gd[i-j] = gd[i];
 					}
 					/* Skip grid */
@@ -13157,6 +13143,21 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 
 			grids -= j;
 		}
+	}
+
+	/* If PROJECT_CHCK, we are done */
+	if (flg & (PROJECT_CHCK))
+	{
+		/* Copy the grids to the path */
+		for (i = 0; i < grids; i++)
+		{
+			target_path_g[i] = grid[i];
+		}
+
+		/* Count of grids */
+		target_path_n = grids;
+
+		return (TRUE);
 	}
 
 	/* Calculate and store the actual damage at each distance. */
@@ -13197,9 +13198,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		{
 			if (gd[i] == 0)
 			{
-				gy[i] = gy[grids-1];
-				gx[i] = gx[grids-1];
-				gd[i] = gd[grids-1];
+				grid[i] = GRID(GRID_Y(grid[grids-1]),GRID_Y(grid[grids-1]));
 				grids--;
 			}
 		}
@@ -13208,23 +13207,20 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* Sort the blast grids by distance, starting at the origin. */
 	for (i = 0, k = 0; i < rad; i++)
 	{
-		int tmp_y, tmp_x, tmp_d;
+		int tmp_grid, tmp_d;
 
 		/* Collect all the grids of a given distance together. */
 		for (j = k; j < grids; j++)
 		{
 			if (gd[j] == i)
 			{
-				tmp_y = gy[k];
-				tmp_x = gx[k];
+				tmp_grid = grid[k];
 				tmp_d = gd[k];
 
-				gy[k] = gy[j];
-				gx[k] = gx[j];
+				grid[k] = grid[j];
 				gd[k] = gd[j];
 
-				gy[j] = tmp_y;
-				gx[j] = tmp_x;
+				grid[j] = tmp_grid;
 				gd[j] = tmp_d;
 
 				/* Write to next slot */
@@ -13233,7 +13229,6 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		}
 	}
 
-
 	/* Display the "blast area" if allowed */
 	if (!blind && !(flg & (PROJECT_HIDE)))
 	{
@@ -13241,8 +13236,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		for (i = 0; i < grids; i++)
 		{
 			/* Extract the location */
-			y = gy[i];
-			x = gx[i];
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
 			/* Only do visuals if the player can "see" the blast */
 			if (player_has_los_bold(y, x))
@@ -13304,8 +13299,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			for (i = 0; i < grids; i++)
 			{
 				/* Extract the location */
-				y = gy[i];
-				x = gx[i];
+				y = GRID_Y(grid[i]);
+				x = GRID_X(grid[i]);
 
 				/* Hack -- Erase if needed */
 				if (player_has_los_bold(y, x))
@@ -13333,8 +13328,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		for (i = 0; i < grids; i++)
 		{
 			/* Get the grid location */
-			y = gy[i];
-			x = gx[i];
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
 			/* Temporarily lite up the grid */
 			if (temp_lite(y, x)) notice = TRUE;
@@ -13344,13 +13339,12 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* Check features */
 	if (flg & (PROJECT_GRID))
 	{
-
 		/* Scan for features */
 		for (i = 0; i < grids; i++)
 		{
 			/* Get the grid location */
-			y = gy[i];
-			x = gx[i];
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
 			/* Affect the feature in that grid */
 			if (project_f(who, what, y, x, dam_at_dist[gd[i]], typ))
@@ -13361,14 +13355,12 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* Check objects */
 	if (flg & (PROJECT_ITEM))
 	{
-
 		/* Scan for objects */
 		for (i = 0; i < grids; i++)
 		{
-
 			/* Get the grid location */
-			y = gy[i];
-			x = gx[i];
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
 			/* Affect the object in the grid */
 			if (project_o(who, what, y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
@@ -13388,8 +13380,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		for (i = 0; i < grids; i++)
 		{
 			/* Get the grid location */
-			y = gy[i];
-			x = gx[i];
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
 			/* Check for monster */
 			if (cave_m_idx[y][x] > 0)
@@ -13441,14 +13433,12 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* Check player */
 	if (flg & (PROJECT_PLAY))
 	{
-
 		/* Scan for player */
 		for (i = 0; i < grids; i++)
 		{
-
 			/* Get the grid location */
-			y = gy[i];
-			x = gx[i];
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
 			/* Player is in this grid */
 			if (cave_m_idx[y][x] < 0)
@@ -13471,8 +13461,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	for (i = 0; i < grids; i++)
 	{
 		/* Get the grid location */
-		y = gy[i];
-		x = gx[i];
+		y = GRID_Y(grid[i]);
+		x = GRID_X(grid[i]);
 
 		/* Grid must be marked. */
 		if (!(play_info[y][x] & (PLAY_TEMP))) continue;

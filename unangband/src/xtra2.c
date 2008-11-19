@@ -6090,12 +6090,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 	return (query);
 }
 
-/*
- * Variables used to highlight project path to target.
- */
-static int target_path_n;
-static u16b target_path_g[256];
-
 
 /*
  * Modify a 'boring' grid appearance based on the 'projectability'
@@ -6355,7 +6349,7 @@ void modify_grid_interesting_project(byte *a, char *c, int y, int x, byte cinfo,
  * This command will cancel any old target, even if used from
  * inside the "look" command.
  */
-bool target_set_interactive(int mode)
+bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc, byte diameter_of_source)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -6377,6 +6371,9 @@ bool target_set_interactive(int mode)
 	char info[80];
 
 	int room = -1;
+
+	/* Get the real range */
+	if (!range) range = MAX_SIGHT;
 
 	/* Cancel target */
 	target_set_monster(0, 0);
@@ -6433,7 +6430,9 @@ bool target_set_interactive(int mode)
 			/* Calculate the path */
 			if (mode & (TARGET_KILL))
 			{
-				target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+				/* Get the projection grids */
+				project(-1, 0, radius, range, py, px, ty, tx, 0, GF_NOTHING,
+							 flg | (PROJECT_CHCK), arc, diameter_of_source);
 
 				/* Redraw map */
 				p_ptr->redraw |= (PR_MAP);
@@ -6504,7 +6503,9 @@ bool target_set_interactive(int mode)
 					/* Calculate the path */
 					if (mode & (TARGET_KILL))
 					{
-						target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+						/* Get the projection grids */
+						project(-1, 0, radius, range, py, px, ty, tx, 0, GF_NOTHING,
+									 flg | (PROJECT_CHCK), arc, diameter_of_source);
 
 						/* Redraw map */
 						p_ptr->redraw |= (PR_MAP);
@@ -6562,7 +6563,9 @@ bool target_set_interactive(int mode)
 							/* Calculate the path */
 							if (mode & (TARGET_KILL))
 							{
-								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+								/* Get the projection grids */
+								project(-1, 0, radius, range, py, px, ty, tx, 0, GF_NOTHING,
+											 flg | (PROJECT_CHCK), arc, diameter_of_source);
 
 								/* Redraw map */
 								p_ptr->redraw |= (PR_MAP);
@@ -6745,7 +6748,9 @@ bool target_set_interactive(int mode)
 					/* Calculate the path */
 					if (mode & (TARGET_KILL))
 					{
-						target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+						/* Get the projection grids */
+						project(-1, 0, radius, range, py, px, ty, tx, 0, GF_NOTHING,
+									 flg | (PROJECT_CHCK), arc, diameter_of_source);
 
 						/* Redraw map */
 						p_ptr->redraw |= (PR_MAP);
@@ -6821,7 +6826,9 @@ bool target_set_interactive(int mode)
 							/* Calculate the path */
 							if (mode & (TARGET_KILL))
 							{
-								target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+								/* Get the projection grids */
+								project(-1, 0, radius, range, py, px, ty, tx, 0, GF_NOTHING,
+											 flg | (PROJECT_CHCK), arc, diameter_of_source);
 
 								/* Redraw map */
 								p_ptr->redraw |= (PR_MAP);
@@ -6942,7 +6949,9 @@ bool target_set_interactive(int mode)
 				/* Calculate the path */
 				if (mode & (TARGET_KILL))
 				{
-					target_path_n = project_path(target_path_g, MAX_SIGHT, py, px, &ty, &tx, 0);
+					/* Get the projection grids */
+					project(-1, 0, radius, range, py, px, ty, tx, 0, GF_NOTHING,
+								 flg | (PROJECT_CHCK), arc, diameter_of_source);
 
 					/* Redraw map */
 					p_ptr->redraw |= (PR_MAP);
@@ -7010,7 +7019,7 @@ bool target_set_interactive(int mode)
  *
  * Currently this function applies confusion directly.
  */
-bool get_aim_dir(int *dp)
+bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diameter_of_source)
 {
 	int dir;
 
@@ -7079,7 +7088,7 @@ bool get_aim_dir(int *dp)
 			/* Set new target, use target if legal */
 			case '*':
 			{
-				if (target_set_interactive(TARGET_KILL)) dir = 5;
+				if (target_set_interactive(TARGET_KILL, range, radius, flg, arc, diameter_of_source)) dir = 5;
 				break;
 			}
 

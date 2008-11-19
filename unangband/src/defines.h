@@ -1669,6 +1669,7 @@
 #define SPELL_SLOW_POIS		58
 #define SPELL_SLOW_DIGEST	59
 #define SPELL_SLOW_META		60
+#define SPELL_DETECT_FIRE	61
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/
@@ -2733,7 +2734,7 @@
 #define PROJECT_JUMP         0x00400000
 #define PROJECT_THRU         0x00800000
 #define PROJECT_CHCK         0x01000000
-#define PROJECT_ORTH         0x02000000 /*(unused)*/
+#define PROJECT_ORTH         0x02000000 /* Projection cannot move diagonally */
 #define PROJECT_LOS		     0x04000000 /* Travel through LOS grids */
 #define PROJECT_EXPAND       0x08000000 /* Spreads further in tight spaces */
 

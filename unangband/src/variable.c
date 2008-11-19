@@ -1292,3 +1292,11 @@ ecology_type cave_ecology;
  */
 u32b hack_monster_equip;
 
+
+/*
+ * Variables used to highlight project path to target.
+ */
+int target_path_n;
+u16b target_path_g[512];
+
+

@@ -1248,6 +1248,7 @@ static cptr s_info_types[] =
 	"SLOW_POIS",
 	"SLOW_DIGEST",
 	"SLOW_META",
+	"DETECT_FIRE",
 	NULL
 };
 

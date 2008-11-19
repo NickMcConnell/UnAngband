@@ -592,3 +592,6 @@ N:143:DELAY_POISON
 I:0:0:0
 D:poison~:::with delayed effect:::
 
+N:144:STICKS_TO_SNAKES
+I:0:0:0
+D:transmute~::junk, arrows, staffs and wands:into snakes:::

@@ -1210,6 +1210,60 @@ retry:
 
 
 /*
+ * Detect all features on current panel
+ */
+bool detect_feat_blows(int effect, int r, bool *known)
+{
+	int y, x;
+
+	bool detect = FALSE;
+
+retry:
+	/* Scan the grids out to radius */
+	for (y = MAX(p_ptr->py - r, 0); y < MIN(p_ptr->py + r, DUNGEON_HGT); y++)
+	{
+		for (x = MAX(p_ptr->px - r, 0); x < MIN(p_ptr->px+r, DUNGEON_WID); x++)
+		{
+			/* Check distance */
+			if (distance(p_ptr->py, p_ptr->px, y, x) > r) continue;
+
+			/* Detect blow match */
+			if (f_info[cave_feat[y][x]].blow.effect == effect)
+			{
+				/* Detect secrets */
+				if (f_info[cave_feat[y][x]].flags1 & (FF1_SECRET))
+				{
+					/*Find secrets*/
+					cave_alter_feat(y,x,FS_SECRET);
+				}
+
+				/* Hack -- Memorize */
+				play_info[y][x] |= (PLAY_MARK);
+
+				/* Redraw */
+				lite_spot(y, x);
+
+				/* Obvious */
+				detect = TRUE;
+			}
+		}
+	}
+
+	/* Was unknown */
+	if (detect && !(*known))
+	{
+		*known = TRUE;
+
+		goto retry;
+	}
+
+	/* Result */
+	return (detect);
+}
+
+
+
+/*
  * Detect all objects of a particular tval on the current panel
  */
 bool detect_objects_tval(int tval)
@@ -1834,7 +1888,7 @@ static bool monster_tester_hook_water(const int m_idx)
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
-	/* Detect all magic monsters */
+	/* Detect all watery monsters */
 	if (r_ptr->flags3 & (RF3_HURT_WATER))
 	{
 		return (TRUE);
@@ -1883,6 +1937,30 @@ static bool monster_tester_hook_mental(const int m_idx)
 
 	return (TRUE);
 }
+
+
+/*
+ * Hook to specify "fiery" monsters
+ */
+static bool monster_tester_hook_fire(const int m_idx)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		int effect = r_ptr->blow[i].effect;
+
+		if ((effect == GF_FIRE) || (effect == GF_SMOKE) || (effect == GF_LAVA))
+			return (TRUE);
+	}
+
+	return (FALSE);
+}
+
+
 
 
 /*
@@ -5873,7 +5951,7 @@ static int thaumacurse(bool verbose, int power)
  *      We should make summoned monsters friendly if plev is > 0. XXX
  *
  */
-bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
+bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known)
 {
 	spell_type *s_ptr = &s_info[spell];
 
@@ -5885,12 +5963,15 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
 		spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
-		method_type *method_ptr = &method_info[blow_ptr->method];
+		int method = blow_ptr->method;
+		method_type *method_ptr = &method_info[method];
 		int damage = 0;
 		int effect = blow_ptr->effect;
+		int range = scale_method(method_ptr->max_range, level);
+		int radius = scale_method(method_ptr->radius, level);
 
 		/* Hack -- no more attacks */
-		if (!blow_ptr->method) break;
+		if (!method) break;
 
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
@@ -5935,10 +6016,14 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel)
 		}
 
 		/* Allow direction to be cancelled for free */
-		if ((!(method_ptr->flags1 & (PROJECT_SELF))) && (!get_aim_dir(&dir))) return (!(*cancel));
+		if ((!(method_ptr->flags1 & (PROJECT_SELF))) &&
+				(!get_aim_dir(&dir, known ? range : MAX_RANGE, known ? radius : 0,
+						known ? method_info[method].flags1 : (PROJECT_BEAM),
+						known ? method_info[method].arc : 0,
+						known ? method_info[method].diameter_of_source : 0))) return (!(*cancel));
 
 		/* Apply spell method */
-		if (fire_projection(who, what, effect, blow_ptr->method, dir, damage, level)) obvious = TRUE;
+		if (fire_projection(who, what, effect, method, dir, damage, level)) obvious = TRUE;
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
@@ -6082,10 +6167,19 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	/* Process the flags -- detect water */
 	if (s_ptr->flags1 & (SF1_DETECT_WATER))
-       {
+	{
                 if (detect_feat_flags(0x0L, FF2_WATER, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "water";
                 if (detect_monsters(monster_tester_hook_water, known)) vp[vn++] = "watery creatures";
-        }
+	}
+
+	/* Process the flags -- detect water */
+	if (s_ptr->type == SPELL_DETECT_FIRE)
+	{
+                if (detect_feat_blows(GF_FIRE, 2 * MAX_SIGHT, known)) vp[vn++] = "fire";
+                if (detect_feat_blows(GF_SMOKE, 2 * MAX_SIGHT, known)) vp[vn++] = "smoke";
+                if (detect_feat_blows(GF_LAVA, 2 * MAX_SIGHT, known)) vp[vn++] = "lava";
+                if (detect_monsters(monster_tester_hook_fire, known)) vp[vn++] = "fiery creatures";
+	}
 
 	/* Process the flags -- detect gold */
 	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
@@ -6988,7 +7082,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				u32b old_cur_flags3 = p_ptr->cur_flags3;
 
 				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir)) return (!(*cancel));
+				if (!get_aim_dir(&dir, 0, 0, 0, 0, 0)) return (!(*cancel));
 
 				/* Use the given direction */
 				ty = p_ptr->py + 99 * ddy[dir];
@@ -7439,12 +7533,11 @@ void process_spell_prepare(int spell, int level)
 /*
  * Hack -- we process swallowed objects a little differently.
  */
-bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
+bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel, bool *known)
 {
 	spell_type *s_ptr = &s_info[spell];
 
 	bool obvious = FALSE;
-	bool known = FALSE;
 
 	int ap_cnt;
 
@@ -7471,6 +7564,8 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 		int d_dice = s_ptr->blow[ap_cnt].d_dice;
 		int d_side = s_ptr->blow[ap_cnt].d_side;
 		int d_plus = s_ptr->blow[ap_cnt].d_plus;
+		int range = scale_method(method_info[method].max_range, level);
+		int radius = scale_method(method_info[method].radius, level);
 
 		/* Hack -- no more attacks */
 		if (!method) break;
@@ -7496,15 +7591,14 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 			damage = d_plus;
 		}
 
-		/* Hack -- breath weapons act like a normal spell */
-		if ((method == RBM_BREATH) && (get_aim_dir(&dir)))
+		/* Hack -- breath weapons/spit act like a normal spell */
+		if (((method == RBM_BREATH) || (method == RBM_SPIT)) &&
+				(!get_aim_dir(&dir, known ? range : MAX_RANGE, known ? radius : 0,
+						known ? method_info[method].flags1 : (PROJECT_BEAM),
+						known ? method_info[method].arc : 0,
+						known ? method_info[method].diameter_of_source : 0)))
 		{
-			if (fire_projection(who, what, effect, 52, dir, damage, level)) obvious = TRUE;
-		}
-		/* Hack -- spitting acts like a normal spell */
-		else if ((method == RBM_SPIT) && (get_rep_dir(&dir)))
-		{
-			if (fire_projection(who, what, effect, 39, dir, damage, level)) obvious = TRUE;
+			if (fire_projection(who, what, effect, method, dir, damage, level)) obvious = TRUE;
 		}
 		/* Hack -- vomit in a random direction */
 		else if (method == RBM_VOMIT)
@@ -7512,7 +7606,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 			/* Random direction */
 			dir = ddd[rand_int(8)];
 
-			if (fire_projection(who, what, effect, 39, dir, damage, level)) obvious = TRUE;
+			if (fire_projection(who, what, effect, RBM_VOMIT, dir, damage, level)) obvious = TRUE;
 		}
 		else
 		{
@@ -7525,7 +7619,7 @@ bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel)
 	}
 
 	/* Apply flags */
-	if (process_spell_flags(who, what, spell, level, cancel, &known)) obvious = TRUE;
+	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
 
 	/* Apply flags */
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
@@ -7566,7 +7660,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
-	if (process_spell_blows(who, what, spell, level, cancel)) obvious = TRUE;
+	if (process_spell_blows(who, what, spell, level, cancel, known)) obvious = TRUE;
 	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
 	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
 

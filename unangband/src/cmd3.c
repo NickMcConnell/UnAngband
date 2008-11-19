@@ -180,7 +180,7 @@ static int quiver_wield(int item, object_type *i_ptr)
     }
 
   /* Use a new slot if needed */
-  if (use_new_slot) 
+  if (use_new_slot)
     object_copy(&inventory[slot], i_ptr);
 
   /* Update "p_ptr->pack_size_reduce" */
@@ -261,7 +261,7 @@ bool player_wield(int item)
 	if (slot < 0) return (FALSE);
 
 	/* Hack -- don't dual wield */
-	if (slot == INVEN_ARM 
+	if (slot == INVEN_ARM
 	    && o_ptr->tval != TV_SHIELD
 	    && o_ptr->tval != TV_RING
 	    && o_ptr->tval != TV_AMULET)
@@ -290,12 +290,12 @@ bool player_wield(int item)
 		if (amt <= 0) return (FALSE);
 	}
 
-	/* Hack - Throwing weapons can we wielded in the quiver too. 
+	/* Hack - Throwing weapons can we wielded in the quiver too.
 	   Ask the player, unless he has already chosen the off-hand. */
-	if ( is_known_throwing_item(o_ptr) 
-		 && !IS_QUIVER_SLOT(slot) 
+	if ( is_known_throwing_item(o_ptr)
+		 && !IS_QUIVER_SLOT(slot)
 		 && slot != INVEN_ARM
-		 && get_check("Do you want to put it in the quiver? ") ) 
+		 && get_check("Do you want to put it in the quiver? ") )
 		slot = INVEN_QUIVER;
 
 	/* Source and destination identical */
@@ -437,10 +437,10 @@ bool player_wield(int item)
 			!(o_ptr->ident & (IDENT_SENSE))
 			&& !(object_named_p(o_ptr)))
 		{
-	
+
 			/* Sense the object */
 			o_ptr->discount = INSCRIP_UNGETTABLE;
-	
+
 			/* The object has been "sensed" */
 			o_ptr->ident |= (IDENT_SENSE);
 		}
@@ -499,7 +499,7 @@ bool player_wield(int item)
 	i_ptr->stackc = 0;
 
 	/* Sometimes use lower stack object */
-	if (!object_charges_p(o_ptr) 
+	if (!object_charges_p(o_ptr)
 	    && (rand_int(o_ptr->number) < o_ptr->stackc))
 	  {
 	    if (amt >= o_ptr->stackc)
@@ -541,7 +541,7 @@ bool player_wield(int item)
 
 
 	/* Special rules for similar rings */
-	if (rings) 
+	if (rings)
 	  {
 	    /* Wear the new rings */
 	    object_absorb(j_ptr, i_ptr, FALSE);
@@ -565,13 +565,13 @@ bool player_wield(int item)
 
 	/* Important - clear this flag */
 	j_ptr->ident &= ~(IDENT_STORE);
-	
+
 	/* Hack - prevent dragon armour swap abuse */
 	if (j_ptr->tval == TV_DRAG_ARMOR)
 	{
 		j_ptr->timeout = 2 * j_ptr->charges;
 	}
-	
+
 	/* Where is the item now */
 	if (slot == INVEN_WIELD)
 	{
@@ -667,7 +667,7 @@ bool player_wield(int item)
 	/* Hack -- identify pval */
 	if (!object_pval_p(j_ptr) &&
 		 f1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
-				 TR1_INT | TR1_DEX | TR1_CON | TR1_CHR)) 
+				 TR1_INT | TR1_DEX | TR1_CON | TR1_CHR))
 		j_ptr->ident |= (IDENT_PVAL);
 
 	/* Hack -- the following are obvious from the displayed combat statistics */
@@ -740,7 +740,7 @@ bool player_wield(int item)
 	n4 = j_ptr->can_flags4 & ~(k4);
 
 	if (n1 || n2 || n3 || n4) update_slot_flags(slot, n1, n2, n3, n4);
-	
+
 	return (TRUE);
 }
 
@@ -826,7 +826,7 @@ bool player_takeoff(int item)
 
 	/* Take off the item */
 	(void)inven_takeoff(item, 255);
-	
+
 	return (TRUE);
 }
 
@@ -837,7 +837,7 @@ bool player_takeoff(int item)
 bool player_drop(int item)
 {
 	int amt;
-	
+
 	object_type *o_ptr;
 
 	/* Get the item (in the pack) */
@@ -893,7 +893,7 @@ bool player_drop(int item)
 
 	/* Drop (some of) the item */
 	inven_drop(item, amt);
-	
+
 	return (TRUE);
 }
 
@@ -1102,7 +1102,7 @@ bool player_observe(int item)
 
 	/* Load the screen */
 	screen_load();
-	
+
 	return (TRUE);
 }
 
@@ -1194,7 +1194,7 @@ bool player_uninscribe(int item)
 			if (object_named_p(i_ptr) || cheat_auto) i_ptr->note = 0;
 		}
 	}
-	
+
 	return (TRUE);
 }
 
@@ -1317,7 +1317,7 @@ bool player_inscribe(int item)
 
 		}
 	}
-	
+
 	return (TRUE);
 }
 
@@ -1361,12 +1361,12 @@ bool item_tester_refill_torch(const object_type *o_ptr)
 bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 {
 	/* Empty flasks are okay */
-	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_FLASK_EMPTY)) 
+	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_FLASK_EMPTY))
 		return (TRUE);
 
 	/* Empty bottles are okay */
-	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_HOLD_BOTTLE) 
-		 && !(o_ptr->name3)) 
+	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_HOLD_BOTTLE)
+		 && !(o_ptr->name3))
 		return (TRUE);
 
 	/* Lanterns are okay */
@@ -1374,7 +1374,7 @@ bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 		return (TRUE);
 
 	/* Torches are okay */
-	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH)) 
+	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 		return (TRUE);
 
 	/* Assume not okay */
@@ -1388,7 +1388,7 @@ bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 bool item_tester_refill_flask(const object_type *o_ptr)
 {
 	/* Flasks are okay */
-	if ((o_ptr->tval == TV_FLASK) && (o_ptr->sval != SV_FLASK_EMPTY)) 
+	if ((o_ptr->tval == TV_FLASK) && (o_ptr->sval != SV_FLASK_EMPTY))
 		return (TRUE);
 
 	/* Potions are okay */
@@ -1406,7 +1406,7 @@ bool item_tester_refill_flask(const object_type *o_ptr)
 int cmd_tester_fill_or_fuel(int item)
 {
 	object_type *o_ptr;
-	
+
 	/* Get the item (in the pack) */
 	if (item >= 0)
 	{
@@ -1442,7 +1442,7 @@ bool player_refill(int item)
 	/* Set up for second command */
 	p_ptr->command_trans = COMMAND_ITEM_FUEL;
 	p_ptr->command_trans_item = item;
-	
+
 	return (TRUE);
 }
 
@@ -1661,9 +1661,9 @@ bool player_refill2(int item2)
 		floor_item_increase(0 - item2, -1);
 		floor_item_describe(0 - item2);
 		floor_item_optimize(0 - item2);
-		if (get_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) 
+		if (get_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0))
 			cave_alter_feat(p_ptr->py,p_ptr->px,FS_GET_FEAT);
-		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0)) 
+		if (use_feat && (scan_feat(p_ptr->py,p_ptr->px) < 0))
 			cave_alter_feat(p_ptr->py,p_ptr->px,FS_USE_FEAT);
 	}
 
@@ -1681,7 +1681,7 @@ bool player_refill2(int item2)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Lite if necessary */
-	if ((item == INVEN_LITE) || (item2 == INVEN_LITE)) 
+	if ((item == INVEN_LITE) || (item2 == INVEN_LITE))
 		p_ptr->update |= (PU_TORCH);
 
 	return (TRUE);
@@ -1739,7 +1739,7 @@ bool player_light_and_douse(int item)
 
 		if (item < 0)
 		{
-			gain_attribute(p_ptr->py, p_ptr->px, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);			
+			gain_attribute(p_ptr->py, p_ptr->px, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 		}
 	}
 
@@ -1749,10 +1749,10 @@ bool player_light_and_douse(int item)
 		msg_format("You douse %s %s.", own_str, o_name);
 		o_ptr->charges = o_ptr->timeout;
 		o_ptr->timeout = 0;
-		
+
 		if (item < 0)
 		{
-			check_attribute_lost(p_ptr->py, p_ptr->px, 2, CAVE_XLOS, require_halo, has_halo, redraw_halo_loss, remove_halo, reapply_halo);			
+			check_attribute_lost(p_ptr->py, p_ptr->px, 2, CAVE_XLOS, require_halo, has_halo, redraw_halo_loss, remove_halo, reapply_halo);
 		}
 	}
 
@@ -1761,7 +1761,7 @@ bool player_light_and_douse(int item)
 
 	/* Fully update the visuals */
 	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
-	
+
 	return (TRUE);
 }
 
@@ -1772,7 +1772,7 @@ bool player_light_and_douse(int item)
 void do_cmd_target(void)
 {
 	/* Target set */
-	if (target_set_interactive(TARGET_KILL))
+	if (target_set_interactive(TARGET_KILL, 0, 0, 0, 0, 0))
 	{
 		msg_print("Target Selected.");
 	}
@@ -1792,7 +1792,7 @@ void do_cmd_target(void)
 void do_cmd_look(void)
 {
 	/* Look around */
-	if (target_set_interactive(TARGET_LOOK))
+	if (target_set_interactive(TARGET_LOOK, 0, 0, 0, 0, 0))
 	{
 		msg_print("Target Selected.");
 	}

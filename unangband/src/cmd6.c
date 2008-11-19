@@ -236,7 +236,9 @@ bool item_tester_hook_food_edible(const object_type *o_ptr)
  */
 bool player_eat_food(int item)
 {
-	int ident, lev;
+	bool ident;
+
+	int lev;
 
 	object_type *o_ptr;
 
@@ -288,7 +290,7 @@ bool player_eat_food(int item)
 
 			/* Apply food effect */
 			if (process_spell_eaten(object_aware_p(o_ptr) ? SOURCE_PLAYER_EAT : SOURCE_PLAYER_EAT_UNKNOWN,
-					o_ptr->k_idx, power,0,&cancel)) ident = TRUE;
+					o_ptr->k_idx, power,0,&cancel,&ident)) ident = TRUE;
 
 			/* Combine / Reorder the pack (later) */
 			p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -358,7 +360,9 @@ bool player_eat_food(int item)
  */
 bool player_quaff_potion(int item)
 {
-	int ident, lev, power;
+	bool ident;
+
+	int lev, power;
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
@@ -398,7 +402,7 @@ bool player_quaff_potion(int item)
 
 	/* Apply food effect */
 	if (power >= 0) ident = process_spell_eaten(object_aware_p(o_ptr) ? SOURCE_PLAYER_QUAFF : SOURCE_PLAYER_QUAFF_UNKNOWN,
-			 o_ptr->k_idx, power,0,&cancel);
+			 o_ptr->k_idx, power,0,&cancel,&ident);
 	else return (FALSE);
 
 	/* Clear styles */
@@ -1173,7 +1177,7 @@ bool player_zap_rod(int item)
 	sound(MSG_ZAP_ROD);
 
 	/* Hack -- get fake direction */
-	if (!object_aware_p(o_ptr) && (o_ptr->sval < SV_ROD_MIN_DIRECTION)) get_aim_dir(&dir);
+	if (!object_aware_p(o_ptr) && (o_ptr->sval < SV_ROD_MIN_DIRECTION)) get_aim_dir(&dir, MAX_RANGE, 0, (PROJECT_BEAM), 0, 0);
 
 	/* Set if known */
 	if (object_aware_p(o_ptr)) known = TRUE;

@@ -2067,7 +2067,7 @@ static void process_world(void)
 			if (rand_int(200) < o_ptr->usage)
 			{
 				/* Process spell - involuntary effects */
-				process_spell_eaten(SOURCE_OBJECT, o_ptr->k_idx, k, 25, &dummy);
+				process_spell_eaten(SOURCE_OBJECT, o_ptr->k_idx, k, 25, &dummy, &dummy);
 
 				/* Warn the player */
 				sound(MSG_CURSED);
