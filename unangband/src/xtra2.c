@@ -2830,9 +2830,6 @@ void improve_familiar(void)
 	int i, j, num;
 	int base, slot, choice;
 
-	bool improved = FALSE;
-	bool improved_hp = FALSE;
-
 	s16b table[10];
 
 #ifdef ALLOW_BORG
@@ -2886,16 +2883,19 @@ void improve_familiar(void)
 		if (get_list(print_familiars, table, num, "Ability", "Familiar gains which ability", ", ?=help", 1, 36, familiar_commands, &choice))
 		{
 			p_ptr->familiar_attr[slot] = familiar_ability[choice].attr;
-
-			improved = TRUE;
-			if ((p_ptr->familiar_attr[slot] == FAMILIAR_HP) || (p_ptr->familiar_attr[slot] == FAMILIAR_SIZE)) improved_hp = TRUE;
 		}
 	}
 
 	/* Revise familiar stats */
-	if (improved)
+	generate_familiar();
+
+	/* Revise familiar hit points */
+	for (i = 0; i < z_info->m_max; i++)
 	{
-		generate_familiar();
+		if (m_list[i].r_idx == FAMILIAR_IDX)
+		{
+			calc_monster_hp(i);
+		}
 	}
 }
 

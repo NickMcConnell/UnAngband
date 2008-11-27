@@ -7634,7 +7634,6 @@ void process_spell_prepare(int spell, int level)
 				p_ptr->familiar_attr[0] = familiar_race[p_ptr->familiar].attr1;
 				p_ptr->familiar_attr[1] = familiar_race[p_ptr->familiar].attr2;
 
-				generate_familiar();
 				improve_familiar();
 			}
 			break;
