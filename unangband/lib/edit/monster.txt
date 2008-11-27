@@ -2315,7 +2315,7 @@ S:BOLT_MANA |
 S:CURE | BLINK | WOUND | BLESS |
 D:A goblin dressed in skins who gestures wildly.
 
-#$# 126 - Unused ###
+### 126 - Unused ###
 
 N:127:Baby blue dragon
 G:d:B
@@ -6421,9 +6421,34 @@ S:CURE | TPORT | TRAPS | WOUND | BLESS | SCARE | HOLD |
 S:S_MONSTER |
 D:It is an ogre wrapped in furs and covered in grotesque body paints.
 
-#$# 329 - Unused ###
+# The next two slots are fixed, and used to represent the player's
+# familiar, should he acquire one.
 
-#$# 330 - Unused ###
+N:329:Your Familiar
+G:@:v
+#$ Clear available
+#$ Metallics available:dwsorgbuDWPyRGBUpvtmYiTVIMzZ
+#$ Colors available:dwsogbDWPyRGBpvtmTVIMzZ
+I:115:5:4:40:99
+W:0:0:0:3
+M:0:0:1:0
+F:NEVER_BLOW |
+F:UNIQUE | NO_FEAR | NO_CONF | NO_SLEEP |
+F:EVASIVE
+D:Your familiar serves you as a faithful pet.
+
+N:330:Your Familiar
+G:@:v
+#$ Clear available
+#$ Metallics available:dwsorgbuDWPyRGBUpvtmYiTVIMzZ
+#$ Colors available:dwsogbDWPyRGBpvtmTVIMzZ
+I:115:5:4:40:99
+W:0:0:0:3
+M:0:0:1:0
+F:NEVER_BLOW |
+F:UNIQUE | NO_FEAR | NO_CONF | NO_SLEEP |
+F:EVASIVE
+D:Your familiar serves you as a faithful pet.
 
 N:331:Ninja
 G:t:y
@@ -24924,7 +24949,6 @@ G:v:v
 I:140:259:22:30:0
 W:26:3:200:200
 M:33:0:4:0
-B:TRAIL:MANA
 F:FORCE_SLEEP | NEVER_BLOW | RAND_25 | RAND_50 |
 F:EMPTY_MIND | BASH_DOOR | TRAIL |
 F:NONVOCAL | NONLIVING | NO_FEAR | NO_CONF | NO_SLEEP |

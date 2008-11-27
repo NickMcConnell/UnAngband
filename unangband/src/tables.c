@@ -3267,3 +3267,137 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 	{ player_light_and_douse, '|', "Light/Douse which light source? ", "You have nothing to light or douse.",
 			item_tester_light_source, 0, (USE_EQUIP | USE_FLOOR | USE_FEATH), 0L, 0, NULL},
 };
+
+
+const familiar_type familiar_race[MAX_FAMILIARS] =
+{
+	{"", 0, 0, 0},
+	{ "monkey",	RBM_HIT, 54, 45 },
+	{ "cat",	RBM_BITE, 45, FAMILIAR_VISION },
+	{ "owl",	RBM_PECK, 46, FAMILIAR_VISION },
+	{ "mouse",	RBM_BITE, 56, FAMILIAR_SPEED },
+	{ "duck", 	RBM_PECK, 46, 42 },
+	{ "snake", 	RBM_BITE, FAMILIAR_BLOW, 37 },
+	{ "wolverine", RBM_CLAW, FAMILIAR_BLOW, 182},
+	{ "badger",	RBM_BUTT, 34, FAMILIAR_BLOW },
+	{ "rat",	RBM_BITE, 45, 42 },
+	{ "spider",	RBM_BITE, 45, 37 },
+	{ "mole",	RBM_CLAW, 34, FAMILIAR_VISION },
+	{ "ferret", RBM_BITE, 45,  FAMILIAR_VISION },
+	{ "bat", RBM_BITE, 46,  231 },
+	{ "hawk", RBM_CLAW, 46,  FAMILIAR_VISION },
+	{ "pig", RBM_BUTT, 53, FAMILIAR_VISION },
+	{ "dog", RBM_BITE, 53, FAMILIAR_VISION },
+	{ "toad", RBM_TOUCH, 84, FAMILIAR_VISION },
+	{ "frog", RBM_BITE, 42, FAMILIAR_VISION },
+	{ "goat", RBM_BUTT, 49, FAMILIAR_BLOW}
+};
+
+
+const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES] =
+{
+	{"", 0, 0},
+
+		/* Pick 2 */
+	{"increase range of vision", FAMILIAR_VISION, 0},
+	{"become hidden to infravision", 37, 0},
+	{"swim", 42, 0},
+	{"dig through dirt and rubble", 34, 0},
+	{"climb walls and ceilings", 45, 0},
+	{"fit through narrow spaces", 72, 0},
+	{"eat body parts to recover health", 53, 0},
+	{"take items from the ground", 54, 0},
+	{"wear armour to protect against arrows and acid", 57, 0},
+
+		/* Pick 2 */
+	{"increase size", FAMILIAR_SIZE, 0},
+	{"bash through doors", 49, FAMILIAR_SIZE},
+	{"act sneaky", 56, 0},
+	{"open doors and disarm traps", 48, 54},
+	{"communicate with you silently", 74, 0},
+	{"resist blindess", 231, 0},
+	{"resist mental attack", 38, 0},
+	{"become harder to hit", FAMILIAR_AC, 0},
+	{"immunity to poison", 84, 0},
+
+		/* Pick 2 */
+	{"immunity to acid", 80, 0 },
+	{"immunity to electricity", 81, 0},
+	{"immunity to fire", 82, 0},
+	{"immunity to cold", 83, 0},
+	{"blink away", 164, 56},
+	{"turn temporarily invisible", 166, 56},
+	{"fly", 46, 45},
+	{"gain an additional attack", FAMILIAR_BLOW, 0},
+	{"radiate lite", 35, 0},
+
+		/* Pick 2 */
+	{"create darkness", 172, 0},
+	{"regenerate quickly", 41, 53},
+	{"go berserk", 182, 0},
+	{"haste itself", 160, 0},
+	{"bless itself", 181, 0},
+	{"cure itself of ills", 163, 0},
+	{"magically shield itself", 183, 0},
+	{"make attack poisonous", FAMILIAR_BLOW + GF_POIS, FAMILIAR_BLOW},
+	{"temporarily resist elemental damage", 184, 0},
+
+		/* Pick 2 */
+	{"move invisibly", 36, 166},
+	{"magically probe an opponent", 186, 0},
+	{"cause hunger", 185, 0},
+	{"cause amnesia", 174, 0},
+	{"dispel magic on enemies", 177, 0},
+	{"teleport away", 165, 164},
+	{"teleport itself to targets", 167, 164},
+	{"increase hit points", FAMILIAR_HP, 0},
+	{"teleport enemies to itself", 168, 164},
+
+		/* Pick 2 */
+	{"cause terror", 187, 0},
+	{"cause blindness", 188, 0},
+	{"cause confusion", 189, 0},
+	{"cause slowness", 190, 0},
+	{"cause illusions", 179,  0},
+	{"assume wraith form", 171, 0},
+	{"create traps", 173, 56},
+	{"become faster", FAMILIAR_SPEED, 0},
+
+		/* Pick 2 */
+	{"curse enemies", 176, 0},
+	{"cause wounds", 180, 0},
+	{"blast the minds of enemies", 178, 0},
+	{"increase mana", FAMILIAR_MANA, 0},
+	{"heal itself", 162, 163},
+	{"drain mana from enemies", 175, 0},
+	{"cause paralysis", 191, 0},
+	{"resist edged weapons", 236, 37},
+	{"resist blunt weapons", 237, 37},
+
+		/* Pick 2 */
+	{"cast spells intelligently", 33, FAMILIAR_MANA},
+	{"add mana to itself", 161, FAMILIAR_MANA},
+	{"never miss when attacking", 225, 0},
+	{"pass through walls", 50, 171},
+	{"tunnel through walls", 51, 49},
+	{"teleport enemies away", 169, 0},
+	{"resist powerful water", 85, 42},
+	{"resist nether", 86, 0},
+	{"resist lava", 87, 82},
+
+		/* Pick 2 */
+	{"increase spell attack damage", FAMILIAR_POWER, 0},
+	{"resist plasma", 88, 82},
+	{"resist nexus", 89, 0},
+	{"resist disenchantment", 90, 0},
+	{"resist powerful light", 232, 35},
+	{"resist powerful darkness", 233, 172},
+	{"resist chaos", 234, 0},
+	{"resist teleportation", 235, 0},
+	{"resistance to magic", 242, 0},
+
+		/* Pick 2 */
+	{"immunity to edged weapons", 238, 236},
+	{"immunity to blunt weapons", 239, 237},
+/*	{"breath powerfully", 44, FAMIILAR_SIZE},*/
+};

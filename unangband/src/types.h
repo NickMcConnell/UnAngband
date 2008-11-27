@@ -127,6 +127,8 @@ typedef struct rune_type rune_type;
 typedef struct hist_type hist_type;
 typedef struct player_other player_other;
 typedef struct quickstart_type quickstart_type;
+typedef struct familiar_type familiar_type;
+typedef struct familiar_ability_type familiar_ability_type;
 typedef struct player_type player_type;
 typedef struct start_item start_item;
 typedef struct tval_desc tval_desc;
@@ -1495,6 +1497,28 @@ struct quickstart_type
 
 
 /*
+ * Different familiar types
+ */
+struct familiar_type
+{
+	const char *name;
+	u16b	method;
+	u16b	attr1, attr2;
+};
+
+
+/*
+ * Abilities familiars can gain
+ */
+struct familiar_ability_type
+{
+	const char *text;
+	u16b attr;
+	u16b preq;
+};
+
+
+/*
  * Most of the "player" information goes here.
  *
  * This stucture gives us a large collection of player variables.
@@ -1612,7 +1636,9 @@ struct player_type
 
 	s16b held_song;     /* Currently held song */
 	byte sneaking; 		/* Currently sneaking */
-	byte u1;
+	byte familiar;		/* Familiar type */
+
+	u16b familiar_attr[MAX_FAMILIAR_GAINS];	/* Abilities for the player's familiar */
 
 	byte climbing; /* Currently climbing */
 	byte searching; /* Currently searching */
@@ -1650,6 +1676,8 @@ struct player_type
 	bool is_dead;   /* Player is dead */
 
 	bool wizard;    /* Player is in wizard mode */
+
+
 
 	/*** Temporary fields ***/
 

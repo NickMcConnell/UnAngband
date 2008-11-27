@@ -2756,6 +2756,149 @@ static void improve_stat(void)
 }
 
 
+/*
+ * Print a list of abilities that can be gained by a familiar.
+ */
+void print_familiars(const s16b *sn, int num, int y, int x)
+{
+	int i;
+
+	char out_val[60];
+
+	byte line_attr;
+
+	/* Title the list */
+	prt("", y, x);
+	put_str("Ability", y, x + 5);
+
+	/* Dump the familiar abilities */
+	for (i = 0; i < num; i++)
+	{
+		line_attr = TERM_WHITE;
+
+		/* Dump the route --(-- */
+		sprintf(out_val, "  %c) %s",
+			I2A(i), familiar_ability[sn[i]].text);
+		c_prt(line_attr, out_val, y + i + 1, x);
+	}
+
+	/* Clear the bottom line */
+	prt("", y + i + 1, x);
+
+}
+
+
+/*
+ * Other stat functions.
+ */
+bool familiar_commands(char choice, const s16b *sn, int i, bool *redraw)
+{
+	(void)sn;
+	(void)i;
+
+	switch (choice)
+	{
+		case '?':
+		{
+			/* Save the screen */
+			if (!(*redraw)) screen_save();
+
+			/* Show stats help */
+			(void)show_file("familiar.txt", NULL, 0, 0);
+
+			/* Load the screen */
+			screen_load();
+
+			break;
+		}
+
+		default:
+		{
+			return (FALSE);
+		}
+	}
+	return (TRUE);
+}
+
+
+/*
+ * Improve the player's familiar by adding a player chosen ability.
+ */
+void improve_familiar(void)
+{
+	int number_allowed = (p_ptr->max_lev / 3) + 2;
+	int i, j, num;
+	int base, slot, choice;
+
+	bool improved = FALSE;
+	bool improved_hp = FALSE;
+
+	s16b table[10];
+
+#ifdef ALLOW_BORG
+	if (count_stop) return;
+#endif
+
+	/* Flush messages */
+	if (easy_more) messages_easy(FALSE);
+
+	/* Does not yet have a familiar */
+	if (!p_ptr->familiar) return;
+
+	/* Keep filling slots if required */
+	while (TRUE)
+	{
+		/* Find the next available slot */
+		for (slot = 2; p_ptr->familiar_attr[slot]; slot++);
+
+		/* No more slots */
+		if (slot >= number_allowed) break;
+
+		/* Re-base */
+		base = (slot - 2) / 2;
+		base *= 9;
+		base++;
+
+		/* No abilities yet */
+		num = 0;
+
+		/* Initialise table of choices */
+		for (i = base; (i < base + 9) && (i < MAX_FAMILIAR_ABILITIES); i++)
+		{
+			bool okay = TRUE;
+			bool preq = FALSE;
+
+			/* Check to see if the player familiar already has this ability */
+			for (j = 0; j < slot; j++)
+			{
+				if (p_ptr->familiar_attr[j] == familiar_ability[i].attr) okay = FALSE;
+				if (p_ptr->familiar_attr[j] == familiar_ability[i].preq) preq = TRUE;
+			}
+
+			/* Ability allowed */
+			if (okay && (preq || !familiar_ability[i].preq))
+			{
+				table[num++] = i;
+			}
+		}
+
+		/* Get a choice */
+		if (get_list(print_familiars, table, num, "Ability", "Familiar gains which ability", ", ?=help", 1, 36, familiar_commands, &choice))
+		{
+			p_ptr->familiar_attr[slot] = familiar_ability[choice].attr;
+
+			improved = TRUE;
+			if ((p_ptr->familiar_attr[slot] == FAMILIAR_HP) || (p_ptr->familiar_attr[slot] == FAMILIAR_SIZE)) improved_hp = TRUE;
+		}
+	}
+
+	/* Revise familiar stats */
+	if (improved)
+	{
+		generate_familiar();
+	}
+}
+
 
 /*
  * Advance experience levels and print experience
@@ -2858,6 +3001,9 @@ void check_experience(void)
 
 		/* Improve awareness */
 		if (p_ptr->lev > p_ptr->max_lev) improve_aware();
+
+		/* Improve familiar */
+		if (p_ptr->lev > p_ptr->max_lev) improve_familiar();
 
 		/* Message */
 		message_format(MSG_LEVEL, p_ptr->lev, "Welcome to level %d.", p_ptr->lev);

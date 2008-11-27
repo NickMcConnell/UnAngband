@@ -212,6 +212,24 @@
 
 
 /*
+ * Maximum number of familiar types
+ */
+#define MAX_FAMILIARS 20
+
+
+/*
+ * Maximum number of familiar abilities
+ */
+#define MAX_FAMILIAR_ABILITIES 84
+
+
+/*
+ * Maximum number of times abilities can be picked
+ */
+#define MAX_FAMILIAR_GAINS	20
+
+
+/*
  * Hack -- Maximum number of quests
  */
 #define MAX_Q_IDX	100
@@ -1035,6 +1053,7 @@
 #define GF_POISON_WATER	141
 #define GF_INVISIBILITY	142
 #define GF_DELAY_POISON	143
+#define GF_STICKS_TO_SNAKES	144
 
 
 
@@ -1885,7 +1904,7 @@
 #define TV_SPELL 10      /* Magic spells (varies) */
 #define TV_STATUE       11      /* Statues ('~') */
 #define TV_ASSEMBLY	12	/* Assemblys ('~') */
-#define TV_ROPE		14	/* Ropes, vines or chains ('~') */
+#define TV_ROPE		14	/* Ropes or chains ('~') */
 #define TV_SHOT   16      /* Ammo for slings */
 #define TV_ARROW 17      /* Ammo for bows */
 #define TV_BOLT  18      /* Ammo for x-bows */
@@ -4551,6 +4570,29 @@
 #define WB_HOLD_SONG     13
 #define WB_RES_FEAR      14
 #define MAX_WEAP_BENEFITS       15
+
+
+/*
+ * Monster race number for familiar
+ */
+#define FAMILIAR_BASE_IDX	329
+#define FAMILIAR_IDX	330
+
+/*
+ * Familiar benefits
+ *
+ * Note the first 288 benefits correspond to monster flags.
+ */
+#define FAMILIAR_AC	288
+#define FAMILIAR_SPEED	289
+#define FAMILIAR_POWER	290
+#define FAMILIAR_HP	291
+#define FAMILIAR_VISION	292
+#define FAMILIAR_SIZE	293
+#define FAMILIAR_MANA	294
+#define FAMILIAR_BLOW	295
+
+/* And the remaining benefits correspond to modifying the blow effect */
 
 
 /*** Macro Definitions ***/

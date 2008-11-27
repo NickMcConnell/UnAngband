@@ -105,7 +105,8 @@ extern const s16b style2tval[32];
 extern const s16b parasite_hack[DISEASE_BLOWS];
 extern const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES];
 extern const do_cmd_item_type cmd_item_list[MAX_COMMANDS];
-
+extern const familiar_type familiar_race[MAX_FAMILIARS];
+extern const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES];
 
 /* variable.c */
 extern cptr copyright;
@@ -901,6 +902,7 @@ extern bool project(int who, int what, int rad, int rng, int y0, int x0, int y1,
 
 /* spells2.c */
 extern bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg, u32b flg2);
+extern void generate_familiar(void);
 extern bool hp_player(int num);
 extern void warding_glyph(void);
 extern void warding_trap(int feat, int dir);
@@ -1112,6 +1114,7 @@ extern bool set_stun(int v);
 extern bool set_cut(int v);
 extern bool set_food(int v);
 extern bool set_rest(int v);
+extern void improve_familiar(void);
 extern void check_experience(void);
 extern void gain_exp(s32b amount);
 extern void lose_exp(s32b amount);

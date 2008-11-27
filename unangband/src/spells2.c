@@ -85,6 +85,107 @@ bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg,
 	return (notice);
 }
 
+/*
+ * Generates the familiar attributes
+ */
+void generate_familiar(void)
+{
+	int i;
+	int blow = 0;
+	int size = 1;
+	monster_race *r_ptr = &r_info[FAMILIAR_IDX];
+
+	COPY(r_ptr, &r_info[FAMILIAR_BASE_IDX], monster_race);
+
+	/* Hack - familiars don't level like regular monsters */
+	r_ptr->flags9 &= ~(RF9_LEVEL_CLASS | RF9_LEVEL_SPEED | RF9_LEVEL_POWER | RF9_LEVEL_AGE | RF9_LEVEL_SIZE);
+
+	/* Familiar not yet defined */
+	if (!p_ptr->familiar) return;
+
+	/* Generate the familiar attributes */
+	for (i = 0; p_ptr->familiar_attr[i]; i++)
+	{
+		int attr = p_ptr->familiar_attr[i];
+
+		/* Hack -- add a flag */
+		if (attr < FAMILIAR_AC)
+		{
+			if (attr < 32) r_ptr->flags1 |= (1 << attr);
+			else if (attr < 64) r_ptr->flags2 |= (1 << (attr - 32));
+			else if (attr < 96) r_ptr->flags3 |= (1 << (attr - 64));
+			else if (attr < 128) r_ptr->flags4 |= (1 << (attr - 96));
+			else if (attr < 160) r_ptr->flags5 |= (1 << (attr - 128));
+			else if (attr < 192) r_ptr->flags6 |= (1 << (attr - 160));
+			else if (attr < 224) r_ptr->flags7 |= (1 << (attr - 192));
+			else if (attr < 256) r_ptr->flags8 |= (1 << (attr - 224));
+			else r_ptr->flags9 |= (1 << (attr - 256));
+
+			/* Hack -- ensure minimal mana */
+			if ((attr >= 96) && (attr <= 224)) r_ptr->mana += method_info[attr].mana_cost;
+		}
+		/* Add other attributes */
+		else
+		{
+			switch(p_ptr->familiar_attr[i])
+			{
+				case FAMILIAR_AC:
+					r_ptr->ac += 25;
+					break;
+				case FAMILIAR_SPEED:
+					r_ptr->speed += 5;
+					break;
+				case FAMILIAR_POWER:
+					r_ptr->spell_power += p_ptr->max_lev;
+					break;
+				case FAMILIAR_HP:
+					r_ptr->hp += 2;
+					break;
+				case FAMILIAR_VISION:
+					r_ptr->aaf *= 2;
+					break;
+				case FAMILIAR_SIZE:
+					r_ptr->hp += 5;
+					size++;
+					break;
+				case FAMILIAR_MANA:
+					r_ptr->mana += 10;
+					break;
+				case FAMILIAR_BLOW:
+					if (blow < 4)
+					{
+						r_ptr->blow[blow].d_dice = 1;
+						r_ptr->blow[blow].d_side = p_ptr->max_lev / 3;
+						r_ptr->blow[blow].method = familiar_race[p_ptr->familiar].method;
+						r_ptr->blow[blow++].effect = GF_HURT;
+					}
+					r_ptr->flags1 &= ~(RF1_NEVER_BLOW);
+					break;
+				default:
+					r_ptr->blow[blow].effect = p_ptr->familiar_attr[i] - FAMILIAR_BLOW;
+					break;
+			}
+		}
+	}
+
+	/* Fix up blow damage based on size */
+	for (i = 0; i < blow; i++)
+	{
+		r_ptr->blow[blow].d_dice *= size;
+	}
+
+	/* Fix up speed based on size */
+	r_ptr->speed = 100 + (r_ptr->speed - 100) / size;
+
+	/* Increase hit points at every level */
+	r_ptr->hp *= p_ptr->max_lev;
+
+	/* Increase mana somewhat */
+	if (p_ptr->max_lev > 15) r_ptr->mana += r_ptr->mana * p_ptr->max_lev / 15;
+
+}
+
+
 
 /*
  * Increase players hit points, notice effects
@@ -162,6 +263,7 @@ void warding_glyph(void)
 	/* Create a glyph */
 	cave_set_feat(py, px, FEAT_GLYPH);
 }
+
 
 /*
  * Leave a "trap" which affects those moving on it
@@ -7517,6 +7619,24 @@ void process_spell_prepare(int spell, int level)
 		case SPELL_RELEASE_CURSE:
 		{
 			power =	thaumacurse(TRUE, level + (level * level / 20));
+			break;
+		}
+
+		case SPELL_SUMMON_RACE:
+		{
+			if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
+			{
+				p_ptr->familiar = randint(19);
+				msg_format("You have found %s %s as a familiar.", is_a_vowel(familiar_race[p_ptr->familiar].name[0]) ? "an" : "a",
+						familiar_race[p_ptr->familiar].name);
+
+				/* Set the default attributes */
+				p_ptr->familiar_attr[0] = familiar_race[p_ptr->familiar].attr1;
+				p_ptr->familiar_attr[1] = familiar_race[p_ptr->familiar].attr2;
+
+				generate_familiar();
+				improve_familiar();
+			}
 			break;
 		}
 	}

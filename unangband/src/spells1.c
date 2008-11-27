@@ -4089,6 +4089,23 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Animate sticks to snakes */
+		case GF_STICKS_TO_SNAKES:
+		{
+			summoner = 0;
+			summon_char_type = 'J';
+
+			/* Must be next to plants/water */
+			if (teleport_nature_hook(y, x, y, x))
+			{
+				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
+						who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level-1 : p_ptr->depth, SUMMON_KIN,
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) obvious = TRUE;
+			}
+			break;
+		}
+
+
 		case GF_WEB:
 		{
 			/* Create webs on floor */
@@ -4569,6 +4586,39 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Sticks to snakes */
+			case GF_STICKS_TO_SNAKES:
+			{
+				if (!is_art)
+				{
+					bool summons = FALSE;
+					int i;
+					object_kind *kind = &k_info[o_ptr->k_idx];
+
+					summoner = 0;
+					summon_char_type = 'J';
+
+					/* Hack -- animate sticks */
+					if ((kind->tval == TV_ARROW) || (kind->tval == TV_WAND) ||
+							(kind->tval == TV_STAFF) ||
+							((kind->tval == TV_JUNK) && (kind->sval >= SV_JUNK_STICK) && (kind->sval <= SV_JUNK_BRANCH)))
+					{
+						for (i = 0; i < o_ptr->number; i++)
+							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
+									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, SUMMON_KIN,
+							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
+
+						if (summons)
+						{
+							do_kill = TRUE;
+							do_break = FALSE;
+							note_kill = (plural ? " animate!" : " animates!");
+						}
+					}
+				}
+				break;
+			}
+
 			/* Animate objects */
 			case GF_ANIM_OBJECT:
 			{
@@ -4576,31 +4626,32 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				{
 					bool summons = FALSE;
 					int i;
+					object_kind *kind = &k_info[o_ptr->k_idx];
 
 					summoner = 0;
 
-					if (k_info[o_ptr->k_idx].flavor)
+					if (kind->flavor)
 					{
-						summon_attr_type = x_info[k_info[o_ptr->k_idx].flavor].d_attr;
-						summon_char_type = x_info[k_info[o_ptr->k_idx].flavor].d_char;
+						summon_attr_type = x_info[kind->flavor].d_attr;
+						summon_char_type = x_info[kind->flavor].d_char;
 					}
 					else
 					{
-						summon_attr_type = k_info[o_ptr->k_idx].d_attr;
-						summon_char_type = k_info[o_ptr->k_idx].d_char;
+						summon_attr_type = kind->d_attr;
+						summon_char_type = kind->d_char;
 					}
 
 					/* Hack -- animate statues */
-					if (k_info[o_ptr->k_idx].tval == TV_STATUE) summon_char_type = 'g';
+					if (kind->tval == TV_STATUE) summon_char_type = 'g';
 
 					/* Hack -- animate food */
-					if ((k_info[o_ptr->k_idx].tval == TV_FOOD) && (k_info[o_ptr->k_idx].sval >= SV_FOOD_MIN_FOOD)) summon_char_type = '!';
+					if ((kind->tval == TV_FOOD) && (kind->sval >= SV_FOOD_MIN_FOOD)) summon_char_type = '!';
 
 					/* Hack -- animate spikes */
-					if (k_info[o_ptr->k_idx].tval == TV_SPIKE) summon_char_type = '|';
+					if (kind->tval == TV_SPIKE) summon_char_type = '|';
 
 					/* Hack -- animate assemblies */
-					if ((k_info[o_ptr->k_idx].tval == TV_ASSEMBLY) && (o_ptr->name3))
+					if ((kind->tval == TV_ASSEMBLY) && (o_ptr->name3))
 					{
 						summon_race_type = o_ptr->name3;
 						for (i = 0; i < o_ptr->number; i++)
@@ -4639,36 +4690,38 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			/* Animate dead */
 			case GF_ANIM_DEAD:
 			{
+				object_kind *kind = &k_info[o_ptr->k_idx];
+
 				summoner = 0;
 				summon_char_type = 0;
 				summon_attr_type = 0;
 				summon_flag_type = 0L;
 
-				switch (k_info[o_ptr->k_idx].tval)
+				switch (kind->tval)
 				{
 					case TV_BONE:
 					{
-						if (k_info[o_ptr->k_idx].sval == SV_BONE_SKELETON)
+						if (kind->sval == SV_BONE_SKELETON)
 						{
 							summon_char_type = 's';
 						}
 						else
 						{
-							summon_char_type = k_info[o_ptr->k_idx].d_char;
-							summon_attr_type = k_info[o_ptr->k_idx].d_attr;
+							summon_char_type = kind->d_char;
+							summon_attr_type = kind->d_attr;
 						}
 						break;
 					}
 					case TV_BODY:
 					{
-						if ((k_info[o_ptr->k_idx].sval == SV_BODY_CORPSE) ||
-							(k_info[o_ptr->k_idx].sval == SV_BODY_HEADLESS) ||
-							(k_info[o_ptr->k_idx].sval == SV_BODY_BUTCHERED))
+						if ((kind->sval == SV_BODY_CORPSE) ||
+							(kind->sval == SV_BODY_HEADLESS) ||
+							(kind->sval == SV_BODY_BUTCHERED))
 						{
 							 summon_char_type = 'z';
 						}
 						/* MegaHack -- animate heads */
-						else if (k_info[o_ptr->k_idx].sval == SV_BODY_HEAD)
+						else if (kind->sval == SV_BODY_HEAD)
 						{
 							summon_char_type = '~';
 							summon_attr_type = TERM_WHITE;
@@ -4676,8 +4729,8 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						/* Hack -- other body parts */
 						else
 						{
-							summon_char_type = k_info[o_ptr->k_idx].d_char;
-							summon_attr_type = k_info[o_ptr->k_idx].d_attr;
+							summon_char_type = kind->d_char;
+							summon_attr_type = kind->d_attr;
 						}
 						break;
 					}
@@ -4725,21 +4778,22 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				bool raise = FALSE;
 				bool summons = FALSE;
 				int i;
+				object_kind *kind = &k_info[o_ptr->k_idx];
 
 				summoner = 0;
 
-				switch (k_info[o_ptr->k_idx].tval)
+				switch (kind->tval)
 				{
 					case TV_BONE:
 					{
-						if (k_info[o_ptr->k_idx].sval == SV_BONE_SKELETON) raise = TRUE;
+						if (kind->sval == SV_BONE_SKELETON) raise = TRUE;
 						break;
 					}
 					case TV_BODY:
 					{
-						if ((k_info[o_ptr->k_idx].sval == SV_BODY_CORPSE) ||
-							(k_info[o_ptr->k_idx].sval == SV_BODY_HEADLESS) ||
-							(k_info[o_ptr->k_idx].sval == SV_BODY_BUTCHERED))
+						if ((kind->sval == SV_BODY_CORPSE) ||
+							(kind->sval == SV_BODY_HEADLESS) ||
+							(kind->sval == SV_BODY_BUTCHERED))
 							 raise = TRUE;
 						break;
 					}

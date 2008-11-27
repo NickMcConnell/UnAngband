@@ -4146,6 +4146,9 @@ void play_game(bool new_game)
 		}
 	}
 
+	/* Generate familiar attributes */
+	generate_familiar();
+
 	/* Generate a dungeon level if needed */
 	if (!character_dungeon) generate_cave();
 
