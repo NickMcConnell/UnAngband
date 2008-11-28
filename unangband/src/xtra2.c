@@ -2826,7 +2826,7 @@ bool familiar_commands(char choice, const s16b *sn, int i, bool *redraw)
  */
 void improve_familiar(void)
 {
-	int number_allowed = (p_ptr->max_lev / 3) + 2;
+	int number_allowed = p_ptr->max_lev < 40 ? (p_ptr->max_lev / 2) : 20 + (p_ptr->max_lev - 40);
 	int i, j, num;
 	int base, slot, choice;
 
@@ -2846,13 +2846,13 @@ void improve_familiar(void)
 	while (TRUE)
 	{
 		/* Find the next available slot */
-		for (slot = 2; p_ptr->familiar_attr[slot]; slot++);
+		for (slot = 0; p_ptr->familiar_attr[slot]; slot++);
 
 		/* No more slots */
 		if (slot >= number_allowed) break;
 
 		/* Re-base */
-		base = (slot - 2) / 2;
+		base = (slot-2) / 2;
 		base *= 9;
 		base++;
 
@@ -2868,9 +2868,12 @@ void improve_familiar(void)
 			/* Check to see if the player familiar already has this ability */
 			for (j = 0; j < slot; j++)
 			{
-				if (p_ptr->familiar_attr[j] == familiar_ability[i].attr) okay = FALSE;
+				if ((familiar_ability[i].attr < FAMILIAR_AC) && (p_ptr->familiar_attr[j] == familiar_ability[i].attr)) okay = FALSE;
 				if (p_ptr->familiar_attr[j] == familiar_ability[i].preq) preq = TRUE;
 			}
+
+			/* Can't pick the same blow improvement twice in a row */
+			if ((slot) && (familiar_ability[i].attr > FAMILIAR_BLOW) && (p_ptr->familiar_attr[slot-1] == familiar_ability[i].attr)) okay = FALSE;
 
 			/* Ability allowed */
 			if (okay && (preq || !familiar_ability[i].preq))

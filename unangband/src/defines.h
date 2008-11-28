@@ -220,13 +220,13 @@
 /*
  * Maximum number of familiar abilities
  */
-#define MAX_FAMILIAR_ABILITIES 84
+#define MAX_FAMILIAR_ABILITIES 118
 
 
 /*
  * Maximum number of times abilities can be picked
  */
-#define MAX_FAMILIAR_GAINS	20
+#define MAX_FAMILIAR_GAINS	32
 
 
 /*
@@ -4590,7 +4590,8 @@
 #define FAMILIAR_VISION	292
 #define FAMILIAR_SIZE	293
 #define FAMILIAR_MANA	294
-#define FAMILIAR_BLOW	295
+#define FAMILIAR_SPIKE	295
+#define FAMILIAR_BLOW	296
 
 /* And the remaining benefits correspond to modifying the blow effect */
 
