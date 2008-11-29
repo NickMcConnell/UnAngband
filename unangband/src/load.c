@@ -89,7 +89,7 @@ static void note(cptr msg)
 /*
  * This function determines if the version of the savefile
  * currently being read is older than version "x.y.z".
- * 
+ *
  * Warning: DO NOT attempt to check sf_extra, as this is
  * used as an xor byte, as opposed to version control.
  */
@@ -110,7 +110,7 @@ bool older_than(int x, int y, int z, int w)
 	/* The maintainer is lazy and doesn't want to bump the version number in the edit files */
 	if (sf_extra < w) return (TRUE);
 	if (sf_extra > w) return (FALSE);
-	
+
 	/* Identical versions */
 	return (FALSE);
 }
@@ -300,9 +300,9 @@ static errr rd_item(object_type *o_ptr)
 	rd_s16b(&o_ptr->charges);
 
 	/* Hack -- fix missing charges from flasks of oil */
-	if ((o_ptr->tval == TV_FLASK 
-		 || o_ptr->tval == TV_FOOD) 
-		&& !o_ptr->charges) 
+	if ((o_ptr->tval == TV_FLASK
+		 || o_ptr->tval == TV_FOOD)
+		&& !o_ptr->charges)
 		o_ptr->charges = k_info[o_ptr->k_idx].charges;
 
 	rd_s16b(&o_ptr->to_h);
@@ -319,9 +319,9 @@ static errr rd_item(object_type *o_ptr)
 	/* Hack -- remove chests */
 	if (o_ptr->tval == TV_CHEST) o_ptr->k_idx = 0;
 
-	rd_byte(&o_ptr->origin); 
-	rd_byte(&o_ptr->origin_depth); 
-	rd_u16b(&o_ptr->origin_xtra); 
+	rd_byte(&o_ptr->origin);
+	rd_byte(&o_ptr->origin_depth);
+	rd_u16b(&o_ptr->origin_xtra);
 
 	/* Old flags */
 	strip_bytes(8);
@@ -498,8 +498,8 @@ static errr rd_item(object_type *o_ptr)
 			/* Force a meaningful pval */
 			if (!o_ptr->pval) o_ptr->pval = 1;
 		}
-		
-		
+
+
 
 		/* Mega-Hack - Enforce the special broken items */
 		if ((o_ptr->name2 == EGO_BLASTED) ||
@@ -558,7 +558,7 @@ static void rd_monster(monster_type *m_ptr)
 
 	rd_u32b(&m_ptr->mflag);
 	rd_u32b(&m_ptr->smart);
-	
+
 	rd_byte(&m_ptr->min_range);
 	rd_byte(&m_ptr->best_range);
 	rd_byte(&m_ptr->ty);
@@ -662,7 +662,7 @@ static errr rd_store()
 	{
 		/* Oops */
 		/*note("Too many stores");*/
-		
+
 		/* Error */
 		/*return (-1);*/
 
@@ -680,11 +680,11 @@ static errr rd_store()
 
 			/* Free the store */
 			FREE(st_ptr);
-			
+
 			/* Disassociate store */
 			store[j] = NULL;
 		}
-		
+
 		/* Just home left after fix */
 		total_store_count = 1;
 	}
@@ -704,7 +704,7 @@ static errr rd_store()
 		for (k = 0; k < STORE_CHOICES; k++)
 		{
 			int tval = st_ptr->tval[k];
-				
+
 			/* Check books */
 			if (((tval == c_info[p_ptr->pclass].spell_book)
 				 || ((tval == TV_MAGIC_BOOK) && (p_ptr->pstyle == WS_MAGIC_BOOK))
@@ -744,11 +744,11 @@ static errr rd_store()
 	}
 
 	st_ptr->owner = own;
-	
+
 	/* Activate the owner, if any */
-	if (st_ptr->base >= STORE_MIN_BUY_SELL) 
+	if (st_ptr->base >= STORE_MIN_BUY_SELL)
 	{
-		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max) 
+		ot_ptr = &b_info[((st_ptr->base - STORE_MIN_BUY_SELL) * z_info->b_max)
 							  + st_ptr->owner];
 		ot_ptr->busy = TRUE;
 	}
@@ -1038,12 +1038,12 @@ static errr rd_extra(void)
 
 	/* Player school */
 	rd_byte(&p_ptr->pschool);
-	
+
 	/* XXX Hack -- should have saved this before */
 	if (p_ptr->pschool < SV_BOOK_MAX_GOOD) p_ptr->pschool = SV_BOOK_MAX_GOOD;
 
 	rd_byte(&p_ptr->sauron_forms);
-	
+
 	/* Special Race/Class info */
 	rd_byte(&p_ptr->expfact);
 
@@ -1119,6 +1119,17 @@ static errr rd_extra(void)
 	{
 		note(format("Invalid player shape (%d).", p_ptr->pshape));
 		return (-1);
+	}
+
+	/* Read familiar */
+	if (!older_than(0, 6, 3, 2))
+	{
+		rd_byte(&p_ptr->familiar);
+
+		for (i = 0; i < MAX_FAMILIAR_GAINS; i++)
+		{
+			rd_u16b(&(p_ptr->familiar_attr[i]));
+		}
 	}
 
 	/* Read the timers */
@@ -1243,7 +1254,7 @@ static errr rd_extra(void)
 	for (i = 0; i < PY_MAX_SPELLS; i++)
 	{
 		rd_s16b(&p_ptr->spell_order[i]);
-	} 
+	}
 
 	return (0);
 }
@@ -1511,7 +1522,7 @@ static errr rd_dungeon(void)
 	rd_s16b(&town);
 
 	rd_u32b(&level_flag);
-	
+
 	/* Ignore illegal dungeons */
 	if (town>=z_info->t_max)
 	{
@@ -1669,7 +1680,7 @@ static errr rd_dungeon(void)
 	{
 		note(format("Fixing too small dungeon depth (%d)", depth));
 		depth = min_depth(dungeon);
-	} 
+	}
 	else if (depth > max_depth(dungeon))
 	{
 		note(format("Fixing too big dungeon depth (%d)", depth));
@@ -1682,7 +1693,7 @@ static errr rd_dungeon(void)
 	p_ptr->town = town;
 
 	/* Fix level flags */
-	if (!level_flag) init_level_flags();	
+	if (!level_flag) init_level_flags();
 
 	/* Apply daylight */
 	if ((level_flag & (LF1_SURFACE)) != 0) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
@@ -1725,7 +1736,7 @@ static errr rd_dungeon(void)
 		rd_s16b(&room_info[i].vault);
 		rd_u32b(&room_info[i].flags);
 		rd_s16b(&room_info[i].deepest_race);
-		rd_u32b(&room_info[i].ecology);		
+		rd_u32b(&room_info[i].ecology);
 
 		for (j = 0; j < ROOM_DESC_SECTIONS; j++)
 		{
@@ -1733,12 +1744,12 @@ static errr rd_dungeon(void)
 
 			if (room_info[i].section[j] == -1) break;
 		}
-		
+
 		/* Discard room sections for any old version */
 		/* This is because the sections are so sensitive to re-ordering */
 		if (older_than(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_EXTRA)) room_info[i].section[0] = -1;
 	}
-	
+
 	/*** Objects ***/
 
 	/* Read the item count */
@@ -1803,7 +1814,7 @@ static errr rd_dungeon(void)
 
 			/* Link the floor to the object */
 			cave_o_idx[y][x] = o_idx;
-			
+
 			/* Check if object lites the dungeon */
 			if (check_object_lite(i_ptr))
 			{
@@ -1894,7 +1905,7 @@ static errr rd_dungeon(void)
 	rd_u16b(&limit);
 
 	rd_byte(&cave_ecology.num_ecologies);
-		
+
 	/* Hack -- verify */
 	if (limit >= MAX_ECOLOGY_RACES)
 	{
@@ -2028,7 +2039,7 @@ static errr rd_savefile_new_aux(void)
 	for (i = 0; i < tmp16u; i++)
 	{
 		object_kind *k_ptr = &k_info[i];
-		
+
 		rd_byte(&k_ptr->aware);
 		rd_byte(&k_ptr->guess);
 
@@ -2079,7 +2090,7 @@ static errr rd_savefile_new_aux(void)
 	rd_u32b(&seed_randart);
 
 	/* Load the Artifact lore */
-	rd_u16b(&tmp16u);	
+	rd_u16b(&tmp16u);
 
 	/* Incompatible save files */
 	if (tmp16u > z_info->a_max)
@@ -2265,16 +2276,16 @@ static errr rd_savefile_new_aux(void)
 	{
 		/* Load the maximum depth */
 		rd_byte(&tmp8u);
-		
+
 		/* Silently fix depth */
-		if (tmp8u > max_depth(i)) 
+		if (tmp8u > max_depth(i))
 			tmp8u = max_depth(i);
-		else if (tmp8u < min_depth(i)) 
+		else if (tmp8u < min_depth(i))
 			tmp8u = min_depth(i);
 
 		/* Set the maximal attained depth */
 		t_info[i].attained_depth = tmp8u;
-			
+
 		rd_byte(&t_info[i].visited);
 
 		if (!p_ptr->is_dead)
@@ -2290,7 +2301,7 @@ static errr rd_savefile_new_aux(void)
 		{
 			/* Load the number of stores */
 			rd_byte(&tmp8u);
-			
+
 			for (j = 0; j < tmp8u; j++)
 			{
 				/* Load the store index */
@@ -2324,14 +2335,14 @@ static errr rd_savefile_new_aux(void)
 			note("However, I'd recommend that you make a backup of the save file first, in the unlikely");
 			note("event that a root cause of the problem is found and a fix implemented in a later");
 			note("version of Unangband.");
-			note("Please note that recovery will involve generating a new dungeon level.");			
-			note("--------");			
+			note("Please note that recovery will involve generating a new dungeon level.");
+			note("--------");
 			if(!get_check("Attempt a recovery? ")) return(-1);
 			if(!get_check("Have you made a backup of this save file? ")) return(-1);
 			if(!get_check("Are you sure you wish to continue (All dungeon data will be lost)? ")) return(-1);
-			
+
 			p_ptr->leaving = TRUE;
-			
+
 			/* Don't bother reading the rest of the file */
 			return (0);
 		}

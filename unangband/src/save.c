@@ -167,7 +167,7 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->tval);
 	wr_byte(o_ptr->sval);
 	wr_s16b(o_ptr->pval);
-	
+
 	wr_byte(o_ptr->stackc);
 
 	wr_byte(o_ptr->show_idx);
@@ -193,9 +193,9 @@ static void wr_item(const object_type *o_ptr)
 
 	wr_u16b(o_ptr->ident);
 
-	wr_byte(o_ptr->origin); 
-	wr_byte(o_ptr->origin_depth); 
-	wr_u16b(o_ptr->origin_xtra); 
+	wr_byte(o_ptr->origin);
+	wr_byte(o_ptr->origin_depth);
+	wr_u16b(o_ptr->origin_xtra);
 
 	/* Old flags */
 	wr_u32b(0L);
@@ -273,7 +273,7 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_byte(m_ptr->oppose_elem);
 	wr_byte(m_ptr->summoned);
 	wr_byte(m_ptr->petrify);
-	wr_byte(m_ptr->facing);	
+	wr_byte(m_ptr->facing);
 
 	wr_u32b(m_ptr->mflag);
 	wr_u32b(m_ptr->smart);
@@ -388,7 +388,7 @@ static void wr_xtra(int k_idx)
 	wr_byte(k_ptr->guess);
 
 	/* Activations */
-	wr_u16b(k_ptr->used);	
+	wr_u16b(k_ptr->used);
 }
 
 
@@ -589,7 +589,7 @@ static void wr_extra(void)
 
 	/* School */
 	wr_byte(p_ptr->pschool);
-	
+
 	/* Forms of Sauron killed on current level */
 	wr_byte(p_ptr->sauron_forms);
 
@@ -612,7 +612,7 @@ static void wr_extra(void)
 	for (i = 0; i < 12; ++i) wr_s16b(0);
 
 	wr_u32b(p_ptr->au);
-	wr_u32b(p_ptr->birth_au);	
+	wr_u32b(p_ptr->birth_au);
 
 	wr_u32b(p_ptr->max_exp);
 	wr_u32b(p_ptr->exp);
@@ -638,6 +638,14 @@ static void wr_extra(void)
 
 	/* Hack --- save shape here.*/
 	wr_byte(p_ptr->pshape);
+
+	/* Hack -- save familiar here */
+	wr_byte(p_ptr->familiar);
+
+	for (i = 0; i < MAX_FAMILIAR_GAINS; i++)
+	{
+		wr_u16b(p_ptr->familiar_attr[i]);
+	}
 
 	/* Write the timers */
 	wr_s16b(p_ptr->msleep);
@@ -701,7 +709,7 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->word_return);
 	wr_s16b(p_ptr->return_y);
 	wr_s16b(p_ptr->return_x);
-	
+
 	/* Write the "object seeds" */
 	wr_u32b(seed_flavor);
 	wr_u32b(seed_town);
@@ -836,7 +844,7 @@ static void wr_dungeon(void)
 	wr_u16b(DUNGEON_WID);
 	wr_u16b(p_ptr->town);
 	wr_u32b(level_flag);
-	
+
 
 	/*** Simple "Run-Length-Encoding" of cave ***/
 
@@ -1023,7 +1031,7 @@ static void wr_dungeon(void)
 	{
 		/* Total races in ecology */
 		wr_u16b(cave_ecology.num_races);
-		
+
 		/* Total number of ecologies. This is only used in wizard2.c, but we may need it later */
 		wr_byte(cave_ecology.num_ecologies);
 
@@ -1036,7 +1044,7 @@ static void wr_dungeon(void)
 		}
 	}
 	else
-	{	
+	{
 		/* Hack -- no ecology */
 		wr_u16b(0);
 		wr_byte(0);
@@ -1231,7 +1239,7 @@ static bool wr_savefile_new(void)
                 /* Oops */
                 wr_byte(e_info[i].aware);
                 wr_byte(0);
- 
+
                 /* Oops */
                	wr_byte(0);
                 wr_byte(0);
@@ -1278,7 +1286,7 @@ static bool wr_savefile_new(void)
 
 		/* Dump object */
 		wr_item(o_ptr);
-	} 
+	}
 
 	/* Add a sentinel */
 	wr_u16b(0xFFFF);
@@ -1295,7 +1303,7 @@ static bool wr_savefile_new(void)
 		{
 			wr_u16b((u16b)bag_contents[i][j]);
 		}
-	} 
+	}
 
 	/* Write the number of dungeon types */
 	wr_u16b((u16b)z_info->t_max);

@@ -114,10 +114,10 @@ void generate_familiar(void)
 			if (attr < 32) r_ptr->flags1 |= (1 << attr);
 			else if (attr < 64) r_ptr->flags2 |= (1 << (attr - 32));
 			else if (attr < 96) r_ptr->flags3 |= (1 << (attr - 64));
-			else if (attr < 128) r_ptr->flags4 |= (1 << (attr - 96));
-			else if (attr < 160) r_ptr->flags5 |= (1 << (attr - 128));
-			else if (attr < 192) r_ptr->flags6 |= (1 << (attr - 160));
-			else if (attr < 224) r_ptr->flags7 |= (1 << (attr - 192));
+			else if (attr < 128) { r_ptr->flags4 |= (1 << (attr - 96)); r_ptr->freq_innate += 10; }
+			else if (attr < 160) { r_ptr->flags5 |= (1 << (attr - 128)); r_ptr->freq_spell += 15;}
+			else if (attr < 192) { r_ptr->flags6 |= (1 << (attr - 160)); r_ptr->freq_spell += 15;}
+			else if (attr < 224) { r_ptr->flags7 |= (1 << (attr - 192)); r_ptr->freq_spell += 15;}
 			else if (attr < 256) r_ptr->flags8 |= (1 << (attr - 224));
 			else r_ptr->flags9 |= (1 << (attr - 256));
 
@@ -161,8 +161,13 @@ void generate_familiar(void)
 					}
 					r_ptr->flags1 &= ~(RF1_NEVER_BLOW);
 					break;
+				case FAMILIAR_SPIKE:
+					r_ptr->blow[blow-1].method = RBM_SPIKE;
+					r_ptr->flags4 |= (1 << blow);
+					r_ptr->freq_innate += 25;
+					break;
 				default:
-					r_ptr->blow[blow].effect = p_ptr->familiar_attr[i] - FAMILIAR_BLOW;
+					r_ptr->blow[blow-1].effect = p_ptr->familiar_attr[i] - FAMILIAR_BLOW;
 					break;
 			}
 		}
@@ -183,6 +188,9 @@ void generate_familiar(void)
 	/* Increase mana somewhat */
 	if (p_ptr->max_lev > 15) r_ptr->mana += r_ptr->mana * p_ptr->max_lev / 15;
 
+	/* Fix up attack frequencies */
+	if (r_ptr->freq_innate > 90) r_ptr->freq_innate = 90;
+	if (r_ptr->freq_spell > 90) r_ptr->freq_spell = 90;
 }
 
 
