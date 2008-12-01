@@ -3610,7 +3610,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 		if (r_ptr->flags9 & (RF9_TOWNSFOLK)) n_ptr->mflag |= (MFLAG_TOWN);
 
 		/* Mega-hack -- no nasty town dwellers when starting out */
-		else if (turn < 1000) return (FALSE);
+		else if ((turn < 1000) && ((flg & (MFLAG_ALLY)) == 0)) return (FALSE);
 	}
 
 	/* Enforce sleeping if needed */
@@ -5189,16 +5189,6 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 bool summon_specific_one(int y1, int x1, int r_idx, bool slp, u32b flg)
 {
 	int i, x, y;
-
-	/* Get the monster */
-	monster_race *r_ptr = &r_info[r_idx];
-
-	/* Hack -- "unique" monsters must be "unique" */
-	if ((r_ptr->flags1 & (RF1_UNIQUE)) &&
-	    (r_ptr->cur_num >= r_ptr->max_num))
-	{
-		return (FALSE);
-	}
 
 	/* Look for a location */
 	for (i = 0; i < 20; ++i)

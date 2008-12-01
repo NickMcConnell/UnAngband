@@ -4078,6 +4078,39 @@ errr file_character(cptr name, bool full)
 		text_out("\n\n");
 	}
 
+	/* Dump familiar abilities gained */
+	if (p_ptr->familiar)
+	{
+		monster_race *r_ptr = &r_info[FAMILIAR_IDX];
+		bool alive = (p_ptr->is_dead || (r_ptr->max_num <= 0)) == 0;
+
+		text_out("  [Familiar]\n\n");
+
+		text_out(format("Your familiar %s a %s.\n\n", alive ? "is" : "was", familiar_race[p_ptr->familiar].name));
+
+		/* Has at least one non-innate ability - 1st and 2nd abilities are innate */
+		if (p_ptr->familiar_attr[2])
+		{
+			text_out(format("While serving you it %sgained the following abilities:\n",
+					alive ? "has " : ""));
+
+			/* Iterate through familiar abilities */
+			for (i = 2; (p_ptr->familiar_attr[i]) && (i < MAX_FAMILIAR_GAINS); i++)
+			{
+				for (j = 0; j < MAX_FAMILIAR_ABILITIES; j++)
+				{
+					if (familiar_ability[j].attr == p_ptr->familiar_attr[i])
+					{
+						text_out(format("  %s\n", familiar_ability[j].text));
+						break;
+					}
+				}
+			}
+		}
+
+		text_out("\n\n");
+	}
+
 #if 0
 	/* Dump quests */
 	text_out("  [Quests]\n\n");

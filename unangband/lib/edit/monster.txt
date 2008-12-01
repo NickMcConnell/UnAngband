@@ -6429,7 +6429,7 @@ G:@:v
 #$ Clear available
 #$ Metallics available:dwsorgbuDWPyRGBUpvtmYiTVIMzZ
 #$ Colors available:dwsogbDWPyRGBpvtmTVIMzZ
-I:115:5:4:40:99
+I:115:5:4:40:0
 W:0:0:0:3
 M:0:0:1:0
 F:NEVER_BLOW |
@@ -6442,7 +6442,7 @@ G:@:v
 #$ Clear available
 #$ Metallics available:dwsorgbuDWPyRGBUpvtmYiTVIMzZ
 #$ Colors available:dwsogbDWPyRGBpvtmTVIMzZ
-I:115:5:4:40:99
+I:115:5:4:40:0
 W:0:0:0:3
 M:0:0:1:0
 F:NEVER_BLOW |

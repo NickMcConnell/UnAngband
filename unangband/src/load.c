@@ -530,6 +530,9 @@ static void rd_monster(monster_type *m_ptr)
 	/* Read the monster race */
 	rd_s16b(&m_ptr->r_idx);
 
+	/* Increase count of this race */
+	r_info[m_ptr->r_idx].cur_num++;
+
 	/* Read the other information */
 	rd_byte(&m_ptr->fy);
 	rd_byte(&m_ptr->fx);

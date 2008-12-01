@@ -2842,6 +2842,9 @@ void improve_familiar(void)
 	/* Does not yet have a familiar */
 	if (!p_ptr->familiar) return;
 
+	/* Familiar is dead */
+	if (r_info[FAMILIAR_IDX].max_num <= 0) return;
+
 	/* Keep filling slots if required */
 	while (TRUE)
 	{

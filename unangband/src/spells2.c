@@ -133,7 +133,7 @@ void generate_familiar(void)
 					r_ptr->ac += 25;
 					break;
 				case FAMILIAR_SPEED:
-					r_ptr->speed += 5;
+					r_ptr->speed += 10;
 					break;
 				case FAMILIAR_POWER:
 					r_ptr->spell_power += p_ptr->max_lev;
@@ -191,6 +191,9 @@ void generate_familiar(void)
 	/* Fix up attack frequencies */
 	if (r_ptr->freq_innate > 90) r_ptr->freq_innate = 90;
 	if (r_ptr->freq_spell > 90) r_ptr->freq_spell = 90;
+
+	/* Set level for blood debt */
+	r_ptr->level = p_ptr->max_lev;
 }
 
 
@@ -1898,6 +1901,26 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 	return (detect);
 }
 
+
+
+static int monster_race_hook = 0;
+
+
+/*
+ * Hook to specify a single race of monster;
+ */
+static bool monster_tester_hook_single(const int m_idx)
+{
+	monster_type *m_ptr = &m_list[m_idx];
+
+	/* Don't detect invisible monsters */
+	if (monster_race_hook == m_ptr->r_idx)
+	{
+		return (TRUE);
+	}
+
+	return (FALSE);
+}
 
 
 /*
@@ -6275,6 +6298,17 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags1 & (SF1_DETECT_EVIL)) && (detect_monsters(monster_tester_hook_evil, known))) vp[vn++] = "evil";
 	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters(monster_tester_hook_normal, known))) vp[vn++] = "monsters";
 
+	/* Process the flags -- specific monster detection */
+	if (s_ptr->type == SUMMON_RACE)
+	{
+		/* If summoning a unique that already exists, find it instead */
+		if (r_info[s_ptr->param].cur_num >= r_info[s_ptr->param].max_num)
+		{
+			monster_race_hook = s_ptr->param;
+			if (detect_monsters(monster_tester_hook_single, known)) vp[vn++] = r_name + r_info[s_ptr->param].name;
+		}
+	}
+
 	/* Process the flags -- detect water */
 	if (s_ptr->flags1 & (SF1_DETECT_WATER))
 	{
@@ -7632,6 +7666,7 @@ void process_spell_prepare(int spell, int level)
 
 		case SPELL_SUMMON_RACE:
 		{
+			/* Choose familiar if summoning it for the first time */
 			if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
 			{
 				p_ptr->familiar = randint(19);
