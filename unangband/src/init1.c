@@ -9485,7 +9485,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	if (f_ptr->defaults)
 	{
 		fprintf(fp,"K:DEFAULT:%d:%d\n",f_ptr->defaults, f_ptr->power);
-		f2_ptr = (feature_type*)head->info_ptr + f_ptr->mimic;
+		f2_ptr = (feature_type*)head->info_ptr + f_ptr->defaults;
 		if (f_ptr->defaults != i) fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 	}
 
