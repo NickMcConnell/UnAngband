@@ -6151,9 +6151,9 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		/* Allow direction to be cancelled for free */
 		if ((!(method_ptr->flags1 & (PROJECT_SELF))) &&
 				(!get_aim_dir(&dir, known ? range : MAX_RANGE, known ? radius : 0,
-						known ? method_info[method].flags1 : (PROJECT_BEAM),
-						known ? method_info[method].arc : 0,
-						known ? method_info[method].diameter_of_source : 0))) return (!(*cancel));
+						known ? method_ptr->flags1 : (PROJECT_BEAM),
+						known ? method_ptr->arc : 0,
+						known ? method_ptr->diameter_of_source : 0))) return (!(*cancel));
 
 		/* Apply spell method */
 		if (fire_projection(who, what, effect, method, dir, damage, level)) obvious = TRUE;
@@ -7960,3 +7960,4 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 	/* Anything seen? */
 	return(obvious);
 }
+

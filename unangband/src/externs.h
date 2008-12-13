@@ -676,6 +676,8 @@ extern int sauron_shape(int old_form);
 extern bool make_attack_ranged(int who, int attack, int py, int px);
 extern bool mon_evade(int m_idx, int chance, int out_of, cptr r);
 extern bool mon_resist_object(int m_idx, const object_type *o_ptr);
+extern bool race_avoid_trap(int r_idx, int y, int x);
+extern bool mon_avoid_trap(monster_type *m_ptr, int y, int x);
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
@@ -693,7 +695,7 @@ extern void feed_monster(int m_idx);
 extern void find_range(int m_idx);
 extern void process_monsters(byte minimum_energy);
 extern int get_scent(int y, int x);
-extern bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok);
+extern bool cave_exist_mon(int m_idx, int y, int x, bool occupied_ok);
 extern void reset_monsters(void);
 
 /* monster1.c */

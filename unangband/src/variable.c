@@ -655,6 +655,42 @@ s16b (*cave_m_idx)[DUNGEON_WID];
 
 
 /*
+ * Array[DUNGEON_HGT][DUNGEON_WID] of cave grid region indexes
+ *
+ * Note that this array yields the index of the top region in the stack of
+ * region in a given grid, using the "next_region_idx" field in that region to
+ * indicate the next region in the stack, and so on, using zero to indicate
+ * "nothing".  This array replicates the information contained in the region
+ * list, for efficiency, providing extremely fast determination of whether
+ * any region is in a grid, and relatively fast determination of which regions
+ * are in a grid.
+ */
+s16b (*cave_region_piece)[DUNGEON_WID];
+
+
+/*
+ * Array[z_info->?_max] of region pieces
+ */
+region_piece_type *region_piece_list;
+
+
+int region_piece_max;
+int region_piece_cnt;
+
+
+/*
+ * Array[z_info->?_max] of regions
+ */
+region_type *region_list;
+
+
+int region__max;
+int region__cnt;
+
+
+
+
+/*
  * The follow functions allow for 'alternate' modes of display the main map.
  */
 void (*modify_grid_adjacent_hook)(byte *a, char *c, int y, int x, byte adj_char[16]);

@@ -7520,7 +7520,7 @@ void pick_trap(int y, int x)
 					break;
 
 				case TV_DRAG_ARMOR:
-					pick_attr = TERM_L_WHITE;	/* Stone face */
+					pick_attr = TERM_L_WHITE;	/* Stone visage */
 					break;
 
 				case TV_FOOD:

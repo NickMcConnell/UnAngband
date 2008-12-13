@@ -5222,6 +5222,269 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 }
 
 
+/*
+ *  Check if race avoids the trap
+ */
+bool race_avoid_trap(int r_idx, int y, int x)
+{
+	feature_type *f_ptr;
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Get feature */
+	f_ptr = &f_info[cave_feat[y][x]];
+
+	/* Hack - test whether we hit trap based on the attr of the trap */
+	switch (f_ptr->d_attr)
+	{
+		/* Trap door */
+		case TERM_WHITE:
+		/* Pit */
+		case TERM_SLATE:
+		{
+			/* Avoid by flying/climbing */
+			if (r_ptr->flags2 & (RF2_MUST_FLY | RF2_CAN_FLY | RF2_CAN_CLIMB)) return (TRUE);
+			break;
+		}
+		/* Strange rune */
+		case TERM_ORANGE:
+		{
+			/* Avoid by being strange */
+			if (r_ptr->flags2 & (RF2_WEIRD_MIND)) return (TRUE);
+			break;
+		}
+		/* Spring loaded trap */
+		case TERM_RED:
+		{
+			/* Avoid by being light footed */
+			if (r_ptr->flags9 & (RF9_EVASIVE)) return (TRUE);
+			break;
+		}
+		/* Gas trap */
+		case TERM_GREEN:
+		{
+			/* Avoid by holding breath */
+			break;
+		}
+		/* Explosive trap */
+		case TERM_BLUE:
+		{
+			/* Avoid by XXXX */
+			break;
+		}
+		/* Discoloured spot */
+		case TERM_UMBER:
+		{
+			/* Avoid by XXXX */
+			break;
+		}
+		/* Silent watcher */
+		case TERM_L_DARK:
+		{
+			/* Avoid by being invisible */
+			if (r_ptr->flags2 & (RF2_INVISIBLE)) return (TRUE);
+			break;
+		}
+		/* Strange visage */
+		case TERM_L_WHITE:
+		{
+			/* Avoid by being dragonish */
+			if (r_ptr->flags3 & (RF3_DRAGON)) return (TRUE);
+			break;
+		}
+		/* Loose rock or multiple traps */
+		case TERM_L_PURPLE:
+		{
+			/* Avoid by sneaking */
+			if (r_ptr->flags1 & (RF2_SNEAKY)) return (TRUE);
+			break;
+		}
+		/* Trip wire */
+		case TERM_YELLOW:
+		{
+			/* Avoid by searching */
+			/*if (m_ptr->m_flag & (MFLAG_SMART)) return (TRUE);*/
+			break;
+		}
+		/* Murder hole */
+		case TERM_L_RED:
+		{
+			/* Avoid if armoured */
+			if (r_ptr->flags2 & (RF2_ARMOR)) return (TRUE);
+			break;
+		}
+		/* Ancient hex */
+		case TERM_L_GREEN:
+		{
+			/* Avoid by being undead */
+			if (r_ptr->flags3 & (RF3_UNDEAD)) return (TRUE);
+			break;
+		}
+		/* Magic symbol */
+		case TERM_L_BLUE:
+		{
+			/* Avoid by not having much mana */
+			if (!r_ptr->mana) return (TRUE);
+			break;
+		}
+		/* Fine net */
+		case TERM_L_UMBER:
+		{
+			/* Avoid unless flying */
+			if ((r_ptr->flags2 & (RF2_MUST_FLY | RF2_CAN_FLY)) == 0) return (TRUE);
+			break;
+		}
+		/* Surreal painting */
+		case TERM_PURPLE:
+		{
+			/* Avoid by being able to see the painting */
+			/*if (!m_ptr->blind) return (TRUE); */
+			break;
+		}
+		/* Ever burning eye */
+		case TERM_VIOLET:
+		{
+			/* Avoid by being cold blooded */
+			break;
+		}
+		/* Upwards draft */
+		case TERM_TEAL:
+		{
+			/* Avoid by being heavy */
+			if (r_ptr->flags3 & (RF3_HUGE)) return (TRUE);
+			break;
+		}
+		/* Dead fall */
+		case TERM_MUD:
+		{
+			/* Avoid by XXXX */
+			break;
+		}
+		/* Shaft of light */
+		case TERM_L_YELLOW:
+		{
+			/* Avoid by being unlit */
+			if (((cave_info[y][x] & (CAVE_LITE)) == 0) &&
+					((play_info[y][x] & (PLAY_LITE)) == 0)) return (TRUE);
+			break;
+		}
+		/* Glowing glyph */
+		case TERM_MAGENTA:
+		{
+			/* Avoid by being blind or unable to read */
+			if (r_ptr->flags2 & (RF2_STUPID)) return (TRUE);
+			break;
+		}
+		/* Demonic sign */
+		case TERM_L_TEAL:
+		{
+			/* Avoid by being demonic */
+			if (r_ptr->flags3 & (RF3_DEMON)) return (TRUE);
+			break;
+		}
+		/* Radagast's snare */
+		case TERM_L_VIOLET:
+		{
+			/* Avoid by being animal */
+			if (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT)) return (TRUE);
+			break;
+		}
+		/* Siege engine */
+		case TERM_L_PINK:
+		/* Clockwork mechanism */
+		case TERM_MUSTARD:
+		{
+			/* Always avoid */
+			return (TRUE);
+			break;
+		}
+		/* Mark of a white hand */
+		case TERM_BLUE_SLATE:
+		{
+			/* Avoid by being orc */
+			if (r_ptr->flags3 & (RF3_ORC)) return (TRUE);
+			break;
+		}
+		/* Shimmering portal */
+		case TERM_DEEP_L_BLUE:
+		{
+			/* Avoid by being anti-teleport */
+			if (r_ptr->flags9 & (RF9_RES_TPORT)) return (TRUE);
+			break;
+		}
+	}
+
+	/* Can't avoid trap */
+	return (FALSE);
+}
+
+
+
+/*
+ *  Check if a monster avoids the trap
+ *
+ *  Note we only apply specific monster checks. All racial checks
+ *  are done above.
+ */
+bool mon_avoid_trap(monster_type *m_ptr, int y, int x)
+{
+	feature_type *f_ptr;
+
+	/* Get feature */
+	f_ptr = &f_info[cave_feat[y][x]];
+
+	/* Hack - test whether we hit trap based on the attr of the trap */
+	switch (f_ptr->d_attr)
+	{
+		/* Strange rune */
+		case TERM_ORANGE:
+		{
+			/* Avoid by being strange */
+			if (m_ptr->confused) return (TRUE);
+			break;
+		}
+		/* Silent watcher */
+		case TERM_L_DARK:
+		{
+			/* Avoid by being invisible */
+			if (m_ptr->tim_invis) return (TRUE);
+			break;
+		}
+		/* Trip wire */
+		case TERM_YELLOW:
+		{
+			/* Avoid by searching */
+			if (m_ptr->mflag & (MFLAG_SMART)) return (TRUE);
+			break;
+		}
+		/* Magic symbol */
+		case TERM_L_BLUE:
+		{
+			/* Avoid by not having much mana */
+			if (m_ptr->mana < r_info[m_ptr->r_idx].mana / 5) return (TRUE);
+			break;
+		}
+		/* Surreal painting */
+		case TERM_PURPLE:
+		{
+			/* Avoid by being able to see the painting */
+			if (!m_ptr->blind) return (TRUE);
+			break;
+		}
+		/* Glowing glyph */
+		case TERM_MAGENTA:
+		{
+			/* Avoid by being blind or unable to read */
+			if (m_ptr->blind) return (TRUE);
+			break;
+		}
+	}
+
+	/* Avoid trap racially */
+	return (race_avoid_trap(m_ptr->r_idx, y, x));
+}
+
+
+
 
 /*
  * Handle monster hitting a real trap.
@@ -5242,6 +5505,9 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 	/* Hack --- don't activate unknown invisible traps */
 	if (cave_feat[y][x] == FEAT_INVIS) return;
+
+	/* Avoid trap */
+	if ((f_ptr->flags1 & (FF1_TRAP)) && (mon_avoid_trap(m_idx, y, x))) return;
 
 	/* Get feature */
 	f_ptr = &f_info[cave_feat[y][x]];

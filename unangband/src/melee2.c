@@ -1916,10 +1916,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 /*
  * Can the monster exist in this grid?
- *
- * Because this function is designed for use in monster placement and
- * generation as well as movement, it cannot accept monster-specific
- * data, but must rely solely on racial information.
  */
 bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok)
 {
@@ -1957,19 +1953,17 @@ bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok)
 static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 {
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 
 	/* Assume nothing in the grid other than the terrain hinders movement */
 	int move_chance = 100;
 
-	int feat;
-
 	int mmove;
+
+
 
 	/* Check Bounds */
 	if (!in_bounds(y, x)) return (FALSE);
-
-	/* Check location */
-	feat = cave_feat[y][x];
 
 	/* Haven't had to bash it */
 	*bash = FALSE;
@@ -2058,11 +2052,12 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	/* Check how we move */
 	mmove = place_monster_here(y,x,m_ptr->r_idx);
 
+
 	/*** Check passability of various features. ***/
 
 	/* The monster is under covered terrain, moving to uncovered terrain. */
 	if ((m_ptr->mflag & (MFLAG_HIDE)) && (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_COVERED)) &&
-		!(f_info[cave_feat[y][x]].flags2 & (FF2_COVERED)) && (mmove != MM_SWIM) && (mmove != MM_DIG) && (mmove != MM_UNDER))
+		!(f_ptr->flags2 & (FF2_COVERED)) && (mmove != MM_SWIM) && (mmove != MM_DIG) && (mmove != MM_UNDER))
 	{
 
 		if ((r_ptr->flags2 & (RF2_BASH_DOOR)) &&  (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags1 & (FF1_BASH)))
@@ -2085,15 +2080,43 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		if (mmove == MM_DROWN && !m_ptr->confused)
 		{
 			/* Try to get out of existing trouble */
-                        if (place_monster_here(m_ptr->fy, m_ptr->fx, m_ptr->r_idx) <= MM_FAIL) move_chance /= 4;
+            if (place_monster_here(m_ptr->fy, m_ptr->fx, m_ptr->r_idx) <= MM_FAIL) move_chance /= 4;
+
 			/* Don't walk into trouble */
 			else move_chance = 0;
 		}
 
 		/* We cannot natively climb, but are negotiating a tree or rubble */
-		else if (mmove != MM_DROWN && mmove == MM_CLIMB && !(r_ptr->flags2 & RF2_CAN_CLIMB))
+		else if (mmove == MM_CLIMB && !(r_ptr->flags2 & RF2_CAN_CLIMB))
 		{
 			move_chance /= 2;
+		}
+
+		/* Check for traps */
+		else if (mmove == MM_TRAP)
+		{
+			/* Stupid monsters ignore traps, as do those which can avoid or resist them */
+			if ((r_ptr->flags2 & (RF2_STUPID)) || (mon_avoid_trap(m_ptr, y, x))
+					|| (mon_resist_feat(cave_feat[y][x], m_ptr->r_idx)))
+			{
+				/* No modification */
+			}
+
+			/* Smart and sneaky monsters will disarm traps.
+			 * Monsters in line of fire to the player will consider moving
+			 * through traps, as will those monsters aggravated by the player. */
+			else if ((r_ptr->flags2 & (RF2_SMART | RF2_SNEAKY)) ||
+					(play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) ||
+					(m_ptr->mflag & (MFLAG_AGGR)))
+			{
+				move_chance /= 4;
+			}
+
+			/* Don't move through traps unnecessarily */
+			else
+			{
+				move_chance = 0;
+			}
 		}
 
 		/* Anything else that's not a wall we assume to be passable. */
@@ -2107,24 +2130,24 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		int bash_chance = 0;
 
 		/* Glyphs */
-		if (f_info[feat].flags1 & (FF1_GLYPH))
+		if (f_ptr->flags1 & (FF1_GLYPH))
 		{
 			/* Glyphs are hard to break */
 			return (MIN(100 * r_ptr->level / BREAK_GLYPH, move_chance));
 		}
 
 		/* Monster can open doors */
-		if (f_info[feat].flags1 & (FF1_SECRET))
+		if (f_ptr->flags1 & (FF1_SECRET))
 		{
 				/* Discover the secret (temporarily) */
-				feat = feat_state(feat,FS_SECRET);
+				f_ptr = &f_info[feat_state(cave_feat[y][x],FS_SECRET)];
 		}
 
 		/* Monster can open doors */
-		if ((r_ptr->flags2 & (RF2_OPEN_DOOR)) && (f_info[feat].flags1 & (FF1_OPEN)))
+		if ((r_ptr->flags2 & (RF2_OPEN_DOOR)) && (f_ptr->flags1 & (FF1_OPEN)))
 		{
 			/* Secret doors and easily opened stuff */
-			if (f_info[feat].power == 0)
+			if (f_ptr->power == 0)
 			{
 				/*
 				 * Note:  This section will have to be rewritten if
@@ -2148,7 +2171,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 				int lock_power, ability;
 
 				/* Door power (from 35 to 245) */
-				lock_power = 35 * f_info[feat].power;
+				lock_power = 35 * f_ptr->power;
 
 				/* Calculate unlocking ability (usu. 11 to 200) */
 				ability = r_ptr->level + 10;
@@ -2166,7 +2189,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		}
 
 		/* Monster can bash doors */
-		if ((r_ptr->flags2 & (RF2_BASH_DOOR)) && (f_info[feat].flags1 & (FF1_BASH)))
+		if ((r_ptr->flags2 & (RF2_BASH_DOOR)) && (f_ptr->flags1 & (FF1_BASH)))
 		{
 			int door_power, bashing_power;
 
@@ -2177,7 +2200,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 			 * character door bashing code is changed, however,
 			 * we'll stick with this.
 			 */
-			door_power = 60 + 60 * f_info[feat].power;
+			door_power = 60 + 60 * f_ptr->power;
 
 			/*
 			 * Calculate bashing ability (usu. 21 to 300).  Note:
@@ -4688,7 +4711,7 @@ static bool bash_from_under(int m_idx, int y, int x, bool *bash)
 	}
 
 	/* Hack -- ensure we now have uncovered terrain */
-	if (f_info[cave_feat[y][x]].flags2 & (FF2_COVERED)) return (FALSE);
+	if (f_ptr->flags2 & (FF2_COVERED)) return (FALSE);
 
 	/* Monster emerges from hiding if required */
 	if ((emerge) && (m_ptr->mflag & (MFLAG_HIDE)))
@@ -5131,9 +5154,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			}
 		}
 
-		/* Hack --- smart monsters try to disarm traps, unless berserk */
+		/* Hack --- smart or sneaky monsters try to disarm traps, unless berserk */
 		else if ((f_info[feat].flags1 & (FF1_TRAP)) &&
-			(r_ptr->flags2 & (RF2_SMART)) && !(m_ptr->berserk))
+			(r_ptr->flags2 & (RF2_SMART | RF2_SNEAKY)) && !(m_ptr->berserk))
 		{
 			int power, chance;
 
@@ -5191,7 +5214,8 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				do_move = FALSE;
 
 				/* Did smart stuff */
-				did_smart = TRUE;
+				did_smart = (r_ptr->flags2 & (RF2_SMART)) != 0;
+				did_sneak = (r_ptr->flags2 & (RF2_SNEAKY)) != 0;
 			}
 
 			/* Don't set off the ward */
@@ -5566,8 +5590,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		}
 
 		/* Hit traps */
-		if (f_info[feat].flags1 & (FF1_HIT_TRAP) &&
-			!(m_ptr->mflag & (MFLAG_OVER)))
+		if (f_info[feat].flags1 & (FF1_HIT_TRAP))
 		{
 			mon_hit_trap(m_idx,ny,nx);
 		}

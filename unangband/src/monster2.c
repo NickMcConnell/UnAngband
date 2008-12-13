@@ -2582,8 +2582,6 @@ void monster_swap(int y1, int x1, int y2, int x2)
  *
  * We then stop monsters flowing that can't flow through all non-wall terrain
  * on the level. This is currently unimplemented.
- *
- * XXX We should risk traps based on monster hp.
  */
 
 bool mon_resist_feat(int feat, int r_idx)
@@ -2605,17 +2603,12 @@ bool mon_resist_feat(int feat, int r_idx)
 	if ((daytime && outside) && (r_ptr->flags3 & (RF3_HURT_LITE)))
 		return (FALSE);
 
-	/* Always risk traps if stupid */
-	if ((f_ptr->flags1 & (FF1_HIT_TRAP)) &&
-	    (r_ptr->flags2 & (RF2_STUPID))) return (TRUE);
+	/* Monsters which never move can never be hit by traps,
+	 * as traps require movement to trigger. */
+	if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) && (f_ptr->flags1 & (FF1_HIT_TRAP))) return (TRUE);
 
 	/* Always fail for spells */
 	if (f_ptr->spell) return (FALSE);
-
-	/* Sometimes risk traps if not smart */
-	if ((f_ptr->flags1 & (FF1_HIT_TRAP)) &&
-	    !(r_ptr->flags2 & (RF2_SMART)) &&
-	    (rand_int(100)<5)) return (TRUE);
 
 	/* Check trap/feature attack */
 	if (f_ptr->blow.method)
@@ -2634,6 +2627,7 @@ bool mon_resist_feat(int feat, int r_idx)
 			return ((f_ptr->blow.d_dice * f_ptr->blow.d_side)==0);
 			break;
 
+			case GF_DELAY_POISON:
 			case GF_POIS:
 			if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (FALSE);
 			break;
@@ -2655,6 +2649,10 @@ bool mon_resist_feat(int feat, int r_idx)
 			case GF_LAVA:
 			if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (FALSE);
 			break;
+
+			case GF_POISON_WATER:
+			if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (FALSE);
+			/* Fall through */
 
 			case GF_WATER_WEAK:
 			case GF_WATER:
@@ -2759,25 +2757,24 @@ bool mon_resist_feat(int feat, int r_idx)
 	return(TRUE);
 }
 
+
 /* ANDY - The routine we use to determine if we can place a monster
  * on a particular terrain type. This returns an integer defining
  * what mode of movement the monster is using (climbing, swimming etc.)
  * or a FALSE result if the monster cannot move (at all) on this terrain.
  *
- * Note the integer is negative if the monster doesn't 'like' the terrain.
+ * Note the integer is negative if the monster doesn't 'like' the terrain
+ * and will begin drowning in it if this returns MM_DROWN. Drowning is
+ * used to force monsters to either move or die.
  */
 int place_monster_here(int y, int x, int r_idx)
 {
-	int feat;
-
 	feature_type *f_ptr;
 	monster_race *r_ptr;
 
 	/* Improve efficiency -- forced boolean */
 	bool resist;
-
-    /* Get feature */
-	feat = cave_feat[y][x];
+	bool trap = FALSE;
 
 	/* Get feature info */
 	f_ptr= &f_info[cave_feat[y][x]];
@@ -2788,11 +2785,31 @@ int place_monster_here(int y, int x, int r_idx)
 	/* Race */
 	r_ptr = &r_info[r_idx];
 
-	/* Monster resists? */
-	resist = mon_resist_feat(feat,r_idx);
+	/* Monster resists terrain damage? */
+	resist = mon_resist_feat(cave_feat[y][x],r_idx);
 
-	/* Hack -- Player traps */
-	if ((cave_o_idx[y][x]) && ((f_info[feat].flags1 & (FF1_HIT_TRAP)) != 0)) resist = TRUE;
+	/* Monster can't move through terrain */
+	if (f_ptr->flags1 & (FF1_HIT_TRAP))
+	{
+		/* Monster can't avoid trap */
+		/*
+		 * Note that traps are the only way flying/climbing monsters can
+		 * take damage from terrain.
+		 */
+		if (f_ptr->flags1 & (FF1_TRAP))
+		{
+			/* Unavoidable */
+			if (race_avoid_trap(r_idx, y, x))
+			{
+				resist = TRUE;
+			}
+			/* Prevent flyers avoiding, but they may resist */
+			else
+			{
+				trap = !resist;
+			}
+		}
+	}
 
 	/* Check for pass wall */
 	if (resist &&
@@ -2835,12 +2852,11 @@ int place_monster_here(int y, int x, int r_idx)
 		return(MM_OOZE);
 	}
 
-
 	/* Hack -- check for flying. */
 	if (((r_ptr->flags2 & (RF2_CAN_FLY | RF2_MUST_FLY)) != 0) &&
 		((f_ptr->flags2 & (FF2_CAN_FLY)) != 0))
 	{
-		return(MM_FLY);
+		return(trap ? MM_TRAP : MM_FLY);
 	}
 
 	else if ((r_ptr->flags2 & (RF2_MUST_FLY)) != 0)
@@ -2852,7 +2868,7 @@ int place_monster_here(int y, int x, int r_idx)
 	if (((r_ptr->flags2 & (RF2_CAN_CLIMB)) != 0) &&
 		((f_ptr->flags3 & (FF3_EASY_CLIMB)) != 0))
 	{
-		return(MM_CLIMB);
+		return(trap ? MM_TRAP : MM_CLIMB);
 	}
 
 	/* Hack -- check for climbing. */
@@ -2873,20 +2889,18 @@ int place_monster_here(int y, int x, int r_idx)
 				&& (f_info[cave_feat[yi][xi]].flags2 & (FF2_CAN_CLIMB)) != 0)
 				return(MM_CLIMB);
 		}
-
 	}
 
 	/* Get mimiced feat if covered/bridged */
 	if ((f_ptr->flags2 & (FF2_COVERED | FF2_BRIDGED)) != 0)
 	{
-		feat = f_ptr->mimic;
-		resist = mon_resist_feat(feat,r_idx);
+		resist = mon_resist_feat(f_ptr->mimic,r_idx);
 	}
 
 	/* Regular move/climb/drown */
 	if (((f_ptr->flags1 & (FF1_MOVE)) != 0) || ((f_ptr->flags3 & (FF3_EASY_CLIMB)) != 0))
 	{
-		if (!resist) return (MM_DROWN);
+		if (!resist) return ((f_ptr->flags1 & (FF1_HIT_TRAP)) ? MM_TRAP : MM_DROWN);
 		if (f_ptr->flags2 & (FF2_DEEP | FF2_FILLED)) return (MM_DROWN);
 		if (!(f_ptr->flags1 & (FF1_MOVE))) return (MM_CLIMB);
 
@@ -5404,6 +5418,9 @@ bool multiply_monster(int m_idx)
 
 		/* Require an "empty" floor grid */
 		if (!cave_empty_bold(y, x)) continue;
+
+		/* Require no risk of damage */
+		if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP)) continue;
 
 		/* Require monster can pass and survive on terrain */
 		if (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL) continue;

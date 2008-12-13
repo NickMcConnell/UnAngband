@@ -1805,6 +1805,220 @@ byte py_pickup(int py, int px, int pickup)
 
 
 /*
+ *  Check if a player avoids the trap
+ */
+static bool avoid_trap(int y, int x)
+{
+	feature_type *f_ptr;
+
+	cptr name;
+
+	int feat = cave_feat[y][x];
+
+	/* Get feature */
+	f_ptr = &f_info[feat];
+
+	/* Get the feature name */
+	name = (f_name + f_ptr->name);
+
+	/* Hack - test whether we hit trap based on the attr of the trap */
+	switch (f_ptr->d_attr)
+	{
+		/* Trap door */
+		case TERM_WHITE:
+		/* Pit */
+		case TERM_SLATE:
+		{
+			/* Avoid by flying */
+			break;
+		}
+		/* Strange rune */
+		case TERM_ORANGE:
+		{
+			/* Avoid by being strange */
+			if ((p_ptr->confused) || (p_ptr->image)) return (TRUE);
+			break;
+		}
+		/* Spring loaded trap */
+		case TERM_RED:
+		{
+			/* Avoid by being light footed */
+			if (p_ptr->cur_flags3 & (TR3_FEATHER)) return (TRUE);
+			break;
+		}
+		/* Gas trap */
+		case TERM_GREEN:
+		{
+			/* Avoid by holding breath */
+			break;
+		}
+		/* Explosive trap */
+		case TERM_BLUE:
+		{
+			/* Avoid by XXXX */
+			break;
+		}
+		/* Discoloured spot */
+		case TERM_UMBER:
+		{
+			/* Avoid by XXXX */
+			break;
+		}
+		/* Silent watcher */
+		case TERM_L_DARK:
+		{
+			/* Avoid by being invisible */
+			if (p_ptr->invis) return (TRUE);
+			break;
+		}
+		/* Strange visage */
+		case TERM_L_WHITE:
+		{
+			/* Avoid by being dragonish */
+			if (p_ptr->cur_flags4 & (TR4_DRAGON)) return (TRUE);
+			break;
+		}
+		/* Loose rock or multiple traps */
+		case TERM_L_PURPLE:
+		{
+			/* Avoid by sneaking */
+			if (p_ptr->sneaking)
+			{
+				/* Can't avoid multiple traps */
+				if (strstr("multiple traps", name)) return (FALSE);
+				msg_format("Hmm... not this time. You avoid the %s.", name);
+				return (TRUE);
+			}
+			break;
+		}
+		/* Trip wire */
+		case TERM_YELLOW:
+		{
+			/* Avoid by searching */
+			if (p_ptr->searching)
+			{
+				msg_format("You find the %s and carefully step over it.", name);
+				return (TRUE);
+			}
+			break;
+		}
+		/* Murder hole */
+		case TERM_L_RED:
+		{
+			/* Arrows always blocked. Do this later to use up ammunition. */
+			break;
+		}
+		/* Ancient hex */
+		case TERM_L_GREEN:
+		{
+			/* Avoid by being undead */
+			if (p_ptr->cur_flags4 & (TR4_UNDEAD)) return (TRUE);
+			break;
+		}
+		/* Magic symbol */
+		case TERM_L_BLUE:
+		{
+			/* Avoid by not having much mana */
+			if ((!p_ptr->csp) || (p_ptr->csp < p_ptr->msp / 5)) return (TRUE);
+			break;
+		}
+		/* Fine net */
+		case TERM_L_UMBER:
+		{
+			/* Avoid unless flying */
+			return (TRUE);
+			break;
+		}
+		/* Surreal painting */
+		case TERM_PURPLE:
+		{
+			/* Avoid by being able to see the painting */
+			if (play_info[y][x] & (PLAY_SEEN)) return (TRUE);
+			break;
+		}
+		/* Ever burning eye */
+		case TERM_VIOLET:
+		{
+			/* Avoid by being cold blooded */
+			break;
+		}
+		/* Upwards draft */
+		case TERM_TEAL:
+		{
+			/* Avoid by being heavy */
+			if (p_ptr->total_weight > 1000)
+			{
+				msg_format("The weight of your equipment protects you from the %s.",name);
+				return (TRUE);
+			}
+			break;
+		}
+		/* Dead fall */
+		case TERM_MUD:
+		{
+			/* Avoid by XXXX */
+			break;
+		}
+		/* Shaft of light */
+		case TERM_L_YELLOW:
+		{
+			/* Avoid by being unlit */
+			if (((cave_info[y][x] & (CAVE_LITE)) == 0) &&
+					((play_info[y][x] & (PLAY_LITE)) == 0)) return (TRUE);
+			break;
+		}
+		/* Glowing glyph */
+		case TERM_MAGENTA:
+		{
+			/* Avoid by being blind or unable to read */
+			if (p_ptr->blind) return (TRUE);
+			break;
+		}
+		/* Demonic sign */
+		case TERM_L_TEAL:
+		{
+			/* Avoid by being demonic */
+			if (p_ptr->cur_flags4 & (TR4_DEMON)) return (TRUE);
+			break;
+		}
+		/* Radagast's snare */
+		case TERM_L_VIOLET:
+		{
+			/* Avoid by being animal */
+			if (p_ptr->cur_flags4 & (TR4_ANIMAL)) return (TRUE);
+			break;
+		}
+		/* Siege engine */
+		case TERM_L_PINK:
+		/* Clockwork mechanism */
+		case TERM_MUSTARD:
+		{
+			/* Always avoid */
+			return (TRUE);
+			break;
+		}
+		/* Mark of a white hand */
+		case TERM_BLUE_SLATE:
+		{
+			/* Avoid by being orc */
+			if (p_ptr->cur_flags4 & (TR4_ORC)) return (TRUE);
+			break;
+		}
+		/* Shimmering portal */
+		case TERM_DEEP_L_BLUE:
+		{
+			/* Avoid by being anti-teleport */
+			if (p_ptr->cur_flags4 & (TR4_ANCHOR)) return (TRUE);
+			break;
+		}
+	}
+
+	/* Can't avoid trap */
+	return (FALSE);
+}
+
+
+/*
  * Handle player hitting a real trap
  */
 void hit_trap(int y, int x)
@@ -1821,6 +2035,9 @@ void hit_trap(int y, int x)
 
 	/* Get feature */
 	f_ptr = &f_info[feat];
+
+	/* Avoid trap */
+	if ((f_ptr->flags1 & (FF1_TRAP)) && (avoid_trap(y, x))) return;
 
 	/* Hack --- trapped doors/chests */
 	while (f_ptr->flags3 & (FF3_PICK_TRAP))
@@ -1903,7 +2120,12 @@ void hit_trap(int y, int x)
 						/* Describe ammo */
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
-						if ((ammo) && (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power, p_ptr->ac, TRUE)))
+						/* Hack - Block murder holes here to use up ammunition */
+						if (p_ptr->blocking)
+						{
+							msg_format("You knock aside the %s.", o_name);
+						}
+						else if ((ammo) && (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power, p_ptr->ac, TRUE)))
 						{
 							int k, mult;
 
@@ -2330,10 +2552,17 @@ void hit_trap(int y, int x)
 			msg_format("%s",text);
 		}
 
-		if (f_ptr->spell)
+		/* Hack - Block murder holes here to use up ammunition */
+		if ((f_ptr->flags1 & (FF1_TRAP)) && (f_ptr->d_attr == TERM_L_RED))
 		{
-      			make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,y,x);
+			/* Do nothing */
 		}
+		/* Apply spell effect */
+		else if (f_ptr->spell)
+		{
+      		make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,y,x);
+		}
+		/* Apply blow effect */
 		else if (f_ptr->blow.method)
 		{
 			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);

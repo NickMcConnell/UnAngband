@@ -209,7 +209,7 @@
 # 2 new features to correctly handle case of rubble with hidden items, and
 # rubble with known items.
 
-# 39 new traps, including 4 new types (magic symbol, stone face, ancient hex
+# 39 new traps, including 4 new types (magic symbol, stone visage, ancient hex
 # and tripwire) and expanded previous types (deep pits, summoning
 # runes of various flavours).
 
@@ -756,19 +756,18 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You are enveloped in a cloud of smoke!
 
-# 0x15 --> visible trap -- rune -- teleport
+# 0x15 --> visible trap -- shimmering portal -- teleport
 
-N:21:strange rune
-G:^:o
-M:20
-#$ strange rune
+N:21:shimmering portal
+G:^:Z
+#$ shimmering portal
 U:56
 #$ granite wall
 O:0
 W:2:1:20:0
 S:TELE_AWAY
 K:DEFAULT:1:5
-#$ strange rune
+#$ shimmering portal
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -1867,149 +1866,149 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You are enveloped in a cloud of sulpher!
 
-# --> visible trap -- stone face
+# --> visible trap -- silent watcher
 
-N:70:stone face
-G:^:W
+N:70:silent watcher
+G:^:d
 U:56
 #$ granite wall
 O:0
 W:2:2:20:0
 T:TERRIFY
 K:DEFAULT:1:5
-#$ stone face
+#$ silent watcher
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
-N:71:stone face
-G:^:W
+N:71:silent watcher
+G:^:d
 M:70
-#$ stone face
+#$ silent watcher
 U:56
 #$ granite wall
 O:0
 W:3:2:20:0
 T:LOSE_CHR
 K:DEFAULT:1:5
-#$ stone face
+#$ silent watcher
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
-N:72:stone face
-G:^:W
+N:72:silent watcher
+G:^:d
 M:70
-#$ stone face
+#$ silent watcher
 U:56
 #$ granite wall
 O:0
 W:4:2:20:0
 T:LOSE_WIS
 K:DEFAULT:1:5
-#$ stone face
+#$ silent watcher
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
-N:73:stone face
-G:^:W
+N:73:silent watcher
+G:^:d
 M:70
-#$ stone face
+#$ silent watcher
 U:56
 #$ granite wall
 O:0
 W:5:2:20:0
 T:LOSE_INT
 K:DEFAULT:1:5
-#$ stone face
+#$ silent watcher
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
-N:74:stone face
-G:^:W
+N:74:silent watcher
+G:^:d
 M:70
-#$ stone face
+#$ silent watcher
 U:56
 #$ granite wall
 O:0
 W:10:2:20:0
 T:EXP_20
 K:DEFAULT:1:10
-#$ stone face
+#$ silent watcher
 K:CHASM:141:10
 #$ chasm
 K:TREE:541:10
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
-N:75:stone face
-G:^:W
+N:75:silent watcher
+G:^:d
 M:70
-#$ stone face
+#$ silent watcher
 U:56
 #$ granite wall
 O:0
 W:15:2:20:0
 T:EXP_40
 K:DEFAULT:1:15
-#$ stone face
+#$ silent watcher
 K:CHASM:141:15
 #$ chasm
 K:TREE:541:15
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
-N:76:stone face
-G:^:W
+N:76:silent watcher
+G:^:d
 M:70
-#$ stone face
+#$ silent watcher
 U:56
 #$ granite wall
 O:0
 W:20:2:20:0
 T:EXP_80
 K:DEFAULT:1:20
-#$ stone face
+#$ silent watcher
 K:CHASM:141:20
 #$ chasm
 K:TREE:541:20
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
@@ -2032,6 +2031,7 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
+D:An alarm goes off in the distance!
 
 #S:SHRIEK
 
@@ -2055,14 +2055,14 @@ F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:79:tripwire
-G:^:y
-M:77
-#$ tripwire
+N:79:ever burning eye
+G:^:v
+M:79
+#$ ever burning eye
 U:56
 #$ granite wall
 O:0
-W:6:2:20:0
+W:16:2:20:0
 T:UN_BONUS
 K:DEFAULT:1:6
 #$ tripwire
@@ -2071,13 +2071,14 @@ K:CHASM:141:6
 K:TREE:541:6
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
+D:You feel a burning presence searching for you.
 
-N:80:tripwire
-G:^:y
-M:77
+N:80:ever burning eye
+G:^:v
+M:79
 #$ tripwire
 U:56
 #$ granite wall
@@ -2091,9 +2092,10 @@ K:CHASM:141:8
 K:TREE:541:8
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
+D:You feel a burning presence searching for you.
 
 # ---> visible trap -- magic symbol
 
@@ -2215,17 +2217,17 @@ F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex
+# ---> visible trap -- shaft of light
 
-N:87:ancient hex
-G:^:G
+N:87:shaft of light
+G:^:Y
 U:56
 #$ granite wall
 O:0
 W:2:3:20:0
 S:DARKNESS
 K:DEFAULT:1:5
-#$ ancient hex
+#$ shaft of light
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2236,9 +2238,11 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You are lost in shadows.
 
+# ---> visible trap -- ancient hex
+
 N:88:ancient hex
 G:^:G
-M:87
+M:88
 #$ ancient hex
 U:56
 #$ granite wall
@@ -2257,17 +2261,15 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:Your memories fade away.
 
-N:89:ancient hex
-G:^:G
-M:87
-#$ ancient hex
+N:89:magic symbol
+G:^:B
+M:81
 U:56
 #$ granite wall
 O:0
 W:8:3:20:0
 S:DRAIN_MANA
 K:DEFAULT:1:8
-#$ ancient hex
 K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
@@ -2280,7 +2282,7 @@ D:You are drained of psionic energy.
 
 N:90:ancient hex
 G:^:G
-M:87
+M:88
 #$ ancient hex
 U:56
 #$ granite wall
@@ -2533,14 +2535,14 @@ F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:PICK_TRAP | ATTR_LITE |
 
-N:102:trapped door (stone face)
+N:102:trapped door (stone visage)
 G:+:W
 U:56
 #$ granite wall
 O:0
 W:22:10:20:0
 K:DEFAULT:1:5
-#$ trapped door (stone face)
+#$ trapped door (stone visage)
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -3886,7 +3888,7 @@ U:56
 O:0
 W:0:0:0:0
 T:STEAM:1d3
-K:DEFAULT:174:0
+K:DEFAULT:173:0
 #$ steam
 K:CHASM:141:0
 #$ chasm
@@ -3904,15 +3906,12 @@ F:HURT_WATER | ATTR_LITE | SPREAD |
 
 N:174:steam over a broken floor
 G:':W
-M:277
-#$ stone face
 U:56
 #$ granite wall
 O:0
 W:0:0:0:0
 T:STEAM:1d3
-K:DEFAULT:172:0
-#$ stone face
+K:DEFAULT:174:0
 K:CHASM:141:0
 #$ chasm
 K:SPREAD:136:0
@@ -5342,219 +5341,215 @@ F:OUTSIDE | ATTR_LITE |
 
 # Here follow some deep traps.
 
-N:272:stone face
+N:272:stone visage
 G:^:W
-M:70
-#$ stone face
+M:272
+#$ stone visage
 U:56
 #$ granite wall
 O:0
 W:30:2:20:0
 S:BALL_ACID
 K:DEFAULT:1:30
-#$ stone face
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:273:stone face
+N:273:stone visage
 G:^:W
-M:70
-#$ stone face
+M:272
+#$ stone visage
 U:56
 #$ granite wall
 O:0
 W:15:2:20:0
 S:BALL_ELEC
 K:DEFAULT:1:15
-#$ stone face
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:274:stone face
+N:274:stone visage
 G:^:W
-M:70
-#$ stone face
+M:272
+#$ stone visage
 U:56
 #$ granite wall
 O:0
 W:25:2:20:0
 S:BALL_FIRE
 K:DEFAULT:1:25
-#$ stone face
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:275:stone face
+N:275:stone visage
 G:^:W
-M:70
-#$ stone face
+M:272
+#$ stone visage
 U:56
 #$ granite wall
 O:0
 W:20:2:20:0
 S:BALL_COLD
 K:DEFAULT:1:20
-#$ stone face
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:276:stone face
+N:276:stone visage
 G:^:W
-M:70
-#$ stone face
+M:272
+#$ stone visage
 U:56
 #$ granite wall
 O:0
 W:10:2:20:0
 S:BALL_POIS
 K:DEFAULT:1:10
-#$ stone face
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:277:stone face
-G:^:W
-M:70
-#$ stone face
+N:277:ancient hex
+G:^:G
+M:88
+#$ ancient hex
 U:56
 #$ granite wall
 O:0
 W:45:2:20:0
 S:BALL_NETHR
 K:DEFAULT:1:60
-#$ stone face
+#$ ancient hex
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:278:stone face
-G:^:W
-M:70
-#$ stone face
+N:278:magic symbol
+G:^:B
+M:81
+#$ magic symbol
 U:56
 #$ granite wall
 O:0
 W:55:2:20:0
 S:BALL_MANA
 K:DEFAULT:1:80
-#$ stone face
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-N:279:stone face
-G:^:W
-M:70
-#$ stone face
+N:279:shaft of light
+G:^:Y
+M:87
 U:56
 #$ granite wall
 O:0
 W:50:2:20:0
 S:BALL_DARK
 K:DEFAULT:1:70
-#$ stone face
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex - cause wounds 1
+# ---> visible trap -- surreal painting - cause wounds 1
 
-N:280:ancient hex
-G:^:G
-M:87
-#$ ancient hex
+N:280:surreal painting
+G:^:p
+#$ surreal painting
 U:56
 #$ granite wall
 O:0
 W:6:3:20:0
 S:WOUND
 K:DEFAULT:1:6
-#$ ancient hex
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex - cause wounds 2
+# ---> visible trap -- surreal painting - animate dead
 
-N:281:ancient hex
-G:^:G
-M:87
-#$ ancient hex
+N:281:surreal painting
+G:^:p
+M:280
+#$ surreal painting
 U:56
 #$ granite wall
 O:0
 W:12:3:20:0
-S:WOUND
+S:A_DEAD
 K:DEFAULT:1:12
-#$ ancient hex
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex - cause wounds 3
+# ---> visible trap -- surreal painting - animate objects
 
-N:282:ancient hex
-G:^:G
-M:87
-#$ ancient hex
+N:282:surreal painting
+G:^:p
+M:280
+#$ surreal painting
 U:56
 #$ granite wall
 O:0
 W:18:3:20:0
-S:WOUND
+S:A_OBJECT
 K:DEFAULT:1:18
-#$ ancient hex
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex - cause wounds 4
+# ---> visible trap -- surreal painting - animate elements
 
-N:283:ancient hex
-G:^:G
-M:87
-#$ ancient hex
+N:283:surreal painting
+G:^:p
+M:280
+#$ surreal painting
 U:56
 #$ granite wall
 O:0
 W:24:3:20:0
-S:WOUND
+S:A_ELEMENT
 K:DEFAULT:1:24
-#$ ancient hex
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# visible trap -- rune -- teleport
+# visible trap -- mark of a white hand - summons
 
-N:284:strange rune
+N:284:mark of a white hand
 G:^:o
-M:20
-#$ strange rune
+#$ mark of a white hand
 U:56
 #$ granite wall
 O:0
 W:10:1:20:0
-S:TELE_LEVEL
 K:DEFAULT:1:10
-#$ strange rune
+S:S_ORC
+#$ mark of a white hand
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5628,19 +5623,18 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You are enveloped in a cloud of dust!
 
-# Loose rock -- wooden cage from ceiling
+# Radagast's snare -- wooden cage from ceiling
 
-N:289:loose rock
-G:^:P
-M:95
-#$ loose rock
+N:289:Radagast's snare
+G:^:V
+#$ Radagast's snare
 U:56
 #$ granite wall
 O:0
 W:18:1:20:0
 T:HURT
 K:DEFAULT:1:8
-#$ loose rock
+#$ Radagast's snare
 K:HIT_TRAP:313:8
 #$ wooden cage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -5649,19 +5643,19 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:A wooden cage falls from the ceiling!
 
-# Loose rock -- iron cage from ceiling
+# Radagast's snare -- iron cage from ceiling
 
-N:290:loose rock
-G:^:P
-M:95
-#$ loose rock
+N:290:Radagast's snare
+G:^:V
+M:289
+#$ Radagast's snare
 U:56
 #$ granite wall
 O:0
 W:31:1:20:0
 T:HURT
 K:DEFAULT:1:32
-#$ loose rock
+#$ Radagast's snare
 K:HIT_TRAP:314:32
 #$ iron cage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -5762,85 +5756,84 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | EASY_HIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into a pit! It quickly fills with acid.
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:295:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:295:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:2:3:20:0
 T:PLASMA:8d6
 K:DEFAULT:1:5
-#$ magic symbol
-K:HIT_TRAP:327:5
+#$ glowing glyph
 #$ large wooden chest
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:296:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:296:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:33:3:20:0
 T:GRAVITY:8d6
 K:DEFAULT:1:36
-#$ magic symbol
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:297:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:297:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:31:3:20:0
 T:INERTIA:8d6
 K:DEFAULT:1:33
-#$ magic symbol
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:298:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:298:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:30:3:20:0
 T:FORCE:8d6
 K:DEFAULT:1:30
-#$ magic symbol
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex
+# ---> visible trap -- glowing glyph
 
 N:299:ancient hex
 G:^:G
-M:87
+M:88
 #$ ancient hex
 U:56
 #$ granite wall
@@ -5848,81 +5841,81 @@ O:0
 W:27:3:20:0
 T:TIME:8d6
 K:DEFAULT:1:27
-#$ ancient hex
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:300:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:300:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:12:3:20:0
 T:SOUND:8d6
 K:DEFAULT:1:12
-#$ magic symbol
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:301:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:301:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:18:3:20:0
 T:SHARD:8d6
 K:DEFAULT:1:18
-#$ magic symbol
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- magic symbol
+# ---> visible trap -- glowing glyph
 
-N:302:magic symbol
-G:^:B
-M:81
-#$ magic symbol
+N:302:glowing glyph
+G:^:M
+M:295
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:15:3:20:0
 T:NEXUS:8d6
 K:DEFAULT:1:15
-#$ magic symbol
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- ancient hex
+# ---> visible trap -- glowing glyph
 
-N:303:ancient hex
+N:303:glowing glyph
 G:^:G
-M:87
-#$ ancient hex
+M:303
+#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:24:3:20:0
 T:CHAOS:8d6
 K:DEFAULT:1:24
-#$ ancient hex
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | GLOW |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
@@ -5930,7 +5923,7 @@ F:ATTR_LITE |
 
 N:304:ancient hex
 G:^:G
-M:87
+M:88
 #$ ancient hex
 U:56
 #$ granite wall
@@ -5938,7 +5931,6 @@ O:0
 W:21:3:20:0
 T:DISENCHANT:8d6
 K:DEFAULT:1:21
-#$ ancient hex
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18235,4 +18227,223 @@ F:LOS | PROJECT | MOVE | NOTICE | REMEMBER | ENTER | PERMANENT |
 F:GLOW | CAN_FLY |
 F:OUTSIDE | ATTR_LITE |
 D:A note on the door says 'Refugees welcome. Back soon. Radagast'.
+
+N:957:shaft of light
+G:^:Y
+M:87
+U:56
+#$ granite wall
+O:0
+W:20:2:20:0
+S:BALL_LITE
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+
+N:958:upwards draft
+G:^:t
+U:56
+#$ granite wall
+O:0
+W:5:2:20:0
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You are blown into the air!
+
+N:959:demonic sign
+G:^:T
+U:56
+#$ granite wall
+O:0
+W:25:2:20:0
+S:ARC_FORCE
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:Demonic forces gather; a rift in reality tears open!
+
+N:960:demonic sign
+G:^:T
+M:959
+U:56
+#$ granite wall
+O:0
+W:50:2:20:0
+S:ARC_HFIRE
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:Demonic forces gather; a rift in reality tears open!
+
+N:961:deadfall
+G:^:m
+U:56
+M:961
+#$ granite wall
+O:0
+W:8:2:20:0
+T:HURT:9d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You've unstacked an avalanche of logs.
+
+N:962:deadfall
+G:^:m
+U:56
+M:961
+#$ granite wall
+O:0
+W:16:2:20:0
+T:HURT:27d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You've unleashed huge rolling boulders.
+
+N:963:deadfall
+G:^:m
+U:56
+M:961
+#$ granite wall
+O:0
+W:4:2:20:0
+T:HURT:3d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You've released a rock fall.
+
+N:964:deadfall
+G:^:m
+U:56
+M:961
+#$ granite wall
+O:0
+W:2:2:20:0
+T:HURT:1d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You've dropped an jumble of junk from the ceiling.
+
+N:965:deadfall
+G:^:m
+U:56
+M:961
+#$ granite wall
+O:0
+W:1:2:20:0
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You've tipped over a stack of valuable looking pots.
+
+N:966:siege engine
+G:^:I
+U:56
+M:966
+#$ granite wall
+O:0
+W:10:2:20:0
+T:HURT:5d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:The catapult hurls a handful of stone shot.
+
+N:967:siege engine
+G:^:I
+U:56
+M:966
+#$ granite wall
+O:0
+W:15:2:20:0
+T:HURT:15d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:The ballista shoots a great steel bolt.
+
+N:968:siege engine
+G:^:I
+U:56
+M:966
+#$ granite wall
+O:0
+W:20:2:20:0
+T:HURT:25d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:The mangonel launches a block of stone.
+
+N:969:siege engine
+G:^:I
+U:56
+M:966
+#$ granite wall
+O:0
+W:30:2:20:0
+T:HURT:50d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:The trebuchet lobs a lump of old architecture.
+
+N:970:siege engine
+G:^:I
+U:56
+M:966
+#$ granite wall
+O:0
+W:50:2:20:0
+T:HURT:75d6
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:The cannon fires an ornate iron ball in a roar of gunpowder.
+
+N:971:clockwork mechanism
+G:^:i
+U:56
+#$ granite wall
+O:0
+W:50:2:20:0
+K:DEFAULT:1:70
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:A clockwork mechanism whirrs furiously.
+
 

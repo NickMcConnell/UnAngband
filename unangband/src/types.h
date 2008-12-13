@@ -105,6 +105,8 @@ typedef struct monster_blow monster_blow;
 typedef struct monster_race monster_race;
 typedef struct monster_lore monster_lore;
 typedef struct vault_type vault_type;
+typedef struct region_piece_type region_piece_type;
+typedef struct region_type region_type;
 typedef struct object_grouper object_grouper;
 typedef struct object_type object_type;
 typedef struct monster_type monster_type;
@@ -890,6 +892,56 @@ struct vault_type
 
 	byte min_lev;	/* Minimum level */
 	byte max_lev;	/* Maximum level */
+};
+
+
+/*
+ * Information about which grids lie in a particular "region"
+ */
+struct region_piece_type
+{
+	int y;
+	int x;
+
+	s16b d;								/* Scalar, usually distance */
+
+	s16b region;						/* Index of region this region piece refers to */
+
+	s16b next_region_piece;				/* Index of next region piece at this square. */
+	s16b next_in_sequence;	/* Index of next region piece with the same effect. */
+};
+
+
+/*
+ * Information about regions affected by ongoing effects
+ */
+struct region_type
+{
+	byte type;          /* Ongoing Type */
+	byte method;		/* Method of ongoing damage */
+	byte effect;		/* Effect of ongoing damage */
+	byte level;			/* Level for ongoing damage */
+
+	byte y0;			/* Source y location */
+	byte x0;			/* Source x location */
+	byte y1;			/* Destination y location */
+	byte x1;			/* Destination x location */
+
+	byte countdown;     /* Number of turns effect has left */
+	byte delay;			/* Number of turns to reset counter to when expired */
+
+	s16b age;			/* Number of turns effect has been alive */
+	s16b lifespan;		/* Number of turns effect will be alive */
+
+	s16b who;          	/* Source of effect - 'who'. */
+	s16b what;			/* Source of effect - 'what'. */
+
+	u32b flags1;		/* Ongoing effect bitflags */
+
+	s16b first_in_sequence;	/* First region piece in sequence */
+
+	s16b next_region;	/* Next region in a list of regions */
+	s16b child_region;	/* Next child region */
 };
 
 

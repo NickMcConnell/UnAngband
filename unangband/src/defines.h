@@ -414,9 +414,6 @@
 #define ROOM_TOWER       		22
 
 
-
-
-
 /*
  * Refueling constants
  */
@@ -3764,7 +3761,8 @@
 /*
  * Monster movement (return from place_monster_on)
  */
-#define MM_DROWN -1  /* Monster suffers in terrain */
+#define MM_DROWN -2  /* Monster suffers continuously in terrain */
+#define MM_TRAP	-1	 /* Monster suffers in terrain while moving */
 #define MM_FAIL 0    /* Monster cannot occupy terrain */
 #define MM_WALK 1    /* Monster will walk on terrain */
 #define MM_FLY  2    /* Monster will fly on terrain */
