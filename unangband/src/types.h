@@ -433,6 +433,7 @@ struct room_info_type
 struct feature_state
 {
 	byte action;
+	byte power;
 	s16b result;
 };
 

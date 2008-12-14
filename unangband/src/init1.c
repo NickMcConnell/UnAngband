@@ -3093,19 +3093,6 @@ errr parse_f_info(char *buf, header *head)
 				while (*t == ' ' || *t == '|') t++;
 			}
 
-			/* XXX XXX XXX Hack -- Read feature power */
-			if (1 == sscanf(s, "POWER_%d", &i))
-			{
-				/* Extract a "frequency" */
-				f_ptr->power =  i;
-
-				/* Start at next entry */
-				s = t;
-
-				/* Continue */
-				continue;
-			}
-
 			/* Parse this entry */
 			if (0 != grab_one_feat_flag(f_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
 
@@ -3136,6 +3123,8 @@ errr parse_f_info(char *buf, header *head)
 	/* Process 'K' for "States" (up to eight lines + default (which cannot be last)) */
 	else if (buf[0] == 'K')
 	{
+		int result, power;
+		
 		/* There better be a current f_ptr */
 		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -3151,11 +3140,18 @@ errr parse_f_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
+		/* Scan for the values */
+		if (2 != sscanf(t, "%d:%d",
+				&result, &power)) return (PARSE_ERROR_GENERIC);
+		
 		/* Is this default entry? */
 		if (streq(s, "DEFAULT"))
 		{
 			/* Analyze result */
-			f_ptr->defaults = atoi(t);
+			f_ptr->defaults = result;
+			
+			/* Analyze power */
+			f_ptr->power = result;
 		}
 		else
 		{
@@ -3166,7 +3162,10 @@ errr parse_f_info(char *buf, header *head)
 			if (0 != grab_one_feat_action(f_ptr, s, i)) return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Analyze result */
-			f_ptr->state[i].result = atoi(t);
+			f_ptr->state[i].result = result;
+			
+			/* Analyze power */
+			f_ptr->state[i].power = result;
 		}
 	}
 
