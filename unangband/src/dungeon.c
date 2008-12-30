@@ -1277,8 +1277,8 @@ static void process_world(void)
 	/* Get the mimiced feature */
 	mimic = f_ptr->mimic;
 
-	/* Use covered or bridged if necessary */
-	if ((f_ptr->flags2 & (FF2_COVERED)) || (f_ptr->flags2 & (FF2_BRIDGED)))
+	/* Use covered if necessary */
+	if (f_ptr->flags2 & (FF2_COVERED))
 	{
 		f_ptr = &(f_info[f_ptr->mimic]);
 	}
@@ -3158,7 +3158,7 @@ static void process_player(void)
 		feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
 
 		/* Use covered or bridged if necessary */
-		if ((f_ptr->flags2 & (FF2_COVERED)) || (f_ptr->flags2 & (FF2_BRIDGED)))
+		if (f_ptr->flags2 & (FF2_COVERED))
 		{
 			f_ptr = &(f_info[f_ptr->mimic]);
 		}

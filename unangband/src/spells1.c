@@ -3245,7 +3245,7 @@ static int project_m_y;
  * the floor visible.
  *
  */
-static bool temp_lite(int y, int x)
+bool temp_lite(int y, int x)
 {
 	int i;
 
@@ -12264,12 +12264,10 @@ static void calc_starburst(int height, int width, byte *arc_first,
  * in the blast radius, in case the illumination of the grid was changed,
  * and "update_view()" and "update_monsters()" need to be called.
  */
-bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
+bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter)
 {
 	int i, j, k;
-
-	u32b dam_temp;
 
 	int y = y0;
 	int x = x0;
@@ -12280,14 +12278,11 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* Assume the player sees nothing */
 	bool notice = FALSE;
 
-	/* Assume the player has seen nothing */
-	bool visual = FALSE;
-
-	/* Assume the player has seen no blast grids */
-	bool drawn = FALSE;
-
 	/* Is the player blind? */
 	bool blind = (p_ptr->blind ? TRUE : FALSE);
+
+	/* Assume the player has seen nothing */
+	bool visual = FALSE;
 
 	/* Projection can also pass through line of sight grids */
 	bool allow_los = (flg & (PROJECT_LOS)) != 0;
@@ -12298,18 +12293,6 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* Actual grids in the "path" */
 	u16b path_g[512];
 
-	/* Number of grids in the "blast area" (including the "beam" path) */
-	int grids = 0;
-
-	/* Coordinates of the affected grids */
-	u16b grid[256];
-
-	/* Distance to each of the affected grids. */
-	byte gd[256];
-
-	/* Precalculated damage values for each distance. */
-	int dam_at_dist[MAX_RANGE+1];
-
 	int n1y = 0;
 	int n1x = 0;
 	int centerline = 0;
@@ -12317,6 +12300,12 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	int dist = 0;
 
 	int rad_temp = rad; /* Original radius of the explosion boosted using PROJECT_EXPAND */
+
+	int dam_temp = 0;
+
+	/* Precalculated damage values for each distance. */
+	int dam_at_dist[MAX_RANGE+1];
+
 
 	/*
 	 * Starburst projections only --
@@ -12351,26 +12340,6 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		flg |= (PROJECT_LITE);
 	}
 
-	/* Some projection types always obvious */
-	/* Include anything that can be felt by raising / lowering temperature */
-	if ((typ == GF_STORM) || (typ == GF_WIND) || (typ == GF_COLD) ||
-		(typ == GF_ICE) || (typ == GF_FIRE) || (typ == GF_LAVA) ||
-		(typ == GF_BMUD) || (typ == GF_BWATER) || (typ == GF_STEAM) ||
-		(typ == GF_SMOKE) || (typ == GF_EXPLODE) || (typ == GF_ELEC) ||
-		(typ == GF_PLASMA))
-	{
-		notice = TRUE;
-	}
-
-	/* Some projection types always obvious unless the player is blind */
-	/* Include anything that emits something physical */
-	if ((typ == GF_ACID) || (typ == GF_VAPOUR) || (typ == GF_SHARD) ||
-		(typ == GF_WEB) || (typ == GF_BLOOD) || (typ == GF_SLIME) ||
-		(typ == GF_WATER) || (typ == GF_SALT_WATER))
-	{
-		if (!blind) notice = TRUE;
-	}
-
 	/* Hack -- paranoia for checking */
 	if (flg & (PROJECT_CHCK))
 	{
@@ -12397,8 +12366,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	/* If a single grid is both source and destination, store it. */
 	if ((x1 == x0) && (y1 == y0))
 	{
-		grid[grids] = GRID(y0, x0);
-		gd[grids++] = 0;
+		grid[*grids] = GRID(y0, x0);
+		gd[(*grids)++] = 0;
 	}
 
 	/* Otherwise, unless an arc or a star, travel along the projection path. */
@@ -12408,7 +12377,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		path_n = project_path(path_g, rng, y0, x0, &y1, &x1, flg);
 
 		/* Project along the path */
-		for (i = 0; i < path_n; ++i)
+		for (i = 0; (i < path_n) && i < (grid_s); ++i)
 		{
 			int oy = y;
 			int ox = x;
@@ -12437,15 +12406,15 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			/* If a beam, collect all grids in the path. */
 			if (flg & (PROJECT_BEAM))
 			{
-				grid[grids] = GRID(y, x);
-				gd[grids++] = 0;
+				grid[*grids] = GRID(y, x);
+				gd[(*grids)++] = 0;
 			}
 
 			/* Otherwise, collect only the final grid in the path. */
 			else if (i == path_n - 1)
 			{
-				grid[grids] = GRID(y, x);
-				gd[grids++] = 0;
+				grid[*grids] = GRID(y, x);
+				gd[(*grids)++] = 0;
 			}
 
 			/* Only do visuals if requested */
@@ -12537,10 +12506,10 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		 * If the center of the explosion hasn't been
 		 * saved already, save it now.
 		 */
-		if (grids == 0)
+		if (*grids == 0)
 		{
-			grid[grids] = GRID(y2, x2);
-			gd[grids++] = 0;
+			grid[*grids] = GRID(y2, x2);
+			gd[(*grids)++] = 0;
 		}
 
 		/* Scan outwards from centre */
@@ -12568,8 +12537,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 				if ((flg & (PROJECT_WALL | PROJECT_PASS)) || cave_project_bold(y, x) ||
 						((allow_los) && (cave_los_bold(y, x))))
 				{
-					grid[grids] = GRID(y, x);
-					gd[grids++] = k;
+					grid[*grids] = GRID(y, x);
+					gd[(*grids)++] = k;
 				}
 			}
 		}
@@ -12614,10 +12583,10 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		 * If the center of the explosion hasn't been
 		 * saved already, save it now.
 		 */
-		if (grids == 0)
+		if (*grids == 0)
 		{
-			grid[grids] = GRID(y2, x2);
-			gd[grids++] = 0;
+			grid[*grids] = GRID(y2, x2);
+			gd[(*grids)++] = 0;
 		}
 
 		/*
@@ -12642,7 +12611,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 				if ((y == y2) && (x == x2)) continue;
 
 				/* Precaution: Stay within area limit. */
-				if (grids >= 255) break;
+				if (*grids >= grid_s - 1) break;
 
 				/* Ignore "illegal" locations */
 				if (!in_bounds(y, x)) continue;
@@ -12715,8 +12684,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 								/* Must be within effect range. */
 								if (max_dist >= dist)
 								{
-									grid[grids] = GRID(y, x);
-									gd[grids++] = 0;
+									grid[*grids] = GRID(y, x);
+									gd[(*grids)++] = 0;
 								}
 
 								/* Arc found.  End search */
@@ -12752,9 +12721,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 						if ((flg & (PROJECT_PASS)) || generic_los(y2, x2, y, x, CAVE_XLOF) ||
 								((allow_los) && (generic_los(y2, x2, y, x, CAVE_XLOS))))
 						{
-							grid[grids] = GRID(y, x);
-							gd[grids++] = dist;
-							grids++;
+							grid[*grids] = GRID(y, x);
+							gd[(*grids)++] = dist;
 						}
 					}
 				}
@@ -12765,8 +12733,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					if ((flg & (PROJECT_PASS)) || generic_los(y2, x2, y, x, CAVE_XLOF) ||
 							((allow_los) && (generic_los(y2, x2, y, x, CAVE_XLOS))))
 					{
-						grid[grids] = GRID(y, x);
-						gd[grids++] = dist;
+						grid[*grids] = GRID(y, x);
+						gd[(*grids)++] = dist;
 					}
 				}
 			}
@@ -12805,13 +12773,13 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		 * If the center of the explosion hasn't been
 		 * saved already, save it now.
 		 */
-		if (grids == 0)
+		if (*grids == 0)
 		{
-			grid[grids] = GRID(y2, x2);
-			gd[grids++] = 0;
+			grid[*grids] = GRID(y2, x2);
+			gd[(*grids)++] = 0;
 		}
 
-		for (i = 0; i < grids; i++)
+		for (i = 0; i < *grids; i++)
 		{
 			/* Mark the grid */
 			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] |= (PLAY_TEMP);
@@ -12821,7 +12789,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		if (flg & (PROJECT_BEAM)) rad = 1;
 
 		/* Spread the flood */
-		for (i = 0; i < grids; i++)
+		for (i = 0; i < *grids; i++)
 		{
 			/* Skip grids at edge of flood */
 			if (gd[i] >= rad) continue;
@@ -12837,7 +12805,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					int xx = GRID_X(grid[i]) + ddx_ddd[j];
 
 					/* Ensure grids left */
-					if (grids >= 255) break;
+					if (*grids >= grid_s - 1) break;
 
 					/* Stay within dungeon */
 					if (!in_bounds(yy, xx)) continue;
@@ -12877,8 +12845,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 									((allow_los) && (cave_los_bold(GRID_Y(grid[i]), GRID_X(grid[i])))))
 							{
 								/* Add grid */
-								grid[grids] = GRID(yy, xx);
-								gd[grids++] = gd[i]+1;
+								grid[*grids] = GRID(yy, xx);
+								gd[(*grids)++] = gd[i]+1;
 
 								/* Mark as added */
 								play_info[yy][xx] |= (PLAY_TEMP);
@@ -12893,8 +12861,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 								((allow_los) && (cave_los_bold(GRID_Y(grid[i]), GRID_X(grid[i])))))
 						{
 							/* Add grid */
-							grid[grids]= GRID(yy, xx);
-							gd[grids++]=gd[i]+1;
+							grid[*grids]= GRID(yy, xx);
+							gd[(*grids)++]=gd[i]+1;
 
 							/* Mark as added */
 							play_info[yy][xx] |= (PLAY_TEMP);
@@ -12904,8 +12872,8 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			}
 		}
 
-		/* Clear temp grids */
-		for (i = 0; i < grids; i++)
+		/* Clear temp *grids */
+		for (i = 0; i < *grids; i++)
 		{
 			/* Mark the grid */
 			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] &= ~(PLAY_TEMP);
@@ -12924,9 +12892,9 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		if (!source_diameter) source_diameter = 10;
 
 		/* Could not fill enough grids */
-		if (grids < rad_temp * rad_temp)
+		if (*grids < rad_temp * rad_temp)
 		{
-			i = grids;
+			i = *grids;
 
 			/* Paranoia */
 			if (i)
@@ -12949,7 +12917,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		/* Grid is outside original radius */
 		else if (gd[rad_temp * rad_temp] >= rad_temp)
 		{
-			for (i = rad_temp * rad_temp + 1; (i < grids) && (gd[rad_temp * rad_temp] == gd[i]); i++) ;
+			for (i = rad_temp * rad_temp + 1; (i < *grids) && (gd[rad_temp * rad_temp] == gd[i]); i++) ;
 
 			/* Reduce damage drop off if area is long and narrow */
 			if (rad_temp)
@@ -12959,7 +12927,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		}
 		else
 		{
-			for (i = 0; i < grids; i++)
+			for (i = 0; i < *grids; i++)
 			{
 				if (gd[i] == rad_temp) break;
 			}
@@ -12968,7 +12936,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		}
 
 		/* Trim grids */
-		grids = i;
+		*grids = i;
 	}
 
 	/*
@@ -12992,7 +12960,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			int tmp_grid, tmp_d;
 
 			/* Collect all the grids of a given distance together. */
-			for (j = k; j < grids; j++)
+			for (j = k; j < *grids; j++)
 			{
 				if (gd[j] == i)
 				{
@@ -13011,7 +12979,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			}
 		}
 
-		for (i = grids -1; i > 0; )
+		for (i = *grids -1; i > 0; )
 		{
 			int c, g = 0, l, m;
 
@@ -13044,7 +13012,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 				for (m = 0; m < 2; m++)
 				{
 					/* Check each more distant grid */
-					for (j = i + 1; (j < grids) && (gd[i] == gd[j]); j++)
+					for (j = i + 1; (j < *grids) && (gd[i] == gd[j]); j++)
 					{
 						/* Skip if not saving it */
 						if (!(play_info[GRID_Y(grid[j])][GRID_X(grid[j])] & (PLAY_TEMP))) continue;
@@ -13052,7 +13020,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 						/* No connections found yet */
 						c = 0;
 
-						/* Check grids at the current level */
+						/* Check *grids at the current level */
 						for (l = i - 1; (l >= 0) && (gd[i] == gd[l]); l--)
 						{
 							/* Don't count monster-less grids on first iteration through */
@@ -13129,7 +13097,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		}
 
 		/* Remove grids except first grid and saved grids */
-		for (i = 1, j = 0; i < grids; i++)
+		for (i = 1, j = 0; i < *grids; i++)
 		{
 			/* Save grid? */
 			if ((j) && (play_info[GRID_Y(grid[i])][GRID_X(grid[i])] & (PLAY_TEMP)))
@@ -13145,25 +13113,24 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		}
 
 		/* Clear temp grids */
-		for (i = 0; i < grids; i++)
+		for (i = 0; i < *grids; i++)
 		{
 			/* Mark the grid */
 			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] &= ~(PLAY_TEMP);
 		}
 	}
 
-
 	/*
 	 * Remove all but the outermost two range bands if requested
 	 */
 	if (flg & (PROJECT_EDGE))
 	{
-		if (grids)
+		if (*grids)
 		{
 			j = 0;
 
 			/* Get maximum range affected */
-			for (i = 0, k = 0; i < grids; i++)
+			for (i = 0, k = 0; i < *grids; i++)
 			{
 				if (k < gd[i]) k = gd[i];
 			}
@@ -13179,7 +13146,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			if (k >= 2)
 			{
 				/* Remove grids except grids in last two range bands */
-				for (i = 0, j = 0; i < grids; i++)
+				for (i = 0, j = 0; i < *grids; i++)
 				{
 					/* Save grid? */
 					if ((j) && (gd[i] >= k - 1))
@@ -13195,7 +13162,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 				}
 			}
 
-			grids -= j;
+			*grids -= j;
 		}
 	}
 
@@ -13203,13 +13170,14 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	if (flg & (PROJECT_CHCK))
 	{
 		/* Copy the grids to the path */
-		for (i = 0; i < grids; i++)
+		for (i = 0; i < *grids; i++)
 		{
 			target_path_g[i] = grid[i];
+			target_path_d[i] = gd[i];
 		}
 
 		/* Count of grids */
-		target_path_n = grids;
+		target_path_n = *grids;
 
 		return (TRUE);
 	}
@@ -13238,24 +13206,11 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		else
 		{
 			dam_temp = (source_diameter * (dam + i)) / ((i + 1) * 10);
-			if (dam_temp > (u32b)dam) dam_temp = dam;
+			if (dam_temp > (s16b)dam) dam_temp = dam;
 		}
 
 		/* Store it. */
 		dam_at_dist[i] = dam_temp;
-	}
-
-	/* Hack -- prevent arcs and starbursts from hurting the player if they are the source */
-	if ( (who < SOURCE_PLAYER_TRAP) && ((flg & (PROJECT_ARC | PROJECT_STAR)) != 0))
-	{
-		for (i = 0; i < grids; i++)
-		{
-			if (gd[i] == 0)
-			{
-				grid[i] = GRID(GRID_Y(grid[grids-1]),GRID_Y(grid[grids-1]));
-				grids--;
-			}
-		}
 	}
 
 	/* Sort the blast grids by distance, starting at the origin. */
@@ -13264,7 +13219,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		int tmp_grid, tmp_d;
 
 		/* Collect all the grids of a given distance together. */
-		for (j = k; j < grids; j++)
+		for (j = k; j < *grids; j++)
 		{
 			if (gd[j] == i)
 			{
@@ -13283,11 +13238,77 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		}
 	}
 
+	/* Write damage at distance back to gd */
+	for (i = 0; i < *grids; i++)
+	{
+		/* Hack - we use gd to hold damage values for most projections */
+		gd[i] = dam_at_dist[gd[i]];
+	}
+
+	return (notice);
+}
+
+
+/*
+ * Apply the effects to a projection shape.
+ */
+bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, int x0, int typ, u32b flg)
+{
+	int i;
+
+	int y = y0;
+	int x = x0;
+
+	int msec = op_ptr->delay_factor * op_ptr->delay_factor;
+
+	/* Assume the player sees nothing */
+	bool notice = FALSE;
+
+	/* Assume the player has seen nothing */
+	bool visual = FALSE;
+
+	/* Assume the player has seen no blast grids */
+	bool drawn = FALSE;
+
+	/* Is the player blind? */
+	bool blind = (p_ptr->blind ? TRUE : FALSE);
+
+	/* Hack - to avoid hitting player with their own arcs / starbursts */
+	int play_hack = 0;
+
+	/* Some projection types always PROJECT_WALL. */
+	if ((typ == GF_KILL_WALL) || (typ == GF_KILL_DOOR))
+	{
+		flg |= (PROJECT_WALL);
+	}
+
+	/* Some projection types always PROJECT_LITE */
+	if ((typ == GF_FIRE) || (typ == GF_LITE) ||
+		(typ == GF_PLASMA) || (typ == GF_LAVA) ||
+		(typ == GF_ELEC))
+	{
+		flg |= (PROJECT_LITE);
+	}
+
+	/* Hack -- prevent arcs and starbursts from hurting the player if they are the source */
+	if (((flg & (PROJECT_ARC | PROJECT_STAR)) != 0))
+	{
+		/* Extract the location */
+		y = GRID_Y(grid[0]);
+		x = GRID_X(grid[0]);
+
+		/* Hack the player */
+		if ((who < SOURCE_PLAYER_TRAP) && (y == p_ptr->py) && (x == p_ptr->px)) play_hack = 1;
+
+		/* Hack the monster */
+		else if ((who > 0) && (y == m_list[who].fy) && (x == m_list[who].fx)) play_hack = 1;
+	}
+
 	/* Display the "blast area" if allowed */
 	if (!blind && !(flg & (PROJECT_HIDE)))
 	{
 		/* Do the blast from inside out */
-		for (i = 0; i < grids; i++)
+		for (i = play_hack; i < grids; i++)
 		{
 			/* Extract the location */
 			y = GRID_Y(grid[i]);
@@ -13315,7 +13336,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			}
 
 			/* Hack -- center the cursor */
-			move_cursor_relative(y2, x2);
+			move_cursor_relative(GRID_Y(grid[0]), GRID_X(grid[0]));
 
 			/* New radius is about to be drawn */
 			if ((i == grids - 1) || ((i < grids - 1) && (gd[i + 1] > gd[i])))
@@ -13350,7 +13371,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		if ((drawn) && (!(flg & (PROJECT_NO_REDRAW))))
 		{
 			/* Erase the explosion drawn above */
-			for (i = 0; i < grids; i++)
+			for (i = play_hack; i < grids; i++)
 			{
 				/* Extract the location */
 				y = GRID_Y(grid[i]);
@@ -13364,7 +13385,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			}
 
 			/* Hack -- center the cursor */
-			move_cursor_relative(y2, x2);
+			move_cursor_relative(GRID_Y(grid[0]), GRID_X(grid[0]));
 
 			/* Flush the explosion */
 			if (op_ptr->delay_factor)
@@ -13379,7 +13400,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	if (flg & (PROJECT_LITE))
 	{
 		/* Scan grids */
-		for (i = 0; i < grids; i++)
+		for (i = play_hack; i < grids; i++)
 		{
 			/* Get the grid location */
 			y = GRID_Y(grid[i]);
@@ -13394,14 +13415,14 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	if (flg & (PROJECT_GRID))
 	{
 		/* Scan for features */
-		for (i = 0; i < grids; i++)
+		for (i = play_hack; i < grids; i++)
 		{
 			/* Get the grid location */
 			y = GRID_Y(grid[i]);
 			x = GRID_X(grid[i]);
 
 			/* Affect the feature in that grid */
-			if (project_f(who, what, y, x, dam_at_dist[gd[i]], typ))
+			if (project_f(who, what, y, x, gd[i], typ))
 				notice = TRUE;
 		}
 	}
@@ -13410,14 +13431,14 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	if (flg & (PROJECT_ITEM))
 	{
 		/* Scan for objects */
-		for (i = 0; i < grids; i++)
+		for (i = play_hack; i < grids; i++)
 		{
 			/* Get the grid location */
 			y = GRID_Y(grid[i]);
 			x = GRID_X(grid[i]);
 
 			/* Affect the object in the grid */
-			if (project_o(who, what, y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
+			if (project_o(who, what, y, x, gd[i], typ)) notice = TRUE;
 		}
 	}
 
@@ -13431,7 +13452,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		project_m_y = 0;
 
 		/* Scan for monsters */
-		for (i = 0; i < grids; i++)
+		for (i = play_hack; i < grids; i++)
 		{
 			/* Get the grid location */
 			y = GRID_Y(grid[i]);
@@ -13459,7 +13480,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 					(mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], who <= SOURCE_PLAYER_START ? " your magic" : ""))) continue;
 
 				/* Affect the monster in the grid */
-				else if (project_m(who, what, y, x, dam_at_dist[gd[i]], typ))	notice = TRUE;
+				else if (project_m(who, what, y, x, gd[i], typ))	notice = TRUE;
 			}
 		}
 
@@ -13488,7 +13509,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	if (flg & (PROJECT_PLAY))
 	{
 		/* Scan for player */
-		for (i = 0; i < grids; i++)
+		for (i = play_hack; i < grids; i++)
 		{
 			/* Get the grid location */
 			y = GRID_Y(grid[i]);
@@ -13499,7 +13520,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 			{
 
 				/* Affect the player */
-				if (project_p(who, what, y, x, dam_at_dist[gd[i]], typ))
+				if (project_p(who, what, y, x, gd[i], typ))
 				{
 					notice = TRUE;
 
@@ -13512,7 +13533,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	}
 
 	/* Teleport monsters and player around, alter certain features. */
-	for (i = 0; i < grids; i++)
+	for (i = play_hack; i < grids; i++)
 	{
 		/* Get the grid location */
 		y = GRID_Y(grid[i]);
@@ -13522,7 +13543,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 		if (!(play_info[y][x] & (PLAY_TEMP))) continue;
 
 		/* Affect marked grid */
-		if (project_t(who, what, y, x, dam_at_dist[gd[i]], typ)) notice = TRUE;
+		if (project_t(who, what, y, x, gd[i], typ)) notice = TRUE;
 	}
 
 	/* Clear the "temp" array  (paranoia is good) */
@@ -13556,5 +13577,62 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	if (p_ptr->update) update_stuff();
 
 	/* Return "something was noticed" */
+	return (notice);
+}
+
+
+/*
+ * The projection function.
+ */
+bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
+			 u32b flg, int degrees, byte source_diameter)
+{
+	/* Number of grids in the "blast area" (including the "beam" path) */
+	int grids = 0;
+
+	/* Coordinates of the affected grids */
+	u16b grid[256];
+
+	/* Distance to each of the affected grids. */
+	s16b gd[256];
+
+	/* Does the player notice the effect */
+	bool notice = FALSE;
+
+	/* Is the player blind? */
+	bool blind = (p_ptr->blind ? TRUE : FALSE);
+
+	/* Some projection types always obvious */
+	/* Include anything that can be felt by raising / lowering temperature */
+	if ((typ == GF_STORM) || (typ == GF_WIND) || (typ == GF_COLD) ||
+		(typ == GF_ICE) || (typ == GF_FIRE) || (typ == GF_LAVA) ||
+		(typ == GF_BMUD) || (typ == GF_BWATER) || (typ == GF_STEAM) ||
+		(typ == GF_SMOKE) || (typ == GF_EXPLODE) || (typ == GF_ELEC) ||
+		(typ == GF_PLASMA))
+	{
+		notice = TRUE;
+	}
+
+	/* Some projection types always obvious unless the player is blind */
+	/* Include anything that emits something physical */
+	if ((typ == GF_ACID) || (typ == GF_VAPOUR) || (typ == GF_SHARD) ||
+		(typ == GF_WEB) || (typ == GF_BLOOD) || (typ == GF_SLIME) ||
+		(typ == GF_WATER) || (typ == GF_SALT_WATER))
+	{
+		if (!blind) notice = TRUE;
+	}
+	
+	grid[0] = 0;
+
+	/* Determine projection shape */
+	notice |= project_shape(grid, gd, &grids, 256, rad, rng, y0, x0, y1, x1, dam, typ, flg, degrees, source_diameter);
+
+	/* We're not getting distances */
+	if ((flg & (PROJECT_CHCK)) ==  0)
+	{
+		/* Apply projection effects to shape */
+		notice |= project_effect(who, what, grid, gd, grids, y0, x0, typ, flg);
+	}
+
 	return (notice);
 }

@@ -122,14 +122,13 @@
 
 # Non-vanilla flags
 
-# BRIDGE:       Bridge this feature when generating a corridor here.
+# PATH:       Bridge this feature when generating a corridor here.
 # RIVER:        Place as river through dungeon.
 # LAKE:         Place as lake in dungeon.
 # GLOW:         Lights itself and adjacent locations.
-# BRIDGED:      Take blows from mimiced feature instead, unless choose to go
-# swimming/burrowing.
+# PUSH:			Terrain is pushed around by player/monsters.
 # COVERED:      Take blows from mimiced feature instead, unless choose to go
-# swimming/burrowing, then no LOS.
+# swimming/burrowing.
 # WATER:        Never generate on ice, acid, oil or lava level. Mark level as
 # water level.
 # LAVA:         Never generate on water, acid, oil or ice level. Mark level as
@@ -152,7 +151,7 @@
 # OIL:          Never generate on ice, acid, water or lava level. Mark level
 # as oil level.
 # CHASM:        Replace with chasm if surrounded by CHASMs or chasm edge if
-# adjacent to non-CHASM, non-BRIDGED.
+# adjacent to non-CHASM, non-COVERED.
 # CAN_CLIMB:    Adjacent CAN_CLIMB creatures treated as CAN_FLY.
 # CAN_FLY:      Creatures with CAN_FLY/MUST_FLY may enter and treated as
 # flying.
@@ -250,10 +249,10 @@
 # placed over them, and may have parts of the lake cut off by room placement
 # so that they become unreachable. XXX XXX XXX
 
-# Corridors bridge terrain that has BRIDGE flags and tunnel through terrain
+# Corridors create paths through terrain that has PATH flags and tunnel through terrain
 # that has TUNNEL flags. This is done to guarantee that there is always a
 # safe path from room to room, even if that 'safe' path requires walking
-# through shallow acid. Terrain that is neither bridged or tunnelled through
+# through shallow acid. Terrain that is neither COVERED or tunnelled through
 # must otherwise be crossable. XXX
 
 # Deep terrain comes in two varieties, hidden deep terrain and known deep
@@ -314,7 +313,7 @@
 
 # Chasms use the CHASM flag to considerably neaten themselves up.
 
-# Note that even shallow lava is dangerous (and bridged) and there is no
+# Note that even shallow lava is dangerous (and COVERED) and there is no
 # shallow BOILING MUD/WATER.
 
 # Note that we use WATER | LAVA | ICE | ACID | OIL to mark a level as such,
@@ -1672,8 +1671,8 @@ F:ATTR_LITE |
 # 0x3C --> permanent wall -- basic (perm)
 
 N:60:permanent wall
-G:#:w
-M:56
+G:#:z
+M:60
 #$ granite wall
 U:56
 #$ granite wall
@@ -1688,8 +1687,8 @@ D:This seems to be permanent rock.
 # 0x3D --> permanent wall -- inner (perm)
 
 N:61:permanent wall
-G:#:w
-M:56
+G:#:z
+M:60
 #$ granite wall
 U:56
 #$ granite wall
@@ -1704,8 +1703,8 @@ D:This seems to be permanent rock.
 # 0x3E --> permanent wall -- outer (perm)
 
 N:62:permanent wall
-G:#:w
-M:56
+G:#:z
+M:60
 #$ granite wall
 U:56
 #$ granite wall
@@ -1720,8 +1719,8 @@ D:This seems to be permanent rock.
 # 0x3F --> permanent wall -- solid (perm)
 
 N:63:permanent wall
-G:#:w
-M:56
+G:#:z
+M:60
 #$ granite wall
 U:56
 #$ granite wall
@@ -2845,14 +2844,14 @@ T:WATER_WEAK:4d6
 K:DEFAULT:118:16
 K:TUNNEL:155:16
 #$ deep water
-K:BRIDGE:153:16
+K:PATH:153:16
 #$ water
 K:CHASM:151:16
 #$ waterfall
 K:SECRET:119:16
 #$ water under a cracked ice wall
 F:MOVE | PLACE | DROP | SECRET | REMEMBER | TUNNEL |
-F:BRIDGE | RIVER | LAKE | FILLED | ICE | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:PATH | RIVER | LAKE | FILLED | ICE | CAN_SWIM | CAN_PASS | HIDE_ITEM |
 F:HIDE_SWIM |
 F:ATTR_LITE |
 
@@ -2866,12 +2865,12 @@ T:WATER_WEAK:4d6
 K:DEFAULT:119:36
 K:TUNNEL:155:36
 #$ deep water
-K:BRIDGE:153:36
+K:PATH:153:36
 #$ water
 K:CHASM:151:36
 #$ waterfall
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL |
-F:BRIDGE | RIVER | LAKE | FILLED | ICE | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:PATH | RIVER | LAKE | FILLED | ICE | CAN_SWIM | CAN_PASS | HIDE_ITEM |
 F:HIDE_SWIM |
 F:ATTR_LITE |
 
@@ -2894,10 +2893,10 @@ K:CHASM:151:36
 #$ waterfall
 K:HURT_POIS:392:36
 #$ underwater
-K:BRIDGE:153:36
+K:PATH:153:36
 #$ water
 F:MOVE | PLACE | DROP | SECRET | REMEMBER | TUNNEL |
-F:BRIDGE | RIVER | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
+F:PATH | RIVER | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
 F:HIDE_ITEM | HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | ATTR_LITE |
 
@@ -2914,12 +2913,12 @@ K:HURT_COLD:150:36
 #$ deep water under an ice wall
 K:CHASM:151:36
 #$ waterfall
-K:BRIDGE:153:36
+K:PATH:153:36
 #$ water
 K:HURT_POIS:393:36
 #$ under poisonous water
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL |
-F:BRIDGE | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
+F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
 F:HIDE_ITEM | HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | ATTR_LITE |
 
@@ -2996,10 +2995,10 @@ K:ERUPT:931:16
 #$ deep icy water
 K:TIMED:933:16
 #$ unstable pile of ice rubble
-K:BRIDGE:147:16
+K:PATH:147:16
 #$ deep water under ice under a stone bridge
 F:NOTICE | REMEMBER | TUNNEL | LESS | HIT_TRAP |
-F:BRIDGE | LAKE | ICE |
+F:PATH | LAKE | ICE |
 F:OUTSIDE | ATTR_LITE | TIMED | ERUPT |
 
 N:126:falling water
@@ -3019,10 +3018,10 @@ K:ADJACENT:601:0
 #$ falling water
 K:TIMED:938:0
 #$ rough water
-K:BRIDGE:153:0
+K:PATH:153:0
 #$ water
 F:LOS | MOVE | DROP | NOTICE | REMEMBER | LESS |
-F:BRIDGE | LAKE | WATER | DEEP | FILLED | HURT_COLD | CAN_SWIM | HIDE_ITEM |
+F:PATH | LAKE | WATER | DEEP | FILLED | HURT_COLD | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | ADJACENT | TIMED |
 
@@ -3039,7 +3038,7 @@ K:CHASM:126:0
 #$ falling water
 K:ADJACENT:602:0
 #$ falling acid
-K:BRIDGE:171:0
+K:PATH:171:0
 #$ acidic vapour over acid
 K:TIMED:940:0
 #$ acidic vapour over acid
@@ -3163,7 +3162,7 @@ W:33:3:7:148
 T:WATER_WEAK:4d6
 K:DEFAULT:155:0
 #$ deep water under ice
-K:BRIDGE:147:0
+K:PATH:147:0
 #$ deep water under ice under a stone bridge
 K:HURT_FIRE:154:0
 #$ hidden deep water
@@ -3186,14 +3185,14 @@ K:DEFAULT:1:0
 #$ open floor
 K:KILL_MOVE:137:0
 #$ dusty trail
-K:BRIDGE:137:0
+K:PATH:137:0
 #$ dusty trail
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN | FLOOR |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
 F:HURT_WATER | ATTR_LITE |
 D:The floor is thick with dust.
 
@@ -3271,7 +3270,7 @@ W:35:1:8:0
 K:DEFAULT:142:0
 #$ stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | ATTR_LITE |
 
 #Chasm center.
@@ -3283,7 +3282,7 @@ W:45:2:1:142
 #$ chasm
 T:FALL_MORE:10d6
 K:DEFAULT:141:0
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 K:CHASM:142:0
 #$ chasm
@@ -3292,7 +3291,7 @@ K:TREE:558:0
 K:SPIKE:779:0
 #$ rope bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | SPIKE | MORE |
-F:BRIDGE | RIVER | CHASM | CAN_FLY |
+F:PATH | RIVER | CHASM | CAN_FLY |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -3306,14 +3305,14 @@ W:35:2:13:140
 T:FALL_MORE:10d6
 K:DEFAULT:141:0
 #$ chasm
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 K:TREE:558:0
 #$ chasm in the shade
 K:SPIKE:779:0
 #$ rope bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | SPIKE | MORE |
-F:BRIDGE | RIVER | LAKE | CHASM | CAN_FLY |
+F:PATH | RIVER | LAKE | CHASM | CAN_FLY |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -3341,12 +3340,12 @@ W:48:2:13:148
 #$ ice wall
 T:FALL_MORE:10d6
 K:DEFAULT:144:0
-K:BRIDGE:796:0
+K:PATH:796:0
 #$ ice bridge
 K:SPIKE:779:0
 #$ rope bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | SPIKE | MORE |
-F:BRIDGE | RIVER | LAKE | ICE | CHASM | CAN_FLY |
+F:PATH | RIVER | LAKE | ICE | CHASM | CAN_FLY |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -3378,7 +3377,7 @@ W:33:3:7:148
 T:WATER_WEAK:4d6
 K:DEFAULT:155:0
 #$ ice
-K:BRIDGE:145:0
+K:PATH:145:0
 #$ ice
 K:HURT_FIRE:154:0
 #$ hidden deep water
@@ -3406,7 +3405,7 @@ K:DEFAULT:152:0
 K:CHASM:151:0
 #$ waterfall
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | WATER | HURT_FIRE | ICE | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | WATER | HURT_FIRE | ICE | CAN_CLIMB | CAN_FLY |
 F:CAN_SWIM | HIDE_SWIM | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
 
@@ -3453,14 +3452,14 @@ W:45:3:12:0
 T:ICE:4d4
 K:DEFAULT:155:36
 #$ deep water under an ice wall
-K:BRIDGE:153:36
+K:PATH:153:36
 #$ water
 K:CHASM:151:36
 #$ waterfall
 K:KILL_HUGE:119:36
 #$ water under a cracked ice wall
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL | HIT_TRAP |
-F:BRIDGE | RIVER | LAKE | FILLED | ICE | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:PATH | RIVER | LAKE | FILLED | ICE | CAN_SWIM | CAN_PASS | HIDE_ITEM |
 F:HIDE_SWIM | KILL_HUGE |
 F:ATTR_LITE |
 
@@ -3471,10 +3470,10 @@ W:48:3:13:126
 #$ falling water
 T:FALL_MORE:10d6
 K:DEFAULT:151:0
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | CHASM | CAN_FLY | HIDE_SWIM |
+F:PATH | RIVER | LAKE | WATER | DEEP | CHASM | CAN_FLY | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -3495,7 +3494,7 @@ K:HURT_POIS:394:0
 K:HURT_WATER:482:0
 #$ a wave breaking over a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | WATER | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:PATH | COVERED | WATER | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
 F:HIDE_SWIM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
@@ -3513,7 +3512,7 @@ K:HURT_POIS:395:0
 K:HURT_WATER:483:0
 #$ the crest of a wave over water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | RIVER | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SNEAK | HIDE_SWIM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
@@ -3529,7 +3528,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:154:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:153:0
+K:PATH:153:0
 #$ water
 K:SECRET:155:0
 #$ deep water
@@ -3540,7 +3539,7 @@ K:HURT_WATER:484:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The water is deeper than it looks.
@@ -3553,7 +3552,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:155:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:HURT_POIS:397:0
 #$ deep poisonous water
@@ -3562,7 +3561,7 @@ K:HURT_WATER:485:0
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
@@ -3582,7 +3581,7 @@ K:CHASM:151:0
 K:HURT_ACID:168:0
 #$ acidic vapour around a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_ACID | ACID | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:PATH | COVERED | HURT_ACID | ACID | CAN_CLIMB | CAN_FLY | CAN_SWIM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | SPREAD |
 
@@ -3619,7 +3618,7 @@ T:ACID:4d6
 K:DEFAULT:158:0
 K:CHASM:226:0
 #$ acid fall
-K:BRIDGE:157:0
+K:PATH:157:0
 #$ acid
 K:SECRET:159:0
 #$ deep acid
@@ -3628,7 +3627,7 @@ K:HURT_ACID:170:0
 K:TIMED:170:0
 #$ acidic vapour over deep acid
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | MUST_CLIMB | ATTR_LITE | TIMED |
 D:The acid is deeper than it looks.
@@ -3644,14 +3643,14 @@ T:ACID:4d6
 K:DEFAULT:159:0
 K:CHASM:226:0
 #$ acid fall
-K:BRIDGE:156:0
+K:PATH:156:0
 #$ deep acid under a stone bridge
 K:HURT_ACID:172:0
 #$ acidic vapour over deep acid
 K:TIMED:172:0
 #$ acidic vapour over deep acid
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | MUST_CLIMB | ATTR_LITE | TIMED |
 
@@ -3668,12 +3667,12 @@ K:CHASM:227:0
 #$ boiling waterfall
 K:ADJACENT:603:0
 #$ falling boiling water
-K:BRIDGE:431:0
+K:PATH:431:0
 #$ geothermal ground
 K:TIMED:942:0
 #$ steam over geothermal ground
 F:LOS | MOVE | PLACE | DROP | NOTICE | REMEMBER | LESS |
-F:BRIDGE | LAKE | LAVA | WATER | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
+F:PATH | LAKE | LAVA | WATER | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
 F:OUTSIDE | ATTR_LITE | ADJACENT | TIMED | SPREAD |
 
 N:161:falling lava
@@ -3685,14 +3684,14 @@ W:57:1:14:136
 #$ broken floor
 T:LAVA:24d10
 K:DEFAULT:161:0
-K:BRIDGE:432:0
+K:PATH:432:0
 #$ magma crust
 K:CHASM:214:0
 #$ lava fall
 K:ADJACENT:604:0
 #$ falling lava
 F:MOVE | PLACE | NOTICE | REMEMBER | LESS |
-F:BRIDGE | LAKE | GLOW | LAVA | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
+F:PATH | LAKE | GLOW | LAVA | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
 F:OUTSIDE | ATTR_LITE | ADJACENT |
 
 N:162:smoke
@@ -3796,7 +3795,7 @@ K:CHASM:226:0
 K:SPREAD:156:0
 #$ deep acid under a stone bridge
 F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGED | HURT_ROCK | ACID | CAN_CLIMB | CAN_FLY | CAN_SWIM | HIDE_SWIM |
+F:COVERED | HURT_ROCK | ACID | CAN_CLIMB | CAN_FLY | CAN_SWIM | HIDE_SWIM |
 F:ATTR_LITE | SPREAD |
 
 #Acidic vapours over acid - SECRET
@@ -3841,7 +3840,7 @@ K:CHASM:226:0
 K:SECRET:172:0
 #$ acidic vapour over deep acid
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 D:The acidic vapours conceal a pool of deep acid.
@@ -3872,12 +3871,12 @@ W:49:1:13:51
 T:ACID:4d6
 K:DEFAULT:159:0
 #$ acidic vapour over deep acid
-K:BRIDGE:168:0
+K:PATH:168:0
 #$ acidic vapour around a stone bridge
 K:CHASM:141:0
 #$ chasm
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
@@ -3943,7 +3942,7 @@ K:HURT_FIRE:207:0
 K:HURT_COLD:207:0
 #$ boiling water under a stone bridge
 F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGED | HURT_ROCK | HURT_FIRE | HURT_COLD | CAN_CLIMB | CAN_FLY |
+F:COVERED | HURT_ROCK | HURT_FIRE | HURT_COLD | CAN_CLIMB | CAN_FLY |
 F:CAN_SWIM | HIDE_SWIM |
 F:OUTSIDE | ATTR_LITE |
 
@@ -4008,7 +4007,7 @@ K:SPREAD:208:0
 #$ boiling water
 K:SECRET:180:0
 #$ steam over boiling water
-K:BRIDGE:176:0
+K:PATH:176:0
 #$ steam around a stone bridge
 F:PROJECT | MOVE | PLACE | SECRET | NOTICE | REMEMBER |
 F:RIVER | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
@@ -4024,14 +4023,14 @@ W:55:2:14:50
 #$ magma vein
 T:BWATER:3d6
 K:DEFAULT:180:0
-K:BRIDGE:207:0
+K:PATH:207:0
 #$ boiling water under a stone bridge
 K:CHASM:227:0
 #$ boiling waterfall
 K:SPREAD:208:0
 #$ boiling water
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | SPREAD |
 
@@ -4117,10 +4116,10 @@ T:FALL_MORE:10d6
 K:DEFAULT:186:0
 K:TIMED:220:0
 #$ oil fall
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER | MORE |
-F:BRIDGE | RIVER | LAKE | GLOW | DEEP | OIL | CHASM | CAN_FLY | HIDE_SWIM |
+F:PATH | RIVER | LAKE | GLOW | DEEP | OIL | CHASM | CAN_FLY | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:187:burning oil under a stone bridge
@@ -4137,7 +4136,7 @@ K:CHASM:186:0
 K:TIMED:223:0
 #$ deep oil under a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGE | BRIDGED | HURT_ROCK | OIL | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_ROCK | OIL | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | TIMED | SPREAD |
 
 N:188:deep burning oil
@@ -4150,7 +4149,7 @@ O:0
 W:49:4:7:0
 T:FIRE:4d6
 K:DEFAULT:188:0
-K:BRIDGE:187:0
+K:PATH:187:0
 #$ burning oil under a stone bridge
 K:CHASM:186:0
 #$ burning oil fall
@@ -4159,7 +4158,7 @@ K:SECRET:189:0
 K:TIMED:184:0
 #$ burning oil
 F:PROJECT | MOVE | PLACE | DROP | SECRET | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | GLOW | DEEP | OIL | CAN_FLY | HIDE_ITEM |
+F:PATH | RIVER | LAKE | GLOW | DEEP | OIL | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 D:The burning oil is deeper than it looks.
 
@@ -4173,12 +4172,12 @@ T:FIRE:4d6
 K:DEFAULT:189:0
 K:CHASM:186:0
 #$ burning oil fall
-K:BRIDGE:187:0
+K:PATH:187:0
 #$ burning oil under a stone bridge
 K:TIMED:184:0
 #$ burning oil
 F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | GLOW | DEEP | OIL | CAN_FLY | HIDE_ITEM |
+F:PATH | RIVER | LAKE | GLOW | DEEP | OIL | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:190:falling oil
@@ -4231,10 +4230,10 @@ K:CHASM:141:0
 #$ chasm
 K:KILL_MOVE:194:0
 #$ sandy trail
-K:BRIDGE:194:0
+K:PATH:194:0
 #$ sandy trail
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
 F:ATTR_LITE |
 
 #Note - 'deep' sand is only partially deep (can hide monsters/but not sink).
@@ -4252,12 +4251,12 @@ K:KILL_MOVE:195:0
 #$ deep sandy trail
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:195:0
+K:PATH:195:0
 #$ deep sandy trail
 K:HURT_WATER:400:0
 #$ wet sand
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG | KILL_MOVE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | ATTR_LITE |
 
 N:194:sandy trail
@@ -4312,7 +4311,7 @@ K:KILL_MOVE:197:0
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HIDE_DIG |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The sand is more dangerous than it looks.
@@ -4327,7 +4326,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:192:0
 #$ quicksand
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HIDE_DIG |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
@@ -4342,7 +4341,7 @@ K:DEFAULT:201:0
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_ROCK | CAN_CLIMB | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | COVERED | HURT_ROCK | CAN_CLIMB | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_DIG |
 F:OUTSIDE | ATTR_LITE |
 
@@ -4354,7 +4353,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:199:0
 K:KILL_MOVE:202:0
 #$ muddy trail
-K:BRIDGE:202:0
+K:PATH:202:0
 #$ muddy trail
 K:CHASM:141:0
 #$ chasm
@@ -4363,7 +4362,7 @@ K:HURT_WATER:201:0
 K:HURT_COLD:154:0
 #$ hidden deep water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_ITEM | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | ATTR_LITE |
 
@@ -4377,7 +4376,7 @@ O:0
 W:39:3:7:0
 T:WATER_WEAK:4d6
 K:DEFAULT:200:0
-K:BRIDGE:202:0
+K:PATH:202:0
 #$ muddy trail
 K:KILL_MOVE:203:0
 #$ deep muddy trail
@@ -4390,7 +4389,7 @@ K:HURT_WATER:201:0
 K:HURT_COLD:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | DROP | SECRET | REMEMBER |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_ITEM | HIDE_DIG | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The mud is deeper than it looks.
@@ -4403,14 +4402,14 @@ T:WATER_WEAK:4d6
 K:DEFAULT:201:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:198:0
+K:PATH:198:0
 #$ deep mud under a stone bridge
 K:HURT_WATER:636:0
 #$ shady water over deep mud
 K:HURT_COLD:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | DROP | REMEMBER |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_ITEM | HIDE_DIG |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
@@ -4450,7 +4449,7 @@ K:HURT_WATER:201:0
 K:TIMED:200:0
 #$ deep mud
 F:LOS | PROJECT | MOVE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_ITEM | HIDE_DIG |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED |
 D:The muddy trail is deeper than it looks.
@@ -4467,7 +4466,7 @@ K:DEFAULT:205:0
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | LAVA | WATER | CAN_CLIMB | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | COVERED | LAVA | WATER | CAN_CLIMB | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_DIG |
 F:OUTSIDE | ATTR_LITE | SPREAD |
 
@@ -4479,10 +4478,10 @@ T:BMUD:6d6
 K:DEFAULT:205:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:204:0
+K:PATH:204:0
 #$ boiling mud under a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_OOZE | CAN_DIG |
+F:PATH | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_OOZE | CAN_DIG |
 F:HIDE_ITEM | HIDE_DIG |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | ERUPT |
 
@@ -4504,7 +4503,7 @@ K:TREE:212:0
 K:TIMED:711:0
 #$ erupting boiling geyser
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | LAVA | WATER | FILLED | CAN_OOZE |
+F:PATH | LAKE | LAVA | WATER | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:207:boiling water under a stone bridge
@@ -4522,7 +4521,7 @@ K:CHASM:141:0
 K:HURT_BWATER:176:0
 #$ steam around a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | LAVA | WATER | HURT_ROCK | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | LAVA | WATER | HURT_ROCK | CAN_CLIMB | CAN_FLY |
 F:CAN_SWIM | HIDE_SWIM |
 F:HURT_BWATER | OUTSIDE | ATTR_LITE | SPREAD |
 
@@ -4535,12 +4534,12 @@ T:BWATER:6d6
 K:DEFAULT:208:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:207:0
+K:PATH:207:0
 #$ boiling water under a stone bridge
 K:HURT_BWATER:180:0
 #$ steam over boiling water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_WATER | HURT_BWATER | OUTSIDE | MUST_CLIMB | ATTR_LITE | SPREAD |
 
@@ -4579,7 +4578,7 @@ K:CHASM:214:0
 K:TIMED:178:0
 #$ broken magma crust
 F:LOS | PROJECT | MOVE | PLACE | DROP | BASH |
-F:BRIDGE | LAKE | COVERED | GLOW | LAVA | CAN_FLY | HIDE_ITEM | KILL_HUGE |
+F:PATH | LAKE | COVERED | GLOW | LAVA | CAN_FLY | HIDE_ITEM | KILL_HUGE |
 F:ATTR_LITE | TIMED |
 
 N:211:gas-filled vent
@@ -4597,7 +4596,7 @@ K:CHASM:141:0
 K:ADJACENT:566:0
 #$ gas-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 D:You are surrounded by a burning green gas!
 
@@ -4616,7 +4615,7 @@ K:CHASM:141:0
 K:ADJACENT:567:0
 #$ steam-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 
 N:213:fiery vent
@@ -4634,7 +4633,7 @@ K:CHASM:141:0
 K:ADJACENT:568:0
 #$ fiery vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 
 N:214:lava fall
@@ -4644,10 +4643,10 @@ W:56:3:14:161
 #$ falling lava
 T:FALL_MORE:24d10
 K:DEFAULT:214:0
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
-F:BRIDGE | RIVER | LAKE | GLOW | LAVA | DEEP | CHASM | CAN_FLY |
+F:PATH | RIVER | LAKE | GLOW | LAVA | DEEP | CHASM | CAN_FLY |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -4663,7 +4662,7 @@ K:DEFAULT:218:0
 K:CHASM:214:0
 #$ lava fall
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | LAVA | CAN_CLIMB | CAN_FLY | HIDE_SWIM | KILL_HUGE |
+F:PATH | COVERED | LAVA | CAN_CLIMB | CAN_FLY | HIDE_SWIM | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
 
 N:216:lava
@@ -4675,14 +4674,14 @@ T:LAVA:12d10
 K:DEFAULT:216:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:432:0
+K:PATH:432:0
 #$ magma crust
 K:HURT_WATER:432:0
 #$ magma crust
 K:TIMED:947:0
 #$ magma crust
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | GLOW | LAVA | SHALLOW | CAN_FLY | HIDE_ITEM |
+F:PATH | RIVER | LAKE | GLOW | LAVA | SHALLOW | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | OUTSIDE | ATTR_LITE | TIMED |
 
 N:217:deep lava
@@ -4698,7 +4697,7 @@ T:LAVA:24d10
 K:DEFAULT:217:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:432:0
+K:PATH:432:0
 #$ magma crust
 K:TIMED:210:0
 #$ deep lava under a magma crust
@@ -4707,7 +4706,7 @@ K:HURT_WATER:210:0
 K:SPREAD:720:0
 #$ magma crust
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
+F:PATH | RIVER | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:218:deep lava
@@ -4719,7 +4718,7 @@ T:LAVA:24d10
 K:DEFAULT:218:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:215:0
+K:PATH:215:0
 #$ deep lava under a stone bridge
 K:HURT_WATER:210:0
 #$ deep lava under a magma crust
@@ -4728,7 +4727,7 @@ K:TIMED:944:0
 K:SPREAD:946:0
 #$ lava
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
+F:PATH | RIVER | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:219:oil
@@ -4755,12 +4754,12 @@ W:48:1:13:219
 #$ oil
 T:FALL_MORE:10d6
 K:DEFAULT:220:0
-K:BRIDGE:223:0
+K:PATH:223:0
 #$ deep oil under a stone bridge
 K:HURT_FIRE:183:0
 #$ 
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | MORE |
-F:BRIDGE | LAKE | DEEP | HURT_FIRE | OIL | CHASM | CAN_FLY | HIDE_SWIM |
+F:PATH | LAKE | DEEP | HURT_FIRE | OIL | CHASM | CAN_FLY | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
 N:221:coal dust
@@ -4776,10 +4775,10 @@ K:HURT_FIRE:185:0
 #$ burning coal dust
 K:KILL_MOVE:222:0
 #$ coal dust trail
-K:BRIDGE:222:0
+K:PATH:222:0
 #$ coal dust trail
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | HURT_FIRE | OIL | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | HURT_FIRE | OIL | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 N:222:coal dust trail
@@ -4813,7 +4812,7 @@ K:HURT_FIRE:187:0
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_ROCK | HURT_FIRE | OIL | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_ROCK | HURT_FIRE | OIL | CAN_CLIMB | CAN_FLY |
 F:USE_FEAT | OUTSIDE | ATTR_LITE |
 
 N:224:deep oil
@@ -4829,14 +4828,14 @@ T:WATER_WEAK:4d6
 K:DEFAULT:224:0
 K:CHASM:220:0
 #$ oil fall
-K:BRIDGE:219:0
+K:PATH:219:0
 #$ oil
 K:SECRET:225:0
 #$ deep oil
 K:HURT_FIRE:188:0
 #$ deep burning oil
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | HURT_FIRE | OIL | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | DEEP | HURT_FIRE | OIL | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The oil is deeper than it looks.
@@ -4851,14 +4850,14 @@ W:37:4:12:219
 T:WATER_WEAK:4d6
 K:DEFAULT:22:0
 #$ deep oil
-K:BRIDGE:223:0
+K:PATH:223:0
 #$ deep oil under a stone bridge
 K:CHASM:220:0
 #$ oil fall
 K:HURT_FIRE:189:0
 #$ deep burning oil
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | DEEP | HURT_FIRE | OIL | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | LAKE | DEEP | HURT_FIRE | OIL | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
@@ -4871,10 +4870,10 @@ W:56:3:13:127
 #$ falling acid
 T:FALL_MORE:10d6
 K:DEFAULT:226:0
-K:BRIDGE:156:0
+K:PATH:156:0
 #$ deep acid under a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
-F:BRIDGE | RIVER | LAKE | DEEP | ACID | CHASM | CAN_FLY | HIDE_SWIM |
+F:PATH | RIVER | LAKE | DEEP | ACID | CHASM | CAN_FLY | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -4888,10 +4887,10 @@ W:56:3:13:160
 T:FALL_MORE:10d6
 K:DEFAULT:226:0
 #$ boiling waterfall
-K:BRIDGE:156:0
+K:PATH:156:0
 #$ deep acid under a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
-F:BRIDGE | RIVER | LAKE | LAVA | WATER | DEEP | CHASM | CAN_FLY | HIDE_SWIM |
+F:PATH | RIVER | LAKE | LAVA | WATER | DEEP | CHASM | CAN_FLY | HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -4960,12 +4959,12 @@ K:DEFAULT:141:0
 #$ steam
 K:CHASM:232:0
 #$ storm cloud over chasm
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 K:SPREAD:235:0
 #$ storm cloud over an open floor over a chasm
 F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ATTR_LITE | STRIKE | SPREAD |
 D:You are struck by lightning!
 
@@ -5032,10 +5031,10 @@ K:HURT_ELEC:231:0
 #$ storm cloud over an open floor over a chasm
 K:TIMED:231:0
 #$ storm cloud over an open floor over a chasm
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:HURT_ELEC | ATTR_LITE | TIMED | SPREAD |
 
 N:236:storm cloud over chasm
@@ -6062,7 +6061,7 @@ K:CHASM:141:0
 K:HURT_WATER:393:0
 #$ under poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | LAKE | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | ATTR_LITE |
 
@@ -6072,7 +6071,7 @@ O:224
 W:27:1:7:0
 K:DEFAULT:155:0
 #$ clear water
-K:BRIDGE:153:0
+K:PATH:153:0
 #$ water
 K:CHASM:151:0
 #$ waterfall
@@ -6081,7 +6080,7 @@ K:HURT_COLD:146:0
 K:HURT_WATER:395:0
 #$ poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
 N:312:broken wood
@@ -6229,7 +6228,7 @@ F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D3 | ATTR_LITE |
 
 N:319:small wooden chest (open)
-G:&:D
+G:&:d
 U:56
 #$ granite wall
 O:0
@@ -6465,7 +6464,7 @@ F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D2 | DROP_1D3 | ATTR_LITE |
 
 N:330:large wooden chest (open)
-G:&:D
+G:&:d
 U:56
 #$ granite wall
 O:0
@@ -6659,7 +6658,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D3 | DROP_GOOD | ATTR_LITE |
 
 N:339:small iron chest (open)
-G:&:D
+G:&:d
 U:56
 #$ granite wall
 O:0
@@ -6850,7 +6849,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D2 | DROP_1D3 | DROP_GOOD | ATTR_LITE |
 
 N:348:large iron chest (open)
-G:&:D
+G:&:d
 U:56
 #$ granite wall
 O:0
@@ -7041,7 +7040,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
 N:357:small steel chest (open)
-G:&:D
+G:&:d
 U:56
 #$ granite wall
 O:0
@@ -7083,8 +7082,8 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 D:You hear a click!
 
-N:359:small steel chest (magical symbol)
-G:&:B
+N:359:small steel chest (demonic sign)
+G:&:T
 U:56
 #$ granite wall
 O:0
@@ -7104,8 +7103,8 @@ F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
-N:360:small steel chest (tripwire)
-G:&:y
+N:360:small steel chest (ever burning eye)
+G:&:v
 U:56
 #$ granite wall
 O:0
@@ -7127,8 +7126,8 @@ F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
-N:361:small steel chest (ancient hex)
-G:&:G
+N:361:small steel chest (glowing glyph)
+G:&:M
 U:56
 #$ granite wall
 O:0
@@ -7234,7 +7233,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D2 | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
 N:366:large steel chest (open)
-G:&:D
+G:&:d
 U:56
 #$ granite wall
 O:0
@@ -7276,8 +7275,8 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D2 | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 D:You hear a click!
 
-N:368:large steel chest (magical symbol)
-G:&:B
+N:368:large steel chest (demonic sign)
+G:&:T
 U:56
 #$ granite wall
 O:0
@@ -7297,8 +7296,8 @@ F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D2 | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
-N:369:large steel chest (tripwire)
-G:&:y
+N:369:large steel chest (ever burning eye)
+G:&:v
 U:56
 #$ granite wall
 O:0
@@ -7320,8 +7319,8 @@ F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D2 | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
-N:370:large steel chest (ancient hex)
-G:&:G
+N:370:large steel chest (glowing glyph)
+G:&:M
 U:56
 #$ granite wall
 O:0
@@ -7701,7 +7700,7 @@ W:54:6:13:0
 T:POISON_WATER:4d6
 K:DEFAULT:397:36
 #$ granite wall
-K:BRIDGE:396:36
+K:PATH:396:36
 #$ hidden deep poisonous water
 K:SECRET:393:36
 #$ under poisonous water
@@ -7710,7 +7709,7 @@ K:CHASM:151:36
 K:HURT_COLD:150:36
 #$ deep water under an ice wall
 F:MOVE | PLACE | DROP | SECRET | REMEMBER | TUNNEL |
-F:BRIDGE | RIVER | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
+F:PATH | RIVER | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE |
 
@@ -7728,7 +7727,7 @@ K:HURT_COLD:150:36
 K:CHASM:151:36
 #$ waterfall
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL |
-F:BRIDGE | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
+F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE |
 
@@ -7750,7 +7749,7 @@ K:HURT_COLD:147:0
 K:HURT_WATER:492:0
 #$ a poisonous wave breaking over a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | WATER | HURT_COLD | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | COVERED | WATER | HURT_COLD | CAN_CLIMB | CAN_FLY |
 F:CAN_SWIM | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
@@ -7766,7 +7765,7 @@ K:CHASM:151:0
 K:HURT_WATER:493:0
 #$ the crest of a wave over poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SNEAK | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
@@ -7780,7 +7779,7 @@ T:POISON_WATER:4d6
 K:DEFAULT:396:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:395:0
+K:PATH:395:0
 #$ poisonous water
 K:SECRET:397:0
 #$ deep poisonous water
@@ -7789,7 +7788,7 @@ K:HURT_COLD:146:0
 K:HURT_WATER:494:0
 #$ the crest of a wave over deep poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The water is deeper than it looks.
@@ -7802,14 +7801,14 @@ T:POISON_WATER:4d6
 K:DEFAULT:397:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:394:0
+K:PATH:394:0
 #$ deep poisonous water under a stone bridge
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 K:HURT_WATER:495:0
 #$ the crest of a wave over deep poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
@@ -7826,10 +7825,10 @@ K:DEFAULT:403:36
 #$ granite wall
 K:SECRET:399:36
 #$ undersea
-K:BRIDGE:402:36
+K:PATH:402:36
 #$ deep salt water
 F:MOVE | PLACE | DROP | SECRET | REMEMBER | TUNNEL |
-F:BRIDGE | RIVER | LAKE | WATER | FILLED | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:PATH | RIVER | LAKE | WATER | FILLED | CAN_SWIM | CAN_PASS | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE |
 
@@ -7842,7 +7841,7 @@ W:57:4:13:0
 T:SALT_WATER:4d6
 K:DEFAULT:399:36
 F:MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | WATER | FILLED | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:PATH | LAKE | WATER | FILLED | CAN_SWIM | CAN_PASS | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE |
 
@@ -7860,7 +7859,7 @@ K:DEFAULT:193:0
 #$ sand
 K:KILL_MOVE:195:0
 #$ deep sandy trail
-K:BRIDGE:195:0
+K:PATH:195:0
 #$ deep sandy trail
 K:CHASM:403:0
 #$ deep salt water
@@ -7869,7 +7868,7 @@ K:HURT_WATER:472:0
 K:TIMED:193:0
 #$ deep sand
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | ATTR_LITE |
 
 N:401:salt water
@@ -7883,7 +7882,7 @@ K:CHASM:403:0
 K:HURT_WATER:473:0
 #$ the crest of a wave over salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
@@ -7897,19 +7896,19 @@ O:255
 W:43:4:7:0
 T:SALT_WATER:4d6
 K:DEFAULT:402:0
-K:BRIDGE:401:0
+K:PATH:401:0
 #$ salt water
 K:SECRET:403:0
 #$ deep salt water
 K:HURT_WATER:474:0
 #$ the crest of a wave over deep salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The water is deeper than it looks.
 
-# Note: never bridged. Full of waves.
+# Note: never COVERED. Full of waves.
 
 N:403:deep salt water
 G:::t
@@ -7923,7 +7922,7 @@ K:HURT_WATER:475:0
 K:TIMED:475:0
 #$ the crest of a wave over deep salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:404:brazier
@@ -7973,14 +7972,14 @@ W:1:10:15:0
 K:DEFAULT:407:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:408:0
+K:PATH:408:0
 #$ dirt trail
 K:TREE:536:0
 #$ shaded earth
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 #Note -- open trail through earth
@@ -7999,7 +7998,7 @@ K:TREE:537:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 N:409:rock
@@ -8039,7 +8038,7 @@ G:.:G
 O:0
 W:1:10:15:0
 K:DEFAULT:411:0
-K:BRIDGE:412:0
+K:PATH:412:0
 #$ open trail through grass
 K:CHASM:141:0
 #$ chasm
@@ -8050,7 +8049,7 @@ K:TREE:539:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | LIVING | ATTR_LITE |
 
@@ -8070,7 +8069,7 @@ K:TREE:540:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | LIVING | ATTR_LITE |
 
 N:413:fire
@@ -8092,7 +8091,7 @@ K:BASH:418:0
 K:OPEN:418:0
 #$ burnt ground
 F:LOS | PROJECT | MOVE | DROP | NOTICE | REMEMBER | BASH |
-F:BRIDGE | LAKE | GLOW | OIL | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_DIG |
+F:PATH | LAKE | GLOW | OIL | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_DIG |
 F:HURT_WATER | OUTSIDE | ATTR_LITE | TIMED | SPREAD |
 
 N:414:open ground
@@ -8102,7 +8101,7 @@ W:1:10:15:0
 K:DEFAULT:414:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:HURT_FIRE:413:0
 #$ fire
@@ -8111,7 +8110,7 @@ K:TREE:541:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | LIVING | ATTR_LITE |
 
 N:415:open trail
@@ -8130,7 +8129,7 @@ K:TREE:542:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 #$# 416 - Unused ###
@@ -8152,7 +8151,7 @@ K:HURT_COLD:418:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_FLY |
+F:PATH | LAKE | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE | SPREAD |
 
 N:418:burnt ground
@@ -8169,7 +8168,7 @@ K:HURT_FIRE:417:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_FLY |
+F:PATH | LAKE | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 N:419:thicket
@@ -8183,7 +8182,7 @@ K:HURT_FIRE:424:1
 K:CHASM:455:1
 #$ tree trunk over a chasm
 F:MOVE | REMEMBER | BASH |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY |
 F:EASY_CLIMB | MUST_CLIMB | LIVING | ATTR_LITE |
 
 N:420:tree trunk
@@ -8194,7 +8193,7 @@ O:0
 W:10:1:17:0
 K:DEFAULT:427:1
 #$ tree trunk
-K:BRIDGE:408:1
+K:PATH:408:1
 #$ dirt trail
 K:HURT_FIRE:424:1
 #$ wall of fire
@@ -8205,7 +8204,7 @@ K:TREE:421:1
 K:HURT_WATER:628:1
 #$ a wave breaking over a tree trunk
 F:REMEMBER | BASH | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | LIVING | TREE | ATTR_LITE |
 
 # Tree trunk covered in branches
@@ -8216,7 +8215,7 @@ O:0
 W:7:1:17:0
 K:DEFAULT:427:1
 #$ tree
-K:BRIDGE:408:1
+K:PATH:408:1
 #$ dirt trail
 K:HURT_FIRE:424:1
 #$ wall of fire
@@ -8225,7 +8224,7 @@ K:CHASM:455:1
 K:HURT_WATER:628:1
 #$ a wave breaking over a tree trunk
 F:REMEMBER | BASH | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:HURT_WATER | EASY_CLIMB | MUST_CLIMB | LIVING | TREE | ATTR_LITE |
 
 N:422:herbs
@@ -8236,7 +8235,7 @@ K:DEFAULT:414:0
 #$ herbs
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:HURT_FIRE:413:0
 #$ fire
@@ -8245,7 +8244,7 @@ K:TREE:543:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | LIVING | ATTR_LITE |
 
 N:423:burning tree
@@ -8306,7 +8305,7 @@ K:BASH:427:0
 K:OPEN:427:0
 #$ tree trunk
 F:LOS | PROJECT | NOTICE | REMEMBER | BASH |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 N:426:apple tree
@@ -8317,7 +8316,7 @@ O:29
 W:10:3:17:0
 K:DEFAULT:427:1
 #$ apple tree
-K:BRIDGE:408:1
+K:PATH:408:1
 #$ dirt trail
 K:CHASM:454:1
 #$ impassable tree trunk
@@ -8326,7 +8325,7 @@ K:HURT_FIRE:423:1
 K:HURT_WATER:629:1
 #$ a wave breaking over open ground
 F:LOS | REMEMBER | BASH |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:HURT_WATER | GET_FEAT | EASY_CLIMB | MUST_CLIMB | LIVING | TREE |
 F:ATTR_LITE |
 
@@ -8346,7 +8345,7 @@ K:HURT_FIRE:423:1
 K:HURT_WATER:629:1
 #$ a wave breaking over open ground
 F:REMEMBER |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:428:snow
@@ -8354,7 +8353,7 @@ G:;:z
 O:0
 W:32:1:17:0
 K:DEFAULT:428:0
-K:BRIDGE:429:0
+K:PATH:429:0
 #$ snowy trail
 K:CHASM:141:0
 #$ chasm
@@ -8365,7 +8364,7 @@ K:TREE:544:0
 K:HURT_WATER:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | SHALLOW | ICE | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | SHALLOW | ICE | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG | KILL_MOVE |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
@@ -8383,7 +8382,7 @@ K:TREE:545:0
 K:HURT_WATER:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | ICE | CAN_FLY | HIDE_DIG |
+F:PATH | ICE | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 N:430:deep snowy trail
@@ -8400,7 +8399,7 @@ K:TREE:546:0
 K:HURT_WATER:201:0
 #$ deep mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | SHALLOW | ICE | CAN_FLY | HIDE_DIG |
+F:PATH | SHALLOW | ICE | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
 N:431:geothermal ground
@@ -8415,7 +8414,7 @@ K:TIMED:433:0
 K:HURT_BWATER:433:0
 #$ steam over geothermal ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | CAN_FLY | HIDE_ITEM |
 F:HURT_BWATER | GROUND | OUTSIDE | ATTR_LITE | TIMED |
 
 N:432:magma crust
@@ -8430,7 +8429,7 @@ K:DEFAULT:432:0
 K:CHASM:214:0
 #$ lava fall
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | BASH |
-F:BRIDGE | LAKE | COVERED | GLOW | LAVA | CAN_FLY | HIDE_ITEM | KILL_HUGE |
+F:PATH | LAKE | COVERED | GLOW | LAVA | CAN_FLY | HIDE_ITEM | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
 
 N:433:steam over geothermal ground
@@ -8444,7 +8443,7 @@ K:CHASM:141:0
 K:SPREAD:431:0
 #$ geothermal ground
 F:PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | CAN_FLY | HIDE_ITEM |
 F:GROUND | OUTSIDE | ATTR_LITE | SPREAD |
 
 # Hack -- treat as uncovered and do not spread fire damage
@@ -8456,11 +8455,11 @@ F:GROUND | OUTSIDE | ATTR_LITE | SPREAD |
 # T:STEAM:1d3
 # K:DEFAULT:216
 # K:CHASM:214
-# K:BRIDGE:433
+# K:PATH:433
 # K:SPREAD:432
 # F:BASH | CAN_FLY | KILL_HUGE | HIDE_ITEM | LAVA | OUTSIDE |
 # F:DROP | MOVE | PROJECT | PLACE | REMEMBER |
-# F:BRIDGE | OUTSIDE | SPREAD | LAKE
+# F:PATH | OUTSIDE | SPREAD | LAKE
 # F:PLACE | DROP
 
 #$# 434 - Unused ###
@@ -8470,7 +8469,7 @@ G:;:G
 O:0
 W:5:1:15:0
 K:DEFAULT:435:0
-K:BRIDGE:407:0
+K:PATH:407:0
 #$ earth
 K:CHASM:141:0
 #$ chasm
@@ -8492,7 +8491,7 @@ O:0
 W:30:1:15:0
 T:HURT:1d4
 K:DEFAULT:436:0
-K:BRIDGE:407:0
+K:PATH:407:0
 #$ earth
 K:HURT_FIRE:437:0
 #$ bush fire
@@ -8563,7 +8562,7 @@ O:599
 W:30:1:15:0
 T:HURT:2d4
 K:DEFAULT:440:0
-K:BRIDGE:407:0
+K:PATH:407:0
 #$ earth
 K:HURT_FIRE:437:0
 #$ bush fire
@@ -8588,7 +8587,7 @@ O:0
 W:35:1:15:0
 T:POISON:2d4
 K:DEFAULT:441:0
-K:BRIDGE:407:0
+K:PATH:407:0
 #$ earth
 K:HURT_FIRE:437:0
 #$ bush fire
@@ -8611,7 +8610,7 @@ O:0
 W:35:1:15:0
 T:POISON:2d4
 K:DEFAULT:442:0
-K:BRIDGE:435:0
+K:PATH:435:0
 #$ bush
 K:CHASM:141:0
 #$ chasm
@@ -8704,7 +8703,7 @@ K:HURT_FIRE:162:0
 K:HURT_WATER:1:0
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_MOVE |
+F:PATH | LAKE | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_MOVE |
 F:HURT_WATER | HURT_BWATER | ATTR_LITE |
 
 N:448:thorns
@@ -8715,7 +8714,7 @@ O:0
 W:30:1:15:0
 T:HURT:1d2
 K:DEFAULT:448:0
-K:BRIDGE:435:0
+K:PATH:435:0
 #$ bush
 K:HURT_FIRE:437:0
 #$ bush fire
@@ -8799,7 +8798,7 @@ K:TREE:548:5
 K:HURT_WATER:200:5
 #$ deep mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET |
-F:BRIDGE | LAKE | DEEP | ICE | CAN_FLY | CAN_DIG | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | DEEP | ICE | CAN_FLY | CAN_DIG | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
@@ -8818,7 +8817,7 @@ K:TREE:549:3
 K:HURT_WATER:201:3
 #$ deep mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | TUNNEL |
-F:BRIDGE | LAKE | DEEP | ICE | CAN_FLY | CAN_DIG | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | DEEP | ICE | CAN_FLY | CAN_DIG | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
@@ -8841,7 +8840,7 @@ K:TREE:700:5
 K:SECRET:454:5
 #$ impassable tree trunk
 F:SECRET | REMEMBER | BASH | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
 F:LIVING | TREE | ATTR_LITE |
 D:The tree trunk blocks your way!
 
@@ -8861,7 +8860,7 @@ K:CHASM:455:5
 K:TREE:701:5
 #$ impassable tree trunk
 F:REMEMBER | BASH | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
 F:LIVING | TREE | ATTR_LITE |
 
 N:455:tree trunk over a chasm
@@ -8873,10 +8872,10 @@ W:48:4:17:421
 #$ tree
 K:DEFAULT:141:0
 #$ tree trunk over a chasm
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 F:NOTICE | REMEMBER |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | CAN_FLY |
+F:PATH | LAKE | COVERED | HURT_FIRE | CAN_FLY |
 F:HURT_WATER | EASY_HIDE | EASY_CLIMB | MUST_CLIMB | LIVING | TREE |
 F:ATTR_LITE |
 
@@ -8911,7 +8910,7 @@ K:TUNNEL:17:5
 K:HURT_WATER:153:5
 #$ water
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | TUNNEL |
-F:BRIDGE | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PATH | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | EASY_HIDE | MUST_CLIMB | ATTR_LITE |
 
 #$# 458 - Unused ###
@@ -8924,7 +8923,7 @@ W:52:3:7:142
 K:DEFAULT:785:0
 #$ giant spider web over a chasm
 F:PROJECT | PLACE | NOTICE | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | CAN_CLIMB | HIDE_ITEM |
+F:PATH | LAKE | COVERED | HURT_FIRE | CAN_CLIMB | HIDE_ITEM |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:460:impassable thicket
@@ -8944,7 +8943,7 @@ K:CHASM:141:5
 K:SECRET:461:5
 #$ impassable thicket
 F:SECRET | REMEMBER | BASH | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:LIVING | ATTR_LITE |
 D:The thicket is impassable.
 
@@ -8961,7 +8960,7 @@ K:HURT_FIRE:424:5
 K:CHASM:141:5
 #$ chasm
 F:REMEMBER | BASH | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:LIVING | ATTR_LITE |
 
 #$# 462 - Unused ###
@@ -9121,7 +9120,7 @@ K:CHASM:151:0
 K:INSTANT:610:0
 #$ water over open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:473:the crest of a wave over salt water
@@ -9139,7 +9138,7 @@ K:ADJACENT:476:0
 K:TIMED:476:0
 #$ a wave over salt water
 F:LOS | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
 N:474:the crest of a wave over deep salt water
@@ -9152,7 +9151,7 @@ O:255
 W:43:2:7:0
 T:SALT_WATER:4d6
 K:DEFAULT:474:0
-K:BRIDGE:401:0
+K:PATH:401:0
 #$ salt water
 K:SECRET:475:0
 #$ the crest of a wave over deep salt water
@@ -9161,7 +9160,7 @@ K:ADJACENT:477:0
 K:TIMED:477:0
 #$ a wave over deep salt water
 F:LOS | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_HIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 D:The water is deeper than it looks.
 
@@ -9179,7 +9178,7 @@ K:ADJACENT:478:0
 K:TIMED:478:0
 #$ a wave over deep salt water
 F:LOS | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
 N:476:a wave over salt water
@@ -9195,7 +9194,7 @@ K:CHASM:403:0
 K:INSTANT:479:0
 #$ rough salt water
 F:PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:477:a wave over deep salt water
@@ -9208,14 +9207,14 @@ O:255
 W:43:2:7:0
 T:WATER:4d6
 K:DEFAULT:477:0
-K:BRIDGE:401:0
+K:PATH:401:0
 #$ salt water
 K:SECRET:478:0
 #$ a wave over deep salt water
 K:INSTANT:480:0
 #$ hidden deep rough salt water
 F:PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
 
@@ -9231,7 +9230,7 @@ K:DEFAULT:478:0
 K:INSTANT:481:0
 #$ deep rough salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | FILLED | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:479:rough salt water
@@ -9249,7 +9248,7 @@ K:CHASM:403:0
 K:INSTANT:401:0
 #$ salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:480:hidden deep rough salt water
@@ -9262,14 +9261,14 @@ O:255
 W:43:2:7:0
 T:SALT_WATER:4d6
 K:DEFAULT:480:0
-K:BRIDGE:401:0
+K:PATH:401:0
 #$ salt water
 K:SECRET:481:0
 #$ deep rough salt water
 K:INSTANT:402:0
 #$ deep salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
 
@@ -9287,7 +9286,7 @@ K:DEFAULT:481:0
 K:INSTANT:403:0
 #$ deep salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:482:a wave breaking over a stone bridge
@@ -9300,7 +9299,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:482:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:HURT_COLD:147:0
 #$ deep water under ice under a stone bridge
@@ -9309,7 +9308,7 @@ K:ADJACENT:152:0
 K:HURT_POIS:492:0
 #$ a poisonous wave breaking over a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
 F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | ATTR_LITE | ADJACENT |
 
@@ -9332,7 +9331,7 @@ K:TIMED:486:0
 K:HURT_POIS:493:0
 #$ the crest of a wave over poisonous water
 F:LOS | PROJECT | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
 N:484:the crest of a wave over hidden deep water
@@ -9347,7 +9346,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:484:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:483:0
+K:PATH:483:0
 #$ the crest of a wave over water
 K:SECRET:485:0
 #$ the crest of a wave over deep water
@@ -9360,7 +9359,7 @@ K:HURT_POIS:494:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 D:The water is deeper than it looks.
 
@@ -9374,7 +9373,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:485:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:ADJACENT:488:0
 #$ a wave over deep water
@@ -9385,7 +9384,7 @@ K:HURT_POIS:495:0
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
 N:486:a wave over water
@@ -9405,7 +9404,7 @@ K:INSTANT:489:0
 K:HURT_POIS:496:0
 #$ a wave over poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -9421,7 +9420,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:487:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:486:0
+K:PATH:486:0
 #$ a wave over water
 K:SECRET:488:0
 #$ a wave over deep water
@@ -9432,7 +9431,7 @@ K:HURT_POIS:497:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
@@ -9447,7 +9446,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:488:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:INSTANT:491:0
 #$ deep rough water
@@ -9456,7 +9455,7 @@ K:HURT_POIS:498:0
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -9476,7 +9475,7 @@ K:INSTANT:153:0
 K:HURT_POIS:499:0
 #$ poisonous rough water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -9492,7 +9491,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:490:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:489:0
+K:PATH:489:0
 #$ rough water
 K:SECRET:491:0
 #$ deep rough water
@@ -9503,7 +9502,7 @@ K:HURT_POIS:500:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
@@ -9518,7 +9517,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:491:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:INSTANT:155:0
 #$ deep water
@@ -9527,7 +9526,7 @@ K:HURT_POIS:501:0
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 
@@ -9541,14 +9540,14 @@ T:POISON_WATER:4d6
 K:DEFAULT:492:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:HURT_COLD:147:0
 #$ deep water under ice under a stone bridge
 K:ADJACENT:394:0
 #$ deep poisonous water under a stone bridge
 F:PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | ADJACENT |
 
@@ -9569,7 +9568,7 @@ K:ADJACENT:496:0
 K:TIMED:496:0
 #$ a wave over poisonous water
 F:LOS | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
 N:494:the crest of a wave over deep poisonous water
@@ -9582,7 +9581,7 @@ T:POISON_WATER:4d6
 K:DEFAULT:494:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:493:0
+K:PATH:493:0
 #$ the crest of a wave over poisonous water
 K:SECRET:495:0
 #$ the crest of a wave over deep poisonous water
@@ -9593,7 +9592,7 @@ K:TIMED:497:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 D:The water is deeper than it looks.
 
@@ -9607,7 +9606,7 @@ T:POISON_WATER:4d6
 K:DEFAULT:495:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:ADJACENT:498:0
 #$ a wave over deep poisonous water
@@ -9616,7 +9615,7 @@ K:TIMED:498:0
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PLACE | DROP | REMEMBER |
-F:BRIDGE | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
 N:496:a wave over poisonous water
@@ -9636,7 +9635,7 @@ K:HURT_COLD:145:0
 K:INSTANT:499:0
 #$ poisonous rough water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -9652,7 +9651,7 @@ T:POISON_WATER:4d6
 K:DEFAULT:497:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:496:0
+K:PATH:496:0
 #$ a wave over poisonous water
 K:SECRET:498:0
 #$ a wave over deep poisonous water
@@ -9661,7 +9660,7 @@ K:INSTANT:500:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
@@ -9678,14 +9677,14 @@ T:POISON_WATER:4d6
 K:DEFAULT:498:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:INSTANT:501:0
 #$ deep poisonous rough water
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -9703,7 +9702,7 @@ K:HURT_COLD:145:0
 K:INSTANT:395:0
 #$ poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -9719,7 +9718,7 @@ T:POISON_WATER:4d6
 K:DEFAULT:500:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:499:0
+K:PATH:499:0
 #$ poisonous rough water
 K:SECRET:501:0
 #$ deep poisonous rough water
@@ -9728,7 +9727,7 @@ K:INSTANT:396:0
 K:HURT_COLD:146:0
 #$ hidden deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
@@ -9743,14 +9742,14 @@ T:POISON_WATER:4d6
 K:DEFAULT:501:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:394:0
+K:PATH:394:0
 #$ deep poisonous water under a stone bridge
 K:INSTANT:397:0
 #$ deep poisonous water
 K:HURT_COLD:133:0
 #$ deep water under ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 
@@ -9967,14 +9966,14 @@ K:DEFAULT:193:0
 #$ a wave breaking over sand
 K:KILL_MOVE:195:0
 #$ deep sandy trail
-K:BRIDGE:195:0
+K:PATH:195:0
 #$ deep sandy trail
 K:CHASM:403:0
 #$ deep salt water
 K:INSTANT:400:0
 #$ wet sand
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | DEEP | CAN_FLY | CAN_SWIM | HIDE_DIG | KILL_MOVE |
+F:PATH | DEEP | CAN_FLY | CAN_SWIM | HIDE_DIG | KILL_MOVE |
 F:OUTSIDE | ATTR_LITE | INSTANT |
 
 #N:524:a wave breaking over a stone bridge
@@ -9984,14 +9983,14 @@ F:OUTSIDE | ATTR_LITE | INSTANT |
 #W:27:1:8:0
 #K:DEFAULT:524
 #K:CHASM:151
-#K:BRIDGE:152
+#K:PATH:152
 #K:USE_FEAT:492
 #K:HURT_COLD:147
 #K:INSTANT:394
 #K:TREE:524
 #T:WATER_WEAK:4d6
 #O:224
-#F:CAN_FLY | CAN_CLIMB | CAN_SWIM | DEEP | BRIDGE | USE_FEAT | WATER |
+#F:CAN_FLY | CAN_CLIMB | CAN_SWIM | DEEP | PATH | USE_FEAT | WATER |
 #F:LOS | MOVE | PROJECT | REMEMBER | DROP | PLACE | HIDE_SWIM | 
 #F:HURT_COLD | OUTSIDE | INSTANT
 
@@ -10006,12 +10005,12 @@ K:KILL_MOVE:526:0
 #$ steep sandy trail
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:526:0
+K:PATH:526:0
 #$ steep sandy trail
 K:TREE:550:0
 #$ shaded sand dune
 F:LOS | PROJECT | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG | KILL_MOVE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG | KILL_MOVE |
 F:OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 N:526:steep sandy trail
@@ -10036,12 +10035,12 @@ W:19:1:15:0
 K:DEFAULT:527:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:528:0
+K:PATH:528:0
 #$ steep dirt trail
 K:TREE:552:0
 #$ shaded earth mound
 F:LOS | PROJECT | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY |
 F:GROUND | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 #Note -- open trail through earth
@@ -10058,7 +10057,7 @@ K:CHASM:141:0
 K:TREE:553:0
 #$ steep dirt trail in the shade
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 N:529:steep trail
@@ -10073,7 +10072,7 @@ K:CHASM:141:0
 K:TREE:554:0
 #$ steep trail in the shade
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 N:530:grassy hill
@@ -10081,7 +10080,7 @@ G:<:G
 O:0
 W:16:1:15:0
 K:DEFAULT:530:0
-K:BRIDGE:531:0
+K:PATH:531:0
 #$ steep trail through grass
 K:CHASM:141:0
 #$ chasm
@@ -10090,7 +10089,7 @@ K:HURT_FIRE:532:0
 K:TREE:555:0
 #$ shady grassy hill
 F:LOS | PROJECT | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:GROUND | OUTSIDE | EASY_CLIMB | LIVING | ATTR_LITE |
 
@@ -10101,7 +10100,7 @@ U:530
 O:0
 W:16:1:16:0
 K:DEFAULT:531:0
-K:BRIDGE:532:0
+K:PATH:532:0
 #$ burning hillside
 K:CHASM:141:0
 #$ chasm
@@ -10110,7 +10109,7 @@ K:HURT_FIRE:532:0
 K:TREE:556:0
 #$ steep shady trail through grass
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:OUTSIDE | EASY_CLIMB | LIVING | ATTR_LITE |
 
 N:532:burning hillside
@@ -10134,7 +10133,7 @@ K:BASH:535:0
 K:OPEN:535:0
 #$ burnt hillside
 F:PROJECT | NOTICE | REMEMBER | BASH |
-F:BRIDGE | LAKE | GLOW | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | LAKE | GLOW | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:533:open hill
@@ -10144,14 +10143,14 @@ W:13:1:15:0
 K:DEFAULT:533:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:529:0
+K:PATH:529:0
 #$ steep trail
 K:HURT_FIRE:532:0
 #$ burning hillside
 K:TREE:557:0
 #$ shadowy hill
 F:LOS | PROJECT | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:GROUND | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 N:534:smoke over burnt hillside
@@ -10169,7 +10168,7 @@ K:SPREAD:535:0
 K:HURT_COLD:535:0
 #$ burnt hillside
 F:PROJECT | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_FLY |
+F:PATH | LAKE | CAN_FLY |
 F:GROUND | OUTSIDE | EASY_CLIMB | ATTR_LITE | SPREAD |
 
 N:535:burnt hillside
@@ -10184,7 +10183,7 @@ K:CHASM:141:0
 K:HURT_FIRE:534:0
 #$ smoke over burnt hillside
 F:LOS | PROJECT | PLACE | DROP |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY |
 F:GROUND | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 # The following are all generated shaded by a tree.
@@ -10198,7 +10197,7 @@ W:1:10:15:0
 K:DEFAULT:536:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:537:0
+K:PATH:537:0
 #$ shady dirt trail
 K:HURT_FIRE:413:0
 #$ fire
@@ -10207,7 +10206,7 @@ K:NEED_TREE:407:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
 #Note -- open trail through earth
@@ -10228,7 +10227,7 @@ K:NEED_TREE:408:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | LIVING | NEED_TREE | ATTR_LITE |
 
 N:538:rock in the shade
@@ -10260,7 +10259,7 @@ U:421
 O:0
 W:1:10:15:0
 K:DEFAULT:539:0
-K:BRIDGE:540:0
+K:PATH:540:0
 #$ shady trail through grass
 K:CHASM:141:0
 #$ chasm
@@ -10271,7 +10270,7 @@ K:NEED_TREE:411:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
@@ -10291,7 +10290,7 @@ K:NEED_TREE:412:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | LIVING | NEED_TREE | ATTR_LITE |
 
 N:541:shady ground
@@ -10302,7 +10301,7 @@ K:DEFAULT:414:0
 #$ shady ground
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:HURT_FIRE:413:0
 #$ fire
@@ -10311,7 +10310,7 @@ K:NEED_TREE:414:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
 N:542:shady trail
@@ -10330,7 +10329,7 @@ K:NEED_TREE:415:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | LIVING | NEED_TREE | ATTR_LITE |
 
 N:543:herbs in the shade
@@ -10350,7 +10349,7 @@ K:NEED_TREE:422:0
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
 N:544:snow in the shade
@@ -10360,7 +10359,7 @@ U:421
 O:0
 W:32:1:17:0
 K:DEFAULT:544:0
-K:BRIDGE:545:0
+K:PATH:545:0
 #$ shady snowy trail
 K:CHASM:141:0
 #$ chasm
@@ -10373,7 +10372,7 @@ K:NEED_TREE:428:0
 K:HURT_WATER:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | SHALLOW | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | SHALLOW | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
 F:HIDE_SNEAK | KILL_MOVE |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
@@ -10393,7 +10392,7 @@ K:NEED_TREE:439:0
 K:HURT_WATER:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | ICE | CAN_FLY |
+F:PATH | HURT_FIRE | ICE | CAN_FLY |
 F:HURT_WATER | LIVING | NEED_TREE | ATTR_LITE |
 
 N:546:shady deep snowy trail
@@ -10412,7 +10411,7 @@ K:NEED_TREE:430:0
 K:HURT_WATER:201:0
 #$ deep mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | SHALLOW | HURT_FIRE | ICE | CAN_FLY |
+F:PATH | SHALLOW | HURT_FIRE | ICE | CAN_FLY |
 F:HURT_WATER | MUST_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 N:547:open vent
@@ -10437,7 +10436,7 @@ K:HURT_ACID:564:0
 K:HURT_WATER:565:0
 #$ water-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | HURT_FIRE | HURT_ACID | CAN_OOZE |
+F:PATH | HURT_FIRE | HURT_ACID | CAN_OOZE |
 F:HURT_POIS | HURT_WATER | HURT_BWATER | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 #Deep snow - hidden
@@ -10462,7 +10461,7 @@ K:NEED_TREE:451:5
 K:HURT_WATER:200:5
 #$ deep mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET |
-F:BRIDGE | LAKE | SHALLOW | DEEP | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | SHALLOW | DEEP | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
 F:HIDE_SNEAK | KILL_MOVE |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
@@ -10483,7 +10482,7 @@ K:NEED_TREE:452:5
 K:HURT_WATER:201:5
 #$ deep mud
 F:LOS | PROJECT | MOVE | PLACE | DROP | TUNNEL |
-F:BRIDGE | LAKE | SHALLOW | DEEP | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | SHALLOW | DEEP | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
 F:HIDE_SNEAK |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
@@ -10498,14 +10497,14 @@ K:KILL_MOVE:551:0
 #$ steep sandy trail in the shade
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:551:0
+K:PATH:551:0
 #$ steep sandy trail in the shade
 K:HURT_FIRE:532:0
 #$ burning hillside
 K:NEED_TREE:525:0
 #$ sand dune
 F:LOS | PROJECT | PLACE | DROP |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG |
 F:KILL_MOVE |
 F:EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
@@ -10537,14 +10536,14 @@ W:30:1:15:0
 K:DEFAULT:552:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:553:0
+K:PATH:553:0
 #$ steep dirt trail in the shade
 K:HURT_FIRE:532:0
 #$ burning hillside
 K:NEED_TREE:527:0
 #$ earth mound
 F:LOS | PROJECT | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:GROUND | EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 #Note -- open trail through earth
@@ -10563,7 +10562,7 @@ K:HURT_FIRE:532:0
 K:NEED_TREE:528:0
 #$ steep dirt trail
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 N:554:steep trail in the shade
@@ -10582,7 +10581,7 @@ K:HURT_FIRE:532:0
 K:NEED_TREE:529:0
 #$ steep trail
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:GET_FEAT | EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 N:555:shady grassy hill
@@ -10592,7 +10591,7 @@ U:421
 O:0
 W:27:1:15:0
 K:DEFAULT:555:0
-K:BRIDGE:556:0
+K:PATH:556:0
 #$ steep shady trail through grass
 K:CHASM:141:0
 #$ chasm
@@ -10601,7 +10600,7 @@ K:HURT_FIRE:532:0
 K:NEED_TREE:530:0
 #$ grassy hill
 F:LOS | PROJECT | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:GROUND | EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
@@ -10621,7 +10620,7 @@ K:HURT_FIRE:532:0
 K:NEED_TREE:531:0
 #$ steep trail through grass
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 N:557:shadowy hill
@@ -10633,14 +10632,14 @@ W:24:1:15:0
 K:DEFAULT:557:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:554:0
+K:PATH:554:0
 #$ steep trail in the shade
 K:HURT_FIRE:532:0
 #$ burning hillside
 K:NEED_TREE:533:0
 #$ open hill
 F:LOS | PROJECT | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:GROUND | EASY_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 N:558:chasm in the shade
@@ -10655,12 +10654,12 @@ W:48:2:13:140
 T:FALL_MORE:10d6
 K:DEFAULT:141:0
 #$ chasm
-K:BRIDGE:140:0
+K:PATH:140:0
 #$ stone bridge
 K:NEED_TREE:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
-F:BRIDGE | RIVER | LAKE | HURT_FIRE | CHASM | CAN_FLY |
+F:PATH | RIVER | LAKE | HURT_FIRE | CHASM | CAN_FLY |
 F:MUST_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 D:You fall into the chasm!
 
@@ -10673,12 +10672,12 @@ K:KILL_MOVE:560:0
 #$ salty trail
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:560:0
+K:PATH:560:0
 #$ salty trail
 K:HURT_WATER:401:0
 #$ salt water
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:BRIDGE | LAKE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG | KILL_MOVE |
+F:PATH | LAKE | CAN_CLIMB | CAN_FLY | CAN_DIG | HIDE_DIG | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | ATTR_LITE |
 
 N:560:salty trail
@@ -10791,7 +10790,7 @@ K:TREE:562:0
 K:ADJACENT:569:0
 #$ acid-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | ACID | CAN_OOZE |
+F:PATH | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 
 N:565:water-filled vent
@@ -10811,7 +10810,7 @@ K:ADJACENT:570:0
 K:HURT_COLD:574:0
 #$ ice-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_OOZE |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 D:You are surrounded by a geyser of water!
 
@@ -10832,7 +10831,7 @@ K:TREE:211:0
 K:INSTANT:581:0
 #$ gas-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a burning green gas!
 
@@ -10853,7 +10852,7 @@ K:TREE:212:0
 K:INSTANT:582:0
 #$ steam-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:568:fiery vent
@@ -10873,7 +10872,7 @@ K:TREE:213:0
 K:INSTANT:583:0
 #$ fiery vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:569:acid-filled vent
@@ -10892,7 +10891,7 @@ K:TREE:562:0
 K:INSTANT:584:0
 #$ acid-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | ACID | CAN_OOZE |
+F:PATH | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:570:water-filled vent
@@ -10913,7 +10912,7 @@ K:INSTANT:585:0
 K:HURT_COLD:574:0
 #$ ice-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | WATER | FILLED | HURT_COLD | CAN_OOZE |
+F:PATH | WATER | FILLED | HURT_COLD | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a geyser of water!
 
@@ -10940,7 +10939,7 @@ K:HURT_ACID:589:0
 K:HURT_WATER:590:0
 #$ water-filled valve
 F:NOTICE | REMEMBER | CLOSE | BASH | WALL |
-F:BRIDGE | HURT_FIRE | HURT_ACID | CAN_OOZE |
+F:PATH | HURT_FIRE | HURT_ACID | CAN_OOZE |
 F:HURT_POIS | HURT_WATER | HURT_BWATER | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:572:closed valve
@@ -10958,7 +10957,7 @@ K:OPEN:858:0
 K:SPIKE:573:0
 #$ jammed valve
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | WALL |
-F:BRIDGE |
+F:PATH |
 F:ATTR_LITE |
 
 N:573:jammed valve
@@ -10974,7 +10973,7 @@ K:CHASM:141:15
 K:OPEN:858:15
 #$ opening valve
 F:NOTICE | REMEMBER | BASH | WALL |
-F:BRIDGE |
+F:PATH |
 F:ATTR_LITE |
 D:The valve is stuck.
 
@@ -10995,7 +10994,7 @@ K:INSTANT:570:0
 K:HURT_FIRE:547:0
 #$ open vent
 F:NOTICE | REMEMBER | WALL | HIT_TRAP |
-F:BRIDGE | FILLED | HURT_FIRE |
+F:PATH | FILLED | HURT_FIRE |
 F:MUST_CLIMB | ATTR_LITE |
 
 N:575:cracked ice wall
@@ -11069,7 +11068,7 @@ K:HURT_WATER:578:20
 K:STREAMER:113:20
 #$ cracked granite wall
 F:REMEMBER | TUNNEL | STREAMER | WALL |
-F:BRIDGE | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_PASS | CAN_OOZE |
+F:PATH | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_PASS | CAN_OOZE |
 F:HURT_WATER | ATTR_LITE |
 
 N:578:water-filled cracked granite wall
@@ -11093,7 +11092,7 @@ K:ADJACENT:579:20
 K:STREAMER:113:20
 #$ cracked granite wall
 F:REMEMBER | TUNNEL | STREAMER | WALL |
-F:BRIDGE | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_PASS | CAN_OOZE |
+F:PATH | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_PASS | CAN_OOZE |
 F:ATTR_LITE | ADJACENT |
 
 N:579:water-filled cracked granite wall
@@ -11116,7 +11115,7 @@ K:INSTANT:580:20
 K:STREAMER:113:20
 #$ cracked granite wall
 F:REMEMBER | TUNNEL | STREAMER | WALL |
-F:BRIDGE | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_CLIMB | CAN_PASS |
+F:PATH | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_CLIMB | CAN_PASS |
 F:CAN_OOZE |
 F:ATTR_LITE | INSTANT |
 
@@ -11140,7 +11139,7 @@ K:INSTANT:577:20
 K:STREAMER:113:20
 #$ cracked granite wall
 F:REMEMBER | TUNNEL | STREAMER | WALL |
-F:BRIDGE | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_PASS | CAN_OOZE |
+F:PATH | LAKE | FILLED | HURT_ROCK | HURT_COLD | CAN_PASS | CAN_OOZE |
 F:ATTR_LITE | INSTANT |
 
 N:581:gas-filled vent
@@ -11160,7 +11159,7 @@ K:TREE:211:0
 K:INSTANT:547:0
 #$ open vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a burning green gas!
 
@@ -11181,7 +11180,7 @@ K:TREE:212:0
 K:INSTANT:547:0
 #$ open vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:583:fiery vent
@@ -11201,7 +11200,7 @@ K:TREE:213:0
 K:INSTANT:547:0
 #$ open vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:584:acid-filled vent
@@ -11220,7 +11219,7 @@ K:TREE:562:0
 K:INSTANT:547:0
 #$ open vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | ACID | CAN_OOZE |
+F:PATH | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:585:water-filled vent
@@ -11238,7 +11237,7 @@ K:TREE:562:0
 K:INSTANT:547:0
 #$ open vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | WATER | FILLED | CAN_OOZE |
+F:PATH | WATER | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a geyser of water!
 
@@ -11260,7 +11259,7 @@ K:ADJACENT:591:0
 K:CLOSE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 D:You are surrounded by a burning green gas!
 
@@ -11282,7 +11281,7 @@ K:ADJACENT:592:0
 K:CLOSE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 
 N:588:fiery valve
@@ -11303,7 +11302,7 @@ K:ADJACENT:593:0
 K:CLOSE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 
 N:589:acid-filled valve
@@ -11323,7 +11322,7 @@ K:ADJACENT:594:0
 K:CLOSE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | ACID | CAN_OOZE |
+F:PATH | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 
 N:590:water-filled valve
@@ -11343,7 +11342,7 @@ K:ADJACENT:595:0
 K:CLOSE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | WATER | FILLED | CAN_OOZE |
+F:PATH | WATER | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 D:You are surrounded by a geyser of water!
 
@@ -11365,7 +11364,7 @@ K:INSTANT:596:0
 K:CLOSE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a burning green gas!
 
@@ -11385,7 +11384,7 @@ K:TREE:212:0
 K:INSTANT:597:0
 #$ steam-filled valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:593:fiery valve
@@ -11404,7 +11403,7 @@ K:TREE:213:0
 K:INSTANT:598:0
 #$ fiery valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:594:acid-filled valve
@@ -11422,7 +11421,7 @@ K:TREE:562:0
 K:INSTANT:599:0
 #$ acid-filled valve
 F:NOTICE | REMEMBER | CLOSE | WALL |
-F:BRIDGE | FILLED | ACID | CAN_OOZE |
+F:PATH | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:595:water-filled valve
@@ -11440,7 +11439,7 @@ K:TREE:562:0
 K:INSTANT:600:0
 #$ water-filled valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | WATER | FILLED | CAN_OOZE |
+F:PATH | WATER | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a geyser of water!
 
@@ -11460,7 +11459,7 @@ K:TREE:211:0
 K:INSTANT:571:0
 #$ open valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a burning green gas!
 
@@ -11480,7 +11479,7 @@ K:TREE:212:0
 K:INSTANT:571:0
 #$ open valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:598:fiery valve
@@ -11499,7 +11498,7 @@ K:TREE:213:0
 K:INSTANT:571:0
 #$ open valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | CAN_OOZE |
+F:PATH | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:599:acid-filled valve
@@ -11517,7 +11516,7 @@ K:TREE:562:0
 K:INSTANT:571:0
 #$ open valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | FILLED | ACID | CAN_OOZE |
+F:PATH | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:600:water-filled valve
@@ -11535,7 +11534,7 @@ K:TREE:562:0
 K:INSTANT:571:0
 #$ open valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | WATER | FILLED | CAN_OOZE |
+F:PATH | WATER | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a geyser of water!
 
@@ -11610,7 +11609,7 @@ W:57:1:14:136
 T:LAVA:24d10
 K:DEFAULT:161:0
 #$ falling lava
-K:BRIDGE:210:0
+K:PATH:210:0
 #$ deep lava under a magma crust
 K:CHASM:214:0
 #$ lava fall
@@ -11619,7 +11618,7 @@ K:TREE:161:0
 K:INSTANT:161:0
 #$ falling lava
 F:MOVE | PLACE | NOTICE | REMEMBER | LESS |
-F:BRIDGE | LAKE | GLOW | LAVA | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
+F:PATH | LAKE | GLOW | LAVA | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
 F:OUTSIDE | ATTR_LITE | INSTANT |
 
 N:605:falling oil
@@ -11677,7 +11676,7 @@ K:DEFAULT:155:0
 #$ clear deep water
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:HURT_POIS:397:0
 #$ deep poisonous water
@@ -11688,7 +11687,7 @@ K:HURT_COLD:133:0
 K:TREE:155:0
 #$ deep water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 
@@ -11708,7 +11707,7 @@ K:HURT_WATER:611:0
 K:INSTANT:307:0
 #$ wet floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | RIVER | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SNEAK | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -11730,7 +11729,7 @@ K:HURT_COLD:145:0
 K:INSTANT:610:0
 #$ water over open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -11748,7 +11747,7 @@ K:HURT_COLD:145:0
 K:INSTANT:307:0
 #$ wet floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -11771,7 +11770,7 @@ K:ADJACENT:612:0
 K:TIMED:498:0
 #$ a wave over deep poisonous water
 F:LOS | PROJECT | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | EASY_CLIMB | ATTR_LITE | ADJACENT |
 F:TIMED |
 
@@ -11790,7 +11789,7 @@ K:HURT_COLD:145:0
 K:INSTANT:613:0
 #$ water over open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -11808,7 +11807,7 @@ K:HURT_COLD:145:0
 K:INSTANT:608:0
 #$ water over open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -11830,7 +11829,7 @@ K:HURT_WATER:616:0
 K:INSTANT:400:0
 #$ wet sand
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | RIVER | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -11850,7 +11849,7 @@ K:CHASM:151:0
 K:INSTANT:400:0
 #$ wet sand
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -11869,7 +11868,7 @@ K:ADJACENT:617:0
 K:TIMED:617:0
 #$ a wave over sand
 F:LOS | PROJECT | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 F:ADJACENT | TIMED |
 
@@ -11886,7 +11885,7 @@ K:CHASM:151:0
 K:INSTANT:618:0
 #$ water over sand
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
+F:PATH | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:618:water over sand
@@ -11903,7 +11902,7 @@ K:CHASM:151:0
 K:INSTANT:614:0
 #$ water over sand
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -11925,7 +11924,7 @@ K:HURT_WATER:622:0
 K:INSTANT:4:0
 #$ open door
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | CLOSE | RUN |
-F:BRIDGE | RIVER | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SNEAK | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | ATTR_LITE | INSTANT |
 D:The water holds the door open.
@@ -11947,7 +11946,7 @@ K:HURT_COLD:145:0
 K:INSTANT:621:0
 #$ water through an open door
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | CLOSE |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 D:The water holds the door open.
@@ -11968,7 +11967,7 @@ K:HURT_COLD:145:0
 K:INSTANT:4:0
 #$ open door
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | CLOSE |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 D:The water holds the door open.
@@ -11990,7 +11989,7 @@ K:ADJACENT:623:0
 K:TIMED:498:0
 #$ a wave over deep poisonous water
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | CLOSE |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HURT_POIS | HURT_WATER | USE_FEAT | EASY_CLIMB | ATTR_LITE | ADJACENT |
 F:TIMED |
 D:The water holds the door open.
@@ -12010,7 +12009,7 @@ K:HURT_COLD:145:0
 K:INSTANT:624:0
 #$ water through an open door
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | CLOSE |
-F:BRIDGE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 D:The water holds the door open.
@@ -12031,7 +12030,7 @@ K:HURT_COLD:145:0
 K:INSTANT:619:0
 #$ water through an open door
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | CLOSE |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 D:The water holds the door open.
@@ -12098,14 +12097,14 @@ W:0:1:17:0
 K:DEFAULT:628:1
 K:CHASM:141:1
 #$ chasm
-K:BRIDGE:427:1
+K:PATH:427:1
 #$ tree trunk
 K:HURT_FIRE:423:1
 #$ burning tree
 K:INSTANT:427:1
 #$ tree trunk
 F:LOS | REMEMBER | BASH |
-F:BRIDGE | WATER | DEEP | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
+F:PATH | WATER | DEEP | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:629:a wave breaking over open ground
@@ -12116,12 +12115,12 @@ K:DEFAULT:414:0
 #$ a wave breaking over open ground
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:INSTANT:633:0
 #$ wet ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | WATER | DEEP | CAN_CLIMB | CAN_FLY |
+F:PATH | WATER | DEEP | CAN_CLIMB | CAN_FLY |
 F:GROUND | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:630:a wave breaking over shady ground
@@ -12134,14 +12133,14 @@ K:DEFAULT:414:0
 #$ a wave breaking over shady ground
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:TREE:541:0
 #$ shady ground
 K:INSTANT:634:0
 #$ shady wet ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | WATER | DEEP | CAN_CLIMB | CAN_FLY |
+F:PATH | WATER | DEEP | CAN_CLIMB | CAN_FLY |
 F:GROUND | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:631:water
@@ -12160,7 +12159,7 @@ K:HURT_COLD:145:0
 K:INSTANT:633:0
 #$ wet ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -12180,7 +12179,7 @@ K:HURT_COLD:145:0
 K:INSTANT:634:0
 #$ shady wet ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | WATER | SHALLOW | HURT_COLD | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT |
 
@@ -12192,7 +12191,7 @@ K:DEFAULT:414:0
 #$ wet ground
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:HURT_COLD:143:0
 #$ ice
@@ -12201,7 +12200,7 @@ K:TREE:634:0
 K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_COLD | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_COLD | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 N:634:shady wet ground
@@ -12214,14 +12213,14 @@ K:DEFAULT:414:0
 #$ shady wet ground
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:415:0
+K:PATH:415:0
 #$ open trail
 K:HURT_COLD:541:0
 #$ shady ground
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | LAKE | HURT_COLD | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | HURT_COLD | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 N:635:water over deep mud
@@ -12235,7 +12234,7 @@ K:DEFAULT:201:0
 #$ water
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:198:0
+K:PATH:198:0
 #$ deep mud under a stone bridge
 K:TREE:201:0
 #$ deep mud
@@ -12246,7 +12245,7 @@ K:HURT_COLD:199:0
 K:SECRET:636:0
 #$ shady water over deep mud
 F:LOS | PROJECT | MOVE | DROP | SECRET | REMEMBER |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_DIG | HIDE_ITEM |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_DIG | HIDE_ITEM |
 F:HIDE_DIG |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The water covers deep mud.
@@ -12262,7 +12261,7 @@ K:DEFAULT:201:0
 #$ water
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:198:0
+K:PATH:198:0
 #$ deep mud under a stone bridge
 K:TREE:201:0
 #$ deep mud
@@ -12271,7 +12270,7 @@ K:HURT_WATER:485:0
 K:HURT_COLD:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | DROP | SECRET | REMEMBER |
-F:BRIDGE | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_DIG | HIDE_ITEM |
+F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_DIG | HIDE_ITEM |
 F:HIDE_DIG |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The water covers deep mud.
@@ -13251,7 +13250,7 @@ O:0
 W:0:1:17:0
 K:DEFAULT:427:5
 #$ tree
-K:BRIDGE:408:5
+K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
 #$ wall of fire
@@ -13264,7 +13263,7 @@ K:SECRET:701:5
 K:STREAMER:113:5
 #$ cracked granite wall
 F:LOS | SECRET | NOTICE | REMEMBER | BASH | STREAMER |
-F:BRIDGE | LAKE | HURT_FIRE | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
 F:LIVING | TREE | ATTR_LITE |
 D:The tree trunk blocks your way!
 
@@ -13276,7 +13275,7 @@ O:0
 W:0:1:17:0
 K:DEFAULT:427:5
 #$ impassable tree trunk
-K:BRIDGE:408:5
+K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
 #$ wall of fire
@@ -13285,7 +13284,7 @@ K:CHASM:455:5
 K:STREAMER:113:5
 #$ cracked granite wall
 F:LOS | NOTICE | REMEMBER | BASH | STREAMER |
-F:BRIDGE | LAKE | HURT_FIRE | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
 F:LIVING | TREE | ATTR_LITE |
 
 N:702:impassable pile of ice rubble
@@ -13335,7 +13334,7 @@ O:0
 W:0:1:17:0
 K:DEFAULT:427:5
 #$ tree trunk
-K:BRIDGE:408:5
+K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
 #$ wall of fire
@@ -13346,7 +13345,7 @@ K:SECRET:705:5
 K:STREAMER:114:5
 #$ earth wall
 F:LOS | SECRET | NOTICE | REMEMBER | BASH | STREAMER |
-F:BRIDGE | LAKE | HURT_FIRE |
+F:PATH | LAKE | HURT_FIRE |
 F:LIVING | ATTR_LITE |
 D:The tree trunk blocks your way!
 
@@ -13358,7 +13357,7 @@ O:0
 W:0:1:17:0
 K:DEFAULT:427:5
 #$ impassable tree trunk
-K:BRIDGE:408:5
+K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
 #$ wall of fire
@@ -13367,7 +13366,7 @@ K:CHASM:455:5
 K:STREAMER:114:5
 #$ earth wall
 F:LOS | NOTICE | REMEMBER | BASH | STREAMER |
-F:BRIDGE | LAKE | HURT_FIRE |
+F:PATH | LAKE | HURT_FIRE |
 F:LIVING | ATTR_LITE |
 
 #Semi-active phase
@@ -13388,7 +13387,7 @@ K:TREE:211:0
 K:TIMED:710:0
 #$ erupting gas-filled vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | FILLED | CAN_OOZE |
+F:PATH | LAKE | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 D:You are surrounded by a burning green gas!
 
@@ -13408,7 +13407,7 @@ K:TREE:213:0
 K:TIMED:712:0
 #$ erupting fiery vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | FILLED | CAN_OOZE |
+F:PATH | LAKE | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:708:acid-filled vent which erupts acid
@@ -13427,7 +13426,7 @@ K:TREE:562:0
 K:TIMED:713:0
 #$ erupting acid vent
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | FILLED | ACID | CAN_OOZE |
+F:PATH | LAKE | FILLED | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
 N:709:water-filled vent which erupts water
@@ -13447,7 +13446,7 @@ K:HURT_COLD:574:0
 K:TIMED:714:0
 #$ erupting water spout
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | WATER | FILLED | HURT_COLD | CAN_OOZE |
+F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 D:You are surrounded by a geyser of water!
 
@@ -13469,7 +13468,7 @@ K:TREE:211:0
 K:ERUPT:715:0
 #$ open vent which erupts poison
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | FILLED | CAN_OOZE |
+F:PATH | LAKE | FILLED | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 D:You are surrounded by a burning green gas!
 
@@ -13566,7 +13565,7 @@ K:TREE:562:0
 K:TIMED:706:0
 #$ gas-filled vent which erupts gas
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | CAN_OOZE |
+F:PATH | LAKE | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:716:open vent which erupts boiling water
@@ -13584,7 +13583,7 @@ K:TREE:562:0
 K:TIMED:206:0
 #$ steam-filled vent which erupts boiling water
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | LAVA | WATER | CAN_OOZE |
+F:PATH | LAKE | LAVA | WATER | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:717:open vent which erupts fire
@@ -13602,7 +13601,7 @@ K:TREE:562:0
 K:TIMED:707:0
 #$ fiery vent which erupts fire
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | CAN_OOZE |
+F:PATH | LAKE | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:718:open vent which erupts acid
@@ -13620,7 +13619,7 @@ K:TREE:562:0
 K:TIMED:708:0
 #$ acid-filled vent which erupts acid
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | ACID | CAN_OOZE |
+F:PATH | LAKE | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:719:open vent which erupts water
@@ -13637,7 +13636,7 @@ K:TREE:562:0
 K:TIMED:709:0
 #$ water-filled vent which erupts water
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | LAKE | WATER | CAN_OOZE |
+F:PATH | LAKE | WATER | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:720:magma crust
@@ -13658,10 +13657,10 @@ K:TREE:541:8
 #$ shady ground
 K:TIMED:943:8
 #$ broken magma crust
-K:BRIDGE:432:8
+K:PATH:432:8
 #$ magma crust
 F:LOS | PROJECT | PLACE | DROP | NOTICE | REMEMBER | RUN |
-F:BRIDGE | LAKE | COVERED | GLOW | CAN_CLIMB | CAN_FLY | HIDE_DIG |
+F:PATH | LAKE | COVERED | GLOW | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:GET_FEAT | EASY_CLIMB | ATTR_LITE | TIMED |
 
 N:721:deep lava which erupts lava
@@ -13673,14 +13672,14 @@ T:LAVA:12d10
 K:DEFAULT:721:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:210:0
+K:PATH:210:0
 #$ deep lava under a magma crust
 K:TIMED:722:0
 #$ erupting lava
 K:HURT_WATER:720:0
 #$ magma crust
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | GLOW | LAVA | SHALLOW | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | GLOW | LAVA | SHALLOW | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | ATTR_LITE | TIMED | SPREAD |
 
 N:722:erupting lava
@@ -13692,7 +13691,7 @@ T:LAVA:24d10
 K:DEFAULT:722:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:215:0
+K:PATH:215:0
 #$ deep lava under a stone bridge
 K:TREE:217:0
 #$ deep lava
@@ -13701,7 +13700,7 @@ K:ERUPT:770:0
 K:TIMED:943:0
 #$ broken magma crust
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | ADJACENT | TIMED | ERUPT |
 
 N:723:window
@@ -14057,7 +14056,7 @@ K:CHASM:141:0
 #$ chasm
 K:OPEN:753:0
 #$ opening lever on a granite wall
-K:BRIDGE:1:0
+K:PATH:1:0
 #$ open floor
 K:SOLID:753:0
 #$ opening lever on a granite wall
@@ -14066,7 +14065,7 @@ K:INNER:862:0
 K:DOOR:726:0
 #$ locked gate
 F:NOTICE | REMEMBER | OPEN | TUNNEL | WALL | OUTER |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
 
 #F:POWER_40
@@ -14407,12 +14406,12 @@ K:TREE:56:0
 #$ granite wall
 K:ADJACENT:739:0
 #$ closed lever on a granite wall
-K:BRIDGE:1:0
+K:PATH:1:0
 #$ open floor
 K:INSTANT:739:0
 #$ closed lever on a granite wall
 F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 #M:738
@@ -14433,10 +14432,10 @@ K:TREE:56:0
 #$ granite wall
 K:ADJACENT:738:0
 #$ open lever on a granite wall
-K:BRIDGE:1:0
+K:PATH:1:0
 #$ open floor
 F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 #M:739
@@ -14750,7 +14749,7 @@ K:CHASM:141:1
 K:HURT_FIRE:502:1
 #$ fire
 F:LOS | PROJECT | REMEMBER | TUNNEL | HAS_ITEM |
-F:BRIDGE | HURT_FIRE | CAN_FLY | CAN_DIG | HIDE_SNEAK |
+F:PATH | HURT_FIRE | CAN_FLY | CAN_DIG | HIDE_SNEAK |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 D:You have found something!
 
@@ -14767,7 +14766,7 @@ K:CHASM:141:1
 K:HURT_FIRE:502:1
 #$ fire
 F:LOS | PROJECT | REMEMBER | TUNNEL | HAS_ITEM |
-F:BRIDGE | HURT_FIRE | CAN_FLY | CAN_DIG | HIDE_SNEAK |
+F:PATH | HURT_FIRE | CAN_FLY | CAN_DIG | HIDE_SNEAK |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:768:a midden containing something
@@ -14854,7 +14853,7 @@ K:CHASM:141:1
 K:HURT_FIRE:502:1
 #$ fire
 F:LOS | NOTICE | REMEMBER | TUNNEL |
-F:BRIDGE | LAKE | HURT_FIRE | CAN_FLY | CAN_DIG | HIDE_SNEAK |
+F:PATH | LAKE | HURT_FIRE | CAN_FLY | CAN_DIG | HIDE_SNEAK |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:772:Gandalf's Firework Shop
@@ -14930,7 +14929,7 @@ W:48:1:8:0
 K:DEFAULT:786:0
 #$ rope bridge
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:KILL_HUGE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
@@ -14945,7 +14944,7 @@ K:OPEN:893:15
 K:CLOSE:894:15
 #$ closing chain bridge
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | OPEN | CLOSE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE |
 
 N:781:wooden bridge
@@ -14957,7 +14956,7 @@ K:DEFAULT:783:0
 K:HURT_FIRE:784:0
 #$ burning wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:PATH | COVERED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
 
 N:782:weak wooden bridge (hidden)
@@ -14973,7 +14972,7 @@ K:HURT_FIRE:790:0
 K:SECRET:783:0
 #$ weak wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | ATTR_LITE |
 
 N:783:weak wooden bridge over a chasm
@@ -14985,7 +14984,7 @@ K:DEFAULT:789:0
 K:HURT_FIRE:790:0
 #$ burning wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | ATTR_LITE |
 
 N:784:burning wooden bridge over a chasm
@@ -14998,7 +14997,7 @@ K:DEFAULT:790:0
 K:HURT_WATER:790:0
 #$ burning wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | OUTSIDE | ATTR_LITE | SPREAD |
 
 N:785:giant spider web hanging over a chasm
@@ -15008,7 +15007,7 @@ W:48:3:7:0
 K:DEFAULT:791:0
 #$ giant spider web hanging over a chasm
 F:PROJECT | PLACE | NOTICE | REMEMBER | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | CAN_CLIMB | HIDE_ITEM | KILL_HUGE |
+F:PATH | LAKE | COVERED | HURT_FIRE | CAN_CLIMB | HIDE_ITEM | KILL_HUGE |
 F:KILL_MOVE |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
@@ -15029,7 +15028,7 @@ K:TIMED:802:0
 K:MORE:1:0
 #$ open floor
 F:LOS | PROJECT | PLACE | REMEMBER | SPIKE | STAIRS | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
+F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY | KILL_HUGE | KILL_MOVE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
@@ -15050,7 +15049,7 @@ K:TIMED:802:0
 K:MORE:1:0
 #$ open floor
 F:LOS | PROJECT | PLACE | REMEMBER | SPIKE | STAIRS | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | COVERED | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
 F:KILL_HUGE | KILL_MOVE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
@@ -15067,7 +15066,7 @@ K:HURT_FIRE:795:0
 K:SECRET:789:0
 #$ broken wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
 F:KILL_MOVE |
 F:OUTSIDE | ATTR_LITE |
 
@@ -15080,7 +15079,7 @@ K:DEFAULT:794:0
 K:HURT_FIRE:795:0
 #$ falling burning wood
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
 F:KILL_MOVE |
 F:OUTSIDE | ATTR_LITE |
 
@@ -15094,7 +15093,7 @@ K:DEFAULT:795:0
 K:HURT_WATER:789:0
 #$ broken wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | CAN_CLIMB | CAN_FLY |
+F:PATH | COVERED | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | OUTSIDE | ATTR_LITE | SPREAD |
 
 N:791:falling giant spider web
@@ -15104,7 +15103,7 @@ W:15:3:7:0
 K:DEFAULT:141:0
 #$ falling giant spider web
 F:PROJECT | PLACE | NOTICE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | HURT_FIRE | CHASM | HIDE_ITEM | KILL_MOVE |
+F:PATH | COVERED | HURT_FIRE | CHASM | HIDE_ITEM | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:792:falling rope
@@ -15114,7 +15113,7 @@ W:48:1:8:0
 K:DEFAULT:142:0
 #$ falling rope
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CHASM | CAN_FLY |
+F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT |
 
 N:793:falling chain
@@ -15124,7 +15123,7 @@ W:48:1:8:0
 K:DEFAULT:142:0
 #$ falling chain
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CHASM | CAN_FLY |
+F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT |
 
 N:794:falling wooden bridge
@@ -15135,7 +15134,7 @@ T:HURT:4d6
 K:DEFAULT:142:0
 #$ falling wooden bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CHASM | CAN_FLY |
+F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT |
 
 N:795:falling burning wood
@@ -15146,7 +15145,7 @@ T:FIRE:4d6
 K:DEFAULT:142:0
 #$ falling burning wood
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CHASM | CAN_FLY |
+F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT | SPREAD |
 
 N:796:ice bridge
@@ -15157,7 +15156,7 @@ W:48:1:8:142
 K:DEFAULT:797:0
 #$ ice bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | COVERED | HURT_FIRE | CAN_FLY | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
 
 N:797:broken ice bridge over a chasm
@@ -15168,7 +15167,7 @@ W:48:1:8:142
 K:DEFAULT:798:0
 #$ broken ice bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | CHASM | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | COVERED | HURT_FIRE | CHASM | CAN_FLY | KILL_HUGE |
 F:KILL_MOVE |
 F:OUTSIDE | ATTR_LITE |
 
@@ -15180,7 +15179,7 @@ T:ICE:4d6
 K:DEFAULT:144:0
 #$ falling ice
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CHASM | CAN_FLY | KILL_HUGE |
+F:PATH | COVERED | CHASM | CAN_FLY | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT |
 
 N:799:vine bridge
@@ -15192,7 +15191,7 @@ K:DEFAULT:800:0
 K:KILL_HUGE:800:0
 #$ vine hanging over a chasm
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
+F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY | KILL_HUGE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | LIVING | ATTR_LITE |
 
@@ -15211,7 +15210,7 @@ K:TIMED:804:0
 K:MORE:456:0
 #$ vines
 F:LOS | PROJECT | PLACE | REMEMBER | STAIRS | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
+F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY | KILL_HUGE | KILL_MOVE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | MUST_CLIMB | LIVING | ATTR_LITE | TIMED |
 
@@ -15222,7 +15221,7 @@ W:48:1:8:0
 K:DEFAULT:142:0
 #$ falling vine
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
-F:BRIDGE | BRIDGED | CHASM | CAN_FLY |
+F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | LIVING | ATTR_LITE | INSTANT |
 
 N:802:rope swinging over a chasm
@@ -15233,7 +15232,7 @@ K:DEFAULT:792:0
 #$ rope swinging over a chasm
 K:INSTANT:786:0
 #$ rope hanging over a chasm
-K:BRIDGE:786:0
+K:PATH:786:0
 #$ rope hanging over a chasm
 K:CHASM:786:0
 #$ rope hanging over a chasm
@@ -15244,7 +15243,7 @@ K:SPIKE:779:0
 K:MORE:1:0
 #$ open floor
 F:LOS | PROJECT | PLACE | REMEMBER | SPIKE | STAIRS | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
+F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 
@@ -15256,7 +15255,7 @@ K:DEFAULT:793:0
 #$ chain swinging over a chasm
 K:INSTANT:787:0
 #$ chain hanging over a chasm
-K:BRIDGE:787:0
+K:PATH:787:0
 #$ chain hanging over a chasm
 K:CHASM:787:0
 #$ chain hanging over a chasm
@@ -15267,7 +15266,7 @@ K:SPIKE:780:0
 K:MORE:1:0
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | SPIKE | STAIRS | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
+F:PATH | LAKE | COVERED | HURT_ACID | CHASM | CAN_CLIMB | CAN_FLY |
 F:GET_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:804:vine swinging over a chasm
@@ -15278,7 +15277,7 @@ K:DEFAULT:801:0
 #$ vine swinging over a chasm
 K:INSTANT:800:0
 #$ vine hanging over a chasm
-K:BRIDGE:800:0
+K:PATH:800:0
 #$ vine hanging over a chasm
 K:CHASM:800:0
 #$ vine hanging over a chasm
@@ -15287,7 +15286,7 @@ K:TREE:800:0
 K:MORE:456:0
 #$ vines
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | STAIRS | MORE | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
+F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY |
 F:GET_FEAT | OUTSIDE | LIVING | ATTR_LITE | INSTANT |
 
@@ -16025,14 +16024,14 @@ K:DEFAULT:847:0
 #$ acid
 K:CHASM:226:0
 #$ acid fall
-K:BRIDGE:843:0
+K:PATH:843:0
 #$ boiling acid
 K:SECRET:159:0
 #$ deep acid
 K:TREE:158:0
 #$ deep acid
 F:LOS | PROJECT | MOVE | PLACE | DROP | SECRET | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | MUST_CLIMB | ATTR_LITE | TIMED | ERUPT |
 D:The acid is deeper than it looks.
@@ -16049,14 +16048,14 @@ K:DEFAULT:849:0
 #$ deep boiling acid
 K:CHASM:226:0
 #$ acid fall
-K:BRIDGE:156:0
+K:PATH:156:0
 #$ deep acid under a stone bridge
 K:USE_FEAT:843:0
 #$ boiling acid
 K:TREE:159:0
 #$ deep acid
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | DEEP | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | MUST_CLIMB | ATTR_LITE | TIMED | ERUPT |
 
@@ -16099,14 +16098,14 @@ K:DEFAULT:844:0
 #$ acidic vapour
 K:CHASM:226:0
 #$ acid fall
-K:BRIDGE:168:0
+K:PATH:168:0
 #$ acidic vapour around a stone bridge
 K:SECRET:849:0
 #$ acidic vapour over deep boiling acid
 K:TREE:170:0
 #$ acidic vapour over deep acid
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 D:The acidic vapours conceal a pool of deep boiling acid.
@@ -16137,12 +16136,12 @@ W:54:2:14:51
 T:ACID:4d6
 K:DEFAULT:845:0
 #$ acidic vapour over deep boiling acid
-K:BRIDGE:168:0
+K:PATH:168:0
 #$ acidic vapour around a stone bridge
 K:CHASM:141:0
 #$ chasm
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | DEEP | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:MUST_CLIMB | ATTR_LITE | TIMED | SPREAD |
 
@@ -16310,7 +16309,7 @@ K:DEFAULT:571:0
 K:CHASM:141:0
 #$ chasm
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE | CAN_OOZE |
+F:PATH | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT | ADJACENT |
 
 N:859:closing valve
@@ -16327,7 +16326,7 @@ K:CHASM:141:0
 K:TREE:572:0
 #$ closed valve
 F:NOTICE | REMEMBER | WALL |
-F:BRIDGE |
+F:PATH |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 N:860:painting on a granite wall
@@ -16456,7 +16455,7 @@ K:OPEN:867:40
 K:CHASM:780:40
 #$ chain bridge
 F:REMEMBER | OPEN | CLOSE | TUNNEL | WALL | OUTER |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
 
 N:866:opening mechanism in a granite wall
@@ -16477,7 +16476,7 @@ K:ADJACENT:878:40
 K:INSTANT:878:40
 #$ mechanism in a granite wall
 F:REMEMBER | TUNNEL | WALL | SOLID |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 N:867:closing mechanism in a granite wall
@@ -16498,7 +16497,7 @@ K:INSTANT:878:40
 K:ADJACENT:878:40
 #$ mechanism in a granite wall
 F:REMEMBER | TUNNEL | WALL | INNER |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 N:868:sliding granite wall
@@ -16519,12 +16518,12 @@ K:DOOR:726:40
 #$ locked gate
 K:OPEN:870:40
 #$ opening sliding wall
-K:BRIDGE:853:40
+K:PATH:853:40
 #$ linked chain
 K:CHASM:780:40
 #$ chain bridge
 F:REMEMBER | OPEN | TUNNEL | WALL | OUTER |
-F:BRIDGE | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
 
 N:869:open sliding wall
@@ -16542,10 +16541,10 @@ K:TREE:541:15
 #$ shady ground
 K:CLOSE:871:15
 #$ closing sliding wall
-K:BRIDGE:853:15
+K:PATH:853:15
 #$ linked chain
 F:LOS | PROJECT | MOVE | PLACE | DROP | CLOSE | RUN | FLOOR |
-F:BRIDGE | CAN_CLIMB | CAN_FLY |
+F:PATH | CAN_CLIMB | CAN_FLY |
 F:ATTR_LITE |
 
 N:870:opening sliding wall
@@ -16563,10 +16562,10 @@ K:TREE:49:40
 #$ pile of rubble
 K:ADJACENT:869:40
 #$ open sliding wall
-K:BRIDGE:853:40
+K:PATH:853:40
 #$ linked chain
 F:REMEMBER | TUNNEL |
-F:BRIDGE | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
+F:PATH | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
 F:EASY_CLIMB | ATTR_LITE | ADJACENT |
 
 N:871:closing sliding wall
@@ -16584,10 +16583,10 @@ K:TREE:49:40
 #$ pile of rubble
 K:ADJACENT:868:40
 #$ sliding granite wall
-K:BRIDGE:853:40
+K:PATH:853:40
 #$ linked chain
 F:REMEMBER | TUNNEL |
-F:BRIDGE | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
+F:PATH | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
 F:EASY_CLIMB | ATTR_LITE | ADJACENT |
 
 N:872:locked cupboard
@@ -17052,7 +17051,7 @@ W:48:1:8:0
 T:KILL_TRAP
 K:DEFAULT:787:0
 #$ opening chain bridge
-K:BRIDGE:780:0
+K:PATH:780:0
 #$ chain bridge
 K:CHASM:780:0
 #$ chain bridge
@@ -17061,7 +17060,7 @@ K:TREE:780:0
 K:ADJACENT:780:0
 #$ chain bridge
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT |
 
 N:894:closing chain bridge
@@ -17071,7 +17070,7 @@ W:48:1:8:0
 T:LOCK_DOOR
 K:DEFAULT:787:0
 #$ closing chain bridge
-K:BRIDGE:780:0
+K:PATH:780:0
 #$ chain bridge
 K:CHASM:780:0
 #$ chain bridge
@@ -17080,7 +17079,7 @@ K:TREE:780:0
 K:ADJACENT:780:0
 #$ chain bridge
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
-F:BRIDGE | LAKE | BRIDGED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT |
 
 N:895:rapidly growing shoot
@@ -17088,7 +17087,7 @@ G:.:G
 O:0
 W:1:10:15:0
 K:DEFAULT:895:0
-K:BRIDGE:412:0
+K:PATH:412:0
 #$ open trail through grass
 K:CHASM:141:0
 #$ chasm
@@ -17101,7 +17100,7 @@ K:HURT_WATER:629:0
 K:INSTANT:896:0
 #$ quivering sapling
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:BRIDGE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | LIVING | ATTR_LITE | INSTANT |
 
@@ -17712,7 +17711,7 @@ K:CHASM:141:3
 K:HURT_ACID:502:3
 #$ fire
 F:LOS | PROJECT | REMEMBER | HAS_ITEM |
-F:BRIDGE | HURT_ACID | CAN_FLY | HIDE_SNEAK |
+F:PATH | HURT_ACID | CAN_FLY | HIDE_SNEAK |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 D:You have found something!
 
@@ -17729,7 +17728,7 @@ K:CHASM:141:3
 K:HURT_ACID:502:3
 #$ fire
 F:LOS | PROJECT | REMEMBER | HAS_ITEM |
-F:BRIDGE | HURT_ACID | CAN_FLY | HIDE_SNEAK |
+F:PATH | HURT_ACID | CAN_FLY | HIDE_SNEAK |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:929:pile of metal
@@ -17745,7 +17744,7 @@ K:CHASM:141:1
 K:HURT_ACID:165:1
 #$ acidic vapour
 F:LOS | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | HURT_ACID | CAN_FLY | HIDE_SNEAK |
+F:PATH | LAKE | HURT_ACID | CAN_FLY | HIDE_SNEAK |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:930:broken metal
@@ -17770,7 +17769,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:931:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:TREE:155:0
 #$ deep water
@@ -17783,7 +17782,7 @@ K:HURT_COLD:932:0
 K:TIMED:932:0
 #$ deep water under unstable ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | WATER | DEEP | HURT_FIRE | HURT_COLD | CAN_FLY |
+F:PATH | RIVER | LAKE | WATER | DEEP | HURT_FIRE | HURT_COLD | CAN_FLY |
 F:CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED |
 
@@ -17797,7 +17796,7 @@ K:DEFAULT:931:0
 #$ deep water under unstable ice
 K:HURT_FIRE:155:0
 #$ deep water
-K:BRIDGE:147:0
+K:PATH:147:0
 #$ deep water under ice under a stone bridge
 K:CHASM:151:0
 #$ waterfall
@@ -17825,10 +17824,10 @@ K:TREE:464:16
 #$ pile of ice rubble
 K:TIMED:934:16
 #$ rising ice wall
-K:BRIDGE:147:16
+K:PATH:147:16
 #$ deep water under ice under a stone bridge
 F:REMEMBER | TUNNEL | WALL | HIT_TRAP |
-F:BRIDGE | LAKE | ICE | CAN_PASS | CAN_OOZE | CAN_DIG |
+F:PATH | LAKE | ICE | CAN_PASS | CAN_OOZE | CAN_DIG |
 F:OUTSIDE | EASY_CLIMB | ATTR_LITE | TIMED |
 
 N:934:rising ice wall
@@ -17846,10 +17845,10 @@ K:TREE:115:16
 #$ cracked ice wall
 K:INSTANT:125:16
 #$ unstable ice wall
-K:BRIDGE:147:16
+K:PATH:147:16
 #$ deep water under ice under a stone bridge
 F:PROJECT | MOVE | NOTICE | REMEMBER | TUNNEL | WALL | HIT_TRAP |
-F:BRIDGE | LAKE | ICE | CAN_PASS | CAN_OOZE |
+F:PATH | LAKE | ICE | CAN_PASS | CAN_OOZE |
 F:ATTR_LITE | INSTANT |
 
 N:935:the crest of a wave over deep icy water
@@ -17862,7 +17861,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:935:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:ADJACENT:936:0
 #$ a wave over deep icy water
@@ -17873,7 +17872,7 @@ K:HURT_FIRE:485:0
 K:HURT_COLD:933:0
 #$ unstable pile of ice rubble
 F:LOS | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_FIRE | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | WATER | FILLED | HURT_FIRE | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM |
 F:USE_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT | TIMED |
 
@@ -17887,7 +17886,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:936:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:INSTANT:937:0
 #$ deep rough icy water
@@ -17896,7 +17895,7 @@ K:HURT_FIRE:488:0
 K:HURT_COLD:933:0
 #$ unstable pile of ice rubble
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | FILLED | HURT_FIRE | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | WATER | FILLED | HURT_FIRE | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
@@ -17910,7 +17909,7 @@ T:WATER_WEAK:4d6
 K:DEFAULT:937:0
 K:CHASM:151:0
 #$ waterfall
-K:BRIDGE:152:0
+K:PATH:152:0
 #$ deep water under a stone bridge
 K:INSTANT:934:0
 #$ rising ice wall
@@ -17919,7 +17918,7 @@ K:HURT_FIRE:491:0
 K:HURT_COLD:933:0
 #$ unstable pile of ice rubble
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | DEEP | HURT_FIRE | HURT_COLD | CAN_FLY | CAN_SWIM |
+F:PATH | WATER | DEEP | HURT_FIRE | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 
@@ -17939,10 +17938,10 @@ K:CHASM:151:0
 #$ waterfall
 K:ERUPT:601:0
 #$ falling water
-K:BRIDGE:153:0
+K:PATH:153:0
 #$ water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SNEAK |
+F:PATH | WATER | SHALLOW | CAN_FLY | CAN_SWIM | HIDE_ITEM | HIDE_SNEAK |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | ERUPT |
 
@@ -17965,10 +17964,10 @@ K:TIMED:940:0
 #$ acidic vapour over acid
 K:ERUPT:602:0
 #$ falling acid
-K:BRIDGE:157:0
+K:PATH:157:0
 #$ acid
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | RIVER | LAKE | SHALLOW | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
+F:PATH | RIVER | LAKE | SHALLOW | HURT_ACID | ACID | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | TIMED | ERUPT |
 
@@ -17986,10 +17985,10 @@ K:CHASM:226:0
 #$ acid fall
 K:ERUPT:602:0
 #$ falling acid
-K:BRIDGE:157:0
+K:PATH:157:0
 #$ acid
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | SHALLOW | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:PATH | RIVER | LAKE | SHALLOW | ACID | CAN_FLY | CAN_SWIM | HIDE_ITEM |
 F:ATTR_LITE | TIMED | ERUPT | SPREAD |
 
 N:941:geothermal ground
@@ -18001,7 +18000,7 @@ W:40:2:7:0
 K:DEFAULT:941:0
 K:CHASM:141:0
 #$ chasm
-K:BRIDGE:431:0
+K:PATH:431:0
 #$ geothermal ground
 K:TIMED:942:0
 #$ steam over geothermal ground
@@ -18010,7 +18009,7 @@ K:ERUPT:603:0
 K:HURT_BWATER:942:0
 #$ steam over geothermal ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | CAN_FLY | HIDE_ITEM |
 F:HURT_BWATER | GROUND | OUTSIDE | ATTR_LITE | TIMED | ERUPT |
 
 N:942:steam over geothermal ground
@@ -18028,7 +18027,7 @@ K:SPREAD:941:0
 K:ERUPT:603:0
 #$ falling boiling water
 F:PROJECT | MOVE | PLACE | DROP | REMEMBER |
-F:BRIDGE | LAKE | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | CAN_FLY | HIDE_ITEM |
 F:GROUND | OUTSIDE | ATTR_LITE | ERUPT | SPREAD |
 
 N:943:broken magma crust
@@ -18061,12 +18060,12 @@ T:LAVA:12d10
 K:DEFAULT:944:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:215:0
+K:PATH:215:0
 #$ deep lava under a stone bridge
 K:TIMED:945:0
 #$ erupting lava
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | GLOW | LAVA | SHALLOW | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | GLOW | LAVA | SHALLOW | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | ATTR_LITE | TIMED | SPREAD |
 
 N:945:erupting lava
@@ -18078,7 +18077,7 @@ T:LAVA:24d10
 K:DEFAULT:945:0
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:215:0
+K:PATH:215:0
 #$ deep lava under a stone bridge
 K:TREE:217:0
 #$ deep lava
@@ -18087,7 +18086,7 @@ K:ERUPT:946:0
 K:TIMED:218:0
 #$ deep lava
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:BRIDGE | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
+F:PATH | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | ADJACENT | TIMED | ERUPT |
 
 N:946:lava
@@ -18102,10 +18101,10 @@ K:CHASM:214:0
 #$ lava fall
 K:HURT_WATER:210:0
 #$ deep lava under a magma crust
-K:BRIDGE:215:0
+K:PATH:215:0
 #$ deep lava under a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER |
-F:BRIDGE | RIVER | LAKE | GLOW | LAVA | SHALLOW | HURT_FIRE | CAN_FLY |
+F:PATH | RIVER | LAKE | GLOW | LAVA | SHALLOW | HURT_FIRE | CAN_FLY |
 F:HIDE_ITEM |
 F:HURT_WATER | OUTSIDE | ATTR_LITE | TIMED |
 
@@ -18121,12 +18120,12 @@ K:DEFAULT:216:0
 #$ magma crust
 K:CHASM:214:0
 #$ lava fall
-K:BRIDGE:432:0
+K:PATH:432:0
 #$ magma crust
 K:TIMED:948:0
 #$ broken magma crust
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | BASH |
-F:BRIDGE | LAKE | COVERED | GLOW | LAVA | CAN_FLY | HIDE_ITEM | KILL_HUGE |
+F:PATH | LAKE | COVERED | GLOW | LAVA | CAN_FLY | HIDE_ITEM | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE | TIMED |
 
 N:948:broken magma crust

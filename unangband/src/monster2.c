@@ -2892,7 +2892,7 @@ int place_monster_here(int y, int x, int r_idx)
 	}
 
 	/* Get mimiced feat if covered/bridged */
-	if ((f_ptr->flags2 & (FF2_COVERED | FF2_BRIDGED)) != 0)
+	if ((f_ptr->flags2 & (FF2_COVERED)) != 0)
 	{
 		resist = mon_resist_feat(f_ptr->mimic,r_idx);
 	}
@@ -3007,7 +3007,7 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 	else if ((f_ptr->flags3 & (FF3_EASY_HIDE)) != 0)
 	{
 		/* Covered/bridged features are special */
-                if ((f_ptr->flags2 & (FF2_BRIDGED)) != 0)
+                if ((f_ptr->flags2 & (FF2_COVERED)) != 0)
 		{
 			/* Nothing */
 		}

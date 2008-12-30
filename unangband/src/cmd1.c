@@ -2055,8 +2055,8 @@ void hit_trap(int y, int x)
 		f_ptr = &f_info[feat];
 	}
 
-	/* Use covered or bridged if necessary */
-	if ((f_ptr->flags2 & (FF2_COVERED)) || (f_ptr->flags2 & (FF2_BRIDGED)))
+	/* Use covered if necessary */
+	if (f_ptr->flags2 & (FF2_COVERED))
 	{
 		f_ptr = &f_info[f_ptr->mimic];
 	}

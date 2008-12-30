@@ -684,8 +684,8 @@ int region_piece_cnt;
 region_type *region_list;
 
 
-int region__max;
-int region__cnt;
+int region_max;
+int region_cnt;
 
 
 
@@ -1334,5 +1334,6 @@ u32b hack_monster_equip;
  */
 int target_path_n;
 u16b target_path_g[512];
+s16b target_path_d[512];
 
 

@@ -122,6 +122,7 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 /* options specific to Un */
 #define OPT_cheat_lore           (OPT_CHEAT+20)
 #define OPT_cheat_auto           (OPT_CHEAT+21)
+#define OPT_cheat_wall           (OPT_CHEAT+22)
 
 #define OPT_adult_randarts          (OPT_ADULT+1)
 #define OPT_adult_ironman           (OPT_ADULT+3)
@@ -146,6 +147,7 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 /* options specific to Un */
 #define OPT_score_lore           (OPT_SCORE+20)
 #define OPT_score_auto           (OPT_SCORE+21)
+#define OPT_score_wall           (OPT_SCORE+22)
 
 /*
  * Hack -- Option symbols
@@ -192,8 +194,8 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define easy_search		  	OPT(easy_search)
 #define view_glowing_lite 	OPT(view_glowing_lite)
 #define show_sidebar      	OPT(show_sidebar)
-#define show_itemlist      OPT(show_itemlist)    
-#define depth_in_feet      OPT(depth_in_feet)   
+#define show_itemlist      OPT(show_itemlist)
+#define depth_in_feet      OPT(depth_in_feet)
 #define view_flavors       OPT(view_flavors)
 #define easy_corpses      	OPT(easy_corpses)
 #define view_unsafe_grids 	OPT(view_unsafe_grids)
@@ -223,6 +225,7 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define cheat_live				OPT(cheat_live)
 #define cheat_lore            OPT(cheat_lore)
 #define cheat_auto            OPT(cheat_auto)
+#define cheat_wall            OPT(cheat_wall)
 
 #define adult_randarts			OPT(adult_randarts)
 #define adult_ironman			OPT(adult_ironman)
@@ -245,5 +248,6 @@ extern const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER];
 #define score_live				OPT(score_live)
 #define score_lore            OPT(score_lore)
 #define score_auto            OPT(score_auto)
+#define score_wall            OPT(score_wall)
 
 #endif /* !INCLUDED_OPTIONS_H */

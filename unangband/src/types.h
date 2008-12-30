@@ -189,6 +189,9 @@ struct maxima
 
 	u16b o_max;     /* Max size for "o_list[]" */
 	u16b m_max;     /* Max size for "m_list[]" */
+
+	u16b region_piece_max;	/* Max size for "region_piece_list" */
+	u16b region_max;		/* Max size for "region_list" */
 };
 
 
@@ -923,6 +926,8 @@ struct region_type
 	byte effect;		/* Effect of ongoing damage */
 	byte level;			/* Level for ongoing damage */
 
+	s16b damage;			/* Damage */
+
 	byte y0;			/* Source y location */
 	byte x0;			/* Source x location */
 	byte y1;			/* Destination y location */
@@ -940,9 +945,6 @@ struct region_type
 	u32b flags1;		/* Ongoing effect bitflags */
 
 	s16b first_in_sequence;	/* First region piece in sequence */
-
-	s16b next_region;	/* Next region in a list of regions */
-	s16b child_region;	/* Next child region */
 };
 
 

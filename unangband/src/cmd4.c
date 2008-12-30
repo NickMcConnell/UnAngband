@@ -281,7 +281,7 @@ int feat_order(int feat)
 	else if (f_ptr->flags3 & (FF3_ALLOC)) return (9);
 	else if (f_ptr->flags1 & (FF1_FLOOR)) return (0);
 	else if (f_ptr->flags1 & (FF1_STREAMER)) return (6);
-	else if (f_ptr->flags2 & (FF2_BRIDGED)) return (10);
+	else if (f_ptr->flags2 & (FF2_COVERED)) return (10);
 	else if (f_ptr->flags2 & (FF2_LAVA)) return (12);
 	else if (f_ptr->flags2 & (FF2_ICE)) return (13);
 	else if (f_ptr->flags2 & (FF2_CAN_DIG)) return (17);

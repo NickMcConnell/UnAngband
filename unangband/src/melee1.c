@@ -5506,11 +5506,11 @@ void mon_hit_trap(int m_idx, int y, int x)
 	/* Hack --- don't activate unknown invisible traps */
 	if (cave_feat[y][x] == FEAT_INVIS) return;
 
-	/* Avoid trap */
-	if ((f_ptr->flags1 & (FF1_TRAP)) && (mon_avoid_trap(m_idx, y, x))) return;
-
 	/* Get feature */
 	f_ptr = &f_info[cave_feat[y][x]];
+
+	/* Avoid trap */
+	if ((f_ptr->flags1 & (FF1_TRAP)) && (mon_avoid_trap(m_ptr, y, x))) return;
 
 	/* Get "the monster" or "it" */
 	monster_desc(m_name, sizeof(m_name), m_idx, 0);
@@ -5531,8 +5531,8 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 	}
 
-	/* Use covered or bridged if necessary */
-	if ((f_ptr->flags2 & (FF2_COVERED)) || (f_ptr->flags2 & (FF2_BRIDGED)))
+	/* Use covered if necessary */
+	if (f_ptr->flags2 & (FF2_COVERED))
 	{
 		f_ptr = &f_info[f_ptr->mimic];
 	}

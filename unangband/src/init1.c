@@ -297,11 +297,11 @@ static cptr f_info_flags1[] =
  */
 static cptr f_info_flags2[] =
 {
-	"BRIDGE",
+	"PATH",
 	"RIVER",
 	"LAKE",
-	"BRIDGED",
 	"COVERED",
+	"PUSH",
 	"GLOW",
 	"LAVA",
 	"WATER",

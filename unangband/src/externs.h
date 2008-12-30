@@ -221,6 +221,13 @@ extern byte (*play_info)[256];
 extern s16b (*cave_feat)[DUNGEON_WID];
 extern s16b (*cave_o_idx)[DUNGEON_WID];
 extern s16b (*cave_m_idx)[DUNGEON_WID];
+extern s16b (*cave_region_piece)[DUNGEON_WID];
+extern region_piece_type *region_piece_list;
+extern int region_piece_max;
+extern int region_piece_cnt;
+extern region_type *region_list;
+extern int region_max;
+extern int region_cnt;
 extern void (*modify_grid_adjacent_hook)(byte *a, char *c, int y, int x, byte adj_char[16]);
 extern void (*modify_grid_boring_hook)(byte *a, char *c, int y, int x, byte cinfo, byte pinfo);
 extern void (*modify_grid_unseen_hook)(byte *a, char *c);
@@ -371,6 +378,7 @@ extern ecology_type cave_ecology;
 extern u32b hack_monster_equip;
 extern int target_path_n;
 extern u16b target_path_g[512];
+extern s16b target_path_d[512];
 
 
 /*
@@ -894,6 +902,7 @@ extern bool res_stat(int stat);
 extern bool apply_disenchant(int mode);
 extern bool hates_fire(object_type *o_ptr);
 extern void check_monster_quest(int m_idx, bool (*questor_test_hook)(int m_idx), u32b event);
+extern bool temp_lite(int y, int x);
 extern bool project_f(int who, int what, int y, int x, int dam, int typ);
 extern bool project_o(int who, int what, int y, int x, int dam, int typ);
 extern bool project_m(int who, int what, int y, int x, int dam, int typ);

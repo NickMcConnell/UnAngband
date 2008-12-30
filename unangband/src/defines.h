@@ -1342,11 +1342,11 @@
 #define FF1_SOLID       0x40000000L
 #define FF1_HIT_TRAP    0x80000000L
 
-#define FF2_BRIDGE      0x00000001
+#define FF2_PATH      0x00000001
 #define FF2_RIVER       0x00000002
 #define FF2_LAKE	0x00000004
-#define FF2_BRIDGED     0x00000008
-#define FF2_COVERED     0x00000010
+#define FF2_COVERED     0x00000008
+#define FF2_PUSH     0x00000010
 #define FF2_GLOW	0x00000020
 #define FF2_LAVA	0x00000040
 #define FF2_WATER       0x00000080
@@ -4904,7 +4904,6 @@
 	 !(f_info[cave_feat[Y][X]].flags1 & (FF1_PERMANENT)) && \
 	(((!(f_info[cave_feat[Y][X]].blow.method) && \
 	!(f_info[cave_feat[Y][X]].spell))) || \
-	(f_info[cave_feat[Y][X]].flags2 & (FF2_BRIDGED)) || \
 	(f_info[cave_feat[Y][X]].flags2 & (FF2_COVERED)) ) && \
 	(cave_m_idx[Y][X] == 0))
 

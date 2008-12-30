@@ -416,7 +416,7 @@ static bool variable_terrain(int *feat, int oldfeat)
 		((f_info[oldfeat].flags3 & (FF3_EASY_CLIMB)) == 0))
 	{
 		if (f_info[oldfeat].flags1 & (FF1_TUNNEL)) oldfeat = feat_state(oldfeat, FS_TUNNEL);
-		else if (f_info[oldfeat].flags2 & (FF2_BRIDGE)) oldfeat = feat_state(oldfeat, FS_BRIDGE);
+		else if (f_info[oldfeat].flags2 & (FF2_PATH)) oldfeat = feat_state(oldfeat, FS_BRIDGE);
 		else oldfeat = FEAT_FLOOR;
 	}
 
@@ -677,7 +677,7 @@ static void build_terrain(int y, int x, int feat)
 	{
 		newfeat = feat;
 	}
-	else if (f2_ptr->flags2 & (FF2_BRIDGED))
+	else if (f2_ptr->flags2 & (FF2_COVERED))
 	{
 		newfeat = feat_state(oldfeat, FS_BRIDGE);
 	}
@@ -2292,7 +2292,7 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 	/* Bridge or tunnel edges instead */
 	else if ((flag & (RG1_BRIDGE_EDGE)) != 0)
 	{
-		if (f_info[feat].flags2 & (FF2_BRIDGE))
+		if (f_info[feat].flags2 & (FF2_PATH))
 		{
 			/* Bridge previous contents */
 			edge = feat_state(feat, FS_BRIDGE);
@@ -3790,7 +3790,7 @@ static void set_irregular_room_info(int room, int type, bool light, u32b exclude
 
 						if ((place_flag & (RG1_BRIDGE_EDGE)) != 0)
 						{
-							if (f_info[*feat].flags2 & (FF2_BRIDGE))
+							if (f_info[*feat].flags2 & (FF2_PATH))
 							{
 								/* Bridge previous contents */
 								*edge = feat_state(*feat, FS_BRIDGE);
@@ -7703,7 +7703,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		}
 
 		/* Bridge features (always in rooms, unless 'flooding') */
-		else if (((f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_BRIDGE)) != 0) ||
+		else if (((f_info[cave_feat[tmp_row][tmp_col]].flags2 & (FF2_PATH)) != 0) ||
 			((cave_info[tmp_row][tmp_col] & (CAVE_ROOM)) && !(flood_tunnel)))
 		{
 			bool left_turn = FALSE;
@@ -7732,7 +7732,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				/* Add a 'left-hand' bridge, but ensure the full bridge is no more than 2 wide */
 				if ((style & (TUNNEL_LARGE_L)) && (!(style & (TUNNEL_LARGE_R)) || (style % 2)))
 				{
-					if (f_info[cave_feat[row1+col_dir][col1-row_dir]].flags2 & (FF2_BRIDGE))
+					if (f_info[cave_feat[row1+col_dir][col1-row_dir]].flags2 & (FF2_PATH))
 					{
 						/* Add a bridge location */
 						made_tunnel = add_tunnel(row1 + col_dir, col1 - row_dir, 0);
@@ -7742,7 +7742,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					if (made_tunnel && right_turn)
 					{
 						/* Add if bridgeable */
-						if ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags2 & (FF2_BRIDGE)) != 0)
+						if ((f_info[cave_feat[row1 - row_dir + col_dir ][col1 - col_dir - row_dir]].flags2 & (FF2_PATH)) != 0)
 						{
 							made_tunnel = add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
 						}
@@ -7752,7 +7752,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				/* Add a 'right-hand' bridge, but ensure the full bridge is no more than 2 wide */
 				else if (style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R))
 				{
-					if (f_info[cave_feat[row1-col_dir][col1+row_dir]].flags2 & (FF2_BRIDGE))
+					if (f_info[cave_feat[row1-col_dir][col1+row_dir]].flags2 & (FF2_PATH))
 					{
 						/* Add a bridge location */
 						made_tunnel = add_tunnel(row1 - col_dir, col1 + row_dir, 0);
@@ -7762,7 +7762,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					if (made_tunnel && left_turn)
 					{
 						/* Add if tunnelable, but not inner, outer or solid */
-						if ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags2 & (FF2_BRIDGE)) != 0)
+						if ((f_info[cave_feat[row1 - row_dir - col_dir ][col1 - col_dir + row_dir]].flags2 & (FF2_PATH)) != 0)
 						{
 							made_tunnel = add_tunnel(row1 - row_dir + col_dir, col1 - col_dir - row_dir, 0);
 						}
@@ -8281,7 +8281,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		}
 
 		/* Apply bridge */
-		if (f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGE))
+		if (f_info[cave_feat[y][x]].flags2 & (FF2_PATH))
 		{
 			/* Bridge previous contents */
 			cave_alter_feat(y, x, FS_BRIDGE);

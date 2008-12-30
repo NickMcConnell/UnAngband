@@ -1147,7 +1147,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		if (pinfo & (PLAY_MARK))
 		{
 			/* Apply "mimic" field */
-			feat = f_info[feat].mimic;
+			if (!cheat_wall) feat = f_info[feat].mimic;
 
 			/* Apply "under" field if appropriate */
 			if (f_info[feat].under)
@@ -5532,8 +5532,8 @@ bool require_chasm_edge(int y, int x)
 bool has_chasm_edge(int y, int x)
 {
 	return ((cave_feat[y][x] != FEAT_NONE) &&
-		 ((f_info[cave_feat[y][x]].flags2 & (FF2_CHASM)) != 0) &&
-		 ((f_info[cave_feat[y][x]].flags2 & (FF2_BRIDGED)) != 0));
+		 (((f_info[cave_feat[y][x]].flags2 & (FF2_CHASM)) != 0) ||
+		 ((f_info[cave_feat[y][x]].flags2 & (FF2_COVERED)) != 0)));
 }
 
 bool redraw_chasm_edge_loss(int y, int x)

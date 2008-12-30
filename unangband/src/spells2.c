@@ -7961,3 +7961,557 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 	return(obvious);
 }
 
+/*
+ * Regions are a collection of grids that have a common ongoing effect.
+ *
+ * We usually define a region to indicate what grids an ongoing effect will possibly hit.
+ * We use the projection function to return a list of grids, by passing it the PROJECT_CHCK
+ * flag. We then initialise a region based on this list of grids.
+ *
+ * A region can be traversed in one of two ways:
+ *
+ * 1. cave_region_piece[y][x] refers to the first region index on top of a stack of regions.
+ * Subsequent regions are chained together as a linked list of regions referred to by the
+ * next_region_idx of each previous region in the list.
+ *
+ * 2. ongoing_effect[n] refers to the first region index of all grids that have a common
+ * effect applied to them. Subsequent regions are chained together as a linked list of
+ * all regions referred by by the next_region_sequence of each previous region in the list.
+ *
+ * We'll only every add and remove to regions by adding or deleting a list of grids
+ * corresponding to an effect. However, if we modify a grid so that it blocks or unblocks
+ * line of sight or line of fire (as appropriate) for an effect on that grid, we will
+ * need to recompute the list of grids in the region for the ongoing effect.
+ *
+ * All this complication is required to ensure that we have a list of all ongoing effects
+ * that could possibly apply to a particular grid, so that the monster AI can determine
+ * whether a grid is safe or not.
+ */
+
+/*
+ * Excise a region piece from any stacks
+ */
+void excise_region_piece(int region_piece)
+{
+	int y = region_piece_list[region_piece].y;
+	int x = region_piece_list[region_piece].x;
+
+	s16b this_region_piece, next_region_piece = 0;
+
+	s16b prev_region_piece = 0;
+
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_region_piece;
+
+		/* Done */
+		if (this_region_piece == region_piece)
+		{
+			if (prev_region_piece == 0)
+			{
+				cave_region_piece[y][x] = next_region_piece;
+			}
+			else
+			{
+				region_piece_type *i_ptr;
+
+				/* Previous object */
+				i_ptr = &region_piece_list[prev_region_piece];
+
+				/* Remove from list */
+				i_ptr->next_region_piece = next_region_piece;
+			}
+
+			/* Forget next pointer */
+			rp_ptr->next_region_piece = 0;
+
+			/* Done */
+			break;
+		}
+
+		/* Save prev_o_idx */
+		prev_region_piece = this_region_piece;
+	}
+}
+
+
+/*
+ * Wipe a region piece clean.
+ */
+void region_piece_wipe(region_piece_type *rp_ptr)
+{
+	/* Wipe the structure */
+	(void)WIPE(rp_ptr, region_piece_type);
+}
+
+
+/*
+ * Delete all region pieces when we leave a level.
+ */
+void wipe_region_piece_list(void)
+{
+	int i;
+
+	/* Delete the existing objects */
+	for (i = 1; i < region_piece_max; i++)
+	{
+		region_piece_type *rp_ptr = &region_piece_list[i];
+
+		/* Get the location */
+		int y = rp_ptr->y;
+		int x = rp_ptr->x;
+
+		/* Skip dead region piece */
+		if (!rp_ptr->region) continue;
+
+		/* Hack -- see above */
+		cave_region_piece[y][x] = 0;
+
+		/* Wipe the region_piece */
+		region_piece_wipe(rp_ptr);
+	}
+
+	/* Reset "o_max" */
+	region_piece_max = 1;
+
+	/* Reset "o_cnt" */
+	region_piece_cnt = 0;
+}
+
+
+/*
+ * Get an available region piece
+ */
+s16b region_piece_pop(void)
+{
+	int i;
+
+	/* Initial allocation */
+	if (region_piece_max < z_info->region_piece_max)
+	{
+		/* Get next space */
+		i = region_piece_max;
+
+		/* Expand region piece array */
+		region_piece_max++;
+
+		/* Count region pieces */
+		region_piece_cnt++;
+
+		/* Use this region piece */
+		return (i);
+	}
+
+
+	/* Recycle dead region pieces */
+	for (i = 1; i < region_piece_max; i++)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the region piece */
+		rp_ptr = &region_piece_list[i];
+
+		/* Skip live region pieces */
+		if (rp_ptr->region) continue;
+
+		/* Count region pieces */
+		region_piece_cnt++;
+
+		/* Use this region piece */
+		return (i);
+	}
+
+
+	/* Warn the player */
+	msg_print("Too many region pieces!");
+
+	/* Oops */
+	return (0);
+}
+
+
+/*
+ * This returns a region piece from (y,x) for the corresponding
+ * region, or 0 if no region piece exists on this grid for this
+ * region
+ */
+int get_region_piece(int y, int x, int region)
+{
+	s16b this_region_piece, next_region_piece = 0;
+
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_region_piece;
+
+		/* Done */
+		if (rp_ptr->region == region)
+		{
+			return (this_region_piece);
+		}
+	}
+
+	return (0);
+}
+
+
+/*
+ * Wipe a region clean.
+ */
+void region_wipe(region_type *r_ptr)
+{
+	/* Wipe the structure */
+	(void)WIPE(r_ptr, region_type);
+}
+
+
+/*
+ * Delete all regions when we leave a level.
+ */
+void wipe_region_list(void)
+{
+	int i;
+
+	/* Delete the existing objects */
+	for (i = 1; i < region_max; i++)
+	{
+		region_type *r_ptr = &region_list[i];
+
+		/* Skip dead region piece */
+		if (!r_ptr->type) continue;
+
+		/* Wipe the region */
+		region_wipe(r_ptr);
+	}
+
+	/* Reset "o_max" */
+	region_max = 1;
+
+	/* Reset "o_cnt" */
+	region_cnt = 0;
+}
+
+
+/*
+ * Get an available region
+ */
+s16b region_pop(void)
+{
+	int i;
+
+	/* Initial allocation */
+	if (region_max < z_info->region_max)
+	{
+		/* Get next space */
+		i = region_max;
+
+		/* Expand region array */
+		region_max++;
+
+		/* Count regions */
+		region_cnt++;
+
+		/* Use this region */
+		return (i);
+	}
+
+
+	/* Recycle dead regions */
+	for (i = 1; i < region_max; i++)
+	{
+		region_type *r_ptr;
+
+		/* Get the region */
+		r_ptr = &region_list[i];
+
+		/* Skip live regions */
+		if (r_ptr->type) continue;
+
+		/* Count regions */
+		region_cnt++;
+
+		/* Use this region */
+		return (i);
+	}
+
+
+	/* Warn the player */
+	msg_print("Too many regions!");
+
+	/* Oops */
+	return (0);
+}
+
+
+/*
+ * Deletes all region pieces which refer to a region
+ */
+void region_delete(s16b region)
+{
+	s16b this_region_piece, next_region_piece = 0;
+
+	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+
+		/* Excise region piece */
+		excise_region_piece(this_region_piece);
+
+		/* Forget next pointer */
+		rp_ptr->next_in_sequence = 0;
+	}
+}
+
+
+/*
+ * Inserts the grids of a region into the region pieces
+ */
+void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
+{
+	int i;
+	int last_in_sequence = 0;
+
+	/* Hack - remove previous list of grids */
+	region_delete(region);
+
+	for (i = 0; i < grid_n; i++)
+	{
+		int y = GRID_Y(gp[i]);
+		int x = GRID_X(gp[i]);
+		int r = region_pop();
+
+		region_piece_type *rp_ptr;
+
+		/* Paranoia */
+		if (!r) return;
+
+		rp_ptr = &region_piece_list[r];
+
+		/* Update the region piece with the grid details */
+		rp_ptr->d = gd[i];
+		rp_ptr->x = x;
+		rp_ptr->y = y;
+		rp_ptr->region = region;
+		rp_ptr->next_region_piece = cave_region_piece[y][x];
+		rp_ptr->next_in_sequence = 0;
+		cave_region_piece[y][x] = r;
+
+		/* Stitch together sequence */
+		if (last_in_sequence)
+		{
+			region_piece_list[last_in_sequence].next_in_sequence = r;
+		}
+		else
+		{
+			region_list[region].first_in_sequence = r;
+		}
+
+		/* Last in sequence */
+		last_in_sequence = r;
+	}
+}
+
+
+/*
+ * Updates a region based on the shape of the defined projection.
+ */
+void region_update(s16b region)
+{
+	region_type *r_ptr = &region_list[region];
+
+	method_type *method_ptr = &method_info[r_ptr->method];
+	int range = scale_method(method_ptr->max_range, r_ptr->level);
+	int radius = scale_method(method_ptr->radius, r_ptr->level);
+	u32b flg = r_ptr->flags1 | (PROJECT_CHCK);
+
+	/* Set up the projection */
+	project(r_ptr->who, r_ptr->what, radius, range, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0, r_ptr->effect,
+			 flg, method_ptr->arc, method_ptr->diameter_of_source);
+
+	/* Take the grids and insert them in the region */
+	region_insert(target_path_g, target_path_n, target_path_d, region);
+}
+
+
+/*
+ * Iterate through a region, applying a region_hook function to each grid in the region
+ */
+bool region_iterate(int region, bool region_iterator(int y, int x, int d, int region))
+{
+	s16b this_region_piece, next_region_piece = 0;
+	bool seen = FALSE;
+
+	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+
+		/* Excise region piece */
+		seen |= region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region);
+
+		/* Forget next pointer */
+		rp_ptr->next_in_sequence = 0;
+	}
+
+	return (seen);
+}
+
+
+/*
+ * Hook for redrawing all grids in a region.
+ */
+bool region_refresh_hook(int y, int x, int d, int region)
+{
+	(void)d;
+	(void)region;
+
+	lite_spot(y, x);
+
+	/* Notice elsewhere */
+	return (FALSE);
+}
+
+
+/*
+ * Hook for apply region effect to all grids in region.
+ *
+ * Note the perhaps unnessary code duplication with the project function.
+ */
+bool region_effect_hook(int y, int x, int d, int region)
+{
+	region_type *r_ptr = &region_list[region];
+	u32b flg = r_ptr->flags1;
+	bool notice = FALSE;
+	int dam = r_ptr->effect == GF_FEATURE ? r_ptr->damage : r_ptr->damage / d;
+
+	/* XXX Should we draw graphics here? */
+
+	/* Temporarily lite up grids */
+	if (flg & (PROJECT_LITE))
+	{
+		/* Temporarily lite up the grid */
+		if (temp_lite(y, x)) notice = TRUE;
+	}
+
+	/* Check features */
+	if (flg & (PROJECT_GRID))
+	{
+		/* Affect the feature in that grid */
+		if (project_f(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))
+			notice = TRUE;
+	}
+
+	/* Check objects */
+	if (flg & (PROJECT_ITEM))
+	{
+		/* Affect the object in the grid */
+		if ((cave_o_idx[y][x] > 0) && (project_o(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect)))
+			notice = TRUE;
+	}
+
+	/* Check monsters */
+	if (flg & (PROJECT_KILL))
+	{
+		/* Check for monster */
+		if (cave_m_idx[y][x] > 0)
+		{
+			monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+
+			/* Hack -- handle resist magic. Deeper monsters are more resistant to spells.
+			 * All monsters are more resistant to devices and spells from each other. */
+			if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
+				&& ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
+				&& (rand_int(100) < 20 + p_ptr->depth / (r_ptr->who != SOURCE_PLAYER_CAST ? 1 : 2)))
+			{
+				/* Hack -- resist magic */
+				if (project_m(r_ptr->who, r_ptr->what, y, x, dam, GF_RES_MAGIC)) notice = TRUE;
+			}
+			/* Check if monster evades */
+			/* Area-effect and jumping spells cannot be dodged */
+			else if (!(flg & (PROJECT_ARC | PROJECT_STAR | PROJECT_JUMP |
+					 PROJECT_BOOM)) && (cave_m_idx[y][x] > 0) &&
+				(mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + d, 5 + d, r_ptr->who <= SOURCE_PLAYER_START ? " your magic" : "")))
+			{
+				/* Do nothing */
+			}
+
+			/* Affect the monster in the grid */
+			else if (project_m(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))	notice = TRUE;
+		}
+	}
+
+	/* Check player */
+	if (flg & (PROJECT_PLAY))
+	{
+		/* Player is in this grid */
+		if ((cave_m_idx[y][x] < 0) && (project_f(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))) notice = TRUE;
+	}
+
+	/* Affect marked grid */
+	if ((play_info[y][x] & (PLAY_TEMP)) && (project_t(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))) notice = TRUE;
+
+	/* Return "something was noticed" */
+	return (notice);
+}
+
+
+/*
+ * This routine writes the current feat under the grid to the scalar
+ * for that region. This is used to overlay temporary terrain onto a region,
+ * then restore it later using region_restore_hook.
+ */
+bool region_uplift_hook(int y, int x, int d, int region)
+{
+	int region_piece = get_region_piece(y, x, region);
+
+	region_piece_type *rp_ptr = &region_piece_list[region_piece];
+
+	(void)d;
+
+	rp_ptr->d = cave_feat[y][x];
+
+	/* Notice elsewhere */
+	return (FALSE);
+}
+
+
+/*
+ * Sets the feature for a grid, based on the scalar set for the
+ * region of that grid. Use region_uplift_hook to set the region.
+ */
+bool region_restore_hook(int y, int x, int d, int region)
+{
+	int region_piece = get_region_piece(y, x, region);
+
+	region_piece_type *rp_ptr = &region_piece_list[region_piece];
+
+	(void)d;
+
+	/* Restore the terrain */
+	cave_set_feat(y, x, rp_ptr->d);
+
+	/* Cave_set_feat handles the player noticing this */
+	return (FALSE);
+}
