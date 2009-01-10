@@ -4475,14 +4475,14 @@ int color_char_to_attr(char c)
 	if (c == '\0' || c == ' ') return (TERM_DARK);
 
 	/* Search the color table */
-	for (a = 0; a < MAX_COLORS; a++)
+	for (a = 0; a < BASE_COLORS; a++)
 	{
 		/* Look for the index */
 		if (color_table[a].index_char == c) break;
 	}
 
 	/* If we don't find the color, we assume white */
-	if (a == MAX_COLORS) return (TERM_WHITE);
+	if (a == BASE_COLORS) return (TERM_WHITE);
 
 	/* Return the color */
 	return (a);
@@ -4497,7 +4497,7 @@ int color_text_to_attr(cptr name)
 {
 	int a;
 
-	for (a = 0; a < MAX_COLORS; a++)
+	for (a = 0; a < BASE_COLORS; a++)
 	{
 		if (my_stricmp(name, color_table[a].name) == 0) return (a);
 	}
@@ -4512,7 +4512,7 @@ int color_text_to_attr(cptr name)
  */
 cptr attr_to_text(byte a)
 {
-	if (a < MAX_COLORS) return (color_table[a].name);
+	if (a < BASE_COLORS) return (color_table[a].name);
 
 	/* Oops */
 	return ("Icky");

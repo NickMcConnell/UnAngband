@@ -1855,33 +1855,6 @@ const player_sex sex_info[MAX_SEXES] =
 };
 
 
-
-
-
-/*
- * Hack -- the "basic" color names (see "TERM_xxx")
- */
-const cptr color_names[16] =
-{
-	"Dark",
-	"White",
-	"Slate",
-	"Orange",
-	"Red",
-	"Green",
-	"Blue",
-	"Umber",
-	"Light Dark",
-	"Light Slate",
-	"Violet",
-	"Yellow",
-	"Light Red",
-	"Light Green",
-	"Light Blue",
-	"Light Umber",
-};
-
-
 /*
  * Abbreviations of healthy stats
  */

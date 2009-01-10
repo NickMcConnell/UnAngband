@@ -1437,7 +1437,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			else if (r_ptr->flags1 & (RF1_ATTR_MULTI))
 			{
 				/* Multi-hued attr */
-				a = randint(MAX_COLORS - 1);
+				a = randint(BASE_COLORS - 1);
 
 				/* Normal char */
 				c = dc;
@@ -1458,7 +1458,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			else if (r_ptr->flags9 & (RF9_ATTR_INDEX))
 			{
 				/* Hack -- Fake flavored attr based on monster index */
-				a = (m_idx % (MAX_COLORS - 1)) + 1;
+				a = (m_idx % (BASE_COLORS - 1)) + 1;
 
 				/* Normal char */
 				c = dc;

@@ -3124,7 +3124,7 @@ errr parse_f_info(char *buf, header *head)
 	else if (buf[0] == 'K')
 	{
 		int result, power;
-		
+
 		/* There better be a current f_ptr */
 		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
@@ -3143,13 +3143,13 @@ errr parse_f_info(char *buf, header *head)
 		/* Scan for the values */
 		if (2 != sscanf(t, "%d:%d",
 				&result, &power)) return (PARSE_ERROR_GENERIC);
-		
+
 		/* Is this default entry? */
 		if (streq(s, "DEFAULT"))
 		{
 			/* Analyze result */
 			f_ptr->defaults = result;
-			
+
 			/* Analyze power */
 			f_ptr->power = result;
 		}
@@ -3163,7 +3163,7 @@ errr parse_f_info(char *buf, header *head)
 
 			/* Analyze result */
 			f_ptr->state[i].result = result;
-			
+
 			/* Analyze power */
 			f_ptr->state[i].power = result;
 		}
@@ -9331,14 +9331,14 @@ errr emit_r_info_index(FILE *fp, header *head, int i)
 	if (!multi) fprintf(fp, "#$ Multihued available\n");
 
 	fprintf(fp, "#$ Metallics available:");
-	for (i = 0; i < MAX_COLORS; i++)
+	for (i = 0; i < BASE_COLORS; i++)
 	{
 		if ((metallics & (1 << i)) == 0) fprintf(fp, "%c",color_table[i].index_char);
 	}
 	fprintf(fp, "\n");
 
 	fprintf(fp, "#$ Colors available:");
-	for (i = 0; i < MAX_COLORS; i++)
+	for (i = 0; i < BASE_COLORS; i++)
 	{
 		if ((chromatics & (1 << i)) == 0) fprintf(fp, "%c",color_table[i].index_char);
 	}

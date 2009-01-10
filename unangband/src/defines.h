@@ -2805,6 +2805,19 @@
 #define PR2_SUMMON_CHAR			0x10000000
 
 
+/* Flags for regions */
+#define RE2_TRIGGER				0x00000001	/* Trigger attack when moving into region */
+#define RE2_LINGER				0x00000002	/* Trigger one grid when moving into region */
+#define RE2_TARGET				0x00000004	/* Target triggered region */
+#define RE2_HIT_TRAP			0x00000008	/* Only triggered by being hit, doesn't count down */
+
+#define RE2_WALL				0x00000010	/* Advancing 'wall' of effect */
+#define RE2_SEEKER				0x00000020	/* Seeker effect which hunts down targets */
+#define RE2_VECTOR				0x00000020	/* Vector effect which fires in different directions */
+
+
+
+
 /* Actual projections */
 #define PR1_PROJECT 0xFFFFFFFF & (PROJECT_SELF)
 #define PR2_PROJECT	(PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL)
@@ -5066,15 +5079,16 @@ extern int PlayerUID;
 #define TERM_TEAL       18	/* 't' */
 #define TERM_MUD        19	/* 'm' */
 #define TERM_L_YELLOW   20	/* 'Y' */
-#define TERM_MAGENTA    21	/* 'M' */
+#define TERM_MAGENTA    21	/* 'i' */
 #define TERM_L_TEAL     22	/* 'T' */
 #define TERM_L_VIOLET   23	/* 'V' */
 #define TERM_L_PINK     24	/* 'I' */
-#define TERM_MUSTARD    25	/* 'i' */
+#define TERM_MUSTARD    25	/* 'M' */
 #define TERM_BLUE_SLATE 26	/* 'z' */
 #define TERM_DEEP_L_BLUE 27	/* 'Z' */
 
-#define MAX_COLORS 		28	/* Maximum 'normal' colours */
+#define BASE_COLORS 	28	/* Maximum 'normal' colours */
+#define MAX_COLORS 		256	/* Maximum 'normal' colours */
 
 
 #define ATTR_FULL		0	/* full color translation */

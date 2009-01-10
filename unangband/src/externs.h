@@ -69,8 +69,6 @@ extern const byte blows_table[12][12];
 extern const byte extract_energy[200];
 extern const s32b player_exp[PY_MAX_LEVEL];
 extern const player_sex sex_info[MAX_SEXES];
-extern const byte chest_traps[64];
-extern const cptr color_names[16];
 extern const cptr stat_names[A_MAX];
 extern const cptr stat_names_reduced[A_MAX];
 extern const cptr stat_names_reduced_short[A_MAX];

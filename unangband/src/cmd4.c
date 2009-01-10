@@ -4698,7 +4698,7 @@ void do_cmd_colors(void)
 				if (!kv && !rv && !gv && !bv) continue;
 
 				/* Extract the color name */
-				if (i < 16) name = color_names[i];
+				if (i < BASE_COLORS) name = color_table[i].name;
 
 				/* Dump a comment */
 				fprintf(fff, "# Color '%s'\n", name);
@@ -4745,7 +4745,7 @@ void do_cmd_colors(void)
 				}
 
 				/* Describe the color */
-				name = ((a < 16) ? color_names[a] : "undefined");
+				name = ((a < BASE_COLORS) ? color_table[a].name : "undefined");
 
 				/* Describe the color */
 				Term_putstr(5, 10, -1, TERM_WHITE,
