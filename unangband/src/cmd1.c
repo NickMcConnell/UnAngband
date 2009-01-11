@@ -1807,7 +1807,7 @@ byte py_pickup(int py, int px, int pickup)
 /*
  *  Check if a player avoids the trap
  */
-static bool avoid_trap(int y, int x)
+bool avoid_trap(int y, int x)
 {
 	feature_type *f_ptr;
 

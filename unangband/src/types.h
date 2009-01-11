@@ -921,12 +921,20 @@ struct region_piece_type
  */
 struct region_type
 {
-	byte type;          /* Ongoing Type */
-	byte method;		/* Method of ongoing damage */
+	byte type;          /* Region Type */
 	byte effect;		/* Effect of ongoing damage */
-	byte level;			/* Level for ongoing damage */
+	byte method;		/* Instead of affecting all grids in region, use this method, if defined */
+	byte level;			/* Level used for method, if defined */
 
-	s16b damage;			/* Damage */
+	byte spawn;			/* Spawn this region instead every countdown */
+	byte transform;		/* Transform to this region at end of lifespan */
+	s16b damage;		/* Damage */
+
+	/* If the flags2 & (RE2_PROJECTION) is defined, the following defines the region shape. */
+	byte radius;		/* Region radius */
+	byte range;			/* Region range */
+	byte arc;			/* Region arc (if applies) */
+	byte diameter_of_source;	/* Region diameter of source (if applies) */
 
 	byte y0;			/* Source y location */
 	byte x0;			/* Source x location */
@@ -934,7 +942,7 @@ struct region_type
 	byte x1;			/* Destination x location */
 
 	byte countdown;     /* Number of turns effect has left */
-	byte delay;			/* Number of turns to reset counter to when expired */
+	byte delay;			/* Number of turns to reset counter to when countdown has finished */
 
 	s16b age;			/* Number of turns effect has been alive */
 	s16b lifespan;		/* Number of turns effect will be alive */
@@ -942,7 +950,8 @@ struct region_type
 	s16b who;          	/* Source of effect - 'who'. */
 	s16b what;			/* Source of effect - 'what'. */
 
-	u32b flags1;		/* Ongoing effect bitflags */
+	u32b flags1;		/* Projection bitflags */
+	u32b flags2;		/* Ongoing effect bitflags */
 
 	s16b first_in_sequence;	/* First region piece in sequence */
 };

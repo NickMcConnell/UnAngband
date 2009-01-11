@@ -454,6 +454,7 @@ extern void find_secret(int y, int x);
 extern void search(void);
 extern bool auto_pickup_ignore(const object_type *o_ptr);
 extern byte py_pickup(int py, int px, int pickup);
+extern bool avoid_trap(int y, int x);
 extern void hit_trap(int y, int x);
 extern void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit);
 extern bool auto_activate(const object_type *o_ptr);
@@ -711,6 +712,7 @@ extern void screen_roff(const monster_race *r_ptr, const monster_lore *l_ptr);
 extern void display_roff(const monster_race *r_ptr, const monster_lore *l_ptr);
 extern void screen_monster_look(const int m_idx);
 extern void display_monster_look(const int m_idx);
+extern void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter);
 
 /* monster2.c */
 extern s16b poly_r_idx(int y, int x, int r_idx);
@@ -906,8 +908,13 @@ extern bool project_o(int who, int what, int y, int x, int dam, int typ);
 extern bool project_m(int who, int what, int y, int x, int dam, int typ);
 extern bool project_p(int who, int what, int y, int x, int dam, int typ);
 extern bool project_t(int who, int what, int y, int x, int dam, int typ);
+extern bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
+			 u32b flg, int degrees, byte source_diameter);
+extern bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, int x0, int typ, u32b flg);
 extern bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);
+extern bool project_one(int who, int what, int y, int x, int dam, int typ, u32b flg);
+
 
 /* spells2.c */
 extern bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg, u32b flg2);

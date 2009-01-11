@@ -13532,18 +13532,22 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 		}
 	}
 
-	/* Teleport monsters and player around, alter certain features. */
-	for (i = play_hack; i < grids; i++)
+	/* Use the temporary flag to mark grids */
+	if ((flg & (PROJECT_TEMP)) == 0)
 	{
-		/* Get the grid location */
-		y = GRID_Y(grid[i]);
-		x = GRID_X(grid[i]);
+		/* Teleport monsters and player around, alter certain features. */
+		for (i = play_hack; i < grids; i++)
+		{
+			/* Get the grid location */
+			y = GRID_Y(grid[i]);
+			x = GRID_X(grid[i]);
 
-		/* Grid must be marked. */
-		if (!(play_info[y][x] & (PLAY_TEMP))) continue;
+			/* Grid must be marked. */
+			if (!(play_info[y][x] & (PLAY_TEMP))) continue;
 
-		/* Affect marked grid */
-		if (project_t(who, what, y, x, gd[i], typ)) notice = TRUE;
+			/* Affect marked grid */
+			if (project_t(who, what, y, x, gd[i], typ)) notice = TRUE;
+		}
 	}
 
 	/* Clear the "temp" array  (paranoia is good) */
@@ -13621,7 +13625,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	{
 		if (!blind) notice = TRUE;
 	}
-	
+
 	grid[0] = 0;
 
 	/* Determine projection shape */
@@ -13636,3 +13640,20 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 
 	return (notice);
 }
+
+
+/*
+ * Project effect to a single grid.
+ */
+bool project_one(int who, int what, int y, int x, int dam, int typ, u32b flg)
+{
+	bool notice = FALSE;
+	u16b grid = GRID(y, x);
+	s16b gd = dam;
+	int grids = 1;
+
+	notice |= project_effect(who, what, &grid, &gd, grids, y, x, typ, flg);
+
+	return (notice);
+}
+

@@ -2390,7 +2390,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				int tx = x;
 
 				/* Pick a 'nearby' location */
-				if (flg & (PROJECT_SCATTER)) scatter(&ty, &tx, y, x, 5, 0);
+				if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&ty, &tx, y, x, 5, 0);
 
 				/* Affect distant monsters */
 				if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))

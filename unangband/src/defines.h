@@ -2759,8 +2759,8 @@
 #define PROJECT_MYST         0x20000000 /* 66% grids affected */
 
 /* Projections that don't use projection function */
-#define PROJECT_SCATTER		 0x40000000 /* Scatter up to x2 radius */
-#define PROJECT_EDGE         0x80000000 /* Only affect outmost 2 radius bands*/
+#define PROJECT_TEMP		 0x40000000 /* Retain temporary effects on grid for later */
+#define PROJECT_EDGE         0x80000000 /* Only affect outmost 2 radius bands */
 
 
 /* Melee specific flags */
@@ -2803,17 +2803,37 @@
 
 /* Summoning flags to set */
 #define PR2_SUMMON_CHAR			0x10000000
+#define PR2_SCATTER				0x20000000
 
 
 /* Flags for regions */
 #define RE2_TRIGGER				0x00000001	/* Trigger attack when moving into region */
 #define RE2_LINGER				0x00000002	/* Trigger one grid when moving into region */
-#define RE2_TARGET				0x00000004	/* Target triggered region */
-#define RE2_HIT_TRAP			0x00000008	/* Only triggered by being hit, doesn't count down */
+#define RE2_SPAWN				0x00000004	/* Instead of apply an attack, spawn a new region */
+#define RE2_AUTOMATIC			0x00000008	/* Automatically apply effect every update */
 
-#define RE2_WALL				0x00000010	/* Advancing 'wall' of effect */
-#define RE2_SEEKER				0x00000020	/* Seeker effect which hunts down targets */
-#define RE2_VECTOR				0x00000020	/* Vector effect which fires in different directions */
+#define RE2_MANUAL				0x00000010	/* Region effect only applied to 'newly affected' regions */
+#define RE2_WALL				0x00000020	/* Advancing 'wall' of effect */
+#define RE2_SEEKER				0x00000040	/* Seeker effect which hunts down targets */
+#define RE2_PROJECTION			0x00000080	/* Grids affected are defined and updated as a projection */
+
+#define RE2_SCALAR_FEATURE		0x00000100	/* Region scalar encodes a feature */
+#define RE2_SCALAR_DAMAGE		0x00000200	/* Region scalar encodes damage */
+#define RE2_SCALAR_VECTOR		0x00000400	/* Region scalar encodes direction and speed */
+#define RE2_SCALAR_DISTANCE		0x00000800	/* Region scalar encodes distance */
+
+#define RE2_CLOSEST_MON			0x00001000	/* Use closest monster as a target */
+#define RE2_PLATFORM			0x00002000	/* As region moves, it pushes stuff around */
+#define RE2_HIT_TRAP			0x00004000	/* Avoid triggering source as if a trap (requires trigger) */
+#define RE2_RANDOM				0x00008000	/* Target a random grid in the region */
+
+#define RE2_AGE_INCREASE		0x00010000	/* Damage increases with age. If DECREASE defined, damage peaks at 1/2 lifespan, then drops. */
+#define RE2_AGE_DECREASE		0x00020000	/* Damage decreases with age. If INCREASE defined, damage peaks at 1/2 lifespan, then drops. */
+#define RE2_INVERSE				0x00040000	/* Invert source and target when spawning attack */
+#define RE2_NOTICE				0x00080000	/* Noticed region? */
+
+#define RE2_CHAIN				0x00100000	/* Set region source and destination to source and target determined when attacking */
+
 
 
 
@@ -4881,6 +4901,16 @@
  */
 #define cave_project_bold(Y,X) \
 	(!(cave_info[Y][X] & (CAVE_XLOF)))
+
+
+/*
+ * Determine if a "legal" grid is suitable for projections.
+ * Third parameter is the projection flags. We either check LOS if
+ * PROJECT_LOS is set, otherwise we check line of fire.
+ */
+#define cave_passable_bold(Y,X,R) \
+	(!(cave_info[Y][X] & ((R & (PROJECT_LOS)) != 0 ? CAVE_XLOS : CAVE_XLOF)))
+
 
 
 /*

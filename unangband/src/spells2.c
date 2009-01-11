@@ -5360,6 +5360,7 @@ void unlite_room(int y, int x)
 	cave_temp_room_unlite();
 }
 
+
 /*
  * Cast a projection
  */
@@ -5379,7 +5380,7 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 	int degrees_of_arc = method_ptr->arc;
 	int diameter_of_source = method_ptr->diameter_of_source;
 
-	u32b flg = method_info[method].flags1;
+	u32b flg = method_ptr->flags1;
 
 	bool noticed = FALSE;
 
@@ -5412,7 +5413,7 @@ static bool fire_projection(int who, int what, int typ, int method, int dir, int
 		int x = tx;
 
 		/* Pick a 'nearby' location */
-		if (flg & (PROJECT_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
+		if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
 
 		/* Affect distant monsters */
 		if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
@@ -8281,50 +8282,43 @@ void region_delete(s16b region)
 
 
 /*
+ * Inserts one region piece into a region
+ */
+void region_piece_insert(int y, int x, s16b d, s16b region)
+{
+	int r = region_piece_pop();
+	region_piece_type *rp_ptr = &region_piece_list[r];
+
+	/* Paranoia */
+	if (!r) return;
+
+	/* Update the region piece with the grid details */
+	rp_ptr->d = d;
+	rp_ptr->x = x;
+	rp_ptr->y = y;
+	rp_ptr->region = region;
+	rp_ptr->next_region_piece = cave_region_piece[y][x];
+	rp_ptr->next_in_sequence = region_list[region].first_in_sequence;
+	cave_region_piece[y][x] = r;
+	region_list[region].first_in_sequence = r;
+
+}
+
+
+/*
  * Inserts the grids of a region into the region pieces
  */
 void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
 {
 	int i;
-	int last_in_sequence = 0;
-
-	/* Hack - remove previous list of grids */
-	region_delete(region);
 
 	for (i = 0; i < grid_n; i++)
 	{
 		int y = GRID_Y(gp[i]);
 		int x = GRID_X(gp[i]);
-		int r = region_pop();
-
-		region_piece_type *rp_ptr;
-
-		/* Paranoia */
-		if (!r) return;
-
-		rp_ptr = &region_piece_list[r];
 
 		/* Update the region piece with the grid details */
-		rp_ptr->d = gd[i];
-		rp_ptr->x = x;
-		rp_ptr->y = y;
-		rp_ptr->region = region;
-		rp_ptr->next_region_piece = cave_region_piece[y][x];
-		rp_ptr->next_in_sequence = 0;
-		cave_region_piece[y][x] = r;
-
-		/* Stitch together sequence */
-		if (last_in_sequence)
-		{
-			region_piece_list[last_in_sequence].next_in_sequence = r;
-		}
-		else
-		{
-			region_list[region].first_in_sequence = r;
-		}
-
-		/* Last in sequence */
-		last_in_sequence = r;
+		region_piece_insert(y, x, gd[i], region);
 	}
 }
 
@@ -8336,14 +8330,15 @@ void region_update(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 
-	method_type *method_ptr = &method_info[r_ptr->method];
-	int range = scale_method(method_ptr->max_range, r_ptr->level);
-	int radius = scale_method(method_ptr->radius, r_ptr->level);
-	u32b flg = r_ptr->flags1 | (PROJECT_CHCK);
+	/* Paranoia */
+	if ((r_ptr->flags2 & (RE2_PROJECTION)) == 0) return;
 
 	/* Set up the projection */
-	project(r_ptr->who, r_ptr->what, radius, range, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0, r_ptr->effect,
-			 flg, method_ptr->arc, method_ptr->diameter_of_source);
+	project(r_ptr->who, r_ptr->what, r_ptr->radius, r_ptr->range, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0, r_ptr->effect,
+			 r_ptr->flags1 | (PROJECT_CHCK), r_ptr->arc, r_ptr->diameter_of_source);
+
+	/* Hack - remove previous list of grids */
+	region_delete(region);
 
 	/* Take the grids and insert them in the region */
 	region_insert(target_path_g, target_path_n, target_path_d, region);
@@ -8395,89 +8390,6 @@ bool region_refresh_hook(int y, int x, int d, int region)
 
 
 /*
- * Hook for apply region effect to all grids in region.
- *
- * Note the perhaps unnessary code duplication with the project function.
- */
-bool region_effect_hook(int y, int x, int d, int region)
-{
-	region_type *r_ptr = &region_list[region];
-	u32b flg = r_ptr->flags1;
-	bool notice = FALSE;
-	int dam = r_ptr->effect == GF_FEATURE ? r_ptr->damage : r_ptr->damage / d;
-
-	/* XXX Should we draw graphics here? */
-
-	/* Temporarily lite up grids */
-	if (flg & (PROJECT_LITE))
-	{
-		/* Temporarily lite up the grid */
-		if (temp_lite(y, x)) notice = TRUE;
-	}
-
-	/* Check features */
-	if (flg & (PROJECT_GRID))
-	{
-		/* Affect the feature in that grid */
-		if (project_f(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))
-			notice = TRUE;
-	}
-
-	/* Check objects */
-	if (flg & (PROJECT_ITEM))
-	{
-		/* Affect the object in the grid */
-		if ((cave_o_idx[y][x] > 0) && (project_o(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect)))
-			notice = TRUE;
-	}
-
-	/* Check monsters */
-	if (flg & (PROJECT_KILL))
-	{
-		/* Check for monster */
-		if (cave_m_idx[y][x] > 0)
-		{
-			monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
-
-			/* Hack -- handle resist magic. Deeper monsters are more resistant to spells.
-			 * All monsters are more resistant to devices and spells from each other. */
-			if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
-				&& ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
-				&& (rand_int(100) < 20 + p_ptr->depth / (r_ptr->who != SOURCE_PLAYER_CAST ? 1 : 2)))
-			{
-				/* Hack -- resist magic */
-				if (project_m(r_ptr->who, r_ptr->what, y, x, dam, GF_RES_MAGIC)) notice = TRUE;
-			}
-			/* Check if monster evades */
-			/* Area-effect and jumping spells cannot be dodged */
-			else if (!(flg & (PROJECT_ARC | PROJECT_STAR | PROJECT_JUMP |
-					 PROJECT_BOOM)) && (cave_m_idx[y][x] > 0) &&
-				(mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + d, 5 + d, r_ptr->who <= SOURCE_PLAYER_START ? " your magic" : "")))
-			{
-				/* Do nothing */
-			}
-
-			/* Affect the monster in the grid */
-			else if (project_m(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))	notice = TRUE;
-		}
-	}
-
-	/* Check player */
-	if (flg & (PROJECT_PLAY))
-	{
-		/* Player is in this grid */
-		if ((cave_m_idx[y][x] < 0) && (project_f(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))) notice = TRUE;
-	}
-
-	/* Affect marked grid */
-	if ((play_info[y][x] & (PLAY_TEMP)) && (project_t(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect))) notice = TRUE;
-
-	/* Return "something was noticed" */
-	return (notice);
-}
-
-
-/*
  * This routine writes the current feat under the grid to the scalar
  * for that region. This is used to overlay temporary terrain onto a region,
  * then restore it later using region_restore_hook.
@@ -8503,15 +8415,757 @@ bool region_uplift_hook(int y, int x, int d, int region)
  */
 bool region_restore_hook(int y, int x, int d, int region)
 {
-	int region_piece = get_region_piece(y, x, region);
-
-	region_piece_type *rp_ptr = &region_piece_list[region_piece];
-
-	(void)d;
+	(void)region;
 
 	/* Restore the terrain */
-	cave_set_feat(y, x, rp_ptr->d);
+	cave_set_feat(y, x, d);
 
 	/* Cave_set_feat handles the player noticing this */
 	return (FALSE);
+}
+
+
+/*
+ * Apply effect to every grid. Note that we have to apply the
+ * project_t() effect separately. This is done by setting the
+ * PROJECT_TEMP flag.
+ */
+bool region_project_hook(int y, int x, int d, int region)
+{
+	region_type *r_ptr = &region_list[region];
+
+	int dam = 0;
+	bool notice;
+
+	/* Get the damage from the region piece */
+	if (r_ptr->flags2 & (RE2_SCALAR_DAMAGE))
+	{
+		dam = d;
+	}
+	/* Compute the damage based on distance */
+	else if (r_ptr->flags2 & (RE2_SCALAR_DISTANCE))
+	{
+		dam = r_ptr->damage / d;
+	}
+	/* Get the damage from the region */
+	else
+	{
+		dam = r_ptr->damage;
+	}
+
+	/* Apply projection effects to the grids */
+	notice = project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, r_ptr->flags1 | (PROJECT_TEMP));
+
+	return (notice);
+}
+
+
+/*
+ * Apply project_t to every grid. Note that we have to apply the
+ * project_t() effect separately.
+ */
+bool region_project_t_hook(int y, int x, int d, int region)
+{
+	region_type *r_ptr = &region_list[region];
+
+	int dam = 0;
+	bool notice;
+
+	/* Get the damage from the region piece */
+	if (r_ptr->flags2 & (RE2_SCALAR_DAMAGE))
+	{
+		dam = d;
+	}
+	/* Compute the damage based on distance */
+	else if (r_ptr->flags2 & (RE2_SCALAR_DISTANCE))
+	{
+		dam = r_ptr->damage / d;
+	}
+	/* Get the damage from the region */
+	else
+	{
+		dam = r_ptr->damage;
+	}
+
+	/* Apply projection effects to the grids */
+	notice = project_t(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect);
+
+	return (notice);
+}
+
+
+/*
+ * Some region types require additional initialisation effects.
+ */
+void init_region(int region)
+{
+	(void)region;
+}
+
+
+/*
+ * Pick a random piece from a region.
+ */
+int region_random_piece(int region)
+{
+	s16b this_region_piece, next_region_piece = 0;
+	int k = 0;
+
+	/*
+	 * Note for efficiency, we iterate through twice. This means we only generate one random number, as opposed to
+	 * one random number for each grid checked.
+	 */
+
+	/* Count grids we could effect */
+	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+
+		/* Count the grids */
+		k++;
+	}
+
+	/* Pick random grid. */
+	if (k) k = randint(k);
+
+	/* Get the coordinates of the grid choosen */
+	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece, k--)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+
+		/* Get coordinates */
+		if (k == 1)
+		{
+			return (this_region_piece);
+		}
+	}
+
+	return(0);
+}
+
+
+/*
+ * Apply effect to a region
+ *
+ * If (y, x) defined, use this as the target.
+ * If RE2_RANDOM, pick a random piece from the grid.
+ * If RE2_INVERSE, reverse the source and destination.
+ * If RE2_CLOSEST_MON, choose the closest monster as a target.
+ * If RE2_CHAIN, update the region after affecting it.
+ *
+ * Note the concept of target only applies if we are using
+ * a method, or spawning a region, not if we affect every
+ * grid in the region.
+ */
+void region_effect(int region, int y, int x)
+{
+	region_type *r_ptr = &region_list[region];
+	bool notice = FALSE;
+
+	int y0 = r_ptr->y0;
+	int x0 = r_ptr->x0;
+	int y1 = y ? y : r_ptr->y1;
+	int x1 = x ? x : r_ptr->x1;
+
+	/* Pick a random grid if required */
+	if (r_ptr->flags2 & (RE2_RANDOM))
+	{
+		int r = region_random_piece(region);
+
+		y1 = region_piece_list[r].y;
+		x1 = region_piece_list[r].x;
+	}
+
+	/* Reverse destination and source */
+	if (r_ptr->flags2 & (RE2_INVERSE))
+	{
+		y = y0;
+		x = x0;
+		y0 = x1;
+		x0 = x1;
+		y1 = y;
+		x1 = x;
+	}
+
+	/* Choose closest monster from source instead */
+	if (r_ptr->flags2 & (RE2_CLOSEST_MON))
+	{
+		/* Try to get a target (nearest or next-nearest monster) */
+		get_closest_monster(randint(2), y0, x0,
+			&y1, &x1, r_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+	}
+
+
+	/* Spawn is defined */
+	if (r_ptr->spawn)
+	{
+		/* XXX Create new region */
+	}
+
+	/* Method is defined */
+	else if (r_ptr->method)
+	{
+		method_type *method_ptr = &method_info[r_ptr->method];
+
+		int rad = scale_method(method_ptr->radius, r_ptr->level);
+		int rng = scale_method(method_ptr->max_range, r_ptr->level);
+		int num = scale_method(method_ptr->number, r_ptr->level);
+
+		int degrees_of_arc = method_ptr->arc;
+		int diameter_of_source = method_ptr->diameter_of_source;
+
+		u32b flg = method_ptr->flags1;
+
+		/* Hack -- fix number */
+		if (num < 1) num = 1;
+
+		/* Hack -- fix diameter of source */
+		if (!diameter_of_source) diameter_of_source = 10;
+
+		/* Always hit first target */
+		if ((y) && (x)) flg |= (PROJECT_STOP);
+
+		/* Create one or more projections */
+		while (num--)
+		{
+			y = y1;
+			x = x1;
+
+			/* Pick a 'nearby' location */
+			if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, 5, 0);
+
+			/* Affect distant monsters */
+			if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
+			{
+				if (project_dist(r_ptr->who, r_ptr->what, y, x, r_ptr->damage, r_ptr->effect, flg, method_ptr->flags2)) notice = TRUE;
+			}
+
+			/* Analyze the "dir" and the "target". */
+			else if (project(r_ptr->who, r_ptr->what, rad, rng, y0, x0, y, x, r_ptr->damage, r_ptr->effect, flg, degrees_of_arc,
+					(byte)diameter_of_source)) notice = TRUE;
+		}
+	}
+
+	/* Method is not defined. Apply effect to all grids */
+	else
+	{
+		/* Apply projection effects to the grids */
+		notice |= region_iterate(region, region_project_hook);
+
+		/* Apply temporary effects to grids */
+		notice |= region_iterate(region, region_project_t_hook);
+
+		/* Clear temporary array */
+		clear_temp_array();
+	}
+
+	/* Noticed region? */
+	if (notice) r_ptr->flags2 |= (RE2_NOTICE);
+
+	/* Region chains */
+	if (r_ptr->flags2 & (RE2_CHAIN))
+	{
+		r_ptr->y0 = y0;
+		r_ptr->x0 = x0;
+		r_ptr->y1 = y1;
+		r_ptr->x1 = x1;
+
+		region_update(region);
+	}
+}
+
+
+/*
+ * Trigger regions at grid y, x.
+ *
+ * This is used to fire traps if a player or monster moves into them,
+ * as well as handle these moving through lingering effects.
+ */
+void trigger_region(int y, int x)
+{
+	int this_region_piece, next_region_piece = 0;
+
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+		region_type *r_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_region_piece;
+
+		/* Get the region */
+		r_ptr = &region_list[rp_ptr->region];
+
+		/* Paranoia */
+		if (!r_ptr->type) continue;
+
+		/* Not yet ready */
+		if (!(r_ptr->flags2 & (RE2_LINGER)) && (r_ptr->countdown)) continue;
+
+		/* Shoot grid with effect */
+		if (r_ptr->flags2 & (RE2_TRIGGER))
+		{
+			if (r_ptr->flags2 & (RE2_HIT_TRAP))
+			{
+				/* Some traps are avoidable by monsters */
+				if ((cave_m_idx[y][x] > 0) && (mon_avoid_trap(&m_list[cave_m_idx[y][x]], y,x)))
+				{
+					return;
+				}
+				/* Some traps are avoidable by the player */
+				else if ((cave_m_idx[y][x] < 0) && (avoid_trap(y,x)))
+				{
+					return;
+				}
+			}
+
+			/* Fire the attack */
+			region_effect(rp_ptr->region, y, x);
+		}
+		/* Lingering effect hits player/monster moving into grid */
+		else if (r_ptr->flags2 & (RE2_LINGER))
+		{
+			int dam = 0;
+			bool notice = FALSE;
+
+			/* Get the damage from the region piece */
+			if (r_ptr->flags2 & (RE2_SCALAR_DAMAGE))
+			{
+				dam = rp_ptr->d;
+			}
+			/* Compute the damage based on distance */
+			else if (r_ptr->flags2 & (RE2_SCALAR_DISTANCE))
+			{
+				dam = r_ptr->damage / rp_ptr->d;
+			}
+			/* Get the damage from the region */
+			else
+			{
+				dam = r_ptr->damage;
+			}
+
+			/* Affect the monster, player or object in this grid only */
+			notice |= project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, r_ptr->flags1);
+
+			/* Noticed region? */
+			if (notice) r_ptr->flags2 |= (RE2_NOTICE);
+		}
+	}
+}
+
+
+/*
+ * Process region.
+ *
+ * We potentially transform the region, then apply the effect if
+ * required.
+ */
+void process_region(int region)
+{
+	region_type *r_ptr = &region_list[region];
+
+	int i, j;
+	int path_n = 0;
+	u16b path_g[99];
+	int manual_region = 0;
+
+	/* Paranoia */
+	if (!r_ptr->type) return;
+
+	/* Count down to next turn, return if not yet ready */
+	if (--r_ptr->countdown > 0) return;
+
+	/* Reset count */
+	r_ptr->countdown = r_ptr->delay;
+
+	/* If the effect has recently been "born", make various tweaks to it */
+	if (r_ptr->age == 0) init_region(region);
+
+	/* Effects eventually "die" */
+	if (r_ptr->age >= r_ptr->lifespan)
+	{
+		/* Effect is "dead" - mark for later */
+		r_ptr->type = 0;
+
+		return;
+	}
+
+	/*
+	 * We are applying damage only to changed grids
+	 */
+	if (r_ptr->flags2 & (RE2_MANUAL))
+	{
+		manual_region = region_pop();
+		region_list[manual_region].age = r_ptr->age;
+		region_list[manual_region].damage = r_ptr->damage;
+		region_list[manual_region].effect = r_ptr->effect;
+		region_list[manual_region].flags1 = r_ptr->flags1;
+		region_list[manual_region].flags2 = r_ptr->flags2;
+		region_list[manual_region].who = r_ptr->who;
+		region_list[manual_region].what = r_ptr->what;
+	}
+
+	/* Updating a projection */
+	if (r_ptr->flags2 & (RE2_PROJECTION))
+	{
+		region_update(region);
+	}
+
+	/* Moving a wall */
+	if (r_ptr->flags2 & (RE2_WALL))
+	{
+		/* Get the direction of travel (angular dir is 2x this) */
+		int major_axis =
+			get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
+
+		/* Get the length of the wall on either side of the major axis */
+		int spread = r_ptr->radius;
+
+		/* Store target grid */
+		int ty = r_ptr->y1;
+		int tx = r_ptr->x1;
+
+		/* Hack - remove previous list of grids */
+		region_delete(region);
+
+		/* Calculate the projection path -- require orthogonal movement */
+		path_n = project_path(path_g, r_ptr->range, r_ptr->y0, r_ptr->x0,
+			&ty, &tx, PROJECT_PASS | PROJECT_THRU | PROJECT_ORTH);
+
+		/* Require a working projection path */
+		if ((path_n > r_ptr->age) || (path_n == r_ptr->range))
+		{
+			/* Remember delay factor */
+			int old_delay = op_ptr->delay_factor;
+
+			int zaps = 0;
+			int axis;
+
+			/* Get center grid (walls travel one grid per turn) */
+			int y0 = GRID_Y(path_g[(path_n > r_ptr->age) ? r_ptr->age : path_n]);
+			int x0 = GRID_X(path_g[(path_n > r_ptr->age) ? r_ptr->age : path_n]);
+
+			/* Set delay to half normal */
+			op_ptr->delay_factor /= 2;
+
+			/*
+			 * If the center grid is both projectable and in LOS
+			 * from the origin of the effect, zap it.
+			 */
+			if ((cave_passable_bold(y0, x0, r_ptr->flags1)) &&
+				(generic_los(r_ptr->y0, r_ptr->x0, y0, x0, r_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+			{
+				zaps++;
+				region_piece_insert(y0, x0, r_ptr->damage, region);
+				if (manual_region) region_piece_insert(y0, x0, r_ptr->damage, manual_region);
+			}
+
+			/* If this wall spreads out from the origin, */
+			if (spread >= 1)
+			{
+				/* Get the directions of spread (angular dir is 150% of this) */
+				int minor_axis1 = (major_axis +  60) % 240;
+				int minor_axis2 = (major_axis + 180) % 240;
+
+				/* Process the left, then right-hand sides of the wall */
+				for (i = 0; i < 2; i++)
+				{
+					if (i == 0) axis = minor_axis1;
+					else        axis = minor_axis2;
+
+					/* Get the target grid for this side */
+					get_grid_using_angle(axis, y0, x0, &ty, &tx);
+
+					/* If we have a legal target, */
+					if ((ty != y0) || (tx != x0))
+					{
+						/* Calculate the projection path */
+						path_n = project_path(path_g, spread, y0, x0, &ty, &tx,
+							PROJECT_PASS | PROJECT_THRU);
+
+						/* Check all the grids */
+						for (j = 0; j < path_n; j++)
+						{
+							/* Get grid */
+							ty = GRID_Y(path_g[j]);
+							tx = GRID_X(path_g[j]);
+
+							/*
+							 * If this grid is both projectable and in LOS
+							 * from the origin of the effect, zap it.
+							 */
+							if ((cave_passable_bold(ty, tx, r_ptr->flags1)) &&
+							    (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, r_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+							{
+								zaps++;
+								region_piece_insert(ty, tx, r_ptr->damage, region);
+								if (manual_region) region_piece_insert(ty, tx, r_ptr->damage, manual_region);
+							}
+						}
+					}
+				}
+			}
+
+			/* Kill wall if nothing got zapped this turn */
+			if (zaps == 0)
+			{
+				r_ptr->age = 250;
+			}
+
+			/* Restore standard delay */
+			op_ptr->delay_factor = old_delay;
+		}
+
+		/* No working projection path -- kill the wall */
+		else
+		{
+			r_ptr->age = 250;
+		}
+	}
+
+	/* Seeking a monster */
+	if (r_ptr->flags2 & (RE2_SEEKER))
+	{
+		int this_region_piece, next_region_piece = 0;
+
+		/*
+		 * Note that each region piece seeks a monster independently.
+		 * This can result in region pieces overlapping...
+		 */
+		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr;
+			int dir, grids = 0;
+			int ty = 0, tx = 0;
+			int i;
+
+			/* Get the object */
+			rp_ptr = &region_piece_list[this_region_piece];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_sequence;
+
+			/* Check around (and under) the vortex */
+			for (dir = 0; dir < 9; dir++)
+			{
+				/* Extract adjacent (legal) location */
+				int y = rp_ptr->y + ddy_ddd[dir];
+				int x = rp_ptr->x + ddx_ddd[dir];
+
+				/* Count passable grids */
+				if (cave_passable_bold(y, x, r_ptr->flags1)) grids++;
+			}
+
+			/*
+			 * Vortexes only seek in open spaces.  This makes them useful in
+			 * rooms and not too powerful in corridors.
+			 */
+			if      (grids >= 5) i = 85;
+			else if (grids == 4) i = 50;
+			else                 i = 0;
+
+			/* Seek out monsters */
+			if (rand_int(100) < i)
+			{
+				/* Try to get a target (nearest or next-nearest monster) */
+				get_closest_monster(randint(2), rp_ptr->y, rp_ptr->x,
+					&ty, &tx, r_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+			}
+
+			/* No valid target, or monster is in an impassable grid */
+			if (((ty == 0) && (tx == 0)) || (!cave_passable_bold(ty, tx, r_ptr->flags1)))
+			{
+				/* Move randomly */
+				dir = randint(9);
+			}
+
+			/* Valid target in passable terrain */
+			else
+			{
+				/* Get change in position from current location to target */
+				int dy = rp_ptr->y - ty;
+				int dx = rp_ptr->x - tx;
+
+				/* Calculate vertical and horizontal distances */
+				int ay = ABS(dy);
+				int ax = ABS(dx);
+
+				/* We mostly want to move vertically */
+				if (ay > (ax * 2))
+				{
+					/* Choose between directions '8' and '2' */
+					if (dy > 0) dir = 8;
+					else        dir = 2;
+				}
+
+				/* We mostly want to move horizontally */
+				else if (ax > (ay * 2))
+				{
+					/* Choose between directions '4' and '6' */
+					if (dx > 0) dir = 4;
+					else        dir = 6;
+				}
+
+				/* We want to move up and sideways */
+				else if (dy > 0)
+				{
+					/* Choose between directions '7' and '9' */
+					if (dx > 0) dir = 7;
+					else        dir = 9;
+				}
+
+				/* We want to move down and sideways */
+				else
+				{
+					/* Choose between directions '1' and '3' */
+					if (dx > 0) dir = 1;
+					else        dir = 3;
+				}
+			}
+
+			/* Convert dir into a grid */
+			for (i = 0; i < 100; i++)
+			{
+				/* Extract adjacent (legal) location */
+				ty = rp_ptr->y + ddy[dir];
+				tx = rp_ptr->x + ddx[dir];
+
+				/* Require passable grids */
+				if (cave_passable_bold(ty, tx, r_ptr->flags1))
+				{
+					/* Try not to stay in place */
+					if ((ty != rp_ptr->y) || (tx != rp_ptr->x)) break;
+				}
+
+				/* Move randomly */
+				dir = randint(9);
+			}
+
+			/* Note failure */
+			if (i == 100)
+			{
+				ty = rp_ptr->y;
+				tx = rp_ptr->x;
+			}
+
+			/* Move the vortex */
+			excise_region_piece(this_region_piece);
+			rp_ptr->y = ty;
+			rp_ptr->x = tx;
+			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
+			cave_region_piece[ty][tx] = this_region_piece;
+
+			/* Apply the effect */
+			if (manual_region) region_piece_insert(ty, tx, rp_ptr->d, region);
+		}
+	}
+
+	/* Vector defined by the region encoding */
+	if (r_ptr->flags2 & (RE2_SCALAR_VECTOR))
+	{
+		int this_region_piece, next_region_piece = 0;
+
+		/*
+		 * This can result in region pieces overlapping...
+		 */
+		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr;
+			int ty = 0, tx = 0;
+			int angle, speed;
+
+			/* Get the object */
+			rp_ptr = &region_piece_list[this_region_piece];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_sequence;
+
+			/* Speed of travel */
+			speed = GRID_X(rp_ptr->d);
+
+			/* Does this fragment move at this age? */
+			if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) continue;
+
+			/* Angle of travel */
+			angle = GRID_Y(rp_ptr->d);
+
+			/* Get the target grid for this angle */
+			get_grid_using_angle(angle, r_ptr->y0, r_ptr->x0, &ty, &tx);
+
+			/* If we have a legal target, */
+			if ((ty != r_ptr->y0) || (tx != r_ptr->x0))
+			{
+				/* Calculate the projection path */
+				path_n = project_path(path_g, 99, r_ptr->y0, r_ptr->x0,
+						&ty, &tx, PROJECT_PASS | PROJECT_THRU);
+
+				/* Get the location */
+				if (path_n >= r_ptr->age)
+				{
+					ty = GRID_Y(path_g[r_ptr->age]);
+					tx = GRID_X(path_g[r_ptr->age]);
+				}
+			}
+
+			/* Move the vertex */
+			excise_region_piece(this_region_piece);
+			rp_ptr->y = ty;
+			rp_ptr->x = tx;
+			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
+			cave_region_piece[ty][tx] = this_region_piece;
+		}
+	}
+
+	/* Apply effect every turn */
+	if (r_ptr->flags2 & (RE2_AUTOMATIC | RE2_MANUAL))
+	{
+		/* Apply the effect */
+		region_effect(manual_region ? manual_region : region, 0, 0);
+
+		/* Discard manual region */
+		region_delete(manual_region);
+
+		/* And delete */
+		region_wipe(&region_list[manual_region]);
+	}
+
+	/* Effects age */
+	if (r_ptr->age < 255) r_ptr->age++;
+}
+
+
+/*
+ * Process effects.
+ */
+void process_regions(void)
+{
+	int i;
+
+	/* Process all regions */
+	for (i = 0; i < z_info->region_max; i++)
+	{
+		/* Get this effect */
+		region_type *r_ptr = &region_list[i];
+
+		/* Skip empty effects */
+		if (!r_ptr->type) continue;
+
+		/* Process effect */
+		process_region(i);
+	}
 }

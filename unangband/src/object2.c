@@ -6334,11 +6334,6 @@ bool apply_alchemical_formula(object_type *o_ptr, int *dam, int *rad, int *rng, 
 					if (n) *flg |= (PROJECT_FORK); else *flg &= ~(PROJECT_FORK);
 					break;
 				}
-				case 'z':
-				{
-					if (n) *flg |= (PROJECT_SCATTER); else *flg &= ~(PROJECT_SCATTER);
-					break;
-				}
 			}
 
 			/* Increase difficulty */

@@ -208,7 +208,7 @@ static cptr method_info_flags1[] =
 	"EXPAND",
 	"FORK",
 	"MYST",
-	"SCATTER",
+	"TEMP",
 	"EDGE"
 };
 
@@ -247,7 +247,7 @@ static cptr method_info_flags2[] =
 	"SCALE_AMMO",
 	"SPECIAL_CASE",
 	"SUMMON_CHAR",
-	"",
+	"SCATTER",
 	"",
 	""
 };

@@ -2103,3 +2103,147 @@ void screen_monster_look(const int m_idx)
 }
 
 
+/*
+ * Given a starting position, find the 'n'th closest monster.
+ *
+ * The follow parameters are possible.
+ *
+ * 0x01 Require LOS
+ * 0x02	Require LOF
+ * 0x04 Require visibility
+ * 0x08 If no monsters found, fall back to choosing an empty square
+ * near the source grid.
+ *
+ *
+ * Set ty and tx to zero on failure.
+ */
+void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameters)
+{
+	monster_type *m_ptr;
+
+	int i, j;
+	int r_idx;
+	int dist = 100;
+
+	int *monster_dist;
+	int *monster_index;
+	int monster_count = 0;
+
+	bool player = FALSE;
+
+	/* Allocate some arrays */
+	monster_dist = C_ZNEW(z_info->m_max, int);
+	monster_index = C_ZNEW(z_info->m_max, int);
+
+	/* Note that we're looking from the character's grid */
+	if ((y0 == p_ptr->py) && (x0 == p_ptr->px)) player = TRUE;
+
+	/* Reset target grids */
+	*ty = 0;  *tx = 0;
+
+	/* N, as input, goes from 1+.  Map it to 0+ for table access */
+	if (n > 0) n--;
+
+
+	/* Check all the monsters */
+	for (i = 1; i < m_max; i++)
+	{
+		/* Get the monster */
+		m_ptr = &m_list[i];
+
+		/* Paranoia -- skip "dead" monsters */
+		if (!m_ptr->r_idx) continue;
+
+		/* Check for visibility */
+		if (parameters & (0x04))
+		{
+			if ((player) && (!m_ptr->ml)) continue;
+		}
+
+		/* Use CAVE_VIEW information (fast way) */
+		if (player)
+		{
+			/* Requires line of sight */
+			if (((parameters & (0x01)) != 0) &&
+					(!(play_info[m_ptr->fy][m_ptr->fx] & (PLAY_VIEW)))) continue;
+
+			/* Requires line of fire */
+			if (((parameters & (0x02)) != 0) &&
+					(!(play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)))) continue;
+
+			/* Get stored distance */
+			dist = m_ptr->cdis;
+		}
+
+		/* Monster must be in los from the starting position (slower way) */
+		else
+		{
+			/* Get distance from starting position */
+			dist = distance(y0, x0, m_ptr->fy, m_ptr->fx);
+
+			/* Monster location must be within range */
+			if (dist > MAX_SIGHT) continue;
+
+			/* Require line of sight */
+			if (((parameters & (0x01)) != 0) && (!generic_los(y0, x0, m_ptr->fy, m_ptr->fx, CAVE_XLOS))) continue;
+
+			/* Require line of fire */
+			if (((parameters & (0x02)) != 0) && (!generic_los(y0, x0, m_ptr->fy, m_ptr->fx, CAVE_XLOF))) continue;
+		}
+
+		/* Remember this monster */
+		monster_dist[monster_count] = dist;
+		monster_index[monster_count++] = i;
+	}
+
+	/* Not enough monsters found */
+	if (monster_count <= n)
+	{
+		/* Free some arrays */
+		FREE(monster_dist);
+		FREE(monster_index);
+
+		/* Pick a nearby grid instead */
+		if (parameters & (0x08)) scatter(ty, tx, y0, x0, n, 0);
+
+		return;
+	}
+
+	/* Sort the monsters in ascending order of distance */
+	for (i = 0; i < monster_count - 1; i++)
+	{
+		for (j = 0; j < monster_count - 1; j++)
+		{
+			int this_dist = monster_dist[j];
+			int next_dist = monster_dist[j + 1];
+
+			/* Bubble sort */
+			if (this_dist > next_dist)
+			{
+				int tmp_dist  = monster_dist[j];
+				int tmp_index = monster_index[j];
+
+				monster_dist[j] = monster_dist[j + 1];
+				monster_dist[j + 1] = tmp_dist;
+
+				monster_index[j] = monster_index[j + 1];
+				monster_index[j + 1] = tmp_index;
+			}
+		}
+	}
+
+
+	/* Get the nth closest monster's index */
+	r_idx = monster_index[n];
+
+	/* Get the monster */
+	m_ptr = &m_list[r_idx];
+
+	/* Set the target to its location */
+	*ty = m_ptr->fy;
+	*tx = m_ptr->fx;
+
+	/* Free some arrays */
+	FREE(monster_dist);
+	FREE(monster_index);
+}
