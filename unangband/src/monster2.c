@@ -1074,6 +1074,10 @@ void display_monlist(void)
 	{
 		/* Clear display and print note */
 		c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
+		
+		/* Display a message */
+		if (Term == angband_term[0])
+		    Term_addstr(-1, TERM_WHITE, "  (Press any key to continue.)");
 
 		/* Free up memory */
 		FREE(race_counts);
@@ -1081,6 +1085,10 @@ void display_monlist(void)
 		/* Done */
 		return;
 	}
+
+	/* Message */
+	prt(format("You can see %d monster%s:",
+		total_count, (total_count > 1 ? "s" : "")), 0, 0);
 
 	/* Iterate over mon_list ( again :-/ ) */
 	for (idx = 1; idx < z_info->m_max && (line < max); idx++)
@@ -1165,6 +1173,23 @@ void display_monlist(void)
 
 		/* Bump line counter */
 		line++;
+
+		/* Page wrap */
+		if (Term == angband_term[0] && (line == max) && disp_count != total_count)
+		{
+			prt("-- more --", line, 0);
+			anykey();
+
+			/* Clear the screen */
+			clear_from(0);
+
+			/* Reprint Message */
+			prt(format("You can see %d monster%s:",
+				total_count, (total_count > 1 ? "s" : "")), 0, 0);
+
+			/* Reset */
+			line = 1;
+		}
 	}
 
 	/* Print "and others" message if we're out of space */
@@ -1174,10 +1199,9 @@ void display_monlist(void)
 	/* Put a shadow */
 	else
 		prt("", line, 0);
-
-	/* Message */
-	prt(format("You can see %d monster%s:",
-	           total_count, (total_count > 1 ? "s" : "")), 0, 0);
+	
+	if (Term == angband_term[0])
+	prt("(Press any key to continue.)", line, 0);
 
 	/* Free the race counters */
 	FREE(race_counts);

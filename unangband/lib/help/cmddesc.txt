@@ -701,6 +701,10 @@ Display time of day (^T) or display time of day (')
         sunrise, midday, sunset or midnight.  This is useful for locating
         guardian monsters which only appear on the surface at night.
 
+Display Visible Monsters ([)
+        This command displays a list of all the monsters that the player is
+        aware of in a list.
+
 Interact with the system (!)
         Allow the user to interact with the underlying visual system.
         This command is currently unused.
