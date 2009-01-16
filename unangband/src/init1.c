@@ -254,6 +254,46 @@ static cptr method_info_flags2[] =
 
 
 /*
+ * Region flags
+ */
+static cptr region_info_flags2[] =
+{
+	"TRIGGER",
+	"LINGER",
+	"SPAWN",
+	"AUTOMATIC",
+	"MANUAL",
+	"WALL",
+	"SEEKER",
+	"PROJECTION",
+	"SCALAR_FEATURE",
+	"SCALAR_DAMAGE",
+	"SCALAR_VECTOR",
+	"SCALAR_DISTANCE",
+	"CLOSEST_MON",
+	"PLATFORM",
+	"HIT_TRAP",
+	"RANDOM",
+	"AGE_INCREASE",
+	"AGE_DECREASE",
+	"INVERSE",
+	"NOTICE",
+	"CHAIN",
+	"TRIGGER_DROP",
+	"TRIGGER_AIM",
+	"SCATTER",
+	"CLOCKWISE",
+	"COUNTER_CLOCKWISE",
+	"TRIGGER_OPEN",
+	"TRIGGER_CLOSE",
+	"BACKWARDS",
+	"SOURCE_FEATURE",
+	"ROOM",
+	"REMEMBER"
+};
+
+
+/*
  * Feature info flags
  */
 static cptr f_info_flags1[] =
@@ -1700,6 +1740,42 @@ errr parse_z_info(char *buf, header *head)
 		z_info->effect_max = max;
 	}
 
+	/* Process 'p' for "Maximum region_piece_list[] subindex" */
+	else if (buf[2] == 'p')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->region_piece_max = max;
+	}
+
+	/* Process 'i' for "Maximum region_info[] subindex" */
+	else if (buf[2] == 'i')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->region_info_max = max;
+	}
+
+	/* Process 'r' for "Maximum region_list[] subindex" */
+	else if (buf[2] == 'r')
+	{
+		int max;
+
+		/* Scan for the value */
+		if (1 != sscanf(buf+4, "%d", &max)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the value */
+		z_info->region_max = max;
+	}
+
 	/* Process 'Q' for "Maximum q_info[] subindex" */
 	else if (buf[2] == 'Q')
 	{
@@ -1954,7 +2030,7 @@ static errr grab_one_level_scalar(method_level_scalar_type *scalar, char *what)
 
 
 /*
- * Initialize the "project_info" array, by parsing an ascii "template" file
+ * Initialize the "method_info" array, by parsing an ascii "template" file
  */
 errr parse_method_info(char *buf, header *head)
 {
@@ -2449,6 +2525,186 @@ errr parse_effect_info(char *buf, header *head)
 
 }
 
+
+/*
+ * Grab one blow flag in a blow_type from a textual string
+ */
+static errr grab_one_region_flag(region_type *region_ptr, cptr what)
+{
+	if (grab_one_flag(&region_ptr->flags1, method_info_flags1, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&region_ptr->flags2, region_info_flags2, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown region flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+
+	return (0);
+}
+
+
+
+
+
+/*
+ * Initialize the "region_info" array, by parsing an ascii "template" file
+ */
+errr parse_region_info(char *buf, header *head)
+{
+	int i;
+
+	char *s, *t;
+
+	/* Current entry */
+	static region_info_type *region_ptr = NULL;
+
+	/* Process 'N' for "New/Number/Name" */
+	if (buf[0] == 'N')
+	{
+		/* Find the colon before the name */
+		s = strchr(buf+2, ':');
+
+		/* Verify that colon */
+		if (!s) return (PARSE_ERROR_GENERIC);
+
+		/* Nuke the colon, advance to the name */
+		*s++ = '\0';
+
+		/* Paranoia -- require a name */
+		if (!*s) return (PARSE_ERROR_GENERIC);
+
+		/* Get the index */
+		i = atoi(buf+2);
+
+		/* Verify information */
+		if (i <= error_idx) return (PARSE_ERROR_NON_SEQUENTIAL_RECORDS);
+
+		/* Verify information */
+		if (i >= head->info_num) return (PARSE_ERROR_TOO_MANY_ENTRIES);
+
+		/* Save the index */
+		error_idx = i;
+
+		/* Point at the "info" */
+		region_ptr = (region_info_type*)head->info_ptr + i;
+
+		/* Store the name */
+		if (!(region_ptr->name = add_name(head, s)))
+			return (PARSE_ERROR_OUT_OF_MEMORY);
+	}
+
+	/* Process 'G' for "Graphics" (one line only) */
+	else if (buf[0] == 'G')
+	{
+		int tmp;
+
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Paranoia */
+		if (!buf[2]) return (PARSE_ERROR_GENERIC);
+		if (!buf[3]) return (PARSE_ERROR_GENERIC);
+		if (!buf[4]) return (PARSE_ERROR_GENERIC);
+
+		/* Extract the attr */
+		tmp = color_char_to_attr(buf[4]);
+
+		/* Paranoia */
+		if (tmp < 0) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		region_ptr->d_attr = tmp;
+		region_ptr->d_char = buf[2];
+	}
+
+	/* Hack -- Process 'F' for flags */
+	else if (buf[0] == 'F')
+	{
+		/* There better be a current f_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_region_flag(region_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
+	/* Process 'A' for "Arc" */
+	else if (buf[0] == 'A')
+	{
+		int arc, deg;
+
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (2 != sscanf(buf, "A:%d:%d",
+			    &arc, &deg)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		region_ptr->arc = arc;
+		region_ptr->diameter_of_source = deg;
+	}
+
+	/* Process 'M' for "Maximum Range" */
+	else if (buf[0] == 'M')
+	{
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the radius information */
+		if (grab_one_level_scalar(&region_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+
+	/* Process 'R' for "Radius" */
+	else if (buf[0] == 'R')
+	{
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the radius information */
+		if (grab_one_level_scalar(&region_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+
+	/* Process 'U' for "Number" */
+	else if (buf[0] == 'U')
+	{
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the radius information */
+		if (grab_one_level_scalar(&region_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
+	}
+
+	else
+	{
+		/* Oops */
+		return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
+	}
+
+	/* Success */
+	return (0);
+
+}
 
 
 /*
@@ -3183,13 +3439,13 @@ errr parse_f_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze the method */
+		/* Analyze the region */
 		for (n1 = 0; n1 < z_info->effect_max; n1++)
 		{
 			if (streq(s, effect_name + effect_info[n1].name)) break;
 		}
 
-		/* Invalid method */
+		/* Invalid region */
 		if (n1 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the third field */
@@ -3198,7 +3454,7 @@ errr parse_f_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == 'd') *t++ = '\0';
 
-		/* Save the method */
+		/* Save the region */
 		f_ptr->blow.method = RBM_TRAP;
 
 		/* Save the effect */

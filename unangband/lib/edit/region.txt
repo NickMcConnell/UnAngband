@@ -1,0 +1,258 @@
+# The following is derived from NPPAngband and Sangband.
+#
+# There are several implementation differences between here and NPPAngband.
+#
+# Traps in Unangband are all implemented as features. However, the effects
+# code herein is used to configure a projection function that is tested every
+# turn to see if a trap that is the source of the projection should be fired.
+#
+# e.g. ^xxxxxx checks the areas marked x from the trap ^. If the player enters
+# this region and fails the trap test (see below)
+#
+#  discoloured sport - cool down after activation; thrown objects activate this
+#  gas trap - effect is delayed a turn
+#  loose rock - searching avoids
+#  deadfall - takes several turns to hit targets; charging on the first turn avoids
+#  siege engine - fired by an adjacent creature; doesn't activate otherwise
+#  clockwork mechanism - fires regularly; cool down after activation
+#
+#  We want to try to do the following:
+#
+#  Sangband style seeker vortices, moving walls,
+#
+#  NPPAngband waves, glaciers.
+#
+#  Spell effects that bombard to/from a particular location, round by round.
+#  Spell effects that try to pick a distant target and then affect it...
+#  e.g. chain lightning.
+
+# Region.txt entry format
+
+# N: number : name
+# G: char : attr
+# A:arc in degrees:diameter_of_source:degree factor
+# R:radius + radius / levels
+# D:damage mult:divisor:variation:maximum:type
+# M:max range + max range / levels
+# U:number + number / levels
+# F: flags
+
+# D: description
+
+# TRIGGER: Trigger attack when moving into region
+# LINGER: Trigger one grid when moving into region
+# SPAWN: Instead of apply an attack, spawn a new region
+# AUTOMATIC: Automatically apply effect every update
+# MANUAL: Region effect only applied to 'newly affected' regions
+# WALL: Advancing 'wall' of effect
+# SEEKER: Seeker effect which hunts down targets
+# PROJECTION: Grids affected are defined and updated as a projection
+# SCALAR_FEATURE: Region scalar encodes a feature
+# SCALAR_DAMAGE: Region scalar encodes damage
+# SCALAR_VECTOR: Region scalar encodes direction and speed
+# SCALAR_DISTANCE: Region scalar encodes distance
+# CLOSEST_MON: Use closest monster as a target
+# PLATFORM: As region moves, it pushes stuff around
+# HIT_TRAP: Avoid triggering source as if a trap (requires trigger)
+# RANDOM: Target a random grid in the region
+# AGE_INCREASE: Damage increases with age. If DECREASE defined, damage peaks at 1/2 lifespan, then drops.
+# AGE_DECREASE: Damage decreases with age. If INCREASE defined, damage peaks at 1/2 lifespan, then drops.
+# INVERSE: Invert source and target when attacking
+# NOTICE: Noticed region?
+# CHAIN: Set region source and destination to source and target determined when attacking
+
+# Version stamp (required)
+
+
+V:0.6.3
+
+
+N:0:nothing
+
+# Regions 1 - 28 correspond to traps, where the trap attr is the region number.
+
+N:1:trap door
+G:x:w
+F:TRIGGER | HIT_TRAP
+
+N:2:pit
+G:x:s
+F:TRIGGER | HIT_TRAP | ROOM
+F:SOURCE_FEATURE | TRIGGER_OPEN | TRIGGER_CLOSE
+
+N:3:strange rune
+G:x:o
+U:1 + 1/10
+F:SCATTER | TRIGGER | HIT_TRAP
+
+N:4:spring-loaded trap
+G:x:r
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:5:gas trap
+G:x:g
+R:0+1/10
+F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:6:explosive trap
+G:x:b
+R:1+1/10
+F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP | SELF
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:7:discoloured spot
+G:x:u
+R:6
+F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP | SELF | TRIGGER_DROP
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:8:silent watcher
+G:x:D
+A:20:60
+R:20
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:LOS 
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:9:stone visage
+G:x:W
+M:10
+R:1
+F:FLOW
+F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:10:loose rock
+G:x:P
+R:1+1/10
+F:FORK
+F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:11:tripwire
+G:x:y
+M:3
+F:BEAM | GRID | ITEM | KILL | PLAY
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:12:murder hole
+G:x:R
+M:10
+F:BEAM | GRID | ITEM | KILL | PLAY
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:13:ancient hex
+G:x:G
+R:1
+F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:14:magic symbol
+G:x:B
+R:4+1/10
+A:20:60
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:FORK
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:15:fine net
+G:x:U
+R:1 + 1/10
+F:4WAY | 4WAX | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:16:surreal painting
+G:x:p
+R:1 + 1/10
+A:40:60
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+#Terrain glows.
+
+N:17:ever burning eye
+G:x:v
+R:20
+A:20:60
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:LOS | CLOCKWISE | COUNTER_CLOCKWISE
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:18:upwards draft
+G:x:t
+R:1 + 1/10
+F:4WAY | 4WAX | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:19:deadfall
+G:x:m
+R:3 + 1/10
+A:30:60
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+#Terrain doesn't glow - this allows trap to be avoided in darkness
+#also makes room filled with these more dangerous if completely lit.
+
+N:20:shaft of light
+G:x:Y
+M:1+1/10
+F:BEAM | GRID | ITEM | KILL | PLAY
+F:LOS 
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+#Terrain glows
+
+N:21:glowing glyph
+G:x:M
+U:4 + 1/10
+F:SCATTER | GRID | ITEM | KILL | PLAY | MAGIC
+F:LOS 
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:22:demonic sign
+G:x:T
+R:10
+A:30:60
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:PROJECTION | TRIGGER | HIT_TRAP
+
+N:23:Radagast's snare
+G:x:V
+U:2 + 1/10
+F:SCATTER | GRID | ITEM | KILL | PLAY | MAGIC
+F:TRIGGER | HIT_TRAP
+
+N:24:siege engine
+G:x:I
+R:12
+F:BEAM | GRID | ITEM | KILL | PLAY
+F:PROJECTION | TRIGGER_AIM
+
+N:25:clockwork mechanism
+G:x:i
+R:8
+F:BEAM | GRID | ITEM | KILL | PLAY
+F:PROJECTION | AUTOMATIC
+
+N:26:mark of a white hand
+G:x:z
+R:6
+A:20:60
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:PROJECTION
+
+#Fixed source and destination.
+
+N:27:shimmering portal
+G:x:Z
+U:2
+M:100
+F:PROJECTION | AUTOMATIC | SCATTER
+F:GRID | ITEM | KILL | PLAY | MAGIC |
+
+# Boulders are released by a deadfall and act as slow
+# moving projections towards the target.
+N:28:boulder
+G:*:u

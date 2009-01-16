@@ -106,6 +106,7 @@ typedef struct monster_race monster_race;
 typedef struct monster_lore monster_lore;
 typedef struct vault_type vault_type;
 typedef struct region_piece_type region_piece_type;
+typedef struct region_info_type region_info_type;
 typedef struct region_type region_type;
 typedef struct object_grouper object_grouper;
 typedef struct object_type object_type;
@@ -192,6 +193,7 @@ struct maxima
 
 	u16b region_piece_max;	/* Max size for "region_piece_list" */
 	u16b region_max;		/* Max size for "region_list" */
+	u16b region_info_max;		/* Max size for "region_list" */
 };
 
 
@@ -917,22 +919,50 @@ struct region_piece_type
 
 
 /*
+ * Information about initialising various types of regions
+ */
+struct region_info_type
+{
+	u32b name;      /* Name (offset) */
+	u32b text;      /* Text (offset) */
+
+	method_level_scalar_type radius;		/* Region radius */
+	method_level_scalar_type max_range;			/* Region range */
+	method_level_scalar_type number;		/* Number of region pieces at generation time */
+
+	u32b flags1;		/* Projection bitflags */
+	u32b flags2;		/* Ongoing effect bitflags */
+
+	byte d_attr;    /* Default region attribute */
+	char d_char;    /* Default region character */
+
+	byte x_attr;    /* Desired region attribute */
+	char x_char;    /* Desired region character */
+
+	byte arc;			/* Region arc (if applies) */
+	byte diameter_of_source;	/* Region diameter of source (if applies) */
+};
+
+
+/*
  * Information about regions affected by ongoing effects
  */
 struct region_type
 {
-	byte type;          /* Region Type */
+	byte type;          /* Index into region_info_type */
 	byte effect;		/* Effect of ongoing damage */
 	byte method;		/* Instead of affecting all grids in region, use this method, if defined */
 	byte level;			/* Level used for method, if defined */
 
-	byte spawn;			/* Spawn this region instead every countdown */
-	byte transform;		/* Transform to this region at end of lifespan */
+	s16b spawn;			/* Spawn this region instead every countdown */
+	s16b transform;		/* Transform to this region at end of lifespan */
+
 	s16b damage;		/* Damage */
 
-	/* If the flags2 & (RE2_PROJECTION) is defined, the following defines the region shape. */
 	byte radius;		/* Region radius */
 	byte range;			/* Region range */
+	byte number;		/* Number of blows */
+	byte facing;		/* Region facing */
 	byte arc;			/* Region arc (if applies) */
 	byte diameter_of_source;	/* Region diameter of source (if applies) */
 

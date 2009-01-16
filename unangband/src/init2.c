@@ -368,6 +368,7 @@ header v_head;
 header d_head;
 header method_head;
 header effect_head;
+header region_head;
 header f_head;
 header k_head;
 header a_head;
@@ -878,6 +879,34 @@ static errr init_effect_info(void)
 	effect_info = effect_head.info_ptr;
 	effect_name = effect_head.name_ptr;
 	effect_text = effect_head.text_ptr;
+
+	return (err);
+}
+
+
+/*
+ * Initialize the "region_info" array
+ */
+static errr init_region_info(void)
+{
+	errr err;
+
+	/* Init the header */
+	init_header(&region_head, z_info->region_max, sizeof(region_type));
+
+#ifdef ALLOW_TEMPLATES
+
+	/* Save a pointer to the parsing function */
+	region_head.parse_info_txt = parse_region_info;
+
+#endif /* ALLOW_TEMPLATES */
+
+	err = init_info("region", &region_head);
+
+	/* Set the global variables */
+	region_info = region_head.info_ptr;
+	region_name = region_head.name_ptr;
+	region_text = region_head.text_ptr;
 
 	return (err);
 }
@@ -2225,13 +2254,17 @@ void init_angband(void)
 	note("[Initializing array sizes...]");
 	if (init_z_info()) quit("Cannot initialize sizes");
 
-	/* Initialize feature info */
+	/* Initialize effect info */
 	note("[Initializing arrays... (effects)]");
 	if (init_effect_info()) quit("Cannot initialize effects");
 
-	/* Initialize feature info */
+	/* Initialize blow info */
 	note("[Initializing arrays... (blows)]");
 	if (init_method_info()) quit("Cannot initialize blows");
+
+	/* Initialize region info */
+	note("[Initializing arrays... (regions)]");
+	if (init_region_info()) quit("Cannot initialize regions");
 
 	/* Initialize feature info */
 	note("[Initializing arrays... (features)]");
@@ -2419,6 +2452,8 @@ void cleanup_angband(void)
 	FREE(l_list);
 	FREE(m_list);
 	FREE(o_list);
+	FREE(region_piece_list);
+	FREE(region_list);
 
 #ifdef MONSTER_FLOW
 
@@ -2471,6 +2506,7 @@ void cleanup_angband(void)
 	free_info(&f_head);
 	free_info(&d_head);
 	free_info(&q_head);
+	free_info(&region_head);
 	free_info(&method_head);
 	free_info(&effect_head);
 	free_info(&z_head);

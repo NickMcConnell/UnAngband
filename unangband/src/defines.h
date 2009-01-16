@@ -2824,23 +2824,34 @@
 
 #define RE2_CLOSEST_MON			0x00001000	/* Use closest monster as a target */
 #define RE2_PLATFORM			0x00002000	/* As region moves, it pushes stuff around */
-#define RE2_HIT_TRAP			0x00004000	/* Avoid triggering source as if a trap (requires trigger) */
+#define RE2_HIT_TRAP			0x00004000	/* Handle this region as a trap */
 #define RE2_RANDOM				0x00008000	/* Target a random grid in the region */
 
 #define RE2_AGE_INCREASE		0x00010000	/* Damage increases with age. If DECREASE defined, damage peaks at 1/2 lifespan, then drops. */
 #define RE2_AGE_DECREASE		0x00020000	/* Damage decreases with age. If INCREASE defined, damage peaks at 1/2 lifespan, then drops. */
-#define RE2_INVERSE				0x00040000	/* Invert source and target when spawning attack */
+#define RE2_INVERSE				0x00040000	/* Invert source and target when spawning attack/subsequent region */
 #define RE2_NOTICE				0x00080000	/* Noticed region? */
 
 #define RE2_CHAIN				0x00100000	/* Set region source and destination to source and target determined when attacking */
+#define RE2_TRIGGER_DROP		0x00200000	/* Trigger if something dropped into the region */
+#define RE2_TRIGGER_AIM			0x00400000	/* Triggered by and targetted by an adjacent creature/player */
+#define RE2_SCATTER				0x00800000	/* Scatter region pieces during creation */
 
+#define RE2_CLOCKWISE			0x01000000	/* Rotates clockwise every turn. If both, randomly choose one. */
+#define RE2_COUNTER_CLOCKWISE	0x02000000	/* Rotates counter-clockwise every turn. If both, randomly choose one. */
+#define RE2_TRIGGER_OPEN		0x04000000	/* Triggered by being 'opened' */
+#define RE2_TRIGGER_CLOSE		0x08000000	/* Triggered by being 'closed'. Note that closing a region ages it backwards */
 
+#define RE2_BACKWARDS			0x10000000	/* Region ages backwards instead of forwards */
+#define RE2_SOURCE_FEATURE		0x20000000	/* Attacks occur from all features in the region that match the source feature */
+#define	RE2_ROOM				0x40000000	/* Region fills a room */
+#define RE2_REMEMBER			0x80000000	/* Remember region */
 
 
 
 /* Actual projections */
 #define PR1_PROJECT 0xFFFFFFFF & (PROJECT_SELF)
-#define PR2_PROJECT	(PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL)
+#define PR2_PROJECT	(PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL | PR2_SCATTER)
 
 
 /*

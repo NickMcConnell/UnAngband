@@ -938,6 +938,13 @@ char *effect_name;
 char *effect_text;
 
 /*
+ * The region info arrays
+ */
+region_info_type *region_info;
+char *region_name;
+char *region_text;
+
+/*
  * The terrain feature arrays
  */
 feature_type *f_info;
