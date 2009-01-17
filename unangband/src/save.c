@@ -241,6 +241,64 @@ static void wr_item(const object_type *o_ptr)
 	}
 }
 
+
+/*
+ * Write a "region" record
+ */
+static void wr_region(const region_type *r_ptr)
+{
+	/* Write the region */
+	wr_byte(r_ptr->type);
+	wr_byte(r_ptr->effect);
+	wr_byte(r_ptr->method);
+	wr_byte(r_ptr->level);
+
+	wr_s16b(r_ptr->spawn);
+	wr_s16b(r_ptr->transform);
+	wr_s16b(r_ptr->damage);
+
+	wr_byte(r_ptr->radius);
+
+	wr_byte(r_ptr->range);
+	wr_byte(r_ptr->number);		/* Number of blows */
+	wr_byte(r_ptr->facing);		/* Region facing */
+	wr_byte(r_ptr->arc);			/* Region arc (if applies) */
+	wr_byte(r_ptr->diameter_of_source);	/* Region diameter of source (if applies) */
+
+	wr_byte(r_ptr->y0);			/* Source y location */
+	wr_byte(r_ptr->x0);			/* Source x location */
+	wr_byte(r_ptr->y1);			/* Destination y location */
+	wr_byte(r_ptr->x1);			/* Destination x location */
+
+	wr_byte(r_ptr->countdown);     /* Number of turns effect has left */
+	wr_byte(r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
+
+	wr_s16b(r_ptr->age);			/* Number of turns effect has been alive */
+	wr_s16b(r_ptr->lifespan);		/* Number of turns effect will be alive */
+
+	wr_s16b(r_ptr->who);          	/* Source of effect - 'who'. */
+	wr_s16b(r_ptr->what);			/* Source of effect - 'what'. */
+
+	wr_u32b(r_ptr->flags1);		/* Projection bitflags */
+	wr_u32b(r_ptr->flags2);		/* Ongoing effect bitflags */
+
+}
+
+
+/*
+ * Write a "region piece" record
+ */
+static void wr_region_piece(const region_piece_type *rp_ptr)
+{
+	/* Write the region piece */
+	wr_byte(rp_ptr->y);
+	wr_byte(rp_ptr->x);
+	wr_s16b(rp_ptr->d);
+	wr_s16b(rp_ptr->region);
+
+}
+
+
 /*
  * Write a "monster" record
  */
@@ -921,7 +979,6 @@ static void wr_dungeon(void)
 		wr_byte((byte)prev_char);
 	}
 
-
 	/*** Simple "Run-Length-Encoding" of cave ***/
 
 	/* Note that this will induce two wasted bytes */
@@ -993,6 +1050,12 @@ static void wr_dungeon(void)
 	/* Compact the objects */
 	compact_objects(0);
 
+	/* Compact the regions */
+	compact_regions(0);
+
+	/* Compact the regions */
+	compact_region_pieces(0);
+
 	/* Compact the monsters */
 	compact_monsters(0);
 
@@ -1009,6 +1072,36 @@ static void wr_dungeon(void)
 
 		/* Dump it */
 		wr_item(o_ptr);
+	}
+
+
+	/*** Dump the regions ***/
+
+	/* Total regions */
+	wr_u16b(region_max);
+
+	/* Dump the regions */
+	for (i = 1; i < region_max; i++)
+	{
+		region_type *r_ptr = &region_list[i];
+
+		/* Dump it */
+		wr_region(r_ptr);
+	}
+
+
+	/*** Dump the region pieces ***/
+
+	/* Total regions */
+	wr_u16b(region_piece_max);
+
+	/* Dump the regions */
+	for (i = 1; i < region_piece_max; i++)
+	{
+		region_piece_type *rp_ptr = &region_piece_list[i];
+
+		/* Dump it */
+		wr_region_piece(rp_ptr);
 	}
 
 

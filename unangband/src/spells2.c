@@ -8087,6 +8087,127 @@ void wipe_region_piece_list(void)
 
 
 /*
+ * Copy a region piece
+ */
+void region_piece_copy(region_piece_type *rp_ptr, const region_piece_type *rp_ptr2)
+{
+	/* Copy the structure */
+	(void)COPY(rp_ptr, rp_ptr2, region_piece_type);
+
+	/* Zero some parameters */
+	rp_ptr->next_in_sequence = 0;
+	rp_ptr->next_region_piece = 0;
+}
+
+
+/*
+ * Move a region piece from index i1 to index i2 in the region piece list
+ */
+static void compact_region_pieces_aux(int i1, int i2)
+{
+	int i, y, x;
+
+	region_piece_type *rp_ptr;
+	region_type *r_ptr;
+
+	/* Do nothing */
+	if (i1 == i2) return;
+
+	/* Repair region pieces */
+	for (i = 1; i < region_piece_max; i++)
+	{
+		/* Get the object */
+		rp_ptr = &region_piece_list[i];
+
+		/* Skip "dead" objects */
+		if (!rp_ptr->region) continue;
+
+		/* Repair "next" pointers */
+		if (rp_ptr->next_in_sequence == i1)
+		{
+			/* Repair */
+			rp_ptr->next_in_sequence = i2;
+		}
+
+		/* Repair "next" pointers */
+		if (rp_ptr->next_region_piece == i1)
+		{
+			/* Repair */
+			rp_ptr->next_region_piece = i2;
+		}
+	}
+
+	/* Repair regions */
+	for (i = 1; i < region_max; i++)
+	{
+		/* Get the object */
+		r_ptr = &region_list[i];
+
+		/* Skip "dead" objects */
+		if (!r_ptr->type) continue;
+
+		/* Repair "next" pointers */
+		if (r_ptr->first_in_sequence == i1)
+		{
+			/* Repair */
+			r_ptr->first_in_sequence = i2;
+		}
+	}
+
+	/* Get the object */
+	rp_ptr = &region_piece_list[i1];
+
+	/* Get location */
+	y = rp_ptr->y;
+	x = rp_ptr->x;
+
+	/* Repair grid */
+	if (cave_region_piece[y][x] == i1)
+	{
+		/* Repair */
+		cave_region_piece[y][x] = i2;
+	}
+
+	/* Hack -- move object */
+	COPY(&region_piece_list[i2], &region_piece_list[i1], region_piece_type);
+
+	/* Hack -- wipe hole */
+	region_piece_wipe(rp_ptr);
+}
+
+
+/*
+ * Compact and Reorder the region piece list
+ *
+ * This function can be very dangerous, use with caution!
+ *
+ * After "compacting" (if needed), we "reorder" the objects into a more
+ * compact order, and we reset the allocation info, and the "live" array.
+ */
+void compact_region_pieces(int size)
+{
+	int i;
+
+	(void)size;
+
+	/* Excise dead objects (backwards!) */
+	for (i = region_piece_max - 1; i >= 1; i--)
+	{
+		region_piece_type *rp_ptr = &region_piece_list[i];
+
+		/* Skip real region pieces */
+		if (rp_ptr->region) continue;
+
+		/* Move last object into open hole */
+		compact_region_pieces_aux(region_piece_max - 1, i);
+
+		/* Compress "region_piece_max" */
+		region_piece_max--;
+	}
+}
+
+
+/*
  * Get an available region piece
  */
 s16b region_piece_pop(void)
@@ -8205,6 +8326,78 @@ void wipe_region_list(void)
 
 
 /*
+ * Move a region piece from index i1 to index i2 in the region piece list
+ */
+static void compact_regions_aux(int i1, int i2)
+{
+	int i;
+
+	region_piece_type *rp_ptr;
+	region_type *r_ptr;
+
+	/* Do nothing */
+	if (i1 == i2) return;
+
+	/* Repair region pieces */
+	for (i = 1; i < region_piece_max; i++)
+	{
+		/* Get the object */
+		rp_ptr = &region_piece_list[i];
+
+		/* Skip "dead" objects */
+		if (!rp_ptr->region) continue;
+
+		/* Repair "next" pointers */
+		if (rp_ptr->region == i1)
+		{
+			/* Repair */
+			rp_ptr->region = i2;
+		}
+	}
+
+	/* Get the object */
+	r_ptr = &region_list[i1];
+
+	/* Hack -- move object */
+	COPY(&region_list[i2], &region_list[i1], region_type);
+
+	/* Hack -- wipe hole */
+	region_wipe(r_ptr);
+}
+
+
+/*
+ * Compact and Reorder the region piece list
+ *
+ * This function can be very dangerous, use with caution!
+ *
+ * After "compacting" (if needed), we "reorder" the objects into a more
+ * compact order, and we reset the allocation info, and the "live" array.
+ */
+void compact_regions(int size)
+{
+	int i;
+
+	(void)size;
+
+	/* Excise dead objects (backwards!) */
+	for (i = region_max - 1; i >= 1; i--)
+	{
+		region_type *r_ptr = &region_list[i];
+
+		/* Skip real region pieces */
+		if (r_ptr->type) continue;
+
+		/* Move last object into open hole */
+		compact_regions_aux(region_max - 1, i);
+
+		/* Compress "region_max" */
+		region_max--;
+	}
+}
+
+
+/*
  * Get an available region
  */
 s16b region_pop(void)
@@ -8306,6 +8499,49 @@ void region_piece_insert(int y, int x, s16b d, s16b region)
 
 
 /*
+ * Makes a copy of a region, excluding the region pieces
+ */
+void region_copy(region_type *r_ptr, const region_type *r_ptr2)
+{
+	/* Copy the structure */
+	(void)COPY(r_ptr, r_ptr2, region_type);
+
+	/* Zero some parameters */
+	r_ptr->first_in_sequence = 0;
+}
+
+
+/*
+ * Takes a copy of the region pieces and adds it to another region.
+ *
+ * If region2 is 0, a new region is created.
+ */
+int region_copy_pieces(int region, int region2)
+{
+	s16b this_region_piece, next_region_piece = 0;
+
+	int new_region = region2 ? region2 : region_pop();
+
+	if (!new_region) return (0);
+
+	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	{
+		/* Get the region piece */
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+
+		/* Copy the region pieces */
+		region_piece_insert(rp_ptr->y, rp_ptr->x, rp_ptr->d, new_region);
+	}
+
+	return (new_region);
+}
+
+
+
+/*
  * Inserts the grids of a region into the region pieces
  */
 void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
@@ -8355,19 +8591,14 @@ bool region_iterate(int region, bool region_iterator(int y, int x, int d, int re
 
 	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
 	{
-		region_piece_type *rp_ptr;
-
-		/* Get the object */
-		rp_ptr = &region_piece_list[this_region_piece];
+		/* Get the region piece */
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
 		next_region_piece = rp_ptr->next_in_sequence;
 
-		/* Excise region piece */
+		/* Iterate on region piece */
 		seen |= region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region);
-
-		/* Forget next pointer */
-		rp_ptr->next_in_sequence = 0;
 	}
 
 	return (seen);
@@ -8782,7 +9013,6 @@ void process_region(int region)
 	int i, j;
 	int path_n = 0;
 	u16b path_g[99];
-	int manual_region = 0;
 
 	/* Paranoia */
 	if (!r_ptr->type) return;
@@ -8803,21 +9033,6 @@ void process_region(int region)
 		r_ptr->type = 0;
 
 		return;
-	}
-
-	/*
-	 * We are applying damage only to changed grids
-	 */
-	if (r_ptr->flags2 & (RE2_MANUAL))
-	{
-		manual_region = region_pop();
-		region_list[manual_region].age = r_ptr->age;
-		region_list[manual_region].damage = r_ptr->damage;
-		region_list[manual_region].effect = r_ptr->effect;
-		region_list[manual_region].flags1 = r_ptr->flags1;
-		region_list[manual_region].flags2 = r_ptr->flags2;
-		region_list[manual_region].who = r_ptr->who;
-		region_list[manual_region].what = r_ptr->what;
 	}
 
 	/* Updating a projection */
@@ -8872,7 +9087,6 @@ void process_region(int region)
 			{
 				zaps++;
 				region_piece_insert(y0, x0, r_ptr->damage, region);
-				if (manual_region) region_piece_insert(y0, x0, r_ptr->damage, manual_region);
 			}
 
 			/* If this wall spreads out from the origin, */
@@ -8914,7 +9128,6 @@ void process_region(int region)
 							{
 								zaps++;
 								region_piece_insert(ty, tx, r_ptr->damage, region);
-								if (manual_region) region_piece_insert(ty, tx, r_ptr->damage, manual_region);
 							}
 						}
 					}
@@ -9069,9 +9282,6 @@ void process_region(int region)
 			rp_ptr->x = tx;
 			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
 			cave_region_piece[ty][tx] = this_region_piece;
-
-			/* Apply the effect */
-			if (manual_region) region_piece_insert(ty, tx, rp_ptr->d, region);
 		}
 	}
 
@@ -9132,16 +9342,10 @@ void process_region(int region)
 	}
 
 	/* Apply effect every turn */
-	if (r_ptr->flags2 & (RE2_AUTOMATIC | RE2_MANUAL))
+	if (r_ptr->flags2 & (RE2_AUTOMATIC))
 	{
 		/* Apply the effect */
-		region_effect(manual_region ? manual_region : region, 0, 0);
-
-		/* Discard manual region */
-		region_delete(manual_region);
-
-		/* And delete */
-		region_wipe(&region_list[manual_region]);
+		region_effect(region, 0, 0);
 	}
 
 	/* Effects age */

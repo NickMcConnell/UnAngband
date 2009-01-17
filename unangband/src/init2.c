@@ -1597,6 +1597,9 @@ static errr init_other(void)
 	/* Padded into array */
 	play_info = C_ZNEW(DUNGEON_HGT, byte_256);
 
+	/* Region piece array */
+	cave_region_piece = C_ZNEW(DUNGEON_HGT, s16b_wid);
+
 	/* Feature array */
 	cave_feat = C_ZNEW(DUNGEON_HGT, s16b_wid);
 
@@ -1625,6 +1628,12 @@ static errr init_other(void)
 
 	/* Monsters */
 	m_list = C_ZNEW(z_info->m_max, monster_type);
+
+	/* Region pieces */
+	region_piece_list = C_ZNEW(z_info->region_piece_max, region_piece_type);
+
+	/* Regions */
+	region_list = C_ZNEW(z_info->region_max, region_type);
 
 
 	/*** Prepare lore array ***/
@@ -2466,6 +2475,8 @@ void cleanup_angband(void)
 	/* Free the cave */
 	FREE(cave_o_idx);
 	FREE(cave_m_idx);
+	FREE(cave_region_piece);
+
 	FREE(cave_feat);
 	FREE(cave_info);
 	FREE(play_info);

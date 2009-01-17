@@ -906,14 +906,13 @@ struct vault_type
  */
 struct region_piece_type
 {
-	int y;
-	int x;
+	byte y;
+	byte x;
+	s16b d;					/* Scalar, usually distance */
 
-	s16b d;								/* Scalar, usually distance */
+	s16b region;			/* Index of region this region piece refers to */
 
-	s16b region;						/* Index of region this region piece refers to */
-
-	s16b next_region_piece;				/* Index of next region piece at this square. */
+	s16b next_region_piece;	/* Index of next region piece at this square. */
 	s16b next_in_sequence;	/* Index of next region piece with the same effect. */
 };
 

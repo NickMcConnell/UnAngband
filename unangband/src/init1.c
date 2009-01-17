@@ -2529,7 +2529,7 @@ errr parse_effect_info(char *buf, header *head)
 /*
  * Grab one blow flag in a blow_type from a textual string
  */
-static errr grab_one_region_flag(region_type *region_ptr, cptr what)
+static errr grab_one_region_flag(region_info_type *region_ptr, cptr what)
 {
 	if (grab_one_flag(&region_ptr->flags1, method_info_flags1, what) == 0)
 		return (0);

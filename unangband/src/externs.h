@@ -978,6 +978,14 @@ extern bool process_spell_types(int who, int spell, int level, bool *cancel);
 extern bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x);
+extern void region_piece_wipe(region_piece_type *rp_ptr);
+extern s16b region_piece_pop(void);
+extern void region_piece_copy(region_piece_type *rp_ptr, const region_piece_type *rp_ptr2);
+extern void compact_region_pieces(int size);
+extern void region_wipe(region_type *r_ptr);
+extern s16b region_pop(void);
+extern void region_copy(region_type *r_ptr, const region_type *r_ptr2);
+extern void compact_regions(int size);
 
 /* store.c */
 extern void do_cmd_store(void);

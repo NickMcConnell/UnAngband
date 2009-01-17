@@ -520,6 +520,61 @@ static errr rd_item(object_type *o_ptr)
 }
 
 
+/*
+ * Read a "region" record
+ */
+static void rd_region(region_type *r_ptr)
+{
+	/* Read the region */
+	rd_byte(&r_ptr->type);
+	rd_byte(&r_ptr->effect);
+	rd_byte(&r_ptr->method);
+	rd_byte(&r_ptr->level);
+
+	rd_s16b(&r_ptr->spawn);
+	rd_s16b(&r_ptr->transform);
+	rd_s16b(&r_ptr->damage);
+
+	rd_byte(&r_ptr->radius);
+
+	rd_byte(&r_ptr->range);
+	rd_byte(&r_ptr->number);		/* Number of blows */
+	rd_byte(&r_ptr->facing);		/* Region facing */
+	rd_byte(&r_ptr->arc);			/* Region arc (if applies) */
+	rd_byte(&r_ptr->diameter_of_source);	/* Region diameter of source (if applies) */
+
+	rd_byte(&r_ptr->y0);			/* Source y location */
+	rd_byte(&r_ptr->x0);			/* Source x location */
+	rd_byte(&r_ptr->y1);			/* Destination y location */
+	rd_byte(&r_ptr->x1);			/* Destination x location */
+
+	rd_byte(&r_ptr->countdown);     /* Number of turns effect has left */
+	rd_byte(&r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
+
+	rd_s16b(&r_ptr->age);			/* Number of turns effect has been alive */
+	rd_s16b(&r_ptr->lifespan);		/* Number of turns effect will be alive */
+
+	rd_s16b(&r_ptr->who);          	/* Source of effect - 'who'. */
+	rd_s16b(&r_ptr->what);			/* Source of effect - 'what'. */
+
+	rd_u32b(&r_ptr->flags1);		/* Projection bitflags */
+	rd_u32b(&r_ptr->flags2);		/* Ongoing effect bitflags */
+
+}
+
+
+/*
+ * Read a "region piece" record
+ */
+static void rd_region_piece(region_piece_type *rp_ptr)
+{
+	/* Read the region piece */
+	rd_byte(&rp_ptr->y);
+	rd_byte(&rp_ptr->x);
+	rd_s16b(&rp_ptr->d);
+	rd_s16b(&rp_ptr->region);
+
+}
 
 
 /*
@@ -1698,7 +1753,6 @@ static errr rd_dungeon(void)
 		}
 	}
 
-
 	/*** Player ***/
 
 	/* Fix depth */
@@ -1846,6 +1900,130 @@ static errr rd_dungeon(void)
 			{
 				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 			}
+		}
+	}
+
+
+	/*** Regions ***/
+	if (!older_than(0, 6, 3, 3))
+	{
+		/* Read the region piece count */
+		rd_u16b(&limit);
+
+		/* Verify maximum */
+		if (limit > z_info->region_max)
+		{
+			note(format("Too many (%d) region entries!", limit));
+			return (-1);
+		}
+
+		/* Read the regions */
+		for (i = 1; i < limit; i++)
+		{
+			region_type *i_ptr;
+			region_type region_type_body;
+
+			s16b region;
+			region_type *rp_ptr;
+
+
+			/* Get the object */
+			i_ptr = &region_type_body;
+
+			/* Wipe the object */
+			region_wipe(i_ptr);
+
+			/* Read the item */
+			rd_region(i_ptr);
+
+			/* Make an object */
+			region = region_pop();
+
+			/* Paranoia */
+			if (region != i)
+			{
+				note(format("Cannot place region %d!", i));
+				return (-1);
+			}
+
+			/* Get the object */
+			rp_ptr = &region_list[region];
+
+			/* Structure Copy */
+			region_copy(rp_ptr, i_ptr);
+		}
+
+		/* Read the region piece count */
+		rd_u16b(&limit);
+
+		/* Verify maximum */
+		if (limit > z_info->region_piece_max)
+		{
+			note(format("Too many (%d) region pieces!", limit));
+			return (-1);
+		}
+
+		/* Read the region_pieces */
+		for (i = 1; i < limit; i++)
+		{
+			region_piece_type *i_ptr;
+			region_piece_type region_piece_type_body;
+			region_type *r_ptr;
+
+			s16b region_piece;
+			region_piece_type *rp_ptr;
+
+			int x;
+			int y;
+
+			/* Get the object */
+			i_ptr = &region_piece_type_body;
+
+			/* Wipe the object */
+			region_piece_wipe(i_ptr);
+
+			/* Read the item */
+			rd_region_piece(i_ptr);
+
+			/* Make an object */
+			region_piece = region_piece_pop();
+
+			/* Paranoia */
+			if (region_piece != i)
+			{
+				note(format("Cannot place region piece %d!", i));
+				return (-1);
+			}
+
+			/* Get the object */
+			rp_ptr = &region_piece_list[region_piece];
+
+			/* Structure Copy */
+			region_piece_copy(rp_ptr, i_ptr);
+
+			/* Get the region */
+			r_ptr = &region_list[rp_ptr->region];
+
+			/* Paranoia */
+			if (!r_ptr->type)
+			{
+				note(format("Inserting piece into expired region %d!", rp_ptr->region));
+				return (-1);
+			}
+
+			/* Insert into the region */
+			rp_ptr->next_in_sequence = r_ptr->first_in_sequence;
+			r_ptr->first_in_sequence = region_piece;
+
+			/* ToDo: Verify coordinates */
+			y = i_ptr->y;
+			x = i_ptr->x;
+
+			/* Link the object to the pile */
+			rp_ptr->next_region_piece = cave_region_piece[y][x];
+
+			/* Link the floor to the object */
+			cave_region_piece[y][x] = region_piece;
 		}
 	}
 

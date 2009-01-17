@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	3
-#define VERSION_EXTRA	2
+#define VERSION_EXTRA	3
 
 /*
  * Oldest version number that can still be imported
@@ -2845,7 +2845,7 @@
 #define RE2_BACKWARDS			0x10000000	/* Region ages backwards instead of forwards */
 #define RE2_SOURCE_FEATURE		0x20000000	/* Attacks occur from all features in the region that match the source feature */
 #define	RE2_ROOM				0x40000000	/* Region fills a room */
-#define RE2_REMEMBER			0x80000000	/* Remember region */
+#define RE2_DISPLAY				0x80000000	/* Display region */
 
 
 

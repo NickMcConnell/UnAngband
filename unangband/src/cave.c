@@ -1303,6 +1303,33 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 	}
 
+	/*
+	 * Display regions when:
+	 *  1.  when the player can see the region
+	 *  2.  when explicitly told to
+	 */
+	if (pinfo & (PLAY_SEEN | PLAY_REGN))
+	{
+		s16b this_region_piece, next_region_piece = 0;
+
+		for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+			region_type *r_ptr = &region_list[rp_ptr->region];
+
+			/* Get the next region */
+			next_region_piece = rp_ptr->next_region_piece;
+
+			/* Displaying region */
+			if ((r_ptr->flags2 & (RE2_DISPLAY)) != 0)
+			{
+				a = region_info[r_ptr->type].x_attr;
+				c = region_info[r_ptr->type].x_char;
+				break;
+			}
+		}
+	}
+
 #if 0
 	/* Room decoration -- should really be '3rd/ego' layer */
 	if ((view_special_lite) && (pinfo & (PLAY_SEEN)) &&
