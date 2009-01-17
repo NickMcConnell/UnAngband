@@ -1868,7 +1868,7 @@ D:You are enveloped in a cloud of sulpher!
 # --> visible trap -- silent watcher
 
 N:70:silent watcher
-G:^:d
+G:^:D
 U:56
 #$ granite wall
 O:0
@@ -1887,7 +1887,7 @@ F:ATTR_LITE |
 D:It gazes at you.
 
 N:71:silent watcher
-G:^:d
+G:^:D
 M:70
 #$ silent watcher
 U:56
@@ -1908,7 +1908,7 @@ F:ATTR_LITE |
 D:It gazes at you.
 
 N:72:silent watcher
-G:^:d
+G:^:D
 M:70
 #$ silent watcher
 U:56
@@ -1929,7 +1929,7 @@ F:ATTR_LITE |
 D:It gazes at you.
 
 N:73:silent watcher
-G:^:d
+G:^:D
 M:70
 #$ silent watcher
 U:56
@@ -1950,7 +1950,7 @@ F:ATTR_LITE |
 D:It gazes at you.
 
 N:74:silent watcher
-G:^:d
+G:^:D
 M:70
 #$ silent watcher
 U:56
@@ -1971,7 +1971,7 @@ F:ATTR_LITE |
 D:It gazes at you.
 
 N:75:silent watcher
-G:^:d
+G:^:D
 M:70
 #$ silent watcher
 U:56
@@ -1992,7 +1992,7 @@ F:ATTR_LITE |
 D:It gazes at you.
 
 N:76:silent watcher
-G:^:d
+G:^:D
 M:70
 #$ silent watcher
 U:56
@@ -2660,20 +2660,26 @@ F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:PICK_TRAP | ATTR_LITE |
 
-#N:108:trapped door (discolored spot)
-#U:56
-#G:+:u
-#W:12:9:20:0
-#K:DEFAULT:1
-#K:HIT_TRAP:108
-#K:BASH:5
-#K:SPIKE:41
-#K:DISARM:4
-#F:OPEN | BASH | SPIKE | DISARM | TRAP | CAN_PASS | DOOR | PICK_TRAP |
-#F:TUNNEL | HURT_ROCK | CAN_CLIMB | REMEMBER | NOTICE | HIT_TRAP |
-#F:POWER_5
-
-#$# 108 - Unused ###
+N:108:trapped door (silent watcher)
+G:+:D
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door ()
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
 
 N:109:trapped door (spring-loaded trap)
 G:+:r
@@ -3257,11 +3263,48 @@ F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN | FLOOR |
 F:LAKE | CAN_CLIMB | CAN_FLY |
 F:ATTR_LITE |
 
+# -> visible trap -- loose rock -- opens adjacent
+
+N:138:loose rock
+G:^:P
+U:56
+#$ granite wall
+M:95
+W:3:1:20:0
+K:DEFAULT:139:1
+K:DISARM:1:1
+T:HURT
+#$ loose rock
+K:CHASM:141:1
+#$ chasm
+K:TREE:541:1
+#$ shady ground
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You hear a click!
+
+# -> visible trap -- loose rock -- opening adjacent
+
+N:139:loose rock
+G:^:P
+U:56
+#$ granite wall
+M:95
+W:3:1:20:0
+T:KILL_TRAP
+K:DEFAULT:1:1
+#$ loose rock
+K:CHASM:141:1
+#$ chasm
+K:TREE:541:1
+#$ shady ground
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM | ADJACENT
+F:ATTR_LITE |
+
 #stone bridge (over chasm)
-
-#$# 138 - Unused ###
-
-#$# 139 - Unused ###
 
 N:140:stone bridge
 G:x:w
@@ -3737,7 +3780,19 @@ F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
 F:LAKE | HURT_COLD | OIL | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | ATTR_LITE | SPREAD |
 
-#$# 164 - Unused ###
+N:164:poisonous waterfall
+G:>:p
+O:0
+W:48:3:13:126
+#$ falling water
+T:FALL_MORE:10d6
+K:DEFAULT:164:0
+K:PATH:140:0
+#$ stone bridge
+F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
+F:PATH | RIVER | LAKE | WATER | DEEP | CHASM | CAN_FLY | HIDE_SWIM |
+F:OUTSIDE | MUST_CLIMB | ATTR_LITE |
+D:You fall into the chasm!
 
 N:165:acidic vapour
 G:':G
@@ -5053,50 +5108,394 @@ F:HURT_ELEC | ATTR_LITE | TIMED | SPREAD |
 
 # Even more dungeon features.
 
+# These invisible traps allow us to always get the same visible trap type.
+
+# 0x02 --> invisible trap (drawn as open floor)
+
+N:237:invisible trap
+G:x:w
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:238:invisible trap
+G:^:s
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:239:invisible trap
+G:^:o
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:240:invisible trap
+G:^:r
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:241:invisible trap
+G:^:g
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:242:invisible trap
+G:^:b
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:243:invisible trap
+G:^:u
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:244:invisible trap
+G:^:W
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:245:invisible trap
+G:^:P
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:246:invisible trap
+G:^:y
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:247:invisible trap
+G:^:R
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:248:invisible trap
+G:^:G
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:249:invisible trap
+G:^:B
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:250:invisible trap
+G:^:p
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:251:invisible trap
+G:^:v
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:252:invisible trap
+G:^:t
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:253:invisible trap
+G:^:m
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:254:invisible trap
+G:^:Y
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:255:invisible trap
+G:^:i
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:256:invisible trap
+G:^:T
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
 # Following open doors allow us to close and relock doors.
 # We can always bash a door to break its lock.
 
 # 0x04 --> open door
-
-#$# 237 - Unused ###
-
-#$# 238 - Unused ###
-
-#$# 239 - Unused ###
-
-#$# 240 - Unused ###
-
-#$# 241 - Unused ###
-
-#$# 242 - Unused ###
-
-#$# 243 - Unused ###
-
-#$# 244 - Unused ###
-
-#$# 245 - Unused ###
-
-#$# 246 - Unused ###
-
-#$# 247 - Unused ###
-
-#$# 248 - Unused ###
-
-#$# 249 - Unused ###
-
-#$# 250 - Unused ###
-
-#$# 251 - Unused ###
-
-#$# 252 - Unused ###
-
-#$# 253 - Unused ###
-
-#$# 254 - Unused ###
-
-#$# 255 - Unused ###
-
-#$# 256 - Unused ###
 
 N:257:open door
 G:':U
@@ -5540,7 +5939,7 @@ F:ATTR_LITE |
 # visible trap -- mark of a white hand - summons
 
 N:284:mark of a white hand
-G:^:o
+G:^:z
 #$ mark of a white hand
 U:56
 #$ granite wall
@@ -7704,7 +8103,7 @@ K:PATH:396:36
 #$ hidden deep poisonous water
 K:SECRET:393:36
 #$ under poisonous water
-K:CHASM:151:36
+K:CHASM:164:36
 #$ waterfall
 K:HURT_COLD:150:36
 #$ deep water under an ice wall
@@ -7724,7 +8123,7 @@ K:DEFAULT:397:36
 #$ under poisonous water
 K:HURT_COLD:150:36
 #$ deep water under an ice wall
-K:CHASM:151:36
+K:CHASM:164:36
 #$ waterfall
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL |
 F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
@@ -7739,10 +8138,10 @@ U:140
 #$ stone bridge
 O:248
 W:38:3:8:0
-T:WATER_WEAK:4d6
+T:POISON_WATER:4d6
 K:DEFAULT:397:0
 #$ stone bridge
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:HURT_COLD:147:0
 #$ deep water under ice under a stone bridge
@@ -7754,13 +8153,13 @@ F:CAN_SWIM | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
 N:395:poisonous water
-G:;:v
+G:;:p
 O:248
 W:33:6:7:0
 K:DEFAULT:395:0
 K:HURT_COLD:145:0
 #$ ice
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:HURT_WATER:493:0
 #$ the crest of a wave over poisonous water
@@ -7770,14 +8169,14 @@ F:HIDE_ITEM | HIDE_SNEAK | HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
 N:396:hidden deep poisonous water
-G:;:v
+G:;:p
 U:395
 #$ poisonous water
 O:248
 W:38:6:7:0
 T:POISON_WATER:4d6
 K:DEFAULT:396:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:395:0
 #$ poisonous water
@@ -7794,12 +8193,12 @@ F:HURT_WATER | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE |
 D:The water is deeper than it looks.
 
 N:397:deep poisonous water
-G:::v
+G:::p
 O:248
 W:47:6:12:0
 T:POISON_WATER:4d6
 K:DEFAULT:397:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:394:0
 #$ deep poisonous water under a stone bridge
@@ -8132,7 +8531,22 @@ F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
 F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
-#$# 416 - Unused ###
+N:416:impassable thorns
+G:#:T
+M:435
+U:435
+T:POISON:2d4
+O:0
+W:30:1:17:0
+K:DEFAULT:441:5
+K:HURT_FIRE:424:5
+K:CHASM:455:5
+K:TREE:700:5
+K:SECRET:434:5
+F:SECRET | REMEMBER | BASH | TUNNEL |
+F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
+F:LIVING | TREE | ATTR_LITE | HIT_TRAP
+D:The poisonous thorns block your way!
 
 N:417:smoke over burnt ground
 G:':D
@@ -8446,23 +8860,20 @@ F:PROJECT | MOVE | PLACE | DROP | REMEMBER |
 F:PATH | LAKE | CAN_FLY | HIDE_ITEM |
 F:GROUND | OUTSIDE | ATTR_LITE | SPREAD |
 
-# Hack -- treat as uncovered and do not spread fire damage
-
-# N:434:steam over geothermal ground
-# G:':W
-# W:72:2:7:50
-# U:431
-# T:STEAM:1d3
-# K:DEFAULT:216
-# K:CHASM:214
-# K:PATH:433
-# K:SPREAD:432
-# F:BASH | CAN_FLY | KILL_HUGE | HIDE_ITEM | LAVA | OUTSIDE |
-# F:DROP | MOVE | PROJECT | PLACE | REMEMBER |
-# F:PATH | OUTSIDE | SPREAD | LAKE
-# F:PLACE | DROP
-
-#$# 434 - Unused ###
+N:434:impassable poisonous thorns
+G:#:T
+U:435
+#$ tree
+O:0
+W:35:1:17:454
+T:POISON:2d4
+K:DEFAULT:441:5
+K:HURT_FIRE:424:5
+K:CHASM:455:5
+K:TREE:701:5
+F:REMEMBER | BASH | TUNNEL |
+F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
+F:LIVING | TREE | ATTR_LITE | HIT_TRAP
 
 N:435:bush
 G:;:G
@@ -8913,8 +9324,6 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | TUNNEL |
 F:PATH | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | EASY_HIDE | MUST_CLIMB | ATTR_LITE |
 
-#$# 458 - Unused ###
-
 N:459:giant spider web over a chasm
 G:x:W
 O:0
@@ -8963,9 +9372,45 @@ F:REMEMBER | BASH | TUNNEL |
 F:PATH | LAKE | HURT_FIRE | CAN_FLY | HIDE_SNEAK |
 F:LIVING | ATTR_LITE |
 
-#$# 462 - Unused ###
+# -> visible trap -- loose rock -- closes adjacent
 
-#$# 463 - Unused ###
+N:462:loose rock
+G:^:P
+U:56
+#$ granite wall
+W:3:1:20:0
+K:DEFAULT:463:1
+K:DISARM:1:1
+T:HURT
+#$ loose rock
+K:CHASM:141:1
+#$ chasm
+K:TREE:541:1
+#$ shady ground
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You hear a click!
+
+# -> visible trap -- loose rock -- closing adjacent
+
+N:463:loose rock
+G:^:P
+U:56
+#$ granite wall
+O:0
+W:3:1:20:0
+T:LOCK_DOOR
+K:DEFAULT:1:1
+#$ loose rock
+K:CHASM:141:1
+#$ chasm
+K:TREE:541:1
+#$ shady ground
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM | ADJACENT
+F:ATTR_LITE |
 
 N:464:pile of ice rubble
 G:::B
@@ -9531,14 +9976,14 @@ F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 
 N:492:a poisonous wave breaking over a stone bridge
-G:x:v
+G:x:p
 U:152
 #$ deep water under a stone bridge
 O:248
 W:27:1:8:0
 T:POISON_WATER:4d6
 K:DEFAULT:492:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:152:0
 #$ deep water under a stone bridge
@@ -9559,7 +10004,7 @@ O:248
 W:18:2:7:0
 T:POISON_WATER:4d6
 K:DEFAULT:493:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:HURT_COLD:145:0
 #$ ice
@@ -9579,7 +10024,7 @@ O:248
 W:37:2:7:0
 T:POISON_WATER:4d6
 K:DEFAULT:494:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:493:0
 #$ the crest of a wave over poisonous water
@@ -9604,7 +10049,7 @@ O:248
 W:27:2:12:0
 T:POISON_WATER:4d6
 K:DEFAULT:495:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:152:0
 #$ deep water under a stone bridge
@@ -9628,7 +10073,7 @@ O:248
 W:18:2:7:0
 T:POISON_WATER:4d6
 K:DEFAULT:496:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:HURT_COLD:145:0
 #$ ice
@@ -9649,7 +10094,7 @@ O:248
 W:37:2:7:0
 T:POISON_WATER:4d6
 K:DEFAULT:497:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:496:0
 #$ a wave over poisonous water
@@ -9675,7 +10120,7 @@ O:248
 W:27:2:12:0
 T:POISON_WATER:4d6
 K:DEFAULT:498:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:152:0
 #$ deep water under a stone bridge
@@ -9689,13 +10134,13 @@ F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:499:poisonous rough water
-G:;:v
+G:;:p
 U:395
 #$ poisonous water
 O:248
 W:18:2:7:0
 K:DEFAULT:499:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:HURT_COLD:145:0
 #$ ice
@@ -9707,7 +10152,7 @@ F:HIDE_SNEAK | HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:500:hidden deep poisonous rough water
-G:;:v
+G:;:p
 M:499
 #$ poisonous rough water
 U:499
@@ -9716,7 +10161,7 @@ O:248
 W:37:2:7:0
 T:POISON_WATER:4d6
 K:DEFAULT:500:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:499:0
 #$ poisonous rough water
@@ -9733,14 +10178,14 @@ F:USE_FEAT | OUTSIDE | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:The water is deeper than it looks.
 
 N:501:deep poisonous rough water
-G:::v
+G:::p
 U:397
 #$ deep poisonous water
 O:248
 W:27:2:12:0
 T:POISON_WATER:4d6
 K:DEFAULT:501:0
-K:CHASM:151:0
+K:CHASM:164:0
 #$ waterfall
 K:PATH:394:0
 #$ deep poisonous water under a stone bridge
@@ -9975,24 +10420,6 @@ K:INSTANT:400:0
 F:LOS | PROJECT | MOVE | PLACE | DROP |
 F:PATH | DEEP | CAN_FLY | CAN_SWIM | HIDE_DIG | KILL_MOVE |
 F:OUTSIDE | ATTR_LITE | INSTANT |
-
-#N:524:a wave breaking over a stone bridge
-#G:x:b
-#M:482
-#U:152
-#W:27:1:8:0
-#K:DEFAULT:524
-#K:CHASM:151
-#K:PATH:152
-#K:USE_FEAT:492
-#K:HURT_COLD:147
-#K:INSTANT:394
-#K:TREE:524
-#T:WATER_WEAK:4d6
-#O:224
-#F:CAN_FLY | CAN_CLIMB | CAN_SWIM | DEEP | PATH | USE_FEAT | WATER |
-#F:LOS | MOVE | PROJECT | REMEMBER | DROP | PLACE | HIDE_SWIM | 
-#F:HURT_COLD | OUTSIDE | INSTANT
 
 #$# 524 - Unused ###
 
@@ -11578,7 +12005,7 @@ F:LAKE | DEEP | FILLED | ACID | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT | SPREAD |
 
 N:603:falling boiling water
-G:<:v
+G:<:P
 U:227
 #$ boiling waterfall
 O:0
@@ -13473,7 +13900,7 @@ F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | ADJACENT | ERUPT |
 D:You are surrounded by a burning green gas!
 
 N:711:erupting boiling geyser
-G:<:v
+G:<:P
 U:227
 #$ boiling waterfall
 O:0
@@ -18445,4 +18872,414 @@ F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:A clockwork mechanism whirrs furiously.
 
+N:972:invisible trap
+G:^:V
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
 
+N:973:invisible trap
+G:^:I
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:974:invisible trap
+G:^:M
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:975:invisible trap
+G:^:z
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:976:invisible trap
+G:^:Z
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:977:invisible trap
+G:^:V
+M:1
+#$ open floor
+U:56
+#$ granite wall
+O:0
+W:1:1:5:0
+K:DEFAULT:1:0
+#$ open floor
+K:CHASM:141:0
+#$ chasm
+K:TREE:541:0
+#$ shady ground
+F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:PICK_TRAP | ATTR_LITE |
+D:You have found a trap.
+
+N:978:trapped door (surreal painting)
+G:+:p
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:979:trapped door (ever burning eye)
+G:+:v
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE | GLOW
+
+N:980:trapped door (upwards draft)
+G:+:t
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:981:trapped door (deadfall)
+G:+:m
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:982:trapped door (shaft of light)
+G:+:Y
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:983:trapped door (glowing glyph)
+G:+:M
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE | GLOW
+
+N:984:trapped door (demonic sign)
+G:+:T
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:985:trapped door (Radagast's snare)
+G:+:V
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:986:trapped door (siege engine)
+G:+:I
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:987:trapped door (clockwork mechanism)
+G:+:i
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:988:trapped door (mark of a white hand)
+G:+:z
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:989:trapped door (shimmering portal)
+G:+:Z
+U:56
+#$ granite wall
+O:0
+W:15:9:20:0
+K:DEFAULT:1:5
+#$ trapped door (trap door)
+K:BASH:5:5
+#$ broken door
+K:SPIKE:41:5
+#$ jammed door
+K:DISARM:4:5
+#$ open door
+K:CHASM:141:5
+#$ chasm
+F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
+F:HIT_TRAP |
+F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
+
+N:990:falling poisonous water
+G:<:p
+U:164
+#$ waterfall
+O:224
+W:35:2:13:499
+#$ rough water
+T:POISON_WATER:4d6
+K:DEFAULT:126:0
+K:CHASM:164:0
+#$ waterfall
+K:HURT_COLD:125:0
+#$ unstable ice wall
+K:ADJACENT:601:0
+#$ falling water
+K:TIMED:938:0
+#$ rough water
+K:PATH:153:0
+#$ water
+F:LOS | MOVE | DROP | NOTICE | REMEMBER | LESS |
+F:PATH | LAKE | WATER | DEEP | FILLED | HURT_COLD | CAN_SWIM | HIDE_ITEM |
+F:HIDE_SWIM |
+F:USE_FEAT | OUTSIDE | ATTR_LITE | ADJACENT | TIMED |
+
+N:991:falling poisonous water
+G:<:v
+U:164
+O:224
+W:35:2:13:499
+#$ rough water
+T:POISON_WATER:4d6
+K:DEFAULT:990:0
+#$ falling water
+K:CHASM:164:0
+#$ waterfall
+K:HURT_COLD:125:0
+#$ unstable ice wall
+K:INSTANT:126:0
+#$ falling water
+K:TIMED:938:0
+#$ rough water
+F:MOVE | DROP | NOTICE | REMEMBER | LESS |
+F:LAKE | WATER | DEEP | FILLED | HURT_COLD | CAN_SWIM | HIDE_ITEM |
+F:HIDE_SWIM |
+F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT | TIMED |

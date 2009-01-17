@@ -7313,11 +7313,6 @@ void place_feature(int y, int x)
 	cave_set_feat(y, x, feat);
 }
 
-/*
- * This is used to force traps to be the type specified by the room trap.
- */
-static s16b vault_trap_type = 0;
-
 
 /*
  * Helper function for "floor traps"
@@ -7340,9 +7335,6 @@ static bool vault_trap_floor(int f_idx)
 
 	/* Decline allocated */
 	if (f_ptr->flags3 & (FF3_ALLOC)) return (FALSE);
-
-	/* Must match vault_trap_type if set */
-	if ((vault_trap_type) && (f_ptr->d_attr != f_info[vault_trap_type].d_attr)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -7385,9 +7377,6 @@ static bool vault_trap_chest(int f_idx)
 	if (test_has_item != chest_has_item) return (FALSE);
 	if (test_has_gold != chest_has_gold) return (FALSE);
 	if (test_drops != chest_drops) return (FALSE);
-
-	/* Must match vault_trap_type if set */
-	if ((vault_trap_type) && (f_ptr->d_attr != f_info[vault_trap_type].d_attr)) return (FALSE);
 
 	/* Okay */
 	return (TRUE);
@@ -7453,9 +7442,6 @@ void pick_trap(int y, int x)
 {
 	int feat= cave_feat[y][x];
 	int room = room_idx(y, x);
-
-	/* Set the vault_trap_type if in a room which has a trap set */
-	vault_trap_type = room_info[room].theme[THEME_TRAP];
 
 	/* Paranoia */
 	if (!(f_info[feat].flags1 & (FF1_TRAP))) return;
@@ -7542,13 +7528,23 @@ void pick_trap(int y, int x)
 		}
 		else get_feat_num_hook = vault_trap_floor;
 	}
-	else if (!vault_trap_type)
+	else
 	{
 		/* Set attribute */
 		pick_attr = f_info[cave_feat[y][x]].d_attr;
 
 		/* Set hook*/
 		get_feat_num_hook = vault_trap_attr;
+	}
+
+	/* Room has specific trap type associated with it. Use it if possible. */
+	if ((room_info[room].theme[THEME_TRAP]) && ((get_feat_num_hook == vault_trap_floor) ||
+			((get_feat_num_hook == vault_trap_attr) && (pick_attr == f_info[room_info[room].theme[THEME_TRAP]].d_attr) )))
+	{
+		/* Set the trap if in a room which has a trap set */
+		cave_set_feat(y, x, room_info[room].theme[THEME_TRAP]);
+
+		return;
 	}
 
 	get_feat_num_prep();
@@ -7559,13 +7555,13 @@ void pick_trap(int y, int x)
 	/* Click! */
 	feat = get_feat_num(object_level);
 
-	/* Clear hook */
+	/* Hack --- force dungeon traps in town */
+	if (!p_ptr->depth) object_level = 0;
+
+	/* Clear the hook */
 	get_feat_num_hook = NULL;
 
 	get_feat_num_prep();
-
-	/* Hack --- force dungeon traps in town */
-	if (!p_ptr->depth) object_level = 0;
 
 	/* More paranoia */
 	if (!feat) return;
@@ -7858,9 +7854,6 @@ static bool vault_trapped_door(int f_idx)
 	/* Decline pick doors */
 	if (f_ptr->flags3 & (FF3_PICK_DOOR)) return (FALSE);
 
-	/* If the room has a trap set, choose doors with the same attribute */
-	if ((vault_trap_type) && (f_ptr->d_attr != f_info[vault_trap_type].d_attr)) return (FALSE);
-
 	/* Okay */
 	return (TRUE);
 }
@@ -7874,9 +7867,6 @@ void place_trapped_door(int y, int x)
 
 	int room = room_idx(y, x);
 
-	/* Set the vault_trap_type if in a room which has a trap set */
-	vault_trap_type = room_info[room].theme[THEME_TRAP];
-
 	/* Set the hook */
 	get_feat_num_hook = vault_trapped_door;
 
@@ -7886,7 +7876,6 @@ void place_trapped_door(int y, int x)
 	feat = get_feat_num(object_level);
 
 	/* Clear the hook */
-	vault_trap_type = 0;
 	get_feat_num_hook = NULL;
 
 	get_feat_num_prep();
