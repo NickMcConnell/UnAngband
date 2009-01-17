@@ -2204,7 +2204,8 @@ void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter
 		FREE(monster_index);
 
 		/* Pick a nearby grid instead */
-		if (parameters & (0x08)) scatter(ty, tx, y0, x0, n, 0);
+		if (parameters & (0x08)) scatter(ty, tx, y0, x0, n,
+				(parameters & (0x01) ? CAVE_XLOS : 0) | (parameters & (0x02) ? CAVE_XLOF : 0));
 
 		return;
 	}

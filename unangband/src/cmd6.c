@@ -289,8 +289,8 @@ bool player_eat_food(int item)
 			if (power < 0) return (FALSE);
 
 			/* Apply food effect */
-			if (process_spell_eaten(object_aware_p(o_ptr) ? SOURCE_PLAYER_EAT : SOURCE_PLAYER_EAT_UNKNOWN,
-					o_ptr->k_idx, power,0,&cancel,&ident)) ident = TRUE;
+			if (process_spell(object_aware_p(o_ptr) ? SOURCE_PLAYER_EAT : SOURCE_PLAYER_EAT_UNKNOWN,
+					o_ptr->k_idx, power,0,&cancel,&ident, TRUE)) ident = TRUE;
 
 			/* Combine / Reorder the pack (later) */
 			p_ptr->notice |= (PN_COMBINE | PN_REORDER);
@@ -401,8 +401,8 @@ bool player_quaff_potion(int item)
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply food effect */
-	if (power >= 0) ident = process_spell_eaten(object_aware_p(o_ptr) ? SOURCE_PLAYER_QUAFF : SOURCE_PLAYER_QUAFF_UNKNOWN,
-			 o_ptr->k_idx, power,0,&cancel,&ident);
+	if (power >= 0) ident = process_spell(object_aware_p(o_ptr) ? SOURCE_PLAYER_QUAFF : SOURCE_PLAYER_QUAFF_UNKNOWN,
+			 o_ptr->k_idx, power,0,&cancel,&ident, TRUE);
 	else return (FALSE);
 
 	/* Clear styles */
@@ -506,7 +506,7 @@ bool player_read_scroll(int item)
 
 	/* Apply scroll effect */
 	if (power >= 0) ident = process_spell(object_aware_p(o_ptr) ? SOURCE_PLAYER_READ : SOURCE_PLAYER_READ_UNKNOWN,
-			 o_ptr->k_idx, power, 0, &cancel, &known);
+			 o_ptr->k_idx, power, 0, &cancel, &known, FALSE);
 	else return (TRUE);
 
 	/* Clear styles */
@@ -687,7 +687,7 @@ bool player_use_staff(int item)
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Apply staff effect */
-	if (power >= 0) ident = process_spell(SOURCE_PLAYER_USE, o_ptr->k_idx, power, 0, &cancel, &known);
+	if (power >= 0) ident = process_spell(SOURCE_PLAYER_USE, o_ptr->k_idx, power, 0, &cancel, &known, FALSE);
 	else return (TRUE);
 
 	/* Clear styles */
@@ -942,7 +942,7 @@ bool player_aim_wand(int item)
 	if (object_aware_p(o_ptr)) known = TRUE;
 
 	/* Apply wand effect */
-	if (power >= 0) ident = process_spell(SOURCE_PLAYER_AIM, o_ptr->k_idx, power, 0, &cancel, &known);
+	if (power >= 0) ident = process_spell(SOURCE_PLAYER_AIM, o_ptr->k_idx, power, 0, &cancel, &known, FALSE);
 	else return (TRUE);
 
 	/* Clear styles */
@@ -1193,7 +1193,7 @@ bool player_zap_rod(int item)
 		ident = process_spell(known && (o_ptr->sval >= SV_ROD_MIN_DIRECTION)
 							  ? SOURCE_PLAYER_ZAP_NO_TARGET
 							  : SOURCE_PLAYER_ZAP,
-							  o_ptr->k_idx, power, 0, &cancel, &known);
+							  o_ptr->k_idx, power, 0, &cancel, &known, FALSE);
 	else
 		return (TRUE);
 
@@ -1833,7 +1833,7 @@ bool player_activate(int item)
 
 	/* Apply object effect */
 	(void)process_spell(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
-			o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), power, 0, &cancel, &known);
+			o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), power, 0, &cancel, &known, FALSE);
 
 	/* We know it activates */
 	object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE,0x0L, item < 0);

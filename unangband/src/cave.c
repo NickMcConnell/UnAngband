@@ -1321,7 +1321,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			next_region_piece = rp_ptr->next_region_piece;
 
 			/* Displaying region */
-			if ((r_ptr->flags2 & (RE2_DISPLAY)) != 0)
+			if ((r_ptr->flags1 & (RE1_DISPLAY)) != 0)
 			{
 				a = region_info[r_ptr->type].x_attr;
 				c = region_info[r_ptr->type].x_char;
@@ -6586,7 +6586,7 @@ byte projectable(int y1, int x1, int y2, int x2, u32b flg)
  * This function is often called from inside a loop which searches for
  * locations while increasing the "d" distance.
  *
- * Currently the "m" parameter is unused.
+ * The m parameter implies what flags we check line of sight with.
  */
 void scatter(int *yp, int *xp, int y, int x, int d, int m)
 {
@@ -6594,8 +6594,8 @@ void scatter(int *yp, int *xp, int y, int x, int d, int m)
 
 	int tries;
 
-	/* Unused parameter */
-	(void)m;
+	/* Slight hack */
+	m++;
 
 	/* Pick a location */
 	for (tries = 0; tries < 100; tries++)
@@ -6611,7 +6611,7 @@ void scatter(int *yp, int *xp, int y, int x, int d, int m)
 		if ((d > 1) && (distance(y, x, ny, nx) > d)) continue;
 
 		/* Require "line of fire" */
-		if (generic_los(y, x, ny, nx, CAVE_XLOF)) break;
+		if ((m) && (generic_los(y, x, ny, nx, m))) break;
 	}
 
 	/* Failed? */

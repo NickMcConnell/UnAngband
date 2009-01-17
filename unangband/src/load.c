@@ -526,40 +526,29 @@ static errr rd_item(object_type *o_ptr)
 static void rd_region(region_type *r_ptr)
 {
 	/* Read the region */
-	rd_byte(&r_ptr->type);
-	rd_byte(&r_ptr->effect);
-	rd_byte(&r_ptr->method);
-	rd_byte(&r_ptr->level);
+	rd_s16b(&r_ptr->type);
 
-	rd_s16b(&r_ptr->spawn);
-	rd_s16b(&r_ptr->transform);
+	rd_s16b(&r_ptr->who);          	/* Source of effect - 'who'. */
+	rd_s16b(&r_ptr->what);			/* Source of effect - 'what'. */
+
+	rd_s16b(&r_ptr->effect);
+	rd_s16b(&r_ptr->method);
+	rd_byte(&r_ptr->level);
+	rd_byte(&r_ptr->facing);		/* Region facing */
+
 	rd_s16b(&r_ptr->damage);
 
-	rd_byte(&r_ptr->radius);
-
-	rd_byte(&r_ptr->range);
-	rd_byte(&r_ptr->number);		/* Number of blows */
-	rd_byte(&r_ptr->facing);		/* Region facing */
-	rd_byte(&r_ptr->arc);			/* Region arc (if applies) */
-	rd_byte(&r_ptr->diameter_of_source);	/* Region diameter of source (if applies) */
+	rd_s16b(&r_ptr->countdown);     /* Number of turns effect has left */
+	rd_s16b(&r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
+	rd_s16b(&r_ptr->age);			/* Number of turns effect has been alive */
+	rd_s16b(&r_ptr->lifespan);		/* Number of turns effect will be alive */
 
 	rd_byte(&r_ptr->y0);			/* Source y location */
 	rd_byte(&r_ptr->x0);			/* Source x location */
 	rd_byte(&r_ptr->y1);			/* Destination y location */
 	rd_byte(&r_ptr->x1);			/* Destination x location */
 
-	rd_byte(&r_ptr->countdown);     /* Number of turns effect has left */
-	rd_byte(&r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
-
-	rd_s16b(&r_ptr->age);			/* Number of turns effect has been alive */
-	rd_s16b(&r_ptr->lifespan);		/* Number of turns effect will be alive */
-
-	rd_s16b(&r_ptr->who);          	/* Source of effect - 'who'. */
-	rd_s16b(&r_ptr->what);			/* Source of effect - 'what'. */
-
-	rd_u32b(&r_ptr->flags1);		/* Projection bitflags */
-	rd_u32b(&r_ptr->flags2);		/* Ongoing effect bitflags */
-
+	rd_u32b(&r_ptr->flags1);		/* Ongoing effect bitflags */
 }
 
 

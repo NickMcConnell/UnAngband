@@ -918,6 +918,8 @@ extern bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, i
 extern bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);
 extern bool project_one(int who, int what, int y, int x, int dam, int typ, u32b flg);
+extern bool project_method(int who, int what, int method, int effect, int damage, int level, int y0, int x0,
+			int y1, int x1, int region, u32b flg);
 
 
 /* spells2.c */
@@ -973,10 +975,9 @@ extern bool concentrate_light_hook(const int y, const int x, const bool modify);
 extern int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 		bool concentrate_hook(const int y, const int x, const bool modify));
 extern bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, bool *known);
-extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known);
+extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
 extern bool process_spell_types(int who, int spell, int level, bool *cancel);
-extern bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel, bool *known);
-extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known);
+extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
 extern bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x);
 extern void region_piece_wipe(region_piece_type *rp_ptr);
 extern s16b region_piece_pop(void);
@@ -986,6 +987,9 @@ extern void region_wipe(region_type *r_ptr);
 extern s16b region_pop(void);
 extern void region_copy(region_type *r_ptr, const region_type *r_ptr2);
 extern void compact_regions(int size);
+extern void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region);
+extern int init_region(int who, int what, int type, int dam, int method, int effect, int level, int y0, int x0, int y1, int x1);
+
 
 /* store.c */
 extern void do_cmd_store(void);

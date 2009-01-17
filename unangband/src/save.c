@@ -248,40 +248,29 @@ static void wr_item(const object_type *o_ptr)
 static void wr_region(const region_type *r_ptr)
 {
 	/* Write the region */
-	wr_byte(r_ptr->type);
-	wr_byte(r_ptr->effect);
-	wr_byte(r_ptr->method);
-	wr_byte(r_ptr->level);
+	wr_s16b(r_ptr->type);
 
-	wr_s16b(r_ptr->spawn);
-	wr_s16b(r_ptr->transform);
+	wr_s16b(r_ptr->who);          	/* Source of effect - 'who'. */
+	wr_s16b(r_ptr->what);			/* Source of effect - 'what'. */
+
+	wr_s16b(r_ptr->effect);
+	wr_s16b(r_ptr->method);
+	wr_byte(r_ptr->level);
+	wr_byte(r_ptr->facing);		/* Region facing */
+
 	wr_s16b(r_ptr->damage);
 
-	wr_byte(r_ptr->radius);
-
-	wr_byte(r_ptr->range);
-	wr_byte(r_ptr->number);		/* Number of blows */
-	wr_byte(r_ptr->facing);		/* Region facing */
-	wr_byte(r_ptr->arc);			/* Region arc (if applies) */
-	wr_byte(r_ptr->diameter_of_source);	/* Region diameter of source (if applies) */
+	wr_s16b(r_ptr->countdown);     /* Number of turns effect has left */
+	wr_s16b(r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
+	wr_s16b(r_ptr->age);			/* Number of turns effect has been alive */
+	wr_s16b(r_ptr->lifespan);		/* Number of turns effect will be alive */
 
 	wr_byte(r_ptr->y0);			/* Source y location */
 	wr_byte(r_ptr->x0);			/* Source x location */
 	wr_byte(r_ptr->y1);			/* Destination y location */
 	wr_byte(r_ptr->x1);			/* Destination x location */
 
-	wr_byte(r_ptr->countdown);     /* Number of turns effect has left */
-	wr_byte(r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
-
-	wr_s16b(r_ptr->age);			/* Number of turns effect has been alive */
-	wr_s16b(r_ptr->lifespan);		/* Number of turns effect will be alive */
-
-	wr_s16b(r_ptr->who);          	/* Source of effect - 'who'. */
-	wr_s16b(r_ptr->what);			/* Source of effect - 'what'. */
-
-	wr_u32b(r_ptr->flags1);		/* Projection bitflags */
-	wr_u32b(r_ptr->flags2);		/* Ongoing effect bitflags */
-
+	wr_u32b(r_ptr->flags1);		/* Ongoing effect bitflags */
 }
 
 

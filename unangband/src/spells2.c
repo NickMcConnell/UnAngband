@@ -5362,75 +5362,6 @@ void unlite_room(int y, int x)
 
 
 /*
- * Cast a projection
- */
-static bool fire_projection(int who, int what, int typ, int method, int dir, int dam, int level)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int ty, tx;
-
-	method_type *method_ptr = &method_info[method];
-
-	int rad = scale_method(method_ptr->radius, level);
-	int rng = scale_method(method_ptr->max_range, level);
-	int num = scale_method(method_ptr->number, level);
-
-	int degrees_of_arc = method_ptr->arc;
-	int diameter_of_source = method_ptr->diameter_of_source;
-
-	u32b flg = method_ptr->flags1;
-
-	bool noticed = FALSE;
-
-	/* Hack -- fix number */
-	if (num < 1) num = 1;
-
-	/* Hack -- fix diameter of source */
-	if (!diameter_of_source) diameter_of_source = 10;
-
-	/* Use the given direction */
-	ty = py + 99 * ddy[dir];
-	tx = px + 99 * ddx[dir];
-
-	/* Hack -- Use an actual "target" */
-	if ((dir == 5) && target_okay())
-	{
-		ty = p_ptr->target_row;
-		tx = p_ptr->target_col;
-	}
-	/* Stop at first target if we're firing in a direction */
-	else if (method_ptr->flags2 & (PR2_DIR_STOP))
-	{
-		flg |= (PROJECT_STOP);
-	}
-
-	/* Create one or more projections */
-	while (num--)
-	{
-		int y = ty;
-		int x = tx;
-
-		/* Pick a 'nearby' location */
-		if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, ty, tx, 5, 0);
-
-		/* Affect distant monsters */
-		if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
-		{
-			if (project_dist(who, what, y, x, dam, typ, flg, method_ptr->flags2)) noticed = TRUE;
-		}
-
-		/* Analyze the "dir" and the "target". */
-		else if (project(who, what, rad, rng, py, px, y, x, dam, typ, flg, degrees_of_arc,
-				(byte)diameter_of_source)) noticed = TRUE;
-	}
-
-	return noticed;
-}
-
-
-/*
  * Create a (wielded) spell item
  */
 static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
@@ -6061,8 +5992,6 @@ static int thaumacurse(bool verbose, int power)
 }
 
 
-
-
 /*
  *      Process a spell.
  *
@@ -6085,24 +6014,35 @@ static int thaumacurse(bool verbose, int power)
  *      We should make summoned monsters friendly if plev is > 0. XXX
  *
  */
-bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known)
+bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten)
 {
 	spell_type *s_ptr = &s_info[spell];
 
 	bool obvious = FALSE;
 	int ap_cnt;
 	int dir = 0;
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+	int ty;
+	int tx;
+	int delay = 0;
 
 	/* Scan through all four blows */
 	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 	{
 		spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
 		int method = blow_ptr->method;
-		method_type *method_ptr = &method_info[method];
 		int damage = 0;
 		int effect = blow_ptr->effect;
+
+		method_type *method_ptr = &method_info[method];
 		int range = scale_method(method_ptr->max_range, level);
 		int radius = scale_method(method_ptr->radius, level);
+		int num = scale_method(method_ptr->number, level);
+
+		u32b flg = 0L;
+
+		int region = 0;
 
 		/* Hack -- no more attacks */
 		if (!method) break;
@@ -6149,15 +6089,62 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			}
 		}
 
+		/* Special case for eaten spells */
+		if (eaten && (method != RBM_SPIT) && (method != RBM_BREATH))
+		{
+			int d = (method == RBM_VOMIT) ? rand_int(8) : 8;
+			ty = py + ddy_ddd[d];
+			tx = px + ddx_ddd[d];
+
+			if (project_one(who, what, ty, tx, damroll(damage, num), effect, flg)) obvious = TRUE;
+
+			continue;
+		}
+
 		/* Allow direction to be cancelled for free */
-		if ((!(method_ptr->flags1 & (PROJECT_SELF))) &&
+		if ((!(flg & (PROJECT_SELF))) &&
+				(!eaten || (method == RBM_SPIT) || (method == RBM_BREATH)) &&
 				(!get_aim_dir(&dir, known ? range : MAX_RANGE, known ? radius : 0,
 						known ? method_ptr->flags1 : (PROJECT_BEAM),
 						known ? method_ptr->arc : 0,
 						known ? method_ptr->diameter_of_source : 0))) return (!(*cancel));
 
-		/* Apply spell method */
-		if (fire_projection(who, what, effect, method, dir, damage, level)) obvious = TRUE;
+		/* Use the given direction */
+		ty = py + 99 * ddy[dir];
+		tx = px + 99 * ddx[dir];
+
+		/* Hack -- Use an actual "target" */
+		if ((dir == 5) && target_okay())
+		{
+			ty = p_ptr->target_row;
+			tx = p_ptr->target_col;
+		}
+		/* Stop at first target if we're firing in a direction */
+		else if (method_ptr->flags2 & (PR2_DIR_STOP))
+		{
+			flg |= (PROJECT_STOP);
+		}
+
+		/* Initialise the region */
+		if (s_ptr->type == SPELL_REGION)
+		{
+			region_type *r_ptr;
+
+			/* Get a newly initialized region */
+			region = init_region(who, what, s_ptr->param, damage, method, effect, level, py, px, ty, tx);
+
+			/* Get the region */
+			r_ptr = &region_list[region];
+
+			/* Hack -- we delay subsequent regions from the same spell casting until the first has expired */
+			r_ptr->delay = delay;
+
+			/* Increase delay */
+			delay += region_list[region].lifespan * region_list[region].delay;
+		}
+
+		/* Projection method */
+		obvious |= project_method(who, what, method, effect, damage, level, py, px, ty, tx, region, flg);
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
@@ -6169,7 +6156,9 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 }
 
 
-
+/*
+ * Process various spell flags.
+ */
 bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, bool *known)
 {
 	spell_type *s_ptr = &s_info[spell];
@@ -7566,6 +7555,12 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				break;
 			}
 
+			case SPELL_REGION:
+			{
+				/* Already initialized elsewhere */
+				break;
+			}
+
 			default:
 			{
 				wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);
@@ -7579,6 +7574,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 	/* Return result */
 	return (obvious);
 }
+
 
 /*
  * Some spell actions have to occur prior to processing the spell
@@ -7694,107 +7690,9 @@ void process_spell_prepare(int spell, int level)
 
 
 /*
- * Hack -- we process swallowed objects a little differently.
+ * Process spells
  */
-bool process_spell_eaten(int who, int what, int spell, int level, bool *cancel, bool *known)
-{
-	spell_type *s_ptr = &s_info[spell];
-
-	bool obvious = FALSE;
-
-	int ap_cnt;
-
-	/* Inform the player */
-	if (strlen(s_text + s_info[spell].text))
-	{
-		msg_format("%s",s_text + s_info[spell].text);
-		obvious = TRUE;
-	}
-
-	/* Check for return flags */
-	process_spell_prepare(spell, level);
-
-	/* Scan through all four blows */
-	for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
-	{
-		int damage = 0;
-
-		int dir;
-
-		/* Extract the attack infomation */
-		int effect = s_ptr->blow[ap_cnt].effect;
-		int method = s_ptr->blow[ap_cnt].method;
-		int d_dice = s_ptr->blow[ap_cnt].d_dice;
-		int d_side = s_ptr->blow[ap_cnt].d_side;
-		int d_plus = s_ptr->blow[ap_cnt].d_plus;
-		int range = scale_method(method_info[method].max_range, level);
-		int radius = scale_method(method_info[method].radius, level);
-
-		/* Hack -- no more attacks */
-		if (!method) break;
-
-		/* Mega hack -- dispel evil/undead objects */
-		if ((!d_side) && (!level))
-		{
-			d_plus += 25 * d_dice;
-		}
-		/* Hack -- use level as modifier */
-		else if (!d_side)
-		{
-			d_plus += level * d_dice;
-		}
-
-		/* Roll out the damage */
-		if ((d_dice) && (d_side))
-		{
-			damage = damroll(d_dice, d_side) + d_plus;
-		}
-		else
-		{
-			damage = d_plus;
-		}
-
-		/* Hack -- breath weapons/spit act like a normal spell */
-		if (((method == RBM_BREATH) || (method == RBM_SPIT)) &&
-				(!get_aim_dir(&dir, known ? range : MAX_RANGE, known ? radius : 0,
-						known ? method_info[method].flags1 : (PROJECT_BEAM),
-						known ? method_info[method].arc : 0,
-						known ? method_info[method].diameter_of_source : 0)))
-		{
-			if (fire_projection(who, what, effect, method, dir, damage, level)) obvious = TRUE;
-		}
-		/* Hack -- vomit in a random direction */
-		else if (method == RBM_VOMIT)
-		{
-			/* Random direction */
-			dir = ddd[rand_int(8)];
-
-			if (fire_projection(who, what, effect, RBM_VOMIT, dir, damage, level)) obvious = TRUE;
-		}
-		else
-		{
-			/* Apply damage */
-			if (project_p(who, what,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
-
-			/* Apply teleport and other effects */
-			if (project_t(who, what,p_ptr->py,p_ptr->px,damage, effect)) obvious = TRUE;
-		}
-	}
-
-	/* Apply flags */
-	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
-
-	/* Apply flags */
-	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
-
-	return (obvious);
-
-}
-
-
-
-
-bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known)
+bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten)
 {
 	bool obvious = FALSE;
 
@@ -7823,9 +7721,9 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
-	if (process_spell_blows(who, what, spell, level, cancel, known)) obvious = TRUE;
+	if (process_spell_blows(who, what, spell, level, cancel, known, eaten)) obvious = TRUE;
 	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
-	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
+	if ((!eaten) && (process_spell_types(who, spell, level, cancel))) obvious = TRUE;
 
 	/* Return result */
 	return (obvious);
@@ -8566,18 +8464,11 @@ void region_update(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 
-	/* Paranoia */
-	if ((r_ptr->flags2 & (RE2_PROJECTION)) == 0) return;
-
-	/* Set up the projection */
-	project(r_ptr->who, r_ptr->what, r_ptr->radius, r_ptr->range, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0, r_ptr->effect,
-			 r_ptr->flags1 | (PROJECT_CHCK), r_ptr->arc, r_ptr->diameter_of_source);
-
 	/* Hack - remove previous list of grids */
 	region_delete(region);
 
-	/* Take the grids and insert them in the region */
-	region_insert(target_path_g, target_path_n, target_path_d, region);
+	/* Hack - add regions */
+	project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, region, 0);
 }
 
 
@@ -8664,17 +8555,18 @@ bool region_restore_hook(int y, int x, int d, int region)
 bool region_project_hook(int y, int x, int d, int region)
 {
 	region_type *r_ptr = &region_list[region];
+	method_type *method_ptr = &method_info[r_ptr->method];
 
 	int dam = 0;
 	bool notice;
 
 	/* Get the damage from the region piece */
-	if (r_ptr->flags2 & (RE2_SCALAR_DAMAGE))
+	if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
 	{
 		dam = d;
 	}
 	/* Compute the damage based on distance */
-	else if (r_ptr->flags2 & (RE2_SCALAR_DISTANCE))
+	else if (r_ptr->flags1 & (RE1_SCALAR_DISTANCE))
 	{
 		dam = r_ptr->damage / d;
 	}
@@ -8685,7 +8577,7 @@ bool region_project_hook(int y, int x, int d, int region)
 	}
 
 	/* Apply projection effects to the grids */
-	notice = project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, r_ptr->flags1 | (PROJECT_TEMP));
+	notice = project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1 | (PROJECT_TEMP));
 
 	return (notice);
 }
@@ -8703,12 +8595,12 @@ bool region_project_t_hook(int y, int x, int d, int region)
 	bool notice;
 
 	/* Get the damage from the region piece */
-	if (r_ptr->flags2 & (RE2_SCALAR_DAMAGE))
+	if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
 	{
 		dam = d;
 	}
 	/* Compute the damage based on distance */
-	else if (r_ptr->flags2 & (RE2_SCALAR_DISTANCE))
+	else if (r_ptr->flags1 & (RE1_SCALAR_DISTANCE))
 	{
 		dam = r_ptr->damage / d;
 	}
@@ -8722,15 +8614,6 @@ bool region_project_t_hook(int y, int x, int d, int region)
 	notice = project_t(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect);
 
 	return (notice);
-}
-
-
-/*
- * Some region types require additional initialisation effects.
- */
-void init_region(int region)
-{
-	(void)region;
 }
 
 
@@ -8803,6 +8686,7 @@ int region_random_piece(int region)
 void region_effect(int region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
+	method_type *method_ptr = &method_info[r_ptr->method];
 	bool notice = FALSE;
 
 	int y0 = r_ptr->y0;
@@ -8811,7 +8695,7 @@ void region_effect(int region, int y, int x)
 	int x1 = x ? x : r_ptr->x1;
 
 	/* Pick a random grid if required */
-	if (r_ptr->flags2 & (RE2_RANDOM))
+	if (r_ptr->flags1 & (RE1_RANDOM))
 	{
 		int r = region_random_piece(region);
 
@@ -8820,7 +8704,7 @@ void region_effect(int region, int y, int x)
 	}
 
 	/* Reverse destination and source */
-	if (r_ptr->flags2 & (RE2_INVERSE))
+	if (r_ptr->flags1 & (RE1_INVERSE))
 	{
 		y = y0;
 		x = x0;
@@ -8831,19 +8715,13 @@ void region_effect(int region, int y, int x)
 	}
 
 	/* Choose closest monster from source instead */
-	if (r_ptr->flags2 & (RE2_CLOSEST_MON))
+	if (r_ptr->flags1 & (RE1_CLOSEST_MON))
 	{
 		/* Try to get a target (nearest or next-nearest monster) */
 		get_closest_monster(randint(2), y0, x0,
-			&y1, &x1, r_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+			&y1, &x1, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
 	}
 
-
-	/* Spawn is defined */
-	if (r_ptr->spawn)
-	{
-		/* XXX Create new region */
-	}
 
 	/* Method is defined */
 	else if (r_ptr->method)
@@ -8875,7 +8753,7 @@ void region_effect(int region, int y, int x)
 			x = x1;
 
 			/* Pick a 'nearby' location */
-			if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, 5, 0);
+			if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, 5, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
 
 			/* Affect distant monsters */
 			if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
@@ -8903,10 +8781,10 @@ void region_effect(int region, int y, int x)
 	}
 
 	/* Noticed region? */
-	if (notice) r_ptr->flags2 |= (RE2_NOTICE);
+	if (notice) r_ptr->flags1 |= (RE1_NOTICE);
 
 	/* Region chains */
-	if (r_ptr->flags2 & (RE2_CHAIN))
+	if (r_ptr->flags1 & (RE1_CHAIN))
 	{
 		r_ptr->y0 = y0;
 		r_ptr->x0 = x0;
@@ -8930,28 +8808,23 @@ void trigger_region(int y, int x)
 
 	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
 	{
-		region_piece_type *rp_ptr;
-		region_type *r_ptr;
-
-		/* Get the object */
-		rp_ptr = &region_piece_list[this_region_piece];
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+		region_type *r_ptr = &region_list[rp_ptr->region];
+		method_type *method_ptr = &method_info[r_ptr->method];
 
 		/* Get the next object */
 		next_region_piece = rp_ptr->next_region_piece;
-
-		/* Get the region */
-		r_ptr = &region_list[rp_ptr->region];
 
 		/* Paranoia */
 		if (!r_ptr->type) continue;
 
 		/* Not yet ready */
-		if (!(r_ptr->flags2 & (RE2_LINGER)) && (r_ptr->countdown)) continue;
+		if (!(r_ptr->flags1 & (RE1_LINGER)) && (r_ptr->countdown)) continue;
 
 		/* Shoot grid with effect */
-		if (r_ptr->flags2 & (RE2_TRIGGER))
+		if (r_ptr->flags1 & (RE1_TRIGGER))
 		{
-			if (r_ptr->flags2 & (RE2_HIT_TRAP))
+			if (r_ptr->flags1 & (RE1_HIT_TRAP))
 			{
 				/* Some traps are avoidable by monsters */
 				if ((cave_m_idx[y][x] > 0) && (mon_avoid_trap(&m_list[cave_m_idx[y][x]], y,x)))
@@ -8969,18 +8842,18 @@ void trigger_region(int y, int x)
 			region_effect(rp_ptr->region, y, x);
 		}
 		/* Lingering effect hits player/monster moving into grid */
-		else if (r_ptr->flags2 & (RE2_LINGER))
+		else if (r_ptr->flags1 & (RE1_LINGER))
 		{
 			int dam = 0;
 			bool notice = FALSE;
 
 			/* Get the damage from the region piece */
-			if (r_ptr->flags2 & (RE2_SCALAR_DAMAGE))
+			if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
 			{
 				dam = rp_ptr->d;
 			}
 			/* Compute the damage based on distance */
-			else if (r_ptr->flags2 & (RE2_SCALAR_DISTANCE))
+			else if (r_ptr->flags1 & (RE1_SCALAR_DISTANCE))
 			{
 				dam = r_ptr->damage / rp_ptr->d;
 			}
@@ -8991,10 +8864,10 @@ void trigger_region(int y, int x)
 			}
 
 			/* Affect the monster, player or object in this grid only */
-			notice |= project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, r_ptr->flags1);
+			notice |= project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1);
 
 			/* Noticed region? */
-			if (notice) r_ptr->flags2 |= (RE2_NOTICE);
+			if (notice) r_ptr->flags1 |= (RE1_NOTICE);
 		}
 	}
 }
@@ -9009,6 +8882,10 @@ void trigger_region(int y, int x)
 void process_region(int region)
 {
 	region_type *r_ptr = &region_list[region];
+	method_type *method_ptr = &method_info[r_ptr->method];
+
+	int range = scale_method(method_ptr->max_range, r_ptr->level);
+	int radius = scale_method(method_ptr->radius, r_ptr->level);
 
 	int i, j;
 	int path_n = 0;
@@ -9023,9 +8900,6 @@ void process_region(int region)
 	/* Reset count */
 	r_ptr->countdown = r_ptr->delay;
 
-	/* If the effect has recently been "born", make various tweaks to it */
-	if (r_ptr->age == 0) init_region(region);
-
 	/* Effects eventually "die" */
 	if (r_ptr->age >= r_ptr->lifespan)
 	{
@@ -9036,20 +8910,17 @@ void process_region(int region)
 	}
 
 	/* Updating a projection */
-	if (r_ptr->flags2 & (RE2_PROJECTION))
+	if (r_ptr->flags1 & (RE1_PROJECTION))
 	{
 		region_update(region);
 	}
 
 	/* Moving a wall */
-	if (r_ptr->flags2 & (RE2_WALL))
+	if (r_ptr->flags1 & (RE1_WALL))
 	{
 		/* Get the direction of travel (angular dir is 2x this) */
 		int major_axis =
 			get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
-
-		/* Get the length of the wall on either side of the major axis */
-		int spread = r_ptr->radius;
 
 		/* Store target grid */
 		int ty = r_ptr->y1;
@@ -9059,11 +8930,11 @@ void process_region(int region)
 		region_delete(region);
 
 		/* Calculate the projection path -- require orthogonal movement */
-		path_n = project_path(path_g, r_ptr->range, r_ptr->y0, r_ptr->x0,
+		path_n = project_path(path_g, range, r_ptr->y0, r_ptr->x0,
 			&ty, &tx, PROJECT_PASS | PROJECT_THRU | PROJECT_ORTH);
 
 		/* Require a working projection path */
-		if ((path_n > r_ptr->age) || (path_n == r_ptr->range))
+		if ((path_n > r_ptr->age) || (path_n == range))
 		{
 			/* Remember delay factor */
 			int old_delay = op_ptr->delay_factor;
@@ -9082,15 +8953,15 @@ void process_region(int region)
 			 * If the center grid is both projectable and in LOS
 			 * from the origin of the effect, zap it.
 			 */
-			if ((cave_passable_bold(y0, x0, r_ptr->flags1)) &&
-				(generic_los(r_ptr->y0, r_ptr->x0, y0, x0, r_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+			if ((cave_passable_bold(y0, x0, method_ptr->flags1)) &&
+				(generic_los(r_ptr->y0, r_ptr->x0, y0, x0, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
 			{
 				zaps++;
 				region_piece_insert(y0, x0, r_ptr->damage, region);
 			}
 
 			/* If this wall spreads out from the origin, */
-			if (spread >= 1)
+			if (radius >= 1)
 			{
 				/* Get the directions of spread (angular dir is 150% of this) */
 				int minor_axis1 = (major_axis +  60) % 240;
@@ -9109,7 +8980,7 @@ void process_region(int region)
 					if ((ty != y0) || (tx != x0))
 					{
 						/* Calculate the projection path */
-						path_n = project_path(path_g, spread, y0, x0, &ty, &tx,
+						path_n = project_path(path_g, radius, y0, x0, &ty, &tx,
 							PROJECT_PASS | PROJECT_THRU);
 
 						/* Check all the grids */
@@ -9123,8 +8994,8 @@ void process_region(int region)
 							 * If this grid is both projectable and in LOS
 							 * from the origin of the effect, zap it.
 							 */
-							if ((cave_passable_bold(ty, tx, r_ptr->flags1)) &&
-							    (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, r_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+							if ((cave_passable_bold(ty, tx, method_ptr->flags1)) &&
+							    (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
 							{
 								zaps++;
 								region_piece_insert(ty, tx, r_ptr->damage, region);
@@ -9152,7 +9023,7 @@ void process_region(int region)
 	}
 
 	/* Seeking a monster */
-	if (r_ptr->flags2 & (RE2_SEEKER))
+	if (r_ptr->flags1 & (RE1_SEEKER))
 	{
 		int this_region_piece, next_region_piece = 0;
 
@@ -9181,7 +9052,7 @@ void process_region(int region)
 				int x = rp_ptr->x + ddx_ddd[dir];
 
 				/* Count passable grids */
-				if (cave_passable_bold(y, x, r_ptr->flags1)) grids++;
+				if (cave_passable_bold(y, x, method_ptr->flags1)) grids++;
 			}
 
 			/*
@@ -9197,11 +9068,11 @@ void process_region(int region)
 			{
 				/* Try to get a target (nearest or next-nearest monster) */
 				get_closest_monster(randint(2), rp_ptr->y, rp_ptr->x,
-					&ty, &tx, r_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+					&ty, &tx, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
 			}
 
 			/* No valid target, or monster is in an impassable grid */
-			if (((ty == 0) && (tx == 0)) || (!cave_passable_bold(ty, tx, r_ptr->flags1)))
+			if (((ty == 0) && (tx == 0)) || (!cave_passable_bold(ty, tx, method_ptr->flags1)))
 			{
 				/* Move randomly */
 				dir = randint(9);
@@ -9259,7 +9130,7 @@ void process_region(int region)
 				tx = rp_ptr->x + ddx[dir];
 
 				/* Require passable grids */
-				if (cave_passable_bold(ty, tx, r_ptr->flags1))
+				if (cave_passable_bold(ty, tx, method_ptr->flags1))
 				{
 					/* Try not to stay in place */
 					if ((ty != rp_ptr->y) || (tx != rp_ptr->x)) break;
@@ -9286,7 +9157,7 @@ void process_region(int region)
 	}
 
 	/* Vector defined by the region encoding */
-	if (r_ptr->flags2 & (RE2_SCALAR_VECTOR))
+	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
 	{
 		int this_region_piece, next_region_piece = 0;
 
@@ -9342,7 +9213,7 @@ void process_region(int region)
 	}
 
 	/* Apply effect every turn */
-	if (r_ptr->flags2 & (RE2_AUTOMATIC))
+	if (r_ptr->flags1 & (RE1_AUTOMATIC))
 	{
 		/* Apply the effect */
 		region_effect(region, 0, 0);
@@ -9372,4 +9243,57 @@ void process_regions(void)
 		/* Process effect */
 		process_region(i);
 	}
+}
+
+
+/*
+ * Initialise a region at (y,x).
+ *
+ * Use the level to initialise region effects.
+ *
+ * Optionally use a target (ty, tx). If target not supplied
+ * try to pick a target to allow the region to affect a number of grids.
+ *
+ */
+int init_region(int who, int what, int type, int dam, int method, int effect, int level, int y0, int x0, int y1, int x1)
+{
+	region_info_type *ri_ptr = &region_info[type];
+	method_type *method_ptr = &method_info[method];
+
+	int lsp = scale_method(ri_ptr->lifespan, level);
+	int region = region_pop();
+
+	region_type *r_ptr = &region_list[region];
+
+	/* Paranoia */
+	if (!region) return(0);
+
+	/* Pick a target */
+	if ((!y1) && (!x1))
+	{
+		 scatter(&y1, &x1, y0, x0, 5, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+	}
+
+	/* Initialise region values from parameters passed to this routine */
+	r_ptr->type = type;
+	r_ptr->level = level;
+	r_ptr->y0 = y0;
+	r_ptr->x0 = x0;
+	r_ptr->y1 = y1;
+	r_ptr->x1 = x1;
+	r_ptr->who = who;
+	r_ptr->what = what;
+	r_ptr->damage = dam;
+	r_ptr->effect = effect;
+	r_ptr->lifespan = lsp;
+	r_ptr->method = method;
+
+	/* Initialise region values from region info type */
+	r_ptr->flags1 = ri_ptr->flags1;
+	r_ptr->delay = ri_ptr->delay;
+
+	/* Get the initial region shape */
+	region_update(region);
+
+	return(region);
 }

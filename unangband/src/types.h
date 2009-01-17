@@ -925,21 +925,18 @@ struct region_info_type
 	u32b name;      /* Name (offset) */
 	u32b text;      /* Text (offset) */
 
-	method_level_scalar_type radius;		/* Region radius */
-	method_level_scalar_type max_range;			/* Region range */
-	method_level_scalar_type number;		/* Number of region pieces at generation time */
+	method_level_scalar_type lifespan;		/* Lifespan */
 
-	u32b flags1;		/* Projection bitflags */
-	u32b flags2;		/* Ongoing effect bitflags */
+	s16b method;	/* Instead of affecting all grids in region, use this method, if defined. */
+	s16b delay;		/* Number of turns to reset counter to when countdown has finished */
+
+	u32b flags1;	/* Region bitflags */
 
 	byte d_attr;    /* Default region attribute */
 	char d_char;    /* Default region character */
 
 	byte x_attr;    /* Desired region attribute */
 	char x_char;    /* Desired region character */
-
-	byte arc;			/* Region arc (if applies) */
-	byte diameter_of_source;	/* Region diameter of source (if applies) */
 };
 
 
@@ -948,39 +945,30 @@ struct region_info_type
  */
 struct region_type
 {
-	byte type;          /* Index into region_info_type */
-	byte effect;		/* Effect of ongoing damage */
-	byte method;		/* Instead of affecting all grids in region, use this method, if defined */
-	byte level;			/* Level used for method, if defined */
+	s16b type;          /* Index into region_info_type */
 
-	s16b spawn;			/* Spawn this region instead every countdown */
-	s16b transform;		/* Transform to this region at end of lifespan */
+	s16b who;          	/* Source of effect - 'who'. */
+	s16b what;			/* Source of effect - 'what'. */
+
+	s16b effect;		/* Effect of ongoing damage */
+	s16b method;		/* Use this method */
+
+	byte level;			/* Level used for method, if defined */
+	byte facing;		/* Region facing */
 
 	s16b damage;		/* Damage */
 
-	byte radius;		/* Region radius */
-	byte range;			/* Region range */
-	byte number;		/* Number of blows */
-	byte facing;		/* Region facing */
-	byte arc;			/* Region arc (if applies) */
-	byte diameter_of_source;	/* Region diameter of source (if applies) */
+	s16b countdown;     /* Number of turns effect has left */
+	s16b delay;			/* Number of turns to reset counter to when countdown has finished */
+	s16b age;			/* Number of turns effect has been alive */
+	s16b lifespan;		/* Number of turns effect will be alive */
 
 	byte y0;			/* Source y location */
 	byte x0;			/* Source x location */
 	byte y1;			/* Destination y location */
 	byte x1;			/* Destination x location */
 
-	byte countdown;     /* Number of turns effect has left */
-	byte delay;			/* Number of turns to reset counter to when countdown has finished */
-
-	s16b age;			/* Number of turns effect has been alive */
-	s16b lifespan;		/* Number of turns effect will be alive */
-
-	s16b who;          	/* Source of effect - 'who'. */
-	s16b what;			/* Source of effect - 'what'. */
-
-	u32b flags1;		/* Projection bitflags */
-	u32b flags2;		/* Ongoing effect bitflags */
+	u32b flags1;		/* Ongoing effect bitflags */
 
 	s16b first_in_sequence;	/* First region piece in sequence */
 };

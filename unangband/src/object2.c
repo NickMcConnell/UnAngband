@@ -6131,7 +6131,7 @@ void race_near(int r_idx, int y1, int x1)
 		int d = 1;
 
 		/* Pick a location */
-		scatter(&y, &x, y1, x1, d, 0);
+		scatter(&y, &x, y1, x1, d, CAVE_XLOF);
 
 		/* Require an "empty" floor grid */
 		if (!cave_empty_bold(y, x)) continue;

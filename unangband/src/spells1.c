@@ -4564,7 +4564,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						nx = 0;
 						ny = 0;
 
-						scatter(&ny, &nx, y, x, dist, 0);
+						scatter(&ny, &nx, y, x, dist, CAVE_XLOF);
 					}
 
 					if (ny != y || nx != x) do_move = TRUE;
@@ -4580,7 +4580,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					nx = 0;
 					ny = 0;
 
-					scatter(&ny, &nx, y, x, 1 + (dam - o_ptr->weight) / 33, 0);
+					scatter(&ny, &nx, y, x, 1 + (dam - o_ptr->weight) / 33, CAVE_XLOF);
 					if (ny != y || nx != x) do_move = TRUE;
 				}
 				break;
@@ -13657,3 +13657,60 @@ bool project_one(int who, int what, int y, int x, int dam, int typ, u32b flg)
 	return (notice);
 }
 
+
+/*
+ * Project an attack method.
+ */
+bool project_method(int who, int what, int method, int effect, int damage, int level, int y0, int x0, int y1, int x1, int region, u32b flg)
+{
+	method_type *method_ptr = &method_info[method];
+	int range = scale_method(method_ptr->max_range, level);
+	int radius = scale_method(method_ptr->radius, level);
+	int num = scale_method(method_ptr->number, level);
+
+	int degrees_of_arc = method_ptr->arc;
+	int diameter_of_source = method_ptr->diameter_of_source;
+
+	bool obvious = FALSE;
+
+	/* Hack -- fix number */
+	if (num < 1) num = 1;
+
+	/* Hack -- fix diameter of source */
+	if (!diameter_of_source) diameter_of_source = 10;
+
+	/* Hack -- regions get applied later */
+	if (region) flg |= (PROJECT_CHCK);
+
+	/* Get method flags */
+	flg |= method_ptr->flags1;
+
+	/* Create one or more projections */
+	while (num--)
+	{
+		int y = y1;
+		int x = x1;
+
+		/* Pick a 'nearby' location */
+		if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, 5, flg & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+
+		/* Affect distant monsters */
+		else if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
+		{
+			if (project_dist(who, what, y, x, damage, effect, flg, method_ptr->flags2)) obvious = TRUE;
+		}
+
+		/* Analyze the "dir" and the "target". */
+		else if (project(who, what, radius, range, y0, x0, y, x, damage, effect, flg, degrees_of_arc,
+				(byte)diameter_of_source)) obvious = TRUE;
+
+		/* Adding projection to a region */
+		if (region)
+		{
+			/* Take the grids and insert them in the region */
+			region_insert(target_path_g, target_path_n, target_path_d, region);
+		}
+	}
+
+	return (obvious);
+}

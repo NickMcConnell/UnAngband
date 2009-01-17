@@ -256,7 +256,7 @@ static cptr method_info_flags2[] =
 /*
  * Region flags
  */
-static cptr region_info_flags2[] =
+static cptr region_info_flags1[] =
 {
 	"TRIGGER",
 	"LINGER",
@@ -289,7 +289,7 @@ static cptr region_info_flags2[] =
 	"BACKWARDS",
 	"SOURCE_FEATURE",
 	"ROOM",
-	"REMEMBER"
+	"DISPLAY"
 };
 
 
@@ -2531,10 +2531,7 @@ errr parse_effect_info(char *buf, header *head)
  */
 static errr grab_one_region_flag(region_info_type *region_ptr, cptr what)
 {
-	if (grab_one_flag(&region_ptr->flags1, method_info_flags1, what) == 0)
-		return (0);
-
-	if (grab_one_flag(&region_ptr->flags2, region_info_flags2, what) == 0)
+	if (grab_one_flag(&region_ptr->flags1, region_info_flags1, what) == 0)
 		return (0);
 
 	/* Oops */
@@ -2647,7 +2644,7 @@ errr parse_region_info(char *buf, header *head)
 			s = t;
 		}
 	}
-
+#if 0
 	/* Process 'A' for "Arc" */
 	else if (buf[0] == 'A')
 	{
@@ -2694,7 +2691,7 @@ errr parse_region_info(char *buf, header *head)
 		/* Get the radius information */
 		if (grab_one_level_scalar(&region_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
-
+#endif
 	else
 	{
 		/* Oops */

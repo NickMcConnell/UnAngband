@@ -106,7 +106,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 		object_type object_type_body;
 		object_type *j_ptr = &object_type_body;
 		object_wipe(j_ptr);
-	
+
 		j_ptr->tval = o_ptr->xtra1;
 		j_ptr->sval = o_ptr->xtra2;
 		j_ptr->k_idx = lookup_kind(o_ptr->xtra1, o_ptr->xtra2);
@@ -130,7 +130,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 #endif /* ALLOW_REPEAT */
 
 	/* Fill the book with spells */
-	fill_book(o_ptr,book,&num); 
+	fill_book(o_ptr,book,&num);
 
 	/* Assume no usable spells */
 	okay = 0;
@@ -274,7 +274,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 			{
 				/* Get the casting details */
 				sc_ptr = spell_cast_details(spell);
-				
+
 				/* Paranoia */
 				if (!sc_ptr) return (FALSE);
 
@@ -327,7 +327,7 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 /*
  * Is the book okay to select?
- * 
+ *
  * This requires that the player has spells in it that
  * they can 'read'.
  */
@@ -350,14 +350,14 @@ bool inven_book_okay(const object_type *o_ptr)
 		s16b book[26];
 		int num;
 		int i;
-		
+
 		fill_book(o_ptr, book, &num);
-		
+
 		for (i=0; i < num; i++)
 		{
 			if (spell_legible(book[i])) return (TRUE);
 		}
-	}			
+	}
 
 	return (FALSE);
 }
@@ -394,7 +394,7 @@ void print_fields(const s16b *sn, int num, int y, int x)
 bool field_commands(char choice, const s16b *sn, int i, bool *redraw)
 {
 	(void)redraw;
-	
+
 	switch (choice)
 	{
 		case 'B':
@@ -402,33 +402,33 @@ bool field_commands(char choice, const s16b *sn, int i, bool *redraw)
 			/* Fake the o_ptr */
 			object_type object_type_body;
 			object_type *o_ptr = &object_type_body;
-			
+
 			/* Set object details required */
 			o_ptr->k_idx = sn[i];
 			o_ptr->tval = k_info[sn[i]].tval;
 			o_ptr->sval = k_info[sn[i]].sval;
 			o_ptr->xtra1 = 0;
-			
+
 			/* Load screen */
 			if (*redraw) screen_load();
-			
+
 			/* Browse the object */
 			do_cmd_browse_object(o_ptr);
 
 			/* Save screen */
 			if (*redraw) screen_save();
-			
+
 			break;
 		}
-		
+
 		default:
 		{
 			return (FALSE);
 		}
 	}
-	
-	
-	
+
+
+
 	return (TRUE);
 }
 
@@ -437,7 +437,7 @@ bool field_commands(char choice, const s16b *sn, int i, bool *redraw)
 
 /*
  * Persuse the spells/prayers in a Book.
- * 
+ *
  * Takes an object as a parameter
  */
 bool do_cmd_browse_object(object_type *o_ptr)
@@ -558,7 +558,7 @@ bool do_cmd_browse_object(object_type *o_ptr)
 			return (FALSE);
 		}
 	}
-	
+
 	/* Display the spells */
 	print_spells(book, num, 1, 20);
 
@@ -578,7 +578,7 @@ bool do_cmd_browse_object(object_type *o_ptr)
 		if ((i >= 0) && (i < num))
 		{
 			spell_type *s_ptr;
-			
+
 			/* Save the spell index */
 			spell = book[i];
 
@@ -596,12 +596,12 @@ bool do_cmd_browse_object(object_type *o_ptr)
 
 			/* Get the spell */
 			s_ptr = &s_info[spell];
-			
+
 			/* Spell is illegible */
 			if (!spell_legible(spell))
 			{
 				msg_format("You cannot read that %s.",p);
-				
+
 				/* Build a prompt (accept all spells) */
 				strnfmt(out_val, 78, "(%^ss %c-%c, ESC=exit) Browse which %s? ",
 					p, I2A(0), I2A(num - 1), p);
@@ -629,7 +629,7 @@ bool do_cmd_browse_object(object_type *o_ptr)
 					text_out(".  ");
 
 					/* Clear until the end of the line */
-					/* XXX XXX Not sure why we have to do this.*/ 
+					/* XXX XXX Not sure why we have to do this.*/
 
 					/* Obtain the cursor */
 					(void)Term_locate(&x, &y);
@@ -666,7 +666,7 @@ bool do_cmd_browse_object(object_type *o_ptr)
 			continue;
 		}
 	}
-	
+
 	return (TRUE);
 }
 
@@ -758,7 +758,7 @@ void do_cmd_browse(void)
 
 	/* Hack -- Handle stuff */
 	handle_stuff();
-	
+
 	/* Save screen */
 	screen_save();
 
@@ -767,7 +767,7 @@ void do_cmd_browse(void)
 	{
 		/* Prompt for a command */
 		put_str("(Browsing) Command: ", 0, 0);
-	
+
 		/* Hack -- Get a new command */
 		p_ptr->command_new = inkey_ex();
 	}
@@ -775,7 +775,7 @@ void do_cmd_browse(void)
 	else if (easy_more)
 	{
 		msg_print(NULL);
-		
+
 		messages_easy(TRUE);
 	}
 
@@ -980,7 +980,7 @@ void do_cmd_study(void)
 		/* Sval hackery */
 		if (o_ptr->sval - (o_ptr->sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 != p_ptr->psval) disdain = TRUE;
 	}
-	
+
 	/* Spell is illegible */
 	if (disdain)
 	{
@@ -993,15 +993,15 @@ void do_cmd_study(void)
 			case 2: msg_print(format("Your %ss resemble deranged scribblings from a lunatic asylum.", p)); break;
 			case 3: msg_print("The book burns red hot in your hands!"); break;
 		}
-		
+
 		msg_print("You pass out from the strain!");
-	
+
 		/* Hack -- Bypass free action */
 		(void)set_paralyzed(p_ptr->paralyzed + randint(o_ptr->sval % 4 + 1));
-		
+
 		return;
 	}
-	
+
 	/* Prayer book -- Learn a random prayer */
 	if (o_ptr->tval == TV_PRAYER_BOOK)
 	{
@@ -1168,7 +1168,7 @@ bool inven_cast_okay(const object_type *o_ptr)
 	if ((o_ptr->tval != TV_MAGIC_BOOK) &&
 	    (o_ptr->tval != TV_PRAYER_BOOK) &&
 		 (o_ptr->tval != TV_SONG_BOOK) &&
-		 (o_ptr->tval != TV_STUDY)) 
+		 (o_ptr->tval != TV_STUDY))
 		return (0);
 
 	/* Research materials */
@@ -1221,7 +1221,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 
 	/* Get the cost */
 	sc_ptr = spell_cast_details(spell);
-	
+
 	/* Paranoia */
 	if (!sc_ptr) return (FALSE);
 
@@ -1240,7 +1240,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 			if (p_ptr->held_song)
 			{
 				/* Redraw the state */
-				p_ptr->redraw |= (PR_STATE);			
+				p_ptr->redraw |= (PR_STATE);
 
 				p_ptr->held_song = 0;
 			}
@@ -1262,7 +1262,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 			if (p_ptr->held_song)
 			{
 				/* Redraw the state */
-				p_ptr->redraw |= (PR_STATE);			
+				p_ptr->redraw |= (PR_STATE);
 
 				p_ptr->held_song = 0;
 			}
@@ -1304,7 +1304,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		if (p_ptr->held_song)
 		{
 			/* Redraw the state */
-			p_ptr->redraw |= (PR_STATE);			
+			p_ptr->redraw |= (PR_STATE);
 
 			p_ptr->held_song = 0;
 		}
@@ -1320,7 +1320,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		bool known = TRUE;
 
 		/* Apply the spell effect */
-		process_spell(SOURCE_PLAYER_CAST, spell, spell,plev,&abort,&known);
+		process_spell(SOURCE_PLAYER_CAST, spell, spell,plev,&abort,&known, FALSE);
 
 		/* Did we cancel? */
 		if (abort) return FALSE;
@@ -1333,7 +1333,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		/* Paranoia */
 		if (i==PY_MAX_SPELLS) ;
 
-		/* A spell was cast */ 
+		/* A spell was cast */
 		else if (!((i < 32) ?
 		      (p_ptr->spell_worked1 & (1L << i)) :
 		      ((i < 64) ? (p_ptr->spell_worked2 & (1L << (i - 32))) :
@@ -1370,7 +1370,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 		 * Note that if this occurs, the spell does not cost any mana.
 		 */
 		if ((p_ptr->reserves) && (p_ptr->csp < adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2) &&
-			(rand_int(100) < adj_con_reserve[p_ptr->stat_ind[A_CON]]) && 
+			(rand_int(100) < adj_con_reserve[p_ptr->stat_ind[A_CON]]) &&
 			(sc_ptr->mana) && (p_ptr->stat_ind[A_CON]))
 		{
 			/* Temporarily weaken the player */
@@ -1378,7 +1378,7 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 			{
 				set_stat_dec_tim(rand_int(20) + 20, A_CON);
 			}
-			
+
 			/* Weaken the player */
 			else
 			{
@@ -1399,14 +1399,14 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 			{
 				/* Give some mana */
 				msg_print("You draw on your reserves.");
-			
+
 				p_ptr->reserves = TRUE;
 
 				p_ptr->csp = (p_ptr->csp + adj_con_reserve[p_ptr->stat_ind[A_CON]]) / 2;
-				
+
 				/* Update mana */
 				p_ptr->update |= (PU_MANA);
-			}			
+			}
 		}
 	}
 
@@ -1433,9 +1433,9 @@ bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t)
 
 			/* Reduce constitution */
 			(void)dec_stat(A_CON, 15 + randint(10));
-			
+
 			/* Add to the temporary drain */
-			set_stat_dec_tim(p_ptr->stat_dec_tim[A_CON] + rand_int(20) + 20, A_CON);	
+			set_stat_dec_tim(p_ptr->stat_dec_tim[A_CON] + rand_int(20) + 20, A_CON);
 		}
 	}
 
@@ -1471,7 +1471,7 @@ void do_cmd_cast(void)
 		if (!get_check(format("Continue singing %s?", s_name + s_info[p_ptr->held_song].name)))
 		{
 			/* Redraw the state */
-			p_ptr->redraw |= (PR_STATE);			
+			p_ptr->redraw |= (PR_STATE);
 
 			p_ptr->held_song = 0;
 		}
@@ -1557,14 +1557,14 @@ void do_cmd_cast(void)
 		{
 			p="cast";
 			t="spell";
-			
+
 			break;
 		}
 		case TV_PRAYER_BOOK:
 		{
 			p="recite";
 			t="prayer";
-			
+
 			break;
 		}
 		case TV_SONG_BOOK:
@@ -1586,7 +1586,7 @@ void do_cmd_cast(void)
 		{
 			p="use";
 			t="power";
-			break;		
+			break;
 		}
 	}
 
@@ -1610,7 +1610,7 @@ void do_cmd_cast(void)
 
 			if (w_info[i].benefit != WB_HOLD_SONG) continue;
 
-			/* Check for styles */       
+			/* Check for styles */
 			if ((w_info[i].styles==0) || (w_info[i].styles & (p_ptr->cur_style & (1L << p_ptr->pstyle))))
 			{
 				/* Verify */

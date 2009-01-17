@@ -113,7 +113,7 @@ void ensure_quest(void)
 						}
 						else
 						{
-							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 3, 0);
+							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 3, CAVE_XLOF);
 						}
 
 						/* Require empty, clean, floor grid */
@@ -209,7 +209,7 @@ void ensure_quest(void)
 						}
 						else
 						{
-							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 2, 0);
+							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 2, CAVE_XLOF);
 						}
 
 						/* Require empty grid */
@@ -321,7 +321,7 @@ void ensure_quest(void)
 						}
 						else
 						{
-							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 2, 0);
+							scatter(&y, &x, p_ptr->py, p_ptr->px, (num / 4) + 2, CAVE_XLOF);
 						}
 
 						/* Require empty grid */
@@ -2067,7 +2067,7 @@ static void process_world(void)
 			if (rand_int(200) < o_ptr->usage)
 			{
 				/* Process spell - involuntary effects */
-				process_spell_eaten(SOURCE_OBJECT, o_ptr->k_idx, k, 25, &dummy, &dummy);
+				process_spell(SOURCE_OBJECT, o_ptr->k_idx, k, 25, &dummy, &dummy, 0);
 
 				/* Warn the player */
 				sound(MSG_CURSED);

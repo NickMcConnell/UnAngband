@@ -1686,6 +1686,7 @@
 #define SPELL_SLOW_DIGEST	59
 #define SPELL_SLOW_META		60
 #define SPELL_DETECT_FIRE	61
+#define SPELL_REGION		62
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/
@@ -2807,45 +2808,45 @@
 
 
 /* Flags for regions */
-#define RE2_TRIGGER				0x00000001	/* Trigger attack when moving into region */
-#define RE2_LINGER				0x00000002	/* Trigger one grid when moving into region */
-#define RE2_SPAWN				0x00000004	/* Instead of apply an attack, spawn a new region */
-#define RE2_AUTOMATIC			0x00000008	/* Automatically apply effect every update */
+#define RE1_TRIGGER				0x00000001	/* Trigger attack when moving into region */
+#define RE1_LINGER				0x00000002	/* Trigger one grid when moving into region */
+#define RE1_SPAWN				0x00000004	/* Instead of apply an attack, spawn a new region */
+#define RE1_AUTOMATIC			0x00000008	/* Automatically apply effect every update */
 
-#define RE2_MANUAL				0x00000010	/* Region effect only applied to 'newly affected' regions */
-#define RE2_WALL				0x00000020	/* Advancing 'wall' of effect */
-#define RE2_SEEKER				0x00000040	/* Seeker effect which hunts down targets */
-#define RE2_PROJECTION			0x00000080	/* Grids affected are defined and updated as a projection */
+#define RE1_MANUAL				0x00000010	/* Region effect only applied to 'newly affected' regions */
+#define RE1_WALL				0x00000020	/* Advancing 'wall' of effect */
+#define RE1_SEEKER				0x00000040	/* Seeker effect which hunts down targets */
+#define RE1_PROJECTION			0x00000080	/* Grids affected are defined and updated as a projection */
 
-#define RE2_SCALAR_FEATURE		0x00000100	/* Region scalar encodes a feature */
-#define RE2_SCALAR_DAMAGE		0x00000200	/* Region scalar encodes damage */
-#define RE2_SCALAR_VECTOR		0x00000400	/* Region scalar encodes direction and speed */
-#define RE2_SCALAR_DISTANCE		0x00000800	/* Region scalar encodes distance */
+#define RE1_SCALAR_FEATURE		0x00000100	/* Region scalar encodes a feature */
+#define RE1_SCALAR_DAMAGE		0x00000200	/* Region scalar encodes damage */
+#define RE1_SCALAR_VECTOR		0x00000400	/* Region scalar encodes direction and speed */
+#define RE1_SCALAR_DISTANCE		0x00000800	/* Region scalar encodes distance */
 
-#define RE2_CLOSEST_MON			0x00001000	/* Use closest monster as a target */
-#define RE2_PLATFORM			0x00002000	/* As region moves, it pushes stuff around */
-#define RE2_HIT_TRAP			0x00004000	/* Handle this region as a trap */
-#define RE2_RANDOM				0x00008000	/* Target a random grid in the region */
+#define RE1_CLOSEST_MON			0x00001000	/* Use closest monster as a target */
+#define RE1_PLATFORM			0x00002000	/* As region moves, it pushes stuff around */
+#define RE1_HIT_TRAP			0x00004000	/* Handle this region as a trap */
+#define RE1_RANDOM				0x00008000	/* Target a random grid in the region */
 
-#define RE2_AGE_INCREASE		0x00010000	/* Damage increases with age. If DECREASE defined, damage peaks at 1/2 lifespan, then drops. */
-#define RE2_AGE_DECREASE		0x00020000	/* Damage decreases with age. If INCREASE defined, damage peaks at 1/2 lifespan, then drops. */
-#define RE2_INVERSE				0x00040000	/* Invert source and target when spawning attack/subsequent region */
-#define RE2_NOTICE				0x00080000	/* Noticed region? */
+#define RE1_AGE_INCREASE		0x00010000	/* Damage increases with age. If DECREASE defined, damage peaks at 1/2 lifespan, then drops. */
+#define RE1_AGE_DECREASE		0x00020000	/* Damage decreases with age. If INCREASE defined, damage peaks at 1/2 lifespan, then drops. */
+#define RE1_INVERSE				0x00040000	/* Invert source and target when spawning attack/subsequent region */
+#define RE1_NOTICE				0x00080000	/* Noticed region? */
 
-#define RE2_CHAIN				0x00100000	/* Set region source and destination to source and target determined when attacking */
-#define RE2_TRIGGER_DROP		0x00200000	/* Trigger if something dropped into the region */
-#define RE2_TRIGGER_AIM			0x00400000	/* Triggered by and targetted by an adjacent creature/player */
-#define RE2_SCATTER				0x00800000	/* Scatter region pieces during creation */
+#define RE1_CHAIN				0x00100000	/* Set region source and destination to source and target determined when attacking */
+#define RE1_TRIGGER_DROP		0x00200000	/* Trigger if something dropped into the region */
+#define RE1_TRIGGER_AIM			0x00400000	/* Triggered by and targetted by an adjacent creature/player */
+#define RE1_SCATTER				0x00800000	/* Scatter region pieces during creation */
 
-#define RE2_CLOCKWISE			0x01000000	/* Rotates clockwise every turn. If both, randomly choose one. */
-#define RE2_COUNTER_CLOCKWISE	0x02000000	/* Rotates counter-clockwise every turn. If both, randomly choose one. */
-#define RE2_TRIGGER_OPEN		0x04000000	/* Triggered by being 'opened' */
-#define RE2_TRIGGER_CLOSE		0x08000000	/* Triggered by being 'closed'. Note that closing a region ages it backwards */
+#define RE1_CLOCKWISE			0x01000000	/* Rotates clockwise every turn. If both, randomly choose one. */
+#define RE1_COUNTER_CLOCKWISE	0x02000000	/* Rotates counter-clockwise every turn. If both, randomly choose one. */
+#define RE1_TRIGGER_OPEN		0x04000000	/* Triggered by being 'opened' */
+#define RE1_TRIGGER_CLOSE		0x08000000	/* Triggered by being 'closed'. Note that closing a region ages it backwards */
 
-#define RE2_BACKWARDS			0x10000000	/* Region ages backwards instead of forwards */
-#define RE2_SOURCE_FEATURE		0x20000000	/* Attacks occur from all features in the region that match the source feature */
-#define	RE2_ROOM				0x40000000	/* Region fills a room */
-#define RE2_DISPLAY				0x80000000	/* Display region */
+#define RE1_BACKWARDS			0x10000000	/* Region ages backwards instead of forwards */
+#define RE1_SOURCE_FEATURE		0x20000000	/* Attacks occur from all features in the region that match the source feature */
+#define	RE1_ROOM				0x40000000	/* Region fills a room */
+#define RE1_DISPLAY				0x80000000	/* Display region */
 
 
 

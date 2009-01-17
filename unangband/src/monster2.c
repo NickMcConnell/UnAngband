@@ -1074,7 +1074,7 @@ void display_monlist(void)
 	{
 		/* Clear display and print note */
 		c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
-		
+
 		/* Display a message */
 		if (Term == angband_term[0])
 		    Term_addstr(-1, TERM_WHITE, "  (Press any key to continue.)");
@@ -1199,7 +1199,7 @@ void display_monlist(void)
 	/* Put a shadow */
 	else
 		prt("", line, 0);
-	
+
 	if (Term == angband_term[0])
 	prt("(Press any key to continue.)", line, 0);
 
@@ -5146,7 +5146,7 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 		int d = (i / 15) + 1;
 
 		/* Pick a location */
-		scatter(&y, &x, y1, x1, d, 0);
+		scatter(&y, &x, y1, x1, d, CAVE_XLOF);
 
 		if (!in_bounds_fully(y,x)) continue;
 
@@ -5223,7 +5223,7 @@ bool summon_specific_one(int y1, int x1, int r_idx, bool slp, u32b flg)
 		int d = (i / 15) + 1;
 
 		/* Pick a location */
-		scatter(&y, &x, y1, x1, d, 0);
+		scatter(&y, &x, y1, x1, d, CAVE_XLOF);
 
 		/* Require "empty" floor grid */
 		if (!cave_empty_bold(y, x)) continue;
@@ -5426,7 +5426,7 @@ bool multiply_monster(int m_idx)
 		int d = 1;
 
 		/* Pick a location */
-		scatter(&y, &x, m_ptr->fy, m_ptr->fx, d, 0);
+		scatter(&y, &x, m_ptr->fy, m_ptr->fx, d, CAVE_XLOF);
 
 		/* Require an "empty" floor grid */
 		if (!cave_empty_bold(y, x)) continue;
