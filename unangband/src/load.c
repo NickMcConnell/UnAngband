@@ -1479,6 +1479,16 @@ static void rd_tip_files(void)
 
 
 /*
+ * Hack -- never redraw gained attributes
+ */
+bool redraw_dummy(int y, int x)
+{
+	return FALSE;
+}
+
+
+
+/*
  * Read the dungeon
  *
  * The monsters/objects must be loaded in the same order
@@ -1495,6 +1505,11 @@ static void rd_tip_files(void)
  *
  * After loading the monsters, the objects being held by monsters are
  * linked directly into those monsters.
+ *
+ * Important note: There are several CAVE_ flags that cannot be determined
+ * until the objects and monsters have been loaded. In particular,
+ * CAVE_HALO depends on objects on the ground, and CAVE_TLIT depends on
+ * the presence of glowing monsters.
  */
 static errr rd_dungeon(void)
 {
@@ -1648,6 +1663,12 @@ static errr rd_dungeon(void)
 				cave_info[y][x] |= (CAVE_XLOF);
 			}
 
+			/* Check for climbable terrain */
+			if (f_info[cave_feat[y][x]].flags2 & (FF2_CAN_CLIMB))
+			{
+				gain_attribute(y, x, 1, 0, apply_climb, redraw_dummy);
+			}
+
 			/* Handle dynamic grids */
 			if (f_info[cave_feat[y][x]].flags3 & (FF3_DYNAMIC_MASK))
 			{
@@ -1708,7 +1729,7 @@ static errr rd_dungeon(void)
 		{
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_GLOW))
 			{
-				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
+				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_dummy);
 			}
 		}
 	}
@@ -1818,7 +1839,7 @@ static errr rd_dungeon(void)
 			/* Link the floor to the object */
 			cave_o_idx[y][x] = o_idx;
 
-			/* Check if object lites the dungeon */
+			/* Check if object lights the dungeon */
 			if (check_object_lite(i_ptr))
 			{
 				gain_attribute(y, x, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);

@@ -1426,7 +1426,7 @@ static void do_cmd_wiz_query(void)
 		{
 			case 'm': mask |= (PLAY_MARK); break;
 			case 'd': mask |= (PLAY_SAFE); break;
-      	      		case 'p': mask |= (PLAY_MAGI); break;
+      	    case 'p': mask |= (PLAY_REGN); break;
 			case 'l': mask |= (PLAY_LITE); break;
 			case 's': mask |= (PLAY_SEEN); break;
 			case 't': mask |= (PLAY_TEMP); break;

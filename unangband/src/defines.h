@@ -3092,7 +3092,7 @@
 #define CAVE_DLIT		0x04	/* lit by daylight during daytime */
 #define CAVE_HALO		0x08	/* lit by glowing feature */
 #define CAVE_TLIT		0x10	/* lit by a monster or player */
-#define CAVE_CLIM		0x20	/* location is 'climable' */
+#define CAVE_CLIM		0x20	/* location is 'climbable' */
 #define CAVE_XLOF		0x40	/* blocks line of fire */
 #define CAVE_XLOS		0x80	/* blocks line of sight */
 
@@ -3104,7 +3104,7 @@
  */
 #define PLAY_MARK		0x01 	/* memorized feature */
 #define PLAY_SAFE		0x02 	/* detected as safe */
-#define PLAY_MAGI		0x04 	/* magical effect */
+#define PLAY_REGN		0x04 	/* player can see "region" here */
 #define PLAY_LITE		0x08 	/* lit by the player */
 #define PLAY_SEEN		0x10 	/* seen flag */
 #define PLAY_TEMP		0x20 	/* temp flag */

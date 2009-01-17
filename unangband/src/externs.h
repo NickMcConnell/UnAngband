@@ -430,6 +430,7 @@ extern bool redraw_halo_gain(int y, int x);
 extern void apply_halo(int y, int x);
 extern void remove_halo(int y, int x);
 extern void reapply_halo(int y, int x);
+extern void apply_climb(int y, int x);
 extern void set_level_flags(int feat);
 extern void cave_set_feat_aux(int y, int x, int feat);
 extern void cave_set_feat(int y, int x, int feat);

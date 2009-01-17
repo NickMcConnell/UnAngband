@@ -2888,31 +2888,19 @@ int place_monster_here(int y, int x, int r_idx)
 		return(MM_DROWN);
 	}
 
-	/* Hack -- check for climbing */
+	/* Check for climbing - easily climb-able */
 	if (((r_ptr->flags2 & (RF2_CAN_CLIMB)) != 0) &&
 		((f_ptr->flags3 & (FF3_EASY_CLIMB)) != 0))
 	{
 		return(trap ? MM_TRAP : MM_CLIMB);
 	}
 
-	/* Hack -- check for climbing. */
-	if (((r_ptr->flags2 & (RF2_CAN_CLIMB)) != 0) &&
+	/* Check for climbing - adjacent to CAN_CLIMB terrain.
+	 * Note the use of the CAVE_CLIM flag to optimise this. */
+	if ((cave_info[y][x] & (CAVE_CLIM)) &&
 		((f_ptr->flags2 & (FF2_CAN_FLY)) != 0))
 	{
-		int i;
-
-		for (i=0;i<8;i++)
-		{
-			int d,yi,xi;
-
-			d = ddd[i];
-			yi = ddy[d];
-			xi = ddx[d];
-
-			if (in_bounds(yi, xi)
-				&& (f_info[cave_feat[yi][xi]].flags2 & (FF2_CAN_CLIMB)) != 0)
-				return(MM_CLIMB);
-		}
+		return(trap ? MM_TRAP : MM_CLIMB);
 	}
 
 	/* Get mimiced feat if covered/bridged */

@@ -3413,7 +3413,7 @@ void forget_view(void)
 		y = GRID_Y(g);
 		x = GRID_X(g);
 
-		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
+		/* Clear "PLAY_VIEW" and "PLAY_SEEN" flags */
 		fast_play_info[g] &= ~(PLAY_VIEW | PLAY_SEEN);
 
 		/* Redraw */
@@ -3574,7 +3574,7 @@ void update_view(void)
 			fast_temp_g[fast_temp_n++] = g;
 		}
 
-		/* Clear "CAVE_VIEW" and "CAVE_SEEN" flags */
+		/* Clear various player FOV flags */
 		pinfo &= ~(PLAY_VIEW | PLAY_SEEN | PLAY_LITE);
 
 		/* Save cave info */
@@ -5269,7 +5269,7 @@ void cave_set_feat_aux(int y, int x, int feat)
  * to these locations still applies.
  *
  * This occurs for cave edges, trees, locations lit by daylight, locations lit by
- * glowing features.
+ * glowing features etc.
  */
 void check_attribute_lost(const int y, const int x, const int r, const byte los, tester_attribute_func require_attribute, tester_attribute_func has_attribute,
 	tester_attribute_func redraw_attribute, modify_attribute_func remove_attribute,	modify_attribute_func reapply_attribute)
@@ -5478,6 +5478,52 @@ void reapply_daylight(int y, int x)
 }
 
 
+/*
+ * Climb-able functions
+ *
+ * Optimisation for placement of monsters which can climb terrain.
+ */
+bool require_climb(int y, int x)
+{
+	return ((cave_info[y][x] & (CAVE_CLIM)) != 0);
+}
+
+bool has_climb(int y, int x)
+{
+	return ((f_info[cave_feat[y][x]].flags2 & (FF2_CAN_CLIMB)) != 0);
+}
+
+bool redraw_climb_loss(int y, int x)
+{
+	(void)y;
+	(void)x;
+	return FALSE;
+}
+
+bool redraw_climb_gain(int y, int x)
+{
+	(void)y;
+	(void)x;
+	return FALSE;
+}
+
+void apply_climb(int y, int x)
+{
+	cave_info[y][x] |= (CAVE_CLIM);
+}
+
+void remove_climb(int y, int x)
+{
+	cave_info[y][x] &= ~(CAVE_CLIM);
+}
+
+void reapply_climb(int y, int x)
+{
+	cave_info[y][x] |= (CAVE_CLIM);
+}
+
+
+
 static int old_feat;
 
 /*
@@ -5608,6 +5654,9 @@ void cave_set_feat(int y, int x, int feat)
 	bool tree = (f_ptr->flags3 & (FF3_TREE)) !=0;
 	bool tree2 = (f_ptr2->flags3 & (FF3_TREE)) != 0;
 
+	bool climb = (f_ptr->flags2 & (FF2_CAN_CLIMB)) !=0;
+	bool climb2 = (f_ptr2->flags2 & (FF2_CAN_CLIMB)) !=0;
+
 	/* Change the feature */
 	cave_set_feat_aux(y,x,feat);
 
@@ -5621,6 +5670,12 @@ void cave_set_feat(int y, int x, int feat)
 	if (dlit && !dlit2)
 	{
 		check_attribute_lost(y, x, 2, CAVE_XLOS, require_daylight, has_daylight, redraw_daylight_loss, remove_daylight, reapply_daylight);
+	}
+
+	/* Handle destroying "climb-able terrain */
+	if (climb && !climb2)
+	{
+		check_attribute_lost(y, x, 1, 0, require_climb, has_climb, redraw_climb_loss, remove_climb, reapply_climb);
 	}
 
 	/* Handle destroying "need_tree" terrain */
@@ -5711,7 +5766,13 @@ void cave_set_feat(int y, int x, int feat)
 	/* Handle creating terrain lit by "daylight" */
 	if (!dlit && dlit2)
 	{
-		gain_attribute(y, x, 2, CAVE_XLOS, apply_daylight, redraw_daylight_gain);
+		gain_attribute(y, x, 1, CAVE_XLOS, apply_daylight, redraw_daylight_gain);
+	}
+
+	/* Handle creating "climb-able terrain */
+	if (!climb && climb2)
+	{
+		gain_attribute(y, x, 2, 0, apply_climb, redraw_climb_gain);
 	}
 
 	/* Handle gold/items */
