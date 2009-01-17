@@ -2644,54 +2644,17 @@ errr parse_region_info(char *buf, header *head)
 			s = t;
 		}
 	}
-#if 0
-	/* Process 'A' for "Arc" */
-	else if (buf[0] == 'A')
-	{
-		int arc, deg;
 
-		/* There better be a current region_ptr */
-		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Scan for the values */
-		if (2 != sscanf(buf, "A:%d:%d",
-			    &arc, &deg)) return (PARSE_ERROR_GENERIC);
-
-		/* Save the values */
-		region_ptr->arc = arc;
-		region_ptr->diameter_of_source = deg;
-	}
-
-	/* Process 'M' for "Maximum Range" */
-	else if (buf[0] == 'M')
+	/* Process 'L' for "Lifespan" */
+	else if (buf[0] == 'L')
 	{
 		/* There better be a current region_ptr */
 		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Get the radius information */
-		if (grab_one_level_scalar(&region_ptr->max_range, buf + 2)) return (PARSE_ERROR_GENERIC);
+		if (grab_one_level_scalar(&region_ptr->lifespan, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
-	/* Process 'R' for "Radius" */
-	else if (buf[0] == 'R')
-	{
-		/* There better be a current region_ptr */
-		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Get the radius information */
-		if (grab_one_level_scalar(&region_ptr->radius, buf + 2)) return (PARSE_ERROR_GENERIC);
-	}
-
-	/* Process 'U' for "Number" */
-	else if (buf[0] == 'U')
-	{
-		/* There better be a current region_ptr */
-		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Get the radius information */
-		if (grab_one_level_scalar(&region_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
-	}
-#endif
 	else
 	{
 		/* Oops */
