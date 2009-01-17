@@ -7300,6 +7300,27 @@ bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diamet
 }
 
 
+/*
+ * Take an angle and returns a direction.
+ */
+int get_angle_to_dir(int angle)
+{
+	int dir;
+
+	/* Convert angle to direction */
+	if (angle < 15) dir = 6;
+	else if (angle < 33) dir = 9;
+	else if (angle < 59) dir = 8;
+	else if (angle < 78) dir = 7;
+	else if (angle < 104) dir = 4;
+	else if (angle < 123) dir = 1;
+	else if (angle < 149) dir = 2;
+	else if (angle < 168) dir = 3;
+	else dir = 6;
+
+	return dir;
+}
+
 
 /*
  * Request a "movement" direction (1,2,3,4,6,7,8,9) from the user.
@@ -7361,15 +7382,7 @@ bool get_rep_dir(int *dp)
 				angle = get_angle_to_target(p_ptr->py, p_ptr->px,y, x, 0);
 
 				/* Convert angle to direction */
-				if (angle < 15) dir = 6;
-				else if (angle < 33) dir = 9;
-				else if (angle < 59) dir = 8;
-				else if (angle < 78) dir = 7;
-				else if (angle < 104) dir = 4;
-				else if (angle < 123) dir = 1;
-				else if (angle < 149) dir = 2;
-				else if (angle < 168) dir = 3;
-				else dir = 6;
+				dir = get_angle_to_dir(angle);
 			}
 			else continue;
 		}

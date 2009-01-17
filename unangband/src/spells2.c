@@ -8500,10 +8500,11 @@ bool region_iterate(int region, bool region_iterator(int y, int x, int d, int re
  * Iterate through a region, applying a region_hook function to each grid in the region
  *
  * Similar to the above region_iterate, but we only affect grids within d distance of (y,x)
- * if gt is true, or further than d distance if gt is false.
+ * if gt is true, or further than d distance if gt is false. We also check for LOS.
  */
 bool region_iterate_distance(int region, int y, int x, int d, bool gt, bool region_iterator(int y, int x, int d, int region))
 {
+	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
 	s16b this_region_piece, next_region_piece = 0;
 	bool seen = FALSE;
 
@@ -8517,6 +8518,9 @@ bool region_iterate_distance(int region, int y, int x, int d, bool gt, bool regi
 
 		/* Check distance */
 		if ((distance(y, x, rp_ptr->y, rp_ptr->x) > d) == gt) continue;
+
+		/* Check projectable */
+		if (!generic_los(y, x, rp_ptr->y, rp_ptr->x, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)) continue;
 
 		/* Iterate on region piece */
 		seen |= region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region);
@@ -8581,7 +8585,12 @@ bool region_uplift_hook(int y, int x, int d, int region)
  */
 bool region_restore_hook(int y, int x, int d, int region)
 {
+	region_type *r_ptr = &region_list[region];
+
 	(void)region;
+
+	/* Paranoia */
+	if ((r_ptr->flags1 & (RE1_SCALAR_FEATURE))== 0) return (FALSE);
 
 	/* Did we collect anything? */
 	if (d)
@@ -8651,8 +8660,13 @@ bool region_project_t_hook(int y, int x, int d, int region)
 	int dam = 0;
 	bool notice;
 
+	/* Using a feature */
+	if (r_ptr->effect == GF_FEATURE)
+	{
+		dam = d;
+	}
 	/* Get the damage from the region piece */
-	if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
+	else if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
 	{
 		dam = d;
 	}
@@ -8731,10 +8745,12 @@ int region_random_piece(int region)
  * Apply effect to a region
  *
  * If (y, x) defined, use this as the target.
- * If RE2_RANDOM, pick a random piece from the grid.
- * If RE2_INVERSE, reverse the source and destination.
- * If RE2_CLOSEST_MON, choose the closest monster as a target.
- * If RE2_CHAIN, update the region after affecting it.
+ * If RE1_RANDOM, pick a random piece from the grid.
+ * If RE1_INVERSE, reverse the source and destination.
+ * If RE1_CLOSEST_MON, choose the closest monster as a target.
+ * If RE1_CHAIN, update the region after affecting it.
+ * If RE1_SOURCE_FEATURE is used, attack multiple times,
+ * once from each feature in the region.
  *
  * Note the concept of target only applies if we are using
  * a method, or spawning a region, not if we affect every
@@ -8800,7 +8816,7 @@ void region_effect(int region, int y, int x)
 			if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
 
 			/* Hack -- restore original terrain if going backwards */
-			if (r_ptr->flags1 & (RE1_BACKWARDS))
+			if ((r_ptr->flags1 & (RE1_BACKWARDS)) && (r_ptr->flags1 & (RE1_SCALAR_FEATURE)))
 			{
 				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, FALSE, region_restore_hook);
 			}
@@ -8977,6 +8993,72 @@ void process_region(int region)
 		r_ptr->type = 0;
 
 		return;
+	}
+
+	/* Rotate the region */
+	if (r_ptr->flags1 & (RE1_CLOCKWISE))
+	{
+		int old_dir = get_angle_to_dir(r_ptr->facing);
+		int facing = r_ptr->facing - 3;
+		int dir;
+		int y, x;
+
+		if (facing < 0) facing += 180;
+
+		dir = get_angle_to_dir(facing);
+
+		/* Change direction if we can't project at least 1 grid after rotating */
+		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddy_ddd[old_dir], method_ptr->flags1)) &&
+				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddy_ddd[dir], method_ptr->flags1)))
+		{
+			facing += 6;
+			if (facing >= 180) facing -= 180;
+
+			r_ptr->flags1 &= ~(RE1_CLOCKWISE);
+			r_ptr->flags1 |= (RE1_COUNTER_CLOCKWISE);
+		}
+
+		/* Use revised facing */
+		r_ptr->facing = facing;
+
+		/* Get new target */
+		get_grid_using_angle(r_ptr->facing, r_ptr->y0, r_ptr->x0, &y, &x);
+
+		r_ptr->y1 = y;
+		r_ptr->x1 = x;
+	}
+
+	/* Rotate the region */
+	else if (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))
+	{
+		int old_dir = get_angle_to_dir(r_ptr->facing);
+		int facing = r_ptr->facing + 3;
+		int dir;
+		int y, x;
+
+		if (facing >= 180) facing -= 180;
+
+		dir = get_angle_to_dir(facing);
+
+		/* Change direction if we can't project at least 1 grid after rotating */
+		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddy_ddd[old_dir], method_ptr->flags1)) &&
+				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddy_ddd[dir], method_ptr->flags1)))
+		{
+			facing -= 6;
+			if (facing < 0) facing += 180;
+
+			r_ptr->flags1 &= ~(RE1_COUNTER_CLOCKWISE);
+			r_ptr->flags1 |= (RE1_CLOCKWISE);
+		}
+
+		/* Use revised facing */
+		r_ptr->facing = facing;
+
+		/* Get new target */
+		get_grid_using_angle(r_ptr->facing, r_ptr->y0, r_ptr->x0, &y, &x);
+
+		r_ptr->y1 = y;
+		r_ptr->x1 = x;
 	}
 
 	/* Updating a projection */

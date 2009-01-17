@@ -1173,6 +1173,7 @@ extern void target_set_location(int y, int x, s16b flags);
 extern key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info);
 extern bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc, byte diameter_of_source);
 extern bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diameter_of_source);
+extern int get_angle_to_dir(int angle);
 extern bool get_rep_dir(int *dp);
 extern bool confuse_dir(int *dp);
 extern int min_depth(int dungeon);

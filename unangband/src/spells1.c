@@ -13707,8 +13707,44 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 		/* Adding projection to a region */
 		if (region)
 		{
+			region_type *r_ptr = &region_list[region];
+			int i;
+
+			/* Overwriting features */
+			if (r_ptr->effect == GF_FEATURE)
+			{
+				/* Clear the scalar */
+				for (i = 0; i < target_path_n; i++) target_path_d[i] = 0;
+
+				/* And set */
+				r_ptr->flags1 |= (RE1_SCALAR_FEATURE);
+				r_ptr->flags1 &= ~(RE1_SCALAR_DISTANCE | RE1_SCALAR_VECTOR | RE1_SCALAR_DAMAGE);
+			}
+			/* Requesting a vector */
+			else if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
+			{
+				int a = degrees_of_arc ? degrees_of_arc : 180;
+				int v = get_angle_to_target(y0, y1, x0, x1, 0);
+
+				/* Randomize the scalar */
+				for (i = 0; i < target_path_n; i++)
+				{
+					int d = (rand_int(a) + v) % 180;
+
+					target_path_d[i] = GRID(d, damage / target_path_d[i]);
+				}
+			}
+			else
+			{
+				/* We currently have the computed distance in the region */
+				r_ptr->flags1 |= (RE1_SCALAR_DISTANCE);
+			}
+
 			/* Take the grids and insert them in the region */
 			region_insert(target_path_g, target_path_n, target_path_d, region);
+
+			/* Initialize the facing */
+			r_ptr->facing = get_angle_to_target(y0, x0, y, x, 0);
 		}
 	}
 
