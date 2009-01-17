@@ -7865,8 +7865,6 @@ void place_trapped_door(int y, int x)
 {
 	int feat;
 
-	int room = room_idx(y, x);
-
 	/* Set the hook */
 	get_feat_num_hook = vault_trapped_door;
 

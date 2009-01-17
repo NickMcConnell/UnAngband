@@ -1483,6 +1483,8 @@ static void rd_tip_files(void)
  */
 bool redraw_dummy(int y, int x)
 {
+	(void)y;
+	(void)x;
 	return FALSE;
 }
 
