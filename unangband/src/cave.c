@@ -1305,10 +1305,10 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 	/*
 	 * Display regions when:
-	 *  1.  when the player can see the region
+	 *  1.  when the player can see the region (either because it is PLAY_SEEN or in PLAY_VIEW and the region is self-lit)
 	 *  2.  when explicitly told to
 	 */
-	if (pinfo & (PLAY_SEEN | PLAY_REGN))
+	if (pinfo & (PLAY_REGN | PLAY_VIEW))
 	{
 		s16b this_region_piece, next_region_piece = 0;
 
@@ -1321,7 +1321,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			next_region_piece = rp_ptr->next_region_piece;
 
 			/* Displaying region */
-			if ((r_ptr->flags1 & (RE1_DISPLAY)) != 0)
+			if (((r_ptr->flags1 & (RE1_DISPLAY)) != 0) &&
+					(((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) ||
+							((r_ptr->flags1 & (RE1_DISPLAY)) != 0)))
 			{
 				a = region_info[r_ptr->type].x_attr;
 				c = region_info[r_ptr->type].x_char;

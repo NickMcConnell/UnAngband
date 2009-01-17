@@ -8497,6 +8497,36 @@ bool region_iterate(int region, bool region_iterator(int y, int x, int d, int re
 
 
 /*
+ * Iterate through a region, applying a region_hook function to each grid in the region
+ *
+ * Similar to the above region_iterate, but we only affect grids within d distance of (y,x)
+ * if gt is true, or further than d distance if gt is false.
+ */
+bool region_iterate_distance(int region, int y, int x, int d, bool gt, bool region_iterator(int y, int x, int d, int region))
+{
+	s16b this_region_piece, next_region_piece = 0;
+	bool seen = FALSE;
+
+	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	{
+		/* Get the region piece */
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+
+		/* Check distance */
+		if ((distance(y, x, rp_ptr->y, rp_ptr->x) > d) == gt) continue;
+
+		/* Iterate on region piece */
+		seen |= region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region);
+	}
+
+	return (seen);
+}
+
+
+/*
  * Hook for redrawing all grids in a region.
  */
 bool region_refresh_hook(int y, int x, int d, int region)
@@ -8518,12 +8548,26 @@ bool region_refresh_hook(int y, int x, int d, int region)
  */
 bool region_uplift_hook(int y, int x, int d, int region)
 {
+	region_type *r_ptr = &region_list[region];
 	int region_piece = get_region_piece(y, x, region);
 
 	region_piece_type *rp_ptr = &region_piece_list[region_piece];
 
 	(void)d;
 
+	/* Start getting features */
+	if ((r_ptr->flags1 & (RE1_SCALAR_DAMAGE | RE1_SCALAR_DISTANCE | RE1_SCALAR_VECTOR)) == 0)
+	{
+		r_ptr->flags1 |= (RE1_SCALAR_FEATURE);
+	}
+
+	/* Paranoia */
+	if ((r_ptr->flags1 & (RE1_SCALAR_FEATURE))== 0) return (FALSE);
+
+	/* Have we already collected a feature */
+	if ((rp_ptr->d) || ((r_ptr->effect == GF_FEATURE) && (rp_ptr->d == r_ptr->damage))) return (FALSE);
+
+	/* Collect this feature */
 	rp_ptr->d = cave_feat[y][x];
 
 	/* Notice elsewhere */
@@ -8539,8 +8583,12 @@ bool region_restore_hook(int y, int x, int d, int region)
 {
 	(void)region;
 
-	/* Restore the terrain */
-	cave_set_feat(y, x, d);
+	/* Did we collect anything? */
+	if (d)
+	{
+		/* Restore the terrain */
+		cave_set_feat(y, x, d);
+	}
 
 	/* Cave_set_feat handles the player noticing this */
 	return (FALSE);
@@ -8560,8 +8608,17 @@ bool region_project_hook(int y, int x, int d, int region)
 	int dam = 0;
 	bool notice;
 
+	/* Get the feature from the region */
+	if (r_ptr->effect == GF_FEATURE)
+	{
+		dam = d;
+
+		/* Collecting the feature */
+		region_uplift_hook(y, x, d, region);
+	}
+
 	/* Get the damage from the region piece */
-	if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
+	else if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
 	{
 		dam = d;
 	}
@@ -8686,6 +8743,7 @@ int region_random_piece(int region)
 void region_effect(int region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
+	region_info_type *ri_ptr = &region_info[r_ptr->type];
 	method_type *method_ptr = &method_info[r_ptr->method];
 	bool notice = FALSE;
 
@@ -8693,6 +8751,9 @@ void region_effect(int region, int y, int x)
 	int x0 = r_ptr->x0;
 	int y1 = y ? y : r_ptr->y1;
 	int x1 = x ? x : r_ptr->x1;
+
+	/* Paranoia */
+	if (!r_ptr->type) return;
 
 	/* Pick a random grid if required */
 	if (r_ptr->flags1 & (RE1_RANDOM))
@@ -8722,49 +8783,46 @@ void region_effect(int region, int y, int x)
 			&y1, &x1, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
 	}
 
+	/* Attacks come from multiple source features in the region */
+	if (r_ptr->flags1 & (RE1_SOURCE_FEATURE))
+	{
+		s16b this_region_piece, next_region_piece = 0;
+
+		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+		{
+			/* Get the region piece */
+			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_sequence;
+
+			/* Skip if it doesn't match source feature */
+			if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
+
+			/* Hack -- restore original terrain if going backwards */
+			if (r_ptr->flags1 & (RE1_BACKWARDS))
+			{
+				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, FALSE, region_restore_hook);
+			}
+			else
+			{
+				/* Apply projection effects to the grids */
+				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_project_hook);
+
+				/* Apply temporary effects to grids */
+				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_project_t_hook);
+
+				/* Clear temporary array */
+				clear_temp_array();
+			}
+		}
+	}
 
 	/* Method is defined */
-	else if (r_ptr->method)
+	else if (ri_ptr->method)
 	{
-		method_type *method_ptr = &method_info[r_ptr->method];
-
-		int rad = scale_method(method_ptr->radius, r_ptr->level);
-		int rng = scale_method(method_ptr->max_range, r_ptr->level);
-		int num = scale_method(method_ptr->number, r_ptr->level);
-
-		int degrees_of_arc = method_ptr->arc;
-		int diameter_of_source = method_ptr->diameter_of_source;
-
-		u32b flg = method_ptr->flags1;
-
-		/* Hack -- fix number */
-		if (num < 1) num = 1;
-
-		/* Hack -- fix diameter of source */
-		if (!diameter_of_source) diameter_of_source = 10;
-
-		/* Always hit first target */
-		if ((y) && (x)) flg |= (PROJECT_STOP);
-
-		/* Create one or more projections */
-		while (num--)
-		{
-			y = y1;
-			x = x1;
-
-			/* Pick a 'nearby' location */
-			if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, 5, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
-
-			/* Affect distant monsters */
-			if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
-			{
-				if (project_dist(r_ptr->who, r_ptr->what, y, x, r_ptr->damage, r_ptr->effect, flg, method_ptr->flags2)) notice = TRUE;
-			}
-
-			/* Analyze the "dir" and the "target". */
-			else if (project(r_ptr->who, r_ptr->what, rad, rng, y0, x0, y, x, r_ptr->damage, r_ptr->effect, flg, degrees_of_arc,
-					(byte)diameter_of_source)) notice = TRUE;
-		}
+		/* Attack the target */
+		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0);
 	}
 
 	/* Method is not defined. Apply effect to all grids */
@@ -8822,7 +8880,7 @@ void trigger_region(int y, int x)
 		if (!(r_ptr->flags1 & (RE1_LINGER)) && (r_ptr->countdown)) continue;
 
 		/* Shoot grid with effect */
-		if (r_ptr->flags1 & (RE1_TRIGGER))
+		if ((r_ptr->flags1 & (RE1_TRIGGER)) && !(r_ptr->flags1 & (RE1_TRIGGERED)))
 		{
 			if (r_ptr->flags1 & (RE1_HIT_TRAP))
 			{
@@ -8840,6 +8898,9 @@ void trigger_region(int y, int x)
 
 			/* Fire the attack */
 			region_effect(rp_ptr->region, y, x);
+
+			/* Mark region as triggered */
+			r_ptr->flags1 |= (RE1_TRIGGERED);
 		}
 		/* Lingering effect hits player/monster moving into grid */
 		else if (r_ptr->flags1 & (RE1_LINGER))
@@ -8872,6 +8933,15 @@ void trigger_region(int y, int x)
 	}
 }
 
+
+
+
+/* Some special 'age' values */
+#define AGE_OLD			10000
+#define AGE_ANCIENT		10001
+#define AGE_LIFELESS	10002
+#define AGE_EXPIRED		10003
+#define AGE_INFINITY	10004
 
 /*
  * Process region.
@@ -9008,7 +9078,7 @@ void process_region(int region)
 			/* Kill wall if nothing got zapped this turn */
 			if (zaps == 0)
 			{
-				r_ptr->age = 250;
+				r_ptr->age = AGE_LIFELESS;
 			}
 
 			/* Restore standard delay */
@@ -9018,7 +9088,7 @@ void process_region(int region)
 		/* No working projection path -- kill the wall */
 		else
 		{
-			r_ptr->age = 250;
+			r_ptr->age = AGE_LIFELESS;
 		}
 	}
 
@@ -9212,15 +9282,32 @@ void process_region(int region)
 		}
 	}
 
-	/* Apply effect every turn */
-	if (r_ptr->flags1 & (RE1_AUTOMATIC))
+	/* Apply effect every turn, unless already applied earlier in the turn */
+	if ((r_ptr->flags1 & (RE1_AUTOMATIC)) && !(r_ptr->flags1 & (RE1_TRIGGERED)))
 	{
 		/* Apply the effect */
 		region_effect(region, 0, 0);
 	}
 
-	/* Effects age */
-	if (r_ptr->age < 255) r_ptr->age++;
+	/* Age the region */
+	if (r_ptr->flags1 & (RE1_AUTOMATIC | RE1_TRIGGERED))
+	{
+		/* Region ages backwards */
+		if (r_ptr->flags1 & (RE1_BACKWARDS))
+		{
+			if (r_ptr->age) r_ptr->age--;
+			else
+			{
+				r_ptr->flags1 &= ~(RE1_BACKWARDS | RE1_AUTOMATIC);
+				if (region_info[r_ptr->type].flags1 & (RE1_AUTOMATIC)) r_ptr->flags1 |= (RE1_AUTOMATIC);
+			}
+		}
+		/* Region ages normally */
+		else if (r_ptr->age < AGE_INFINITY) r_ptr->age++;
+
+		/* Clear trigger */
+		r_ptr->flags1 &= ~(RE1_TRIGGERED);
+	}
 }
 
 
@@ -9291,9 +9378,6 @@ int init_region(int who, int what, int type, int dam, int method, int effect, in
 	/* Initialise region values from region info type */
 	r_ptr->flags1 = ri_ptr->flags1;
 	r_ptr->delay = ri_ptr->delay;
-
-	/* Get the initial region shape */
-	region_update(region);
 
 	return(region);
 }

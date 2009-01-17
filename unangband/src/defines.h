@@ -2810,10 +2810,10 @@
 /* Flags for regions */
 #define RE1_TRIGGER				0x00000001	/* Trigger attack when moving into region */
 #define RE1_LINGER				0x00000002	/* Trigger one grid when moving into region */
-#define RE1_SPAWN				0x00000004	/* Instead of apply an attack, spawn a new region */
+#define RE1_TRIGGERED			0x00000004	/* Region has been triggered this turn, and therefore ages */
 #define RE1_AUTOMATIC			0x00000008	/* Automatically apply effect every update */
 
-#define RE1_MANUAL				0x00000010	/* Region effect only applied to 'newly affected' regions */
+#define RE1_SHINING				0x00000010	/* Region is visible in darkness */
 #define RE1_WALL				0x00000020	/* Advancing 'wall' of effect */
 #define RE1_SEEKER				0x00000040	/* Seeker effect which hunts down targets */
 #define RE1_PROJECTION			0x00000080	/* Grids affected are defined and updated as a projection */

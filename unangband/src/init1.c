@@ -260,9 +260,9 @@ static cptr region_info_flags1[] =
 {
 	"TRIGGER",
 	"LINGER",
-	"SPAWN",
+	"TRIGGERED",
 	"AUTOMATIC",
-	"MANUAL",
+	"SHINING",
 	"WALL",
 	"SEEKER",
 	"PROJECTION",
