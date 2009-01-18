@@ -8955,34 +8955,6 @@ void region_effect(int region, int y, int x)
 	/* Paranoia */
 	if (!r_ptr->type) return;
 
-	/* Pick a random grid if required */
-	if (r_ptr->flags1 & (RE1_RANDOM))
-	{
-		int r = region_random_piece(region);
-
-		y1 = region_piece_list[r].y;
-		x1 = region_piece_list[r].x;
-	}
-
-	/* Reverse destination and source */
-	if (r_ptr->flags1 & (RE1_INVERSE))
-	{
-		y = y0;
-		x = x0;
-		y0 = x1;
-		x0 = x1;
-		y1 = y;
-		x1 = x;
-	}
-
-	/* Choose closest monster from source instead */
-	if (r_ptr->flags1 & (RE1_CLOSEST_MON))
-	{
-		/* Try to get a target (nearest or next-nearest monster) */
-		get_closest_monster(randint(2), y0, x0,
-			&y1, &x1, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
-	}
-
 	/* Attacks come from multiple source features in the region */
 	if (r_ptr->flags1 & (RE1_SOURCE_FEATURE))
 	{
@@ -9021,6 +8993,34 @@ void region_effect(int region, int y, int x)
 	/* Method is defined */
 	else if (ri_ptr->method)
 	{
+		/* Pick a random grid if required */
+		if (r_ptr->flags1 & (RE1_RANDOM))
+		{
+			int r = region_random_piece(region);
+
+			y1 = region_piece_list[r].y;
+			x1 = region_piece_list[r].x;
+		}
+
+		/* Reverse destination and source */
+		if (r_ptr->flags1 & (RE1_INVERSE))
+		{
+			y = y0;
+			x = x0;
+			y0 = x1;
+			x0 = x1;
+			y1 = y;
+			x1 = x;
+		}
+
+		/* Choose closest monster from source instead */
+		if (r_ptr->flags1 & (RE1_CLOSEST_MON))
+		{
+			/* Try to get a target (nearest or next-nearest monster) */
+			get_closest_monster(randint(2), y0, x0,
+				&y1, &x1, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+		}
+
 		/* Attack the target */
 		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0);
 	}
@@ -9102,8 +9102,9 @@ void trigger_region(int y, int x)
 			/* Mark region as triggered */
 			r_ptr->flags1 |= (RE1_TRIGGERED);
 		}
+
 		/* Lingering effect hits player/monster moving into grid */
-		else if (r_ptr->flags1 & (RE1_LINGER))
+		if (r_ptr->flags1 & (RE1_LINGER))
 		{
 			int dam = 0;
 			bool notice = FALSE;
@@ -9183,7 +9184,7 @@ void process_region(int region)
 	if (r_ptr->flags1 & (RE1_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int facing = r_ptr->facing - 3;
+		int facing = r_ptr->facing - (r_ptr->flags1 & (RE1_RANDOM)) ? randint(6) : 3;
 		int dir;
 		int y, x;
 
@@ -9216,7 +9217,7 @@ void process_region(int region)
 	else if (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int facing = r_ptr->facing + 3;
+		int facing = r_ptr->facing + (r_ptr->flags1 & (RE1_RANDOM)) ? randint(6) : 3;
 		int dir;
 		int y, x;
 
@@ -9373,12 +9374,16 @@ void process_region(int region)
 			int dir, grids = 0;
 			int ty = 0, tx = 0;
 			int i;
+			int r = rand_int(100);
 
 			/* Get the object */
 			rp_ptr = &region_piece_list[this_region_piece];
 
 			/* Get the next object */
 			next_region_piece = rp_ptr->next_in_sequence;
+
+			/* If random, we only move vortexes half the time */
+			if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) continue;
 
 			/* Check around (and under) the vortex */
 			for (dir = 0; dir < 9; dir++)
@@ -9400,15 +9405,17 @@ void process_region(int region)
 			else                 i = 0;
 
 			/* Seek out monsters */
-			if (rand_int(100) < i)
+			if (r < i)
 			{
 				/* Try to get a target (nearest or next-nearest monster) */
 				get_closest_monster(randint(2), rp_ptr->y, rp_ptr->x,
 					&ty, &tx, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
 			}
 
-			/* No valid target, or monster is in an impassable grid */
-			if (((ty == 0) && (tx == 0)) || (!cave_passable_bold(ty, tx, method_ptr->flags1)))
+			/* No valid target, or monster is in an impassable grid, or moving randomly some of
+			 * the time */
+			if (((ty == 0) && (tx == 0)) || (!cave_passable_bold(ty, tx, method_ptr->flags1)) ||
+					((r_ptr->flags1 & (RE1_RANDOM)) && ((r % 3) != 0)))
 			{
 				/* Move randomly */
 				dir = randint(9);
@@ -9518,6 +9525,9 @@ void process_region(int region)
 			/* Does this fragment move at this age? */
 			if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) continue;
 
+			/* If random, we only move vertexes half the time */
+			if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 50)) continue;
+
 			/* Angle of travel */
 			angle = GRID_Y(rp_ptr->d);
 
@@ -9545,6 +9555,44 @@ void process_region(int region)
 			rp_ptr->x = tx;
 			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
 			cave_region_piece[ty][tx] = this_region_piece;
+		}
+	}
+
+	/* Vector defined by the region encoding */
+	if (r_ptr->flags1 & (RE1_SPREAD))
+	{
+		int this_region_piece, next_region_piece = 0;
+
+		/*
+		 * This can result in region pieces overlapping...
+		 */
+		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr;
+			int dir = rand_int(12);
+
+			/* Get the object */
+			rp_ptr = &region_piece_list[this_region_piece];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_sequence;
+
+			if (dir < 8)
+			{
+				int ty = rp_ptr->y + ddy_ddd[dir];
+				int tx = rp_ptr->x + ddx_ddd[dir];
+
+				/* Can drift into new location? */
+				if (cave_passable_bold(ty, tx, method_ptr->flags1))
+				{
+					/* Move the vertex */
+					excise_region_piece(this_region_piece);
+					rp_ptr->y = ty;
+					rp_ptr->x = tx;
+					rp_ptr->next_region_piece = cave_region_piece[ty][tx];
+					cave_region_piece[ty][tx] = this_region_piece;
+				}
+			}
 		}
 	}
 

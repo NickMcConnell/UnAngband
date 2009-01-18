@@ -2111,7 +2111,8 @@ C:8:31:25:70:3
 C:10:31:25:70:3
 C:11:23:12:60:8
 P:0:0
-B:LINE:FEATURE:228
+B:ARC_60:FIRE:5d9+(1d9)/4
+S:REGION:38
 
 N:151:Fire Bolt II
 A:65:33:1
@@ -2216,7 +2217,8 @@ C:8:27:18:65:5
 C:10:31:25:70:3
 C:11:23:12:60:8
 P:0:0
-B:LINE:FEATURE:127
+B:ARC_60:ACID:7d9+(1d9)/4
+S:REGION:38
 
 N:160:Acid Storm
 A:65:37:1
@@ -2315,7 +2317,8 @@ C:8:23:12:60:8
 C:10:31:25:70:3
 C:11:23:12:60:8
 P:0:0
-B:LINE:FEATURE:229
+B:ARC_60:ELEC:2d7+(1d7)/4
+S:REGION:38
 
 N:168:Ball Lightning
 A:90:8:6
@@ -2430,7 +2433,8 @@ C:8:28:15:75:18
 C:10:36:28:85:12
 C:11:28:15:75:18
 P:430:0
-B:LINE:FEATURE:115
+B:ARC_60:ICE:4d10+(1d10)/4
+S:REGION:38
 
 N:178:Stone Tell
 A:90:18:5
@@ -2458,7 +2462,8 @@ C:8:7:6:40:2
 C:10:7:6:40:2
 C:11:3:4:30:1
 P:0:0
-B:BLAST:CONFUSE_WEAK:10+1/1
+B:CLOUD:CONFUSE_WEAK:10+1/1
+S:REGION:39
 
 N:180:Philtre of Fearlessness
 A:75:28:1
@@ -2754,9 +2759,8 @@ C:8:35:27:105:140
 C:10:40:35:105:100
 C:11:35:27:105:140
 P:0:0
-B:STORM:POISON:80+2/1
-
-#Replace with timed poison effect when spell effects implemented
+B:STORM:POISON:40+1/1
+S:REGION:31
 
 N:203:Summon Dragon
 A:92:6:6
@@ -2970,7 +2974,8 @@ C:8:33:22:90:16
 C:10:41:35:100:6
 C:11:33:22:90:16
 P:0:0
-B:LINE:FEATURE:50
+B:ARC_60:FEATURE:50
+S:REGION:38
 
 N:220:Turn Water to Air
 A:90:19:3
@@ -3123,7 +3128,8 @@ C:8:28:15:75:18
 C:10:36:28:85:12
 C:11:28:15:75:18
 P:227:0
-B:LINE:FEATURE:126
+B:ARC_60:WATER:5d8+(1d8)/4
+S:REGION:38
 
 N:233:Whirlpool
 A:65:50:1
@@ -5246,8 +5252,6 @@ C:11:13:8:45:4
 P:11:0
 B:BALL_MINOR:ELEC:15+1/1
 
-# These are place holders until we get chain lightning working.
-
 N:454:Chain Lightning
 A:10:30:2
 A:90:12:11
@@ -5258,6 +5262,7 @@ C:10:29:22:60:15
 C:11:25:13:50:16
 P:166:0
 B:ARC_30:ELEC:3/1
+S:REGION:37
 
 N:455:Chain Lightning II
 A:90:12:12
@@ -5268,6 +5273,7 @@ C:10:39:45:80:15
 C:11:35:27:70:16
 P:454:0
 B:ARC_40:ELEC:4/1
+S:REGION:37
 
 N:456:Chain Lightning III
 A:90:12:13
@@ -5278,6 +5284,7 @@ C:10:49:91:100:15
 C:11:45:55:90:16
 P:455:0
 B:ARC_50:ELEC:5/1
+S:REGION:37
 
 N:457:Disrupt Undead
 A:90:14:10
@@ -5944,9 +5951,8 @@ C:9:13:11:55:4
 C:10:13:11:55:4
 C:11:7:6:30:5
 P:0:0
-B:BEAM:ELEC:2d6+(1d6)/4
-
-#Replace with timed lightning effect when spell effects implemented
+B:AREA:ELEC:2d6+(1d6)/4
+S:REGION:29
 
 N:510:Ignite Blaze
 A:90:37:10
@@ -5956,9 +5962,8 @@ C:9:21:19:60:3
 C:10:21:19:60:3
 C:11:11:7:45:8
 P:0:0
-B:BALL_MINOR:FIRE:7+1/1
-
-#Replace with timed fire effect when spell effects implemented
+B:SELF:FIRE:7+1/1
+S:REGION:30
 
 N:511:Ent's Song
 A:90:37:11
@@ -6134,8 +6139,6 @@ C:11:20:9:50:8
 P:0:0
 B:STORM:POISON:20+2/1
 
-#Replace with timed poison effect when spell effects implemented
-
 N:526:Thunderhead
 A:90:39:2
 A:90:19:13
@@ -6145,11 +6148,8 @@ C:8:25:13:50:16
 C:10:29:22:60:15
 C:11:25:13:50:16
 P:166:0
-B:BEAM:ELEC:2d9+(1d9)/4
-B:BEAM:ELEC:2d9+(1d9)/4
-B:BEAM:ELEC:2d9+(1d9)/4
-
-#Replace with timed lightning effect when spell effects implemented
+B:STORM:STORM:2d9+(1d9)/4
+S:REGION:32
 
 N:527:Blizzard
 A:90:39:3
@@ -6159,9 +6159,8 @@ C:8:29:23:75:8
 C:10:37:43:85:3
 C:11:29:23:75:8
 P:0:0
-B:BALL:COLD:55+2/1
-
-#Replace with timed frost effect when spell effects implemented
+B:STORM:COLD:5+1/1
+S:REGION:33
 
 N:528:Twister
 A:90:39:4
@@ -6171,9 +6170,8 @@ C:8:34:31:80:10
 C:10:41:47:95:4
 C:11:34:31:80:10
 P:0:0
-B:STORM:WIND:145+3/1
-
-#Replace with timed wind effect when spell effects implemented
+B:ARC_60:WIND:45+1/1
+S:REGION:34
 
 N:529:Tsunami
 A:90:39:5
@@ -6184,8 +6182,7 @@ C:10:45:71:100:5
 C:11:39:57:85:12
 P:0:0
 B:ARC_40:WATER:3/1
-
-#Replace with timed water effect when spell effects implemented
+S:REGION:35
 
 N:530:Volcano
 A:90:39:6
@@ -6194,9 +6191,10 @@ C:1:44:63:100:10
 C:8:44:63:100:10
 C:11:44:63:100:10
 P:0:0
-B:8WAY_III:LAVA:295+4/1
-
-#Replace with timed fire effect when spell effects implemented
+B:BALL_III:FEATURE:178
+B:BALL_III:LAVA:100+2/1
+B:STAR:LAVA:295+4/1
+S:REGION:36
 
 N:531:Tree of Life
 A:90:39:7

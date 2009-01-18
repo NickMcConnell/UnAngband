@@ -2830,15 +2830,15 @@
 #define RE1_HIT_TRAP			0x00004000	/* Handle this region as a trap */
 #define RE1_RANDOM				0x00008000	/* Target a random grid in the region */
 
-#define RE1_AGE_INCREASE		0x00010000	/* Damage increases with age. If DECREASE defined, damage peaks at 1/2 lifespan, then drops. */
-#define RE1_AGE_DECREASE		0x00020000	/* Damage decreases with age. If INCREASE defined, damage peaks at 1/2 lifespan, then drops. */
+#define RE1_ACCELERATE			0x00010000	/* Delay decreases with age. If DECREASE defined, delay bottoms out at 1/2 lifespan, then increases. */
+#define RE1_DECELERATE			0x00020000	/* Delay increases with age. If INCREASE defined, delay bottoms out at 1/2 lifespan, then increases. */
 #define RE1_INVERSE				0x00040000	/* Invert source and target when spawning attack/subsequent region */
 #define RE1_NOTICE				0x00080000	/* Noticed region? */
 
 #define RE1_CHAIN				0x00100000	/* Set region source and destination to source and target determined when attacking */
 #define RE1_TRIGGER_DROP		0x00200000	/* Trigger if something dropped into the region */
 #define RE1_TRIGGER_AIM			0x00400000	/* Triggered by and targetted by an adjacent creature/player */
-#define RE1_SCATTER				0x00800000	/* Scatter region pieces during creation */
+#define RE1_SPREAD				0x00800000	/* Region pieces drift randomly. Affected by the wind. */
 
 #define RE1_CLOCKWISE			0x01000000	/* Rotates clockwise every turn. If both, randomly choose one. */
 #define RE1_COUNTER_CLOCKWISE	0x02000000	/* Rotates counter-clockwise every turn. If both, randomly choose one. */

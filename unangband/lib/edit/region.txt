@@ -80,7 +80,7 @@ F:SOURCE_FEATURE | TRIGGER_OPEN | TRIGGER_CLOSE
 N:3:strange rune
 G:x:o
 #U:1 + 1/10
-F:SCATTER | TRIGGER | HIT_TRAP
+F:TRIGGER | HIT_TRAP
 
 N:4:spring-loaded trap
 G:x:r
@@ -207,7 +207,7 @@ G:x:M
 #U:4 + 1/10
 #F:SCATTER | GRID | ITEM | KILL | PLAY | MAGIC
 #F:LOS 
-F:PROJECTION | TRIGGER | HIT_TRAP  | SCATTER
+F:PROJECTION | TRIGGER | HIT_TRAP
 
 N:22:demonic sign
 G:x:T
@@ -248,10 +248,82 @@ N:27:shimmering portal
 G:x:Z
 #U:2
 #M:100
-F:PROJECTION | AUTOMATIC | SCATTER
+F:PROJECTION | AUTOMATIC | SHINING
 #F:GRID | ITEM | KILL | PLAY | MAGIC |
 
 # Boulders are released by a deadfall and act as slow
 # moving projections towards the target.
 N:28:boulder
 G:*:u
+F:SCALAR_VECTOR | AUTOMATIC | RANDOM | DECELERATE
+
+# Blasts of narrow forked lightning - used by Call Lightning
+N:29:storm
+G:*:Y
+F:AUTOMATIC | INVERSE | RANDOM | PROJECTION
+#B:BEAM
+
+# Seeker vortex - used by Ignite Blaze
+N:30:vortex
+G:*:o
+F:AUTOMATIC | LINGER | SHINING | SEEKER
+
+# Mass of randomly moving creeps - Used by Creeping Death
+N:31:creep
+G:*:p
+F:AUTOMATIC | SEEKER | RANDOM | SPREAD
+
+# Lingering cloud of damage - Used by Miasma
+N:32:miasma
+G:*:v
+F:AUTOMATIC | LINGER | SPREAD
+
+# Hail of explosions - used by Blizzard
+# Note that moving through this is more dangerous than
+# standing still.
+
+N:33:blizzard
+G:*:B
+F:AUTOMATIC | LINGER
+#B:FLASK
+
+# Rotating arc - moves randomly faster or slower - used by Twister
+
+N:34:twister
+G:*:W
+F:AUTOMATIC | LINGER | CLOCKWISE | COUNTER_CLOCKWISE | PROJECTION
+F:RANDOM | ACCELERATE
+
+# Slowly advancing wave - used by Tsunami
+# TODO: Randomly advancing wall should only sometimes advance... and do
+# so in a wave-like pattern...
+
+N:35:wave
+G:*:b
+F:AUTOMATIC | WALL | RANDOM | DECELERATE
+
+# Hail of accerating explosions - used by Volcano
+
+N:36:eruption
+G:*:r
+F:AUTOMATIC | LINGER | ACCELERATE | SHINING
+#B:FLASK
+
+# Chains of monster seeking attacks - Used by Chain Lightning
+
+N:37:chain
+G:*:y
+F:AUTOMATIC | CHAIN | CLOSEST_MON | INVERSE
+
+# Advancing wall - Used by the wall spells
+
+N:38:wall
+G:*:w
+F:AUTOMATIC | LINGER | WALL
+
+# Scattered dust - used by Dust of Sneezing
+
+N:39:dust
+G:*:s
+F:AUTOMATIC | LINGER | SPREAD | SHINING
+

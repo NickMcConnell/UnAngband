@@ -892,7 +892,7 @@ static errr init_region_info(void)
 	errr err;
 
 	/* Init the header */
-	init_header(&region_head, z_info->region_max, sizeof(region_type));
+	init_header(&region_head, z_info->region_info_max, sizeof(region_type));
 
 #ifdef ALLOW_TEMPLATES
 
