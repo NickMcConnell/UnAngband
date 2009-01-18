@@ -4920,10 +4920,12 @@
 /*
  * Determine if a "legal" grid is suitable for projections.
  * Third parameter is the projection flags. We either check LOS if
- * PROJECT_LOS is set, otherwise we check line of fire.
+ * PROJECT_LOS is set, otherwise we check line of fire. If
+ * PROJECT_THRU is set this is always true.
  */
 #define cave_passable_bold(Y,X,R) \
-	(!(cave_info[Y][X] & ((R & (PROJECT_LOS)) != 0 ? CAVE_XLOS : CAVE_XLOF)))
+	(((R & (PROJECT_THRU)) != 0) ? (TRUE) : \
+	 (!(cave_info[Y][X] & ((R & (PROJECT_LOS)) != 0 ? CAVE_XLOS : CAVE_XLOF))))
 
 
 

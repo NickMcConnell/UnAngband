@@ -9439,29 +9439,31 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 		}
 	}
 
-	/* Convert dir into a grid */
-	for (i = 0; i < 100; i++)
+	/* Extract adjacent (legal) location */
+	*ty = y + ddy[dir];
+	*tx = x + ddx[dir];
+
+	/* Require passable grids */
+	if (!cave_passable_bold(*ty, *tx, method_ptr->flags1))
 	{
+		int i;
+		int k = 0;
+		
+		/* Is at least one adjacent grid passable? */
+		for (i = 1; i < 9; i++)
+		{
+			int yy = y + ddy[dir];
+			int xx = x + ddx[dir];
+			
+			if ((cave_passable_bold(yy, xx, method_ptr->flags1)) && (rand_int(++k))) dir = i;
+		}
+		
+		/* No grids passable, we're stuck */
+		if (!cave_passable_bold(y, x, method_ptr->flags1)) dir = randint(9);
+		
 		/* Extract adjacent (legal) location */
 		*ty = y + ddy[dir];
 		*tx = x + ddx[dir];
-
-		/* Require passable grids */
-		if (cave_passable_bold(*ty, *tx, method_ptr->flags1))
-		{
-			/* Try not to stay in place */
-			if ((*ty != y) || (*tx != x)) break;
-		}
-
-		/* Move randomly */
-		dir = randint(9);
-	}
-
-	/* Note failure */
-	if (i == 100)
-	{
-		*ty = y;
-		*tx = x;
 	}
 
 	return;
@@ -9545,7 +9547,7 @@ void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
 			}
 			
 			/* If at least one grid passable, abort */
-			if (i < 8)
+			if ((i < 8) || (cave_passable_bold(y, x, method_ptr->flags1)))
 			{
 				*ty = y;
 				*tx = x;
