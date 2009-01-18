@@ -260,22 +260,30 @@ F:SCALAR_VECTOR | AUTOMATIC | RANDOM | DECELERATE
 # Blasts of narrow forked lightning - used by Call Lightning
 N:29:storm
 G:*:Y
-F:AUTOMATIC | INVERSE | RANDOM | PROJECTION
-#B:BEAM
+I:120
+L:2+1/10
+F:AUTOMATIC | INVERSE | RANDOM | PROJECTION | ACCELERATE | DECELERATE
+B:BEAM
 
 # Seeker vortex - used by Ignite Blaze
 N:30:vortex
 G:*:o
+I:14
+L:50+1/1
 F:AUTOMATIC | LINGER | SHINING | SEEKER
 
 # Mass of randomly moving creeps - Used by Creeping Death
 N:31:creep
+I:60
+L:50+1/1
 G:*:p
 F:AUTOMATIC | SEEKER | RANDOM | SPREAD
 
 # Lingering cloud of damage - Used by Miasma
 N:32:miasma
 G:*:v
+I:66
+L:20+1/2
 F:AUTOMATIC | LINGER | SPREAD
 
 # Hail of explosions - used by Blizzard
@@ -284,13 +292,17 @@ F:AUTOMATIC | LINGER | SPREAD
 
 N:33:blizzard
 G:*:B
+B:BALL_MINOR
+I:33
+L:40+1/2
 F:AUTOMATIC | LINGER
-#B:FLASK
 
 # Rotating arc - moves randomly faster or slower - used by Twister
 
 N:34:twister
 G:*:W
+I:128
+L:7
 F:AUTOMATIC | LINGER | CLOCKWISE | COUNTER_CLOCKWISE | PROJECTION
 F:RANDOM | ACCELERATE
 
@@ -300,30 +312,40 @@ F:RANDOM | ACCELERATE
 
 N:35:wave
 G:*:b
+I:25
+L:20
 F:AUTOMATIC | WALL | RANDOM | DECELERATE
 
 # Hail of accerating explosions - used by Volcano
 
 N:36:eruption
 G:*:r
+I:256
+L:8
 F:AUTOMATIC | LINGER | ACCELERATE | SHINING
-#B:FLASK
+B:BALL_MINOR
 
 # Chains of monster seeking attacks - Used by Chain Lightning
 
 N:37:chain
 G:*:y
+I:100
+L:2+1/10
 F:AUTOMATIC | CHAIN | CLOSEST_MON | INVERSE
 
 # Advancing wall - Used by the wall spells
 
 N:38:wall
 G:*:w
+I:50
+L:20
 F:AUTOMATIC | LINGER | WALL
 
 # Scattered dust - used by Dust of Sneezing
 
 N:39:dust
 G:*:s
+I:66
+L:5+1/4
 F:AUTOMATIC | LINGER | SPREAD | SHINING
 

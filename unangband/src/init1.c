@@ -258,7 +258,7 @@ static cptr method_info_flags2[] =
  */
 static cptr region_info_flags1[] =
 {
-	"TRIGGER",
+	"TRIGGER_MOVE",
 	"LINGER",
 	"TRIGGERED",
 	"AUTOMATIC",
@@ -2618,6 +2618,46 @@ errr parse_region_info(char *buf, header *head)
 		/* Save the values */
 		region_ptr->d_attr = tmp;
 		region_ptr->d_char = buf[2];
+	}
+
+	/* Process 'I' for "Info" (one line only) */
+	else if (buf[0] == 'I')
+	{
+		int delay;
+
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+				&delay)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		region_ptr->delay = (u16b)delay;
+	}
+
+	/* Process 'B' for "Blows" */
+	else if (buf[0] == 'B')
+	{
+		int n1;
+
+		/* There better be a current s_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Analyze the first field */
+		for (s = t = buf+2; *t; t++) /* loop */;
+
+		/* Analyze the method */
+		for (n1 = 0; n1 < z_info->method_max; n1++)
+		{
+			if (streq(s, method_name + method_info[n1].name)) break;
+		}
+
+		/* Invalid method */
+		if (n1 == z_info->method_max) return (PARSE_ERROR_GENERIC);
+
+		/* Store the type */
+		region_ptr->method = n1;
 	}
 
 	/* Hack -- Process 'F' for flags */

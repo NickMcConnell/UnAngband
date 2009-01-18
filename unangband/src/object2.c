@@ -6898,6 +6898,9 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 			msg_print("You feel something roll beneath your feet.");
 		}
 	}
+
+	/* Trigger regions */
+	trigger_region(y, x, FALSE);
 }
 
 

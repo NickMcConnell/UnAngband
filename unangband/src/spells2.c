@@ -6153,7 +6153,10 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			r_ptr->delay = delay;
 
 			/* Increase delay */
-			delay += region_list[region].lifespan * region_list[region].delay;
+			delay += r_ptr->lifespan * r_ptr->delay;
+
+			/* Always display newly created regions */
+			r_ptr->flags1 |= (RE1_DISPLAY);
 		}
 
 		/* Projection method */
@@ -6161,6 +6164,9 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
+
+		/* Notice region? */
+		if (obvious && region) region_list[region].flags1 |= (RE1_NOTICE);
 	}
 
 	/* Return result */
@@ -9055,12 +9061,15 @@ void region_effect(int region, int y, int x)
 
 
 /*
- * Trigger regions at grid y, x.
+ * Trigger regions at grid y, x when a monster moves through it.
  *
  * This is used to fire traps if a player or monster moves into them,
  * as well as handle these moving through lingering effects.
+ *
+ * If move is true, we check for TRIGGER_MOVE, otherwise we check for
+ * TRIGGER_DROP.
  */
-void trigger_region(int y, int x)
+void trigger_region(int y, int x, bool move)
 {
 	int this_region_piece, next_region_piece = 0;
 
@@ -9080,7 +9089,8 @@ void trigger_region(int y, int x)
 		if (!(r_ptr->flags1 & (RE1_LINGER)) && (r_ptr->countdown)) continue;
 
 		/* Shoot grid with effect */
-		if ((r_ptr->flags1 & (RE1_TRIGGER)) && !(r_ptr->flags1 & (RE1_TRIGGERED)))
+		if ((move ? ((r_ptr->flags1 & (RE1_TRIGGER_MOVE)) != 0) : ((r_ptr->flags1 & (RE1_TRIGGER_DROP)) != 0)) &&
+				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0))
 		{
 			if (r_ptr->flags1 & (RE1_HIT_TRAP))
 			{
@@ -9125,8 +9135,17 @@ void trigger_region(int y, int x)
 				dam = r_ptr->damage;
 			}
 
-			/* Affect the monster, player or object in this grid only */
-			notice |= project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1);
+			/* Avoid hitting player or monsters multiple times with lingering effects unless moving. */
+			if (move)
+			{
+				/* Affect the monster, player or object in this grid only */
+				notice |= project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1);
+			}
+			else
+			{
+				/* Damage objects directly if dropping an object. */
+				notice |= project_o(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect);
+			}
 
 			/* Noticed region? */
 			if (notice) r_ptr->flags1 |= (RE1_NOTICE);
@@ -9168,27 +9187,54 @@ void process_region(int region)
 	/* Count down to next turn, return if not yet ready */
 	if (--r_ptr->countdown > 0) return;
 
+	/* Accelerating */
+	if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (r_ptr->age < r_ptr->lifespan / 2)))
+	{
+		r_ptr->countdown /= 2;
+		if (r_ptr->countdown < 1) r_ptr->countdown = 1;
+	}
+
+	/* Decelerating */
+	if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (r_ptr->age > r_ptr->lifespan / 2)))
+	{
+		r_ptr->countdown /= 2;
+		if (r_ptr->countdown < 1) r_ptr->countdown = 1;
+	}
+
 	/* Reset count */
 	r_ptr->countdown = r_ptr->delay;
 
 	/* Effects eventually "die" */
 	if (r_ptr->age >= r_ptr->lifespan)
 	{
-		/* Effect is "dead" - mark for later */
-		r_ptr->type = 0;
+		/* Region loops backwards once finished */
+		if (region_info[r_ptr->type].flags1 & (RE1_BACKWARDS))
+		{
+			/* Start going backwards instead */
+			r_ptr->flags1 |= (RE1_BACKWARDS);
 
-		return;
+			/* Wait for trigger?  */
+			if (!(region_info[r_ptr->type].flags1 & (RE1_AUTOMATIC))) r_ptr->flags1 &= ~(RE1_AUTOMATIC);
+		}
+		else
+		{
+			/* Effect is "dead" - mark for later */
+			r_ptr->type = 0;
+
+			return;
+		}
 	}
 
 	/* Rotate the region */
 	if (r_ptr->flags1 & (RE1_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int facing = r_ptr->facing - (r_ptr->flags1 & (RE1_RANDOM)) ? randint(6) : 3;
+		int angle = method_ptr->arc ? method_ptr->arc : 6;
+		int facing = r_ptr->facing - (r_ptr->flags1 & (RE1_RANDOM)) ? randint(angle) : angle / 2;
 		int dir;
 		int y, x;
 
-		if (facing < 0) facing += 180;
+		while (facing < 0) facing += 180;
 
 		dir = get_angle_to_dir(facing);
 
@@ -9196,8 +9242,8 @@ void process_region(int region)
 		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddy_ddd[old_dir], method_ptr->flags1)) &&
 				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddy_ddd[dir], method_ptr->flags1)))
 		{
-			facing += 6;
-			if (facing >= 180) facing -= 180;
+			facing += angle * 2;
+			while (facing >= 180) facing -= 180;
 
 			r_ptr->flags1 &= ~(RE1_CLOCKWISE);
 			r_ptr->flags1 |= (RE1_COUNTER_CLOCKWISE);
@@ -9217,11 +9263,12 @@ void process_region(int region)
 	else if (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int facing = r_ptr->facing + (r_ptr->flags1 & (RE1_RANDOM)) ? randint(6) : 3;
+		int angle = method_ptr->arc ? method_ptr->arc : 6;
+		int facing = r_ptr->facing + (r_ptr->flags1 & (RE1_RANDOM)) ? randint(angle) : angle / 2;
 		int dir;
 		int y, x;
 
-		if (facing >= 180) facing -= 180;
+		while (facing >= 180) facing -= 180;
 
 		dir = get_angle_to_dir(facing);
 
@@ -9229,8 +9276,8 @@ void process_region(int region)
 		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddy_ddd[old_dir], method_ptr->flags1)) &&
 				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddy_ddd[dir], method_ptr->flags1)))
 		{
-			facing -= 6;
-			if (facing < 0) facing += 180;
+			facing -= angle * 2;
+			while (facing < 0) facing += 180;
 
 			r_ptr->flags1 &= ~(RE1_COUNTER_CLOCKWISE);
 			r_ptr->flags1 |= (RE1_CLOCKWISE);

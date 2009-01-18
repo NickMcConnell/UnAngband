@@ -2810,7 +2810,7 @@
 
 
 /* Flags for regions */
-#define RE1_TRIGGER				0x00000001	/* Trigger attack when moving into region */
+#define RE1_TRIGGER_MOVE		0x00000001	/* Trigger attack when moving into region */
 #define RE1_LINGER				0x00000002	/* Trigger one grid when moving into region */
 #define RE1_TRIGGERED			0x00000004	/* Region has been triggered this turn, and therefore ages */
 #define RE1_AUTOMATIC			0x00000008	/* Automatically apply effect every update */

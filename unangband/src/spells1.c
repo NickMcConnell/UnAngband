@@ -3587,6 +3587,22 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Destroy Traps (and Locks) */
 		case GF_KILL_TRAP:
 		{
+			int this_region_piece, next_region_piece = 0;
+
+			/* Trigger opening */
+			for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+			{
+				region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+				region_type *r_ptr = &region_list[rp_ptr->region];
+
+				/* Start opening */
+				if (r_ptr->flags1 & (RE1_TRIGGER_OPEN))
+				{
+					r_ptr->flags1 |= (RE1_AUTOMATIC);
+					r_ptr->flags1 &= ~(RE1_BACKWARDS);
+				}
+			}
+
 			/* Reveal secret doors */
 			if (cave_feat[y][x] == FEAT_SECRET)
 			{
@@ -3716,6 +3732,21 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Jam Doors */
 		case GF_LOCK_DOOR:
 		{
+			int this_region_piece, next_region_piece = 0;
+
+			/* Trigger closing */
+			for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+			{
+				region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+				region_type *r_ptr = &region_list[rp_ptr->region];
+
+				/* Start opening */
+				if (r_ptr->flags1 & (RE1_TRIGGER_CLOSE))
+				{
+					r_ptr->flags1 |= (RE1_AUTOMATIC | RE1_BACKWARDS);
+				}
+			}
+
 			/* Close doors/traps/chests */
 			if (f_ptr->flags1 & (FF1_CLOSE))
 			{

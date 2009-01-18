@@ -2200,6 +2200,9 @@ static void process_world(void)
 	/* Check quests */
 	ensure_quest();
 
+	/* Process regions */
+	process_regions();
+
 #ifdef ALLOW_BORG
 	if (count_stop)
 	{
