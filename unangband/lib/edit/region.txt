@@ -286,25 +286,22 @@ I:66
 L:20+1/2
 F:AUTOMATIC | LINGER | SPREAD
 
-# Hail of explosions - used by Blizzard
-# Note that moving through this is more dangerous than
-# standing still.
+# Wandering cloud - used by Blizzard
 
 N:33:blizzard
 G:*:B
-B:BALL_MINOR
 I:33
 L:40+1/2
-F:AUTOMATIC | LINGER
+F:AUTOMATIC | LINGER | SPREAD | MOVE_SOURCE | PROJECTION
 
-# Rotating arc - moves randomly faster or slower - used by Twister
+# Wandering arc - used by Twister
 
 N:34:twister
 G:*:W
 I:128
-L:7
-F:AUTOMATIC | LINGER | CLOCKWISE | COUNTER_CLOCKWISE | PROJECTION
-F:RANDOM | ACCELERATE
+L:30
+F:AUTOMATIC | LINGER | PROJECTION
+F:MOVE_SOURCE | SPREAD
 
 # Slowly advancing wave - used by Tsunami
 # TODO: Randomly advancing wall should only sometimes advance... and do
@@ -331,7 +328,7 @@ N:37:chain
 G:*:y
 I:100
 L:2+1/10
-F:AUTOMATIC | CHAIN | CLOSEST_MON | INVERSE
+F:AUTOMATIC | CHAIN | INVERSE | SEEKER
 
 # Advancing wall - Used by the wall spells
 

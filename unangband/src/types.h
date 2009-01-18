@@ -912,8 +912,8 @@ struct region_piece_type
 
 	s16b region;			/* Index of region this region piece refers to */
 
-	s16b next_region_piece;	/* Index of next region piece at this square. */
-	s16b next_in_sequence;	/* Index of next region piece with the same effect. */
+	s16b next_in_grid;		/* Index of next region piece at this square. */
+	s16b next_in_region;	/* Index of next region piece with the same effect. */
 };
 
 
@@ -970,7 +970,7 @@ struct region_type
 
 	u32b flags1;		/* Ongoing effect bitflags */
 
-	s16b first_in_sequence;	/* First region piece in sequence */
+	s16b first_piece;	/* First region piece in sequence */
 };
 
 

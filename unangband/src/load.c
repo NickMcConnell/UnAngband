@@ -2001,15 +2001,15 @@ static errr rd_dungeon(void)
 			}
 
 			/* Insert into the region */
-			rp_ptr->next_in_sequence = r_ptr->first_in_sequence;
-			r_ptr->first_in_sequence = region_piece;
+			rp_ptr->next_in_region = r_ptr->first_piece;
+			r_ptr->first_piece = region_piece;
 
 			/* ToDo: Verify coordinates */
 			y = i_ptr->y;
 			x = i_ptr->x;
 
 			/* Link the object to the pile */
-			rp_ptr->next_region_piece = cave_region_piece[y][x];
+			rp_ptr->next_in_grid = cave_region_piece[y][x];
 
 			/* Link the floor to the object */
 			cave_region_piece[y][x] = region_piece;

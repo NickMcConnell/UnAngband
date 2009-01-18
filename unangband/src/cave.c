@@ -1318,7 +1318,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			region_type *r_ptr = &region_list[rp_ptr->region];
 
 			/* Get the next region */
-			next_region_piece = rp_ptr->next_region_piece;
+			next_region_piece = rp_ptr->next_in_grid;
 			
 			/* Skip dead regions */
 			if (!r_ptr->type) continue;

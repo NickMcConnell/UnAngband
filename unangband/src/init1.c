@@ -270,7 +270,7 @@ static cptr region_info_flags1[] =
 	"SCALAR_DAMAGE",
 	"SCALAR_VECTOR",
 	"SCALAR_DISTANCE",
-	"CLOSEST_MON",
+	"MOVE_SOURCE",
 	"PLATFORM",
 	"HIT_TRAP",
 	"RANDOM",

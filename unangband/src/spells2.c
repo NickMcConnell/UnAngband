@@ -8097,7 +8097,7 @@ void excise_region_piece(int region_piece)
 		rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_region_piece;
+		next_region_piece = rp_ptr->next_in_grid;
 
 		/* Done */
 		if (this_region_piece == region_piece)
@@ -8114,11 +8114,11 @@ void excise_region_piece(int region_piece)
 				i_ptr = &region_piece_list[prev_region_piece];
 
 				/* Remove from list */
-				i_ptr->next_region_piece = next_region_piece;
+				i_ptr->next_in_grid = next_region_piece;
 			}
 
 			/* Forget next pointer */
-			rp_ptr->next_region_piece = 0;
+			rp_ptr->next_in_grid = 0;
 
 			/* Done */
 			break;
@@ -8183,8 +8183,8 @@ void region_piece_copy(region_piece_type *rp_ptr, const region_piece_type *rp_pt
 	(void)COPY(rp_ptr, rp_ptr2, region_piece_type);
 
 	/* Zero some parameters */
-	rp_ptr->next_in_sequence = 0;
-	rp_ptr->next_region_piece = 0;
+	rp_ptr->next_in_region = 0;
+	rp_ptr->next_in_grid = 0;
 }
 
 
@@ -8211,17 +8211,17 @@ static void compact_region_pieces_aux(int i1, int i2)
 		if (!rp_ptr->region) continue;
 
 		/* Repair "next" pointers */
-		if (rp_ptr->next_in_sequence == i1)
+		if (rp_ptr->next_in_region == i1)
 		{
 			/* Repair */
-			rp_ptr->next_in_sequence = i2;
+			rp_ptr->next_in_region = i2;
 		}
 
 		/* Repair "next" pointers */
-		if (rp_ptr->next_region_piece == i1)
+		if (rp_ptr->next_in_grid == i1)
 		{
 			/* Repair */
-			rp_ptr->next_region_piece = i2;
+			rp_ptr->next_in_grid = i2;
 		}
 	}
 
@@ -8235,10 +8235,10 @@ static void compact_region_pieces_aux(int i1, int i2)
 		if (!r_ptr->type) continue;
 
 		/* Repair "next" pointers */
-		if (r_ptr->first_in_sequence == i1)
+		if (r_ptr->first_piece == i1)
 		{
 			/* Repair */
-			r_ptr->first_in_sequence = i2;
+			r_ptr->first_piece = i2;
 		}
 	}
 
@@ -8363,7 +8363,7 @@ int get_region_piece(int y, int x, int region)
 		rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_region_piece;
+		next_region_piece = rp_ptr->next_in_grid;
 
 		/* Done */
 		if (rp_ptr->region == region)
@@ -8543,7 +8543,7 @@ void region_delete(s16b region)
 {
 	s16b this_region_piece, next_region_piece = 0;
 
-	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		region_piece_type *rp_ptr;
 
@@ -8551,20 +8551,20 @@ void region_delete(s16b region)
 		rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
+		next_region_piece = rp_ptr->next_in_region;
 
 		/* Excise region piece */
 		excise_region_piece(this_region_piece);
 
 		/* Forget next pointer */
-		rp_ptr->next_in_sequence = 0;
+		rp_ptr->next_in_region = 0;
 
 		/* Forget owner */
 		rp_ptr->region = 0;
 	}
 
 	/* Clear first in sequence */
-	region_list[region].first_in_sequence = 0;
+	region_list[region].first_piece = 0;
 }
 
 
@@ -8584,10 +8584,10 @@ void region_piece_insert(int y, int x, s16b d, s16b region)
 	rp_ptr->x = x;
 	rp_ptr->y = y;
 	rp_ptr->region = region;
-	rp_ptr->next_region_piece = cave_region_piece[y][x];
-	rp_ptr->next_in_sequence = region_list[region].first_in_sequence;
+	rp_ptr->next_in_grid = cave_region_piece[y][x];
+	rp_ptr->next_in_region = region_list[region].first_piece;
 	cave_region_piece[y][x] = r;
-	region_list[region].first_in_sequence = r;
+	region_list[region].first_piece = r;
 
 }
 
@@ -8601,7 +8601,7 @@ void region_copy(region_type *r_ptr, const region_type *r_ptr2)
 	(void)COPY(r_ptr, r_ptr2, region_type);
 
 	/* Zero some parameters */
-	r_ptr->first_in_sequence = 0;
+	r_ptr->first_piece = 0;
 }
 
 
@@ -8618,13 +8618,13 @@ int region_copy_pieces(int region, int region2)
 
 	if (!new_region) return (0);
 
-	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		/* Get the region piece */
 		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
+		next_region_piece = rp_ptr->next_in_region;
 
 		/* Copy the region pieces */
 		region_piece_insert(rp_ptr->y, rp_ptr->x, rp_ptr->d, new_region);
@@ -8654,21 +8654,6 @@ void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
 
 
 /*
- * Updates a region based on the shape of the defined projection.
- */
-void region_update(s16b region)
-{
-	region_type *r_ptr = &region_list[region];
-
-	/* Hack - remove previous list of grids */
-	region_delete(region);
-
-	/* Hack - add regions */
-	project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, region, 0);
-}
-
-
-/*
  * Iterate through a region, applying a region_hook function to each grid in the region
  */
 bool region_iterate(int region, bool region_iterator(int y, int x, int d, int region))
@@ -8676,13 +8661,13 @@ bool region_iterate(int region, bool region_iterator(int y, int x, int d, int re
 	s16b this_region_piece, next_region_piece = 0;
 	bool seen = FALSE;
 
-	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		/* Get the region piece */
 		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
+		next_region_piece = rp_ptr->next_in_region;
 
 		/* Iterate on region piece */
 		seen |= region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region);
@@ -8704,13 +8689,13 @@ bool region_iterate_distance(int region, int y, int x, int d, bool gt, bool regi
 	s16b this_region_piece, next_region_piece = 0;
 	bool seen = FALSE;
 
-	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		/* Get the region piece */
 		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
+		next_region_piece = rp_ptr->next_in_region;
 
 		/* Check distance */
 		if ((distance(y, x, rp_ptr->y, rp_ptr->x) > d) == gt) continue;
@@ -8747,6 +8732,38 @@ bool region_refresh_hook(int y, int x, int d, int region)
 void region_refresh(int region)
 {
 	region_iterate(region, region_refresh_hook);
+}
+
+
+/*
+ * Updates a region based on the shape of the defined projection.
+ */
+void region_update(s16b region)
+{
+	region_type *r_ptr = &region_list[region];
+	
+	int type = r_ptr->type;
+	
+	/* Fake clearing the old grids */
+	r_ptr->type = 0;
+	
+	/* Clear the grids */
+	region_refresh(region);
+
+	/* Unfake */
+	r_ptr->type = type;
+	
+	/* Hack - remove previous list of grids */
+	region_delete(region);
+
+	/* Hack - add regions */
+	project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, region, (PROJECT_HIDE));
+	
+	/* Redraw grids */
+	region_refresh(region);
+	
+	/* Update the facing */
+	r_ptr->facing = get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
 }
 
 
@@ -8848,7 +8865,7 @@ bool region_project_hook(int y, int x, int d, int region)
 	}
 
 	/* Apply projection effects to the grids */
-	notice = project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1 | (PROJECT_TEMP));
+	notice = project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1 | (PROJECT_TEMP | PROJECT_HIDE));
 
 	return (notice);
 }
@@ -8907,7 +8924,7 @@ int region_random_piece(int region)
 	 */
 
 	/* Count grids we could effect */
-	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		region_piece_type *rp_ptr;
 
@@ -8915,7 +8932,7 @@ int region_random_piece(int region)
 		rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
+		next_region_piece = rp_ptr->next_in_region;
 
 		/* Count the grids */
 		k++;
@@ -8925,7 +8942,7 @@ int region_random_piece(int region)
 	if (k) k = randint(k);
 
 	/* Get the coordinates of the grid choosen */
-	for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece, k--)
+	for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece, k--)
 	{
 		region_piece_type *rp_ptr;
 
@@ -8933,7 +8950,7 @@ int region_random_piece(int region)
 		rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
+		next_region_piece = rp_ptr->next_in_region;
 
 		/* Get coordinates */
 		if (k == 1)
@@ -8965,7 +8982,7 @@ void region_effect(int region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
 	region_info_type *ri_ptr = &region_info[r_ptr->type];
-	method_type *method_ptr = &method_info[r_ptr->method];
+
 	bool notice = FALSE;
 
 	int y0 = r_ptr->y0;
@@ -8981,13 +8998,13 @@ void region_effect(int region, int y, int x)
 	{
 		s16b this_region_piece, next_region_piece = 0;
 
-		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+		for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
 		{
 			/* Get the region piece */
 			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 
 			/* Get the next object */
-			next_region_piece = rp_ptr->next_in_sequence;
+			next_region_piece = rp_ptr->next_in_region;
 
 			/* Skip if it doesn't match source feature */
 			if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
@@ -9033,17 +9050,9 @@ void region_effect(int region, int y, int x)
 			y1 = y;
 			x1 = x;
 		}
-
-		/* Choose closest monster from source instead */
-		if (r_ptr->flags1 & (RE1_CLOSEST_MON))
-		{
-			/* Try to get a target (nearest or next-nearest monster) */
-			get_closest_monster(randint(2), y0, x0,
-				&y1, &x1, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
-		}
-
+		
 		/* Attack the target */
-		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0);
+		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, (PROJECT_HIDE));
 	}
 
 	/* Method is not defined. Apply effect to all grids */
@@ -9095,7 +9104,7 @@ void trigger_region(int y, int x, bool move)
 		method_type *method_ptr = &method_info[r_ptr->method];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_region_piece;
+		next_region_piece = rp_ptr->next_in_grid;
 
 		/* Paranoia */
 		if (!r_ptr->type) continue;
@@ -9184,26 +9193,80 @@ void trigger_region(int y, int x, bool move)
  *
  * Similar to the above region_iterate, but we are going to move each piece as a part of the
  * function and eliminate pieces if we cannot move them because of underlying terrain.
+ * 
+ * XXX Note that ball projections with MOVE_SOURCE which move will jump all over the place.
+ * This is only because we can't see the source of the ball projection, which itself is moving.
+ * 
+ * We should consider removing the defines which prevent us moving the destination to a grid
+ * that can't be projected from the source. However, this will result in moving projections
+ * frequently 'locking up' and not moving at all (for no visible reason). We should really
+ * do some smarter way of verifying the source and destination that stops jumping while
+ * allowing some movement.
  */
 bool region_iterate_movement(int region, void region_iterator(int y, int x, int d, int region, int *y1, int *x1))
 {
 	region_type *r_ptr = &region_list[region];
-#if 0
 	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
-#endif
+	
 	s16b this_region_piece, next_region_piece = 0;
 	int prev_region_piece = 0;
 	bool seen = FALSE;
+	bool update_facing = FALSE;
 	int ty, tx;
+	
+	/* Move the destination */
+	region_iterator(r_ptr->y1, r_ptr->x1, 0, region, &ty, &tx);
 
-	for (this_region_piece = r_ptr->first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	/* Ensure new destination is projectable from source */
+#if 0
+	if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+	{
+#endif
+		r_ptr->y1 = ty;
+		r_ptr->x1 = tx;
+		update_facing = TRUE;
+#if 0
+	}
+#endif
+	
+	/* Move the source if requested */
+	if (r_ptr->flags1 & (RE1_MOVE_SOURCE))
+	{
+		/* Move the source */
+		region_iterator(r_ptr->y0, r_ptr->x0, 0, region, &ty, &tx);
+#if 0
+		/* Ensure new source is projectable from destination */
+		if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || (generic_los(ty, tx, r_ptr->y1, r_ptr->x1, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+		{
+#endif
+			r_ptr->y0 = ty;
+			r_ptr->x0 = tx;
+			update_facing = TRUE;
+#if 0
+		}
+#endif
+	}
+	
+	/* Update the facing */
+	if (update_facing)
+	{
+		r_ptr->facing = get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
+	}
+	
+	/* We are done? */
+	if ((r_ptr->flags1 & (RE1_MOVE_SOURCE)) && (r_ptr->flags1 & (RE1_PROJECTION)))
+	{
+		return (FALSE);
+	}
+		
+	for (this_region_piece = r_ptr->first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		/* Get the region piece */
 		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 
 		/* Get the next object */
-		next_region_piece = rp_ptr->next_in_sequence;
-#if 0
+		next_region_piece = rp_ptr->next_in_region;
+
 		/* Unable to exist here */
 		if (!cave_passable_bold(rp_ptr->y, rp_ptr->x, method_ptr->flags1))
 		{
@@ -9213,7 +9276,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 			/* No previous */
 			if (prev_region_piece == 0)
 			{
-				region_list[region].first_in_sequence = next_region_piece;
+				region_list[region].first_piece = next_region_piece;
 			}
 			/* Real previous */
 			else
@@ -9224,18 +9287,20 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 				i_ptr = &region_piece_list[prev_region_piece];
 
 				/* Remove from list */
-				i_ptr->next_region_piece = next_region_piece;
+				i_ptr->next_in_region = next_region_piece;
 			}
 
 			/* Remove region piece */
 			rp_ptr->region = 0;
+
+			/* Forget next pointer */
+			rp_ptr->next_in_region = 0;
 
 			/* Relight */
 			lite_spot(rp_ptr->y, rp_ptr->x);
 
 			continue;
 		}
-#endif
 
 		/* Update previous */
 		prev_region_piece = this_region_piece;
@@ -9256,7 +9321,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 			excise_region_piece(this_region_piece);
 			rp_ptr->y = ty;
 			rp_ptr->x = tx;
-			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
+			rp_ptr->next_in_grid = cave_region_piece[ty][tx];
 			cave_region_piece[ty][tx] = this_region_piece;
 
 			/* Redraw old grid */
@@ -9266,9 +9331,9 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 			lite_spot(ty, tx);
 		}
 	}
-
+	
 	/* Kill region if no grids are left */
-	if (!r_ptr->first_in_sequence) r_ptr->age = AGE_LIFELESS;
+	if (!r_ptr->first_piece) r_ptr->age = AGE_LIFELESS;
 
 	return (seen);
 }
@@ -9286,6 +9351,10 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 	int grids = 0;
 
 	(void)d;
+
+	/* No movement by default */
+	*ty = y;
+	*tx = x;
 
 	/* If random, we only move vortexes half the time */
 	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) return;
@@ -9410,8 +9479,9 @@ void region_move_vector_hook(int y, int x, int d, int region, int *ty, int *tx)
 	u16b path_g[99];
 	int path_n;
 
-	(void)y;
-	(void)x;
+	/* No movement by default */
+	*ty = y;
+	*tx = x;
 
 	/* Speed of travel */
 	speed = GRID_X(d);
@@ -9463,9 +9533,29 @@ void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
 		/* Can drift into new location? */
 		if (!cave_passable_bold(*ty, *tx, method_ptr->flags1))
 		{
-			*ty = y;
-			*tx = x;
+			int i;
+			
+			/* Is at least one adjacent grid passable? */
+			for (i = 0; i < 8; i++)
+			{
+				int yy = y + ddy_ddd[dir];
+				int xx = x + ddx_ddd[dir];
+				
+				if (cave_passable_bold(yy, xx, method_ptr->flags1)) break;
+			}
+			
+			/* If at least one grid passable, abort */
+			if (i < 8)
+			{
+				*ty = y;
+				*tx = x;
+			}
 		}
+	}
+	else
+	{
+		*ty = y;
+		*tx = x;
 	}
 }
 
@@ -9498,15 +9588,14 @@ void process_region(int region)
 	/* Accelerating */
 	if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (r_ptr->age < r_ptr->lifespan / 2)))
 	{
-		r_ptr->countdown /= 2;
-		if (r_ptr->countdown < 1) r_ptr->countdown = 1;
+		r_ptr->delay /= 2;
+		if (r_ptr->delay < 1) r_ptr->delay = 1;
 	}
 
 	/* Decelerating */
 	if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (r_ptr->age > r_ptr->lifespan / 2)))
 	{
-		r_ptr->countdown /= 2;
-		if (r_ptr->countdown < 1) r_ptr->countdown = 1;
+		r_ptr->delay *= 2;
 	}
 
 	/* Reset count */
@@ -9538,13 +9627,13 @@ void process_region(int region)
 			return;
 		}
 	}
-
+	
 	/* Rotate the region */
 	if (r_ptr->flags1 & (RE1_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
 		int angle = method_ptr->arc ? method_ptr->arc : 6;
-		int facing = r_ptr->facing - (r_ptr->flags1 & (RE1_RANDOM)) ? randint(angle) : angle / 2;
+		int facing = r_ptr->facing - angle / 2;
 		int dir;
 		int y, x;
 
@@ -9553,8 +9642,8 @@ void process_region(int region)
 		dir = get_angle_to_dir(facing);
 
 		/* Change direction if we can't project at least 1 grid after rotating */
-		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddy_ddd[old_dir], method_ptr->flags1)) &&
-				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddy_ddd[dir], method_ptr->flags1)))
+		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddx_ddd[old_dir], method_ptr->flags1)) &&
+				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddx_ddd[dir], method_ptr->flags1)))
 		{
 			facing += angle * 2;
 			while (facing >= 180) facing -= 180;
@@ -9578,7 +9667,7 @@ void process_region(int region)
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
 		int angle = method_ptr->arc ? method_ptr->arc : 6;
-		int facing = r_ptr->facing + (r_ptr->flags1 & (RE1_RANDOM)) ? randint(angle) : angle / 2;
+		int facing = r_ptr->facing + angle / 2;
 		int dir;
 		int y, x;
 
@@ -9587,8 +9676,8 @@ void process_region(int region)
 		dir = get_angle_to_dir(facing);
 
 		/* Change direction if we can't project at least 1 grid after rotating */
-		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddy_ddd[old_dir], method_ptr->flags1)) &&
-				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddy_ddd[dir], method_ptr->flags1)))
+		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddx_ddd[old_dir], method_ptr->flags1)) &&
+				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddx_ddd[dir], method_ptr->flags1)))
 		{
 			facing -= angle * 2;
 			while (facing < 0) facing += 180;
@@ -9612,7 +9701,7 @@ void process_region(int region)
 	{
 		region_update(region);
 	}
-
+	
 	/* Moving a wall */
 	if (r_ptr->flags1 & (RE1_WALL))
 	{

@@ -2825,7 +2825,7 @@
 #define RE1_SCALAR_VECTOR		0x00000400	/* Region scalar encodes direction and speed */
 #define RE1_SCALAR_DISTANCE		0x00000800	/* Region scalar encodes distance */
 
-#define RE1_CLOSEST_MON			0x00001000	/* Use closest monster as a target */
+#define RE1_MOVE_SOURCE			0x00001000	/* If moving region, move the source as well */
 #define RE1_PLATFORM			0x00002000	/* As region moves, it pushes stuff around */
 #define RE1_HIT_TRAP			0x00004000	/* Handle this region as a trap */
 #define RE1_RANDOM				0x00008000	/* Target a random grid in the region */
