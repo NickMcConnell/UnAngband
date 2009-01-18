@@ -77,26 +77,26 @@ bool do_cmd_item(int command)
 	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BLIND)) && (p_ptr->blind))
 	{
 		msg_print("You can't see anything.");
-		return;
+		return (FALSE);
 	}
 
 	if ((cmd_item_list[command].conditions & (CONDITION_LITE)) && (no_lite()))
 	{
 		msg_print("You have no light to read by.");
-		return;
+		return (FALSE);
 	}
 
 	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BERSERK)) && (p_ptr->shero))
 	{
 		msg_print("You are too enraged!");
-		return;
+		return (FALSE);
 	}
 
 	/* Amnesia */
 	if ((cmd_item_list[command].conditions & (CONDITION_NOT_FORGET)) && (p_ptr->amnesia))
 	{
 		msg_print("You have forgotten how!");
-		return;
+		return (FALSE);
 	}
 
 	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
@@ -125,7 +125,7 @@ bool do_cmd_item(int command)
 	item_tester_tval = cmd_item_list[command].item_tester_tval;
 
 	/* Get an item */
-	if (!get_item(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, flags & ~(USE_BAGS))) return;
+	if (!get_item(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, flags & ~(USE_BAGS))) return (FALSE);
 
 	/* Get the item from a bag */
 	if (flags & (USE_BAGC))
@@ -150,13 +150,13 @@ bool do_cmd_item(int command)
 			/* Get item from bag */
 			if (!get_item_from_bag(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, o_ptr))
 			{
-				if ((flags & (USE_BAGS)) == 0) return;
+				if ((flags & (USE_BAGS)) == 0) return (FALSE);
 			}
 		}
 	}
 
 	/* Auxiliary function */
-	result = !(cmd_item_list[command].player_command)(item);
+	result = (cmd_item_list[command].player_command)(item);
 
 	/* Return whether we cancelled */
 	return (result);
