@@ -9182,7 +9182,9 @@ void trigger_region(int y, int x, bool move)
 bool region_iterate_movement(int region, void region_iterator(int y, int x, int d, int region, int *y1, int *x1))
 {
 	region_type *r_ptr = &region_list[region];
+#if 0
 	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
+#endif
 	s16b this_region_piece, next_region_piece = 0;
 	int prev_region_piece = 0;
 	bool seen = FALSE;
@@ -9192,7 +9194,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 	{
 		/* Get the region piece */
 		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
-		
+
 		/* Get the next object */
 		next_region_piece = rp_ptr->next_in_sequence;
 #if 0
@@ -9201,7 +9203,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 		{
 			/* Excise region piece */
 			excise_region_piece(this_region_piece);
-			
+
 			/* No previous */
 			if (prev_region_piece == 0)
 			{
@@ -9216,49 +9218,49 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 				i_ptr = &region_piece_list[prev_region_piece];
 
 				/* Remove from list */
-				i_ptr->next_region_piece = next_region_piece;	
+				i_ptr->next_region_piece = next_region_piece;
 			}
-			
+
 			/* Remove region piece */
 			rp_ptr->region = 0;
-			
+
 			/* Relight */
 			lite_spot(rp_ptr->y, rp_ptr->x);
-			
+
 			continue;
 		}
 #endif
-		
+
 		/* Update previous */
 		prev_region_piece = this_region_piece;
 
 		/* Iterate on region piece */
 		region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region, &ty, &tx);
-		
+
 		/* Move the piece */
 		if ((ty != rp_ptr->y) || (tx != rp_ptr->x))
 		{
 			int y = rp_ptr->y;
 			int x = rp_ptr->x;
-			
+
 			/* Can't move out of bounds */
-			if (!in_bounds(ty, tx)) continue;		
-			
+			if (!in_bounds(ty, tx)) continue;
+
 			/* Move the vortex */
 			excise_region_piece(this_region_piece);
 			rp_ptr->y = ty;
 			rp_ptr->x = tx;
 			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
 			cave_region_piece[ty][tx] = this_region_piece;
-			
+
 			/* Redraw old grid */
 			lite_spot(y, x);
-			
+
 			/* Redraw new grid */
 			lite_spot(ty, tx);
 		}
 	}
-	
+
 	/* Kill region if no grids are left */
 	if (!r_ptr->first_in_sequence) r_ptr->age = AGE_LIFELESS;
 
@@ -9276,7 +9278,9 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 	int r = rand_int(100);
 	int i, dir;
 	int grids = 0;
-	
+
+	(void)d;
+
 	/* If random, we only move vortexes half the time */
 	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) return;
 
@@ -9384,7 +9388,7 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 		*ty = y;
 		*tx = x;
 	}
-	
+
 	return;
 }
 
@@ -9396,9 +9400,12 @@ void region_move_vector_hook(int y, int x, int d, int region, int *ty, int *tx)
 {
 	region_type *r_ptr = &region_list[region];
 	int angle, speed;
-	
+
 	u16b path_g[99];
 	int path_n;
+
+	(void)y;
+	(void)x;
 
 	/* Speed of travel */
 	speed = GRID_X(d);
@@ -9439,6 +9446,8 @@ void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
 {
 	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
 	int dir = rand_int(12);
+
+	(void)d;
 
 	if (dir < 8)
 	{
@@ -9513,13 +9522,13 @@ void process_region(int region)
 		{
 			/* Effect is "dead" - mark for later */
 			r_ptr->type = 0;
-			
+
 			/* Redraw region */
 			region_refresh(region);
 
 			/* Clear the grids associated with the region */
 			region_delete(region);
-			
+
 			return;
 		}
 	}

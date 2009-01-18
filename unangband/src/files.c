@@ -270,7 +270,7 @@ s16b tokenize(char *buf, s16b num, char **tokens)
  *
  * Specify the attr/char values for "regions" by region index.
  *   E:<num>:<a>/<c>
- * 
+ *
  * Specify the attr/char values for "special" things.
  *   S:<num>:<a>/<c>
  *
@@ -428,7 +428,7 @@ errr process_pref_file_command(char *buf)
 			n1 = strtol(zz[1], NULL, 0);
 			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= z_info->region_info_max)) return (1);
-			r_ptr = &r_info[i];
+			r_ptr = &region_info[i];
 			if (n1) r_ptr->x_attr = n1;
 			if (n2) r_ptr->x_char = n2;
 			return (0);
