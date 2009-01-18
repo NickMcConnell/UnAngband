@@ -8736,6 +8736,15 @@ bool region_refresh_hook(int y, int x, int d, int region)
 
 
 /*
+ * Redraw the region
+ */
+void region_refresh(int region)
+{
+	region_iterate(region, region_refresh_hook);
+}
+
+
+/*
  * This routine writes the current feat under the grid to the scalar
  * for that region. This is used to overlay temporary terrain onto a region,
  * then restore it later using region_restore_hook.
@@ -9125,7 +9134,7 @@ void trigger_region(int y, int x, bool move)
 				dam = rp_ptr->d;
 			}
 			/* Compute the damage based on distance */
-			else if (r_ptr->flags1 & (RE1_SCALAR_DISTANCE))
+			else if ((rp_ptr->d) && (r_ptr->flags1 & (RE1_SCALAR_DISTANCE)))
 			{
 				dam = r_ptr->damage / rp_ptr->d;
 			}
@@ -9154,14 +9163,298 @@ void trigger_region(int y, int x, bool move)
 }
 
 
-
-
 /* Some special 'age' values */
 #define AGE_OLD			10000
 #define AGE_ANCIENT		10001
 #define AGE_LIFELESS	10002
 #define AGE_EXPIRED		10003
 #define AGE_INFINITY	10004
+
+
+
+
+/*
+ * Iterate through a region, applying a region_hook function to each grid in the region
+ *
+ * Similar to the above region_iterate, but we are going to move each piece as a part of the
+ * function and eliminate pieces if we cannot move them because of underlying terrain.
+ */
+bool region_iterate_movement(int region, void region_iterator(int y, int x, int d, int region, int *y1, int *x1))
+{
+	region_type *r_ptr = &region_list[region];
+	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
+	s16b this_region_piece, next_region_piece = 0;
+	int prev_region_piece = 0;
+	bool seen = FALSE;
+	int ty, tx;
+
+	for (this_region_piece = r_ptr->first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
+	{
+		/* Get the region piece */
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+		
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_sequence;
+#if 0
+		/* Unable to exist here */
+		if (!cave_passable_bold(rp_ptr->y, rp_ptr->x, method_ptr->flags1))
+		{
+			/* Excise region piece */
+			excise_region_piece(this_region_piece);
+			
+			/* No previous */
+			if (prev_region_piece == 0)
+			{
+				region_list[region].first_in_sequence = next_region_piece;
+			}
+			/* Real previous */
+			else
+			{
+				region_piece_type *i_ptr;
+
+				/* Previous object */
+				i_ptr = &region_piece_list[prev_region_piece];
+
+				/* Remove from list */
+				i_ptr->next_region_piece = next_region_piece;	
+			}
+			
+			/* Remove region piece */
+			rp_ptr->region = 0;
+			
+			/* Relight */
+			lite_spot(rp_ptr->y, rp_ptr->x);
+			
+			continue;
+		}
+#endif
+		
+		/* Update previous */
+		prev_region_piece = this_region_piece;
+
+		/* Iterate on region piece */
+		region_iterator(rp_ptr->y, rp_ptr->x, rp_ptr->d, region, &ty, &tx);
+		
+		/* Move the piece */
+		if ((ty != rp_ptr->y) || (tx != rp_ptr->x))
+		{
+			int y = rp_ptr->y;
+			int x = rp_ptr->x;
+			
+			/* Can't move out of bounds */
+			if (!in_bounds(ty, tx)) continue;		
+			
+			/* Move the vortex */
+			excise_region_piece(this_region_piece);
+			rp_ptr->y = ty;
+			rp_ptr->x = tx;
+			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
+			cave_region_piece[ty][tx] = this_region_piece;
+			
+			/* Redraw old grid */
+			lite_spot(y, x);
+			
+			/* Redraw new grid */
+			lite_spot(ty, tx);
+		}
+	}
+	
+	/* Kill region if no grids are left */
+	if (!r_ptr->first_in_sequence) r_ptr->age = AGE_LIFELESS;
+
+	return (seen);
+}
+
+
+/*
+ * Movement for seekers
+ */
+void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
+{
+	region_type *r_ptr = &region_list[region];
+	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
+	int r = rand_int(100);
+	int i, dir;
+	int grids = 0;
+	
+	/* If random, we only move vortexes half the time */
+	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) return;
+
+	/* Check around (and under) the vortex */
+	for (dir = 0; dir < 9; dir++)
+	{
+		/* Extract adjacent (legal) location */
+		int yy = y + ddy_ddd[dir];
+		int xx = x + ddx_ddd[dir];
+
+		/* Count passable grids */
+		if (cave_passable_bold(yy, xx, method_ptr->flags1)) grids++;
+	}
+
+	/*
+	 * Vortexes only seek in open spaces.  This makes them useful in
+	 * rooms and not too powerful in corridors.
+	 */
+	if      (grids >= 5) i = 85;
+	else if (grids == 4) i = 50;
+	else                 i = 0;
+
+	/* Seek out monsters */
+	if (r < i)
+	{
+		/* Try to get a target (nearest or next-nearest monster) */
+		get_closest_monster(randint(2), y, x,
+			ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+	}
+
+	/* No valid target, or monster is in an impassable grid, or moving randomly some of
+	 * the time */
+	if (((*ty == 0) && (*tx == 0)) || (!cave_passable_bold(*ty, *tx, method_ptr->flags1)) ||
+			((r_ptr->flags1 & (RE1_RANDOM)) && ((r % 3) != 0)))
+	{
+		/* Move randomly */
+		dir = randint(9);
+	}
+
+	/* Valid target in passable terrain */
+	else
+	{
+		/* Get change in position from current location to target */
+		int dy = y - *ty;
+		int dx = x - *tx;
+
+		/* Calculate vertical and horizontal distances */
+		int ay = ABS(dy);
+		int ax = ABS(dx);
+
+		/* We mostly want to move vertically */
+		if (ay > (ax * 2))
+		{
+			/* Choose between directions '8' and '2' */
+			if (dy > 0) dir = 8;
+			else        dir = 2;
+		}
+
+		/* We mostly want to move horizontally */
+		else if (ax > (ay * 2))
+		{
+			/* Choose between directions '4' and '6' */
+			if (dx > 0) dir = 4;
+			else        dir = 6;
+		}
+
+		/* We want to move up and sideways */
+		else if (dy > 0)
+		{
+			/* Choose between directions '7' and '9' */
+			if (dx > 0) dir = 7;
+			else        dir = 9;
+		}
+
+		/* We want to move down and sideways */
+		else
+		{
+			/* Choose between directions '1' and '3' */
+			if (dx > 0) dir = 1;
+			else        dir = 3;
+		}
+	}
+
+	/* Convert dir into a grid */
+	for (i = 0; i < 100; i++)
+	{
+		/* Extract adjacent (legal) location */
+		*ty = y + ddy[dir];
+		*tx = x + ddx[dir];
+
+		/* Require passable grids */
+		if (cave_passable_bold(*ty, *tx, method_ptr->flags1))
+		{
+			/* Try not to stay in place */
+			if ((*ty != y) || (*tx != x)) break;
+		}
+
+		/* Move randomly */
+		dir = randint(9);
+	}
+
+	/* Note failure */
+	if (i == 100)
+	{
+		*ty = y;
+		*tx = x;
+	}
+	
+	return;
+}
+
+
+/*
+ * Function to move region pieces as if encoding a vector
+ */
+void region_move_vector_hook(int y, int x, int d, int region, int *ty, int *tx)
+{
+	region_type *r_ptr = &region_list[region];
+	int angle, speed;
+	
+	u16b path_g[99];
+	int path_n;
+
+	/* Speed of travel */
+	speed = GRID_X(d);
+
+	/* Does this fragment move at this age? */
+	if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) return;
+
+	/* If random, we only move vertexes half the time */
+	if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 50)) return;
+
+	/* Angle of travel */
+	angle = GRID_Y(d);
+
+	/* Get the target grid for this angle */
+	get_grid_using_angle(angle, r_ptr->y0, r_ptr->x0, ty, tx);
+
+	/* If we have a legal target, */
+	if ((*ty != r_ptr->y0) || (*tx != r_ptr->x0))
+	{
+		/* Calculate the projection path */
+		path_n = project_path(path_g, 99, r_ptr->y0, r_ptr->x0,
+				ty, tx, PROJECT_PASS | PROJECT_THRU);
+
+		/* Get the location */
+		if (path_n >= (r_ptr->age * speed / 100))
+		{
+			*ty = GRID_Y(path_g[(r_ptr->age * speed / 100)]);
+			*tx = GRID_X(path_g[(r_ptr->age * speed / 100)]);
+		}
+	}
+}
+
+
+/*
+ * Function to spread regions
+ */
+void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
+{
+	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
+	int dir = rand_int(12);
+
+	if (dir < 8)
+	{
+		*ty = y + ddy_ddd[dir];
+		*tx = x + ddx_ddd[dir];
+
+		/* Can drift into new location? */
+		if (!cave_passable_bold(*ty, *tx, method_ptr->flags1))
+		{
+			*ty = y;
+			*tx = x;
+		}
+	}
+}
+
+
 
 /*
  * Process region.
@@ -9220,6 +9513,9 @@ void process_region(int region)
 		{
 			/* Effect is "dead" - mark for later */
 			r_ptr->type = 0;
+			
+			/* Redraw region */
+			region_refresh(region);
 
 			return;
 		}
@@ -9406,241 +9702,22 @@ void process_region(int region)
 		}
 	}
 
-	/* Seeking a monster */
+	/* Apply seeker effect */
 	if (r_ptr->flags1 & (RE1_SEEKER))
 	{
-		int this_region_piece, next_region_piece = 0;
-
-		/*
-		 * Note that each region piece seeks a monster independently.
-		 * This can result in region pieces overlapping...
-		 */
-		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
-		{
-			region_piece_type *rp_ptr;
-			int dir, grids = 0;
-			int ty = 0, tx = 0;
-			int i;
-			int r = rand_int(100);
-
-			/* Get the object */
-			rp_ptr = &region_piece_list[this_region_piece];
-
-			/* Get the next object */
-			next_region_piece = rp_ptr->next_in_sequence;
-
-			/* If random, we only move vortexes half the time */
-			if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) continue;
-
-			/* Check around (and under) the vortex */
-			for (dir = 0; dir < 9; dir++)
-			{
-				/* Extract adjacent (legal) location */
-				int y = rp_ptr->y + ddy_ddd[dir];
-				int x = rp_ptr->x + ddx_ddd[dir];
-
-				/* Count passable grids */
-				if (cave_passable_bold(y, x, method_ptr->flags1)) grids++;
-			}
-
-			/*
-			 * Vortexes only seek in open spaces.  This makes them useful in
-			 * rooms and not too powerful in corridors.
-			 */
-			if      (grids >= 5) i = 85;
-			else if (grids == 4) i = 50;
-			else                 i = 0;
-
-			/* Seek out monsters */
-			if (r < i)
-			{
-				/* Try to get a target (nearest or next-nearest monster) */
-				get_closest_monster(randint(2), rp_ptr->y, rp_ptr->x,
-					&ty, &tx, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
-			}
-
-			/* No valid target, or monster is in an impassable grid, or moving randomly some of
-			 * the time */
-			if (((ty == 0) && (tx == 0)) || (!cave_passable_bold(ty, tx, method_ptr->flags1)) ||
-					((r_ptr->flags1 & (RE1_RANDOM)) && ((r % 3) != 0)))
-			{
-				/* Move randomly */
-				dir = randint(9);
-			}
-
-			/* Valid target in passable terrain */
-			else
-			{
-				/* Get change in position from current location to target */
-				int dy = rp_ptr->y - ty;
-				int dx = rp_ptr->x - tx;
-
-				/* Calculate vertical and horizontal distances */
-				int ay = ABS(dy);
-				int ax = ABS(dx);
-
-				/* We mostly want to move vertically */
-				if (ay > (ax * 2))
-				{
-					/* Choose between directions '8' and '2' */
-					if (dy > 0) dir = 8;
-					else        dir = 2;
-				}
-
-				/* We mostly want to move horizontally */
-				else if (ax > (ay * 2))
-				{
-					/* Choose between directions '4' and '6' */
-					if (dx > 0) dir = 4;
-					else        dir = 6;
-				}
-
-				/* We want to move up and sideways */
-				else if (dy > 0)
-				{
-					/* Choose between directions '7' and '9' */
-					if (dx > 0) dir = 7;
-					else        dir = 9;
-				}
-
-				/* We want to move down and sideways */
-				else
-				{
-					/* Choose between directions '1' and '3' */
-					if (dx > 0) dir = 1;
-					else        dir = 3;
-				}
-			}
-
-			/* Convert dir into a grid */
-			for (i = 0; i < 100; i++)
-			{
-				/* Extract adjacent (legal) location */
-				ty = rp_ptr->y + ddy[dir];
-				tx = rp_ptr->x + ddx[dir];
-
-				/* Require passable grids */
-				if (cave_passable_bold(ty, tx, method_ptr->flags1))
-				{
-					/* Try not to stay in place */
-					if ((ty != rp_ptr->y) || (tx != rp_ptr->x)) break;
-				}
-
-				/* Move randomly */
-				dir = randint(9);
-			}
-
-			/* Note failure */
-			if (i == 100)
-			{
-				ty = rp_ptr->y;
-				tx = rp_ptr->x;
-			}
-
-			/* Move the vortex */
-			excise_region_piece(this_region_piece);
-			rp_ptr->y = ty;
-			rp_ptr->x = tx;
-			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
-			cave_region_piece[ty][tx] = this_region_piece;
-		}
+		region_iterate_movement(region, region_move_seeker_hook);
 	}
 
-	/* Vector defined by the region encoding */
+	/* Apply scalar vector effect */
 	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
 	{
-		int this_region_piece, next_region_piece = 0;
-
-		/*
-		 * This can result in region pieces overlapping...
-		 */
-		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
-		{
-			region_piece_type *rp_ptr;
-			int ty = 0, tx = 0;
-			int angle, speed;
-
-			/* Get the object */
-			rp_ptr = &region_piece_list[this_region_piece];
-
-			/* Get the next object */
-			next_region_piece = rp_ptr->next_in_sequence;
-
-			/* Speed of travel */
-			speed = GRID_X(rp_ptr->d);
-
-			/* Does this fragment move at this age? */
-			if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) continue;
-
-			/* If random, we only move vertexes half the time */
-			if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 50)) continue;
-
-			/* Angle of travel */
-			angle = GRID_Y(rp_ptr->d);
-
-			/* Get the target grid for this angle */
-			get_grid_using_angle(angle, r_ptr->y0, r_ptr->x0, &ty, &tx);
-
-			/* If we have a legal target, */
-			if ((ty != r_ptr->y0) || (tx != r_ptr->x0))
-			{
-				/* Calculate the projection path */
-				path_n = project_path(path_g, 99, r_ptr->y0, r_ptr->x0,
-						&ty, &tx, PROJECT_PASS | PROJECT_THRU);
-
-				/* Get the location */
-				if (path_n >= r_ptr->age)
-				{
-					ty = GRID_Y(path_g[r_ptr->age]);
-					tx = GRID_X(path_g[r_ptr->age]);
-				}
-			}
-
-			/* Move the vertex */
-			excise_region_piece(this_region_piece);
-			rp_ptr->y = ty;
-			rp_ptr->x = tx;
-			rp_ptr->next_region_piece = cave_region_piece[ty][tx];
-			cave_region_piece[ty][tx] = this_region_piece;
-		}
+		region_iterate_movement(region, region_move_vector_hook);
 	}
 
-	/* Vector defined by the region encoding */
+	/* Apply spreading effect */
 	if (r_ptr->flags1 & (RE1_SPREAD))
 	{
-		int this_region_piece, next_region_piece = 0;
-
-		/*
-		 * This can result in region pieces overlapping...
-		 */
-		for (this_region_piece = region_list[region].first_in_sequence; this_region_piece; this_region_piece = next_region_piece)
-		{
-			region_piece_type *rp_ptr;
-			int dir = rand_int(12);
-
-			/* Get the object */
-			rp_ptr = &region_piece_list[this_region_piece];
-
-			/* Get the next object */
-			next_region_piece = rp_ptr->next_in_sequence;
-
-			if (dir < 8)
-			{
-				int ty = rp_ptr->y + ddy_ddd[dir];
-				int tx = rp_ptr->x + ddx_ddd[dir];
-
-				/* Can drift into new location? */
-				if (cave_passable_bold(ty, tx, method_ptr->flags1))
-				{
-					/* Move the vertex */
-					excise_region_piece(this_region_piece);
-					rp_ptr->y = ty;
-					rp_ptr->x = tx;
-					rp_ptr->next_region_piece = cave_region_piece[ty][tx];
-					cave_region_piece[ty][tx] = this_region_piece;
-				}
-			}
-		}
+		region_iterate_movement(region, region_move_spread_hook);
 	}
 
 	/* Apply effect every turn, unless already applied earlier in the turn */
