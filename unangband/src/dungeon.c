@@ -4205,7 +4205,8 @@ void play_game(bool new_game)
 		/* Erase the old cave */
 		wipe_o_list();
 		wipe_m_list();
-
+		wipe_region_piece_list();
+		wipe_region_list();
 
 		/* XXX XXX XXX */
 		msg_print(NULL);

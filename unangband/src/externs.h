@@ -982,6 +982,8 @@ extern bool process_spell_prepare(int spell, int level, bool *cancel, bool forre
 extern bool process_spell_types(int who, int spell, int level, bool *cancel);
 extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
 extern int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal);
+extern void wipe_region_piece_list(void);
+extern void wipe_region_list(void);
 extern void region_piece_wipe(region_piece_type *rp_ptr);
 extern s16b region_piece_pop(void);
 extern void region_piece_copy(region_piece_type *rp_ptr, const region_piece_type *rp_ptr2);

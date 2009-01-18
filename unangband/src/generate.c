@@ -11969,6 +11969,10 @@ void generate_cave(void)
 
 		/* Wipe the monsters */
 		wipe_m_list();
+
+		/* Wipe the regions */
+		wipe_region_piece_list();
+		wipe_region_list();
 	}
 
 

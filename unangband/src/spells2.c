@@ -8558,7 +8558,13 @@ void region_delete(s16b region)
 
 		/* Forget next pointer */
 		rp_ptr->next_in_sequence = 0;
+
+		/* Forget owner */
+		rp_ptr->region = 0;
 	}
+
+	/* Clear first in sequence */
+	region_list[region].first_in_sequence = 0;
 }
 
 
@@ -9769,7 +9775,7 @@ void process_regions(void)
 	int i;
 
 	/* Process all regions */
-	for (i = 0; i < z_info->region_max; i++)
+	for (i = 0; i < region_max; i++)
 	{
 		/* Get this effect */
 		region_type *r_ptr = &region_list[i];
@@ -9779,6 +9785,19 @@ void process_regions(void)
 
 		/* Process effect */
 		process_region(i);
+	}
+
+	/* Warn if we get orphaned pieces */
+	for (i = 0; i < z_info->region_piece_max; i++)
+	{
+		int region = region_piece_list[i].region;
+		/* Get this effect */
+		region_type *r_ptr = &region_list[region];
+
+		if (!region) continue;
+
+		/* Skip empty effects */
+		if (!r_ptr->type) msg_format("Piece %d is orphaned from %d.", i, region);
 	}
 }
 
