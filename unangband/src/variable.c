@@ -674,8 +674,8 @@ s16b (*cave_region_piece)[DUNGEON_WID];
 region_piece_type *region_piece_list;
 
 
-int region_piece_max;
-int region_piece_cnt;
+int region_piece_max = 1;
+int region_piece_cnt = 0;
 
 
 /*
@@ -684,8 +684,8 @@ int region_piece_cnt;
 region_type *region_list;
 
 
-int region_max;
-int region_cnt;
+int region_max = 1;
+int region_cnt = 0;
 
 
 

@@ -356,6 +356,16 @@ void reset_visuals(bool unused)
 	}
 
 
+	/* Extract default attr/char code for regions */
+	for (i = 0; i < z_info->region_info_max; i++)
+	{
+		region_info_type *r_ptr = &region_info[i];
+
+		/* Default attr/char */
+		r_ptr->x_attr = r_ptr->d_attr;
+		r_ptr->x_char = r_ptr->d_char;
+	}
+
 	/* Extract attr/chars for inventory objects (by tval) */
 	for (i = 0; i < 128; i++)
 	{

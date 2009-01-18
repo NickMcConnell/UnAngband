@@ -8822,7 +8822,7 @@ bool region_project_hook(int y, int x, int d, int region)
 		dam = d;
 	}
 	/* Compute the damage based on distance */
-	else if (r_ptr->flags1 & (RE1_SCALAR_DISTANCE))
+	else if ((d) && (r_ptr->flags1 & (RE1_SCALAR_DISTANCE)))
 	{
 		dam = r_ptr->damage / d;
 	}
@@ -8861,7 +8861,7 @@ bool region_project_t_hook(int y, int x, int d, int region)
 		dam = d;
 	}
 	/* Compute the damage based on distance */
-	else if (r_ptr->flags1 & (RE1_SCALAR_DISTANCE))
+	else if ((d) && (r_ptr->flags1 & (RE1_SCALAR_DISTANCE)))
 	{
 		dam = r_ptr->damage / d;
 	}

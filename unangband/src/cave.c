@@ -1319,6 +1319,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 			/* Get the next region */
 			next_region_piece = rp_ptr->next_region_piece;
+			
+			/* Skip dead regions */
+			if (!r_ptr->type) continue;
 
 			/* Displaying region */
 			if (((r_ptr->flags1 & (RE1_DISPLAY)) != 0) &&
