@@ -1280,7 +1280,7 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char b
 		d2 = 0;
 	}
 	/* Damage uses dice roll */
-	else
+	else if (blow_ptr->levels)
 	{
 		/* Add in level dependent damage */
 		if (blow_ptr->l_side == blow_ptr->d_side)
