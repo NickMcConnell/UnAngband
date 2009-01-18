@@ -9517,6 +9517,9 @@ void process_region(int region)
 			/* Redraw region */
 			region_refresh(region);
 
+			/* Clear the grids associated with the region */
+			region_delete(region);
+			
 			return;
 		}
 	}
