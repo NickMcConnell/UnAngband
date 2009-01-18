@@ -6087,6 +6087,9 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 					damage += blow_ptr->l_plus * level / blow_ptr->levels;
 				}
 			}
+
+			/* Add boosted damage */
+			damage += p_ptr->boost_spell_power;
 		}
 
 		/* Special case for eaten spells */
@@ -6126,7 +6129,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		}
 
 		/* Initialise the region */
-		if (s_ptr->type == SPELL_REGION)
+		if ((s_ptr->type == SPELL_REGION) || (s_ptr->type == SPELL_SET_TRAP))
 		{
 			region_type *r_ptr;
 
@@ -6135,6 +6138,16 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 
 			/* Get the region */
 			r_ptr = &region_list[region];
+
+			/* Hack -- we override the life span if requested */
+			if ((s_ptr->l_dice) && (s_ptr->l_side))
+			{
+				r_ptr->lifespan = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+			}
+			else if (s_ptr->l_plus)
+			{
+				r_ptr->lifespan = s_ptr->l_plus;
+			}
 
 			/* Hack -- we delay subsequent regions from the same spell casting until the first has expired */
 			r_ptr->delay = delay;
@@ -7577,6 +7590,58 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 
 /*
+ * Hook to determine if a trap is useful.
+ */
+bool item_tester_hook_magic_trap(const object_type *o_ptr)
+{
+	/* Check based on tval */
+	switch(o_ptr->tval)
+	{
+		/* Undead can't eat normal food */
+		case TV_FOOD:
+			/* Normal food doesn't do much in a trap */
+			if (o_ptr->sval >= SV_FOOD_MIN_FOOD) return (FALSE);
+
+		/* All these are good */
+		case TV_HAFTED:
+		case TV_SWORD:
+		case TV_POLEARM:
+		case TV_WAND:
+		case TV_STAFF:
+		case TV_ROD:
+		case TV_DRAG_ARMOR:
+		case TV_POTION:
+		case TV_SCROLL:
+		case TV_FLASK:
+		case TV_LITE:
+		case TV_SPIKE:
+			return (TRUE);
+	}
+
+	/* Assume not edible */
+	return (FALSE);
+}
+
+
+/* Hack to allow us to record the item used for later */
+int set_magic_trap_item;
+
+/*
+ * The player sets a magic trap
+ */
+bool player_set_magic_trap(int item)
+{
+	/* Hack - record the item selected */
+	set_magic_trap_item = item;
+
+	/* Destroy item later */
+	return (TRUE);
+}
+
+
+
+
+/*
  * Some spell actions have to occur prior to processing the spell
  * proper.
  *
@@ -7585,13 +7650,20 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
  *
  * We also concentrate spells here, in order to hackily set
  * the spell power for later processing in spell blows.
+ *
+ * When browsing spells, we should also call this function to
+ * correctly initialize the spell for the current circumstances.
+ * When doing this forreal is set to FALSE, and interact is set to
+ * TRUE if the player is examining the individual spell, and FALSE
+ * if just browsing.
  */
-void process_spell_prepare(int spell, int level)
+bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, bool interact)
 {
 	spell_type *s_ptr = &s_info[spell];
+	bool obvious = FALSE;
 
-	/* Many of these boost spell damage / power */
-	int power = 0;
+	/* Clear boost */
+	p_ptr->boost_spell_power = 0;
 
 	switch (s_info[spell].type)
 	{
@@ -7600,35 +7672,42 @@ void process_spell_prepare(int spell, int level)
 		{
 			bool return_time = FALSE;
 
-			/* Set the return location if required */
-			if (!(p_ptr->return_y) && !(p_ptr->return_x))
+			/* This affects the game world */
+			if (forreal)
 			{
-				/* Set return point */
-				p_ptr->return_y = p_ptr->py;
-				p_ptr->return_x = p_ptr->px;
-
-				/* Set the return time */
-				if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;
-			}
-			/* Set the return time */
-			else if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN)
-			{
-				/* Set the return time */
-				return_time = TRUE;
-			}
-
-			/* Set return time */
-			if (return_time)
-			{
-				/* Roll out the duration */
-				if ((s_ptr->l_dice) && (s_ptr->l_side))
+				/* Set the return location if required */
+				if (!(p_ptr->return_y) && !(p_ptr->return_x))
 				{
-					p_ptr->word_return = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+					/* Set return point */
+					p_ptr->return_y = p_ptr->py;
+					p_ptr->return_x = p_ptr->px;
+
+					/* Set the return time */
+					if (s_ptr->type == SPELL_SET_RETURN) return_time = TRUE;
 				}
-				else
+				/* Set the return time */
+				else if (s_ptr->type == SPELL_SET_OR_MAKE_RETURN)
 				{
-					p_ptr->word_return = s_ptr->l_plus;
+					/* Set the return time */
+					return_time = TRUE;
 				}
+
+				/* Set return time */
+				if (return_time)
+				{
+					/* Roll out the duration */
+					if ((s_ptr->l_dice) && (s_ptr->l_side))
+					{
+						p_ptr->word_return = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+					}
+					else
+					{
+						p_ptr->word_return = s_ptr->l_plus;
+					}
+				}
+
+				obvious = TRUE;
+				*cancel = FALSE;
 			}
 
 			break;
@@ -7636,56 +7715,132 @@ void process_spell_prepare(int spell, int level)
 
 		case SPELL_CONCENTRATE_LITE:
 		{
-			power = concentrate_power(p_ptr->py, p_ptr->px,
+			p_ptr->boost_spell_power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, TRUE, concentrate_light_hook);
 			break;
 		}
 
 		case SPELL_CONCENTRATE_LIFE:
 		{
-			power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
+			p_ptr->boost_spell_power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, FALSE, concentrate_life_hook);
 			break;
 		}
 
 		case SPELL_CONCENTRATE_WATER:
 		{
-			power = concentrate_power(p_ptr->py, p_ptr->px,
+			p_ptr->boost_spell_power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, TRUE, FALSE, concentrate_water_hook);
 			break;
 		}
 
 		case SPELL_RELEASE_CURSE:
 		{
-			power =	thaumacurse(TRUE, level + (level * level / 20));
+			p_ptr->boost_spell_power =	thaumacurse(TRUE, level + (level * level / 20));
 			break;
 		}
 
 		case SPELL_SUMMON_RACE:
 		{
-			/* Choose familiar if summoning it for the first time */
-			if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
+			/* You can choose a familiar ahead of time by examining the find familiar spell */
+			if (interact)
 			{
-				p_ptr->familiar = randint(19);
-				msg_format("You have found %s %s as a familiar.", is_a_vowel(familiar_race[p_ptr->familiar].name[0]) ? "an" : "a",
-						familiar_race[p_ptr->familiar].name);
+				/* Choose familiar if summoning it for the first time */
+				if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
+				{
+					p_ptr->familiar = randint(19);
+					msg_format("You have found %s %s as a familiar.", is_a_vowel(familiar_race[p_ptr->familiar].name[0]) ? "an" : "a",
+							familiar_race[p_ptr->familiar].name);
 
-				/* Set the default attributes */
-				p_ptr->familiar_attr[0] = familiar_race[p_ptr->familiar].attr1;
-				p_ptr->familiar_attr[1] = familiar_race[p_ptr->familiar].attr2;
+					/* Set the default attributes */
+					p_ptr->familiar_attr[0] = familiar_race[p_ptr->familiar].attr1;
+					p_ptr->familiar_attr[1] = familiar_race[p_ptr->familiar].attr2;
 
-				improve_familiar();
+					improve_familiar();
+				}
+
+				/* Obvious */
+				*cancel = FALSE;
+				obvious = TRUE;
 			}
 			break;
 		}
+
+		case SPELL_SET_TRAP:
+		{
+			/* You can see how much damage a particular object does when setting it in a trap */
+			if (interact)
+			{
+				int item;
+				int power;
+				object_type *o_ptr;
+
+				/* Pick the item */
+				if (do_cmd_item(COMMAND_ITEM_MAGIC_TRAP))
+				{
+					/* Get the item */
+					item = set_magic_trap_item;
+
+					/* Get the item (in the pack) */
+					if (item >= 0)
+					{
+						o_ptr = &inventory[item];
+					}
+
+					/* Get the item (on the floor) */
+					else
+					{
+						o_ptr = &o_list[0 - item];
+					}
+
+					/* Get item effect */
+					get_spell(&power, "use", o_ptr, FALSE);
+
+					/* Modify power */
+					p_ptr->boost_spell_power = process_item_blow(0, 0, o_ptr, 0, 0, FALSE);
+
+					/*
+					 * This hack is so ugly, I'm going to have to shower afterwards.
+					 */
+					s_ptr->blow[0].effect = power ? s_info[power].blow[0].effect : GF_HURT;
+
+					/* Use up the item if required */
+					if (forreal)
+					{
+						/* Destroy an item in the pack */
+						if (item >= 0)
+						{
+							if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
+							inven_item_increase(item, -1);
+							inven_item_describe(item);
+							inven_item_optimize(item);
+						}
+
+						/* Destroy a food on the floor */
+						else
+						{
+							floor_item_increase(0 - item, -1);
+							floor_item_describe(0 - item);
+							floor_item_optimize(0 - item);
+						}
+
+						/* Window stuff */
+						p_ptr->window |= (PW_INVEN | PW_EQUIP);
+					}
+
+
+					/* Done something? */
+					*cancel = FALSE;
+				}
+			}
+
+			/* Obvious */
+			obvious = TRUE;
+		}
 	}
 
-	/* Hack -- modify spell power */
-	if (power)
-	{
-		if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
-		else s_ptr->l_plus += power;
-	}
+	return (obvious);
 }
 
 
@@ -7716,14 +7871,15 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 		obvious = TRUE;
 	}
 
-	/* Check for return flags */
-	process_spell_prepare(spell, level);
-
 	/* Note the order is important -- because of the impact of blinding a character on their subsequent
 		ability to see spell blows that affect themselves */
+	if (process_spell_prepare(spell, level, cancel, TRUE, !eaten)) obvious = TRUE;
 	if (process_spell_blows(who, what, spell, level, cancel, known, eaten)) obvious = TRUE;
 	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
 	if ((!eaten) && (process_spell_types(who, spell, level, cancel))) obvious = TRUE;
+
+	/* Paranoia - clear boost */
+	p_ptr->boost_spell_power = 0;
 
 	/* Return result */
 	return (obvious);
@@ -7735,16 +7891,30 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
  *
  * XXX We assume that there is only 1 item in the stack at present.
  */
-bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
+int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal)
 {
 	int power = 0;
 	bool obvious = FALSE;
+	bool cancel = TRUE;
+
+	int damage = 0;
 
 	/* Get item effect */
 	get_spell(&power, "use", o_ptr, FALSE);
 
 	/* Check for return if player */
-	if (cave_m_idx[y][x] < 0) process_spell_prepare(power, 25);
+	if (cave_m_idx[y][x] < 0) process_spell_prepare(power, 25, &cancel, forreal, FALSE);
+
+	/* Calculate average base damage if guessing */
+	if (!forreal)
+	{
+		int d_dice = o_ptr->dd;
+		int d_side = o_ptr->ds;
+		int d_plus = o_ptr->to_d;
+
+		/* Base damage */
+		damage += d_side > 1 ? (d_dice * (d_side + 1)) / 2 + d_plus : d_dice * d_side + d_plus;
+	}
 
 	/* Has a power */
 	if (power > 0)
@@ -7756,13 +7926,11 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 		int flg = (PROJECT_JUMP | PROJECT_HIDE | PROJECT_KILL | PROJECT_GRID | PROJECT_PLAY);
 
 		/* Object is used */
-		if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+		if ((forreal) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
 
 		/* Scan through all four blows */
 		for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 		{
-			int damage = 0;
-
 			/* Extract the attack infomation */
 			int effect = s_ptr->blow[ap_cnt].effect;
 			int method = s_ptr->blow[ap_cnt].method;
@@ -7782,17 +7950,33 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 			/* Roll out the damage */
 			if ((d_dice) && (d_side))
 			{
-				damage = damroll(d_dice, d_side) + d_plus;
+				if (forreal)
+					damage += damroll(d_dice, d_side) + d_plus;
+				else
+					damage += d_side > 1 ? (d_dice * (d_side + 1)) / 2 + d_plus : d_dice * d_side + d_plus;
 			}
 			else
 			{
-				damage = d_plus;
+				damage += d_plus;
 			}
 
-			/* Hack -- apply damage as projection */
-			obvious |= project(who, what, 0, 0, y, x, y, x,
-				(coated_p(o_ptr) ? damage / 5 : damage), effect, flg, 0, 0);
+			/* Reapply apply damage? */
+			if (forreal)
+			{
+				/* Apply damage as projection */
+				obvious |= project_one(who, what, y, x, (coated_p(o_ptr) ? damage / 5 : damage), effect, flg);
+
+				/* We've applied the damage */
+				damage = 0;
+			}
+			else
+			{
+				continue;
+			}
 		}
+
+		/* We've calculated damage? */
+		if (!forreal) return (damage);
 
 		/* Evaluate coating */
 		if (obvious && (coated_p(o_ptr)))
@@ -7857,7 +8041,7 @@ bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x)
 	}
 
 	/* Anything seen? */
-	return(obvious);
+	return(obvious ? -1 : 0);
 }
 
 /*

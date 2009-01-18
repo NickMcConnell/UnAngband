@@ -63,12 +63,12 @@
 /*
  * Do a command to an item.
  */
-void do_cmd_item(int command)
+bool do_cmd_item(int command)
 {
 	int item;
 
-	/* Must be true to let us cancel */
-	bool cancel = TRUE;
+	/* Did we cancel out of command */
+	bool result;
 
 	/* Flags we can use the item from */
 	u16b flags = cmd_item_list[command].use_from;
@@ -156,8 +156,12 @@ void do_cmd_item(int command)
 	}
 
 	/* Auxiliary function */
-	cancel = !(cmd_item_list[command].player_command)(item);
+	result = !(cmd_item_list[command].player_command)(item);
+
+	/* Return whether we cancelled */
+	return (result);
 }
+
 
 static bool kind_is_harmful_shroom(int k_idx)
 {
@@ -173,6 +177,7 @@ static bool kind_is_harmful_shroom(int k_idx)
 	}
 	return FALSE;
 }
+
 
 /*
  * Hook to determine if an object is edible

@@ -5642,14 +5642,14 @@ void mon_hit_trap(int m_idx, int y, int x)
 						if (auto_activate(o_ptr))
 						{
 							/* Make item strike */
-							process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x);
+							process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x, TRUE);
 						}
 
 						/* Apply additional effect from coating*/
 						else if (coated_p(o_ptr))
 						{
 							/* Make item strike */
-							process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
+							process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE);
 						}
 
 						/* Drop nearby - some chance of breakage */
@@ -5905,14 +5905,14 @@ void mon_hit_trap(int m_idx, int y, int x)
 				if (auto_activate(o_ptr))
 				{
 					/* Make item strike */
-					process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x);
+					process_item_blow(SOURCE_PLAYER_ACT_ARTIFACT, o_ptr->name1, o_ptr, y, x, TRUE);
 				}
 
 				/* Apply additional effect from coating*/
 				else if (coated_p(o_ptr))
 				{
 					/* Make item strike */
-					process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x);
+					process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE);
 				}
 
 				/* Drop nearby - some chance of breakage */

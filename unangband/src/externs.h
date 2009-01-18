@@ -559,7 +559,7 @@ extern bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t);
 extern void do_cmd_cast(void);
 
 /* cmd6.c */
-extern void do_cmd_item(int item);
+extern bool do_cmd_item(int item);
 extern bool item_tester_hook_food_edible(const object_type *o_ptr);
 extern bool item_tester_hook_rod_charged(const object_type *o_ptr);
 extern bool item_tester_hook_assembly(const object_type *o_ptr);
@@ -976,9 +976,12 @@ extern int concentrate_power(int y0, int x0, int radius, bool for_real, bool use
 		bool concentrate_hook(const int y, const int x, const bool modify));
 extern bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, bool *known);
 extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
+extern bool item_tester_hook_magic_trap(const object_type *o_ptr);
+extern bool player_set_magic_trap(int item);
+extern bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, bool interact);
 extern bool process_spell_types(int who, int spell, int level, bool *cancel);
 extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
-extern bool process_item_blow(int who, int what, object_type *o_ptr, int y, int x);
+extern int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal);
 extern void region_piece_wipe(region_piece_type *rp_ptr);
 extern s16b region_piece_pop(void);
 extern void region_piece_copy(region_piece_type *rp_ptr, const region_piece_type *rp_ptr2);

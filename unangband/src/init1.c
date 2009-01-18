@@ -1289,6 +1289,8 @@ static cptr s_info_types[] =
 	"SLOW_DIGEST",
 	"SLOW_META",
 	"DETECT_FIRE",
+	"REGION",
+	"REGION_SET_TRAP",
 	NULL
 };
 

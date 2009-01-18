@@ -3239,6 +3239,10 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 
 	{ player_light_and_douse, '|', "Light/Douse which light source? ", "You have nothing to light or douse.",
 			item_tester_light_source, 0, (USE_EQUIP | USE_FLOOR | USE_FEATH), 0L, 0, NULL},
+
+	{ player_set_magic_trap, 'S', "Set trap with which item? ", "You have nothing which can be used in a trap.",
+			item_tester_hook_magic_trap, 0, (USE_INVEN | USE_FLOOR), 0L, 0, NULL},
+
 };
 
 

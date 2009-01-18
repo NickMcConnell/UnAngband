@@ -609,6 +609,10 @@ bool do_cmd_browse_object(object_type *o_ptr)
 			else
 			{
 				bool intro = FALSE;
+				bool dummy = TRUE;
+
+				/* Prepare the spell */
+				process_spell_prepare(spell, spell_power(spell), &dummy, FALSE, TRUE);
 
 				/* Set text_out hook */
 				text_out_hook = text_out_to_screen;
@@ -661,6 +665,9 @@ bool do_cmd_browse_object(object_type *o_ptr)
 				/* Build a prompt (accept all spells) */
 				strnfmt(out_val, 78, "The %s of %s. (%c-%c, ESC) Browse which %s:",
 					p, s_name + s_info[spell].name,I2A(0), I2A(num - 1), p);
+
+				/* Paranoia - clear boost */
+				p_ptr->boost_spell_power = 0;
 			}
 
 			continue;

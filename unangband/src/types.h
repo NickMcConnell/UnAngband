@@ -1822,6 +1822,8 @@ struct player_type
 
 	s16b old_spells;
 
+	s16b boost_spell_power;		/* Temporary power boost for some spells */
+
 	bool old_cumber_armor;
 	bool old_cumber_glove;
 	bool old_heavy_wield;

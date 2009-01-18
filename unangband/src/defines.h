@@ -665,6 +665,7 @@
 #define COMMAND_ITEM_FUEL_TORCH	24
 #define COMMAND_ITEM_FUEL_LAMP	25
 #define COMMAND_ITEM_LITE		26
+#define COMMAND_ITEM_MAGIC_TRAP	27
 
 
 #define MAX_COMMANDS	100
@@ -1687,6 +1688,7 @@
 #define SPELL_SLOW_META		60
 #define SPELL_DETECT_FIRE	61
 #define SPELL_REGION		62
+#define SPELL_SET_TRAP		63
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/

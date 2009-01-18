@@ -1316,6 +1316,9 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char b
 		}
 	}
 
+	/* Boost with player spell power */
+	d3 += p_ptr->boost_spell_power;
+
 	/* Consolidation */
 	if (d2 == 1)
 	{
@@ -1616,64 +1619,12 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 
 
 /*
- * Update spell details if required.
- *
- * This analyses the surrounding area and modifies the spell blow.
- */
-static void spell_update_power(spell_type *s_ptr, int level)
-{
-	int power = 0;
-
-	if (character_dungeon) switch(s_ptr->type)
-	{
-		case SPELL_CONCENTRATE_LITE:
-		{
-			power = concentrate_power(p_ptr->py, p_ptr->px,
-					5 + level / 10, FALSE, TRUE, concentrate_light_hook);
-
-			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
-			else s_ptr->l_plus = power;
-			break;
-		}
-
-		case SPELL_CONCENTRATE_LIFE:
-		{
-			power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
-					5 + level / 10, FALSE, FALSE, concentrate_life_hook);
-
-			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
-			else s_ptr->l_plus = power;
-			break;
-		}
-
-		case SPELL_CONCENTRATE_WATER:
-		{
-			power = concentrate_power(p_ptr->py, p_ptr->px,
-					5 + level / 10, FALSE, FALSE, concentrate_water_hook);
-
-			if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
-			else s_ptr->l_plus = power;
-			break;
-		}
-	}
-
-	/* Hack -- modify spell power */
-	if (power)
-	{
-		if (s_ptr->l_dice && !s_ptr->l_side) s_ptr->l_side = power;
-		else s_ptr->l_plus += power;
-	}
-}
-
-
-/*
  * Hack -- Get spell description.
  */
 bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int target)
 {
 	bool anything = FALSE;
 
-	spell_update_power(s_ptr, level);
 	anything |= spell_desc_flags(s_ptr, intro, level, detail, target, anything);
 	anything |= spell_desc_blows(s_ptr, intro, level, detail, target, anything);
 
@@ -1700,9 +1651,6 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 	int level = spell_power(spell);
 
 	if (!use_level) level = 0;
-
-	/* Update spell if required */
-	spell_update_power(s_ptr, use_level);
 
 	/* Default */
 	my_strcpy(p, "", p_s);
@@ -4059,11 +4007,16 @@ void print_powers(const s16b *book, int num, int y, int x)
 	/* Dump the spells */
 	for (i = 0; i < num; i++)
 	{
+		bool dummy = TRUE;
+
 		/* Get the spell index */
 		spell = book[i];
 
 		/* Get the spell info */
 		s_ptr = &s_info[spell];
+
+		/* Prepare the spell */
+		process_spell_prepare(spell, 25, &dummy, FALSE, FALSE);
 
 		/* Get extra info */
 		spell_info(info, sizeof(info), spell, FALSE);
@@ -4079,6 +4032,9 @@ void print_powers(const s16b *book, int num, int y, int x)
 			I2A(i), s_name + s_ptr->name,
 			comment);
 		c_prt(line_attr, out_val, y + i + 1, x);
+
+		/* Paranoia - clear boost */
+		p_ptr->boost_spell_power = 0;
 	}
 
 	/* Clear the bottom line */
@@ -4113,6 +4069,8 @@ void print_spells(const s16b *sn, int num, int y, int x)
 	/* Dump the spells */
 	for (i = 0; i < num; i++)
 	{
+		bool dummy = TRUE;
+
 		/* Get the spell index */
 		spell = sn[i];
 
@@ -4137,6 +4095,9 @@ void print_spells(const s16b *sn, int num, int y, int x)
 			c_prt(TERM_L_DARK, out_val, y + i + 1, x);
 			continue;
 		}
+
+		/* Prepare the spell */
+		process_spell_prepare(spell, spell_power(spell), &dummy, FALSE, FALSE);
 
 		/* Get extra info */
 		spell_info(info, sizeof(info), spell, TRUE);
