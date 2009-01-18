@@ -7722,21 +7722,21 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 		case SPELL_CONCENTRATE_LITE:
 		{
 			p_ptr->boost_spell_power = concentrate_power(p_ptr->py, p_ptr->px,
-					5 + level / 10, TRUE, TRUE, concentrate_light_hook);
+					5 + level / 10, forreal, TRUE, concentrate_light_hook);
 			break;
 		}
 
 		case SPELL_CONCENTRATE_LIFE:
 		{
 			p_ptr->boost_spell_power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
-					5 + level / 10, TRUE, FALSE, concentrate_life_hook);
+					5 + level / 10, forreal, FALSE, concentrate_life_hook);
 			break;
 		}
 
 		case SPELL_CONCENTRATE_WATER:
 		{
 			p_ptr->boost_spell_power = concentrate_power(p_ptr->py, p_ptr->px,
-					5 + level / 10, TRUE, FALSE, concentrate_water_hook);
+					5 + level / 10, forreal, FALSE, concentrate_water_hook);
 			break;
 		}
 
