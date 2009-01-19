@@ -705,21 +705,21 @@ F:TUNNEL |
 
 ##### Armor #####
 
-N:91:& Pair~ of Soft Leather Boots
+N:91:& Pair~ of Leather Boots
 G:]:U
 I:30:2:0
 W:3:0:20:7
 A:3/1
 P:2:1d2:0:0:0
 
-N:92:& Pair~ of Hard Leather Boots
+N:92:& Pair~ of Iron Shod Boots
 G:]:U
 I:30:3:0
 W:5:0:40:12
 A:5/1
 P:3:1d3:0:0:0
 
-N:93:& Pair~ of Metal Shod Boots
+N:93:& Pair~ of Steel Shod Boots
 G:]:s
 I:30:6:0
 W:20:0:80:50
@@ -929,12 +929,12 @@ P:16:1d4:-2:0:0
 
 # This shield does not belong here
 
-N:122:& Shield~ of Deflection
+N:122:& Mithril Shield~
 G:[:B
 I:34:10:0
 W:50:0:100:10000
 A:50/8
-P:10:1d3:0:0:10
+P:10:1d4:0:0:10
 F:IGNORE_ACID |
 
 ### Cloaks ###
@@ -963,48 +963,48 @@ A:1/1
 P:1:0d0:0:0:0
 
 N:126:& Set~ of Gauntlets
-G:]:U
+G:]:s
 I:31:2:0
-W:10:0:25:35
+W:10:0:25:45
 A:10/1
-P:2:1d2:0:0:0
+P:3:1d2:0:0:0
 
-N:127:& Set~ of Cesti
-G:]:W
-I:31:5:0
-W:40:0:40:100
-A:40/1
-P:5:1d3:0:0:0
+N:127:& Set~ of Caestus
+G:]:r
+I:31:4:0
+W:0:0:40:100
+A:20/1
+P:2:1d4:0:3:0
 
 ### The shields ###
 
-N:128:& Small Leather Shield~
+N:128:& Buckler~
 G:):U
 I:34:2:0
 W:3:0:50:30
 A:3/1
 P:2:1d1:0:0:0
 
-N:129:& Large Leather Shield~
+N:129:& Knight's Shield~
 G:):U
 I:34:4:0
-W:15:0:100:120
+W:15:0:80:120
 A:15/1
-P:4:1d2:0:0:0
+P:6:1d2:0:0:0
 
-N:130:& Small Metal Shield~
+N:130:& Round Shield~
 G:):s
 I:34:3:0
-W:10:0:65:50
-A:10/1
-P:3:1d2:0:0:0
+W:8:0:65:50
+A:8/1
+P:4:1d2:0:0:0
 
-N:131:& Large Metal Shield~
+N:131:& Tower Shield~
 G:):s
 I:34:5:0
-W:30:0:120:200
-A:30/1
-P:5:1d3:0:0:0
+W:20:0:120:200
+A:20/1
+P:8:1d3:0:0:0
 
 ##### Rings #####
 
@@ -2565,13 +2565,21 @@ P:0:1d6:0:0:0
 Y:27:3
 F:SPEED |
 
-### 315 - Unused ###
+N:315:& Set~ of Mithril Gauntlets
+G:]:B
+I:31:3:0
+W:0:0:20:700
+A:40/1
+P:5:1d1:0:0:0
+F:IGNORE_ACID
 
-### 316 - Unused ###
-
-#$# 315 - Unused ###
-
-#$# 316 - Unused ###
+N:316:& Set~ of Alchemist's Gloves
+G:]:R
+I:31:5:0
+W:0:0:5:500
+A:30/2
+P:0:1d1:0:0:2
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
 
 N:317:Remove Curse
 G:-:w
@@ -3232,9 +3240,13 @@ A:15/1:25/1:37/1
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_FIRE | IGNORE_WATER |
 
-### 396 - Unused ###
-
-#$# 396 - Unused ###
+N:396:& Ethereal Vest~
+G:(:y
+I:36:3:0
+W:0:0:0:4
+A:30/5
+P:0:0d0:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
 
 N:397:& # Box~
 G:~:g
@@ -7089,22 +7101,45 @@ P:0:1d1:0:0:0
 #A:20/9
 #P:0:1d1:0:0:0
 
+
+### One additional boot ###
+
+N:135:& Pair~ of Ethereal Slippers
+G:]:y
+I:30:6:0
+W:0:0:0:4
+A:30/5
+P:0:0d0:0:0:0
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
+
+
 ### Some additional 'cloaks' ###
+
+N:904:& Fur Cloak~
+G:(:o
+I:35:2:0
+W:1:0:40:600
+A:20/2
+P:3:0d0:0:0:0
+
+N:905:& Elven Cloak~
+G:(:D
+I:35:4:2
+W:30:0:5:2000
+A:30/2
+P:6:0d0:0:0:0
+F:STEALTH
+
+N:906:& Ethereal Cloak~
+G:(:W
+I:35:5:0
+W:45:0:0:4500
+A:45/4
+P:0:0d0:0:0:10
+F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
 
 # These are to give low level players an option to aim for high ac
 # but sacrifice significant carrying capacity.
-
-### 904 - Unused ###
-
-### 905 - Unused ###
-
-### 906 - Unused ###
-
-#$# 904 - Unused ###
-
-#$# 905 - Unused ###
-
-#$# 906 - Unused ###
 
 N:907:Tabard~
 G:(:r
