@@ -1488,7 +1488,7 @@ F:AGGRAVATE |
 # The Lochaber Axe 'Turmil'
 
 N:122:'Turmil'
-I:21:10:4
+I:22:9:4
 W:20:15:120:30000
 P:0:3d4:10:6:8
 A:340:40:0

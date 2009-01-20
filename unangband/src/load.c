@@ -1335,6 +1335,14 @@ static errr rd_randarts(void)
 
 		rd_byte(&a_ptr->tval);
 		rd_byte(&a_ptr->sval);
+
+		/* Hack for removal of lucerne hammers */
+		if ((a_ptr->tval == TV_HAFTED) && (a_ptr->sval == 10))
+		{
+			a_ptr->tval = TV_POLEARM;
+			a_ptr->sval = 9;
+		}
+
 		rd_s16b(&a_ptr->pval);
 
 		rd_s16b(&a_ptr->to_h);

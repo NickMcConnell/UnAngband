@@ -8741,27 +8741,27 @@ void region_refresh(int region)
 void region_update(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
-	
+
 	int type = r_ptr->type;
-	
+
 	/* Fake clearing the old grids */
 	r_ptr->type = 0;
-	
+
 	/* Clear the grids */
 	region_refresh(region);
 
 	/* Unfake */
 	r_ptr->type = type;
-	
+
 	/* Hack - remove previous list of grids */
 	region_delete(region);
 
 	/* Hack - add regions */
 	project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, region, (PROJECT_HIDE));
-	
+
 	/* Redraw grids */
 	region_refresh(region);
-	
+
 	/* Update the facing */
 	r_ptr->facing = get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
 }
@@ -9050,7 +9050,7 @@ void region_effect(int region, int y, int x)
 			y1 = y;
 			x1 = x;
 		}
-		
+
 		/* Attack the target */
 		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, (PROJECT_HIDE));
 	}
@@ -9193,10 +9193,10 @@ void trigger_region(int y, int x, bool move)
  *
  * Similar to the above region_iterate, but we are going to move each piece as a part of the
  * function and eliminate pieces if we cannot move them because of underlying terrain.
- * 
+ *
  * XXX Note that ball projections with MOVE_SOURCE which move will jump all over the place.
  * This is only because we can't see the source of the ball projection, which itself is moving.
- * 
+ *
  * We should consider removing the defines which prevent us moving the destination to a grid
  * that can't be projected from the source. However, this will result in moving projections
  * frequently 'locking up' and not moving at all (for no visible reason). We should really
@@ -9207,13 +9207,13 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 {
 	region_type *r_ptr = &region_list[region];
 	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
-	
+
 	s16b this_region_piece, next_region_piece = 0;
 	int prev_region_piece = 0;
 	bool seen = FALSE;
 	bool update_facing = FALSE;
 	int ty, tx;
-	
+
 	/* Move the destination */
 	region_iterator(r_ptr->y1, r_ptr->x1, 0, region, &ty, &tx);
 
@@ -9228,7 +9228,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 #if 0
 	}
 #endif
-	
+
 	/* Move the source if requested */
 	if (r_ptr->flags1 & (RE1_MOVE_SOURCE))
 	{
@@ -9246,19 +9246,19 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 		}
 #endif
 	}
-	
+
 	/* Update the facing */
 	if (update_facing)
 	{
 		r_ptr->facing = get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
 	}
-	
+
 	/* We are done? */
 	if ((r_ptr->flags1 & (RE1_MOVE_SOURCE)) && (r_ptr->flags1 & (RE1_PROJECTION)))
 	{
 		return (FALSE);
 	}
-		
+
 	for (this_region_piece = r_ptr->first_piece; this_region_piece; this_region_piece = next_region_piece)
 	{
 		/* Get the region piece */
@@ -9331,7 +9331,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 			lite_spot(ty, tx);
 		}
 	}
-	
+
 	/* Kill region if no grids are left */
 	if (!r_ptr->first_piece) r_ptr->age = AGE_LIFELESS;
 
@@ -9448,19 +9448,19 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 	{
 		int i;
 		int k = 0;
-		
+
 		/* Is at least one adjacent grid passable? */
 		for (i = 1; i < 9; i++)
 		{
 			int yy = y + ddy[dir];
 			int xx = x + ddx[dir];
-			
+
 			if ((cave_passable_bold(yy, xx, method_ptr->flags1)) && (rand_int(++k))) dir = i;
 		}
-		
+
 		/* No grids passable, we're stuck */
 		if (!cave_passable_bold(y, x, method_ptr->flags1)) dir = randint(9);
-		
+
 		/* Extract adjacent (legal) location */
 		*ty = y + ddy[dir];
 		*tx = x + ddx[dir];
@@ -9536,16 +9536,16 @@ void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
 		if (!cave_passable_bold(*ty, *tx, method_ptr->flags1))
 		{
 			int i;
-			
+
 			/* Is at least one adjacent grid passable? */
 			for (i = 0; i < 8; i++)
 			{
 				int yy = y + ddy_ddd[dir];
 				int xx = x + ddx_ddd[dir];
-				
+
 				if (cave_passable_bold(yy, xx, method_ptr->flags1)) break;
 			}
-			
+
 			/* If at least one grid passable, abort */
 			if ((i < 8) || (cave_passable_bold(y, x, method_ptr->flags1)))
 			{
@@ -9629,13 +9629,12 @@ void process_region(int region)
 			return;
 		}
 	}
-	
+
 	/* Rotate the region */
 	if (r_ptr->flags1 & (RE1_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int angle = method_ptr->arc ? method_ptr->arc : 6;
-		int facing = r_ptr->facing - angle / 2;
+		int facing = r_ptr->facing - 3;
 		int dir;
 		int y, x;
 
@@ -9647,7 +9646,7 @@ void process_region(int region)
 		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddx_ddd[old_dir], method_ptr->flags1)) &&
 				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddx_ddd[dir], method_ptr->flags1)))
 		{
-			facing += angle * 2;
+			facing += 6;
 			while (facing >= 180) facing -= 180;
 
 			r_ptr->flags1 &= ~(RE1_CLOCKWISE);
@@ -9668,8 +9667,7 @@ void process_region(int region)
 	else if (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int angle = method_ptr->arc ? method_ptr->arc : 6;
-		int facing = r_ptr->facing + angle / 2;
+		int facing = r_ptr->facing + 3;
 		int dir;
 		int y, x;
 
@@ -9681,7 +9679,7 @@ void process_region(int region)
 		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddx_ddd[old_dir], method_ptr->flags1)) &&
 				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddx_ddd[dir], method_ptr->flags1)))
 		{
-			facing -= angle * 2;
+			facing -= 6;
 			while (facing < 0) facing += 180;
 
 			r_ptr->flags1 &= ~(RE1_COUNTER_CLOCKWISE);
@@ -9703,7 +9701,7 @@ void process_region(int region)
 	{
 		region_update(region);
 	}
-	
+
 	/* Moving a wall */
 	if (r_ptr->flags1 & (RE1_WALL))
 	{
@@ -9938,6 +9936,15 @@ int init_region(int who, int what, int type, int dam, int method, int effect, in
 	/* Initialise region values from region info type */
 	r_ptr->flags1 = ri_ptr->flags1;
 	r_ptr->delay = ri_ptr->delay;
+
+	/* Exclude one of clockwise and counter clockwise */
+	if ((r_ptr->flags1 & (RE1_CLOCKWISE)) &&
+			(r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE)) &&
+			(rand_int(100) < 50))
+	{
+		/* Remove one - we always default to clockwise if both set */
+		r_ptr->flags1 &= ~(RE1_CLOCKWISE);
+	}
 
 	return(region);
 }
