@@ -239,6 +239,59 @@ s16b tokenize(char *buf, s16b num, char **tokens)
 
 
 /*
+ * Allow users to supply attr and char information in decimal, hexa-
+ * decimal, octal, or even character form (the last of these three
+ * being most familiar to many).  -LM-
+ */
+static bool read_byte_or_char(char *zz, byte *a, char *c)
+{
+	*a = 0;  *c = '\0';
+
+	/* First character is a single quote; third is another */
+	if ((zz[0] == '\'') && (zz[1]) && (zz[2]) && (zz[2] == '\''))
+	{
+		/* Accept the character between them */
+		*c = zz[1];
+
+		/* We are returning a char */
+		return (FALSE);
+	}
+
+	/* First character is a '+' followed by a digit */
+	if ((zz[0] == '+') && zz[1] && isdigit(zz[1]))
+	{
+		/* Skip the '+' */
+		zz++;
+
+		/* Read as 8-bit number */
+		*a = (byte)strtol(zz, NULL, 0);
+
+		/* If number is less than 128, add 128 */
+		if (*a < 128) *a += 128;
+
+		/* We are returning a byte */
+		return (TRUE);
+	}
+
+	/* First character is a digit, or a '-' followed by a digit */
+	if (isdigit(zz[0]) || ((zz[0] == '-') && zz[1] && isdigit(zz[1])))
+	{
+		/* Read as 8-bit number */
+		*a = (byte)strtol(zz, NULL, 0);
+
+		/* We are returning a byte */
+		return (TRUE);
+	}
+
+	/* Usual case -- read it as a character */
+	*c = zz[0];
+
+	/* We are returning a char */
+	return (FALSE);
+}
+
+
+/*
  * Parse a sub-file of the "extra info" (format shown below)
  *
  * Each "action" line has an "action symbol" in the first column,
@@ -314,6 +367,9 @@ errr process_pref_file_command(char *buf)
 
 	char *zz[16];
 
+	byte a;
+	char c;
+
 
 	/* Skip "empty" lines */
 	if (!buf[0]) return (0);
@@ -340,12 +396,19 @@ errr process_pref_file_command(char *buf)
 		{
 			monster_race *r_ptr;
 			i = (huge)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= z_info->r_max)) return (1);
 			r_ptr = &r_info[i];
-			if (n1) r_ptr->x_attr = n1;
-			if (n2) r_ptr->x_char = n2;
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      r_ptr->x_attr = a;
+			else  r_ptr->x_attr = (byte)color_char_to_attr(c);
+
+			/* Get symbol */
+			if (read_byte_or_char(zz[2], &a, &c))
+			      r_ptr->x_char = (char)a;
+			else  r_ptr->x_char = c;
+
 			return (0);
 		}
 	}
@@ -358,18 +421,25 @@ errr process_pref_file_command(char *buf)
 		{
 			object_kind *k_ptr;
 			i = (huge)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= z_info->k_max)) return (1);
 			k_ptr = &k_info[i];
-			if (n1) k_ptr->x_attr = n1;
-			if (n2) k_ptr->x_char = n2;
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      k_ptr->x_attr = a;
+			else  k_ptr->x_attr = (byte)color_char_to_attr(c);
+
+			/* Get symbol */
+			if (read_byte_or_char(zz[2], &a, &c))
+			      k_ptr->x_char = (char)a;
+			else  k_ptr->x_char = c;
+
 			return (0);
 		}
 	}
 
 
-	/* Process "F:<num>:<a>/<c>:<flags>" -- attr/char for terrain features, plus flags for lighting etc. */
+	/* Process "F:<num>:<a>/<c>:<under>:<flags>" -- attr/char for terrain features, plus flags for lighting etc. */
 	else if (buf[0] == 'F')
 	{
 		/* Mega-hack -- feat supports lighting 'yes' or 'no' */
@@ -378,18 +448,27 @@ errr process_pref_file_command(char *buf)
 			feature_type *f_ptr;
 
 			i = (huge)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
-			n3 = strtol(zz[3], NULL, 0);
 			if ((i < 0) || (i >= z_info->f_max)) return (1);
 			f_ptr = &f_info[i];
-			if (n1) f_ptr->x_attr = n1;
-			if (n2) f_ptr->x_char = n2;
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      f_ptr->x_attr = a;
+			else  f_ptr->x_attr = (byte)color_char_to_attr(c);
+
+			/* Get symbol */
+			if (read_byte_or_char(zz[2], &a, &c))
+			      f_ptr->x_char = (char)a;
+			else  f_ptr->x_char = c;
+
+			/* Get graphic 'under' the main graphic */
+			n3 = strtol(zz[3], NULL, 0);
 			if (n3) f_ptr->under = n3;
 
 			/* Clear current flags */
 			f_ptr->flags3 &= ~(FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL);
 
+			/* Get feature flags */
 			if (strstr("A", zz[4])) f_ptr->flags3 |= (FF3_ATTR_LITE);
 			else if (strstr("F", zz[4])) f_ptr->flags3 |= (FF3_ATTR_ITEM);
 			else if (strstr("D", zz[4])) f_ptr->flags3 |= (FF3_ATTR_DOOR);
@@ -407,50 +486,110 @@ errr process_pref_file_command(char *buf)
 		{
 			flavor_type *x_ptr;
 			i = (huge)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
                         if ((i < 0) || (i >= z_info->x_max)) return (1);
 			x_ptr = &x_info[i];
-			if (n1) x_ptr->x_attr = n1;
-			if (n2) x_ptr->x_char = n2;
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      x_ptr->x_attr = a;
+			else  x_ptr->x_attr = (byte)color_char_to_attr(c);
+
+			/* Get symbol */
+			if (read_byte_or_char(zz[2], &a, &c))
+			      x_ptr->x_char = (char)a;
+			else  x_ptr->x_char = c;
+
 			return (0);
 		}
 	}
 
 
-	/* Process "E:<num>:<a>/<c>" -- attr/char for regions */
-	if (buf[0] == 'E')
+	/* Process "N:<num>:<a>/<c>:<use effect>" -- attr/char for regions */
+	if (buf[0] == 'N')
 	{
-		if (tokenize(buf+2, 3, zz) == 3)
+		if (tokenize(buf+2, 4, zz) == 4)
 		{
 			region_info_type *r_ptr;
 			i = (huge)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
 			if ((i < 0) || (i >= z_info->region_info_max)) return (1);
 			r_ptr = &region_info[i];
-			if (n1) r_ptr->x_attr = n1;
-			if (n2) r_ptr->x_char = n2;
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      r_ptr->x_attr = a;
+			else  r_ptr->x_attr = (byte)color_char_to_attr(c);
+
+			/* Get symbol */
+			if (read_byte_or_char(zz[2], &a, &c))
+			      r_ptr->x_char = (char)a;
+			else  r_ptr->x_char = c;
+
+			/* Clear use of effect for attribute */
+			r_ptr->flags1 &= ~(RE1_ATTR_EFFECT);
+
+			/* Get whether we use effect for attribute */
+			if (strstr("TRUE", zz[4])) r_ptr->flags1 |= (RE1_ATTR_EFFECT);
+
 			return (0);
 		}
 	}
 
 
-	/* Process "S:<num>:<a>/<c>" -- attr/char for special things */
+	/* Process "S:<num>:<a>/<c>" -- projection graphics */
 	else if (buf[0] == 'S')
 	{
-		if (tokenize(buf+2, 3, zz) == 3)
+		if (tokenize(buf+2, 11, zz) == 11)
 		{
-			j = (byte)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
-			if ((j < 0) || (j >= 256)) return (1);
-			misc_to_attr[j] = n1;
-			misc_to_char[j] = n2;
+			i = (huge)strtol(zz[0], NULL, 0);
+
+			/* Scan the project graphics array */
+			for (j = i; j < 256; j++)
+			{
+				int k;
+				byte atmp;
+				char ctmp;
+
+				/* Scan down the list */
+				for (k = 1; k < 11; k++)
+				{
+					/* Translate attr/chars */
+					if (read_byte_or_char(zz[k], &a, &c))
+					{
+						if ((k == 1) || (k == 3) || (k == 5) || (k == 7) || (k == 9))
+							atmp = a;
+						else
+							atmp = a;
+						ctmp = (char)atmp;
+					}
+					else
+					{
+						if ((k == 1) || (k == 3) || (k == 5) || (k == 7) || (k == 9))
+							ctmp = color_char_to_attr(c);
+						else
+							ctmp = c;
+						atmp = (byte)ctmp;
+					}
+
+					/* Store attr/char pairs */
+					if (k == 1) proj_graphics[j].attr_vert  = atmp;
+					else if (k == 2) proj_graphics[j].char_vert  = ctmp;
+					else if (k == 3) proj_graphics[j].attr_horiz = atmp;
+					else if (k == 4) proj_graphics[j].char_horiz = ctmp;
+					else if (k == 5) proj_graphics[j].attr_rdiag = atmp;
+					else if (k == 6) proj_graphics[j].char_rdiag = ctmp;
+					else if (k == 7) proj_graphics[j].attr_ldiag = atmp;
+					else if (k == 8) proj_graphics[j].char_ldiag = ctmp;
+					else if (k == 9) proj_graphics[j].attr_ball  = atmp;
+					else if (k ==10) proj_graphics[j].char_ball  = ctmp;
+				}
+
+				/* Usually only store this set of graphics */
+				if (i) break;
+			}
+
 			return (0);
 		}
 	}
-
 
 	/* Process "E:<tv>:<a>" -- attribute for inventory objects */
 	else if (buf[0] == 'E')
@@ -637,6 +776,31 @@ errr process_pref_file_command(char *buf)
 			 }
 		}
 	}
+
+	/* Process "D:<num>" -- delay factor */
+	else if (buf[0] == 'D')
+	{
+		if (tokenize(buf + 2, 1, zz) == 1)
+		{
+			op_ptr->delay_factor = strtol(zz[0], NULL, 0);
+
+			/* Success */
+			return (0);
+		}
+	}
+
+	/* Process "H:<num>" -- hit point warning */
+	else if (buf[0] == 'H')
+	{
+		if (tokenize(buf + 2, 1, zz) == 1)
+		{
+			op_ptr->hitpoint_warn = strtol(zz[0], NULL, 0);
+
+			/* Success */
+			return (0);
+		}
+	}
+
 
 
 

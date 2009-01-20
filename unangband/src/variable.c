@@ -854,11 +854,9 @@ alloc_entry *alloc_race_table;
 
 
 /*
- * Specify attr/char pairs for visual special effects
- * Be sure to use "index & 0xFF" to avoid illegal access
+ * The projection graphics table
  */
-byte misc_to_attr[256];
-char misc_to_char[256];
+proj_graphics_type *proj_graphics;
 
 
 /*

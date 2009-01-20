@@ -1168,47 +1168,70 @@ byte spell_color(int type)
  *
  * It is moving (or has moved) from (x,y) to (nx,ny).
  *
- * If the distance is not "one", we (may) return "*".
+ * Spell character is always specified in pref files.  Spell color
+ * may or may not be.
  */
-static u16b bolt_pict(int y, int x, int ny, int nx, int typ)
+u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 {
-	int base;
-
-	byte k;
-
 	byte a;
 	char c;
 
 	/* No motion (*) */
-	if ((ny == y) && (nx == x)) base = 0x00;
+	if ((ny == y) && (nx == x))
+	{
+		a = proj_graphics[typ].attr_ball ?
+		    proj_graphics[typ].attr_ball : spell_color(typ);
+		c = proj_graphics[typ].char_ball ?
+			proj_graphics[typ].char_ball : '*';
+	}
 
 	/* Vertical (|) */
-	else if (nx == x) base = 0x20;
+	else if (nx == x)
+	{
+		a = proj_graphics[typ].attr_vert ?
+		    proj_graphics[typ].attr_vert : spell_color(typ);
+		c = proj_graphics[typ].char_vert ?
+			proj_graphics[typ].char_vert : '|';
+	}
 
 	/* Horizontal (-) */
-	else if (ny == y) base = 0x40;
+	else if (ny == y)
+	{
+		a = proj_graphics[typ].attr_horiz ?
+		    proj_graphics[typ].attr_horiz : spell_color(typ);
+		c = proj_graphics[typ].char_horiz ?
+			proj_graphics[typ].char_horiz : '-';
+	}
 
 	/* Diagonal (/) */
-	else if ((ny-y) == (x-nx)) base = 0x60;
+	else if ((ny - y) == (x - nx))
+	{
+		a = proj_graphics[typ].attr_rdiag ?
+		    proj_graphics[typ].attr_rdiag : spell_color(typ);
+		c = proj_graphics[typ].char_rdiag ?
+			proj_graphics[typ].char_rdiag : '/';
+	}
 
 	/* Diagonal (\) */
-	else if ((ny-y) == (nx-x)) base = 0x80;
+	else if ((ny - y) == (nx - x))
+	{
+		a = proj_graphics[typ].attr_ldiag ?
+		    proj_graphics[typ].attr_ldiag : spell_color(typ);
+		c = proj_graphics[typ].char_ldiag ?
+			proj_graphics[typ].char_ldiag : '\\';
+	}
 
 	/* Weird (*) */
-	else base = 0x00;
-
-	/* Basic spell color */
-	k = spell_color(typ);
-
-	/* Reduce to allowed colour range for spell bolts/balls - see e.g. font-xxx.prf */
-	k = get_color(k, ATTR_MISC, 1);
-
-	/* Obtain attr/char */
-	a = misc_to_attr[base+k];
-	c = misc_to_char[base+k];
+	else
+	{
+		a = proj_graphics[typ].attr_ball ?
+		    proj_graphics[typ].attr_ball : spell_color(typ);
+		c = proj_graphics[typ].char_horiz ?
+			proj_graphics[typ].char_horiz : '*';
+	}
 
 	/* Create pict */
-	return (PICT(a,c));
+	return (PICT(a, c));
 }
 
 

@@ -6040,7 +6040,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		int radius = scale_method(method_ptr->radius, level);
 		int num = scale_method(method_ptr->number, level);
 
-		u32b flg = 0L;
+		u32b flg = method_ptr->flags1;
 
 		int region = 0;
 
@@ -6105,10 +6105,9 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		}
 
 		/* Allow direction to be cancelled for free */
-		if ((!(flg & (PROJECT_SELF))) &&
-				(!eaten || (method == RBM_SPIT) || (method == RBM_BREATH)) &&
+		if ((((flg & (PROJECT_SELF)) == 0)) &&
 				(!get_aim_dir(&dir, known ? range : MAX_RANGE, known ? radius : 0,
-						known ? method_ptr->flags1 : (PROJECT_BEAM),
+						known ? flg : (PROJECT_BEAM),
 						known ? method_ptr->arc : 0,
 						known ? method_ptr->diameter_of_source : 0))) return (!(*cancel));
 

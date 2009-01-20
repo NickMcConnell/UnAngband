@@ -264,6 +264,7 @@ I:120
 L:2+1/10
 F:AUTOMATIC | INVERSE | RANDOM | PROJECTION | ACCELERATE | DECELERATE
 B:BEAM
+F:ATTR_EFFECT
 
 # Seeker vortex - used by Ignite Blaze
 N:30:vortex
@@ -271,6 +272,7 @@ G:*:o
 I:14
 L:50+1/1
 F:AUTOMATIC | LINGER | SHINING | SEEKER
+F:ATTR_EFFECT
 
 # Mass of randomly moving creeps - Used by Creeping Death
 N:31:creep
@@ -278,6 +280,7 @@ I:60
 L:50+1/1
 G:*:p
 F:AUTOMATIC | SEEKER | RANDOM | SPREAD
+F:ATTR_EFFECT
 
 # Lingering cloud of damage - Used by Miasma
 N:32:miasma
@@ -285,6 +288,7 @@ G:*:v
 I:66
 L:20+1/2
 F:AUTOMATIC | LINGER | SPREAD
+F:ATTR_EFFECT
 
 # Wandering cloud - used by Blizzard
 
@@ -293,6 +297,7 @@ G:*:B
 I:33
 L:40+1/2
 F:AUTOMATIC | LINGER | SPREAD | MOVE_SOURCE | PROJECTION
+F:ATTR_EFFECT
 
 # Wandering arc - used by Twister
 
@@ -302,6 +307,7 @@ I:128
 L:30
 F:AUTOMATIC | LINGER | PROJECTION | CLOCKWISE | COUNTER_CLOCKWISE
 F:MOVE_SOURCE | SPREAD
+F:ATTR_EFFECT
 
 # Slowly advancing wave - used by Tsunami
 # TODO: Randomly advancing wall should only sometimes advance... and do
@@ -312,6 +318,7 @@ G:*:b
 I:25
 L:20
 F:AUTOMATIC | WALL | RANDOM | DECELERATE
+F:ATTR_EFFECT
 
 # Hail of accerating explosions - used by Volcano
 
@@ -321,6 +328,7 @@ I:256
 L:8
 F:AUTOMATIC | LINGER | ACCELERATE | SHINING
 B:BALL_MINOR
+F:ATTR_EFFECT
 
 # Chains of monster seeking attacks - Used by Chain Lightning
 
@@ -329,6 +337,7 @@ G:*:y
 I:100
 L:2+1/10
 F:AUTOMATIC | CHAIN | INVERSE | SEEKER
+F:ATTR_EFFECT
 
 # Advancing wall - Used by the wall spells
 
@@ -337,6 +346,7 @@ G:*:w
 I:50
 L:20
 F:AUTOMATIC | LINGER | WALL
+F:ATTR_EFFECT
 
 # Scattered dust - used by Dust of Sneezing
 
@@ -345,4 +355,5 @@ G:*:s
 I:66
 L:5+1/4
 F:AUTOMATIC | LINGER | SPREAD | SHINING
+F:ATTR_EFFECT
 

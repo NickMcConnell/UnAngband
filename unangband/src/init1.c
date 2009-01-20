@@ -271,7 +271,7 @@ static cptr region_info_flags1[] =
 	"SCALAR_VECTOR",
 	"SCALAR_DISTANCE",
 	"MOVE_SOURCE",
-	"PLATFORM",
+	"ATTR_EFFECT",
 	"HIT_TRAP",
 	"RANDOM",
 	"ACCELERATE",

@@ -1319,7 +1319,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 			/* Get the next region */
 			next_region_piece = rp_ptr->next_in_grid;
-			
+
 			/* Skip dead regions */
 			if (!r_ptr->type) continue;
 
@@ -1328,8 +1328,19 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					(((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) ||
 							((r_ptr->flags1 & (RE1_DISPLAY)) != 0)))
 			{
-				a = region_info[r_ptr->type].x_attr;
-				c = region_info[r_ptr->type].x_char;
+				/* Display the effect */
+				if (r_ptr->flags1 & (RE1_ATTR_EFFECT))
+				{
+					u16b pict = bolt_pict(y, x, y, x, r_ptr->effect);
+
+					a = PICT_A(pict);
+					c = PICT_C(pict);
+				}
+				else
+				{
+					a = region_info[r_ptr->type].x_attr;
+					c = region_info[r_ptr->type].x_char;
+				}
 				break;
 			}
 		}

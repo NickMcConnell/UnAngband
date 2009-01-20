@@ -140,6 +140,7 @@ typedef struct quiver_group_type quiver_group_type;
 typedef struct ecology_type ecology_type;
 typedef struct do_cmd_item_type do_cmd_item_type;
 typedef struct color_type color_type;
+typedef struct proj_graphics_type proj_graphics_type;
 
 
 
@@ -2089,5 +2090,34 @@ struct color_type
 	char name[32];              /* Color name */
 
 	byte color_translate[MAX_ATTR];       /* Index for various in-game translations */
+};
+
+
+/*
+ * A projection graphics type.
+ *
+ * Among the possible future uses for "flags" is to allow transparency.
+ * Among the possible future uses for "unused" is to allow multiple
+ * user-editable colors (using a different array, indexed by this value).
+ */
+struct proj_graphics_type
+{
+	byte attr_vert;      /* Spell graphics */
+	char char_vert;
+
+	byte attr_horiz;
+	char char_horiz;
+
+	byte attr_rdiag;
+	char char_rdiag;
+
+	byte attr_ldiag;
+	char char_ldiag;
+
+	byte attr_ball;
+	char char_ball;
+
+	byte flags;          /* Special flags */
+	byte unused;         /* Padding to make this array 32 bit-compliant */
 };
 
