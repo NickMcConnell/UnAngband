@@ -133,6 +133,7 @@ typedef struct quiver_group_type quiver_group_type;
 typedef struct ecology_type ecology_type;
 typedef struct do_cmd_item_type do_cmd_item_type;
 typedef struct color_type color_type;
+typedef struct proj_graphics_type proj_graphics_type;
 
 
 
@@ -179,7 +180,7 @@ struct maxima
 
 	u16b w_max;	/* Max size per element of "w_info[]" */
 	u16b blow_max;	/* Max size per element of "blow_info[]" */
-	
+
 	u16b o_max;     /* Max size for "o_list[]" */
 	u16b m_max;     /* Max size for "m_list[]" */
 };
@@ -216,24 +217,24 @@ struct town_type
 	u32b text;     /* Text (offset) */
 
 	u16b nearby[MAX_NEARBY];
-	
+
 	u16b quest_opens;
 	u16b quest_monster;
-	
+
 	u16b replace_with;
 	u16b replace_ifvisited;
 
 	u16b replace_guardian;
 	u16b guardian_ifvisited;
-	
+
 	u16b town_lockup_monster;
 	u16b town_lockup_ifvisited;
-	
+
 	byte r_char;    /* Add races of this char */
 	byte r_flag;    /* Add races with this flag */
 	byte attained_depth; /* Absolute, not from dungeon surface */
 	byte visited;
-	
+
 	u16b store[MAX_STORES];
 	u16b store_index[MAX_STORES];
 
@@ -249,13 +250,13 @@ struct blow_desc_type
 {
 	s16b min;
 	s16b max;
-	u32b text;	
+	u32b text;
 };
 
 
 /*
  * Scalar for blow effect per level
- * 
+ *
  * Returned value is value + gain * actual_level / levels;
  */
 struct blow_level_scalar_type
@@ -282,7 +283,7 @@ struct blow_type
 	byte diameter_of_source;
 	byte degree_factor;
 	byte unused;
-	
+
 	byte mana_cost;
 	byte best_range;
 	byte max_range;
@@ -293,18 +294,18 @@ struct blow_type
 	byte dam_div;
 	byte dam_var;
 	byte dam_max;
-	
+
 	/* Monster spell desirability */
 	byte d_base;
 	byte d_hurt;
 	byte d_esc;
 	byte d_res;
-	
+
 	byte d_summ;
 	byte d_mana;
 	byte d_tact;
 	byte d_range;
-	
+
 	blow_level_scalar_type radius;
 	blow_level_scalar_type number;
 };
@@ -335,7 +336,7 @@ struct desc_type
 
 	byte branch;	/* Branch to chart index */
 	byte branch_on;	/* Branch on chart index */
-	
+
 	byte level_min; /* Minimum level */
 	byte level_max;	/* Maximum level */
 
@@ -367,19 +368,19 @@ struct room_info_type
 
 	s16b deepest_race;	/* Deepest race in this ecology */
 	u32b ecology;	/* What ecologies appear in the room */
-	
+
 	u32b flags;		/* Room flags */
 
 	/* Decorations: TODO some of these could be discarded after dungeon generation*/
-	
+
 	s16b	theme[MAX_THEMES];	/* Features to use for placement around the room */
-	
+
 #if 0
 	s16b	solid;		/* Feature to use as solid wall */
 	s16b	tunnel;		/* Feature to use as tunnel */
 	s16b	trap;		/* Feature to use as trap */
 	s16b	bridge;		/* Feature to use as bridge over chasm */
-	
+
 	byte d_attr[5];    	/* Desired feature attribute (basic / inner / outer / solid) */
 	char d_char[5];    	/* Desired feature character (basic / inner / outer / solid) */
 
@@ -685,7 +686,7 @@ struct flavor_type
 {
 	u32b name;      /* Name (offset) */
 	u32b text;      /* Text (offset) */
-	
+
 	byte tval;      /* Associated object type */
 	byte sval;      /* Associated object sub-type */
 
@@ -996,7 +997,7 @@ struct monster_type
 
 	byte ty;	/* Current target */
 	byte tx;
-	
+
 	u32b mflag;     /* Extra monster flags */
 	u32b smart;     /* Field for "smart_learn" */
 
@@ -1139,7 +1140,7 @@ struct store_type
 	byte tval[STORE_CHOICES];
 	byte sval[STORE_CHOICES];
 	s16b count[STORE_CHOICES];
-	
+
 	byte tvals_will_buy[STORE_WILL_BUY]; /* Tvals that the store will buy */
 
 	byte stock_num; /* Stock -- Number of entries */
@@ -1337,7 +1338,7 @@ struct spell_blow
 	byte l_dice;
 	byte l_side;
 	s16b l_plus;
-	byte levels;	
+	byte levels;
 };
 
 
@@ -1432,7 +1433,7 @@ struct quickstart_type
 	byte pschool;	/* Current magic 'school' */
 
 	s16b stat_birth[A_MAX];	/* Birth "maximal" stat values */
-	
+
 	s32b birth_au;	/* Birth gold */
 };
 
@@ -1498,7 +1499,7 @@ struct player_type
 	s16b stat_max[A_MAX];   /* Current "maximal" stat values */
 	s16b stat_cur[A_MAX];   /* Current "natural" stat values */
 	s16b stat_birth[A_MAX];	/* Birth "maximal" stat values */
-	
+
 	s16b stat_inc_tim[A_MAX];      /* Timed -- Stat increase */
 	s16b stat_dec_tim[A_MAX];      /* Timed -- Stat decrease */
 
@@ -1560,7 +1561,7 @@ struct player_type
 	byte charging;	/* Currently charging */
 	byte reserves;	/* Currently on reserve mana */
 
-	
+
 	u32b disease;	/* Disease types */
 
 	u32b spell_learned1;    /* Spell flags */
@@ -1615,9 +1616,9 @@ struct player_type
 	s16b target_who;/* Target identity */
 	s16b target_row;/* Target location */
 	s16b target_col;/* Target location */
-	
-	s16b target_race;/* Target monsters of this race only */	
-	
+
+	s16b target_race;/* Target monsters of this race only */
+
 	s16b health_who;/* Health bar trackee */
 
 	s16b monster_race_idx;  /* Monster race trackee */
@@ -1644,7 +1645,7 @@ struct player_type
 
 	s16b command_see;       /* See "cmd1.c" */
 	s16b command_wrk;       /* See "cmd1.c" */
-	
+
 	s16b command_trans;		/* See "cmd6.c" */
 	s16b command_trans_item;	/* See "cmd6.c" */
 
@@ -1671,7 +1672,7 @@ struct player_type
 	bool heavy_shoot;       /* Heavy shooter */
 	bool icky_wield;/* Icky weapon */
 	bool uncontrolled;		/* Uncontrolled activation */
-	
+
 	s16b cur_lite;  /* Radius of lite (if any) */
 
 	u32b notice;    /* Special Updates (bit flags) */
@@ -1687,7 +1688,7 @@ struct player_type
 
 	byte branded_blows;	/* Current blow is branded with */
 	byte unused2;
-	
+
 	/*** Extracted fields ***/
 
 	s16b stat_add[A_MAX];   /* Equipment stat bonuses */
@@ -1699,7 +1700,7 @@ struct player_type
 	u32b cur_flags4;
 
 	byte incr_resist[MAX_INCR_RESISTS];
-	
+
 	byte siz_penalty;
 
 	s16b dis_to_h;  /* Known bonus to hit */
@@ -1895,7 +1896,7 @@ struct do_cmd_item_type
 {
 	bool (*player_command)(int item);	/* The function to use as the command */
 	char cmd_char;						/* The 'internal' keypress the command corresponds to */
-	
+
 	const char *item_query;				/* The string to display when asking for which item */
 	const char *item_not_found;			/* The string to display if no valid items are found */
 
@@ -1904,7 +1905,7 @@ struct do_cmd_item_type
 
 	u16b use_from;						/* Where item can be used from */
 	u32b conditions;					/* Restrictions on what state the player must be in */
-	
+
 	byte next_command;					/* The next command to use */
 	int (*next_command_eval)(int item);	/* The next command to use - evaluation function */
 };
@@ -1920,5 +1921,34 @@ struct color_type
 	char name[32];              /* Color name */
 
 	byte color_translate[MAX_ATTR];       /* Index for various in-game translations */
+};
+
+
+/*
+ * A projection graphics type.
+ *
+ * Among the possible future uses for "flags" is to allow transparency.
+ * Among the possible future uses for "unused" is to allow multiple
+ * user-editable colors (using a different array, indexed by this value).
+ */
+struct proj_graphics_type
+{
+	byte attr_vert;      /* Spell graphics */
+	char char_vert;
+
+	byte attr_horiz;
+	char char_horiz;
+
+	byte attr_rdiag;
+	char char_rdiag;
+
+	byte attr_ldiag;
+	char char_ldiag;
+
+	byte attr_ball;
+	char char_ball;
+
+	byte flags;          /* Special flags */
+	byte unused;         /* Padding to make this array 32 bit-compliant */
 };
 

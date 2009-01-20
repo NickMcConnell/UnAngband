@@ -32,7 +32,7 @@ void safe_setuid_drop(void)
 	{
 		quit("setegid(): cannot set permissions correctly!");
 	}
- 
+
 #  else /* HAVE_SETEGID */
 
 #   ifdef SAFE_SETUID_POSIX
@@ -41,7 +41,7 @@ void safe_setuid_drop(void)
 	{
 		quit("setgid(): cannot set permissions correctly!");
 	}
-    
+
 #   else /* SAFE_SETUID_POSIX */
 
 	if (setregid(getegid(), getgid()) != 0)
@@ -237,6 +237,58 @@ s16b tokenize(char *buf, s16b num, char **tokens)
 }
 
 
+/*
+ * Allow users to supply attr and char information in decimal, hexa-
+ * decimal, octal, or even character form (the last of these three
+ * being most familiar to many).  -LM-
+ */
+static bool read_byte_or_char(char *zz, byte *a, char *c)
+{
+	*a = 0;  *c = '\0';
+
+	/* First character is a single quote; third is another */
+	if ((zz[0] == '\'') && (zz[1]) && (zz[2]) && (zz[2] == '\''))
+	{
+		/* Accept the character between them */
+		*c = zz[1];
+
+		/* We are returning a char */
+		return (FALSE);
+	}
+
+	/* First character is a '+' followed by a digit */
+	if ((zz[0] == '+') && zz[1] && isdigit(zz[1]))
+	{
+		/* Skip the '+' */
+		zz++;
+
+		/* Read as 8-bit number */
+		*a = (byte)strtol(zz, NULL, 0);
+
+		/* If number is less than 128, add 128 */
+		if (*a < 128) *a += 128;
+
+		/* We are returning a byte */
+		return (TRUE);
+	}
+
+	/* First character is a digit, or a '-' followed by a digit */
+	if (isdigit(zz[0]) || ((zz[0] == '-') && zz[1] && isdigit(zz[1])))
+	{
+		/* Read as 8-bit number */
+		*a = (byte)strtol(zz, NULL, 0);
+
+		/* We are returning a byte */
+		return (TRUE);
+	}
+
+	/* Usual case -- read it as a character */
+	*c = zz[0];
+
+	/* We are returning a char */
+	return (FALSE);
+}
+
 
 /*
  * Parse a sub-file of the "extra info" (format shown below)
@@ -311,6 +363,8 @@ errr process_pref_file_command(char *buf)
 
 	char *zz[16];
 
+	byte a;
+	char c;
 
 	/* Skip "empty" lines */
 	if (!buf[0]) return (0);
@@ -415,21 +469,61 @@ errr process_pref_file_command(char *buf)
 	}
 
 
-	/* Process "S:<num>:<a>/<c>" -- attr/char for special things */
+	/* Process "S:<num>:<a>/<c>" -- projection graphics */
 	else if (buf[0] == 'S')
 	{
-		if (tokenize(buf+2, 3, zz) == 3)
+		if (tokenize(buf+2, 11, zz) == 11)
 		{
-			j = (byte)strtol(zz[0], NULL, 0);
-			n1 = strtol(zz[1], NULL, 0);
-			n2 = strtol(zz[2], NULL, 0);
-			if ((j < 0) || (j >= 256)) return (1);
-			misc_to_attr[j] = n1;
-			misc_to_char[j] = n2;
+			i = (huge)strtol(zz[0], NULL, 0);
+
+			/* Scan the project graphics array */
+			for (j = i; j < 256; j++)
+			{
+				int k;
+				byte atmp;
+				char ctmp;
+
+				/* Scan down the list */
+				for (k = 1; k < 11; k++)
+				{
+					/* Translate attr/chars */
+					if (read_byte_or_char(zz[k], &a, &c))
+					{
+						if ((k == 1) || (k == 3) || (k == 5) || (k == 7) || (k == 9))
+							atmp = a;
+						else
+							atmp = a;
+						ctmp = (char)atmp;
+					}
+					else
+					{
+						if ((k == 1) || (k == 3) || (k == 5) || (k == 7) || (k == 9))
+							ctmp = color_char_to_attr(c);
+						else
+							ctmp = c;
+						atmp = (byte)ctmp;
+					}
+
+					/* Store attr/char pairs */
+					if (k == 1) proj_graphics[j].attr_vert  = atmp;
+					else if (k == 2) proj_graphics[j].char_vert  = ctmp;
+					else if (k == 3) proj_graphics[j].attr_horiz = atmp;
+					else if (k == 4) proj_graphics[j].char_horiz = ctmp;
+					else if (k == 5) proj_graphics[j].attr_rdiag = atmp;
+					else if (k == 6) proj_graphics[j].char_rdiag = ctmp;
+					else if (k == 7) proj_graphics[j].attr_ldiag = atmp;
+					else if (k == 8) proj_graphics[j].char_ldiag = ctmp;
+					else if (k == 9) proj_graphics[j].attr_ball  = atmp;
+					else if (k ==10) proj_graphics[j].char_ball  = ctmp;
+				}
+
+				/* Usually only store this set of graphics */
+				if (i) break;
+			}
+
 			return (0);
 		}
 	}
-
 
 	/* Process "E:<tv>:<a>" -- attribute for inventory objects */
 	else if (buf[0] == 'E')
@@ -1502,7 +1596,7 @@ static void display_player_xtra_info(void)
 
 	/* Pre-calculate height */
 	i = (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20;
-	
+
 	/* Height */
 	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
 	Term_putstr(col+7, row + 1, -1, TERM_L_BLUE, format("%2d'%2d", i / 12, i % 12));
@@ -1516,7 +1610,7 @@ static void display_player_xtra_info(void)
 
 	/* Char level */
 	Term_putstr(col, 10, -1, TERM_WHITE, "Level");
-	Term_putstr(col+10, 10, -1, 
+	Term_putstr(col+10, 10, -1,
 		    ((p_ptr->lev >= p_ptr->max_lev) ? TERM_L_GREEN : TERM_YELLOW),
 		    format("%8d", p_ptr->lev));
 
@@ -1555,36 +1649,36 @@ static void display_player_xtra_info(void)
 	}
 
 	/* Current dungeon level */
-	Term_putstr(col, 14, -1, TERM_WHITE, "Curr Danger"); 	 
-  	 
-	if (p_ptr->depth) 	 
-	{ 
+	Term_putstr(col, 14, -1, TERM_WHITE, "Curr Danger");
+
+	if (p_ptr->depth)
+	{
 		if (p_ptr->depth < 100)
 		{
-			/* express in feet or level */ 	 
+			/* express in feet or level */
 			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->depth * 50);
-			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->depth); 	 
+			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->depth);
 		}
 		else strnfmt(buf, sizeof(buf), " Absurd");
-	} 	 
-	else strnfmt(buf, sizeof(buf), " Benign"); 	 
+	}
+	else strnfmt(buf, sizeof(buf), " Benign");
 
 	Term_putstr(col+11, 14, -1, TERM_L_GREEN, buf);
 
-	/* Max dungeon level */ 	 
-	Term_putstr(col, 15, -1, TERM_WHITE, "Max Dungeon"); 	 
-  	 
-	if (p_ptr->max_depth) 	 
+	/* Max dungeon level */
+	Term_putstr(col, 15, -1, TERM_WHITE, "Max Dungeon");
+
+	if (p_ptr->max_depth)
 	{
 		if (p_ptr->max_depth < 100)
 		{
-			/* express in feet or level */ 	 
-			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->max_depth * 50); 	 
-			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->max_depth); 	 
+			/* express in feet or level */
+			if (depth_in_feet) strnfmt(buf, sizeof(buf), "%4d ft", p_ptr->max_depth * 50);
+			else strnfmt(buf, sizeof(buf), " Lev%3d", p_ptr->max_depth);
 		}
 		else strnfmt(buf, sizeof(buf), " Bottom");
 	}
-	else strnfmt(buf, sizeof(buf), "   None"); 	 
+	else strnfmt(buf, sizeof(buf), "   None");
 
 	Term_putstr(col+11, 15, -1, TERM_L_GREEN, buf);
 
@@ -1613,7 +1707,7 @@ static void display_player_xtra_info(void)
 		Term_putstr(col, 10, -1, TERM_WHITE, "HP");
 		Term_putstr(col+8, 10, -1, TERM_L_BLUE, format("%9s", buf));
 	}
-	else 
+	else
 	{
 		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
 		Term_putstr(col, 10, -1, TERM_WHITE, "Hit-Points");
@@ -1627,7 +1721,7 @@ static void display_player_xtra_info(void)
 		Term_putstr(col, 11, -1, TERM_WHITE, "SP");
 		Term_putstr(col+8, 11, -1, TERM_L_BLUE, format("%9s", buf));
 	}
-	else 
+	else
 	{
 		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
 		Term_putstr(col, 11, -1, TERM_WHITE, "Spell-Pts");
@@ -1729,7 +1823,7 @@ static void display_player_xtra_info(void)
 
 	/* Base skill; damage from equipment bound by weapon dice */
 	hit = p_ptr->dis_to_h;
-	dam = MIN(p_ptr->dis_to_d, 
+	dam = MIN(p_ptr->dis_to_d,
 		  o_ptr->dd * o_ptr->ds + 5);
 	hit_real = p_ptr->to_h;
 
@@ -1763,7 +1857,7 @@ static void display_player_xtra_info(void)
 	else if (p_ptr->pstyle == WS_TWO_HANDED
 			 && p_ptr->cur_style & (1L << WS_TWO_HANDED))
 		Term_putstr(col, 11, -1, TERM_WHITE, "2Hand");
-	else if (p_ptr->cur_style & (1L << WS_TWO_WEAPON)) 
+	else if (p_ptr->cur_style & (1L << WS_TWO_WEAPON))
 	{
 		Term_putstr(col, 11, -1, TERM_WHITE, "Dual");
 
@@ -1774,7 +1868,7 @@ static void display_player_xtra_info(void)
 
 		/* Base skill; damage from equipment bound by weapon dice */
 		hit = p_ptr->dis_to_h;
-		dam = MIN(p_ptr->dis_to_d, 
+		dam = MIN(p_ptr->dis_to_d,
 			  o_ptr->dd * o_ptr->ds + 5);
 
 		/* Check melee styles only */
@@ -1793,7 +1887,7 @@ static void display_player_xtra_info(void)
 		strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 		Term_putstr(col+5, 12, -1, TERM_L_BLUE, format("%12s", buf));
 	}
-	else if (p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)) 
+	else if (p_ptr->cur_style & (1L << WS_WEAPON_SHIELD))
 	{
 		Term_putstr(col, 11, -1, TERM_WHITE, "WShld");
 
@@ -1817,8 +1911,8 @@ static void display_player_xtra_info(void)
 	if (inventory[INVEN_ARM].k_idx)
 	{
 		o_ptr = &inventory[INVEN_ARM];
-	
-		if (o_ptr->tval == TV_SHIELD 
+
+		if (o_ptr->tval == TV_SHIELD
 		    && !(p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)))
 		{
 			/* Shield stats (if shield bashes are in, display bash value) */
@@ -1843,7 +1937,7 @@ static void display_player_xtra_info(void)
 	}
 
 	/* Blows */
-	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", 
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)",
 		p_ptr->num_blow, p_ptr->num_charge);
 	Term_putstr(col, 13, -1, TERM_WHITE, "Blows");
 	Term_putstr(col+5, 13, -1, TERM_L_BLUE, format("%12s", buf));
@@ -1858,7 +1952,7 @@ static void display_player_xtra_info(void)
 
 	/* Check shooting styles only */
 	style = p_ptr->cur_style & WS_LAUNCHER_FLAGS;
-	
+
 	/* Get style benefits */
 	mon_style_benefits(NULL, style, &style_hit, &style_dam, &style_crit);
 	hit += style_hit;
@@ -1877,11 +1971,11 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 14, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Describe shooting styles */
-	if (p_ptr->cur_style & (1L << WS_SLING)) 
+	if (p_ptr->cur_style & (1L << WS_SLING))
 		Term_putstr(col, 14, -1, TERM_WHITE, "Sling");
-	else if (p_ptr->cur_style & (1L << WS_BOW)) 
+	else if (p_ptr->cur_style & (1L << WS_BOW))
 		Term_putstr(col, 14, -1, TERM_WHITE, "Bow  ");
-	else if (p_ptr->cur_style & (1L << WS_XBOW)) 
+	else if (p_ptr->cur_style & (1L << WS_XBOW))
 		Term_putstr(col, 14, -1, TERM_WHITE, "XBow ");
 	else
 		Term_putstr(col, 14, -1, TERM_WHITE, "Shoot");
@@ -1913,8 +2007,8 @@ static void display_player_xtra_info(void)
 	Term_putstr(col+5, 16, -1, TERM_L_BLUE, format("%12s", buf));
 
 	/* Throws */
-	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw, 
-		is_known_throwing_item(&inventory[INVEN_WIELD]) 
+	strnfmt(buf, sizeof(buf), "%d/turn(x%d)", p_ptr->num_throw,
+		is_known_throwing_item(&inventory[INVEN_WIELD])
 		? p_ptr->num_blow : 1);
 	Term_putstr(col, 17, -1, TERM_WHITE, "Hurls");
 	Term_putstr(col+5, 17, -1, TERM_L_BLUE, format("%12s", buf));
@@ -2262,7 +2356,7 @@ static void put_flag_char(u32b f[4], int set, u32b flag, int y, int x, int row, 
 		{
 			c_put_str(TERM_SLATE, ".", row, col);
 		}
-		
+
 		/* Hack -- show resistances as fake pvals */
 		else if ((y < 5) && (f[set] & flag))
 		{
@@ -2852,7 +2946,7 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 	int i;
 
 	char buf[80];
-	
+
 	player_race *shape_ptr = &p_info[p_ptr->pshape != p_ptr->prace ? p_ptr->pshape : 0];
 
 	/* Hack -- display header if displaying first stat only */
@@ -2903,7 +2997,7 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 		c_put_str(TERM_L_BLUE, buf, row+i, col+17);
 
 		/* Temporary Bonus */
-		sprintf(buf, "%+3d", 
+		sprintf(buf, "%+3d",
 				(p_ptr->stat_inc_tim[i] ? 5 : 0)
 				- (p_ptr->stat_dec_tim[i] ? 5 : 0));
 		c_put_str(TERM_L_BLUE, buf, row+i, col+21);
@@ -2962,7 +3056,7 @@ static void display_player_sust_info(void)
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
 		/* Get the object */
-		
+
 		o_ptr = &inventory[i];
 
 		/* Get the "known" flags */
@@ -2978,12 +3072,12 @@ static void display_player_sust_info(void)
 			{
 				/* Assume uppercase stat name */
 				c_put_str(TERM_WHITE, stat_names[stat], row+stat, col);
-				if (stat == A_DEX) 
+				if (stat == A_DEX)
 				  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, col);
-				if (stat == A_STR) 
+				if (stat == A_STR)
 				  c_put_str(TERM_WHITE, stat_names[A_SIZ], row+A_SIZ, col);
 			}
-			  
+
 			/* Default */
 			a = TERM_SLATE;
 			c = '.';
@@ -3027,9 +3121,9 @@ static void display_player_sust_info(void)
 
 			/* Dump proper character */
 			Term_putch(col + 5, row+stat, a, c);
-			if (stat == A_DEX) 
+			if (stat == A_DEX)
 			  Term_putch(col + 5, row+A_AGI, a, c);
-			if (stat == A_STR) 
+			if (stat == A_STR)
 			  Term_putch(col + 5, row+A_SIZ, a, c);
 		}
 
@@ -3057,9 +3151,9 @@ static void display_player_sust_info(void)
 
 		/* Dump */
 		Term_putch(col+5, row+stat, a, c);
-		if (stat == A_DEX) 
+		if (stat == A_DEX)
 		  Term_putch(col+5, row+A_AGI, a, c);
-		if (stat == A_STR) 
+		if (stat == A_STR)
 		  Term_putch(col+5, row+A_SIZ, a, c);
 	}
 }
@@ -3132,9 +3226,9 @@ static void display_home_equipment_info(int mode)
 		{
 			/* Assume uppercase stat name */
 			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
-			if (stats == A_DEX) 
+			if (stats == A_DEX)
 			  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
-			if (stats == A_STR) 
+			if (stats == A_STR)
 			  c_put_str(TERM_WHITE, stat_names[A_SIZ], row+A_SIZ, 2);
 
 			/* Default */
@@ -3180,9 +3274,9 @@ static void display_home_equipment_info(int mode)
 
 			/* Dump proper character */
 			Term_putch(col, row+stats, a, c);
-			if (stats == A_DEX) 
+			if (stats == A_DEX)
 			  Term_putch(col, row+A_AGI, a, c);
-			if (stats == A_STR) 
+			if (stats == A_STR)
 			  Term_putch(col, row+A_SIZ, a, c);
 		}
 
@@ -4040,11 +4134,11 @@ errr file_character(cptr name, bool full)
 	}
 
 	/* Print other storages */
-	for (j = 0; j < total_store_count; j++) 
+	for (j = 0; j < total_store_count; j++)
 	{
 		store_type *st_ptr = store[j];
 
-		if ((st_ptr->base != 1 && st_ptr->base != 2) || !st_ptr->stock_num) 
+		if ((st_ptr->base != 1 && st_ptr->base != 2) || !st_ptr->stock_num)
 			continue;
 
 		/* Header */
@@ -4055,7 +4149,7 @@ errr file_character(cptr name, bool full)
 		{
 			object_desc(o_name, sizeof(o_name), &st_ptr->stock[i], TRUE, 3);
 			text_out(format("%c) %s\n", I2A(i), o_name));
-			
+
 			if (st_ptr->stock[i].tval == TV_BAG)
 			{
 				if (!bags_listed[st_ptr->stock[i].sval])
@@ -4109,12 +4203,12 @@ errr file_character(cptr name, bool full)
 				}
 			}
 
-			if (victory) 
+			if (victory)
 			{
 				/* guardians present and all killed */
 
 				/* too interesting */
-				if (x) 
+				if (x)
 					continue;
 
 				if (t_info[i].attained_depth > min_depth(i))
@@ -4124,7 +4218,7 @@ errr file_character(cptr name, bool full)
 					/* won on the surface */
 					text_out("You cleared the passage through");
 			}
-			else 
+			else
 			{
 				/* no guardians or not all killed */
 
@@ -4136,50 +4230,50 @@ errr file_character(cptr name, bool full)
 						/* completed */
 
 						/* too interesting */
-						if (x) 
+						if (x)
 							continue;
 
 						text_out("You fought through to the other side of");
 					}
-					else 
+					else
 					{
 						/* not interesting enough */
-						if (!x) 
+						if (!x)
 							continue;
 
 						if (havoc)
 							text_out("You broke through to");
 						else
 							text_out("You reached");
-		
+
 						/* Express in feet or level*/
 						if (depth_in_feet) text_out(format(" %d foot depth in", t_info[i].attained_depth));
 						else text_out(format(" level %d in", t_info[i].attained_depth));
 					}
 				}
-				else 
+				else
 				{
 					/* not descended, but visited */
 
 					please_print_depths = FALSE;
 
-					if (t_info[i].quest_monster 
-						 && r_info[t_info[i].quest_monster].max_num == 0) 
+					if (t_info[i].quest_monster
+						 && r_info[t_info[i].quest_monster].max_num == 0)
 					{
 						/* not descended nor cleared, but another location opened */
 
 						/* too interesting */
-						if (x) 
+						if (x)
 							continue;
 
 						text_out("You opened the passage through");
 					}
-					else if (havoc) 
+					else if (havoc)
 					{
 						/* not descended nor cleared, but killed a guardian */
 
 						/* too interesting */
-						if (x) 
+						if (x)
 							continue;
 
 						text_out("You wrecked havoc at");
@@ -4189,17 +4283,17 @@ errr file_character(cptr name, bool full)
 						/* only visited on the surface */
 
 						/* not interesting enough */
-						if (!x) 
+						if (!x)
 							continue;
 
-						text_out("You have visited");		
+						text_out("You have visited");
 					}
 				}
 			}
 
 			text_out(format(" %s", str));
 
-			if (please_print_depths || min_depth(i) != max_depth(i)) 
+			if (please_print_depths || min_depth(i) != max_depth(i))
 			{
 				if (min_depth(i) == max_depth(i))
 					text_out(format(" (%d).\n",  min_depth(i)));
@@ -4315,13 +4409,13 @@ static void string_lower(char *buf)
  * use of perfect seeking.  XXX XXX XXX
  *
  * Allow the user to "save" the current file.  XXX XXX XXX
- * 
+ *
  * If mode is set to 1, the file is shown but ignores the menu
  * structure, and only has 3 commands: space advances a
  * screenful, enter exits, and any other key exits and pushes
  * the key_press back as a command.  This is used to show
  * the commands for the user if they press the enter key.
- * 
+ *
  */
 bool show_file(cptr name, cptr what, int line, int mode)
 {
@@ -4658,14 +4752,14 @@ bool show_file(cptr name, cptr what, int line, int mode)
 		{
 			/* Also break on ENTER */
 			if ((ke.key == ESCAPE) || (ke.key == '\r') || (ke.key == '\n')) break;
-			
+
 			else if (ke.key != ' ')
 			{
 				p_ptr->command_new = ke;
 				break;
 			}
 		}
-		
+
 		/* Return to last screen */
 		if (ke.key == '?') break;
 
@@ -4842,23 +4936,23 @@ void do_cmd_quick_help(void)
 
 /*
  * Queue up tips to be shown.
- * 
+ *
  * Tips are bits of context sensitive help that
  * we want to interrupt the game with (because they are
  * useful) but only want to interrupt the game in certain
  * 'safe' locations. Currently, we use show a tip every
  * 1000 turns while searching, every 100 turns while in town,
  * and when we first enter a level.
- * 
+ *
  * Tips go into the info directly (currently unused).
- * 
+ *
  * We don't show tips while repeating a command.
- * 
+ *
  * But because these are context sensitive, we need them
  * to approximately appear at the time we find them. So
  * we queue them up in the permanent array of already shown tips
  * clear the queue markers in show_tip when they are shown.
- * 
+ *
  * Currently we check if the tip file exists before queuing it.
  * If we call tips frequently, we probably will want to
  * move this check to when we show the tip.
@@ -4873,7 +4967,7 @@ bool queue_tip(cptr tip)
 
 	/* If no space for more tips; panic */
 	assert(tips_end < TIPS_MAX);
-	
+
 	/* Build the filename */
 	path_build(path, 1024, ANGBAND_DIR_INFO, tip);
 
@@ -4884,11 +4978,11 @@ bool queue_tip(cptr tip)
 	if (!fff) return (FALSE);
 
 	/* Close the file */
-	my_fclose(fff);		
-	
+	my_fclose(fff);
+
 	/* Add the tip, using quarks */
 	tips[tips_end++] = quark_add(tip);
-	
+
 	return (TRUE);
 }
 
@@ -4900,10 +4994,10 @@ void show_tip(void)
 {
 	/* Don't interrupt running with tips */
 	if (p_ptr->running) return;
-	
+
 	/* Don't interrupt repeating with tips */
 	if (p_ptr->command_rep) return;
-	
+
 	/* Have tips to show */
 	if (tips_start != tips_end)
 	{
@@ -4912,18 +5006,18 @@ void show_tip(void)
 #ifdef ALLOW_BORG
 		if (count_stop) { /* Do nothing */ } else
 #endif
-	
+
 		if (show_tips)
 		{
 			msg_print("You find a note.");
 			msg_print(NULL);
-			
+
 			/* Save screen */
 			screen_save();
-	
+
 			/* Peruse the help tip file */
 			(void)show_file(tip, NULL, 0, 0);
-	
+
 			/* Load screen */
 			screen_load();
 		}
@@ -5633,7 +5727,7 @@ static void death_examine(void)
 		screen_object(o_ptr);
 
 		(void)anykey();
-		
+
 		/* Needed to handle bags */
 		notice_stuff();
 
@@ -5904,12 +5998,12 @@ void display_scores_aux(int from, int to, int note, high_score *score)
 
 			/* Another line of info */
 			sprintf(out_val, "               %s %s",
-			        (cdep == min_depth(cdun) 
+			        (cdep == min_depth(cdun)
 				 && cdep == max_depth(cdun))
 				? "in"
-				: (cdep == min_depth(cdun) 
+				: (cdep == min_depth(cdun)
 				   ? "on the surface of"
-				   : format("on level %d in", cdep)), 
+				   : format("on level %d in", cdep)),
 				str);
 			}
 
@@ -6366,7 +6460,7 @@ static void close_game_aux(void)
 
 	/* Easy more? */
 	if (easy_more) messages_easy(FALSE);
-	
+
 	/* Save screen */
 	screen_save();
 
@@ -6678,7 +6772,7 @@ static Signal_Handler_t wrap_signal(int sig, Signal_Handler_t handler)
 	return signal(sig, handler);
 }
 
-/* Call this instead of calling signal() directly. */  
+/* Call this instead of calling signal() directly. */
 Signal_Handler_t (*signal_aux)(int, Signal_Handler_t) = wrap_signal;
 
 

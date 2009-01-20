@@ -84,7 +84,7 @@ void init_file_paths(char *path)
 #ifdef PRIVATE_USER_PATH
 	char dirpath[1024];
 	char buf[1024];
-#endif 
+#endif
 
 	/*** Free everything ***/
 
@@ -800,7 +800,7 @@ static errr init_d_info(void)
 	/* Save a pointer to the evaluate power function*/
 	d_head.emit_info_txt_always = emit_d_info_always;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("room", &d_head);
@@ -903,7 +903,7 @@ static errr init_k_info(void)
 	/* Save a pointer to the emit function*/
 	k_head.emit_info_txt_index = emit_k_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("object", &k_head);
@@ -938,7 +938,7 @@ static errr init_a_info(void)
 	/* Save a pointer to the emit function*/
 	a_head.emit_info_txt_index = emit_a_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("artifact", &a_head);
@@ -1001,7 +1001,7 @@ static errr init_e_info(void)
 	/* Save a pointer to the evaluate power function*/
 	e_head.emit_info_txt_index = emit_e_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("ego_item", &e_head);
@@ -1035,7 +1035,7 @@ static errr init_x_info(void)
 	/* Save a pointer to the evaluate power function*/
 	x_head.emit_info_txt_index = emit_x_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("flavor", &x_head);
@@ -1135,7 +1135,7 @@ static errr init_p_info(void)
 	/* Save a pointer to the evaluate power function*/
 	p_head.emit_info_txt_index = emit_p_info_index;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
-	
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("p_race", &p_head);
@@ -1631,6 +1631,9 @@ static errr init_other(void)
 		op_ptr->window_flag[n] = 0L;
 	}
 
+
+	/*** Initialize the array of spell graphics ***/
+	proj_graphics = C_ZNEW(256, proj_graphics_type);
 
 	/*** Pre-allocate space for the "format()" buffer ***/
 
@@ -2186,8 +2189,8 @@ void init_angband(void)
 
 	/* Initialize feature info */
 	note("[Initializing arrays... (blows)]");
-	if (init_blow_info()) quit("Cannot initialize blows");	
-	
+	if (init_blow_info()) quit("Cannot initialize blows");
+
 	/* Initialize feature info */
 	note("[Initializing arrays... (features)]");
 	if (init_f_info()) quit("Cannot initialize features");
@@ -2293,13 +2296,13 @@ void init_angband(void)
 }
 
 void ang_atexit(void (*arg)(void) ){
-	
+
 	typedef struct exitlist exitlist;
 	struct exitlist {
 		void (*func)(void) ;
 		exitlist *next;
 	};
-	static exitlist *list; 
+	static exitlist *list;
 	exitlist *next;
 
 	if(arg != 0) {
@@ -2309,7 +2312,7 @@ void ang_atexit(void (*arg)(void) ){
 		list = next;
 		return;
 	}
-	
+
 	while (list) {
 		next = list->next;
 		list->func();
@@ -2363,6 +2366,9 @@ void cleanup_angband(void)
 			FREE(st_ptr);
 		}
 	}
+
+	/* Free the projection graphics */
+	FREE(proj_graphics);
 
 	/* Free the player inventory */
 	FREE(inventory);
