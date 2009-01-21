@@ -1176,58 +1176,61 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	byte a;
 	char c;
 
+	/* Paranoia */
+	if (typ > z_info->effect_max) return (PICT(TERM_WHITE, '@'));
+
 	/* No motion (*) */
 	if ((ny == y) && (nx == x))
 	{
-		a = proj_graphics[typ].attr_ball ?
-		    proj_graphics[typ].attr_ball : spell_color(typ);
-		c = proj_graphics[typ].char_ball ?
-			proj_graphics[typ].char_ball : '*';
+		a = effect_info[typ].attr_ball ?
+		    effect_info[typ].attr_ball : spell_color(typ);
+		c = effect_info[typ].char_ball ?
+			effect_info[typ].char_ball : '*';
 	}
 
 	/* Vertical (|) */
 	else if (nx == x)
 	{
-		a = proj_graphics[typ].attr_vert ?
-		    proj_graphics[typ].attr_vert : spell_color(typ);
-		c = proj_graphics[typ].char_vert ?
-			proj_graphics[typ].char_vert : '|';
+		a = effect_info[typ].attr_vert ?
+		    effect_info[typ].attr_vert : spell_color(typ);
+		c = effect_info[typ].char_vert ?
+			effect_info[typ].char_vert : '|';
 	}
 
 	/* Horizontal (-) */
 	else if (ny == y)
 	{
-		a = proj_graphics[typ].attr_horiz ?
-		    proj_graphics[typ].attr_horiz : spell_color(typ);
-		c = proj_graphics[typ].char_horiz ?
-			proj_graphics[typ].char_horiz : '-';
+		a = effect_info[typ].attr_horiz ?
+		    effect_info[typ].attr_horiz : spell_color(typ);
+		c = effect_info[typ].char_horiz ?
+			effect_info[typ].char_horiz : '-';
 	}
 
 	/* Diagonal (/) */
 	else if ((ny - y) == (x - nx))
 	{
-		a = proj_graphics[typ].attr_rdiag ?
-		    proj_graphics[typ].attr_rdiag : spell_color(typ);
-		c = proj_graphics[typ].char_rdiag ?
-			proj_graphics[typ].char_rdiag : '/';
+		a = effect_info[typ].attr_rdiag ?
+		    effect_info[typ].attr_rdiag : spell_color(typ);
+		c = effect_info[typ].char_rdiag ?
+			effect_info[typ].char_rdiag : '/';
 	}
 
 	/* Diagonal (\) */
 	else if ((ny - y) == (nx - x))
 	{
-		a = proj_graphics[typ].attr_ldiag ?
-		    proj_graphics[typ].attr_ldiag : spell_color(typ);
-		c = proj_graphics[typ].char_ldiag ?
-			proj_graphics[typ].char_ldiag : '\\';
+		a = effect_info[typ].attr_ldiag ?
+		    effect_info[typ].attr_ldiag : spell_color(typ);
+		c = effect_info[typ].char_ldiag ?
+			effect_info[typ].char_ldiag : '\\';
 	}
 
 	/* Weird (*) */
 	else
 	{
-		a = proj_graphics[typ].attr_ball ?
-		    proj_graphics[typ].attr_ball : spell_color(typ);
-		c = proj_graphics[typ].char_horiz ?
-			proj_graphics[typ].char_horiz : '*';
+		a = effect_info[typ].attr_ball ?
+		    effect_info[typ].attr_ball : spell_color(typ);
+		c = effect_info[typ].char_horiz ?
+			effect_info[typ].char_horiz : '*';
 	}
 
 	/* Create pict */

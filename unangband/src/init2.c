@@ -1711,11 +1711,6 @@ static errr init_other(void)
 	}
 
 
-	/*** Initialize the array of spell graphics ***/
-	proj_graphics = C_ZNEW(256, proj_graphics_type);
-
-
-
 	/*** Pre-allocate space for the "format()" buffer ***/
 
 	/* Hack -- Just call the "format()" function */
@@ -2454,10 +2449,6 @@ void cleanup_angband(void)
 			FREE(st_ptr);
 		}
 	}
-
-	/* Free the projection graphics */
-	FREE(proj_graphics);
-
 
 
 	/* Free the player inventory */

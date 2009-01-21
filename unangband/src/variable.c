@@ -854,12 +854,6 @@ alloc_entry *alloc_race_table;
 
 
 /*
- * The projection graphics table
- */
-proj_graphics_type *proj_graphics;
-
-
-/*
  * Specify color for inventory item text display (by tval)
  * Be sure to use "index & 0x7F" to avoid illegal access
  */

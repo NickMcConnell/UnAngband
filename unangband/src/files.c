@@ -363,7 +363,7 @@ static bool read_byte_or_char(char *zz, byte *a, char *c)
  */
 errr process_pref_file_command(char *buf)
 {
-	int i, j, n1, n2, n3;
+	int i, j, n1, n3;
 
 	char *zz[16];
 
@@ -571,16 +571,16 @@ errr process_pref_file_command(char *buf)
 					}
 
 					/* Store attr/char pairs */
-					if (k == 1) proj_graphics[j].attr_vert  = atmp;
-					else if (k == 2) proj_graphics[j].char_vert  = ctmp;
-					else if (k == 3) proj_graphics[j].attr_horiz = atmp;
-					else if (k == 4) proj_graphics[j].char_horiz = ctmp;
-					else if (k == 5) proj_graphics[j].attr_rdiag = atmp;
-					else if (k == 6) proj_graphics[j].char_rdiag = ctmp;
-					else if (k == 7) proj_graphics[j].attr_ldiag = atmp;
-					else if (k == 8) proj_graphics[j].char_ldiag = ctmp;
-					else if (k == 9) proj_graphics[j].attr_ball  = atmp;
-					else if (k ==10) proj_graphics[j].char_ball  = ctmp;
+					if (k == 1) effect_info[j].attr_vert  = atmp;
+					else if (k == 2) effect_info[j].char_vert  = ctmp;
+					else if (k == 3) effect_info[j].attr_horiz = atmp;
+					else if (k == 4) effect_info[j].char_horiz = ctmp;
+					else if (k == 5) effect_info[j].attr_rdiag = atmp;
+					else if (k == 6) effect_info[j].char_rdiag = ctmp;
+					else if (k == 7) effect_info[j].attr_ldiag = atmp;
+					else if (k == 8) effect_info[j].char_ldiag = ctmp;
+					else if (k == 9) effect_info[j].attr_ball  = atmp;
+					else if (k ==10) effect_info[j].char_ball  = ctmp;
 				}
 
 				/* Usually only store this set of graphics */
