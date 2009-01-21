@@ -54,8 +54,6 @@ copy lib\xtra\sound\*.wav unangband-062-win\lib\xtra\sound
 copy lib\xtra\help\angband.hlp unangband-062-win\lib\xtra\help
 copy lib\xtra\help\angband.cnt unangband-062-win\lib\xtra\help
 
-upx -9 unangband-062-win\unangband.exe
-
 7z a -tzip -r unangband-062-win.zip unangband-062-win
 
 rmdir /q /s unangband-062-win
