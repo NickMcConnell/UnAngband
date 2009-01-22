@@ -6128,18 +6128,37 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		}
 
 		/* Initialise the region */
-		if ((s_ptr->type == SPELL_REGION) || (s_ptr->type == SPELL_SET_TRAP))
+		if ((s_ptr->type == SPELL_REGION) ||
+				(s_ptr->type == SPELL_SET_TRAP) ||
+				((who == SOURCE_PLAYER_CAST) &&
+				((p_ptr->spell_trap) || (p_ptr->delay_spell))))
 		{
 			region_type *r_ptr;
 
+			int ri = (s_ptr->type == SPELL_REGION) ||
+				(s_ptr->type == SPELL_SET_TRAP) ? s_ptr->param : p_ptr->spell_trap;
+
 			/* Get a newly initialized region */
-			region = init_region(who, what, s_ptr->param, damage, method, effect, level, py, px, ty, tx);
+			region = init_region(who, what, ri, damage, method, effect, level, py, px, ty, tx);
 
 			/* Get the region */
 			r_ptr = &region_list[region];
 
-			/* Hack -- we override the life span if requested */
-			if ((s_ptr->l_dice) && (s_ptr->l_side))
+			/* Hack -- we delay subsequent regions from the same spell casting until the first has expired */
+			r_ptr->delay = delay;
+
+			/* Delaying casting of a spell */
+			if ((p_ptr->delay_spell) || (p_ptr->spell_trap))
+			{
+				/* Delay the effect */
+				r_ptr->delay = p_ptr->delay_spell;
+
+				/* Lasts one turn only */
+				r_ptr->lifespan = 1;
+			}
+
+			/* Set the life span according to the duration */
+			else if ((s_ptr->l_dice) && (s_ptr->l_side))
 			{
 				r_ptr->lifespan = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
 			}
@@ -6147,9 +6166,6 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			{
 				r_ptr->lifespan = s_ptr->l_plus;
 			}
-
-			/* Hack -- we delay subsequent regions from the same spell casting until the first has expired */
-			r_ptr->delay = delay;
 
 			/* Increase delay */
 			delay += r_ptr->lifespan * r_ptr->delay;
@@ -6165,7 +6181,15 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		*cancel = FALSE;
 
 		/* Notice region? */
-		if (obvious && region) region_list[region].flags1 |= (RE1_NOTICE);
+		if (obvious && region && !ap_cnt) region_list[region].flags1 |= (RE1_NOTICE);
+	}
+
+	/* Player successfully delayed casting */
+	if ((delay) && (who == SOURCE_PLAYER_CAST))
+	{
+		/* Clear delay */
+		p_ptr->delay_spell = 0;
+		p_ptr->spell_trap = 0;
 	}
 
 	/* Return result */
@@ -7574,6 +7598,8 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 
 			case SPELL_REGION:
+			case SPELL_SET_TRAP:
+			case SPELL_DELAY_SPELL:
 			{
 				/* Already initialized elsewhere */
 				break;
@@ -7581,9 +7607,16 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 			default:
 			{
-				wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);
-				*cancel = FALSE;
-				obvious = TRUE;
+				if ((s_ptr->type >= INVEN_WIELD) && (s_ptr->type < END_EQUIPMENT))
+				{
+					wield_spell(s_ptr->type,s_ptr->param,lasts, level, 0);
+					*cancel = FALSE;
+					obvious = TRUE;
+				}
+				else
+				{
+					msg_format("Undefined spell %d.", s_ptr->type);
+				}
 				break;
 			}
 		}
@@ -7838,10 +7871,39 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 					/* Done something? */
 					*cancel = FALSE;
 				}
+
+				/* Obvious */
+				obvious = TRUE;
+			}
+			/* Paranoia */
+			else
+			{
+				/* Not interacting --> no effect */
+				s_ptr->blow[0].effect = GF_NOTHING;
 			}
 
-			/* Obvious */
-			obvious = TRUE;
+			break;
+		}
+
+		/* The spell */
+		case SPELL_DELAY_SPELL:
+		{
+			/* Use up the item if required */
+			if (forreal)
+			{
+				/* Choose the effect */
+				p_ptr->spell_trap = s_ptr->param;
+
+				/* Set the delay */
+				if ((s_ptr->l_dice) && (s_ptr->l_side))
+				{
+					p_ptr->delay_spell = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+				}
+				else if (s_ptr->l_plus)
+				{
+					p_ptr->delay_spell = s_ptr->l_plus;
+				}
+			}
 		}
 	}
 
@@ -9108,12 +9170,9 @@ void trigger_region(int y, int x, bool move)
 		/* Paranoia */
 		if (!r_ptr->type) continue;
 
-		/* Not yet ready */
-		if (!(r_ptr->flags1 & (RE1_LINGER)) && (r_ptr->countdown)) continue;
-
 		/* Shoot grid with effect */
 		if ((move ? ((r_ptr->flags1 & (RE1_TRIGGER_MOVE)) != 0) : ((r_ptr->flags1 & (RE1_TRIGGER_DROP)) != 0)) &&
-				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0))
+				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0) && (!r_ptr->countdown))
 		{
 			if (r_ptr->flags1 & (RE1_HIT_TRAP))
 			{
@@ -9137,7 +9196,7 @@ void trigger_region(int y, int x, bool move)
 		}
 
 		/* Lingering effect hits player/monster moving into grid */
-		if (r_ptr->flags1 & (RE1_LINGER))
+		if ((r_ptr->flags1 & (RE1_LINGER)) && (r_ptr->age))
 		{
 			int dam = 0;
 			bool notice = FALSE;
@@ -9178,11 +9237,11 @@ void trigger_region(int y, int x, bool move)
 
 
 /* Some special 'age' values */
-#define AGE_OLD			10000
-#define AGE_ANCIENT		10001
-#define AGE_LIFELESS	10002
-#define AGE_EXPIRED		10003
-#define AGE_INFINITY	10004
+#define AGE_OLD			9998
+#define AGE_ANCIENT		9999
+#define AGE_INFINITY	10000
+#define AGE_LIFELESS	10001
+#define AGE_EXPIRED		10002
 
 
 
@@ -9904,7 +9963,6 @@ int init_region(int who, int what, int type, int dam, int method, int effect, in
 	region_info_type *ri_ptr = &region_info[type];
 	method_type *method_ptr = &method_info[method];
 
-	int lsp = scale_method(ri_ptr->lifespan, level);
 	int region = region_pop();
 
 	region_type *r_ptr = &region_list[region];
@@ -9929,7 +9987,7 @@ int init_region(int who, int what, int type, int dam, int method, int effect, in
 	r_ptr->what = what;
 	r_ptr->damage = dam;
 	r_ptr->effect = effect;
-	r_ptr->lifespan = lsp;
+	r_ptr->lifespan = AGE_INFINITY;
 	r_ptr->method = method;
 
 	/* Initialise region values from region info type */

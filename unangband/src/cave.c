@@ -5700,6 +5700,12 @@ void cave_set_feat(int y, int x, int feat)
 	bool climb = (f_ptr->flags2 & (FF2_CAN_CLIMB)) !=0;
 	bool climb2 = (f_ptr2->flags2 & (FF2_CAN_CLIMB)) !=0;
 
+	bool los =  (f_ptr->flags1 & (FF1_LOS)) !=0;
+	bool los2 =  (f_ptr2->flags1 & (FF1_LOS)) !=0;
+
+	bool project =  (f_ptr->flags1 & (FF1_PROJECT)) !=0;
+	bool project2 =  (f_ptr2->flags1 & (FF1_PROJECT)) !=0;
+
 	/* Change the feature */
 	cave_set_feat_aux(y,x,feat);
 
@@ -5759,6 +5765,43 @@ void cave_set_feat(int y, int x, int feat)
 			{
 				/* Add more light */
 				gain_attribute(yy, xx, 2, CAVE_XLOS, apply_daylight, redraw_daylight_gain);
+			}
+		}
+	}
+
+	/* Handle updating regions if required */
+	if ((los && !los2) || (!los && los2) || (project && !project2) || (!project && project2))
+	{
+		s16b this_region_piece, next_region_piece = 0;
+
+		for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+		{
+			/* Get the region piece */
+			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+			/* Get the region */
+			region_type *r_ptr = &region_list[rp_ptr->region];
+
+			/* Get the method */
+			method_type *method_ptr = &method_info[r_ptr->method];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_grid;
+
+			/* Skip regions that don't need updating */
+			if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || ((r_ptr->flags1 & (RE1_LINGER)) != 0)) continue;
+
+			/* Refresh the region if projection changes */
+			if ((project != project2) && ((method_ptr->flags1 & (PROJECT_LOS | PROJECT_THRU)) == 0))
+			{
+				/* Update the region */
+				region_update(rp_ptr->region);
+			}
+			/* Use line of sight instead */
+			else if ((project != project2) && ((method_ptr->flags1 & (PROJECT_LOS)) != 0))
+			{
+				/* Update the region */
+				region_update(rp_ptr->region);
 			}
 		}
 	}

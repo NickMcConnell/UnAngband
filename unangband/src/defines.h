@@ -1689,6 +1689,7 @@
 #define SPELL_DETECT_FIRE	61
 #define SPELL_REGION		62
 #define SPELL_SET_TRAP		63
+#define SPELL_DELAY_SPELL	64
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/

@@ -992,6 +992,7 @@ extern s16b region_pop(void);
 extern void region_copy(region_type *r_ptr, const region_type *r_ptr2);
 extern void compact_regions(int size);
 extern void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region);
+extern void region_update(s16b region);
 extern void trigger_region(int y, int x, bool move);
 extern int init_region(int who, int what, int type, int dam, int method, int effect, int level, int y0, int x0, int y1, int x1);
 extern void process_regions(void);

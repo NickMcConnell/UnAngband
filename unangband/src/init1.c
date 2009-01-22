@@ -1290,7 +1290,8 @@ static cptr s_info_types[] =
 	"SLOW_META",
 	"DETECT_FIRE",
 	"REGION",
-	"REGION_SET_TRAP",
+	"SET_TRAP",
+	"DELAY_SPELL",
 	NULL
 };
 
@@ -2685,16 +2686,6 @@ errr parse_region_info(char *buf, header *head)
 			/* Start the next entry */
 			s = t;
 		}
-	}
-
-	/* Process 'L' for "Lifespan" */
-	else if (buf[0] == 'L')
-	{
-		/* There better be a current region_ptr */
-		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Get the radius information */
-		if (grab_one_level_scalar(&region_ptr->lifespan, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
 	else

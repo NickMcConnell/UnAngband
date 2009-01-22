@@ -30,7 +30,7 @@
 
 # N: number : name
 # G: char : attr
-# L: lifespan
+# I: delay between blows
 # B: blow method
 # F: flags
 
@@ -261,7 +261,6 @@ F:SCALAR_VECTOR | AUTOMATIC | RANDOM | DECELERATE
 N:29:storm
 G:*:Y
 I:120
-L:2+1/10
 F:AUTOMATIC | INVERSE | RANDOM | PROJECTION | ACCELERATE | DECELERATE
 B:BEAM
 F:ATTR_EFFECT
@@ -270,14 +269,12 @@ F:ATTR_EFFECT
 N:30:vortex
 G:*:o
 I:14
-L:50+1/1
 F:AUTOMATIC | LINGER | SHINING | SEEKER
 F:ATTR_EFFECT
 
 # Mass of randomly moving creeps - Used by Creeping Death
 N:31:creep
 I:60
-L:50+1/1
 G:*:p
 F:AUTOMATIC | SEEKER | RANDOM | SPREAD
 F:ATTR_EFFECT
@@ -286,7 +283,6 @@ F:ATTR_EFFECT
 N:32:miasma
 G:*:v
 I:66
-L:20+1/2
 F:AUTOMATIC | LINGER | SPREAD
 F:ATTR_EFFECT
 
@@ -295,7 +291,6 @@ F:ATTR_EFFECT
 N:33:blizzard
 G:*:B
 I:33
-L:40+1/2
 F:AUTOMATIC | LINGER | SPREAD | MOVE_SOURCE | PROJECTION
 F:ATTR_EFFECT
 
@@ -304,7 +299,6 @@ F:ATTR_EFFECT
 N:34:twister
 G:*:W
 I:128
-L:30
 F:AUTOMATIC | LINGER | PROJECTION | CLOCKWISE | COUNTER_CLOCKWISE
 F:MOVE_SOURCE | SPREAD
 F:ATTR_EFFECT
@@ -316,7 +310,6 @@ F:ATTR_EFFECT
 N:35:wave
 G:*:b
 I:25
-L:20
 F:AUTOMATIC | WALL | RANDOM | DECELERATE
 F:ATTR_EFFECT
 
@@ -325,7 +318,6 @@ F:ATTR_EFFECT
 N:36:eruption
 G:*:r
 I:256
-L:8
 F:AUTOMATIC | LINGER | ACCELERATE | SHINING
 B:BALL_MINOR
 F:ATTR_EFFECT
@@ -335,7 +327,6 @@ F:ATTR_EFFECT
 N:37:chain
 G:*:y
 I:100
-L:2+1/10
 F:AUTOMATIC | CHAIN | INVERSE | SEEKER
 F:ATTR_EFFECT
 
@@ -344,7 +335,6 @@ F:ATTR_EFFECT
 N:38:wall
 G:*:w
 I:50
-L:20
 F:AUTOMATIC | LINGER | WALL
 F:ATTR_EFFECT
 
@@ -353,7 +343,34 @@ F:ATTR_EFFECT
 N:39:dust
 G:*:s
 I:66
-L:5+1/4
 F:AUTOMATIC | LINGER | SPREAD | SHINING
 F:ATTR_EFFECT
+
+# Persistent area of effect - Used by tangle
+
+N:40:persist
+G:*:w
+I:100
+F:AUTOMATIC | LINGER
+F:ATTR_EFFECT
+
+# Slow, intermittent effect - Used by pyrokinesis/cyrokinesis
+
+N:41:kinesis
+G:*:w
+I:200
+F:AUTOMATIC
+F:ATTR_EFFECT
+
+# Projection which acts somewhat 'like' a trap - Used by spell trap
+
+N:42:trap
+G:x:w
+F:PROJECTION | TRIGGER_MOVE
+
+# Delayed spell effect - Used by spell trap
+
+N:43:delayed
+G:*:w
+F:AUTOMATIC | PROJECTION | ATTR_EFFECT
 

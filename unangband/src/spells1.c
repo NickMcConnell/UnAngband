@@ -8325,7 +8325,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			/* Big, heavy monsters, metallic monsters and ghosts */
 			if (r_ptr->flags9 & (RF9_IM_BLUNT)) do_petrify = 0;
-			else if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_BLUNT))) do_petrify /= 5;
+			else if ((r_ptr->flags3 & (RF3_HUGE)) || (r_ptr->flags9 & (RF9_IM_EDGED))) do_petrify /= 5;
 			else if ((r_ptr->flags3 & (RF3_GIANT)) || (r_ptr->flags9 & (RF9_RES_BLUNT | RF9_RES_EDGED))) do_petrify /= 3;
 
 			if (do_petrify <= 1)

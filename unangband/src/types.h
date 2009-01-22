@@ -940,8 +940,6 @@ struct region_info_type
 	u32b name;      /* Name (offset) */
 	u32b text;      /* Text (offset) */
 
-	method_level_scalar_type lifespan;		/* Lifespan */
-
 	s16b method;	/* Instead of affecting all grids in region, use this method, if defined. */
 	s16b delay;		/* Number of turns to reset counter to when countdown has finished */
 
@@ -1731,6 +1729,8 @@ struct player_type
 	s16b water;     /* TODO: Current water */
 
 	s16b held_song;     /* Currently held song */
+	s16b spell_trap;	/* Spells the player cast get turned into traps */
+	s16b delay_spell;	/* Delay the next spell cast for this many turns */
 	byte sneaking; 		/* Currently sneaking */
 	byte familiar;		/* Familiar type */
 
