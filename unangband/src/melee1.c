@@ -1828,13 +1828,12 @@ int sauron_shape(int old_form)
  */
 bool make_attack_ranged(int who, int attack, int y, int x)
 {
-	int k, rlev, spower, rad, what;
+	int k, rlev, spower;
 
 	method_type *method_ptr = &method_info[attack];
 
 	int method = attack;
 	int effect = method_ptr->d_res;
-	int dam = 0;
 	bool hit = TRUE;
 
 	monster_type *m_ptr, *n_ptr;
@@ -1849,6 +1848,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	char t_nref[80]; /* Not reflexive if required */
 
 	int result;
+	int dam;
+	int what;
 
 	int target = cave_m_idx[y][x];
 
@@ -1875,7 +1876,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	char atk_desc[80];
 	int dam_desc;
 
-	byte atk_flg;
+	byte atk_flg = 0;
 
 	int fy = y;
 	int fx = x;
@@ -1927,8 +1928,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Describe target - target is itself */
-	if ((who > 0) && (who == target))
+	if (((who > 0) && (who == target)) || (!who))
 	{
+		/* Paranoia */
+		if (!who) who = target;
+
 		n_ptr = &m_list[who];
 		s_ptr = &r_info[n_ptr->r_idx];
 		k_ptr = &l_list[who];
@@ -2070,6 +2074,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Extract the monster level.  Must be at least 1. */
 		rlev = MAX(1, r_ptr->level);
 
+		/* Extract spell power */
+		spower = r_ptr->power;
+
 		/* Extract the powerfulness */
 		powerful = (r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE);
 
@@ -2104,7 +2111,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 
 		/* Get damage for spell attacks */
-		else if (!(method_ptr->flags2 & (PR2_BREATH)))
+		else
 		{
 			dam = get_dam(spower, attack);
 
@@ -2424,7 +2431,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 96+7:
 		{
 			/* The target is attacked by a ball attack */
-			mon_blow_ranged(who, attack, y, x, RBM_AURA, rad, FLG_MON_CLOUD);
+			mon_blow_ranged(who, attack, y, x, RBM_AURA, 2, FLG_MON_CLOUD);
 
 			break;
 		}
