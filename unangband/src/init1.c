@@ -6131,21 +6131,28 @@ errr parse_s_info(char *buf, header *head)
 		for (s = t = buf+2; *t && (*t != 'd'); t++) /* loop */;
 
 		/* Terminate the field (if necessary) */
-		if (*t == 'd') *t++ = '\0';
+		if (*t == 'd')
+		{
+			*t++ = '\0';
 
-		/* Extract the lasts dice */
-		s_ptr->l_dice = atoi(s);
+			/* Extract the lasts dice */
+			s_ptr->l_dice = atoi(s);
 
-		/* Analyze the second field */
-		for (s = t; *t && (*t != '+'); t++) /* loop */;
+			/* Analyze the second field */
+			for (s = t; *t && (*t != '+'); t++) /* loop */;
 
-		/* Terminate the field (if necessary) */
-		if (*t == 'd') *t++ = '\0';
+			/* Terminate the field (if necessary) */
+			if (*t == 'd') *t++ = '\0';
 
-		/* Extract the damage sides and plus */
-		s_ptr->l_side = atoi(s);
-		s_ptr->l_plus = atoi(t);
-
+			/* Extract the damage sides and plus */
+			s_ptr->l_side = atoi(s);
+			s_ptr->l_plus = atoi(t);
+		}
+		else
+		{
+			/* Extract the lasts plus */
+			s_ptr->l_plus = atoi(s);
+		}
 	}
 
 	/* Process 'D' for "Description" */

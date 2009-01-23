@@ -9196,7 +9196,8 @@ void trigger_region(int y, int x, bool move)
 		}
 
 		/* Lingering effect hits player/monster moving into grid */
-		if ((r_ptr->flags1 & (RE1_LINGER)) && (r_ptr->age))
+		if ((r_ptr->flags1 & (RE1_LINGER)) &&
+				((r_ptr->age) || ((r_ptr->flags1 & (RE1_TRIGGERED)) != 0)))
 		{
 			int dam = 0;
 			bool notice = FALSE;

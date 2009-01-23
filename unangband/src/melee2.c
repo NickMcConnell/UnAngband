@@ -5589,6 +5589,13 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			disturb(0, 0);
 		}
 
+		/* Get hit by regions */
+		if (cave_region_piece[ny][nx])
+		{
+			/* Trigger the region */
+			trigger_region(ny, nx, TRUE);
+		}
+
 		/* Hit traps */
 		if (f_info[feat].flags1 & (FF1_HIT_TRAP))
 		{

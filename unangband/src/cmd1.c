@@ -3496,6 +3496,13 @@ void move_player(int dir)
 		/* Notice unknown obstacles */
 		if (!(play_info[y][x] & (PLAY_MARK)))
 		{
+			/* Get hit by regions */
+			if (cave_region_piece[y][x])
+			{
+				/* Trigger the region */
+				trigger_region(y, x, TRUE);
+			}
+
 			/* Get hit by terrain/traps */
 			if (((f_ptr->flags1 & (FF1_HIT_TRAP)) && !(f_ptr->flags3 & (FF3_CHEST))) ||
 				(f_ptr->spell) || (f_ptr->blow.method))
@@ -3717,6 +3724,12 @@ void move_player(int dir)
 			p_ptr->notice |= (PN_PICKUP);
 		}
 
+		/* Get hit by regions */
+		if (cave_region_piece[y][x])
+		{
+			/* Trigger the region */
+			trigger_region(y, x, TRUE);
+		}
 
 		/* Get hit by terrain/traps */
 		/* Except for chests which must be opened to hit */

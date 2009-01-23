@@ -1115,6 +1115,13 @@ static bool do_cmd_open_aux(int y, int x)
 		pick_door(y,x);
 	}
 
+	/* Get hit by regions */
+	if (cave_region_piece[y][x])
+	{
+		/* Trigger the region */
+		trigger_region(y, x, TRUE);
+	}
+
 	/* Trapped door */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
@@ -1331,6 +1338,13 @@ static bool do_cmd_close_aux(int y, int x)
 	/* Verify legality */
 	if (!do_cmd_test(y, x,FS_CLOSE)) return (FALSE);
 
+	/* Get hit by regions */
+	if (cave_region_piece[y][x])
+	{
+		/* Trigger the region */
+		trigger_region(y, x, TRUE);
+	}
+
 	/* Trapped door */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
 	{
@@ -1510,6 +1524,13 @@ static bool do_cmd_tunnel_aux(int y, int x)
 
 	/* Hack - bump up power for doors */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_DOOR)) j = 30;
+
+	/* Get hit by regions */
+	if (cave_region_piece[y][x])
+	{
+		/* Trigger the region */
+		trigger_region(y, x, TRUE);
+	}
 
 	/* Trapped door */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))
@@ -1818,6 +1839,13 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 		/* Message */
 		msg_format("You set off the %s!", name);
 
+		/* Get hit by regions */
+		if (cave_region_piece[y][x])
+		{
+			/* Trigger the region */
+			trigger_region(y, x, TRUE);
+		}
+
 		/* Hit the trap */
 		hit_trap(y, x);
 
@@ -1956,6 +1984,13 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 
 	/* Message */
 	msg_format("You smash into the %s!",name);
+
+	/* Get hit by regions */
+	if (cave_region_piece[y][x])
+	{
+		/* Trigger the region */
+		trigger_region(y, x, TRUE);
+	}
 
 	/* Trapped door */
 	if (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))

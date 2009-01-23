@@ -2396,9 +2396,6 @@ static void player_swap(const int y1, const int x1, const int y2, const int x2)
 
 	/* Update positional information */
 	player_position();
-
-	/* Trigger regions */
-	trigger_region(y2, x2, TRUE);
 }
 
 
@@ -2437,9 +2434,6 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Move monster */
 		m_ptr->fy = y2;
 		m_ptr->fx = x2;
-
-		/* Trigger regions */
-		trigger_region(y2, x2, TRUE);
 
 		/* Some monsters radiate damage when moving */
 		if (r_ptr->flags2 & (RF2_HAS_AURA))
@@ -2487,9 +2481,6 @@ void monster_swap(int y1, int x1, int y2, int x2)
 		/* Move monster */
 		m_ptr->fy = y1;
 		m_ptr->fx = x1;
-
-		/* Trigger regions */
-		trigger_region(y1, x1, TRUE);
 
 		/* Some monsters radiate lite when moving */
 		if (r_ptr->flags2 & (RF2_HAS_LITE | RF2_NEED_LITE))
