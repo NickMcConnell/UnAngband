@@ -3400,7 +3400,7 @@ errr parse_f_info(char *buf, header *head)
 			f_ptr->defaults = result;
 
 			/* Analyze power */
-			f_ptr->power = result;
+			f_ptr->power = power;
 		}
 		else
 		{
@@ -3414,7 +3414,7 @@ errr parse_f_info(char *buf, header *head)
 			f_ptr->state[i].result = result;
 
 			/* Analyze power */
-			f_ptr->state[i].power = result;
+			f_ptr->state[i].power = power;
 		}
 	}
 
@@ -3432,7 +3432,22 @@ errr parse_f_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze the region */
+		/* Analyze the method */
+		for (n1 = 0; n1 < z_info->method_max; n1++)
+		{
+			if (streq(s, method_name + method_info[n1].name)) break;
+		}
+
+		/* Invalid region */
+		if (n1 == z_info->method_max) return (PARSE_ERROR_GENERIC);
+
+		/* Analyze the second field */
+		for (s = t; *t && (*t != ':'); t++) /* loop */;
+
+		/* Terminate the field (if necessary) */
+		if (*t == ':') *t++ = '\0';
+
+		/* Analyze the effect */
 		for (n1 = 0; n1 < z_info->effect_max; n1++)
 		{
 			if (streq(s, effect_name + effect_info[n1].name)) break;
@@ -9707,14 +9722,13 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	/* Output 'T' for "Trap" (one line only) */
 	if (f_ptr->blow.method)
 	{
-#if 0
 		/* Output blow method */
-		fprintf(fp, "T:%s", method_head->name_ptr + method_info[f_ptr->blow.method].name);
-#endif
+		fprintf(fp, "T:%s", f_ptr->blow.method ? method_name + method_info[f_ptr->blow.method].name  : "SELF");
+
 		/* Output blow effect */
 		if (f_ptr->blow.effect)
 		{
-			fprintf(fp, /*":%s"*/ "T:%s", effect_name + effect_info[f_ptr->blow.effect].name);
+			fprintf(fp, ":%s", effect_name + effect_info[f_ptr->blow.effect].name);
 
 			/* Output blow damage if required */
 			if ((f_ptr->blow.d_dice) && (f_ptr->blow.d_side))
@@ -9730,10 +9744,10 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	/* Output 'S' for "Spell" (one line only) */
 	if (f_ptr->spell)
 	{
-		fprintf(fp,"S:%s\n", f_ptr->spell < 129 ? r_info_flags4[f_ptr->spell - 96] :
-							 (f_ptr->spell < 161 ? r_info_flags5[f_ptr->spell - 128] :
-							 (f_ptr->spell < 193 ? r_info_flags6[f_ptr->spell - 160] :
-							 (f_ptr->spell < 225 ? r_info_flags7[f_ptr->spell - 192] : "Error"))));
+		fprintf(fp,"S:%s\n", f_ptr->spell < 128 ? r_info_flags4[f_ptr->spell - 96] :
+							 (f_ptr->spell < 160 ? r_info_flags5[f_ptr->spell - 128] :
+							 (f_ptr->spell < 192 ? r_info_flags6[f_ptr->spell - 160] :
+							 (f_ptr->spell < 224 ? r_info_flags7[f_ptr->spell - 192] : "Error"))));
 	}
 
 	/* Output 'K' for "Transitions" (up to 8 lines, plus default) */
@@ -9752,7 +9766,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 		fprintf(fp,"K:%s:%d:%d\n", f_ptr->state[n].action < 32 ? f_info_flags1[f_ptr->state[n].action] :
 							 (f_ptr->state[n].action < 64 ? f_info_flags2[f_ptr->state[n].action - 32] :
 							 (f_ptr->state[n].action < 128 ? f_info_flags3[f_ptr->state[n].action - 64] : "Error"))
-							 ,f_ptr->state[n].result, f_ptr->power);
+							 ,f_ptr->state[n].result, f_ptr->state[n].power);
 		f2_ptr = (feature_type*)head->info_ptr + f_ptr->state[n].result;
 		fprintf(fp, "#$ %s\n",head->name_ptr + f2_ptr->name);
 	}

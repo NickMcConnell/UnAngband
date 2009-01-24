@@ -126,7 +126,7 @@
 # RIVER:        Place as river through dungeon.
 # LAKE:         Place as lake in dungeon.
 # GLOW:         Lights itself and adjacent locations.
-# PUSH:			Terrain is pushed around by player/monsters.
+# PUSH:                 Terrain is pushed around by player/monsters.
 # COVERED:      Take blows from mimiced feature instead, unless choose to go
 # swimming/burrowing.
 # WATER:        Never generate on ice, acid, oil or lava level. Mark level as
@@ -382,6 +382,7 @@
 V:0.6.3
 
 
+
 # 0x00 --> nothing
 
 N:0:nothing
@@ -447,7 +448,7 @@ U:56
 O:0
 W:0:1:20:0
 K:DEFAULT:1:0
-#$ glyph of warding
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
@@ -465,7 +466,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:1:0
-#$ open door
+#$ open floor
 K:CLOSE:32:0
 #$ door
 K:BASH:5:0
@@ -492,7 +493,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:1:0
-#$ broken door
+#$ open floor
 K:HURT_FIRE:502:0
 #$ fire
 K:HURT_ACID:165:0
@@ -638,9 +639,9 @@ U:56
 #$ granite wall
 O:0
 W:5:1:20:0
-T:FALL_MORE:6d6
+T:TRAP:FALL_MORE:6d6
 K:DEFAULT:1:5
-#$ trap door
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -659,9 +660,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:20:0
-T:FALL:2d6
+T:TRAP:FALL:2d6
 K:DEFAULT:1:5
-#$ pit
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -688,9 +689,9 @@ U:56
 #$ granite wall
 O:345
 W:3:1:20:0
-T:FALL_SPIKE:4d6
+T:TRAP:FALL_SPIKE:4d6
 K:DEFAULT:1:5
-#$ pit
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -717,9 +718,9 @@ U:56
 #$ granite wall
 O:345
 W:4:1:20:0
-T:FALL_POISON:4d6
+T:TRAP:FALL_POISON:4d6
 K:DEFAULT:1:5
-#$ pit
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -744,7 +745,7 @@ O:0
 W:6:1:20:0
 S:S_MONSTERS
 K:DEFAULT:1:6
-#$ strange rune
+#$ open floor
 K:CHASM:141:6
 #$ chasm
 K:TREE:541:6
@@ -759,14 +760,13 @@ D:You are enveloped in a cloud of smoke!
 
 N:21:shimmering portal
 G:^:Z
-#$ shimmering portal
 U:56
 #$ granite wall
 O:0
 W:2:1:20:0
 S:TELE_AWAY
 K:DEFAULT:1:5
-#$ shimmering portal
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -785,9 +785,9 @@ U:56
 #$ granite wall
 O:348
 W:4:1:20:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:1:5
-#$ discolored spot
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -807,9 +807,9 @@ U:56
 #$ granite wall
 O:344
 W:4:1:20:0
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:1:5
-#$ discolored spot
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -827,9 +827,9 @@ U:56
 #$ granite wall
 O:434
 W:1:1:20:0
-T:SLOW:1d4
+T:TRAP:SLOW:1d4
 K:DEFAULT:1:5
-#$ spring-loaded trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -850,9 +850,9 @@ U:56
 #$ granite wall
 O:434
 W:2:1:20:0
-T:LOSE_STR:1d4
+T:TRAP:LOSE_STR:1d4
 K:DEFAULT:1:5
-#$ spring-loaded trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -873,9 +873,9 @@ U:56
 #$ granite wall
 O:434
 W:3:1:20:0
-T:LOSE_DEX:1d4
+T:TRAP:LOSE_DEX:1d4
 K:DEFAULT:1:5
-#$ spring-loaded trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -896,9 +896,9 @@ U:56
 #$ granite wall
 O:434
 W:4:1:20:0
-T:LOSE_CON:1d4
+T:TRAP:LOSE_CON:1d4
 K:DEFAULT:1:5
-#$ spring-loaded trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -917,9 +917,9 @@ U:56
 #$ granite wall
 O:0
 W:2:1:20:0
-T:BLIND
+T:TRAP:BLIND
 K:DEFAULT:1:5
-#$ gas trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -940,9 +940,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:20:0
-T:CONFUSE
+T:TRAP:CONFUSE
 K:DEFAULT:1:5
-#$ gas trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -963,9 +963,9 @@ U:56
 #$ granite wall
 O:0
 W:3:1:20:0
-T:POISON
+T:TRAP:POISON
 K:DEFAULT:1:5
-#$ gas trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -986,9 +986,9 @@ U:56
 #$ granite wall
 O:0
 W:4:1:20:0
-T:PARALYZE
+T:TRAP:PARALYZE
 K:DEFAULT:1:5
-#$ gas trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -1008,7 +1008,7 @@ U:56
 O:0
 W:1:1:17:0
 K:DEFAULT:5:0
-#$ door
+#$ broken door
 K:OPEN:4:0
 #$ open door
 K:HURT_FIRE:502:0
@@ -1036,7 +1036,7 @@ U:56
 O:0
 W:2:1:17:0
 K:DEFAULT:5:1
-#$ door
+#$ broken door
 K:OPEN:257:1
 #$ open door
 K:HURT_FIRE:502:1
@@ -1064,7 +1064,7 @@ U:56
 O:0
 W:4:1:17:0
 K:DEFAULT:5:2
-#$ door
+#$ broken door
 K:OPEN:258:2
 #$ open door
 K:HURT_FIRE:502:2
@@ -1092,7 +1092,7 @@ U:56
 O:0
 W:8:1:17:0
 K:DEFAULT:5:3
-#$ door
+#$ broken door
 K:OPEN:259:3
 #$ open door
 K:HURT_FIRE:502:3
@@ -1120,7 +1120,7 @@ U:56
 O:0
 W:12:1:17:0
 K:DEFAULT:5:4
-#$ door
+#$ broken door
 K:OPEN:260:4
 #$ open door
 K:HURT_FIRE:228:4
@@ -1148,7 +1148,7 @@ U:56
 O:0
 W:16:1:17:0
 K:DEFAULT:5:5
-#$ door
+#$ broken door
 K:OPEN:261:5
 #$ open door
 K:HURT_FIRE:228:5
@@ -1176,7 +1176,7 @@ U:56
 O:0
 W:20:1:17:0
 K:DEFAULT:5:6
-#$ door
+#$ broken door
 K:OPEN:262:6
 #$ open door
 K:HURT_FIRE:228:6
@@ -1204,7 +1204,7 @@ U:56
 O:0
 W:24:1:17:0
 K:DEFAULT:5:7
-#$ door
+#$ broken door
 K:OPEN:263:7
 #$ open door
 K:HURT_FIRE:228:7
@@ -1237,7 +1237,7 @@ U:56
 O:0
 W:3:1:17:0
 K:DEFAULT:5:0
-#$ door
+#$ broken door
 K:SPIKE:41:0
 #$ jammed door
 K:HURT_FIRE:502:0
@@ -1260,7 +1260,7 @@ U:56
 O:0
 W:6:1:17:0
 K:DEFAULT:5:1
-#$ jammed door
+#$ broken door
 K:SPIKE:42:1
 #$ jammed door
 K:HURT_FIRE:502:1
@@ -1286,7 +1286,7 @@ U:56
 O:0
 W:12:1:17:0
 K:DEFAULT:5:2
-#$ jammed door
+#$ broken door
 K:SPIKE:43:2
 #$ jammed door
 K:HURT_FIRE:502:2
@@ -1312,7 +1312,7 @@ U:56
 O:0
 W:16:1:17:0
 K:DEFAULT:5:3
-#$ jammed door
+#$ broken door
 K:SPIKE:44:3
 #$ jammed door
 K:HURT_FIRE:502:3
@@ -1338,7 +1338,7 @@ U:56
 O:0
 W:20:1:17:0
 K:DEFAULT:5:4
-#$ jammed door
+#$ broken door
 K:SPIKE:45:4
 #$ jammed door
 K:HURT_FIRE:228:4
@@ -1364,7 +1364,7 @@ U:56
 O:0
 W:24:1:17:0
 K:DEFAULT:5:5
-#$ jammed door
+#$ broken door
 K:SPIKE:46:5
 #$ jammed door
 K:HURT_FIRE:228:5
@@ -1390,7 +1390,7 @@ U:56
 O:0
 W:28:1:17:0
 K:DEFAULT:5:6
-#$ jammed door
+#$ broken door
 K:SPIKE:47:6
 #$ jammed door
 K:HURT_FIRE:228:6
@@ -1416,7 +1416,7 @@ U:56
 O:0
 W:31:1:17:0
 K:DEFAULT:5:7
-#$ jammed door
+#$ broken door
 K:HURT_FIRE:228:7
 #$ wall of fire
 K:HURT_ACID:165:7
@@ -1440,7 +1440,7 @@ U:56
 O:0
 W:2:1:10:0
 K:DEFAULT:1:0
-#$ granite wall
+#$ open floor
 K:SECRET:32:0
 #$ door
 K:OPEN:4:0
@@ -1461,7 +1461,7 @@ G:::w
 O:82
 W:20:1:13:0
 K:DEFAULT:1:10
-#$ pile of rubble
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:HURT_WATER:625:10
@@ -1479,7 +1479,7 @@ U:56
 O:0
 W:15:8:12:0
 K:DEFAULT:1:10
-#$ magma vein
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 F:REMEMBER | TUNNEL | STREAMER | WALL |
@@ -1495,7 +1495,7 @@ U:56
 O:0
 W:4:6:11:0
 K:DEFAULT:1:20
-#$ quartz vein
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 F:REMEMBER | TUNNEL | STREAMER | WALL |
@@ -1513,7 +1513,7 @@ U:56
 O:0
 W:5:1:12:0
 K:DEFAULT:1:10
-#$ magma vein
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:STREAMER:54:10
@@ -1533,7 +1533,7 @@ U:56
 O:0
 W:3:2:11:0
 K:DEFAULT:1:20
-#$ quartz vein
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:STREAMER:55:20
@@ -1551,7 +1551,7 @@ U:56
 O:0
 W:5:90:19:0
 K:DEFAULT:1:10
-#$ magma vein with treasure
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:STREAMER:52:10
@@ -1569,7 +1569,7 @@ U:56
 O:0
 W:3:40:19:0
 K:DEFAULT:1:20
-#$ quartz vein with treasure
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:STREAMER:53:20
@@ -1585,7 +1585,7 @@ G:#:w
 O:0
 W:1:3:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:HURT_ACID:728:40
@@ -1607,7 +1607,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:HURT_ACID:728:40
@@ -1629,7 +1629,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:SOLID:59:40
@@ -1657,7 +1657,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:HURT_ACID:821:40
@@ -1672,8 +1672,6 @@ F:ATTR_LITE |
 
 N:60:permanent wall
 G:#:z
-M:60
-#$ granite wall
 U:56
 #$ granite wall
 O:0
@@ -1689,7 +1687,7 @@ D:This seems to be permanent rock.
 N:61:permanent wall
 G:#:z
 M:60
-#$ granite wall
+#$ permanent wall
 U:56
 #$ granite wall
 O:0
@@ -1705,7 +1703,7 @@ D:This seems to be permanent rock.
 N:62:permanent wall
 G:#:z
 M:60
-#$ granite wall
+#$ permanent wall
 U:56
 #$ granite wall
 O:0
@@ -1721,7 +1719,7 @@ D:This seems to be permanent rock.
 N:63:permanent wall
 G:#:z
 M:60
-#$ granite wall
+#$ permanent wall
 U:56
 #$ granite wall
 O:0
@@ -1738,9 +1736,9 @@ U:56
 #$ granite wall
 O:0
 W:5:2:20:0
-T:FALL:5d6
+T:TRAP:FALL:5d6
 K:DEFAULT:1:5
-#$ deep pit
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -1762,9 +1760,9 @@ U:56
 #$ granite wall
 O:345
 W:11:2:20:0
-T:FALL_SPIKE:12d6
+T:TRAP:FALL_SPIKE:12d6
 K:DEFAULT:1:11
-#$ pit
+#$ open floor
 K:CHASM:141:11
 #$ chasm
 K:TREE:541:11
@@ -1787,9 +1785,9 @@ U:56
 #$ granite wall
 O:345
 W:13:2:20:0
-T:FALL_POISON:12d6
+T:TRAP:FALL_POISON:12d6
 K:DEFAULT:1:13
-#$ pit
+#$ open floor
 K:CHASM:141:13
 #$ chasm
 K:TREE:541:13
@@ -1812,7 +1810,7 @@ O:0
 W:12:2:20:0
 S:S_UNDEAD
 K:DEFAULT:1:12
-#$ strange rune
+#$ open floor
 K:CHASM:141:12
 #$ chasm
 K:TREE:541:12
@@ -1833,7 +1831,7 @@ O:0
 W:18:2:20:0
 S:S_DRAGON
 K:DEFAULT:1:18
-#$ strange rune
+#$ open floor
 K:CHASM:141:18
 #$ chasm
 K:TREE:541:18
@@ -1854,7 +1852,7 @@ O:0
 W:24:2:20:0
 S:S_DEMON
 K:DEFAULT:1:24
-#$ strange rune
+#$ open floor
 K:CHASM:141:24
 #$ chasm
 K:TREE:541:24
@@ -1873,16 +1871,16 @@ U:56
 #$ granite wall
 O:0
 W:2:2:20:0
-T:TERRIFY
+T:TRAP:TERRIFY
 K:DEFAULT:1:5
-#$ silent watcher
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -1894,16 +1892,16 @@ U:56
 #$ granite wall
 O:0
 W:3:2:20:0
-T:LOSE_CHR
+T:TRAP:LOSE_CHR
 K:DEFAULT:1:5
-#$ silent watcher
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -1915,16 +1913,16 @@ U:56
 #$ granite wall
 O:0
 W:4:2:20:0
-T:LOSE_WIS
+T:TRAP:LOSE_WIS
 K:DEFAULT:1:5
-#$ silent watcher
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -1936,16 +1934,16 @@ U:56
 #$ granite wall
 O:0
 W:5:2:20:0
-T:LOSE_INT
+T:TRAP:LOSE_INT
 K:DEFAULT:1:5
-#$ silent watcher
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -1957,16 +1955,16 @@ U:56
 #$ granite wall
 O:0
 W:10:2:20:0
-T:EXP_20
+T:TRAP:EXP_20
 K:DEFAULT:1:10
-#$ silent watcher
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:TREE:541:10
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -1978,16 +1976,16 @@ U:56
 #$ granite wall
 O:0
 W:15:2:20:0
-T:EXP_40
+T:TRAP:EXP_40
 K:DEFAULT:1:15
-#$ silent watcher
+#$ open floor
 K:CHASM:141:15
 #$ chasm
 K:TREE:541:15
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -1999,16 +1997,16 @@ U:56
 #$ granite wall
 O:0
 W:20:2:20:0
-T:EXP_80
+T:TRAP:EXP_80
 K:DEFAULT:1:20
-#$ silent watcher
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:TREE:541:20
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:It gazes at you.
 
@@ -2021,7 +2019,7 @@ U:56
 O:0
 W:2:2:20:0
 K:DEFAULT:1:5
-#$ tripwire
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2042,9 +2040,9 @@ U:56
 #$ granite wall
 O:0
 W:4:2:20:0
-T:ELEC:4d6
+T:TRAP:ELEC:4d6
 K:DEFAULT:1:5
-#$ tripwire
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2056,43 +2054,41 @@ F:ATTR_LITE |
 
 N:79:ever burning eye
 G:^:v
-M:79
-#$ ever burning eye
 U:56
 #$ granite wall
 O:0
 W:16:2:20:0
-T:UN_BONUS
+T:TRAP:UN_BONUS
 K:DEFAULT:1:6
-#$ tripwire
+#$ open floor
 K:CHASM:141:6
 #$ chasm
 K:TREE:541:6
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You feel a burning presence searching for you.
 
 N:80:ever burning eye
 G:^:v
 M:79
-#$ tripwire
+#$ ever burning eye
 U:56
 #$ granite wall
 O:0
 W:8:2:20:0
-T:UN_POWER
+T:TRAP:UN_POWER
 K:DEFAULT:1:8
-#$ tripwire
+#$ open floor
 K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You feel a burning presence searching for you.
 
@@ -2104,9 +2100,9 @@ U:56
 #$ granite wall
 O:0
 W:2:3:20:0
-T:EAT_FOOD
+T:TRAP:EAT_FOOD
 K:DEFAULT:1:5
-#$ magic symbol
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2124,9 +2120,9 @@ U:56
 #$ granite wall
 O:0
 W:3:3:20:0
-T:EAT_LITE
+T:TRAP:EAT_LITE
 K:DEFAULT:1:5
-#$ magic symbol
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2144,9 +2140,9 @@ U:56
 #$ granite wall
 O:0
 W:8:3:20:0
-T:HURT:20d1
+T:TRAP:HURT:20d1
 K:DEFAULT:1:8
-#$ magic symbol
+#$ open floor
 K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
@@ -2164,9 +2160,9 @@ U:56
 #$ granite wall
 O:0
 W:5:3:20:0
-T:EAT_GOLD
+T:TRAP:EAT_GOLD
 K:DEFAULT:1:5
-#$ magic symbol
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2184,9 +2180,9 @@ U:56
 #$ granite wall
 O:0
 W:6:3:20:0
-T:EAT_ITEM
+T:TRAP:EAT_ITEM
 K:DEFAULT:1:6
-#$ magic symbol
+#$ open floor
 K:CHASM:141:6
 #$ chasm
 K:TREE:541:6
@@ -2204,9 +2200,9 @@ U:56
 #$ granite wall
 O:0
 W:6:3:20:0
-T:HALLU
+T:TRAP:HALLU
 K:DEFAULT:1:6
-#$ magic symbol
+#$ open floor
 K:CHASM:141:6
 #$ chasm
 K:TREE:541:6
@@ -2226,7 +2222,7 @@ O:0
 W:2:3:20:0
 S:DARKNESS
 K:DEFAULT:1:5
-#$ shaft of light
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2241,15 +2237,13 @@ D:You are lost in shadows.
 
 N:88:ancient hex
 G:^:G
-M:88
-#$ ancient hex
 U:56
 #$ granite wall
 O:0
 W:4:3:20:0
 S:FORGET
 K:DEFAULT:1:5
-#$ ancient hex
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2263,12 +2257,14 @@ D:Your memories fade away.
 N:89:magic symbol
 G:^:B
 M:81
+#$ magic symbol
 U:56
 #$ granite wall
 O:0
 W:8:3:20:0
 S:DRAIN_MANA
 K:DEFAULT:1:8
+#$ open floor
 K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
@@ -2289,7 +2285,7 @@ O:0
 W:16:3:20:0
 S:MIND_BLAST
 K:DEFAULT:1:16
-#$ ancient hex
+#$ open floor
 K:CHASM:141:16
 #$ chasm
 K:TREE:541:16
@@ -2308,9 +2304,9 @@ U:56
 #$ granite wall
 O:78
 W:2:1:20:0
-T:HURT:1d6
+T:TRAP:HURT:1d6
 K:DEFAULT:1:5
-#$ murder hole
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2329,9 +2325,9 @@ U:56
 #$ granite wall
 O:80
 W:5:1:20:0
-T:HURT:3d6
+T:TRAP:HURT:3d6
 K:DEFAULT:1:5
-#$ murder hole
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -2350,9 +2346,9 @@ U:56
 #$ granite wall
 O:79
 W:8:1:20:0
-T:HURT:5d6
+T:TRAP:HURT:5d6
 K:DEFAULT:1:8
-#$ murder hole
+#$ open floor
 K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
@@ -2371,9 +2367,9 @@ U:56
 #$ granite wall
 O:81
 W:11:1:20:0
-T:HURT:7d6
+T:TRAP:HURT:7d6
 K:DEFAULT:1:11
-#$ murder hole
+#$ open floor
 K:CHASM:141:11
 #$ chasm
 K:TREE:541:11
@@ -2392,9 +2388,9 @@ U:56
 #$ granite wall
 O:0
 W:3:1:20:0
-T:HURT
+T:TRAP:HURT
 K:DEFAULT:1:1
-#$ loose rock
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:541:1
@@ -2416,7 +2412,7 @@ M:49
 O:82
 W:1:9:13:0
 K:DEFAULT:1:10
-#$ pile of rubble
+#$ open floor
 K:SECRET:97:10
 #$ a pile of rubble containing something
 K:CHASM:141:10
@@ -2435,7 +2431,7 @@ G:&:w
 O:82
 W:1:9:13:0
 K:DEFAULT:1:10
-#$ a pile of rubble containing something
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:HURT_WATER:625:10
@@ -2456,7 +2452,7 @@ U:56
 O:0
 W:11:3:17:0
 K:DEFAULT:1:5
-#$ door
+#$ open floor
 K:OPEN:4:5
 #$ open door
 K:BASH:5:5
@@ -2478,7 +2474,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2499,7 +2495,7 @@ U:56
 O:0
 W:11:3:20:0
 K:DEFAULT:1:5
-#$ trapped door (pit)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2520,7 +2516,7 @@ U:56
 O:0
 W:16:3:20:0
 K:DEFAULT:1:5
-#$ trapped door (strange rune)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2541,7 +2537,7 @@ U:56
 O:0
 W:22:10:20:0
 K:DEFAULT:1:5
-#$ trapped door (stone visage)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2562,7 +2558,7 @@ U:56
 O:0
 W:13:10:20:0
 K:DEFAULT:1:5
-#$ trapped door (tripwire)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2583,7 +2579,7 @@ U:56
 O:0
 W:14:11:20:0
 K:DEFAULT:1:5
-#$ trapped door (magic symbol)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2604,7 +2600,7 @@ U:56
 O:0
 W:18:11:20:0
 K:DEFAULT:1:5
-#$ trapped door (ancient hex)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2625,7 +2621,7 @@ U:56
 O:0
 W:12:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (murder hole)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2646,7 +2642,7 @@ U:56
 O:0
 W:13:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (loose rock)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2667,7 +2663,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door ()
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2688,7 +2684,7 @@ U:56
 O:0
 W:11:1:20:0
 K:DEFAULT:1:5
-#$ trapped door (spring-loaded trap)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2709,7 +2705,7 @@ U:56
 O:0
 W:13:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (gas trap)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -2730,7 +2726,7 @@ U:56
 O:0
 W:12:3:11:0
 K:DEFAULT:1:4
-#$ limestone features
+#$ open floor
 K:CHASM:141:4
 #$ chasm
 F:REMEMBER | TUNNEL | WALL |
@@ -2744,7 +2740,7 @@ U:56
 O:0
 W:3:1:11:0
 K:DEFAULT:1:8
-#$ sandstone
+#$ open floor
 K:CHASM:141:8
 #$ chasm
 F:REMEMBER | TUNNEL | STREAMER | WALL |
@@ -2758,7 +2754,7 @@ U:56
 O:0
 W:21:3:12:0
 K:DEFAULT:1:20
-#$ cracked granite wall
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:HURT_WATER:577:20
@@ -2780,7 +2776,7 @@ G:#:u
 O:0
 W:30:2:12:0
 K:DEFAULT:135:5
-#$ earth wall
+#$ earth floor
 K:CHASM:141:5
 #$ chasm
 F:REMEMBER | TUNNEL | STREAMER | WALL |
@@ -2793,9 +2789,9 @@ U:148
 #$ ice wall
 O:0
 W:35:12:12:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:145:16
-#$ cracked ice wall
+#$ ice
 K:CHASM:144:16
 #$ ice chasm
 K:STREAMER:575:16
@@ -2812,9 +2808,9 @@ U:148
 #$ ice wall
 O:0
 W:40:2:12:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:209:16
-#$ cracked ice wall
+#$ geothermal floor
 K:CHASM:144:16
 #$ ice chasm
 K:SECRET:117:16
@@ -2829,9 +2825,9 @@ U:148
 #$ ice wall
 O:0
 W:42:2:12:0
-T:ICE:2d4
+T:TRAP:ICE:2d4
 K:DEFAULT:209:16
-#$ cracked ice wall over a geothermal floor
+#$ geothermal floor
 K:CHASM:144:16
 #$ ice chasm
 F:REMEMBER | TUNNEL | WALL | HIT_TRAP |
@@ -2846,7 +2842,7 @@ U:148
 #$ ice wall
 O:0
 W:45:3:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:118:16
 K:TUNNEL:155:16
 #$ deep water
@@ -2867,7 +2863,7 @@ U:148
 #$ ice wall
 O:0
 W:45:3:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:119:36
 K:TUNNEL:155:36
 #$ deep water
@@ -2888,9 +2884,9 @@ U:56
 #$ granite wall
 O:224
 W:45:2:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:155:36
-#$ granite wall
+#$ deep water
 K:SECRET:121:36
 #$ underwater
 K:HURT_COLD:150:36
@@ -2912,9 +2908,9 @@ U:56
 #$ granite wall
 O:224
 W:45:2:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:155:36
-#$ underwater
+#$ deep water
 K:HURT_COLD:150:36
 #$ deep water under an ice wall
 K:CHASM:151:36
@@ -2924,8 +2920,8 @@ K:PATH:153:36
 K:HURT_POIS:393:36
 #$ under poisonous water
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL |
-F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
-F:HIDE_ITEM | HIDE_SWIM |
+F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:HIDE_SWIM |
 F:HURT_POIS | USE_FEAT | ATTR_LITE |
 
 N:122:oil shale
@@ -2935,7 +2931,7 @@ U:56
 O:0
 W:38:3:12:0
 K:DEFAULT:219:32
-#$ oil shale
+#$ oil
 K:CHASM:141:32
 #$ chasm
 K:STREAMER:123:32
@@ -2951,7 +2947,7 @@ U:56
 O:0
 W:40:3:12:0
 K:DEFAULT:222:16
-#$ coal
+#$ coal dust trail
 K:HURT_FIRE:124:16
 #$ burning coal
 K:HURT_ROCK:1:16
@@ -2970,9 +2966,9 @@ U:56
 #$ granite wall
 O:0
 W:46:3:13:0
-T:FIRE:8d6
+T:TRAP:FIRE:8d6
 K:DEFAULT:223:16
-#$ burning coal
+#$ deep oil under a stone bridge
 K:HURT_ROCK:1:16
 #$ open floor
 K:CHASM:141:16
@@ -2994,9 +2990,9 @@ U:148
 O:0
 W:35:2:13:145
 #$ ice
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:145:16
-#$ unstable ice wall
+#$ ice
 K:ERUPT:931:16
 #$ deep icy water
 K:TIMED:933:16
@@ -3014,7 +3010,7 @@ U:151
 O:224
 W:35:2:13:938
 #$ rough water
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:126:0
 K:CHASM:151:0
 #$ waterfall
@@ -3038,7 +3034,7 @@ U:56
 O:344
 W:54:2:13:940
 #$ acidic vapour over acid
-T:ACID:6d6
+T:TRAP:ACID:6d6
 K:DEFAULT:127:0
 K:CHASM:126:0
 #$ falling water
@@ -3062,7 +3058,7 @@ O:0
 W:12:1:20:0
 S:TRAPS
 K:DEFAULT:1:6
-#$ loose rock
+#$ open floor
 K:CHASM:141:6
 #$ chasm
 K:TREE:541:6
@@ -3081,9 +3077,9 @@ U:56
 #$ granite wall
 O:598
 W:6:1:20:0
-T:HURT:4d6
+T:TRAP:HURT:4d6
 K:DEFAULT:1:5
-#$ loose rock
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -3102,9 +3098,9 @@ U:56
 #$ granite wall
 O:598
 W:24:1:20:0
-T:SHATTER:16d6
+T:TRAP:SHATTER:16d6
 K:DEFAULT:1:14
-#$ loose rock
+#$ open floor
 K:CHASM:141:14
 #$ chasm
 K:TREE:541:14
@@ -3124,7 +3120,7 @@ U:56
 O:0
 W:1:1:20:0
 K:DEFAULT:1:1
-#$ loose rock
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:541:1
@@ -3145,9 +3141,9 @@ U:56
 #$ granite wall
 O:0
 W:4:1:20:0
-T:COLD:4d6
+T:TRAP:COLD:4d6
 K:DEFAULT:1:5
-#$ gas trap
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -3165,9 +3161,9 @@ G:;:B
 O:0
 W:33:3:7:148
 #$ ice wall
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:155:0
-#$ deep water under ice
+#$ deep water
 K:PATH:147:0
 #$ deep water under ice under a stone bridge
 K:HURT_FIRE:154:0
@@ -3267,14 +3263,17 @@ F:ATTR_LITE |
 
 N:138:loose rock
 G:^:P
+M:95
+#$ loose rock
 U:56
 #$ granite wall
-M:95
+O:0
 W:3:1:20:0
+T:TRAP:HURT
 K:DEFAULT:139:1
-K:DISARM:1:1
-T:HURT
 #$ loose rock
+K:DISARM:1:1
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:541:1
@@ -3289,20 +3288,22 @@ D:You hear a click!
 
 N:139:loose rock
 G:^:P
+M:95
+#$ loose rock
 U:56
 #$ granite wall
-M:95
+O:0
 W:3:1:20:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:1:1
-#$ loose rock
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:541:1
 #$ shady ground
-F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM | ADJACENT
-F:ATTR_LITE |
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE | ADJACENT |
 
 #stone bridge (over chasm)
 
@@ -3311,7 +3312,7 @@ G:x:w
 O:0
 W:35:1:8:0
 K:DEFAULT:142:0
-#$ stone bridge
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
 F:PATH | COVERED | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | ATTR_LITE |
@@ -3323,7 +3324,7 @@ G: :D
 O:0
 W:45:2:1:142
 #$ chasm
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:141:0
 K:PATH:140:0
 #$ stone bridge
@@ -3345,7 +3346,7 @@ G:>:D
 O:0
 W:35:2:13:140
 #$ stone bridge
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:141:0
 #$ chasm
 K:PATH:140:0
@@ -3371,7 +3372,7 @@ O:0
 W:48:3:7:148
 #$ ice wall
 K:DEFAULT:144:0
-#$ ice
+#$ ice chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
 F:RIVER | LAKE | HURT_FIRE | ICE | CAN_FLY | KILL_HUGE |
 F:GROUND | ATTR_LITE |
@@ -3381,7 +3382,7 @@ G:>:B
 O:0
 W:48:2:13:148
 #$ ice wall
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:144:0
 K:PATH:796:0
 #$ ice bridge
@@ -3417,9 +3418,9 @@ U:145
 O:0
 W:33:3:7:148
 #$ ice wall
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:155:0
-#$ ice
+#$ deep water
 K:PATH:145:0
 #$ ice
 K:HURT_FIRE:154:0
@@ -3442,23 +3443,23 @@ M:140
 #$ stone bridge
 O:0
 W:33:1:8:0
-T:WATER_WEAK:6d6
+T:TRAP:WATER_WEAK:6d6
 K:DEFAULT:152:0
-#$ stone bridge
+#$ deep water under a stone bridge
 K:CHASM:151:0
 #$ waterfall
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:PATH | COVERED | WATER | HURT_FIRE | ICE | CAN_CLIMB | CAN_FLY |
-F:CAN_SWIM | HIDE_SWIM | KILL_HUGE |
+F:PATH | COVERED | WATER | HURT_FIRE | ICE | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:HIDE_SWIM | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
 
 N:148:ice wall
 G:#:B
 O:0
 W:30:2:12:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:145:40
-#$ ice wall
+#$ ice
 K:CHASM:144:40
 #$ ice chasm
 K:KILL_HUGE:115:40
@@ -3475,9 +3476,9 @@ U:148
 #$ ice wall
 O:0
 W:30:1:12:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:209:36
-#$ geothermal floor under an ice wall
+#$ geothermal floor
 K:CHASM:144:36
 #$ ice chasm
 K:KILL_HUGE:118:36
@@ -3492,9 +3493,9 @@ U:149
 #$ geothermal floor under an ice wall
 O:0
 W:45:3:12:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:155:36
-#$ deep water under an ice wall
+#$ deep water
 K:PATH:153:36
 #$ water
 K:CHASM:151:36
@@ -3511,7 +3512,7 @@ G:>:b
 O:0
 W:48:3:13:126
 #$ falling water
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:151:0
 K:PATH:140:0
 #$ stone bridge
@@ -3526,7 +3527,7 @@ M:140
 #$ stone bridge
 O:224
 W:27:1:8:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:152:0
 K:CHASM:151:0
 #$ waterfall
@@ -3567,7 +3568,7 @@ U:153
 #$ water
 O:224
 W:37:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:154:0
 K:CHASM:151:0
 #$ waterfall
@@ -3591,7 +3592,7 @@ N:155:deep water
 G:::b
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:155:0
 K:CHASM:151:0
 #$ waterfall
@@ -3616,9 +3617,9 @@ U:56
 #$ granite wall
 O:344
 W:54:1:7:0
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:159:0
-#$ stone bridge
+#$ deep acid
 K:CHASM:151:0
 #$ waterfall
 K:HURT_ACID:168:0
@@ -3635,7 +3636,7 @@ U:56
 O:344
 W:47:1:13:51
 #$ quartz vein
-T:ACID:2d6
+T:TRAP:ACID:2d6
 K:DEFAULT:157:0
 K:CHASM:226:0
 #$ acid fall
@@ -3657,7 +3658,7 @@ U:56
 O:344
 W:50:2:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:158:0
 K:CHASM:226:0
 #$ acid fall
@@ -3682,7 +3683,7 @@ U:56
 O:344
 W:49:1:14:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:159:0
 K:CHASM:226:0
 #$ acid fall
@@ -3704,7 +3705,7 @@ U:227
 O:0
 W:55:2:14:942
 #$ steam over geothermal ground
-T:BWATER:6d6
+T:TRAP:BWATER:6d6
 K:DEFAULT:160:0
 K:CHASM:227:0
 #$ boiling waterfall
@@ -3725,7 +3726,7 @@ U:214
 O:0
 W:57:1:14:136
 #$ broken floor
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:161:0
 K:PATH:432:0
 #$ magma crust
@@ -3744,9 +3745,9 @@ U:56
 O:0
 W:41:1:14:308
 #$ burnt floor
-T:SMOKE:2d4
+T:TRAP:SMOKE:2d4
 K:DEFAULT:163:0
-#$ smoke
+#$ smoke over a broken floor
 K:CHASM:141:0
 #$ chasm
 K:SPREAD:308:0
@@ -3766,7 +3767,7 @@ U:56
 O:0
 W:43:3:14:136
 #$ broken floor
-T:SMOKE:2d4
+T:TRAP:SMOKE:2d4
 K:DEFAULT:163:0
 K:SPREAD:136:0
 #$ broken floor
@@ -3785,7 +3786,7 @@ G:>:p
 O:0
 W:48:3:13:126
 #$ falling water
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:164:0
 K:PATH:140:0
 #$ stone bridge
@@ -3801,9 +3802,9 @@ U:56
 O:0
 W:46:1:14:309
 #$ melted floor
-T:VAPOUR:2d4
+T:TRAP:VAPOUR:2d4
 K:DEFAULT:166:0
-#$ acidic vapour
+#$ acidic vapour over a broken floor
 K:CHASM:141:0
 #$ chasm
 K:SPREAD:309:0
@@ -3821,7 +3822,7 @@ U:56
 O:0
 W:48:3:14:309
 #$ melted floor
-T:VAPOUR:2d4
+T:TRAP:VAPOUR:2d4
 K:DEFAULT:166:0
 K:CHASM:141:0
 #$ chasm
@@ -3843,7 +3844,7 @@ U:56
 #$ granite wall
 O:0
 W:0:0:0:0
-T:ACID:8d6
+T:TRAP:ACID:8d6
 K:DEFAULT:168:0
 K:CHASM:226:0
 #$ acid fall
@@ -3864,9 +3865,9 @@ U:56
 O:0
 W:47:1:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:157:0
-#$ acidic vapour
+#$ acid
 K:CHASM:226:0
 #$ acid fall
 K:SECRET:171:0
@@ -3887,9 +3888,9 @@ U:56
 O:0
 W:50:2:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:158:0
-#$ acidic vapour
+#$ deep acid
 K:CHASM:226:0
 #$ acid fall
 K:SECRET:172:0
@@ -3907,9 +3908,9 @@ U:56
 O:0
 W:47:1:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:157:0
-#$ acidic vapour over acid
+#$ acid
 K:CHASM:226:0
 #$ acid fall
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
@@ -3923,9 +3924,9 @@ U:56
 O:0
 W:49:1:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:159:0
-#$ acidic vapour over deep acid
+#$ deep acid
 K:PATH:168:0
 #$ acidic vapour around a stone bridge
 K:CHASM:141:0
@@ -3941,9 +3942,8 @@ U:56
 #$ granite wall
 O:0
 W:0:0:0:0
-T:STEAM:1d3
+T:TRAP:STEAM:1d3
 K:DEFAULT:173:0
-#$ steam
 K:CHASM:141:0
 #$ chasm
 K:SPREAD:1:0
@@ -3964,7 +3964,7 @@ U:56
 #$ granite wall
 O:0
 W:0:0:0:0
-T:STEAM:1d3
+T:TRAP:STEAM:1d3
 K:DEFAULT:174:0
 K:CHASM:141:0
 #$ chasm
@@ -3986,7 +3986,7 @@ N:176:steam around a stone bridge
 G:x:P
 O:0
 W:0:0:0:0
-T:BWATER:3d6
+T:TRAP:BWATER:3d6
 K:DEFAULT:176:0
 K:CHASM:227:0
 #$ boiling waterfall
@@ -4007,7 +4007,7 @@ U:56
 #$ granite wall
 O:0
 W:0:0:0:0
-T:STEAM:1d3
+T:TRAP:STEAM:1d3
 K:DEFAULT:177:0
 K:CHASM:141:0
 #$ chasm
@@ -4030,9 +4030,9 @@ U:216
 O:0
 W:56:1:7:50
 #$ magma vein
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:210:0
-#$ broken magma crust
+#$ deep lava under a magma crust
 K:CHASM:214:0
 #$ lava fall
 K:HURT_FIRE:218:0
@@ -4054,7 +4054,7 @@ U:173
 O:0
 W:55:2:14:50
 #$ magma vein
-T:BWATER:3d6
+T:TRAP:BWATER:3d6
 K:DEFAULT:179:0
 K:CHASM:227:0
 #$ boiling waterfall
@@ -4076,7 +4076,7 @@ U:173
 O:0
 W:55:2:14:50
 #$ magma vein
-T:BWATER:3d6
+T:TRAP:BWATER:3d6
 K:DEFAULT:180:0
 K:PATH:207:0
 #$ boiling water under a stone bridge
@@ -4085,8 +4085,8 @@ K:CHASM:227:0
 K:SPREAD:208:0
 #$ boiling water
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
-F:PATH | RIVER | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM |
-F:HIDE_ITEM | HIDE_SWIM |
+F:PATH | RIVER | LAKE | LAVA | WATER | DEEP | CAN_FLY | CAN_SWIM | HIDE_ITEM |
+F:HIDE_SWIM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | SPREAD |
 
 N:181:poison gas
@@ -4095,9 +4095,9 @@ U:56
 #$ granite wall
 O:0
 W:0:0:0:0
-T:POISON:3d4
+T:TRAP:POISON:3d4
 K:DEFAULT:182:0
-#$ poison gas
+#$ poison gas over broken floor
 K:CHASM:141:0
 #$ chasm
 K:SPREAD:1:0
@@ -4114,7 +4114,7 @@ U:56
 #$ granite wall
 O:0
 W:0:0:0:0
-T:POISON:3d4
+T:TRAP:POISON:3d4
 K:DEFAULT:182:0
 K:CHASM:141:0
 #$ chasm
@@ -4134,7 +4134,7 @@ U:56
 #$ granite wall
 O:0
 W:45:2:14:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:184:0
 K:CHASM:141:0
 #$ chasm
@@ -4150,7 +4150,7 @@ U:56
 #$ granite wall
 O:0
 W:45:2:13:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:185:0
 K:CHASM:141:0
 #$ chasm
@@ -4167,7 +4167,7 @@ U:56
 O:0
 W:48:1:13:184
 #$ burning oil
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:186:0
 K:TIMED:220:0
 #$ oil fall
@@ -4202,7 +4202,7 @@ U:56
 #$ granite wall
 O:0
 W:49:4:7:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:188:0
 K:PATH:187:0
 #$ burning oil under a stone bridge
@@ -4223,7 +4223,7 @@ U:56
 #$ granite wall
 O:0
 W:47:4:12:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:189:0
 K:CHASM:186:0
 #$ burning oil fall
@@ -4242,7 +4242,7 @@ U:56
 O:348
 W:40:2:13:219
 #$ oil
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:190:0
 K:CHASM:220:0
 #$ oil fall
@@ -4261,7 +4261,7 @@ U:56
 O:348
 W:50:4:13:184
 #$ burning oil
-T:FIRE:10d6
+T:TRAP:FIRE:10d6
 K:DEFAULT:191:0
 K:CHASM:186:0
 #$ burning oil fall
@@ -4356,9 +4356,9 @@ U:400
 #$ wet sand
 O:0
 W:30:4:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:193:0
-#$ wet sand
+#$ deep sand
 K:SECRET:197:0
 #$ quicksand
 K:KILL_MOVE:197:0
@@ -4377,9 +4377,9 @@ U:400
 #$ wet sand
 O:0
 W:20:4:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:192:0
-#$ quicksand
+#$ sand
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
 F:PATH | LAKE | WATER | DEEP | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HIDE_DIG |
@@ -4392,7 +4392,7 @@ M:140
 O:0
 W:39:1:8:0
 K:DEFAULT:201:0
-#$ stone bridge
+#$ deep mud
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -4404,7 +4404,7 @@ N:199:mud
 G:;:m
 O:0
 W:21:3:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:199:0
 K:KILL_MOVE:202:0
 #$ muddy trail
@@ -4429,7 +4429,7 @@ U:199
 #$ mud
 O:0
 W:39:3:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:200:0
 K:PATH:202:0
 #$ muddy trail
@@ -4453,7 +4453,7 @@ N:201:deep mud
 G:::m
 O:0
 W:42:3:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:201:0
 K:CHASM:141:0
 #$ chasm
@@ -4493,7 +4493,7 @@ U:199
 #$ mud
 O:0
 W:39:1:6:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:203:0
 K:CHASM:141:0
 #$ chasm
@@ -4504,8 +4504,8 @@ K:HURT_WATER:201:0
 K:TIMED:200:0
 #$ deep mud
 F:LOS | PROJECT | MOVE | DROP | SECRET | REMEMBER |
-F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG |
-F:HIDE_ITEM | HIDE_DIG |
+F:PATH | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_OOZE | CAN_DIG | HIDE_ITEM |
+F:HIDE_DIG |
 F:HURT_WATER | OUTSIDE | MUST_CLIMB | ATTR_LITE | TIMED |
 D:The muddy trail is deeper than it looks.
 
@@ -4515,9 +4515,9 @@ M:140
 #$ stone bridge
 O:0
 W:45:1:8:0
-T:BMUD:6d6
+T:TRAP:BMUD:6d6
 K:DEFAULT:205:0
-#$ stone bridge
+#$ boiling mud
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -4529,7 +4529,7 @@ N:205:boiling mud
 G:::M
 O:0
 W:45:1:13:0
-T:BMUD:6d6
+T:TRAP:BMUD:6d6
 K:DEFAULT:205:0
 K:CHASM:141:0
 #$ chasm
@@ -4549,7 +4549,7 @@ U:56
 O:0
 W:45:6:13:431
 #$ geothermal ground
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:206:0
 K:CHASM:141:0
 #$ chasm
@@ -4568,16 +4568,16 @@ M:140
 O:0
 W:55:1:8:50
 #$ magma vein
-T:BWATER:6d6
+T:TRAP:BWATER:6d6
 K:DEFAULT:208:0
-#$ stone bridge
+#$ boiling water
 K:CHASM:141:0
 #$ chasm
 K:HURT_BWATER:176:0
 #$ steam around a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:PATH | COVERED | LAVA | WATER | HURT_ROCK | CAN_CLIMB | CAN_FLY |
-F:CAN_SWIM | HIDE_SWIM |
+F:PATH | COVERED | LAVA | WATER | HURT_ROCK | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:HIDE_SWIM |
 F:HURT_BWATER | OUTSIDE | ATTR_LITE | SPREAD |
 
 N:208:boiling water
@@ -4585,7 +4585,7 @@ G:::P
 O:0
 W:55:2:14:50
 #$ magma vein
-T:BWATER:6d6
+T:TRAP:BWATER:6d6
 K:DEFAULT:208:0
 K:CHASM:151:0
 #$ waterfall
@@ -4626,7 +4626,7 @@ U:216
 O:0
 W:56:1:7:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:210:0
 K:CHASM:214:0
 #$ lava fall
@@ -4643,9 +4643,9 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:547:0
-#$ gas-filled vent
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:ADJACENT:566:0
@@ -4662,9 +4662,9 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:547:0
-#$ steam-filled vent
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:ADJACENT:567:0
@@ -4680,9 +4680,9 @@ U:56
 O:0
 W:51:1:14:432
 #$ magma crust
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:547:0
-#$ fiery vent
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:ADJACENT:568:0
@@ -4696,7 +4696,7 @@ G:>:r
 O:0
 W:56:3:14:161
 #$ falling lava
-T:FALL_MORE:24d10
+T:TRAP:FALL_MORE:24d10
 K:DEFAULT:214:0
 K:PATH:140:0
 #$ stone bridge
@@ -4711,9 +4711,9 @@ M:140
 #$ stone bridge
 O:0
 W:56:1:14:0
-T:LAVA:24d6
+T:TRAP:LAVA:24d6
 K:DEFAULT:218:0
-#$ stone bridge
+#$ deep lava
 K:CHASM:214:0
 #$ lava fall
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -4725,7 +4725,7 @@ G:;:r
 O:0
 W:56:1:14:50
 #$ magma vein
-T:LAVA:12d10
+T:TRAP:LAVA:12d10
 K:DEFAULT:216:0
 K:CHASM:214:0
 #$ lava fall
@@ -4748,7 +4748,7 @@ U:216
 O:0
 W:56:1:14:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:217:0
 K:CHASM:214:0
 #$ lava fall
@@ -4769,7 +4769,7 @@ G:::r
 O:0
 W:57:1:14:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:218:0
 K:CHASM:214:0
 #$ lava fall
@@ -4807,7 +4807,7 @@ U:56
 O:0
 W:48:1:13:219
 #$ oil
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:220:0
 K:PATH:223:0
 #$ deep oil under a stone bridge
@@ -4879,7 +4879,7 @@ U:56
 O:0
 W:39:2:7:219
 #$ oil
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:224:0
 K:CHASM:220:0
 #$ oil fall
@@ -4902,9 +4902,9 @@ U:56
 O:348
 W:37:4:12:219
 #$ oil
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:22:0
-#$ deep oil
+#$ discolored spot
 K:PATH:223:0
 #$ deep oil under a stone bridge
 K:CHASM:220:0
@@ -4923,7 +4923,7 @@ U:56
 O:0
 W:56:3:13:127
 #$ falling acid
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:226:0
 K:PATH:156:0
 #$ deep acid under a stone bridge
@@ -4939,9 +4939,9 @@ U:56
 O:0
 W:56:3:13:160
 #$ falling boiling water
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:226:0
-#$ boiling waterfall
+#$ acid fall
 K:PATH:156:0
 #$ deep acid under a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
@@ -4956,7 +4956,7 @@ U:56
 O:0
 W:20:2:14:308
 #$ burnt floor
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:228:4
 K:CHASM:141:4
 #$ chasm
@@ -4972,9 +4972,9 @@ N:229:storm cloud
 G:':y
 O:0
 W:40:2:14:0
-T:ELEC:4d6
+T:TRAP:ELEC:4d6
 K:DEFAULT:230:0
-#$ storm cloud
+#$ storm cloud over broken floor
 K:CHASM:232:0
 #$ storm cloud over chasm
 K:SPREAD:233:0
@@ -4988,7 +4988,7 @@ N:230:storm cloud over broken floor
 G:':y
 O:0
 W:40:2:14:0
-T:ELEC:4d6
+T:TRAP:ELEC:4d6
 K:DEFAULT:230:0
 K:CHASM:232:0
 #$ storm cloud over chasm
@@ -5009,9 +5009,9 @@ U:56
 #$ granite wall
 O:0
 W:48:2:14:0
-T:ELEC:4d6
+T:TRAP:ELEC:4d6
 K:DEFAULT:141:0
-#$ steam
+#$ chasm
 K:CHASM:232:0
 #$ storm cloud over chasm
 K:PATH:140:0
@@ -5028,7 +5028,7 @@ G:':y
 O:0
 W:48:2:14:231
 #$ storm cloud over an open floor over a chasm
-T:ELEC:6d6
+T:TRAP:ELEC:6d6
 K:DEFAULT:232:0
 K:SPREAD:236:0
 #$ storm cloud over chasm
@@ -5042,7 +5042,7 @@ G:':W
 O:0
 W:40:2:14:0
 K:DEFAULT:234:0
-#$ storm cloud
+#$ storm cloud over broken floor
 K:CHASM:236:0
 #$ storm cloud over chasm
 K:TIMED:229:0
@@ -5079,7 +5079,7 @@ U:56
 O:0
 W:48:2:14:0
 K:DEFAULT:141:0
-#$ steam
+#$ chasm
 K:CHASM:236:0
 #$ storm cloud over chasm
 K:HURT_ELEC:231:0
@@ -5506,7 +5506,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:32:0
 #$ door
 K:HURT_FIRE:502:0
@@ -5530,7 +5530,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:33:0
 #$ locked door
 K:HURT_FIRE:502:0
@@ -5554,7 +5554,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:34:0
 #$ locked door
 K:HURT_FIRE:502:0
@@ -5578,7 +5578,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:35:0
 #$ locked door
 K:HURT_FIRE:502:0
@@ -5602,7 +5602,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:36:0
 #$ locked door
 K:HURT_FIRE:502:0
@@ -5626,7 +5626,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:37:0
 #$ locked door
 K:HURT_FIRE:502:0
@@ -5650,7 +5650,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:5:0
-#$ open door
+#$ broken door
 K:CLOSE:38:0
 #$ locked door
 K:HURT_FIRE:502:0
@@ -5741,15 +5741,13 @@ F:OUTSIDE | ATTR_LITE |
 
 N:272:stone visage
 G:^:W
-M:272
-#$ stone visage
 U:56
 #$ granite wall
 O:0
 W:30:2:20:0
 S:BALL_ACID
 K:DEFAULT:1:30
-#$ stone visage
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5765,7 +5763,7 @@ O:0
 W:15:2:20:0
 S:BALL_ELEC
 K:DEFAULT:1:15
-#$ stone visage
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5781,7 +5779,7 @@ O:0
 W:25:2:20:0
 S:BALL_FIRE
 K:DEFAULT:1:25
-#$ stone visage
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5797,7 +5795,7 @@ O:0
 W:20:2:20:0
 S:BALL_COLD
 K:DEFAULT:1:20
-#$ stone visage
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5813,7 +5811,7 @@ O:0
 W:10:2:20:0
 S:BALL_POIS
 K:DEFAULT:1:10
-#$ stone visage
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5829,7 +5827,7 @@ O:0
 W:45:2:20:0
 S:BALL_NETHR
 K:DEFAULT:1:60
-#$ ancient hex
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5845,7 +5843,7 @@ O:0
 W:55:2:20:0
 S:BALL_MANA
 K:DEFAULT:1:80
-#$ stone visage
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5854,12 +5852,14 @@ F:ATTR_LITE |
 N:279:shaft of light
 G:^:Y
 M:87
+#$ shaft of light
 U:56
 #$ granite wall
 O:0
 W:50:2:20:0
 S:BALL_DARK
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5869,14 +5869,13 @@ F:ATTR_LITE |
 
 N:280:surreal painting
 G:^:p
-#$ surreal painting
 U:56
 #$ granite wall
 O:0
 W:6:3:20:0
 S:WOUND
 K:DEFAULT:1:6
-#$ surreal painting
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5894,7 +5893,7 @@ O:0
 W:12:3:20:0
 S:A_DEAD
 K:DEFAULT:1:12
-#$ surreal painting
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5912,7 +5911,7 @@ O:0
 W:18:3:20:0
 S:A_OBJECT
 K:DEFAULT:1:18
-#$ surreal painting
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5930,7 +5929,7 @@ O:0
 W:24:3:20:0
 S:A_ELEMENT
 K:DEFAULT:1:24
-#$ surreal painting
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5940,14 +5939,13 @@ F:ATTR_LITE |
 
 N:284:mark of a white hand
 G:^:z
-#$ mark of a white hand
 U:56
 #$ granite wall
 O:0
 W:10:1:20:0
-K:DEFAULT:1:10
 S:S_ORC
-#$ mark of a white hand
+K:DEFAULT:1:10
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5963,7 +5961,7 @@ O:0
 W:55:2:20:0
 S:S_HI_DEMON
 K:DEFAULT:1:80
-#$ strange rune
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5980,7 +5978,7 @@ O:0
 W:6:2:20:0
 S:S_SPIDER
 K:DEFAULT:1:6
-#$ strange rune
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5997,7 +5995,7 @@ O:0
 W:45:2:20:0
 S:S_HI_DRAGON
 K:DEFAULT:1:60
-#$ strange rune
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6014,7 +6012,7 @@ O:0
 W:50:2:20:0
 S:S_HI_UNDEAD
 K:DEFAULT:1:70
-#$ strange rune
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6025,14 +6023,13 @@ D:You are enveloped in a cloud of dust!
 
 N:289:Radagast's snare
 G:^:V
-#$ Radagast's snare
 U:56
 #$ granite wall
 O:0
 W:18:1:20:0
-T:HURT
+T:TRAP:HURT
 K:DEFAULT:1:8
-#$ Radagast's snare
+#$ open floor
 K:HIT_TRAP:313:8
 #$ wooden cage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -6051,9 +6048,9 @@ U:56
 #$ granite wall
 O:0
 W:31:1:20:0
-T:HURT
+T:TRAP:HURT
 K:DEFAULT:1:32
-#$ Radagast's snare
+#$ open floor
 K:HIT_TRAP:314:32
 #$ iron cage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -6072,9 +6069,9 @@ U:56
 #$ granite wall
 O:0
 W:13:2:20:0
-T:FALL:6d6
+T:TRAP:FALL:6d6
 K:DEFAULT:1:13
-#$ pit
+#$ open floor
 K:HIT_TRAP:155:13
 #$ deep water
 K:HURT_WATER:155:13
@@ -6095,9 +6092,9 @@ U:56
 #$ granite wall
 O:0
 W:14:2:20:0
-T:FALL:6d6
+T:TRAP:FALL:6d6
 K:DEFAULT:1:14
-#$ pit
+#$ open floor
 K:HIT_TRAP:189:14
 #$ deep burning oil
 K:HURT_WATER:155:14
@@ -6118,9 +6115,9 @@ U:56
 #$ granite wall
 O:0
 W:15:2:20:0
-T:FALL:6d6
+T:TRAP:FALL:6d6
 K:DEFAULT:1:15
-#$ pit
+#$ open floor
 K:HIT_TRAP:208:15
 #$ boiling water
 K:HURT_WATER:155:15
@@ -6141,9 +6138,9 @@ U:56
 #$ granite wall
 O:0
 W:16:2:20:0
-T:FALL:6d6
+T:TRAP:FALL:6d6
 K:DEFAULT:1:16
-#$ pit
+#$ open floor
 K:HIT_TRAP:158:16
 #$ deep acid
 K:HURT_WATER:155:16
@@ -6158,19 +6155,16 @@ D:You fall into a pit! It quickly fills with acid.
 
 N:295:glowing glyph
 G:^:M
-M:295
-#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:2:3:20:0
-T:PLASMA:8d6
+T:TRAP:PLASMA:8d6
 K:DEFAULT:1:5
-#$ glowing glyph
-#$ large wooden chest
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6183,12 +6177,12 @@ U:56
 #$ granite wall
 O:0
 W:33:3:20:0
-T:GRAVITY:8d6
+T:TRAP:GRAVITY:8d6
 K:DEFAULT:1:36
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6201,12 +6195,12 @@ U:56
 #$ granite wall
 O:0
 W:31:3:20:0
-T:INERTIA:8d6
+T:TRAP:INERTIA:8d6
 K:DEFAULT:1:33
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6219,12 +6213,12 @@ U:56
 #$ granite wall
 O:0
 W:30:3:20:0
-T:FORCE:8d6
+T:TRAP:FORCE:8d6
 K:DEFAULT:1:30
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6237,12 +6231,12 @@ U:56
 #$ granite wall
 O:0
 W:27:3:20:0
-T:TIME:8d6
+T:TRAP:TIME:8d6
 K:DEFAULT:1:27
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6255,12 +6249,12 @@ U:56
 #$ granite wall
 O:0
 W:12:3:20:0
-T:SOUND:8d6
+T:TRAP:SOUND:8d6
 K:DEFAULT:1:12
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6273,12 +6267,12 @@ U:56
 #$ granite wall
 O:0
 W:18:3:20:0
-T:SHARD:8d6
+T:TRAP:SHARD:8d6
 K:DEFAULT:1:18
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
@@ -6291,30 +6285,28 @@ U:56
 #$ granite wall
 O:0
 W:15:3:20:0
-T:NEXUS:8d6
+T:TRAP:NEXUS:8d6
 K:DEFAULT:1:15
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- glowing glyph
 
 N:303:glowing glyph
 G:^:G
-M:303
-#$ glowing glyph
 U:56
 #$ granite wall
 O:0
 W:24:3:20:0
-T:CHAOS:8d6
+T:TRAP:CHAOS:8d6
 K:DEFAULT:1:24
-#$ glowing glyph
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP | GLOW |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:HIT_TRAP |
+F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
 # ---> visible trap -- ancient hex
@@ -6327,8 +6319,9 @@ U:56
 #$ granite wall
 O:0
 W:21:3:20:0
-T:DISENCHANT:8d6
+T:TRAP:DISENCHANT:8d6
 K:DEFAULT:1:21
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6344,7 +6337,7 @@ U:56
 O:0
 W:12:1:6:0
 K:DEFAULT:1:0
-#$ blood-stained floor
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:HURT_WATER:609:0
@@ -6366,7 +6359,7 @@ U:56
 O:0
 W:12:1:6:0
 K:DEFAULT:1:0
-#$ slimy trail
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:HURT_WATER:609:0
@@ -6388,7 +6381,7 @@ U:56
 O:224
 W:18:2:7:0
 K:DEFAULT:1:0
-#$ wet floor
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TIMED:1:0
@@ -6406,7 +6399,7 @@ U:56
 O:0
 W:18:2:7:0
 K:DEFAULT:1:0
-#$ burnt floor
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:HURT_FIRE:162:0
@@ -6428,7 +6421,7 @@ U:56
 O:0
 W:18:2:7:0
 K:DEFAULT:1:0
-#$ melted floor
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:HURT_ACID:165:0
@@ -6469,7 +6462,7 @@ G:;:b
 O:224
 W:27:1:7:0
 K:DEFAULT:155:0
-#$ clear water
+#$ deep water
 K:PATH:153:0
 #$ water
 K:CHASM:151:0
@@ -6489,7 +6482,7 @@ U:56
 O:0
 W:10:1:17:0
 K:DEFAULT:1:0
-#$ broken wood
+#$ open floor
 K:HURT_FIRE:502:0
 #$ fire
 K:HURT_ACID:165:0
@@ -6505,7 +6498,7 @@ U:56
 O:0
 W:10:1:17:0
 K:DEFAULT:312:5
-#$ wooden cage
+#$ broken wood
 K:HURT_FIRE:502:5
 #$ fire
 K:OPEN:695:5
@@ -6521,7 +6514,7 @@ U:56
 O:0
 W:20:1:17:0
 K:DEFAULT:727:9
-#$ iron cage
+#$ broken bars
 K:HURT_ACID:165:9
 #$ acidic vapour
 K:OPEN:696:9
@@ -6551,7 +6544,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:1:0
-#$ broken chest
+#$ open floor
 K:CLOSE:32:0
 #$ door
 K:CHASM:141:0
@@ -6567,7 +6560,7 @@ U:56
 O:0
 W:5:1:19:0
 K:DEFAULT:1:2
-#$ small wooden chest
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:BASH:315:2
@@ -6595,7 +6588,7 @@ U:56
 O:0
 W:5:5:19:0
 K:DEFAULT:1:2
-#$ small wooden chest
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:BASH:315:2
@@ -6615,7 +6608,7 @@ U:56
 O:0
 W:5:1:19:0
 K:DEFAULT:1:2
-#$ small wooden chest (locked)
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:BASH:315:2
@@ -6633,7 +6626,7 @@ U:56
 O:0
 W:5:1:15:0
 K:DEFAULT:1:0
-#$ small wooden chest (open)
+#$ open floor
 K:CLOSE:465:0
 #$ small wooden chest (locked)
 K:BASH:315:0
@@ -6652,7 +6645,7 @@ O:0
 W:1:1:20:0
 S:TRAPS
 K:DEFAULT:1:2
-#$ small wooden chest (multiple traps)
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:HIT_TRAP:319:2
@@ -6676,7 +6669,7 @@ U:56
 O:0
 W:5:1:20:0
 K:DEFAULT:1:2
-#$ small wooden chest (murder hole)
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:DISARM:318:2
@@ -6697,7 +6690,7 @@ U:56
 O:0
 W:5:1:20:0
 K:DEFAULT:1:2
-#$ small wooden chest (spring-loaded trap)
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:DISARM:318:2
@@ -6718,7 +6711,7 @@ U:56
 O:0
 W:5:1:20:0
 K:DEFAULT:1:2
-#$ small wooden chest (gas trap)
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:DISARM:318:2
@@ -6742,7 +6735,7 @@ O:417
 W:5:1:20:0
 S:EXPLODE
 K:DEFAULT:1:2
-#$ small wooden chest (explosive trap)
+#$ open floor
 K:OPEN:319:2
 #$ small wooden chest (open)
 K:HIT_TRAP:315:2
@@ -6768,7 +6761,7 @@ O:417
 W:11:3:20:0
 S:EXPLODE
 K:DEFAULT:1:2
-#$ trapped door (explosive trap)
+#$ open floor
 K:BASH:5:2
 #$ broken door
 K:SPIKE:41:2
@@ -6792,7 +6785,7 @@ O:417
 W:10:1:20:0
 S:EXPLODE
 K:DEFAULT:1:10
-#$ explosive trap
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -6807,7 +6800,7 @@ U:56
 O:0
 W:15:1:19:0
 K:DEFAULT:1:4
-#$ large wooden chest
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:BASH:315:4
@@ -6831,7 +6824,7 @@ U:56
 O:0
 W:15:3:19:0
 K:DEFAULT:1:4
-#$ large wooden chest
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:BASH:315:4
@@ -6851,7 +6844,7 @@ U:56
 O:0
 W:15:1:19:0
 K:DEFAULT:1:4
-#$ large wooden chest (locked)
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:BASH:315:4
@@ -6869,7 +6862,7 @@ U:56
 O:0
 W:15:1:15:0
 K:DEFAULT:1:0
-#$ large wooden chest (open)
+#$ open floor
 K:CLOSE:466:0
 #$ large wooden chest (locked)
 K:BASH:315:0
@@ -6888,7 +6881,7 @@ O:0
 W:1:1:20:0
 S:TRAPS
 K:DEFAULT:1:4
-#$ large wooden chest (multiple traps)
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:DISARM:329:4
@@ -6912,7 +6905,7 @@ U:56
 O:0
 W:15:1:20:0
 K:DEFAULT:1:4
-#$ large wooden chest (murder hole)
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:DISARM:329:4
@@ -6933,7 +6926,7 @@ U:56
 O:0
 W:15:1:20:0
 K:DEFAULT:1:4
-#$ large wooden chest (spring-loaded trap)
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:BASH:315:4
@@ -6954,7 +6947,7 @@ U:56
 O:0
 W:15:1:20:0
 K:DEFAULT:1:4
-#$ large wooden chest (gas trap)
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:BASH:315:4
@@ -6978,7 +6971,7 @@ O:417
 W:15:1:20:0
 S:EXPLODE
 K:DEFAULT:1:4
-#$ large wooden chest (explosive trap)
+#$ open floor
 K:OPEN:330:4
 #$ large wooden chest (open)
 K:BASH:315:4
@@ -7001,7 +6994,7 @@ U:56
 O:0
 W:25:1:19:0
 K:DEFAULT:1:6
-#$ small iron chest
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7025,7 +7018,7 @@ U:56
 O:0
 W:25:1:19:0
 K:DEFAULT:1:6
-#$ small iron chest
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7045,7 +7038,7 @@ U:56
 O:0
 W:25:1:19:0
 K:DEFAULT:1:6
-#$ small iron chest (locked)
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7063,7 +7056,7 @@ U:56
 O:0
 W:25:1:15:0
 K:DEFAULT:1:0
-#$ small iron chest (open)
+#$ open floor
 K:CLOSE:467:0
 #$ small iron chest (locked)
 K:BASH:315:0
@@ -7082,7 +7075,7 @@ O:0
 W:1:1:20:0
 S:TRAPS
 K:DEFAULT:1:6
-#$ small iron chest (multiple traps)
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7106,7 +7099,7 @@ U:56
 O:0
 W:25:1:20:0
 K:DEFAULT:1:6
-#$ small iron chest (magic symbol)
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7127,7 +7120,7 @@ U:56
 O:0
 W:25:1:20:0
 K:DEFAULT:1:6
-#$ small iron chest (tripwire)
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7148,7 +7141,7 @@ U:56
 O:0
 W:25:1:20:0
 K:DEFAULT:1:6
-#$ small iron chest (ancient hex)
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7171,7 +7164,7 @@ U:56
 O:0
 W:25:1:20:0
 K:DEFAULT:1:6
-#$ small iron chest (explosive trap)
+#$ open floor
 K:OPEN:339:6
 #$ small iron chest (open)
 K:BASH:315:6
@@ -7192,7 +7185,7 @@ U:56
 O:0
 W:32:3:19:0
 K:DEFAULT:1:8
-#$ large iron chest
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7216,7 +7209,7 @@ U:56
 O:0
 W:32:1:19:0
 K:DEFAULT:1:8
-#$ large iron chest
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7236,7 +7229,7 @@ U:56
 O:0
 W:32:1:19:0
 K:DEFAULT:1:8
-#$ large iron chest (locked)
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7254,7 +7247,7 @@ U:56
 O:0
 W:32:1:15:0
 K:DEFAULT:1:0
-#$ large iron chest (open)
+#$ open floor
 K:CLOSE:468:0
 #$ large iron chest (locked)
 K:BASH:315:0
@@ -7273,7 +7266,7 @@ O:0
 W:1:1:20:0
 S:TRAPS
 K:DEFAULT:1:8
-#$ large iron chest (multiple traps)
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7297,7 +7290,7 @@ U:56
 O:0
 W:32:1:20:0
 K:DEFAULT:1:8
-#$ large iron chest (magic symbol)
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7318,7 +7311,7 @@ U:56
 O:0
 W:32:1:20:0
 K:DEFAULT:1:8
-#$ large iron chest (tripwire)
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7339,7 +7332,7 @@ U:56
 O:0
 W:32:1:20:0
 K:DEFAULT:1:8
-#$ large iron chest (ancient hex)
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7362,7 +7355,7 @@ U:56
 O:0
 W:32:1:20:0
 K:DEFAULT:1:8
-#$ large iron chest (explosive trap)
+#$ open floor
 K:OPEN:348:8
 #$ large iron chest (open)
 K:BASH:315:8
@@ -7383,7 +7376,7 @@ U:56
 O:0
 W:37:1:19:0
 K:DEFAULT:1:10
-#$ small steel chest
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:BASH:315:10
@@ -7407,7 +7400,7 @@ U:56
 O:0
 W:37:1:19:0
 K:DEFAULT:1:10
-#$ small steel chest
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:BASH:315:10
@@ -7427,7 +7420,7 @@ U:56
 O:0
 W:37:1:19:0
 K:DEFAULT:1:10
-#$ small steel chest (locked)
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:BASH:315:10
@@ -7445,7 +7438,7 @@ U:56
 O:0
 W:37:1:15:0
 K:DEFAULT:1:0
-#$ small steel chest (open)
+#$ open floor
 K:CLOSE:469:0
 #$ small steel chest (locked)
 K:BASH:315:0
@@ -7464,7 +7457,7 @@ O:0
 W:1:1:20:0
 S:TRAPS
 K:DEFAULT:1:10
-#$ small steel chest (multiple traps)
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:HIT_TRAP:357:10
@@ -7488,7 +7481,7 @@ U:56
 O:0
 W:37:1:20:0
 K:DEFAULT:1:10
-#$ small steel chest (magical symbol)
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:DISARM:356:10
@@ -7509,11 +7502,11 @@ U:56
 O:0
 W:37:1:20:0
 K:DEFAULT:1:10
-#$ small steel chest (tripwire)
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:HIT_TRAP:359:10
-#$ small steel chest (magical symbol)
+#$ small steel chest (demonic sign)
 K:DISARM:356:10
 #$ small steel chest (locked)
 K:BASH:315:10
@@ -7532,11 +7525,11 @@ U:56
 O:0
 W:37:1:20:0
 K:DEFAULT:1:10
-#$ small steel chest (ancient hex)
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:HIT_TRAP:359:10
-#$ small steel chest (magical symbol)
+#$ small steel chest (demonic sign)
 K:DISARM:356:10
 #$ small steel chest (locked)
 K:BASH:315:10
@@ -7555,7 +7548,7 @@ U:56
 O:0
 W:37:1:20:0
 K:DEFAULT:1:10
-#$ small steel chest (explosive trap)
+#$ open floor
 K:OPEN:357:10
 #$ small steel chest (open)
 K:BASH:315:10
@@ -7576,7 +7569,7 @@ U:56
 O:0
 W:42:5:19:0
 K:DEFAULT:1:12
-#$ large steel chest
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:BASH:315:12
@@ -7600,7 +7593,7 @@ U:56
 O:0
 W:42:1:19:0
 K:DEFAULT:1:12
-#$ large steel chest
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:BASH:315:12
@@ -7620,7 +7613,7 @@ U:56
 O:0
 W:42:1:19:0
 K:DEFAULT:1:12
-#$ large steel chest (locked)
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:BASH:315:12
@@ -7638,7 +7631,7 @@ U:56
 O:0
 W:42:1:15:0
 K:DEFAULT:1:0
-#$ large steel chest (open)
+#$ open floor
 K:CLOSE:470:0
 #$ large steel chest (locked)
 K:BASH:315:0
@@ -7657,7 +7650,7 @@ O:0
 W:1:1:20:0
 S:TRAPS
 K:DEFAULT:1:12
-#$ large steel chest (multiple traps)
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
@@ -7681,7 +7674,7 @@ U:56
 O:0
 W:42:1:20:0
 K:DEFAULT:1:12
-#$ large steel chest (magical symbol)
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
@@ -7702,13 +7695,13 @@ U:56
 O:0
 W:42:1:20:0
 K:DEFAULT:1:12
-#$ large steel chest (tripwire)
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
 #$ large steel chest (locked)
 K:HIT_TRAP:368:12
-#$ large steel chest (magical symbol)
+#$ large steel chest (demonic sign)
 K:BASH:315:12
 #$ broken chest
 K:CHASM:141:12
@@ -7725,13 +7718,13 @@ U:56
 O:0
 W:42:1:20:0
 K:DEFAULT:1:12
-#$ large steel chest (ancient hex)
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
 #$ large steel chest (locked)
 K:HIT_TRAP:368:12
-#$ large steel chest (magical symbol)
+#$ large steel chest (demonic sign)
 K:BASH:315:12
 #$ broken chest
 K:CHASM:141:12
@@ -7748,7 +7741,7 @@ U:56
 O:0
 W:42:1:20:0
 K:DEFAULT:1:12
-#$ large steel chest (explosive trap)
+#$ open floor
 K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
@@ -7787,7 +7780,7 @@ U:56
 O:384
 W:30:1:20:0
 K:DEFAULT:372:2
-#$ wooden altar
+#$ broken altar
 F:MOVE | NOTICE | REMEMBER | BASH |
 F:CAN_CLIMB | CAN_FLY |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -7801,7 +7794,7 @@ U:56
 O:537
 W:17:1:20:0
 K:DEFAULT:372:3
-#$ stone altar
+#$ broken altar
 K:HURT_FIRE:378:3
 #$ ashen altar
 F:MOVE | NOTICE | REMEMBER |
@@ -7817,7 +7810,7 @@ U:56
 O:539
 W:35:1:20:0
 K:DEFAULT:372:5
-#$ blood-stained altar
+#$ broken altar
 K:HURT_WATER:374:5
 #$ stone altar
 K:HURT_FIRE:378:5
@@ -7835,7 +7828,7 @@ U:56
 O:387
 W:35:2:20:0
 K:DEFAULT:372:5
-#$ dusty altar
+#$ broken altar
 K:HURT_WATER:374:5
 #$ stone altar
 K:HURT_FIRE:378:5
@@ -7853,7 +7846,7 @@ U:56
 O:388
 W:40:4:20:0
 K:DEFAULT:372:4
-#$ corroded altar
+#$ broken altar
 F:MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -7867,7 +7860,7 @@ U:56
 O:541
 W:32:2:20:0
 K:DEFAULT:372:4
-#$ ashen altar
+#$ broken altar
 K:HURT_WATER:374:4
 #$ stone altar
 F:MOVE | NOTICE | REMEMBER |
@@ -7883,7 +7876,7 @@ U:56
 O:538
 W:22:1:20:0
 K:DEFAULT:372:4
-#$ golden altar
+#$ broken altar
 F:MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -7897,7 +7890,7 @@ U:56
 O:542
 W:37:2:20:0
 K:DEFAULT:372:5
-#$ iron altar
+#$ broken altar
 K:HURT_ACID:377:5
 #$ corroded altar
 K:HURT_WATER:377:5
@@ -7915,7 +7908,7 @@ U:56
 O:540
 W:22:1:20:0
 K:DEFAULT:372:3
-#$ bone altar
+#$ broken altar
 F:MOVE | NOTICE | REMEMBER | BASH |
 F:CAN_CLIMB | CAN_FLY |
 F:ALLOC | HURT_WATER | USE_FEAT | ATTR_LITE |
@@ -7929,7 +7922,7 @@ U:56
 O:385
 W:25:1:20:0
 K:DEFAULT:372:1
-#$ glass altar
+#$ broken altar
 F:LOS | MOVE | NOTICE | REMEMBER | BASH |
 F:CAN_CLIMB | CAN_FLY |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -7943,7 +7936,7 @@ U:56
 O:0
 W:0:0:0:0
 K:DEFAULT:1:0
-#$ broken fountain
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:HURT_ROCK | CAN_CLIMB | CAN_FLY |
 F:ALLOC | ATTR_LITE |
@@ -7957,7 +7950,7 @@ U:56
 O:0
 W:1:1:20:0
 K:DEFAULT:1:0
-#$ empty fountain
+#$ open floor
 K:HURT_WATER:385:0
 #$ clear fountain
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -7974,7 +7967,7 @@ U:56
 O:224
 W:1:1:20:0
 K:DEFAULT:1:5
-#$ clear fountain
+#$ open floor
 K:BASH:383:5
 #$ broken fountain
 K:OPEN:383:5
@@ -7992,7 +7985,7 @@ U:56
 O:254
 W:10:3:20:0
 K:DEFAULT:1:5
-#$ cloudy fountain
+#$ open floor
 K:BASH:383:5
 #$ broken fountain
 K:OPEN:383:5
@@ -8010,7 +8003,7 @@ U:56
 O:241
 W:10:3:20:0
 K:DEFAULT:1:5
-#$ bubbling fountain
+#$ open floor
 K:BASH:383:5
 #$ broken fountain
 K:OPEN:383:5
@@ -8028,7 +8021,7 @@ U:56
 O:432
 W:30:3:20:0
 K:DEFAULT:1:5
-#$ misty fountain
+#$ open floor
 K:BASH:383:5
 #$ broken fountain
 K:OPEN:383:5
@@ -8046,7 +8039,7 @@ U:56
 O:256
 W:20:3:20:0
 K:DEFAULT:1:5
-#$ smoky fountain
+#$ open floor
 K:BASH:383:5
 #$ broken fountain
 K:OPEN:383:5
@@ -8062,7 +8055,7 @@ U:56
 O:0
 W:12:2:6:0
 K:DEFAULT:1:0
-#$ muddy floor
+#$ open floor
 K:HURT_WATER:307:0
 #$ wet floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | FLOOR |
@@ -8076,7 +8069,7 @@ U:56
 O:224
 W:0:1:20:0
 K:DEFAULT:1:10
-#$ stone well
+#$ open floor
 K:SECRET:814:10
 #$ water-filled well
 F:LOS | PROJECT | SECRET | NOTICE | REMEMBER | MORE |
@@ -8096,15 +8089,15 @@ U:56
 #$ granite wall
 O:248
 W:54:6:13:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:397:36
-#$ granite wall
+#$ deep poisonous water
 K:PATH:396:36
 #$ hidden deep poisonous water
 K:SECRET:393:36
 #$ under poisonous water
 K:CHASM:164:36
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:150:36
 #$ deep water under an ice wall
 F:MOVE | PLACE | DROP | SECRET | REMEMBER | TUNNEL |
@@ -8118,16 +8111,16 @@ U:56
 #$ granite wall
 O:248
 W:54:6:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:397:36
-#$ under poisonous water
+#$ deep poisonous water
 K:HURT_COLD:150:36
 #$ deep water under an ice wall
 K:CHASM:164:36
-#$ waterfall
+#$ poisonous waterfall
 F:MOVE | PLACE | DROP | REMEMBER | TUNNEL |
-F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS |
-F:HIDE_ITEM | HIDE_SWIM |
+F:PATH | LAKE | WATER | FILLED | HURT_COLD | CAN_SWIM | CAN_PASS | HIDE_ITEM |
+F:HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE |
 
 N:394:deep poisonous water under a stone bridge
@@ -8138,18 +8131,18 @@ U:140
 #$ stone bridge
 O:248
 W:38:3:8:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:397:0
-#$ stone bridge
+#$ deep poisonous water
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:147:0
 #$ deep water under ice under a stone bridge
 K:HURT_WATER:492:0
 #$ a poisonous wave breaking over a stone bridge
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
-F:PATH | LAKE | COVERED | WATER | HURT_COLD | CAN_CLIMB | CAN_FLY |
-F:CAN_SWIM | HIDE_SWIM |
+F:PATH | LAKE | COVERED | WATER | HURT_COLD | CAN_CLIMB | CAN_FLY | CAN_SWIM |
+F:HIDE_SWIM |
 F:HURT_WATER | USE_FEAT | OUTSIDE | ATTR_LITE |
 
 N:395:poisonous water
@@ -8160,7 +8153,7 @@ K:DEFAULT:395:0
 K:HURT_COLD:145:0
 #$ ice
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_WATER:493:0
 #$ the crest of a wave over poisonous water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
@@ -8174,10 +8167,10 @@ U:395
 #$ poisonous water
 O:248
 W:38:6:7:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:396:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:395:0
 #$ poisonous water
 K:SECRET:397:0
@@ -8196,10 +8189,10 @@ N:397:deep poisonous water
 G:::p
 O:248
 W:47:6:12:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:397:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:394:0
 #$ deep poisonous water under a stone bridge
 K:HURT_COLD:146:0
@@ -8219,9 +8212,9 @@ M:56
 #$ granite wall
 O:255
 W:57:4:13:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:403:36
-#$ granite wall
+#$ deep salt water
 K:SECRET:399:36
 #$ undersea
 K:PATH:402:36
@@ -8237,11 +8230,10 @@ U:56
 #$ granite wall
 O:255
 W:57:4:13:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:399:36
 F:MOVE | PLACE | DROP | REMEMBER |
-F:PATH | LAKE | WATER | FILLED | CAN_SWIM | CAN_PASS | HIDE_ITEM |
-F:HIDE_SWIM |
+F:PATH | LAKE | WATER | FILLED | CAN_SWIM | CAN_PASS | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE |
 
 # Wetting sand forces diggers out
@@ -8255,7 +8247,7 @@ U:192
 O:0
 W:22:3:7:0
 K:DEFAULT:193:0
-#$ sand
+#$ deep sand
 K:KILL_MOVE:195:0
 #$ deep sandy trail
 K:PATH:195:0
@@ -8274,7 +8266,7 @@ N:401:salt water
 G:;:t
 O:255
 W:38:4:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:401:0
 K:CHASM:403:0
 #$ deep salt water
@@ -8293,7 +8285,7 @@ U:401
 #$ salt water
 O:255
 W:43:4:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:402:0
 K:PATH:401:0
 #$ salt water
@@ -8314,7 +8306,7 @@ G:::t
 O:255
 W:52:4:12:401
 #$ salt water
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:403:0
 K:HURT_WATER:475:0
 #$ the crest of a wave over deep salt water
@@ -8330,9 +8322,9 @@ U:56
 #$ granite wall
 O:346
 W:1:1:15:0
-T:FIRE:1d6
+T:TRAP:FIRE:1d6
 K:DEFAULT:405:0
-#$ brazier
+#$ unlit brazier
 F:LOS | PROJECT | NOTICE | REMEMBER | BASH | RUN | FLOOR | HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY |
 F:ALLOC | HURT_WATER | USE_FEAT | EASY_CLIMB | ATTR_LITE |
@@ -8356,9 +8348,9 @@ U:56
 #$ granite wall
 O:346
 W:1:15:15:0
-T:FIRE:1d6
+T:TRAP:FIRE:1d6
 K:DEFAULT:405:0
-#$ brazier containing something
+#$ unlit brazier
 F:LOS | PROJECT | NOTICE | REMEMBER | BASH | HAS_ITEM | RUN | FLOOR |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY |
@@ -8477,7 +8469,7 @@ U:162
 #$ smoke
 O:0
 W:37:1:17:0
-T:FIRE:3d6
+T:TRAP:FIRE:3d6
 K:DEFAULT:413:0
 K:CHASM:141:0
 #$ chasm
@@ -8534,18 +8526,25 @@ F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 N:416:impassable thorns
 G:#:T
 M:435
+#$ bush
 U:435
-T:POISON:2d4
+#$ bush
 O:0
 W:30:1:17:0
+T:TRAP:POISON:2d4
 K:DEFAULT:441:5
+#$ poisonous thorns
 K:HURT_FIRE:424:5
+#$ wall of fire
 K:CHASM:455:5
+#$ tree trunk over a chasm
 K:TREE:700:5
+#$ impassable tree trunk
 K:SECRET:434:5
-F:SECRET | REMEMBER | BASH | TUNNEL |
+#$ impassable poisonous thorns
+F:SECRET | REMEMBER | BASH | TUNNEL | HIT_TRAP |
 F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
-F:LIVING | TREE | ATTR_LITE | HIT_TRAP
+F:LIVING | TREE | ATTR_LITE |
 D:The poisonous thorns block your way!
 
 N:417:smoke over burnt ground
@@ -8554,7 +8553,7 @@ U:162
 #$ smoke
 O:0
 W:32:1:17:0
-T:SMOKE:2d4
+T:TRAP:SMOKE:2d4
 K:DEFAULT:417:0
 K:CHASM:141:0
 #$ chasm
@@ -8590,7 +8589,7 @@ G:::G
 O:0
 W:20:2:17:0
 K:DEFAULT:435:1
-#$ thicket
+#$ bush
 K:HURT_FIRE:424:1
 #$ wall of fire
 K:CHASM:455:1
@@ -8628,7 +8627,7 @@ G:0:G
 O:0
 W:7:1:17:0
 K:DEFAULT:427:1
-#$ tree
+#$ tree trunk
 K:PATH:408:1
 #$ dirt trail
 K:HURT_FIRE:424:1
@@ -8646,7 +8645,7 @@ G:.:I
 O:0
 W:4:3:15:0
 K:DEFAULT:414:0
-#$ herbs
+#$ open ground
 K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
@@ -8667,7 +8666,7 @@ U:162
 #$ smoke
 O:0
 W:32:1:16:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:423:1
 K:CHASM:141:1
 #$ chasm
@@ -8689,7 +8688,7 @@ U:162
 #$ smoke
 O:0
 W:34:1:16:0
-T:FIRE:6d6
+T:TRAP:FIRE:6d6
 K:DEFAULT:424:4
 K:CHASM:141:4
 #$ chasm
@@ -8729,7 +8728,7 @@ U:421
 O:29
 W:10:3:17:0
 K:DEFAULT:427:1
-#$ apple tree
+#$ tree trunk
 K:PATH:408:1
 #$ dirt trail
 K:CHASM:454:1
@@ -8778,8 +8777,8 @@ K:TREE:544:0
 K:HURT_WATER:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:PATH | LAKE | SHALLOW | ICE | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
-F:HIDE_DIG | KILL_MOVE |
+F:PATH | LAKE | SHALLOW | ICE | CAN_FLY | HIDE_ITEM | HIDE_SNEAK | HIDE_DIG |
+F:KILL_MOVE |
 F:HURT_WATER | GROUND | OUTSIDE | ATTR_LITE |
 
 N:429:snowy trail
@@ -8838,7 +8837,7 @@ U:216
 O:0
 W:51:2:7:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:432:0
 K:CHASM:214:0
 #$ lava fall
@@ -8850,7 +8849,7 @@ N:433:steam over geothermal ground
 G:':W
 O:0
 W:40:2:7:0
-T:STEAM:1d3
+T:TRAP:STEAM:1d3
 K:DEFAULT:433:0
 K:CHASM:141:0
 #$ chasm
@@ -8863,17 +8862,22 @@ F:GROUND | OUTSIDE | ATTR_LITE | SPREAD |
 N:434:impassable poisonous thorns
 G:#:T
 U:435
-#$ tree
+#$ bush
 O:0
 W:35:1:17:454
-T:POISON:2d4
+#$ impassable tree trunk
+T:TRAP:POISON:2d4
 K:DEFAULT:441:5
+#$ poisonous thorns
 K:HURT_FIRE:424:5
+#$ wall of fire
 K:CHASM:455:5
+#$ tree trunk over a chasm
 K:TREE:701:5
-F:REMEMBER | BASH | TUNNEL |
+#$ impassable tree trunk
+F:REMEMBER | BASH | TUNNEL | HIT_TRAP |
 F:PATH | LAKE | HURT_FIRE | HIDE_SNEAK |
-F:LIVING | TREE | ATTR_LITE | HIT_TRAP
+F:LIVING | TREE | ATTR_LITE |
 
 N:435:bush
 G:;:G
@@ -8900,7 +8904,7 @@ U:435
 #$ bush
 O:0
 W:30:1:15:0
-T:HURT:1d4
+T:TRAP:HURT:1d4
 K:DEFAULT:436:0
 K:PATH:407:0
 #$ earth
@@ -8923,7 +8927,7 @@ U:162
 #$ smoke
 O:0
 W:31:1:17:0
-T:FIRE:3d6
+T:TRAP:FIRE:3d6
 K:DEFAULT:437:0
 K:CHASM:141:0
 #$ chasm
@@ -8942,7 +8946,7 @@ G:.:U
 O:0
 W:24:10:15:0
 K:DEFAULT:771:0
-#$ wooden deck
+#$ pile of wood
 K:HURT_FIRE:502:0
 #$ fire
 K:CHASM:445:0
@@ -8958,7 +8962,7 @@ U:56
 O:0
 W:24:10:15:0
 K:DEFAULT:1:0
-#$ tiled floor
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN | FLOOR |
@@ -8971,7 +8975,7 @@ U:435
 #$ bush
 O:599
 W:30:1:15:0
-T:HURT:2d4
+T:TRAP:HURT:2d4
 K:DEFAULT:440:0
 K:PATH:407:0
 #$ earth
@@ -8996,7 +9000,7 @@ U:435
 #$ bush
 O:0
 W:35:1:15:0
-T:POISON:2d4
+T:TRAP:POISON:2d4
 K:DEFAULT:441:0
 K:PATH:407:0
 #$ earth
@@ -9019,7 +9023,7 @@ U:435
 #$ bush
 O:0
 W:35:1:15:0
-T:POISON:2d4
+T:TRAP:POISON:2d4
 K:DEFAULT:442:0
 K:PATH:435:0
 #$ bush
@@ -9040,7 +9044,7 @@ U:56
 O:0
 W:0:1:20:0
 K:DEFAULT:1:0
-#$ curtain
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:OPEN:444:0
@@ -9060,7 +9064,7 @@ U:56
 O:0
 W:0:1:20:0
 K:DEFAULT:1:0
-#$ open curtain
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:CLOSE:443:0
@@ -9080,7 +9084,7 @@ U:438
 O:0
 W:24:10:15:0
 K:DEFAULT:141:0
-#$ wooden deck over chasm
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
 F:HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
@@ -9092,7 +9096,7 @@ U:56
 O:0
 W:25:3:7:0
 K:DEFAULT:1:0
-#$ giant spider web
+#$ open floor
 K:HURT_FIRE:162:0
 #$ smoke
 K:CHASM:459:0
@@ -9108,7 +9112,7 @@ U:56
 O:0
 W:15:3:7:0
 K:DEFAULT:1:0
-#$ dusty cobwebs
+#$ open floor
 K:HURT_FIRE:162:0
 #$ smoke
 K:HURT_WATER:1:0
@@ -9123,7 +9127,7 @@ U:435
 #$ bush
 O:0
 W:30:1:15:0
-T:HURT:1d2
+T:TRAP:HURT:1d2
 K:DEFAULT:448:0
 K:PATH:435:0
 #$ bush
@@ -9145,7 +9149,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:0
-#$ cupboard
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:56:0
@@ -9170,7 +9174,7 @@ M:449
 O:0
 W:1:3:10:0
 K:DEFAULT:1:2
-#$ cupboard
+#$ open floor
 K:CHASM:141:2
 #$ chasm
 K:TREE:56:2
@@ -9199,7 +9203,7 @@ U:428
 O:0
 W:40:1:17:0
 K:DEFAULT:430:5
-#$ snow
+#$ deep snowy trail
 K:SECRET:452:5
 #$ deep snow
 K:CHASM:141:5
@@ -9220,7 +9224,7 @@ U:428
 O:0
 W:37:1:17:0
 K:DEFAULT:430:3
-#$ deep snow
+#$ deep snowy trail
 K:CHASM:141:3
 #$ chasm
 K:TREE:549:3
@@ -9263,7 +9267,7 @@ O:0
 W:35:1:17:454
 #$ impassable tree trunk
 K:DEFAULT:427:5
-#$ impassable tree trunk
+#$ tree trunk
 K:HURT_FIRE:424:5
 #$ wall of fire
 K:CHASM:455:5
@@ -9282,7 +9286,7 @@ O:0
 W:48:4:17:421
 #$ tree
 K:DEFAULT:141:0
-#$ tree trunk over a chasm
+#$ chasm
 K:PATH:140:0
 #$ stone bridge
 F:NOTICE | REMEMBER |
@@ -9295,7 +9299,7 @@ G:':g
 O:846
 W:10:1:20:0
 K:DEFAULT:407:0
-#$ vines
+#$ earth
 K:CHASM:141:0
 #$ chasm
 K:HURT_FIRE:413:0
@@ -9311,7 +9315,7 @@ G:^:U
 O:0
 W:0:0:0:0
 K:DEFAULT:1:5
-#$ shallow pit
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -9324,13 +9328,15 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | TUNNEL |
 F:PATH | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | EASY_HIDE | MUST_CLIMB | ATTR_LITE |
 
+#$# 458 - Unused ###
+
 N:459:giant spider web over a chasm
 G:x:W
 O:0
 W:52:3:7:142
 #$ chasm
 K:DEFAULT:785:0
-#$ giant spider web over a chasm
+#$ giant spider web hanging over a chasm
 F:PROJECT | PLACE | NOTICE | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | CAN_CLIMB | HIDE_ITEM |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
@@ -9363,7 +9369,7 @@ U:421
 O:0
 W:35:1:17:0
 K:DEFAULT:419:5
-#$ impassable thicket
+#$ thicket
 K:HURT_FIRE:424:5
 #$ wall of fire
 K:CHASM:141:5
@@ -9378,11 +9384,13 @@ N:462:loose rock
 G:^:P
 U:56
 #$ granite wall
+O:0
 W:3:1:20:0
+T:TRAP:HURT
 K:DEFAULT:463:1
-K:DISARM:1:1
-T:HURT
 #$ loose rock
+K:DISARM:1:1
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:541:1
@@ -9401,24 +9409,24 @@ U:56
 #$ granite wall
 O:0
 W:3:1:20:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:1:1
-#$ loose rock
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:541:1
 #$ shady ground
-F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM | ADJACENT
-F:ATTR_LITE |
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE | ADJACENT |
 
 N:464:pile of ice rubble
 G:::B
 O:0
 W:40:12:12:0
-T:ICE:2d4
+T:TRAP:ICE:2d4
 K:DEFAULT:145:16
-#$ pile of ice rubble
+#$ ice
 K:CHASM:144:16
 #$ ice chasm
 F:NOTICE | REMEMBER | TUNNEL | WALL | HIT_TRAP |
@@ -9434,7 +9442,7 @@ U:56
 O:0
 W:5:1:19:0
 K:DEFAULT:1:0
-#$ small wooden chest (locked)
+#$ open floor
 K:OPEN:319:0
 #$ small wooden chest (open)
 K:BASH:315:0
@@ -9452,7 +9460,7 @@ U:56
 O:0
 W:15:1:19:0
 K:DEFAULT:1:0
-#$ large wooden chest (locked)
+#$ open floor
 K:OPEN:330:0
 #$ large wooden chest (open)
 K:BASH:315:0
@@ -9470,7 +9478,7 @@ U:56
 O:0
 W:25:1:19:0
 K:DEFAULT:1:0
-#$ small iron chest (locked)
+#$ open floor
 K:OPEN:339:0
 #$ small iron chest (open)
 K:BASH:315:0
@@ -9488,7 +9496,7 @@ U:56
 O:0
 W:32:1:19:0
 K:DEFAULT:1:0
-#$ large iron chest (locked)
+#$ open floor
 K:OPEN:348:0
 #$ large iron chest (open)
 K:BASH:315:0
@@ -9506,7 +9514,7 @@ U:56
 O:0
 W:37:1:19:0
 K:DEFAULT:1:0
-#$ small steel chest (locked)
+#$ open floor
 K:OPEN:357:0
 #$ small steel chest (open)
 K:BASH:315:0
@@ -9524,7 +9532,7 @@ U:56
 O:0
 W:42:1:19:0
 K:DEFAULT:1:0
-#$ large steel chest (locked)
+#$ open floor
 K:OPEN:366:0
 #$ large steel chest (open)
 K:BASH:315:0
@@ -9558,7 +9566,7 @@ U:153
 #$ water
 O:224
 W:34:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:472:0
 K:CHASM:151:0
 #$ waterfall
@@ -9574,7 +9582,7 @@ U:401
 #$ salt water
 O:255
 W:38:2:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:473:0
 K:CHASM:403:0
 #$ deep salt water
@@ -9594,7 +9602,7 @@ U:401
 #$ salt water
 O:255
 W:43:2:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:474:0
 K:PATH:401:0
 #$ salt water
@@ -9616,7 +9624,7 @@ U:403
 O:255
 W:52:2:12:401
 #$ salt water
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:475:0
 K:ADJACENT:478:0
 #$ a wave over deep salt water
@@ -9632,7 +9640,7 @@ U:401
 #$ salt water
 O:255
 W:38:2:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:476:0
 K:CHASM:403:0
 #$ deep salt water
@@ -9650,7 +9658,7 @@ U:401
 #$ salt water
 O:255
 W:43:2:7:0
-T:WATER:4d6
+T:TRAP:WATER:4d6
 K:DEFAULT:477:0
 K:PATH:401:0
 #$ salt water
@@ -9670,7 +9678,7 @@ U:403
 O:255
 W:52:2:12:401
 #$ salt water
-T:WATER:4d6
+T:TRAP:WATER:4d6
 K:DEFAULT:478:0
 K:INSTANT:481:0
 #$ deep rough salt water
@@ -9686,7 +9694,7 @@ U:401
 #$ salt water
 O:255
 W:38:2:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:479:0
 K:CHASM:403:0
 #$ deep salt water
@@ -9704,7 +9712,7 @@ U:401
 #$ salt water
 O:255
 W:43:2:7:0
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:480:0
 K:PATH:401:0
 #$ salt water
@@ -9726,7 +9734,7 @@ U:403
 O:255
 W:42:2:12:401
 #$ salt water
-T:SALT_WATER:4d6
+T:TRAP:SALT_WATER:4d6
 K:DEFAULT:481:0
 K:INSTANT:403:0
 #$ deep salt water
@@ -9740,7 +9748,7 @@ U:152
 #$ deep water under a stone bridge
 O:224
 W:27:1:8:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:482:0
 K:CHASM:151:0
 #$ waterfall
@@ -9763,7 +9771,7 @@ U:153
 #$ water
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:483:0
 K:CHASM:151:0
 #$ waterfall
@@ -9787,7 +9795,7 @@ U:153
 #$ water
 O:224
 W:37:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:484:0
 K:CHASM:151:0
 #$ waterfall
@@ -9814,7 +9822,7 @@ U:155
 #$ deep water
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:485:0
 K:CHASM:151:0
 #$ waterfall
@@ -9838,7 +9846,7 @@ U:153
 #$ water
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:486:0
 K:CHASM:151:0
 #$ waterfall
@@ -9861,7 +9869,7 @@ U:153
 #$ water
 O:224
 W:37:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:487:0
 K:CHASM:151:0
 #$ waterfall
@@ -9887,7 +9895,7 @@ U:155
 #$ deep water
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:488:0
 K:CHASM:151:0
 #$ waterfall
@@ -9932,7 +9940,7 @@ U:153
 #$ water
 O:224
 W:37:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:490:0
 K:CHASM:151:0
 #$ waterfall
@@ -9958,7 +9966,7 @@ U:155
 #$ deep water
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:491:0
 K:CHASM:151:0
 #$ waterfall
@@ -9981,10 +9989,10 @@ U:152
 #$ deep water under a stone bridge
 O:248
 W:27:1:8:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:492:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:152:0
 #$ deep water under a stone bridge
 K:HURT_COLD:147:0
@@ -10002,10 +10010,10 @@ U:395
 #$ poisonous water
 O:248
 W:18:2:7:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:493:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:145:0
 #$ ice
 K:ADJACENT:496:0
@@ -10022,10 +10030,10 @@ U:395
 #$ poisonous water
 O:248
 W:37:2:7:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:494:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:493:0
 #$ the crest of a wave over poisonous water
 K:SECRET:495:0
@@ -10047,10 +10055,10 @@ U:397
 #$ deep poisonous water
 O:248
 W:27:2:12:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:495:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:152:0
 #$ deep water under a stone bridge
 K:ADJACENT:498:0
@@ -10071,10 +10079,10 @@ U:395
 #$ poisonous water
 O:248
 W:18:2:7:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:496:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:145:0
 #$ ice
 K:INSTANT:499:0
@@ -10092,10 +10100,10 @@ U:395
 #$ poisonous water
 O:248
 W:37:2:7:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:497:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:496:0
 #$ a wave over poisonous water
 K:SECRET:498:0
@@ -10118,10 +10126,10 @@ U:397
 #$ deep poisonous water
 O:248
 W:27:2:12:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:498:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:152:0
 #$ deep water under a stone bridge
 K:INSTANT:501:0
@@ -10141,7 +10149,7 @@ O:248
 W:18:2:7:0
 K:DEFAULT:499:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:145:0
 #$ ice
 K:INSTANT:395:0
@@ -10159,10 +10167,10 @@ U:499
 #$ poisonous rough water
 O:248
 W:37:2:7:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:500:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:499:0
 #$ poisonous rough water
 K:SECRET:501:0
@@ -10183,10 +10191,10 @@ U:397
 #$ deep poisonous water
 O:248
 W:27:2:12:0
-T:POISON_WATER:4d6
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:501:0
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:PATH:394:0
 #$ deep poisonous water under a stone bridge
 K:INSTANT:397:0
@@ -10204,7 +10212,7 @@ U:56
 #$ granite wall
 O:0
 W:31:1:16:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:502:0
 K:CHASM:141:0
 #$ chasm
@@ -10406,9 +10414,9 @@ U:192
 #$ sand
 O:0
 W:22:3:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:193:0
-#$ a wave breaking over sand
+#$ deep sand
 K:KILL_MOVE:195:0
 #$ deep sandy trail
 K:PATH:195:0
@@ -10545,7 +10553,7 @@ U:162
 #$ smoke
 O:0
 W:34:1:17:0
-T:FIRE:3d6
+T:TRAP:FIRE:3d6
 K:DEFAULT:532:0
 K:CHASM:141:0
 #$ chasm
@@ -10586,7 +10594,7 @@ U:162
 #$ smoke
 O:0
 W:33:1:17:0
-T:SMOKE:2d4
+T:TRAP:SMOKE:2d4
 K:DEFAULT:534:0
 K:CHASM:141:0
 #$ chasm
@@ -10725,7 +10733,7 @@ G:.:U
 O:0
 W:1:10:15:0
 K:DEFAULT:414:0
-#$ shady ground
+#$ open ground
 K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
@@ -10766,7 +10774,7 @@ U:421
 O:0
 W:4:1:15:0
 K:DEFAULT:541:0
-#$ herbs in the shade
+#$ shady ground
 K:CHASM:141:0
 #$ chasm
 K:HURT_FIRE:413:0
@@ -10799,8 +10807,8 @@ K:NEED_TREE:428:0
 K:HURT_WATER:199:0
 #$ mud
 F:LOS | PROJECT | MOVE | PLACE | DROP |
-F:PATH | LAKE | SHALLOW | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM |
-F:HIDE_SNEAK | KILL_MOVE |
+F:PATH | LAKE | SHALLOW | HURT_FIRE | ICE | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
+F:KILL_MOVE |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
 N:545:shady snowy trail
@@ -10899,7 +10907,7 @@ U:421
 O:0
 W:37:1:17:0
 K:DEFAULT:430:5
-#$ deep snow in the shade
+#$ deep snowy trail
 K:CHASM:141:5
 #$ chasm
 K:HURT_FIRE:413:5
@@ -11078,7 +11086,7 @@ U:421
 O:0
 W:48:2:13:140
 #$ stone bridge
-T:FALL_MORE:10d6
+T:TRAP:FALL_MORE:10d6
 K:DEFAULT:141:0
 #$ chasm
 K:PATH:140:0
@@ -11153,7 +11161,7 @@ O:0
 W:10:5:10:56
 #$ granite wall
 K:DEFAULT:1:5
-#$ cracked granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:59:5
@@ -11181,7 +11189,7 @@ O:0
 W:20:2:10:56
 #$ granite wall
 K:DEFAULT:1:5
-#$ weak granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:59:5
@@ -11208,7 +11216,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:564:0
 K:CHASM:141:0
 #$ chasm
@@ -11226,7 +11234,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:565:0
 K:CHASM:141:0
 #$ chasm
@@ -11248,9 +11256,9 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:1:0
-#$ gas-filled vent
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:211:0
@@ -11269,9 +11277,9 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:1:0
-#$ steam-filled vent
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:212:0
@@ -11289,9 +11297,9 @@ U:56
 O:0
 W:51:1:14:432
 #$ magma crust
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:1:0
-#$ fiery vent
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:213:0
@@ -11309,7 +11317,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:569:0
 K:CHASM:141:0
 #$ chasm
@@ -11328,7 +11336,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:570:0
 K:CHASM:141:0
 #$ chasm
@@ -11350,7 +11358,7 @@ U:56
 O:0
 W:40:1:13:0
 K:DEFAULT:547:0
-#$ open valve
+#$ open vent
 K:CLOSE:859:0
 #$ closing valve
 K:CHASM:141:0
@@ -11376,7 +11384,7 @@ U:56
 O:0
 W:40:1:13:0
 K:DEFAULT:547:0
-#$ closed valve
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:OPEN:858:0
@@ -11394,7 +11402,7 @@ U:56
 O:0
 W:40:1:13:0
 K:DEFAULT:547:15
-#$ jammed valve
+#$ open vent
 K:CHASM:141:15
 #$ chasm
 K:OPEN:858:15
@@ -11410,7 +11418,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:574:0
 K:CHASM:141:0
 #$ chasm
@@ -11431,9 +11439,9 @@ U:148
 O:0
 W:30:12:12:148
 #$ ice wall
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:145:4
-#$ cracked ice wall
+#$ ice
 K:CHASM:144:4
 #$ ice chasm
 K:TREE:115:4
@@ -11458,9 +11466,9 @@ U:148
 O:0
 W:30:12:12:148
 #$ ice wall
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:145:4
-#$ weak ice wall
+#$ ice
 K:CHASM:144:4
 #$ ice chasm
 K:TREE:115:4
@@ -11483,7 +11491,7 @@ O:0
 W:13:3:12:56
 #$ granite wall
 K:DEFAULT:1:20
-#$ water-filled cracked granite wall
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:TREE:113:20
@@ -11505,9 +11513,9 @@ U:56
 O:0
 W:23:3:12:56
 #$ granite wall
-T:WATER:4d6
+T:TRAP:WATER:4d6
 K:DEFAULT:1:20
-#$ water-filled cracked granite wall
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:TREE:113:20
@@ -11530,7 +11538,7 @@ O:0
 W:23:6:12:56
 #$ granite wall
 K:DEFAULT:1:20
-#$ water-filled cracked granite wall
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:TREE:113:20
@@ -11554,7 +11562,7 @@ O:0
 W:23:9:12:56
 #$ granite wall
 K:DEFAULT:1:20
-#$ water-filled cracked granite wall
+#$ open floor
 K:CHASM:141:20
 #$ chasm
 K:TREE:113:20
@@ -11576,9 +11584,9 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:1:0
-#$ gas-filled vent
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:211:0
@@ -11597,9 +11605,9 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:1:0
-#$ steam-filled vent
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:212:0
@@ -11617,9 +11625,9 @@ U:56
 O:0
 W:51:1:14:432
 #$ magma crust
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:1:0
-#$ fiery vent
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:213:0
@@ -11637,7 +11645,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:584:0
 K:CHASM:141:0
 #$ chasm
@@ -11655,7 +11663,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:585:0
 K:CHASM:141:0
 #$ chasm
@@ -11674,9 +11682,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:547:0
-#$ gas-filled valve
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:TREE:211:0
@@ -11696,9 +11704,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:547:0
-#$ steam-filled valve
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:TREE:212:0
@@ -11717,9 +11725,9 @@ U:56
 #$ granite wall
 O:0
 W:51:1:14:0
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:547:0
-#$ fiery valve
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 K:TREE:213:0
@@ -11738,7 +11746,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:589:0
 K:CHASM:141:0
 #$ chasm
@@ -11758,7 +11766,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:590:0
 K:CHASM:141:0
 #$ chasm
@@ -11779,9 +11787,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:1:0
-#$ gas-filled valve
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:211:0
@@ -11801,9 +11809,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:1:0
-#$ steam-filled valve
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:212:0
@@ -11820,9 +11828,9 @@ U:56
 #$ granite wall
 O:0
 W:51:1:14:0
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:1:0
-#$ fiery valve
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:213:0
@@ -11839,7 +11847,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:594:0
 K:CHASM:141:0
 #$ chasm
@@ -11857,7 +11865,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:595:0
 K:CHASM:141:0
 #$ chasm
@@ -11876,9 +11884,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:1:0
-#$ gas-filled valve
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:211:0
@@ -11896,9 +11904,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:BWATER:4d1
+T:TRAP:BWATER:4d1
 K:DEFAULT:1:0
-#$ steam-filled valve
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:212:0
@@ -11915,9 +11923,9 @@ U:56
 #$ granite wall
 O:0
 W:51:1:14:0
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:1:0
-#$ fiery valve
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:213:0
@@ -11934,7 +11942,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:599:0
 K:CHASM:141:0
 #$ chasm
@@ -11952,7 +11960,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:600:0
 K:CHASM:141:0
 #$ chasm
@@ -11972,7 +11980,7 @@ U:151
 O:224
 W:35:2:13:938
 #$ rough water
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:126:0
 #$ falling water
 K:CHASM:151:0
@@ -11995,7 +12003,7 @@ U:56
 O:344
 W:54:2:13:157
 #$ acid
-T:ACID:6d6
+T:TRAP:ACID:6d6
 K:DEFAULT:127:0
 #$ falling acid
 K:CHASM:126:0
@@ -12011,7 +12019,7 @@ U:227
 O:0
 W:55:3:14:942
 #$ steam over geothermal ground
-T:BWATER:6d6
+T:TRAP:BWATER:6d6
 K:DEFAULT:160:0
 #$ falling boiling water
 K:CHASM:227:0
@@ -12033,7 +12041,7 @@ U:214
 O:0
 W:57:1:14:136
 #$ broken floor
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:161:0
 #$ falling lava
 K:PATH:210:0
@@ -12055,7 +12063,7 @@ U:56
 O:348
 W:40:2:13:153
 #$ water
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:190:0
 #$ falling oil
 K:CHASM:220:0
@@ -12079,7 +12087,7 @@ U:56
 O:348
 W:50:4:13:184
 #$ burning oil
-T:FIRE:10d6
+T:TRAP:FIRE:10d6
 K:DEFAULT:191:0
 #$ falling burning oil
 K:CHASM:186:0
@@ -12098,9 +12106,9 @@ N:607:clear deep water
 G:::b
 O:224
 W:22:4:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:155:0
-#$ clear deep water
+#$ deep water
 K:CHASM:151:0
 #$ waterfall
 K:PATH:152:0
@@ -12147,7 +12155,7 @@ U:56
 #$ granite wall
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:609:0
 K:CHASM:151:0
 #$ waterfall
@@ -12186,7 +12194,7 @@ U:56
 #$ granite wall
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:611:0
 K:CHASM:151:0
 #$ waterfall
@@ -12207,7 +12215,7 @@ U:56
 #$ granite wall
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:612:0
 K:CHASM:151:0
 #$ waterfall
@@ -12286,7 +12294,7 @@ U:173
 #$ steam
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:616:0
 K:CHASM:151:0
 #$ waterfall
@@ -12305,7 +12313,7 @@ U:173
 #$ steam
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:617:0
 K:CHASM:151:0
 #$ waterfall
@@ -12364,7 +12372,7 @@ U:56
 #$ granite wall
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:620:0
 K:CHASM:151:0
 #$ waterfall
@@ -12405,7 +12413,7 @@ U:56
 #$ granite wall
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:622:0
 K:CHASM:151:0
 #$ waterfall
@@ -12427,7 +12435,7 @@ U:56
 #$ granite wall
 O:224
 W:18:2:7:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:623:0
 K:CHASM:151:0
 #$ waterfall
@@ -12467,7 +12475,7 @@ G:':b
 O:82
 W:1:1:13:0
 K:DEFAULT:1:10
-#$ a wave breaking over a pile of rubble
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:TREE:49:10
@@ -12484,7 +12492,7 @@ G:':b
 O:598
 W:0:1:15:0
 K:DEFAULT:409:0
-#$ a wave breaking over rock
+#$ rock
 K:CHASM:141:0
 #$ chasm
 K:GET_FEAT:410:0
@@ -12502,7 +12510,7 @@ G:':b
 O:82
 W:0:1:15:0
 K:DEFAULT:410:0
-#$ a wave breaking over pebbles
+#$ pebbles
 K:CHASM:141:0
 #$ chasm
 K:GET_FEAT:410:0
@@ -12539,7 +12547,7 @@ G:':b
 O:0
 W:0:1:15:0
 K:DEFAULT:414:0
-#$ a wave breaking over open ground
+#$ open ground
 K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
@@ -12557,7 +12565,7 @@ U:421
 O:0
 W:0:1:15:0
 K:DEFAULT:414:0
-#$ a wave breaking over shady ground
+#$ open ground
 K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
@@ -12615,7 +12623,7 @@ G:.:b
 O:0
 W:35:2:15:0
 K:DEFAULT:414:0
-#$ wet ground
+#$ open ground
 K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
@@ -12637,7 +12645,7 @@ U:421
 O:0
 W:35:2:15:0
 K:DEFAULT:414:0
-#$ shady wet ground
+#$ open ground
 K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
@@ -12656,9 +12664,9 @@ M:153
 #$ water
 O:0
 W:42:3:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:201:0
-#$ water
+#$ deep mud
 K:CHASM:141:0
 #$ chasm
 K:PATH:198:0
@@ -12683,9 +12691,9 @@ M:153
 #$ water
 O:0
 W:42:3:13:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:201:0
-#$ water
+#$ deep mud
 K:CHASM:141:0
 #$ chasm
 K:PATH:198:0
@@ -13036,7 +13044,7 @@ U:56
 O:546
 W:26:2:20:0
 K:DEFAULT:1:2
-#$ harpsichord
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13050,7 +13058,7 @@ U:56
 O:547
 W:30:2:20:0
 K:DEFAULT:1:2
-#$ grand harp
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13064,7 +13072,7 @@ U:56
 O:548
 W:31:2:20:0
 K:DEFAULT:1:2
-#$ iron bell
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13078,7 +13086,7 @@ U:56
 O:549
 W:33:2:20:0
 K:DEFAULT:1:2
-#$ snake basket
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13092,7 +13100,7 @@ U:56
 O:550
 W:35:2:20:0
 K:DEFAULT:1:2
-#$ great horn
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13106,7 +13114,7 @@ U:56
 O:551
 W:36:2:20:0
 K:DEFAULT:1:2
-#$ pipe organ
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13120,7 +13128,7 @@ U:56
 O:552
 W:38:2:20:0
 K:DEFAULT:1:2
-#$ giant war drum
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13134,7 +13142,7 @@ U:56
 O:549
 W:40:2:20:0
 K:DEFAULT:1:2
-#$ brass gong
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13148,7 +13156,7 @@ U:56
 O:549
 W:45:2:20:0
 K:DEFAULT:1:2
-#$ grand piano
+#$ open floor
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:ALLOC | USE_FEAT | ATTR_LITE |
@@ -13165,7 +13173,7 @@ U:56
 O:600
 W:10:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13182,7 +13190,7 @@ U:56
 O:601
 W:40:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13198,7 +13206,7 @@ U:56
 O:602
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13214,7 +13222,7 @@ U:56
 O:603
 W:30:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13230,7 +13238,7 @@ U:56
 O:604
 W:15:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13246,7 +13254,7 @@ U:56
 O:605
 W:15:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13262,7 +13270,7 @@ U:56
 O:606
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13278,7 +13286,7 @@ U:56
 O:607
 W:35:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13294,7 +13302,7 @@ U:56
 O:608
 W:20:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13310,7 +13318,7 @@ U:56
 O:609
 W:25:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13326,7 +13334,7 @@ U:56
 O:610
 W:15:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13342,7 +13350,7 @@ U:56
 O:611
 W:15:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13358,7 +13366,7 @@ U:56
 O:612
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13374,7 +13382,7 @@ U:56
 O:613
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13390,7 +13398,7 @@ U:56
 O:614
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13406,7 +13414,7 @@ U:56
 O:615
 W:15:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13422,7 +13430,7 @@ U:56
 O:616
 W:35:4:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13438,7 +13446,7 @@ U:56
 O:617
 W:35:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13454,7 +13462,7 @@ U:56
 O:618
 W:15:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13470,7 +13478,7 @@ U:56
 O:619
 W:30:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13486,7 +13494,7 @@ U:56
 O:620
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13502,7 +13510,7 @@ U:56
 O:621
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13518,7 +13526,7 @@ U:56
 O:622
 W:25:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13534,7 +13542,7 @@ U:56
 O:623
 W:20:3:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13550,7 +13558,7 @@ U:56
 O:624
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13566,7 +13574,7 @@ U:56
 O:627
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13582,7 +13590,7 @@ U:56
 O:628
 W:5:2:20:0
 K:DEFAULT:1:2
-#$ shrine
+#$ open floor
 K:USE_FEAT:820:2
 #$ empty shrine
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER |
@@ -13596,7 +13604,7 @@ U:56
 O:0
 W:10:1:17:0
 K:DEFAULT:312:5
-#$ open cage (wooden)
+#$ broken wood
 K:HURT_FIRE:502:5
 #$ fire
 K:HURT_ACID:165:5
@@ -13617,7 +13625,7 @@ U:56
 O:0
 W:20:1:17:0
 K:DEFAULT:727:9
-#$ open cage (iron)
+#$ broken bars
 K:HURT_ACID:165:9
 #$ acidic vapour
 K:CLOSE:314:9
@@ -13637,7 +13645,7 @@ M:49
 O:82
 W:15:3:13:0
 K:DEFAULT:1:10
-#$ pile of rubble
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:SECRET:698:10
@@ -13656,7 +13664,7 @@ G:#:w
 O:82
 W:15:3:13:0
 K:DEFAULT:1:10
-#$ impassable pile of rubble
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:STREAMER:113:10
@@ -13676,7 +13684,7 @@ U:421
 O:0
 W:0:1:17:0
 K:DEFAULT:427:5
-#$ tree
+#$ tree trunk
 K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
@@ -13701,7 +13709,7 @@ U:421
 O:0
 W:0:1:17:0
 K:DEFAULT:427:5
-#$ impassable tree trunk
+#$ tree trunk
 K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
@@ -13720,9 +13728,9 @@ M:464
 #$ pile of ice rubble
 O:0
 W:30:12:12:0
-T:ICE:2d4
+T:TRAP:ICE:2d4
 K:DEFAULT:145:16
-#$ pile of ice rubble
+#$ ice
 K:CHASM:144:16
 #$ ice chasm
 K:SECRET:703:16
@@ -13738,9 +13746,9 @@ N:703:impassable pile of ice rubble
 G:#:B
 O:0
 W:30:12:12:0
-T:ICE:2d4
+T:TRAP:ICE:2d4
 K:DEFAULT:145:16
-#$ impassable pile of ice rubble
+#$ ice
 K:CHASM:144:16
 #$ ice chasm
 K:STREAMER:115:16
@@ -13783,7 +13791,7 @@ U:421
 O:0
 W:0:1:17:0
 K:DEFAULT:427:5
-#$ impassable tree trunk
+#$ tree trunk
 K:PATH:408:5
 #$ dirt trail
 K:HURT_FIRE:424:5
@@ -13805,7 +13813,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:POISON:4d1
+T:TRAP:POISON:4d1
 K:DEFAULT:706:0
 K:CHASM:141:0
 #$ chasm
@@ -13825,7 +13833,7 @@ U:56
 O:0
 W:51:1:14:432
 #$ magma crust
-T:FIRE:12d1
+T:TRAP:FIRE:12d1
 K:DEFAULT:707:0
 K:CHASM:141:0
 #$ chasm
@@ -13844,7 +13852,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:ACID:4d1
+T:TRAP:ACID:4d1
 K:DEFAULT:708:0
 K:CHASM:141:0
 #$ chasm
@@ -13862,7 +13870,7 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:WATER:4d1
+T:TRAP:WATER:4d1
 K:DEFAULT:709:0
 K:CHASM:141:0
 #$ chasm
@@ -13886,7 +13894,7 @@ U:56
 O:0
 W:40:1:13:431
 #$ geothermal ground
-T:POISON:4d6
+T:TRAP:POISON:4d6
 K:DEFAULT:710:0
 K:CHASM:141:0
 #$ chasm
@@ -13906,7 +13914,7 @@ U:227
 O:0
 W:55:3:14:431
 #$ geothermal ground
-T:BWATER:6d6
+T:TRAP:BWATER:6d6
 K:DEFAULT:711:0
 K:CHASM:227:0
 #$ boiling waterfall
@@ -13923,7 +13931,7 @@ U:56
 O:836
 W:50:4:13:432
 #$ magma crust
-T:FIRE:12d6
+T:TRAP:FIRE:12d6
 K:DEFAULT:712:0
 K:CHASM:186:0
 #$ burning oil fall
@@ -13943,7 +13951,7 @@ U:56
 O:344
 W:54:2:13:157
 #$ acid
-T:ACID:6d6
+T:TRAP:ACID:6d6
 K:DEFAULT:713:0
 K:CHASM:126:0
 #$ falling water
@@ -13962,7 +13970,7 @@ U:151
 O:224
 W:35:2:13:153
 #$ water
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:714:0
 K:CHASM:151:0
 #$ waterfall
@@ -14075,9 +14083,9 @@ U:216
 O:82
 W:52:3:7:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:136:8
-#$ magma crust
+#$ broken floor
 K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
@@ -14095,7 +14103,7 @@ G:%:r
 O:0
 W:55:1:14:50
 #$ magma vein
-T:LAVA:12d10
+T:TRAP:LAVA:12d10
 K:DEFAULT:721:0
 K:CHASM:214:0
 #$ lava fall
@@ -14114,7 +14122,7 @@ G:<:r
 O:0
 W:56:1:14:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:722:0
 K:CHASM:214:0
 #$ lava fall
@@ -14137,7 +14145,7 @@ U:56
 O:0
 W:1:1:17:0
 K:DEFAULT:725:0
-#$ window
+#$ broken window
 K:OPEN:724:0
 #$ open window
 K:CHASM:141:0
@@ -14153,7 +14161,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:725:0
-#$ open window
+#$ broken window
 K:CLOSE:723:0
 #$ window
 K:CHASM:141:0
@@ -14169,7 +14177,7 @@ U:56
 O:0
 W:1:1:15:0
 K:DEFAULT:547:0
-#$ broken window
+#$ open vent
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | PLACE | NOTICE | REMEMBER | CLOSE | DOOR |
@@ -14184,7 +14192,7 @@ U:56
 O:0
 W:30:1:17:0
 K:DEFAULT:727:15
-#$ locked gate
+#$ broken bars
 K:OPEN:851:15
 #$ opening gate
 K:CHASM:141:15
@@ -14200,7 +14208,7 @@ U:56
 O:0
 W:10:1:17:0
 K:DEFAULT:1:0
-#$ broken bars
+#$ open floor
 K:HURT_ACID:165:0
 #$ acidic vapour
 K:SPIKE:726:0
@@ -14216,7 +14224,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ acid-marked granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:58:40
@@ -14239,7 +14247,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ burnt granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:59:40
@@ -14262,7 +14270,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:1
-#$ shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14291,7 +14299,7 @@ U:56
 O:0
 W:1:3:10:0
 K:DEFAULT:767:1
-#$ shelf
+#$ a pile of wood containing something
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14318,7 +14326,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ painting on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:SOLID:822:40
@@ -14343,7 +14351,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ painting on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:SECRET:32:40
@@ -14359,9 +14367,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:762:1
-#$ lit fireplace
+#$ empty fireplace
 K:CHASM:141:1
 #$ chasm
 K:BASH:49:1
@@ -14386,9 +14394,9 @@ U:56
 #$ granite wall
 O:0
 W:1:8:10:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:762:1
-#$ lit fireplace
+#$ empty fireplace
 K:CHASM:141:1
 #$ chasm
 K:SECRET:758:1
@@ -14416,7 +14424,7 @@ U:56
 O:346
 W:1:1:10:0
 K:DEFAULT:58:40
-#$ burning torch on a granite wall
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:SOLID:823:40
@@ -14438,7 +14446,7 @@ U:56
 O:346
 W:1:0:10:0
 K:DEFAULT:57:40
-#$ burning torch on a granite wall
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TUNNEL:1:40
@@ -14454,7 +14462,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:0
-#$ open lever on a granite wall
+#$ granite wall
 K:CHASM:141:0
 #$ chasm
 K:CLOSE:752:0
@@ -14478,7 +14486,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:0
-#$ closed lever on a granite wall
+#$ granite wall
 K:CHASM:141:0
 #$ chasm
 K:OPEN:753:0
@@ -14504,7 +14512,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -14533,7 +14541,7 @@ U:56
 O:0
 W:1:4:10:0
 K:DEFAULT:767:40
-#$ weapon rack
+#$ a pile of wood containing something
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -14560,7 +14568,7 @@ U:56
 O:846
 W:10:1:10:0
 K:DEFAULT:58:40
-#$ vine-covered granite wall
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TUNNEL:456:40
@@ -14589,7 +14597,7 @@ U:56
 O:846
 W:1:0:10:0
 K:DEFAULT:1:1
-#$ vine-covered granite wall
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:1:1
@@ -14610,7 +14618,7 @@ U:56
 O:0
 W:10:1:10:0
 K:DEFAULT:1:1
-#$ basin
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14635,7 +14643,7 @@ U:56
 O:0
 W:1:8:10:0
 K:DEFAULT:1:1
-#$ basin
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14663,9 +14671,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:POISON
+T:TRAP:POISON
 K:DEFAULT:49:1
-#$ midden
+#$ pile of rubble
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14691,9 +14699,9 @@ U:56
 #$ granite wall
 O:0
 W:1:7:10:0
-T:POISON
+T:TRAP:POISON
 K:DEFAULT:97:1
-#$ midden
+#$ a pile of rubble containing something
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14723,7 +14731,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ coffers
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -14752,7 +14760,7 @@ M:748
 O:0
 W:1:2:10:0
 K:DEFAULT:56:40
-#$ coffers
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:SECRET:769:40
@@ -14779,7 +14787,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ writing on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -14806,7 +14814,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ writing on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -14824,9 +14832,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:56:0
-#$ closing lever on a granite wall
+#$ granite wall
 K:CHASM:141:0
 #$ chasm
 K:TREE:56:0
@@ -14850,9 +14858,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:56:0
-#$ opening lever on a granite wall
+#$ granite wall
 K:CHASM:141:0
 #$ chasm
 K:TREE:56:0
@@ -14875,7 +14883,7 @@ U:56
 O:0
 W:55:1:10:0
 K:DEFAULT:305:40
-#$ blood-stained wall
+#$ blood-stained floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:58:40
@@ -14901,7 +14909,7 @@ U:56
 O:0
 W:55:0:10:0
 K:DEFAULT:305:40
-#$ blood-stained wall
+#$ blood-stained floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:59:40
@@ -14921,7 +14929,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:306:40
-#$ slime-covered wall
+#$ slimy trail
 K:CHASM:141:40
 #$ chasm
 K:TREE:57:40
@@ -14947,7 +14955,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:306:40
-#$ slime-covered wall
+#$ slimy trail
 K:CHASM:141:40
 #$ chasm
 K:TREE:58:40
@@ -14966,9 +14974,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:1:1
-#$ a lit fireplace containing something
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -14993,7 +15001,7 @@ O:0
 W:1:1:10:0
 S:TRAPS
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -15019,7 +15027,7 @@ O:0
 W:1:1:10:0
 S:TRAPS
 K:DEFAULT:1:40
-#$ trapped wall (multiple traps)
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -15044,7 +15052,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:1
-#$ empty shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:HURT_FIRE:502:1
@@ -15066,7 +15074,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:1
-#$ empty fireplace
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:49:1
@@ -15094,7 +15102,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ empty weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:DOOR:32:40
@@ -15116,7 +15124,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:1
-#$ empty basin
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:49:1
@@ -15144,7 +15152,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:1
-#$ empty midden
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:49:1
@@ -15170,7 +15178,7 @@ U:56
 O:0
 W:15:7:17:0
 K:DEFAULT:312:1
-#$ pile of wood
+#$ broken wood
 K:CHASM:141:1
 #$ chasm
 K:HURT_FIRE:502:1
@@ -15187,7 +15195,7 @@ U:56
 O:0
 W:15:7:17:0
 K:DEFAULT:312:1
-#$ a pile of wood containing something
+#$ broken wood
 K:CHASM:141:1
 #$ chasm
 K:HURT_FIRE:502:1
@@ -15204,9 +15212,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:POISON
+T:TRAP:POISON
 K:DEFAULT:765:1
-#$ midden
+#$ empty midden
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -15233,7 +15241,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ empty coffers
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:SOLID:926:40
@@ -15255,7 +15263,7 @@ U:216
 O:82
 W:57:3:7:50
 #$ magma vein
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:770:0
 K:CHASM:141:0
 #$ chasm
@@ -15274,7 +15282,7 @@ U:56
 O:0
 W:10:1:17:0
 K:DEFAULT:312:1
-#$ pile of wood
+#$ broken wood
 K:CHASM:141:1
 #$ chasm
 K:HURT_FIRE:502:1
@@ -15354,7 +15362,7 @@ G:x:y
 O:345
 W:48:1:8:0
 K:DEFAULT:786:0
-#$ rope bridge
+#$ rope hanging over a chasm
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:KILL_HUGE |
@@ -15365,7 +15373,7 @@ G:x:s
 O:345
 W:48:1:8:0
 K:DEFAULT:787:15
-#$ chain bridge
+#$ chain hanging over a chasm
 K:OPEN:893:15
 #$ opening chain bridge
 K:CLOSE:894:15
@@ -15379,7 +15387,7 @@ G:x:U
 O:0
 W:35:1:8:0
 K:DEFAULT:783:0
-#$ wooden bridge
+#$ weak wooden bridge over a chasm
 K:HURT_FIRE:784:0
 #$ burning wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -15393,7 +15401,7 @@ M:781
 O:0
 W:35:1:8:0
 K:DEFAULT:788:0
-#$ wooden bridge
+#$ broken wooden bridge (hidden)
 K:HURT_FIRE:790:0
 #$ burning wooden bridge over a chasm
 K:SECRET:783:0
@@ -15407,7 +15415,7 @@ G:x:u
 O:0
 W:35:1:8:0
 K:DEFAULT:789:0
-#$ weak wooden bridge over a chasm
+#$ broken wooden bridge over a chasm
 K:HURT_FIRE:790:0
 #$ burning wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -15418,7 +15426,7 @@ N:784:burning wooden bridge over a chasm
 G:x:o
 O:0
 W:35:1:8:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:790:0
 #$ burning wooden bridge over a chasm
 K:HURT_WATER:790:0
@@ -15432,7 +15440,7 @@ G:>:W
 O:0
 W:48:3:7:0
 K:DEFAULT:791:0
-#$ giant spider web hanging over a chasm
+#$ falling giant spider web
 F:PROJECT | PLACE | NOTICE | REMEMBER | MORE | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | CAN_CLIMB | HIDE_ITEM | KILL_HUGE |
 F:KILL_MOVE |
@@ -15443,7 +15451,7 @@ G:>:y
 O:844
 W:48:1:8:0
 K:DEFAULT:792:0
-#$ rope hanging over a chasm
+#$ falling rope
 K:SPIKE:779:0
 #$ rope bridge
 K:KILL_HUGE:802:0
@@ -15464,7 +15472,7 @@ G:>:s
 O:845
 W:48:1:8:0
 K:DEFAULT:793:0
-#$ chain hanging over a chasm
+#$ falling chain
 K:SPIKE:780:0
 #$ chain bridge
 K:KILL_MOVE:803:0
@@ -15487,7 +15495,7 @@ M:783
 O:0
 W:48:1:8:0
 K:DEFAULT:794:0
-#$ weak wooden bridge over a chasm
+#$ falling wooden bridge
 K:HURT_FIRE:795:0
 #$ falling burning wood
 K:SECRET:789:0
@@ -15502,7 +15510,7 @@ G:>:u
 O:0
 W:48:1:8:0
 K:DEFAULT:794:0
-#$ broken wooden bridge over a chasm
+#$ falling wooden bridge
 K:HURT_FIRE:795:0
 #$ falling burning wood
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -15514,9 +15522,9 @@ N:790:burning wooden bridge over a chasm
 G:>:o
 O:0
 W:48:1:8:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:795:0
-#$ burning wooden bridge over a chasm
+#$ falling burning wood
 K:HURT_WATER:789:0
 #$ broken wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
@@ -15528,7 +15536,7 @@ G:>:W
 O:0
 W:15:3:7:0
 K:DEFAULT:141:0
-#$ falling giant spider web
+#$ chasm
 F:PROJECT | PLACE | NOTICE | REMEMBER | RUN |
 F:PATH | COVERED | HURT_FIRE | CHASM | HIDE_ITEM | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
@@ -15538,7 +15546,7 @@ G:>:y
 O:0
 W:48:1:8:0
 K:DEFAULT:142:0
-#$ falling rope
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
 F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT |
@@ -15548,7 +15556,7 @@ G:>:s
 O:0
 W:48:1:8:0
 K:DEFAULT:142:0
-#$ falling chain
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
 F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT |
@@ -15557,9 +15565,9 @@ N:794:falling wooden bridge
 G:>:u
 O:0
 W:48:1:8:0
-T:HURT:4d6
+T:TRAP:HURT:4d6
 K:DEFAULT:142:0
-#$ falling wooden bridge
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
 F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT |
@@ -15568,9 +15576,9 @@ N:795:falling burning wood
 G:>:o
 O:0
 W:48:1:8:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:142:0
-#$ falling burning wood
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
 F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT | SPREAD |
@@ -15581,7 +15589,7 @@ O:0
 W:48:1:8:142
 #$ chasm
 K:DEFAULT:797:0
-#$ ice bridge
+#$ broken ice bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | CAN_FLY | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE |
@@ -15592,7 +15600,7 @@ O:0
 W:48:1:8:142
 #$ chasm
 K:DEFAULT:798:0
-#$ broken ice bridge over a chasm
+#$ falling ice
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | CHASM | CAN_FLY | KILL_HUGE |
 F:KILL_MOVE |
@@ -15602,9 +15610,9 @@ N:798:falling ice
 G:>:B
 O:0
 W:48:1:8:0
-T:ICE:4d6
+T:TRAP:ICE:4d6
 K:DEFAULT:144:0
-#$ falling ice
+#$ ice chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
 F:PATH | COVERED | CHASM | CAN_FLY | KILL_HUGE |
 F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT |
@@ -15614,7 +15622,7 @@ G:x:G
 O:846
 W:48:1:8:0
 K:DEFAULT:800:0
-#$ vine bridge
+#$ vine hanging over a chasm
 K:KILL_HUGE:800:0
 #$ vine hanging over a chasm
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
@@ -15627,7 +15635,7 @@ G:>:G
 O:846
 W:48:1:8:0
 K:DEFAULT:801:0
-#$ vine hanging over a chasm
+#$ falling vine
 K:KILL_HUGE:804:0
 #$ vine swinging over a chasm
 K:KILL_MOVE:804:0
@@ -15646,7 +15654,7 @@ G:>:G
 O:0
 W:48:1:8:0
 K:DEFAULT:142:0
-#$ falling vine
+#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | RUN |
 F:PATH | COVERED | CHASM | CAN_FLY |
 F:OUTSIDE | LIVING | ATTR_LITE | INSTANT |
@@ -15656,7 +15664,7 @@ G:x:y
 O:844
 W:48:1:8:0
 K:DEFAULT:792:0
-#$ rope swinging over a chasm
+#$ falling rope
 K:INSTANT:786:0
 #$ rope hanging over a chasm
 K:PATH:786:0
@@ -15679,7 +15687,7 @@ G:x:s
 O:845
 W:48:1:8:0
 K:DEFAULT:793:0
-#$ chain swinging over a chasm
+#$ falling chain
 K:INSTANT:787:0
 #$ chain hanging over a chasm
 K:PATH:787:0
@@ -15701,7 +15709,7 @@ G:x:G
 O:846
 W:48:1:8:0
 K:DEFAULT:801:0
-#$ vine swinging over a chasm
+#$ falling vine
 K:INSTANT:800:0
 #$ vine hanging over a chasm
 K:PATH:800:0
@@ -15742,7 +15750,7 @@ G:0:w
 O:0
 W:1:1:20:0
 K:DEFAULT:1:0
-#$ stone furnishings
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:SECRET:809:0
@@ -15759,7 +15767,7 @@ M:807
 O:0
 W:1:10:20:0
 K:DEFAULT:1:0
-#$ stone furnishings
+#$ open floor
 K:SECRET:809:0
 #$ empty stone furnishings
 K:CHASM:141:0
@@ -15774,7 +15782,7 @@ G:0:D
 O:0
 W:1:1:20:0
 K:DEFAULT:1:0
-#$ empty stone furnishings
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | TUNNEL |
@@ -15786,7 +15794,7 @@ G:0:U
 O:0
 W:1:1:15:0
 K:DEFAULT:771:0
-#$ wooden furniture
+#$ pile of wood
 K:HURT_FIRE:502:0
 #$ fire
 K:SECRET:812:0
@@ -15805,7 +15813,7 @@ M:810
 O:0
 W:1:5:15:0
 K:DEFAULT:771:0
-#$ wooden furniture
+#$ pile of wood
 K:SECRET:812:0
 #$ empty wooden furniture
 K:HURT_FIRE:502:0
@@ -15822,7 +15830,7 @@ G:0:D
 O:0
 W:24:10:15:0
 K:DEFAULT:771:0
-#$ empty wooden furniture
+#$ pile of wood
 K:HURT_FIRE:502:0
 #$ fire
 K:CHASM:445:0
@@ -15840,7 +15848,7 @@ U:56
 O:224
 W:1:6:20:0
 K:DEFAULT:1:5
-#$ clear fountain
+#$ open floor
 K:BASH:383:5
 #$ broken fountain
 K:OPEN:383:5
@@ -15861,7 +15869,7 @@ U:56
 O:224
 W:0:1:20:0
 K:DEFAULT:1:10
-#$ water-filled well
+#$ open floor
 K:USE_FEAT:391:10
 #$ stone well
 F:LOS | PROJECT | NOTICE | REMEMBER | MORE |
@@ -15876,7 +15884,7 @@ U:56
 O:0
 W:0:1:20:0
 K:DEFAULT:1:10
-#$ stone well
+#$ open floor
 K:MORE:1:10
 #$ open floor
 K:SECRET:816:10
@@ -15893,7 +15901,7 @@ U:56
 O:0
 W:0:1:20:0
 K:DEFAULT:1:10
-#$ empty well
+#$ open floor
 K:MORE:1:10
 #$ open floor
 F:LOS | PROJECT | NOTICE | REMEMBER | STAIRS | MORE |
@@ -15907,7 +15915,7 @@ U:56
 O:0
 W:24:10:15:0
 K:DEFAULT:1:0
-#$ writing-covered floor
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN | FLOOR |
@@ -15919,7 +15927,7 @@ G:0:g
 O:0
 W:30:1:20:0
 K:DEFAULT:1:0
-#$ shrine
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 K:SECRET:820:0
@@ -15936,7 +15944,7 @@ M:818
 O:0
 W:30:1:20:0
 K:DEFAULT:1:0
-#$ shrine
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | PLACE | SECRET | REMEMBER | TUNNEL | HAS_ITEM |
@@ -15949,7 +15957,7 @@ G:0:D
 O:0
 W:30:1:20:0
 K:DEFAULT:1:0
-#$ empty shrine
+#$ open floor
 K:CHASM:141:0
 #$ chasm
 F:LOS | PROJECT | PLACE | REMEMBER | TUNNEL |
@@ -15965,7 +15973,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ acid-marked granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -15984,7 +15992,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ painting on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16005,7 +16013,7 @@ U:56
 O:346
 W:1:0:10:0
 K:DEFAULT:56:40
-#$ burning torch on a granite wall
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TUNNEL:1:40
@@ -16023,7 +16031,7 @@ U:56
 O:846
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ vine-covered granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16045,7 +16053,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ writing on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16067,7 +16075,7 @@ O:0
 W:1:0:10:0
 S:TRAPS
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16086,7 +16094,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:1
-#$ empty cupboard
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:763:1
@@ -16112,7 +16120,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ burnt granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16129,7 +16137,7 @@ U:56
 O:0
 W:1:10:10:0
 K:DEFAULT:1:40
-#$ web-covered granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16152,7 +16160,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ web-covered granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16169,7 +16177,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ mossy granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16194,7 +16202,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ mossy granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16211,7 +16219,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ scratched granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16234,7 +16242,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ scratched granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16251,7 +16259,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ roughly-hewn granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16274,7 +16282,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:40
-#$ roughly-hewn granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16291,7 +16299,7 @@ U:56
 O:0
 W:20:1:10:0
 K:DEFAULT:307:40
-#$ wet granite wall
+#$ wet floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16318,7 +16326,7 @@ U:56
 O:0
 W:20:0:10:0
 K:DEFAULT:307:40
-#$ roughly-hewn granite wall
+#$ wet floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16337,7 +16345,7 @@ U:56
 O:0
 W:45:1:10:0
 K:DEFAULT:1:40
-#$ icy granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16362,7 +16370,7 @@ U:56
 O:0
 W:45:0:10:0
 K:DEFAULT:1:40
-#$ roughly-hewn granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16379,7 +16387,7 @@ U:56
 O:0
 W:1:1:17:0
 K:DEFAULT:766:10
-#$ wooden wall
+#$ pile of wood
 K:TUNNEL:1:10
 #$ open floor
 K:HURT_FIRE:502:10
@@ -16405,7 +16413,7 @@ U:56
 O:0
 W:1:0:17:0
 K:DEFAULT:766:10
-#$ wooden wall
+#$ pile of wood
 K:TUNNEL:1:10
 #$ open floor
 K:HURT_FIRE:502:10
@@ -16425,9 +16433,9 @@ U:56
 O:344
 W:52:2:13:51
 #$ quartz vein
-T:ACID:2d6
+T:TRAP:ACID:2d6
 K:DEFAULT:846:0
-#$ boiling acid
+#$ acidic vapour over boiling acid
 K:CHASM:226:0
 #$ acid fall
 K:TREE:157:0
@@ -16446,9 +16454,9 @@ U:56
 O:344
 W:55:3:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:847:0
-#$ acid
+#$ acidic vapour over deep boiling acid
 K:CHASM:226:0
 #$ acid fall
 K:PATH:843:0
@@ -16470,9 +16478,9 @@ U:56
 O:344
 W:54:2:14:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:849:0
-#$ deep boiling acid
+#$ acidic vapour over deep boiling acid
 K:CHASM:226:0
 #$ acid fall
 K:PATH:156:0
@@ -16497,9 +16505,9 @@ U:56
 O:0
 W:52:2:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:843:0
-#$ acidic vapour
+#$ boiling acid
 K:CHASM:226:0
 #$ acid fall
 K:SECRET:847:0
@@ -16520,9 +16528,9 @@ U:56
 O:0
 W:55:3:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:844:0
-#$ acidic vapour
+#$ deep boiling acid
 K:CHASM:226:0
 #$ acid fall
 K:PATH:168:0
@@ -16544,9 +16552,9 @@ U:56
 O:0
 W:54:2:14:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:843:0
-#$ acidic vapour over boiling acid
+#$ boiling acid
 K:CHASM:226:0
 #$ acid fall
 F:PROJECT | MOVE | PLACE | NOTICE | REMEMBER |
@@ -16560,9 +16568,9 @@ U:56
 O:0
 W:54:2:14:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:845:0
-#$ acidic vapour over deep boiling acid
+#$ deep boiling acid
 K:PATH:168:0
 #$ acidic vapour around a stone bridge
 K:CHASM:141:0
@@ -16596,9 +16604,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:17:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:727:15
-#$ opening gate
+#$ broken bars
 K:CHASM:141:15
 #$ chasm
 K:TREE:726:15
@@ -16617,9 +16625,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:15:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:727:15
-#$ closing gate
+#$ broken bars
 K:CHASM:141:15
 #$ chasm
 K:TREE:4:15
@@ -16639,7 +16647,7 @@ U:56
 O:345
 W:1:1:15:0
 K:DEFAULT:1:15
-#$ linked chain
+#$ open floor
 K:GET_FEAT:854:15
 #$ loose chain
 K:OPEN:855:15
@@ -16660,7 +16668,7 @@ U:56
 O:845
 W:1:7:15:0
 K:DEFAULT:1:0
-#$ linked chain
+#$ open floor
 K:SPIKE:853:0
 #$ linked chain
 K:SECRET:857:0
@@ -16677,9 +16685,9 @@ U:56
 #$ granite wall
 O:345
 W:1:1:15:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:1:15
-#$ opening chain
+#$ open floor
 K:GET_FEAT:854:15
 #$ loose chain
 K:ADJACENT:877:15
@@ -16696,9 +16704,9 @@ U:56
 #$ granite wall
 O:345
 W:1:1:15:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:1:15
-#$ closing chain
+#$ open floor
 K:GET_FEAT:854:15
 #$ loose chain
 K:ADJACENT:877:15
@@ -16716,7 +16724,7 @@ U:56
 O:845
 W:1:1:15:0
 K:DEFAULT:1:0
-#$ loose chain
+#$ open floor
 K:SPIKE:853:0
 #$ linked chain
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | SPIKE | RUN |
@@ -16730,9 +16738,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:571:0
-#$ opening valve
+#$ open valve
 K:CHASM:141:0
 #$ chasm
 F:NOTICE | REMEMBER | WALL |
@@ -16745,9 +16753,9 @@ U:56
 #$ granite wall
 O:0
 W:40:1:13:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:572:0
-#$ closing valve
+#$ closed valve
 K:CHASM:141:0
 #$ chasm
 K:TREE:572:0
@@ -16763,7 +16771,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ painting on a granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -16785,7 +16793,7 @@ U:56
 O:346
 W:1:0:10:0
 K:DEFAULT:56:40
-#$ burning torch on a granite wall
+#$ granite wall
 K:TUNNEL:1:40
 #$ open floor
 K:CHASM:141:40
@@ -16806,7 +16814,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:SECRET:752:40
@@ -16827,7 +16835,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:SECRET:753:40
@@ -16846,7 +16854,7 @@ U:56
 O:0
 W:1:0:17:0
 K:DEFAULT:766:10
-#$ wooden wall
+#$ pile of wood
 K:TUNNEL:1:10
 #$ open floor
 K:HURT_FIRE:502:10
@@ -16868,7 +16876,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:853:40
-#$ granite wall
+#$ linked chain
 K:SOLID:752:40
 #$ closing lever on a granite wall
 K:INNER:867:40
@@ -16891,9 +16899,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:853:40
-#$ opening mechanism in a granite wall
+#$ linked chain
 K:CHASM:780:40
 #$ chain bridge
 K:TREE:56:40
@@ -16912,9 +16920,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:10:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:853:40
-#$ closing mechanism in a granite wall
+#$ linked chain
 K:CHASM:780:40
 #$ chain bridge
 K:TREE:56:40
@@ -16936,7 +16944,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:853:40
-#$ granite wall
+#$ linked chain
 K:SOLID:752:40
 #$ closing lever on a granite wall
 K:INNER:867:40
@@ -16980,9 +16988,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:13:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:853:40
-#$ opening sliding wall
+#$ linked chain
 K:CHASM:780:40
 #$ chain bridge
 K:TREE:49:40
@@ -17001,9 +17009,9 @@ U:56
 #$ granite wall
 O:0
 W:1:1:13:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:853:40
-#$ closing sliding wall
+#$ linked chain
 K:CHASM:780:40
 #$ chain bridge
 K:TREE:49:40
@@ -17021,7 +17029,7 @@ G:*:U
 O:0
 W:1:3:10:0
 K:DEFAULT:1:2
-#$ locked cupboard
+#$ open floor
 K:CHASM:141:2
 #$ chasm
 K:TREE:56:2
@@ -17044,7 +17052,7 @@ O:82
 W:25:3:7:50
 #$ magma vein
 K:DEFAULT:136:0
-#$ crumbling floor
+#$ broken floor
 K:CHASM:141:0
 #$ chasm
 K:TREE:141:0
@@ -17064,7 +17072,7 @@ G:::w
 O:82
 W:25:3:13:0
 K:DEFAULT:1:10
-#$ trembling pile of rubble
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:TREE:49:10
@@ -17083,9 +17091,9 @@ N:875:pulsing pile of rubble
 G:::w
 O:82
 W:25:3:13:0
-T:FALL_LESS
+T:TRAP:FALL_LESS
 K:DEFAULT:1:10
-#$ pulsing pile of rubble
+#$ open floor
 K:CHASM:141:10
 #$ chasm
 K:TREE:49:10
@@ -17107,9 +17115,9 @@ U:56
 #$ granite wall
 O:0
 W:25:3:20:0
-T:FALL_MORE
+T:TRAP:FALL_MORE
 K:DEFAULT:136:5
-#$ cracked floor
+#$ broken floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:141:5
@@ -17130,7 +17138,7 @@ U:56
 O:845
 W:1:7:15:0
 K:DEFAULT:1:15
-#$ winding chain
+#$ open floor
 K:INSTANT:879:15
 #$ linked chain
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN | FLOOR |
@@ -17146,7 +17154,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -17170,7 +17178,7 @@ U:56
 O:845
 W:1:7:15:0
 K:DEFAULT:1:15
-#$ linked chain
+#$ open floor
 K:INSTANT:853:15
 #$ linked chain
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN | FLOOR |
@@ -17186,7 +17194,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:1:40
-#$ granite wall
+#$ open floor
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -17212,7 +17220,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:56:1
-#$ empty shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:TREE:761:1
@@ -17232,7 +17240,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:56:1
-#$ empty shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:TREE:761:1
@@ -17252,7 +17260,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:1
-#$ shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17275,7 +17283,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:1
-#$ shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17298,7 +17306,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:56:1
-#$ shelf
+#$ granite wall
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17321,7 +17329,7 @@ U:56
 O:0
 W:1:3:10:0
 K:DEFAULT:767:1
-#$ shelf
+#$ a pile of wood containing something
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17344,7 +17352,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -17367,7 +17375,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -17390,7 +17398,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -17417,7 +17425,7 @@ U:56
 O:0
 W:1:4:10:0
 K:DEFAULT:767:40
-#$ weapon rack
+#$ a pile of wood containing something
 K:CHASM:141:40
 #$ chasm
 K:TREE:56:40
@@ -17440,7 +17448,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ empty weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TREE:763:40
@@ -17460,7 +17468,7 @@ U:56
 O:0
 W:1:1:10:0
 K:DEFAULT:56:40
-#$ empty weapon rack
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TREE:763:40
@@ -17475,9 +17483,9 @@ N:893:opening chain bridge
 G:x:y
 O:345
 W:48:1:8:0
-T:KILL_TRAP
+T:TRAP:KILL_TRAP
 K:DEFAULT:787:0
-#$ opening chain bridge
+#$ chain hanging over a chasm
 K:PATH:780:0
 #$ chain bridge
 K:CHASM:780:0
@@ -17494,9 +17502,9 @@ N:894:closing chain bridge
 G:x:y
 O:345
 W:48:1:8:0
-T:LOCK_DOOR
+T:TRAP:LOCK_DOOR
 K:DEFAULT:787:0
-#$ closing chain bridge
+#$ chain hanging over a chasm
 K:PATH:780:0
 #$ chain bridge
 K:CHASM:780:0
@@ -17527,8 +17535,7 @@ K:HURT_WATER:629:0
 K:INSTANT:896:0
 #$ quivering sapling
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
-F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK |
-F:HIDE_DIG |
+F:PATH | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM | HIDE_SNEAK | HIDE_DIG |
 F:HURT_WATER | GROUND | OUTSIDE | LIVING | ATTR_LITE | INSTANT |
 
 N:896:quivering sapling
@@ -17536,7 +17543,7 @@ G:':u
 O:0
 W:10:1:17:0
 K:DEFAULT:1:0
-#$ quivering sapling
+#$ open floor
 K:HURT_FIRE:413:0
 #$ fire
 K:INSTANT:420:0
@@ -17625,9 +17632,9 @@ U:56
 #$ granite wall
 O:0
 W:1:0:10:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:762:1
-#$ lit fireplace
+#$ empty fireplace
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17651,9 +17658,9 @@ U:56
 #$ granite wall
 O:0
 W:1:0:10:0
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:572:1
-#$ lit fireplace
+#$ closed valve
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17678,7 +17685,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:1
-#$ basin
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17703,7 +17710,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:1
-#$ basin
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17727,9 +17734,9 @@ U:56
 #$ granite wall
 O:0
 W:1:0:10:0
-T:POISON
+T:TRAP:POISON
 K:DEFAULT:49:1
-#$ midden
+#$ pile of rubble
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17751,9 +17758,9 @@ U:56
 #$ granite wall
 O:0
 W:1:0:10:0
-T:POISON
+T:TRAP:POISON
 K:DEFAULT:49:1
-#$ midden
+#$ pile of rubble
 K:CHASM:141:1
 #$ chasm
 K:TREE:56:1
@@ -17776,7 +17783,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:1
-#$ empty fireplace
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:49:1
@@ -17800,7 +17807,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:1
-#$ empty basin
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:49:1
@@ -17824,7 +17831,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:1
-#$ empty midden
+#$ open floor
 K:CHASM:141:1
 #$ chasm
 K:TREE:49:1
@@ -17846,7 +17853,7 @@ U:56
 O:0
 W:1:15:10:0
 K:DEFAULT:1:5
-#$ painting on a granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:732:5
@@ -17872,7 +17879,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:1:5
-#$ a weak granite wall containing something
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:59:5
@@ -17898,7 +17905,7 @@ U:56
 O:0
 W:10:10:10:0
 K:DEFAULT:1:5
-#$ vine-covered granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:732:5
@@ -17926,7 +17933,7 @@ U:56
 O:0
 W:15:8:10:0
 K:DEFAULT:1:5
-#$ vine-covered granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:732:5
@@ -17954,7 +17961,7 @@ O:0
 W:10:15:10:56
 #$ granite wall
 K:DEFAULT:1:5
-#$ cracked granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:59:5
@@ -17980,7 +17987,7 @@ U:56
 O:0
 W:15:10:10:0
 K:DEFAULT:1:5
-#$ vine-covered weak granite wall
+#$ open floor
 K:CHASM:141:5
 #$ chasm
 K:TREE:59:5
@@ -18008,7 +18015,7 @@ U:56
 O:846
 W:10:1:10:0
 K:DEFAULT:58:40
-#$ vine-covered granite wall
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:TUNNEL:456:40
@@ -18030,7 +18037,7 @@ G:0:s
 O:0
 W:1:1:15:0
 K:DEFAULT:927:0
-#$ metal framework
+#$ pile of metal
 K:HURT_ACID:502:0
 #$ fire
 K:SECRET:923:0
@@ -18049,7 +18056,7 @@ M:810
 O:0
 W:1:2:15:0
 K:DEFAULT:927:0
-#$ wooden furniture
+#$ pile of metal
 K:SECRET:923:0
 #$ empty metal framework
 K:HURT_ACID:502:0
@@ -18066,7 +18073,7 @@ G:0:D
 O:0
 W:24:10:15:0
 K:DEFAULT:927:0
-#$ empty metal framework
+#$ pile of metal
 K:HURT_ACID:502:0
 #$ fire
 K:CHASM:445:0
@@ -18082,7 +18089,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:56:40
-#$ coffers
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:SECRET:926:40
@@ -18099,7 +18106,7 @@ M:748
 O:0
 W:1:0:10:0
 K:DEFAULT:56:40
-#$ coffers
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 K:SECRET:926:40
@@ -18116,7 +18123,7 @@ U:56
 O:0
 W:1:0:10:0
 K:DEFAULT:56:40
-#$ empty coffers
+#$ granite wall
 K:CHASM:141:40
 #$ chasm
 F:REMEMBER | TUNNEL | WALL | SOLID |
@@ -18132,7 +18139,7 @@ U:56
 O:0
 W:25:5:17:0
 K:DEFAULT:930:3
-#$ pile of metal
+#$ broken metal
 K:CHASM:141:3
 #$ chasm
 K:HURT_ACID:502:3
@@ -18149,7 +18156,7 @@ U:56
 O:0
 W:25:5:17:0
 K:DEFAULT:930:3
-#$ a pile of metal containing something
+#$ broken metal
 K:CHASM:141:3
 #$ chasm
 K:HURT_ACID:502:3
@@ -18165,7 +18172,7 @@ U:56
 O:0
 W:25:1:17:0
 K:DEFAULT:930:1
-#$ pile of metal
+#$ broken metal
 K:CHASM:141:1
 #$ chasm
 K:HURT_ACID:165:1
@@ -18181,7 +18188,7 @@ U:56
 O:0
 W:10:1:17:0
 K:DEFAULT:1:0
-#$ broken metal
+#$ open floor
 K:HURT_ACID:165:0
 #$ acidic vapour
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | BASH |
@@ -18192,7 +18199,7 @@ N:931:deep icy water
 G:::b
 O:224
 W:35:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:931:0
 K:CHASM:151:0
 #$ waterfall
@@ -18218,9 +18225,9 @@ G:;:B
 O:0
 W:35:2:7:148
 #$ ice wall
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:931:0
-#$ deep water under unstable ice
+#$ deep icy water
 K:HURT_FIRE:155:0
 #$ deep water
 K:PATH:147:0
@@ -18242,9 +18249,9 @@ N:933:unstable pile of ice rubble
 G:::B
 O:0
 W:40:12:12:0
-T:ICE:2d4
+T:TRAP:ICE:2d4
 K:DEFAULT:931:16
-#$ unstable pile of ice rubble
+#$ deep icy water
 K:CHASM:144:16
 #$ ice chasm
 K:TREE:464:16
@@ -18263,9 +18270,9 @@ U:148
 #$ ice wall
 O:0
 W:35:12:12:0
-T:ICE:4d4
+T:TRAP:ICE:4d4
 K:DEFAULT:933:16
-#$ rising ice wall
+#$ unstable pile of ice rubble
 K:CHASM:144:16
 #$ ice chasm
 K:TREE:115:16
@@ -18284,7 +18291,7 @@ U:155
 #$ deep water
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:935:0
 K:CHASM:151:0
 #$ waterfall
@@ -18309,7 +18316,7 @@ U:155
 #$ deep water
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:936:0
 K:CHASM:151:0
 #$ waterfall
@@ -18332,7 +18339,7 @@ U:155
 #$ deep water
 O:224
 W:27:2:12:0
-T:WATER_WEAK:4d6
+T:TRAP:WATER_WEAK:4d6
 K:DEFAULT:937:0
 K:CHASM:151:0
 #$ waterfall
@@ -18381,7 +18388,7 @@ U:56
 O:344
 W:47:1:13:51
 #$ quartz vein
-T:ACID:2d6
+T:TRAP:ACID:2d6
 K:DEFAULT:939:0
 K:CHASM:226:0
 #$ acid fall
@@ -18405,9 +18412,9 @@ U:56
 O:0
 W:47:1:13:51
 #$ quartz vein
-T:ACID:4d6
+T:TRAP:ACID:4d6
 K:DEFAULT:939:0
-#$ acidic vapour over acid
+#$ acid
 K:CHASM:226:0
 #$ acid fall
 K:ERUPT:602:0
@@ -18445,7 +18452,7 @@ M:433
 #$ steam over geothermal ground
 O:0
 W:40:2:7:0
-T:STEAM:1d3
+T:TRAP:STEAM:1d3
 K:DEFAULT:942:0
 K:CHASM:141:0
 #$ chasm
@@ -18464,7 +18471,7 @@ U:216
 O:82
 W:52:3:7:50
 #$ magma vein
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:943:8
 K:CHASM:141:8
 #$ chasm
@@ -18483,7 +18490,7 @@ G:%:r
 O:0
 W:55:1:14:50
 #$ magma vein
-T:LAVA:12d10
+T:TRAP:LAVA:12d10
 K:DEFAULT:944:0
 K:CHASM:214:0
 #$ lava fall
@@ -18500,7 +18507,7 @@ G:<:r
 O:0
 W:56:1:14:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:945:0
 K:CHASM:214:0
 #$ lava fall
@@ -18521,9 +18528,9 @@ G:;:r
 O:0
 W:56:1:14:50
 #$ magma vein
-T:LAVA:12d10
+T:TRAP:LAVA:12d10
 K:DEFAULT:218:0
-#$ lava
+#$ deep lava
 K:CHASM:214:0
 #$ lava fall
 K:HURT_WATER:210:0
@@ -18542,9 +18549,9 @@ U:216
 O:0
 W:51:2:7:50
 #$ magma vein
-T:LAVA:24d10
+T:TRAP:LAVA:24d10
 K:DEFAULT:216:0
-#$ magma crust
+#$ lava
 K:CHASM:214:0
 #$ lava fall
 K:PATH:432:0
@@ -18562,7 +18569,7 @@ U:216
 O:82
 W:52:3:7:50
 #$ magma vein
-T:FIRE:4d6
+T:TRAP:FIRE:4d6
 K:DEFAULT:948:8
 K:CHASM:141:8
 #$ chasm
@@ -18657,12 +18664,14 @@ D:A note on the door says 'Refugees welcome. Back soon. Radagast'.
 N:957:shaft of light
 G:^:Y
 M:87
+#$ shaft of light
 U:56
 #$ granite wall
 O:0
 W:20:2:20:0
 S:BALL_LITE
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18675,6 +18684,7 @@ U:56
 O:0
 W:5:2:20:0
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18689,6 +18699,7 @@ O:0
 W:25:2:20:0
 S:ARC_FORCE
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18698,12 +18709,14 @@ D:Demonic forces gather; a rift in reality tears open!
 N:960:demonic sign
 G:^:T
 M:959
+#$ demonic sign
 U:56
 #$ granite wall
 O:0
 W:50:2:20:0
 S:ARC_HFIRE
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18713,12 +18726,12 @@ D:Demonic forces gather; a rift in reality tears open!
 N:961:deadfall
 G:^:m
 U:56
-M:961
 #$ granite wall
 O:0
 W:8:2:20:0
-T:HURT:9d6
+T:TRAP:HURT:9d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18727,13 +18740,15 @@ D:You've unstacked an avalanche of logs.
 
 N:962:deadfall
 G:^:m
-U:56
 M:961
+#$ deadfall
+U:56
 #$ granite wall
 O:0
 W:16:2:20:0
-T:HURT:27d6
+T:TRAP:HURT:27d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18742,13 +18757,15 @@ D:You've unleashed huge rolling boulders.
 
 N:963:deadfall
 G:^:m
-U:56
 M:961
+#$ deadfall
+U:56
 #$ granite wall
 O:0
 W:4:2:20:0
-T:HURT:3d6
+T:TRAP:HURT:3d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18757,13 +18774,15 @@ D:You've released a rock fall.
 
 N:964:deadfall
 G:^:m
-U:56
 M:961
+#$ deadfall
+U:56
 #$ granite wall
 O:0
 W:2:2:20:0
-T:HURT:1d6
+T:TRAP:HURT:1d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18772,12 +18791,14 @@ D:You've dropped an jumble of junk from the ceiling.
 
 N:965:deadfall
 G:^:m
-U:56
 M:961
+#$ deadfall
+U:56
 #$ granite wall
 O:0
 W:1:2:20:0
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18787,12 +18808,12 @@ D:You've tipped over a stack of valuable looking pots.
 N:966:siege engine
 G:^:I
 U:56
-M:966
 #$ granite wall
 O:0
 W:10:2:20:0
-T:HURT:5d6
+T:TRAP:HURT:5d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18801,13 +18822,15 @@ D:The catapult hurls a handful of stone shot.
 
 N:967:siege engine
 G:^:I
-U:56
 M:966
+#$ siege engine
+U:56
 #$ granite wall
 O:0
 W:15:2:20:0
-T:HURT:15d6
+T:TRAP:HURT:15d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18816,13 +18839,15 @@ D:The ballista shoots a great steel bolt.
 
 N:968:siege engine
 G:^:I
-U:56
 M:966
+#$ siege engine
+U:56
 #$ granite wall
 O:0
 W:20:2:20:0
-T:HURT:25d6
+T:TRAP:HURT:25d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18831,13 +18856,15 @@ D:The mangonel launches a block of stone.
 
 N:969:siege engine
 G:^:I
-U:56
 M:966
+#$ siege engine
+U:56
 #$ granite wall
 O:0
 W:30:2:20:0
-T:HURT:50d6
+T:TRAP:HURT:50d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18846,13 +18873,15 @@ D:The trebuchet lobs a lump of old architecture.
 
 N:970:siege engine
 G:^:I
-U:56
 M:966
+#$ siege engine
+U:56
 #$ granite wall
 O:0
 W:50:2:20:0
-T:HURT:75d6
+T:TRAP:HURT:75d6
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18866,6 +18895,7 @@ U:56
 O:0
 W:50:2:20:0
 K:DEFAULT:1:70
+#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18993,7 +19023,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19014,7 +19044,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19025,8 +19055,8 @@ K:CHASM:141:5
 #$ chasm
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
-F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
-F:PICK_TRAP | ATTR_LITE | GLOW
+F:GLOW | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
 
 N:980:trapped door (upwards draft)
 G:+:t
@@ -19035,7 +19065,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19056,7 +19086,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19077,7 +19107,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19098,7 +19128,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19109,8 +19139,8 @@ K:CHASM:141:5
 #$ chasm
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
-F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
-F:PICK_TRAP | ATTR_LITE | GLOW
+F:GLOW | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:PICK_TRAP | ATTR_LITE |
 
 N:984:trapped door (demonic sign)
 G:+:T
@@ -19119,7 +19149,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19140,7 +19170,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19161,7 +19191,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19182,7 +19212,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19203,7 +19233,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19224,7 +19254,7 @@ U:56
 O:0
 W:15:9:20:0
 K:DEFAULT:1:5
-#$ trapped door (trap door)
+#$ open floor
 K:BASH:5:5
 #$ broken door
 K:SPIKE:41:5
@@ -19241,14 +19271,15 @@ F:PICK_TRAP | ATTR_LITE |
 N:990:falling poisonous water
 G:<:p
 U:164
-#$ waterfall
+#$ poisonous waterfall
 O:224
 W:35:2:13:499
-#$ rough water
-T:POISON_WATER:4d6
+#$ poisonous rough water
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:126:0
+#$ falling water
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:125:0
 #$ unstable ice wall
 K:ADJACENT:601:0
@@ -19265,14 +19296,15 @@ F:USE_FEAT | OUTSIDE | ATTR_LITE | ADJACENT | TIMED |
 N:991:falling poisonous water
 G:<:v
 U:164
+#$ poisonous waterfall
 O:224
 W:35:2:13:499
-#$ rough water
-T:POISON_WATER:4d6
+#$ poisonous rough water
+T:TRAP:POISON_WATER:4d6
 K:DEFAULT:990:0
-#$ falling water
+#$ falling poisonous water
 K:CHASM:164:0
-#$ waterfall
+#$ poisonous waterfall
 K:HURT_COLD:125:0
 #$ unstable ice wall
 K:INSTANT:126:0
@@ -19283,3 +19315,4 @@ F:MOVE | DROP | NOTICE | REMEMBER | LESS |
 F:LAKE | WATER | DEEP | FILLED | HURT_COLD | CAN_SWIM | HIDE_ITEM |
 F:HIDE_SWIM |
 F:USE_FEAT | OUTSIDE | ATTR_LITE | INSTANT | TIMED |
+
