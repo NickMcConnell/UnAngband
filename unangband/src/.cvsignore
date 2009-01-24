@@ -1,0 +1,11 @@
+unangband
+*.exe
+*.raw
+*.o
+*.res
+*.icns
+makefile
+.gdb*
+.*.swp
+foo*
+junk*

@@ -1,0 +1,16 @@
+unangband
+*.exe
+*.raw
+*.o
+*.zip
+*.ini
+*.dmg
+*.tgz
+.DS_Store
+.gdb*
+.*.swp
+.settings
+UnAngband.app
+.amateras
+.cdtproject
+.project
