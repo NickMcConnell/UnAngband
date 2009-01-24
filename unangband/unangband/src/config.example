@@ -1,2 +1,0 @@
-CC=ccache gcc
-CFLAGS=-O0 -W -Wall -Wextra -Wpointer-arith -Wcast-qual -Wmissing-field-initializers -fno-inline -ggdb #-D"ALLOW_BORG"
