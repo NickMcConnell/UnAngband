@@ -2667,6 +2667,35 @@ static void improve_stat(void)
 		/* Improve how many stats with level gain */
 		for (stat_gain_selected = 0; stat_gain_selected < count; stat_gain_selected++)
 		{
+			/* Random pick */
+			if (birth_rand_stats)
+			{
+				/* Pick a random stat */
+				stat_gain_selection[stat_gain_selected] = rand_int(A_MAX);
+
+				/* Valid choice? */
+				if (p_ptr->stat_max[stat_gain_selection[stat_gain_selected]] < 18 + 999)
+				{
+					bool okay = TRUE;
+
+					/* Check we are not improving another stat */
+					for (i = 0; i < stat_gain_selected; i++)
+					{
+						if (stat_gain_selection[i] == stat_gain_selection[stat_gain_selected]) okay = FALSE;
+					}
+
+					/* Retry */
+					if (!okay) stat_gain_selected--;
+				}
+				else
+				{
+					/* Retry */
+					stat_gain_selected--;
+				}
+
+				continue;
+			}
+
 			/* Should be paranoid here */
 			while (TRUE)
 			{
@@ -2705,6 +2734,9 @@ static void improve_stat(void)
 				}
 			}
 		}
+
+		/* Done? */
+		if (birth_rand_stats) break;
 
 		/* Save screen */
 		screen_save();

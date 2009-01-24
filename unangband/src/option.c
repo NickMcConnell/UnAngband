@@ -104,7 +104,7 @@ const byte option_page[OPT_PAGE_MAX][OPT_PAGE_PER] =
 		OPT_birth_intermediate,
 		OPT_birth_first_time,
 		OPT_birth_reseed_artifacts,
-		OPT_NONE,
+		OPT_birth_rand_stats,
 		OPT_NONE,
 		OPT_NONE,
 		OPT_NONE,
@@ -275,7 +275,7 @@ static option_entry options[OPT_MAX] =
 { NULL,                  NULL,                                          FALSE }, /* 127 */
 { NULL,                  NULL,                                          FALSE }, /* 128 */
 { "birth_randarts",      "Randomize all of the artifacts, even fixed",  FALSE }, /* 129 */
-{ NULL,                  NULL,                                          FALSE }, /* 130 */
+{ "birth_rand_stats",    "Randomize attributes chosen on level gain",   FALSE }, /* 130 */
 { "birth_ironman",       "Restrict the use of stairs/recall",           FALSE }, /* 131 */
 { "birth_no_stores",     "Restrict the use of stores/home",             FALSE }, /* 132 */
 { "birth_no_artifacts",  "Restrict creation of artifacts",              FALSE }, /* 133 */
