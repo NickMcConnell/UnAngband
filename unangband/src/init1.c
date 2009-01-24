@@ -2634,7 +2634,7 @@ errr parse_region_info(char *buf, header *head)
 				&delay)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
-		region_ptr->delay = (u16b)delay;
+		region_ptr->delay_reset = (u16b)delay;
 	}
 
 	/* Process 'B' for "Blows" */

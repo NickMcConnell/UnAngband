@@ -260,8 +260,8 @@ static void wr_region(const region_type *r_ptr)
 
 	wr_s16b(r_ptr->damage);
 
-	wr_s16b(r_ptr->countdown);     /* Number of turns effect has left */
-	wr_s16b(r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
+	wr_s16b(r_ptr->delay);     /* Number of turns effect has left */
+	wr_s16b(r_ptr->delay_reset);			/* Number of turns to reset counter to when countdown has finished */
 	wr_s16b(r_ptr->age);			/* Number of turns effect has been alive */
 	wr_s16b(r_ptr->lifespan);		/* Number of turns effect will be alive */
 

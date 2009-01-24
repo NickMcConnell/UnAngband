@@ -538,8 +538,8 @@ static void rd_region(region_type *r_ptr)
 
 	rd_s16b(&r_ptr->damage);
 
-	rd_s16b(&r_ptr->countdown);     /* Number of turns effect has left */
-	rd_s16b(&r_ptr->delay);			/* Number of turns to reset counter to when countdown has finished */
+	rd_s16b(&r_ptr->delay);		     /* Number of turns effect has left */
+	rd_s16b(&r_ptr->delay_reset);			/* Number of turns to reset counter to when countdown has finished */
 	rd_s16b(&r_ptr->age);			/* Number of turns effect has been alive */
 	rd_s16b(&r_ptr->lifespan);		/* Number of turns effect will be alive */
 

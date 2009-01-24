@@ -6168,10 +6168,10 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			}
 
 			/* Increase delay */
-			delay += r_ptr->lifespan * r_ptr->delay;
+			delay += r_ptr->lifespan * r_ptr->delay_reset;
 
-			/* Always display newly created regions */
-			r_ptr->flags1 |= (RE1_DISPLAY);
+			/* Display first of newly created regions */
+			if (ap_cnt) r_ptr->flags1 |= (RE1_DISPLAY);
 		}
 
 		/* Projection method */
@@ -9173,7 +9173,7 @@ void trigger_region(int y, int x, bool move)
 
 		/* Shoot grid with effect */
 		if ((move ? ((r_ptr->flags1 & (RE1_TRIGGER_MOVE)) != 0) : ((r_ptr->flags1 & (RE1_TRIGGER_DROP)) != 0)) &&
-				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0) && (!r_ptr->countdown))
+				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0) && (!r_ptr->delay))
 		{
 			if (r_ptr->flags1 & (RE1_HIT_TRAP))
 			{
@@ -9650,23 +9650,23 @@ void process_region(int region)
 	if (!r_ptr->type) return;
 
 	/* Count down to next turn, return if not yet ready */
-	if (--r_ptr->countdown > 0) return;
+	if (--r_ptr->delay > 0) return;
 
 	/* Accelerating */
 	if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (r_ptr->age < r_ptr->lifespan / 2)))
 	{
-		r_ptr->delay /= 2;
-		if (r_ptr->delay < 1) r_ptr->delay = 1;
+		r_ptr->delay_reset /= 2;
+		if (r_ptr->delay_reset < 1) r_ptr->delay_reset = 1;
 	}
 
 	/* Decelerating */
 	if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (r_ptr->age > r_ptr->lifespan / 2)))
 	{
-		r_ptr->delay *= 2;
+		r_ptr->delay_reset *= 2;
 	}
 
 	/* Reset count */
-	r_ptr->countdown = r_ptr->delay;
+	r_ptr->delay = r_ptr->delay_reset;
 
 	/* Effects eventually "die" */
 	if (r_ptr->age >= r_ptr->lifespan)
@@ -9999,7 +9999,7 @@ int init_region(int who, int what, int type, int dam, int method, int effect, in
 
 	/* Initialise region values from region info type */
 	r_ptr->flags1 = ri_ptr->flags1;
-	r_ptr->delay = ri_ptr->delay;
+	r_ptr->delay_reset = ri_ptr->delay_reset;
 
 	/* Exclude one of clockwise and counter clockwise */
 	if ((r_ptr->flags1 & (RE1_CLOCKWISE)) &&
