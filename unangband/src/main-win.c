@@ -5517,7 +5517,7 @@ static void hook_quit(cptr str)
  */
 static void init_stuff(void)
 {
-	int i;
+	//int i;
 
 	char path[1024];
 #ifdef USE_SAVER
@@ -5534,8 +5534,12 @@ static void init_stuff(void)
 	/* Save the "program name" */
 	argv0 = string_make(path);
 
+	/* really get the path this time */
+	if(GetCurrentDirectory(sizeof(path) - 1, path)==0)
+		show_win_error();
+
 	/* Get the name of the "*.ini" file */
-	strcpy(path + strlen(path) - 4, ".INI");
+	strcpy(path + strlen(path) /*- 4*/, "\\unangband.INI");
 
 #ifdef USE_SAVER
 	if (screensaver)
@@ -5545,28 +5549,19 @@ static void init_stuff(void)
 
 		GetPrivateProfileString("Angband", "AngbandPath", "", tmp, sizeof(tmp), path);
 
-		sprintf(path, "%sangband.ini", tmp);
+		sprintf(path, "%sunangband.ini", tmp);
 	}
 #endif
 
 	/* Save the the name of the ini-file */
 	ini_file = string_make(path);
 
-	/* Analyze the path */
-	i = strlen(path);
-
-	/* Get the path */
-	for (; i > 0; i--)
-	{
-		if (path[i] == '\\')
-		{
-			/* End of path */
-			break;
-		}
-	}
+	/* get the path again (lazy) */
+	if(GetCurrentDirectory(sizeof(path) - 1, path)==0)
+		show_win_error();
 
 	/* Add "lib" to the path */
-	strcpy(path + i + 1, "lib\\");
+	strcpy(path + strlen(path), "\\lib\\");
 
 	/* Validate the path */
 	validate_dir(path);
