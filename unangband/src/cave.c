@@ -5682,7 +5682,9 @@ void cave_set_feat(int y, int x, int feat)
 {
 	int i;
 
-	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+	int oldfeat = cave_feat[y][x];
+
+	feature_type *f_ptr = &f_info[oldfeat];
 	feature_type *f_ptr2 = &f_info[feat];
 
 	bool surface = (level_flag & (LF1_SURFACE));
@@ -5705,6 +5707,9 @@ void cave_set_feat(int y, int x, int feat)
 
 	bool project =  (f_ptr->flags1 & (FF1_PROJECT)) !=0;
 	bool project2 =  (f_ptr2->flags1 & (FF1_PROJECT)) !=0;
+
+	bool trap = (f_ptr->flags1 & (FF1_PROJECT)) !=0;
+	bool trap2 = (f_ptr2->flags1 & (FF1_PROJECT)) !=0;
 
 	/* Change the feature */
 	cave_set_feat_aux(y,x,feat);
@@ -5770,7 +5775,7 @@ void cave_set_feat(int y, int x, int feat)
 	}
 
 	/* Handle updating regions if required */
-	if ((los && !los2) || (!los && los2) || (project && !project2) || (!project && project2))
+	if ((los && !los2) || (!los && los2) || (project && !project2) || (!project && project2) || (trap && !trap2))
 	{
 		s16b this_region_piece, next_region_piece = 0;
 
@@ -5788,17 +5793,34 @@ void cave_set_feat(int y, int x, int feat)
 			/* Get the next object */
 			next_region_piece = rp_ptr->next_in_grid;
 
+			/* Delete traps */
+			if (trap && !trap && ((r_ptr->flags1 & (RE1_HIT_TRAP)) != 0))
+			{
+				int region = rp_ptr->region;
+
+				/* Clear the region */
+				r_ptr->type = 0;
+
+				/* Update all affected grids */
+				region_refresh(region);
+
+				/* Wipe the region pieces */
+				region_delete(region);
+
+				continue;
+			}
+
 			/* Skip regions that don't need updating */
 			if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || ((r_ptr->flags1 & (RE1_LINGER)) != 0)) continue;
 
 			/* Refresh the region if projection changes */
-			if ((project != project2) && ((method_ptr->flags1 & (PROJECT_LOS | PROJECT_THRU)) == 0))
+			if ((project != project2) && ((method_ptr->flags1 & (PROJECT_LOS | PROJECT_PASS)) == 0))
 			{
 				/* Update the region */
 				region_update(rp_ptr->region);
 			}
 			/* Use line of sight instead */
-			else if ((project != project2) && ((method_ptr->flags1 & (PROJECT_LOS)) != 0))
+			else if ((los != los2) && ((method_ptr->flags1 & (PROJECT_LOS)) != 0))
 			{
 				/* Update the region */
 				region_update(rp_ptr->region);
@@ -6011,7 +6033,6 @@ void cave_alter_feat(int y, int x, int action)
 	/* Other stuff */
 	else
 	{
-
 		/* Set the new feature */
 		cave_set_feat(y,x,newfeat);
 	}

@@ -8790,7 +8790,7 @@ bool region_refresh_hook(int y, int x, int d, int region)
 /*
  * Redraw the region
  */
-void region_refresh(int region)
+void region_refresh(s16b region)
 {
 	region_iterate(region, region_refresh_hook);
 }
@@ -9068,6 +9068,7 @@ void region_effect(int region, int y, int x)
 			next_region_piece = rp_ptr->next_in_region;
 
 			/* Skip if it doesn't match source feature */
+			if ((r_ptr->who != SOURCE_FEATURE) && (r_ptr->who != SOURCE_PLAYER_TRAP)) continue;
 			if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
 
 			/* Hack -- restore original terrain if going backwards */
@@ -9186,10 +9187,15 @@ void trigger_region(int y, int x, bool move)
 				{
 					return;
 				}
-			}
 
-			/* Fire the attack */
-			region_effect(rp_ptr->region, y, x);
+				/* Discharge the trap */
+				discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
+			}
+			else
+			{
+				/* Fire the attack */
+				region_effect(rp_ptr->region, y, x);
+			}
 
 			/* Mark region as triggered */
 			r_ptr->flags1 |= (RE1_TRIGGERED);
