@@ -1096,6 +1096,9 @@ static void process_world(void)
 	/* no shuffling for alien towns */
 	town_type *t_ptr = &t_info[p_ptr->town];
 
+	/* Process regions */
+	process_regions();
+
 	/* Every 10 game turns */
 	if (turn % 10) return;
 
@@ -2199,9 +2202,6 @@ static void process_world(void)
 
 	/* Check quests */
 	ensure_quest();
-
-	/* Process regions */
-	process_regions();
 
 #ifdef ALLOW_BORG
 	if (count_stop)

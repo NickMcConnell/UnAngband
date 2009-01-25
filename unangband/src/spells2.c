@@ -6167,11 +6167,37 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 				r_ptr->lifespan = s_ptr->l_plus;
 			}
 
-			/* Increase delay */
-			delay += r_ptr->lifespan * r_ptr->delay_reset;
+			/* Increase delay - we predict effects of acceleration/deceleration */
+			if (r_ptr->flags1 & (RE1_ACCELERATE | RE1_DECELERATE))
+			{
+				int i;
+				int delay_current = delay;
 
-			/* Display first of newly created regions */
-			if (ap_cnt) r_ptr->flags1 |= (RE1_DISPLAY);
+				for (i = 0; i < r_ptr->lifespan; i++)
+				{
+					delay += delay_current;
+
+					if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (i < r_ptr->lifespan / 2)))
+					{
+						delay_current /= 2;
+						if (delay_current < 1) delay_current = 1;
+					}
+
+					/* Decelerating */
+					if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (i > r_ptr->lifespan / 2)))
+					{
+						delay_current *= 2;
+					}
+				}
+			}
+			/* Normal delay */
+			else
+			{
+				delay += r_ptr->lifespan * r_ptr->delay_reset;
+			}
+
+			/* Display first of newly created regions. Allow features to be seen underneath. */
+			if ((!ap_cnt) && (r_ptr->effect != GF_FEATURE)) r_ptr->flags1 |= (RE1_DISPLAY);
 		}
 
 		/* Projection method */
