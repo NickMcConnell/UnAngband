@@ -1368,28 +1368,24 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	/* Partially fill the maze back in */
 	if (flag & (MAZE_DEAD | MAZE_POOL))
 	{
-		int loops = (flag & (MAZE_LOOP)) ?  1 /* ydim * xdim / 4 */ : 0;
-		int flood = (flag & (MAZE_FLOOD)) ? ydim * xdim / 4 : 0;
-		int pools = (flag & (MAZE_POOL)) ? ydim * xdim / 4 : 0;
-		int doors = (flag & (MAZE_DOOR)) ? ydim * xdim / 4 : 0;
-		int stuff = (flag & (MAZE_FILL)) ? ydim * xdim / 4 : 0;
+		/* Less dead ends if not surrounded by wall */
+		int n = ydim * xdim - ((flag & (MAZE_WALL)) == 0) ? 2 * ydim + 2 * xdim - 4 : 0;
+
+		int loops = (flag & (MAZE_LOOP)) ?  1 /* n / 4 */ : 0;
+		int flood = (flag & (MAZE_FLOOD)) ? n / 4 : 0;
+		int pools = (flag & (MAZE_POOL)) ? n / 4 : 0;
+		int doors = (flag & (MAZE_DOOR)) ? n / 4 : 0;
+		int stuff = (flag & (MAZE_FILL)) ? n / 4 : 0;
 
 		/* Number of grids to fill back in */
-		if (flag & (MAZE_DEAD)) grids = ydim * xdim / 4;
+		if (flag & (MAZE_DEAD)) grids = n / 4;
 
-		/* Less dead ends if not surrounded by wall */
-		if ((flag & (MAZE_WALL)) == 0)
-		{
-			int n = 2 * ydim + 2 * xdim - 4;
-			grids -= n;
-			pools -= n;
-			doors -= n;
-			stuff -= n;
-			if(grids<0) grids=0;
-			if(pools<0) pools=0;
-			if(doors<0) doors=0;
-			if(stuff<0) stuff=0;
-		}
+		/* Paranoia */
+		if(loops<0) loops=0;
+		if(pools<0) pools=0;
+		if(doors<0) doors=0;
+		if(stuff<0) stuff=0;
+		if(grids<0) grids=0;
 
 		/* Dead end filler */
 		while (loops || grids || pools || doors || stuff)
