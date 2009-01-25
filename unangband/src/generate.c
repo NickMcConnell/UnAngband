@@ -1382,9 +1382,13 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 		{
 			int n = 2 * ydim + 2 * xdim - 4;
 			grids -= n;
-			if (pools) pools -= n;
-			if (doors) doors -= n;
-			if (stuff) stuff -= n;
+			pools -= n;
+			doors -= n;
+			stuff -= n;
+			if(grids<0) grids=0;
+			if(pools<0) pools=0;
+			if(doors<0) doors=0;
+			if(stuff<0) stuff=0;
 		}
 
 		/* Dead end filler */
