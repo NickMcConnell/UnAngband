@@ -1000,6 +1000,19 @@ static byte confu_color(void)
 	return (TERM_WHITE);
 }
 
+static byte wind_color(void)
+{
+	switch (rand_int(4))
+	{
+		case 0: return (TERM_L_DARK);
+		case 1: return (TERM_SLATE);
+		case 2: return (TERM_L_WHITE);
+		case 3: return (TERM_WHITE);
+	}
+
+	return (TERM_WHITE);
+}
+
 static byte grav_color(void)
 {
 	switch (rand_int(4))
@@ -1130,7 +1143,7 @@ byte spell_color(int type)
 		case GF_WATER_WEAK:	return (water_color());
 		case GF_WATER:        return (water_color());
 
-		case GF_WIND:         return (TERM_WHITE);
+		case GF_WIND:         return (wind_color());
 		case GF_STORM:        return (storm_color());
 
 		case GF_NEXUS:        return (TERM_L_RED);
@@ -3331,8 +3344,6 @@ bool temp_lite(int y, int x)
 }
 
 
-
-
 /*
  * We are called from "project()" to "damage" terrain features
  *
@@ -3858,50 +3869,14 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Make features */
 		case GF_FEATURE:
 		{
-			object_type object_type_body;
-			object_type *o_ptr = &object_type_body;
-
 			burnout = FALSE;
 
 			/* Require a "floor or ground" grid */
 			if (!(f_ptr->flags1 & (FF1_FLOOR))
 			 && !(f_ptr->flags3 & (FF3_GROUND))) break;
 
-			/* If caster is player, place a 'counter' or 'timer' */
-			if ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY))))
-			{
-				object_prep(o_ptr, lookup_kind(TV_SPELL, SV_SPELL_COUNTER));
-
-				/* Hack -- record feature under terrain to allow 'reversion' to old terrain */
-				o_ptr->pval = cave_feat[y][x];
-
-				/* Traps are given so many charges */
-				if (f_info[dam].flags1 & (FF1_HIT_TRAP))
-				{
-					o_ptr->charges = (p_ptr->lev + 1) / 2;
-				}
-				/* Other features time out relatively quickly.
-				 * Note this must be the same for all terrain in a single casting
-				 * otherwise e.g. bridges of stone will time out unusually.
-				 */
-				else
-				{
-					o_ptr->timeout = (p_ptr->lev + 1) / 2;
-				}
-
-				/* Part of the terrain */
-				o_ptr->ident |= (IDENT_STORE);
-			}
-
 			/* Place a feature */
 			if (dam) cave_set_feat(y,x,dam);
-
-			/* Place the counter */
-			if ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY))))
-			{
-				/* Add to the floor */
-				(void)floor_carry(y,x,o_ptr);
-			}
 
 			/* Notice any changes */
 			obvious = TRUE;

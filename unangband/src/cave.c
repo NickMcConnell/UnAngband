@@ -5798,14 +5798,8 @@ void cave_set_feat(int y, int x, int feat)
 			{
 				int region = rp_ptr->region;
 
-				/* Clear the region */
-				r_ptr->type = 0;
-
-				/* Update all affected grids */
-				region_refresh(region);
-
-				/* Wipe the region pieces */
-				region_delete(region);
+				/* Kill the region */
+				region_terminate(region);
 
 				continue;
 			}

@@ -6042,7 +6042,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 
 		u32b flg = method_ptr->flags1;
 
-		int region = 0;
+		s16b region = 0;
 
 		/* Hack -- no more attacks */
 		if (!method) break;
@@ -8167,7 +8167,7 @@ int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool 
 /*
  * Excise a region piece from any stacks
  */
-void excise_region_piece(int region_piece)
+void excise_region_piece(s16b region_piece)
 {
 	int y = region_piece_list[region_piece].y;
 	int x = region_piece_list[region_piece].x;
@@ -8438,7 +8438,7 @@ s16b region_piece_pop(void)
  * region, or 0 if no region piece exists on this grid for this
  * region
  */
-int get_region_piece(int y, int x, int region)
+int get_region_piece(int y, int x, s16b region)
 {
 	s16b this_region_piece, next_region_piece = 0;
 
@@ -8697,7 +8697,7 @@ void region_copy(region_type *r_ptr, const region_type *r_ptr2)
  *
  * If region2 is 0, a new region is created.
  */
-int region_copy_pieces(int region, int region2)
+s16b region_copy_pieces(s16b region, s16b region2)
 {
 	s16b this_region_piece, next_region_piece = 0;
 
@@ -8743,7 +8743,7 @@ void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
 /*
  * Iterate through a region, applying a region_hook function to each grid in the region
  */
-bool region_iterate(int region, bool region_iterator(int y, int x, int d, int region))
+bool region_iterate(s16b region, bool region_iterator(int y, int x, int d, s16b region))
 {
 	s16b this_region_piece, next_region_piece = 0;
 	bool seen = FALSE;
@@ -8770,7 +8770,7 @@ bool region_iterate(int region, bool region_iterator(int y, int x, int d, int re
  * Similar to the above region_iterate, but we only affect grids within d distance of (y,x)
  * if gt is true, or further than d distance if gt is false. We also check for LOS.
  */
-bool region_iterate_distance(int region, int y, int x, int d, bool gt, bool region_iterator(int y, int x, int d, int region))
+bool region_iterate_distance(s16b region, int y, int x, int d, bool gt, bool region_iterator(int y, int x, int d, s16b region))
 {
 	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
 	s16b this_region_piece, next_region_piece = 0;
@@ -8801,7 +8801,7 @@ bool region_iterate_distance(int region, int y, int x, int d, bool gt, bool regi
 /*
  * Hook for redrawing all grids in a region.
  */
-bool region_refresh_hook(int y, int x, int d, int region)
+bool region_refresh_hook(int y, int x, int d, s16b region)
 {
 	(void)d;
 	(void)region;
@@ -8859,14 +8859,19 @@ void region_update(s16b region)
  * for that region. This is used to overlay temporary terrain onto a region,
  * then restore it later using region_restore_hook.
  */
-bool region_uplift_hook(int y, int x, int d, int region)
+bool region_uplift_hook(int y, int x, int d, s16b region)
 {
 	region_type *r_ptr = &region_list[region];
-	int region_piece = get_region_piece(y, x, region);
+	s16b region_piece = get_region_piece(y, x, region);
 
 	region_piece_type *rp_ptr = &region_piece_list[region_piece];
 
+	int this_region_piece, next_region_piece = 0;
+
 	(void)d;
+
+	/* Paranoia */
+	if (!region_piece) return (FALSE);
 
 	/* Start getting features */
 	if ((r_ptr->flags1 & (RE1_SCALAR_DAMAGE | RE1_SCALAR_DISTANCE | RE1_SCALAR_VECTOR)) == 0)
@@ -8880,6 +8885,25 @@ bool region_uplift_hook(int y, int x, int d, int region)
 	/* Have we already collected a feature */
 	if ((rp_ptr->d) || ((r_ptr->effect == GF_FEATURE) && (rp_ptr->d == r_ptr->damage))) return (FALSE);
 
+	/* Check overlapping regions */
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr2 = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr2->next_in_grid;
+
+		/* Skip itself */
+		if (rp_ptr2->region == region) continue;
+
+		/* Skip if not a region piece */
+		if ((r_ptr->flags1 & (RE1_SCALAR_FEATURE))== 0) continue;
+
+		/* We have something else collecting the underlying feature. Use it's value instead */
+		rp_ptr->d = rp_ptr2->d;
+		return (FALSE);
+	}
+
 	/* Collect this feature */
 	rp_ptr->d = cave_feat[y][x];
 
@@ -8892,9 +8916,10 @@ bool region_uplift_hook(int y, int x, int d, int region)
  * Sets the feature for a grid, based on the scalar set for the
  * region of that grid. Use region_uplift_hook to set the region.
  */
-bool region_restore_hook(int y, int x, int d, int region)
+bool region_restore_hook(int y, int x, int d, s16b region)
 {
 	region_type *r_ptr = &region_list[region];
+	int this_region_piece, next_region_piece = 0;
 
 	(void)region;
 
@@ -8904,6 +8929,24 @@ bool region_restore_hook(int y, int x, int d, int region)
 	/* Did we collect anything? */
 	if (d)
 	{
+		/* Check overlapping regions */
+		for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr2 = &region_piece_list[this_region_piece];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr2->next_in_grid;
+
+			/* Skip itself */
+			if (rp_ptr2->region == region) continue;
+
+			/* Skip if not a region piece */
+			if ((r_ptr->flags1 & (RE1_SCALAR_FEATURE))== 0) continue;
+
+			/* We have something else collecting the underlying feature. Don't write this value down. */
+			return (FALSE);
+		}
+
 		/* Restore the terrain */
 		cave_set_feat(y, x, d);
 	}
@@ -8918,7 +8961,7 @@ bool region_restore_hook(int y, int x, int d, int region)
  * project_t() effect separately. This is done by setting the
  * PROJECT_TEMP flag.
  */
-bool region_project_hook(int y, int x, int d, int region)
+bool region_project_hook(int y, int x, int d, s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 	method_type *method_ptr = &method_info[r_ptr->method];
@@ -8962,7 +9005,7 @@ bool region_project_hook(int y, int x, int d, int region)
  * Apply project_t to every grid. Note that we have to apply the
  * project_t() effect separately.
  */
-bool region_project_t_hook(int y, int x, int d, int region)
+bool region_project_t_hook(int y, int x, int d, s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 
@@ -8998,9 +9041,33 @@ bool region_project_t_hook(int y, int x, int d, int region)
 
 
 /*
+ * Kill a region.
+ */
+void region_terminate(s16b region)
+{
+	region_type *r_ptr = &region_list[region];
+
+	/* Effect is "dead" - mark for later */
+	r_ptr->type = 0;
+
+	/* Restore underlying terrain */
+	region_iterate(region, region_restore_hook);
+
+	/* Redraw region */
+	region_refresh(region);
+
+	/* Clear the grids associated with the region */
+	region_delete(region);
+
+	/* Wipe the region clean */
+	region_wipe(r_ptr);
+}
+
+
+/*
  * Pick a random piece from a region.
  */
-int region_random_piece(int region)
+s16b region_random_piece(s16b region)
 {
 	s16b this_region_piece, next_region_piece = 0;
 	int k = 0;
@@ -9065,7 +9132,7 @@ int region_random_piece(int region)
  * a method, or spawning a region, not if we affect every
  * grid in the region.
  */
-void region_effect(int region, int y, int x)
+void region_effect(s16b region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
 	region_info_type *ri_ptr = &region_info[r_ptr->type];
@@ -9140,7 +9207,7 @@ void region_effect(int region, int y, int x)
 		}
 
 		/* Attack the target */
-		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, (PROJECT_HIDE));
+		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0L);
 	}
 
 	/* Method is not defined. Apply effect to all grids */
@@ -9294,7 +9361,7 @@ void trigger_region(int y, int x, bool move)
  * do some smarter way of verifying the source and destination that stops jumping while
  * allowing some movement.
  */
-bool region_iterate_movement(int region, void region_iterator(int y, int x, int d, int region, int *y1, int *x1))
+bool region_iterate_movement(s16b region, void region_iterator(int y, int x, int d, s16b region, int *y1, int *x1))
 {
 	region_type *r_ptr = &region_list[region];
 	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
@@ -9433,7 +9500,7 @@ bool region_iterate_movement(int region, void region_iterator(int y, int x, int 
 /*
  * Movement for seekers
  */
-void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
+void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 {
 	region_type *r_ptr = &region_list[region];
 	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
@@ -9447,8 +9514,8 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 	*ty = y;
 	*tx = x;
 
-	/* If random, we only move vortexes half the time */
-	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) return;
+	/* If random, we only move vortexes 20% of the time */
+	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 5)) return;
 
 	/* Check around (and under) the vortex */
 	for (dir = 0; dir < 9; dir++)
@@ -9477,10 +9544,8 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 			ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
 	}
 
-	/* No valid target, or monster is in an impassable grid, or moving randomly some of
-	 * the time */
-	if (((*ty == 0) && (*tx == 0)) || (!cave_passable_bold(*ty, *tx, method_ptr->flags1)) ||
-			((r_ptr->flags1 & (RE1_RANDOM)) && ((r % 3) != 0)))
+	/* No valid target, or monster is in an impassable grid */
+	if (((*ty == 0) && (*tx == 0)) || (!cave_passable_bold(*ty, *tx, method_ptr->flags1)))
 	{
 		/* Move randomly */
 		dir = randint(9);
@@ -9564,7 +9629,7 @@ void region_move_seeker_hook(int y, int x, int d, int region, int *ty, int *tx)
 /*
  * Function to move region pieces as if encoding a vector
  */
-void region_move_vector_hook(int y, int x, int d, int region, int *ty, int *tx)
+void region_move_vector_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 {
 	region_type *r_ptr = &region_list[region];
 	int angle, speed;
@@ -9582,8 +9647,8 @@ void region_move_vector_hook(int y, int x, int d, int region, int *ty, int *tx)
 	/* Does this fragment move at this age? */
 	if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) return;
 
-	/* If random, we only move vertexes half the time */
-	if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 50)) return;
+	/* If random, we only move vertexes 20% of the time */
+	if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 80)) return;
 
 	/* Angle of travel */
 	angle = GRID_Y(d);
@@ -9611,7 +9676,7 @@ void region_move_vector_hook(int y, int x, int d, int region, int *ty, int *tx)
 /*
  * Function to spread regions
  */
-void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
+void region_move_spread_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 {
 	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
 	int dir = rand_int(12);
@@ -9660,7 +9725,7 @@ void region_move_spread_hook(int y, int x, int d, int region, int *ty, int *tx)
  * We potentially transform the region, then apply the effect if
  * required.
  */
-void process_region(int region)
+void process_region(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 	method_type *method_ptr = &method_info[r_ptr->method];
@@ -9708,14 +9773,8 @@ void process_region(int region)
 		}
 		else
 		{
-			/* Effect is "dead" - mark for later */
-			r_ptr->type = 0;
-
-			/* Redraw region */
-			region_refresh(region);
-
-			/* Clear the grids associated with the region */
-			region_delete(region);
+			/* Kill the region */
+			region_terminate(region);
 
 			return;
 		}
@@ -9970,7 +10029,7 @@ void process_regions(void)
 	/* Warn if we get orphaned pieces */
 	for (i = 0; i < z_info->region_piece_max; i++)
 	{
-		int region = region_piece_list[i].region;
+		s16b region = region_piece_list[i].region;
 		/* Get this effect */
 		region_type *r_ptr = &region_list[region];
 
@@ -9991,12 +10050,12 @@ void process_regions(void)
  * try to pick a target to allow the region to affect a number of grids.
  *
  */
-int init_region(int who, int what, int type, int dam, int method, int effect, int level, int y0, int x0, int y1, int x1)
+s16b init_region(int who, int what, int type, int dam, int method, int effect, int level, int y0, int x0, int y1, int x1)
 {
 	region_info_type *ri_ptr = &region_info[type];
 	method_type *method_ptr = &method_info[method];
 
-	int region = region_pop();
+	s16b region = region_pop();
 
 	region_type *r_ptr = &region_list[region];
 
