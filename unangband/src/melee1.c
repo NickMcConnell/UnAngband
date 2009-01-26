@@ -5517,7 +5517,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	/* XXX XXX Dangerous */
 	while (!(f_ptr->spell) && !(f_ptr->blow.method) && (f_ptr->flags1 & (FF1_TRAP)))
 	{
-		pick_trap(y,x);
+		pick_trap(y,x, FALSE);
 
 		/* Error */
 		if (cave_feat[y][x] == feat) break;

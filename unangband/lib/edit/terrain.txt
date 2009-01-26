@@ -2220,6 +2220,7 @@ U:56
 #$ granite wall
 O:0
 W:2:3:20:0
+T:LINE_LOS
 S:DARKNESS
 K:DEFAULT:1:5
 #$ open floor
@@ -5857,6 +5858,7 @@ U:56
 #$ granite wall
 O:0
 W:50:2:20:0
+T:LINE_LOS
 S:BALL_DARK
 K:DEFAULT:1:70
 #$ open floor
@@ -18669,6 +18671,7 @@ U:56
 #$ granite wall
 O:0
 W:20:2:20:0
+T:LINE_LOS
 S:BALL_LITE
 K:DEFAULT:1:70
 #$ open floor
@@ -19116,6 +19119,7 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+T:LINE_LOS
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |

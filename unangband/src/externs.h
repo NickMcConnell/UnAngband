@@ -831,7 +831,7 @@ extern void place_gold(int y, int x);
 extern errr get_feat_num_prep(void);
 extern s16b get_feat_num(int level);
 extern void place_feature(int y, int x);
-extern void pick_trap(int y, int x);
+extern void pick_trap(int y, int x, bool player);
 extern void place_trap(int y, int x);
 extern void pick_door(int y, int x);
 extern void place_secret_door(int y, int x);

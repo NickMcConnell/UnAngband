@@ -380,7 +380,7 @@ N:43:LINE
 T:0-9999:creat||es| a path of *
 W:4:0:0
 M:8
-F:BEAM |
+F:BEAM | GRID | KILL | PLAY | ITEM
 D::one direction
 
 N:44:AIM
@@ -714,7 +714,13 @@ F:4WAY | 4WAX | BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY |
 F:MAGIC |
 D:surround~ & with a star:$ enemies
 
-#$# 84 - Unused ###
+N:84:LINE_LOS
+T:0-9999:creat||es| a path of *
+W:4:0:0
+M:8
+F:BEAM | GRID | KILL | PLAY | ITEM | LOS
+D::one direction
+
 
 #$# 85 - Unused ###
 

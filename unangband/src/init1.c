@@ -3441,6 +3441,9 @@ errr parse_f_info(char *buf, header *head)
 		/* Invalid region */
 		if (n1 == z_info->method_max) return (PARSE_ERROR_GENERIC);
 
+		/* Save the region */
+		f_ptr->blow.method = n1;
+
 		/* Analyze the second field */
 		for (s = t; *t && (*t != ':'); t++) /* loop */;
 
@@ -3461,9 +3464,6 @@ errr parse_f_info(char *buf, header *head)
 
 		/* Terminate the field (if necessary) */
 		if (*t == 'd') *t++ = '\0';
-
-		/* Save the region */
-		f_ptr->blow.method = RBM_TRAP;
 
 		/* Save the effect */
 		f_ptr->blow.effect = n1;

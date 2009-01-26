@@ -2350,7 +2350,8 @@ void do_cmd_set_trap_or_spike(void)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int y, x, dir, item, action;
+	int y, x, item, action;
+	int dir = 0;
 
 	object_type *o_ptr;
 
@@ -2388,6 +2389,26 @@ void do_cmd_set_trap_or_spike(void)
 	{
 		/* We are spiking */
 		action = FS_SPIKE;
+
+#ifdef ALLOW_EASY_OPEN
+
+		/* Easy Bash */
+		if (easy_open)
+		{
+			/* Handle a single visible trap */
+			if (count_feats(&y, &x, action)==1)
+			{
+				p_ptr->command_dir = coords_to_dir(y, x);
+			}
+		}
+
+#endif /* ALLOW_EASY_OPEN */
+
+		/* Get a direction (or abort) */
+		if (!get_rep_dir(&dir)) return;
+
+		/* Hack -- Apply stuck */
+		stuck_player(&dir);
 	}
 	else
 	{
@@ -2395,30 +2416,9 @@ void do_cmd_set_trap_or_spike(void)
 		action = FS_FLOOR;
 	}
 
-#ifdef ALLOW_EASY_OPEN
-
-	/* Easy Bash */
-	if (easy_open)
-	{
-		/* Handle a single visible trap */
-		if (count_feats(&y, &x, action)==1)
-		{
-			p_ptr->command_dir = coords_to_dir(y, x);
-		}
-	}
-
-#endif /* ALLOW_EASY_OPEN */
-
-	/* Get a direction (or abort) */
-	if (!get_rep_dir(&dir)) return;
-
-	/* Hack -- Apply stuck */
-	stuck_player(&dir);
-
 	/* Get location */
 	y = py + ddy[dir];
 	x = px + ddx[dir];
-
 
 	/* Verify legality */
 	if (!do_cmd_test(y, x, action)) return;
@@ -2745,7 +2745,7 @@ void do_cmd_set_trap_or_spike(void)
 				cave_set_feat(y,x,FEAT_INVIS);
 
 				/* Set the trap */
-				pick_trap(y,x);
+				pick_trap(y,x, TRUE);
 
 				/* Reset object level */
 				object_level = p_ptr->depth;

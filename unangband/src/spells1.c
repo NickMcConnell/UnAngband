@@ -13756,7 +13756,7 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 			else if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
 			{
 				int a = degrees_of_arc ? degrees_of_arc : 180;
-				int v = get_angle_to_target(y0, y1, x0, x1, 0);
+				int v = get_angle_to_target(y0, y, x0, x, 0);
 
 				/* Randomize the scalar */
 				for (i = 0; i < target_path_n; i++)

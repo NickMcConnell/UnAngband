@@ -5708,8 +5708,8 @@ void cave_set_feat(int y, int x, int feat)
 	bool project =  (f_ptr->flags1 & (FF1_PROJECT)) !=0;
 	bool project2 =  (f_ptr2->flags1 & (FF1_PROJECT)) !=0;
 
-	bool trap = (f_ptr->flags1 & (FF1_PROJECT)) !=0;
-	bool trap2 = (f_ptr2->flags1 & (FF1_PROJECT)) !=0;
+	bool trap = (f_ptr->flags1 & (FF1_TRAP)) !=0;
+	bool trap2 = (f_ptr2->flags1 & (FF1_TRAP)) !=0;
 
 	/* Change the feature */
 	cave_set_feat_aux(y,x,feat);
@@ -5774,8 +5774,27 @@ void cave_set_feat(int y, int x, int feat)
 		}
 	}
 
+	/* Handle disarming traps if required */
+	if (trap && !trap2)
+	{
+		for (i = 0; i < region_max; i++)
+		{
+			/* Get the region */
+			region_type *r_ptr = &region_list[i];
+
+			/* Delete traps */
+			if (((r_ptr->flags1 & (RE1_HIT_TRAP)) != 0) && (r_ptr->y0 == y) && (r_ptr->x0 == x))
+			{
+				/* Kill the region */
+				region_terminate(i);
+
+				continue;
+			}
+		}
+	}
+
 	/* Handle updating regions if required */
-	if ((los && !los2) || (!los && los2) || (project && !project2) || (!project && project2) || (trap && !trap2))
+	if ((los && !los2) || (!los && los2) || (project && !project2) || (!project && project2))
 	{
 		s16b this_region_piece, next_region_piece = 0;
 
@@ -5792,17 +5811,6 @@ void cave_set_feat(int y, int x, int feat)
 
 			/* Get the next object */
 			next_region_piece = rp_ptr->next_in_grid;
-
-			/* Delete traps */
-			if (trap && !trap && ((r_ptr->flags1 & (RE1_HIT_TRAP)) != 0))
-			{
-				int region = rp_ptr->region;
-
-				/* Kill the region */
-				region_terminate(region);
-
-				continue;
-			}
 
 			/* Skip regions that don't need updating */
 			if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || ((r_ptr->flags1 & (RE1_LINGER)) != 0)) continue;
@@ -5999,7 +6007,7 @@ void cave_alter_feat(int y, int x, int action)
 		if (f_info[oldfeat].flags3 & (FF3_PICK_TRAP))
 		{
 			/* Pick a trap */
-			pick_trap(y, x);
+			pick_trap(y, x, FALSE);
 
 			/* Update new feature */
 			newfeat = cave_feat[y][x];

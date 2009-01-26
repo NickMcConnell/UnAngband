@@ -7441,19 +7441,23 @@ static bool vault_trap_attr(int f_idx)
  * Have modified this routine to use the modified feature selection
  * code above.
  */
-void pick_trap(int y, int x)
+void pick_trap(int y, int x, bool player)
 {
 	int feat= cave_feat[y][x];
 	int room = room_idx(y, x);
+	feature_type *f_ptr = &f_info[feat];
+
+	int power = 0;
+	bool need_power = TRUE;
 
 	/* Paranoia */
-	if (!(f_info[feat].flags1 & (FF1_TRAP))) return;
+	if (!(f_ptr->flags1 & (FF1_TRAP))) return;
 
 	/* Floor trap */
-	if (f_info[feat].flags3 & (FF3_ALLOC))
+	if (f_ptr->flags3 & (FF3_ALLOC))
 	{
 		/* Set hook */
-		if (f_info[feat].flags3 & (FF3_CHEST))
+		if (f_ptr->flags3 & (FF3_CHEST))
 		{
 			feature_type *f_ptr = &f_info[feat];
 
@@ -7467,18 +7471,22 @@ void pick_trap(int y, int x)
 		}
 		else if (cave_o_idx[y][x])
 		{
-			switch (o_list[cave_o_idx[y][x]].tval)
+			object_type *o_ptr = &o_list[cave_o_idx[y][x]];
+
+			switch (o_ptr->tval)
 			{
 				case TV_SHOT:
 				case TV_ARROW:
 				case TV_BOLT:
 				case TV_BOW:
+					need_power = FALSE;
 					pick_attr = TERM_L_RED;		/* Murder hole */
 					break;
 
 				case TV_HAFTED:
 				case TV_SWORD:
 				case TV_POLEARM:
+					need_power = FALSE;
 					pick_attr = TERM_RED;		/* Spring-loaded trap */
 					break;
 
@@ -7487,8 +7495,11 @@ void pick_trap(int y, int x)
 					break;
 
 				case TV_STAFF:
-				case TV_ROD:
 					pick_attr = TERM_L_BLUE;	/* Magic symbol */
+					break;
+
+				case TV_ROD:
+					pick_attr = TERM_MUSTARD;	/* Clockwork mechanism */
 					break;
 
 				case TV_POTION:
@@ -7520,14 +7531,70 @@ void pick_trap(int y, int x)
 					pick_attr = TERM_SLATE;	/* Pit */
 					break;
 
- 				default:
+				case TV_ROPE:
+					pick_attr = TERM_L_UMBER;	/* Fine net */
+					break;
+
+				case TV_JUNK:
+					pick_attr = TERM_MUD;	/* Dead fall */
+					break;
+
+				case TV_BAG:
+					pick_attr = TERM_DEEP_L_BLUE; /* Shimmering portal */
+					break;
+
+				case TV_LITE:
+					pick_attr = TERM_L_YELLOW;	/* Shaft of light */
+					break;
+
+				case TV_STUDY:
+					pick_attr = TERM_MAGENTA;	/* Glowing glyph */
+					break;
+
+				case TV_STATUE:
+					pick_attr = TERM_PURPLE;	/* Surreal painting */
+					break;
+
+				case TV_RING:
+					pick_attr = TERM_VIOLET;	/* Ever burning eye  */
+					break;
+
+				case TV_AMULET:
+					pick_attr = TERM_L_TEAL;	/* Demonic sign */
+					break;
+
+				case TV_INSTRUMENT:
+					pick_attr = TERM_TEAL;		/* Upwards draft */
+					break;
+
+				case TV_HOLD:
+					pick_attr = TERM_L_VIOLET;	/* Radagast's snare */
+					break;
+
+				case TV_HELM:
+					pick_attr = TERM_L_DARK;	/* Silent watcher */
+					break;
+
+				case TV_GLOVES:
+					pick_attr = TERM_BLUE_SLATE;	/* Mark of the white hand */
+					break;
+
+				default:
 					pick_attr = TERM_L_PURPLE;	/* Loose rock */
 					break;
+
+				/* nothing
+				 *
+				 * pick_attr = TERM_L_PINK;		Siege engine
+				 * break;
+				 */
 			}
 
 			/* Set hook*/
 			get_feat_num_hook = vault_trap_attr;
 
+			/* Get item effect */
+			get_spell(&power, "use", o_ptr, FALSE);
 		}
 		else get_feat_num_hook = vault_trap_floor;
 	}
@@ -7538,6 +7605,9 @@ void pick_trap(int y, int x)
 
 		/* Set hook*/
 		get_feat_num_hook = vault_trap_attr;
+
+		/* Don't need power */
+		need_power = FALSE;
 	}
 
 	/* Room has specific trap type associated with it. Use it if possible. */
@@ -7545,32 +7615,101 @@ void pick_trap(int y, int x)
 			((get_feat_num_hook == vault_trap_attr) && (pick_attr == f_info[room_info[room].theme[THEME_TRAP]].d_attr) )))
 	{
 		/* Set the trap if in a room which has a trap set */
-		cave_set_feat(y, x, room_info[room].theme[THEME_TRAP]);
-
-		return;
+		feat = room_info[room].theme[THEME_TRAP];
 	}
+	/* Pick a trap */
+	else
+	{
+		get_feat_num_prep();
 
-	get_feat_num_prep();
+		/* Hack --- force dungeon traps in town */
+		if (!p_ptr->depth) object_level = 3;
 
-	/* Hack --- force dungeon traps in town */
-	if (!p_ptr->depth) object_level = 3;
+		/* Click! */
+		feat = get_feat_num(object_level);
 
-	/* Click! */
-	feat = get_feat_num(object_level);
+		/* Hack --- force dungeon traps in town */
+		if (!p_ptr->depth) object_level = 0;
 
-	/* Hack --- force dungeon traps in town */
-	if (!p_ptr->depth) object_level = 0;
+		/* Clear the hook */
+		get_feat_num_hook = NULL;
 
-	/* Clear the hook */
-	get_feat_num_hook = NULL;
+		get_feat_num_prep();
 
-	get_feat_num_prep();
-
-	/* More paranoia */
-	if (!feat) return;
+		/* More paranoia */
+		if (!feat) return;
+	}
 
 	/* Activate the trap */
 	cave_set_feat(y, x, feat);
+
+	/* Create region associated with trap */
+	if ((power) || !(need_power))
+	{
+		feature_type *f_ptr2 = &f_info[feat];
+
+		int ty = 0;
+		int tx = 0;
+		int dir = 0;
+		int region;
+
+		int method = f_ptr2->blow.method ? f_ptr2->blow.method : f_ptr2->spell;
+		int effect = power ? s_info[power].blow[0].effect : (f_ptr2->blow.method ? f_ptr2->blow.method : method_info[f_ptr2->spell].d_res);
+
+		method_type *method_ptr = &method_info[method];
+		u32b flg = method_ptr->flags1;
+
+		int radius = scale_method(method_ptr->radius, player ? p_ptr->lev : p_ptr->depth);
+
+		/* Paranoia */
+		if (effect == GF_FEATURE) effect = 0;
+
+		/* Player is setting a trap */
+		if (player)
+		{
+			if (((flg & (PROJECT_SELF)) == 0) &&
+					(!get_aim_dir(&dir, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
+							return;
+
+			msg_format("%d", dir);
+
+			/* Use the given direction */
+			ty = y + 99 * ddy[dir];
+			tx = x + 99 * ddx[dir];
+
+			/* Hack -- Use an actual "target" */
+			if ((dir == 5) && target_okay())
+			{
+				ty = p_ptr->target_row;
+				tx = p_ptr->target_col;
+			}
+			/* Stop at first target if we're firing in a direction */
+			else if (method_ptr->flags2 & (PR2_DIR_STOP))
+			{
+				flg |= (PROJECT_STOP);
+			}
+		}
+
+		/* Get the region */
+		region = init_region(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, f_ptr2->d_attr, 0, method, effect,
+						player ? p_ptr->lev : p_ptr->depth, y, x, ty, tx);
+
+		/* Add to it */
+		if (region)
+		{
+			/* Display if player */
+			if (player)
+			{
+				region_type *r_ptr = &region_list[region];
+
+				r_ptr->flags1 |= (RE1_DISPLAY  | RE1_NOTICE);
+			}
+
+			/* Shape the region */
+			project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, 0,
+				player ? p_ptr->lev : p_ptr->depth, y, x, ty, tx, region, flg);
+		}
+	}
 }
 
 

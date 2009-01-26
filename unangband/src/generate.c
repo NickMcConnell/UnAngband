@@ -10957,7 +10957,7 @@ static bool cave_gen(void)
 
 	/* Various special level types. Only deep in dungeon */
 	if (((level_flag & (LF1_TOWER | LF1_SURFACE)) == 0) &&
-		(rand_int(3/* 100 */) < DUN_SPECIAL))
+		(rand_int(100) < DUN_SPECIAL))
 	{
 		dun->special = randint(MAX_SPECIAL_DUNGEONS);
 

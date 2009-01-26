@@ -5181,7 +5181,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				if ((feat == FEAT_INVIS) || (feat == FEAT_DOOR_INVIS))
 				{
 					/* Pick a trap */
-					pick_trap(ny,nx);
+					pick_trap(ny,nx, FALSE);
 
 					/* Describe observable breakage */
 					if ((play_info[ny][nx] & (PLAY_MARK)) && (m_ptr->ml))
