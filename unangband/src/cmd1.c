@@ -2151,7 +2151,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 						/* Continue along path. Note hack to affect zero length path e.g. straight down. */
-						for (j = 0; (j < path_n) || (path_n && (j < 1)); ++j)
+						for (j = 0; (j < path_n) || (!path_n && (j < 1)); ++j)
 						{
 							bool player;
 
@@ -2240,6 +2240,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 							{
 								/* Finished shooting */
 								shots = 0;
+								path_n = 0;
 							}
 
 							/* Then optimize the stack */
@@ -2248,7 +2249,6 @@ bool discharge_trap(int y, int x, int ty, int tx)
 							/* Alter feat if out of ammunition */
 							if (!cave_o_idx[y][x]) cave_alter_source_feat(y,x,FS_DISARM);
 						}
-						break;
 					}
 					else
 					{
@@ -2256,6 +2256,8 @@ bool discharge_trap(int y, int x, int ty, int tx)
 						cave_alter_source_feat(y,x,FS_DISARM);
 					}
 				}
+
+				break;
 			}
 
 			/* Similar to hitting a regular trap below, but uses up a charge of the object. */
