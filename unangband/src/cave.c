@@ -6001,6 +6001,8 @@ void cave_alter_feat(int y, int x, int action)
 	/* Get the new feat */
 	newfeat = feat_state(cave_feat[y][x],action);
 
+	msg_format("1: %d, %d", oldfeat, newfeat);
+
 	/* Invisible trap */
 	if (newfeat == oldfeat)
 	{
@@ -6037,6 +6039,8 @@ void cave_alter_feat(int y, int x, int action)
 	{
 		/* Set the new feature */
 		cave_set_feat(y,x,newfeat);
+
+		msg_format("2: %d", newfeat);
 	}
 
 	/* Notice */

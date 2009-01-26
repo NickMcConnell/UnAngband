@@ -2144,8 +2144,15 @@ bool discharge_trap(int y, int x, int ty, int tx)
 						object_type *i_ptr;
 						object_type object_type_body;
 
+						byte missile_attr;
+						char missile_char;
+
 						/* Use ammo instead of bow */
 						o_ptr = &o_list[ammo];
+
+						/* Find the color and symbol for the object */
+						missile_attr = object_attr(o_ptr);
+						missile_char = object_char(o_ptr);
 
 						/* Describe ammo */
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
@@ -2155,11 +2162,25 @@ bool discharge_trap(int y, int x, int ty, int tx)
 						{
 							bool player;
 
+							int msec = op_ptr->delay_factor * op_ptr->delay_factor;
+
 							/* Are we travelling along the path? */
 							if (path_n)
 							{
 								ny = GRID_Y(path_g[j]);
 								nx = GRID_X(path_g[j]);
+							}
+
+							/* Only do visuals if the player can "see" the missile */
+							if (panel_contains(ny, nx) && player_can_see_bold(ny, nx))
+							{
+								/* Visual effects */
+								print_rel(missile_char, missile_attr, ny, nx);
+								move_cursor_relative(ny, nx);
+								Term_fresh();
+								Term_xtra(TERM_XTRA_DELAY, msec);
+								lite_spot(ny, nx);
+								Term_fresh();
 							}
 
 							player = (ny == p_ptr->py) && (nx == p_ptr->px);

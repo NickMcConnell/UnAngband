@@ -263,14 +263,14 @@ D:surround~ & with an aura:$ enemies
 N:28:SELF
 T:0-9999:concentrate~ on &
 W:3:0:0
-F:KILL | PLAY | SELF |
+F:KILL | PLAY | SELF | KILL | PLAY | ITEM | GRID |
 D::&
 
 N:29:ADJACENT
 T:0-9999:surround & with *
 W:3:0:0
 R:1
-F:SELF | SAFE |
+F:SELF | SAFE | KILL | PLAY | ITEM | GRID | BOOM |
 D::all enemies adjacent to &
 
 N:30:HANDS

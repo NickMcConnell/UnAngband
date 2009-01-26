@@ -7697,17 +7697,17 @@ void pick_trap(int y, int x, bool player)
 		/* Add to it */
 		if (region)
 		{
+			region_type *r_ptr = &region_list[region];
+
 			/* Display if player */
 			if (player)
 			{
-				region_type *r_ptr = &region_list[region];
-
 				r_ptr->flags1 |= (RE1_DISPLAY  | RE1_NOTICE);
 			}
 
 			/* Shape the region */
 			project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, 0,
-				player ? p_ptr->lev : p_ptr->depth, y, x, ty, tx, region, flg);
+				player ? p_ptr->lev : p_ptr->depth, y, x, r_ptr->y1, r_ptr->x1, region, flg);
 		}
 	}
 }
