@@ -4709,7 +4709,7 @@ static void room_info_top(int room)
 	Term_gotoxy(0, 0);
 
 	/* Hack - set first character to upper */
-	if (first[0] >= 'a') first[0] = name[0]-32;
+	if (name[0] >= 'a') first[0] = name[0]-32;
 	else first[0] = name[0];
 	first[1] = '\0';
 
