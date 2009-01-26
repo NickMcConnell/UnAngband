@@ -2490,7 +2490,7 @@ static void store_purchase(int store_index)
 		object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
 		/* Haggle for a final price */
-		choice = purchase_haggle(i_ptr, &price, o_name, store_to_label(item, store_index), store_index);
+		choice = purchase_haggle(i_ptr, &price, o_name, (char)store_to_label(item, store_index), store_index);
 
 		/* Hack -- Got kicked out */
 		if (st_ptr->store_open >= turn) return;

@@ -86,7 +86,7 @@ void do_cmd_borg(void)
 		count_teleport = rand_range(100, 150);
 
 		/* Pick a direction of travel at random */
-		borg_dir = rand_int(8);
+		borg_dir = (byte)rand_int(8);
 	}
 
 	/* Stop when needed. */
@@ -195,7 +195,7 @@ void do_cmd_borg(void)
 				dungeon_zone *zone=&t_info[0].zone[0];
 
 				/* New dungeon */
-				p_ptr->dungeon = rand_int(z_info->t_max);
+				p_ptr->dungeon = (s16b)rand_int(z_info->t_max);
 				
 				/* Get the zone */
 				get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -205,12 +205,12 @@ void do_cmd_borg(void)
 			}
 
 			/* New depth */
-			p_ptr->depth = rand_range(min_depth(p_ptr->dungeon), max_depth(p_ptr->dungeon));
+			p_ptr->depth = (s16b)rand_range(min_depth(p_ptr->dungeon), max_depth(p_ptr->dungeon));
 		}
 		else
 		{
 			/* New depth */
-			p_ptr->depth = rand_range(allowed_depth[0], allowed_depth[1]);
+			p_ptr->depth = (s16b)rand_range(allowed_depth[0], allowed_depth[1]);
 		}
 
 		/* Leaving */

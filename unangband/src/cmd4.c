@@ -859,7 +859,7 @@ static void display_knowledge_start_at(
 	if (!grp_cnt)
 			prt(format("No %s known.", title), 15, 0);
 
-	FREE(g_names);
+	FREE((char**)g_names);
 	FREE(g_offset);
 	FREE(g_list);
 }
@@ -2176,7 +2176,7 @@ static void do_cmd_knowledge_dungeons(void)
 }
 
 /* Keep macro counts happy. */
-static void cleanup_cmds () {
+static void cleanup_cmds (void) {
 	FREE(obj_group_order);
 }
 

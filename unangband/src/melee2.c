@@ -7225,7 +7225,7 @@ static void recover_monster(int m_idx, bool regen)
 	/* Get hit by terrain continuously */
 	if (place_monster_here(y, x, m_ptr->r_idx) < MM_FAIL)
 	{
-		bool daytime = level_flag & (LF1_DAYLIGHT);
+		bool daytime = (bool)(level_flag & (LF1_DAYLIGHT));
 
 		bool hurt_lite = ((r_ptr->flags3 & (RF3_HURT_LITE)) ? TRUE : FALSE);
 

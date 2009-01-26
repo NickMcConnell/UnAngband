@@ -4389,7 +4389,7 @@ static void try_supercharge(artifact_type *a_ptr)
 	{
 		if (rand_int (z_info->a_max) < artprobs[ART_IDX_MELEE_DICE_SUPER])
 		{
-			a_ptr->dd += 3 + rand_int(4);
+			a_ptr->dd += 3 + (s16b)rand_int(4);
 			if (a_ptr->dd > 9) a_ptr->dd = 9;
 			LOG_PRINT1("Supercharging damage dice!  (Now %d dice)\n", a_ptr->dd);
 		}
@@ -4416,7 +4416,7 @@ static void try_supercharge(artifact_type *a_ptr)
 	if (rand_int (z_info->a_max) < artprobs[ART_IDX_GEN_SPEED_SUPER])
 	{
 		a_ptr->flags1 |= TR1_SPEED;
-		a_ptr->pval = 3 + rand_int(3);
+		a_ptr->pval = 3 + (s16b)rand_int(3);
 		LOG_PRINT1("Supercharging speed for this item!  (New speed bonus is %d)\n", a_ptr->pval);
 	}
 	/* Aggravation */

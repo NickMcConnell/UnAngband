@@ -303,7 +303,7 @@ static void get_history(void)
 static void get_ahw(void)
 {
 	/* Calculate the age */
-	p_ptr->age = rp_ptr->b_age + randint(rp_ptr->m_age);
+	p_ptr->age = rp_ptr->b_age + (s16b)randint(rp_ptr->m_age);
 
 	/* Calculate the height for males */
 	if (p_ptr->psex == SEX_MALE)
@@ -705,7 +705,7 @@ static void player_outfit(void)
 			i_ptr->origin = ORIGIN_BIRTH; 
 
 			/* Modify the charges */
-			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = rand_range(e_ptr->charge_min, e_ptr->charge_max);
+			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = (s16b)rand_range(e_ptr->charge_min, e_ptr->charge_max);
 
 			/* Rings are mysterious and powerful */
 			if (i_ptr->tval == TV_RING)

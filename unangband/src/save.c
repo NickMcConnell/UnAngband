@@ -1149,7 +1149,7 @@ static bool wr_savefile_new(void)
 	s16b tmp16s;
 
 	/* Guess at the current time */
-	now = time((time_t *)0);
+	now = (u32b)time((time_t *)0);
 
 
 	/* Note the operating system */

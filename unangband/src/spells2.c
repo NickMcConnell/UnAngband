@@ -1240,7 +1240,7 @@ void set_recall(void)
 				 t_info[p_ptr->dungeon].attained_depth = p_ptr->depth;
 		}
 
-		p_ptr->word_recall = rand_int(20) + 15;
+		p_ptr->word_recall = (s16b)rand_int(20) + 15;
 		msg_print("The air about you becomes charged...");
 	}
 
@@ -4320,7 +4320,7 @@ bool recharge(int num)
 			t = (num / (lev + 2)) + 1;
 
 			/* Recharge based on the power */
-			if (t > 0) o_ptr->charges += 2 + randint(t);
+			if (t > 0) o_ptr->charges += 2 + (s16b)randint(t);
 
 			/* Hack -- we no longer "know" the item */
 			o_ptr->ident &= ~(IDENT_KNOWN);
@@ -5754,7 +5754,7 @@ static void create_gold(void)
 	base = k_info[i_ptr->k_idx].cost;
 
 	/* Determine how much the treasure is "worth" */
-	i_ptr->charges = (base + (8L * randint(base)) + randint(8));
+	i_ptr->charges = (s16b)(base + (8 * randint(base)) + randint(8));
 
 	/* Floor carries the item */
 	drop_near(i_ptr, 0, p_ptr->py, p_ptr->px);
@@ -5800,7 +5800,7 @@ static bool curse_armor(void)
 		/* Blast the armor */
 		o_ptr->name1 = 0;
 		o_ptr->name2 = EGO_BLASTED;
-		o_ptr->to_a = 0 - randint(5) - randint(5);
+		o_ptr->to_a = 0 - (s16b)randint(5) - (s16b)randint(5);
 		o_ptr->to_h = 0;
 		o_ptr->to_d = 0;
 		o_ptr->ac = 0;
@@ -5868,8 +5868,8 @@ static bool curse_weapon(void)
 		/* Shatter the weapon */
 		o_ptr->name1 = 0;
 		o_ptr->name2 = EGO_SHATTERED;
-		o_ptr->to_h = 0 - randint(5) - randint(5);
-		o_ptr->to_d = 0 - randint(5) - randint(5);
+		o_ptr->to_h = 0 - (s16b)randint(5) - (s16b)randint(5);
+		o_ptr->to_d = 0 - (s16b)randint(5) - (s16b)randint(5);
 		o_ptr->to_a = 0;
 		o_ptr->ac = 0;
 		o_ptr->dd = 0;
@@ -7812,7 +7812,7 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 				/* Choose familiar if summoning it for the first time */
 				if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
 				{
-					p_ptr->familiar = randint(19);
+					p_ptr->familiar = (byte)randint(19);
 					msg_format("You have found %s %s as a familiar.", is_a_vowel(familiar_race[p_ptr->familiar].name[0]) ? "an" : "a",
 							familiar_race[p_ptr->familiar].name);
 
@@ -8128,7 +8128,7 @@ int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool 
 			else
 			{
 				/* Time object out */
-				o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
+				o_ptr->timeout = (s16b)rand_int(o_ptr->charges)+o_ptr->charges;
 			}
 		}
 	}

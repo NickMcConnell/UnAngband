@@ -782,7 +782,7 @@ errr process_pref_file_command(char *buf)
 	{
 		if (tokenize(buf + 2, 1, zz) == 1)
 		{
-			op_ptr->delay_factor = strtol(zz[0], NULL, 0);
+			op_ptr->delay_factor = (byte)strtol(zz[0], NULL, 0);
 
 			/* Success */
 			return (0);
@@ -794,7 +794,7 @@ errr process_pref_file_command(char *buf)
 	{
 		if (tokenize(buf + 2, 1, zz) == 1)
 		{
-			op_ptr->hitpoint_warn = strtol(zz[0], NULL, 0);
+			op_ptr->hitpoint_warn = (byte)strtol(zz[0], NULL, 0);
 
 			/* Success */
 			return (0);

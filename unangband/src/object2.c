@@ -2727,9 +2727,9 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		if (max_pval)
 		{
 			if (max_pval > 0)
-				o_ptr->pval += great ? max_pval : rand_range(1, max_pval);
+				o_ptr->pval += great ? (s16b)max_pval : (s16b)rand_range(1, max_pval);
 			else
-				o_ptr->pval += great ? max_pval : -rand_range(1, -max_pval);
+				o_ptr->pval += great ? (s16b)max_pval : -(s16b)rand_range(1, -max_pval);
 		}
 
 		return(TRUE);
@@ -3064,31 +3064,31 @@ static void charge_item(object_type *o_ptr)
 {
 	if (k_info[o_ptr->k_idx].level < 2)
 	{
-		o_ptr->charges = randint(15)+8;
+		o_ptr->charges = (s16b)randint(15)+8;
 	}
 	else if (k_info[o_ptr->k_idx].level < 4)
 	{
-		o_ptr->charges = randint(10)+6;
+		o_ptr->charges = (s16b)randint(10)+6;
 	}
 	else if (k_info[o_ptr->k_idx].level < 40)
 	{
-		o_ptr->charges = randint(8)+6;
+		o_ptr->charges = (s16b)randint(8)+6;
 	}
 	else if (k_info[o_ptr->k_idx].level < 50)
 	{
-		o_ptr->charges = randint(6)+2;
+		o_ptr->charges = (s16b)randint(6)+2;
 	}
 	else if (k_info[o_ptr->k_idx].level < 60)
 	{
-		o_ptr->charges = randint(4)+2;
+		o_ptr->charges = (s16b)randint(4)+2;
 	}
 	else if (k_info[o_ptr->k_idx].level < 70)
 	{
-		o_ptr->charges = randint(3)+1;
+		o_ptr->charges = (s16b)randint(3)+1;
 	}
 	else
 	{
-		o_ptr->charges = randint(2)+1;
+		o_ptr->charges = (s16b)randint(2)+1;
 	}
 
 }
@@ -3162,7 +3162,7 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 			if (power < -1)
 			{
 				/* Hack -- Horrible digging bonus */
-				o_ptr->pval = 0 - (5 + randint(5));
+				o_ptr->pval = 0 - (5 + (s16b)randint(5));
 			}
 
 			/* Bad */
@@ -3340,7 +3340,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_SPEED:
 				{
 					/* Base speed (1 to 8) */
-					o_ptr->pval = randint(3) + m_bonus(5, level);
+					o_ptr->pval = (s16b)randint(3) + m_bonus(5, level);
 
 					/* Super-charge the ring */
 					while (p_ptr->depth > 25 + rand_int (20)
@@ -3413,7 +3413,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_DAMAGE:
 				{
 					/* Bonus to damage */
-					o_ptr->to_d = 5 + randint(5) + m_bonus(10, level);
+					o_ptr->to_d = 5 + (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
@@ -3429,7 +3429,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_ACCURACY:
 				{
 					/* Bonus to hit */
-					o_ptr->to_h = 5 + randint(5) + m_bonus(10, level);
+					o_ptr->to_h = 5 + (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
@@ -3445,7 +3445,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_PROTECTION:
 				{
 					/* Bonus to armor class */
-					o_ptr->to_a = 5 + randint(5) + m_bonus(10, level);
+					o_ptr->to_a = 5 + (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
@@ -3461,8 +3461,8 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_SLAYING:
 				{
 					/* Bonus to damage and to hit */
-					o_ptr->to_d = randint(5) + m_bonus(10, level);
-					o_ptr->to_h = randint(5) + m_bonus(10, level);
+					o_ptr->to_d = (s16b)randint(5) + m_bonus(10, level);
+					o_ptr->to_h = (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
@@ -3504,7 +3504,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* Amulet of searching */
 				case SV_AMULET_SEARCHING:
 				{
-					o_ptr->pval = randint(5) + m_bonus(5, level);
+					o_ptr->pval = (s16b)randint(5) + m_bonus(5, level);
 
 					/* Cursed */
 					if (power < 0)
@@ -3535,7 +3535,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* Amulet of ESP -- never cursed */
 				case SV_AMULET_ESP:
 				{
-					o_ptr->pval = randint(5) + m_bonus(5, level);
+					o_ptr->pval = (s16b)randint(5) + m_bonus(5, level);
 
 					break;
 				}
@@ -3544,7 +3544,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_AMULET_THE_MAGI:
 				{
 					o_ptr->pval = 1 + m_bonus(3, level);
-					o_ptr->to_a = randint(5) + m_bonus(5, level);
+					o_ptr->to_a = (s16b)randint(5) + m_bonus(5, level);
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3579,7 +3579,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* Amulet of Trickery -- never cursed below DL50 */
 				case SV_AMULET_TRICKERY:
 				{
-					o_ptr->pval = randint(1) + m_bonus(3, level);
+					o_ptr->pval = (s16b)randint(1) + m_bonus(3, level);
 
 					/* Cursed */
 					if (p_ptr->depth < 20 + rand_int (30))
@@ -3600,8 +3600,8 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_AMULET_DOOM:
 				{
 					/* Penalize */
-					o_ptr->pval = 0 - (randint(5) + m_bonus(5, level));
-					o_ptr->to_a = 0 - (randint(5) + m_bonus(5, level));
+					o_ptr->pval = 0 - ((s16b)randint(5) + m_bonus(5, level));
+					o_ptr->to_a = 0 - ((s16b)randint(5) + m_bonus(5, level));
 
 					break;
 				}
@@ -3683,13 +3683,13 @@ static void a_m_aux_4(object_type *o_ptr, int level, int power)
 			/* Hack -- Torches -- random fuel */
 			if (o_ptr->sval == SV_LITE_TORCH)
 			{
-				if (o_ptr->charges > 0) o_ptr->charges = randint(o_ptr->charges);
+				if (o_ptr->charges > 0) o_ptr->charges = (s16b)randint(o_ptr->charges);
 			}
 
 			/* Hack -- Lanterns -- random fuel */
 			if (o_ptr->sval == SV_LITE_LANTERN)
 			{
-				if (o_ptr->charges > 0) o_ptr->charges = randint(o_ptr->charges);
+				if (o_ptr->charges > 0) o_ptr->charges = (s16b)randint(o_ptr->charges);
 			}
 
 			break;
@@ -4489,23 +4489,23 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 		/* Apply bonuses or penalties */
 		if (e_ptr->max_to_h > 0)
-			o_ptr->to_h = MAX(o_ptr->to_h, randint(e_ptr->max_to_h));
-		else if (e_ptr->max_to_h < 0) o_ptr->to_h -= randint(-e_ptr->max_to_h);
+			o_ptr->to_h = MAX(o_ptr->to_h, (s16b)randint(e_ptr->max_to_h));
+		else if (e_ptr->max_to_h < 0) o_ptr->to_h -= (s16b)randint(-e_ptr->max_to_h);
 
 		if (e_ptr->max_to_d > 0)
-			o_ptr->to_d = MIN(MAX(o_ptr->to_d, randint(e_ptr->max_to_d)),
+			o_ptr->to_d = MIN(MAX(o_ptr->to_d, (s16b)randint(e_ptr->max_to_d)),
 									(o_ptr->tval == TV_BOW
 									 ? 15 : o_ptr->dd * o_ptr->ds + 5));
-		else if (e_ptr->max_to_d < 0) o_ptr->to_d -= randint(-e_ptr->max_to_d);
+		else if (e_ptr->max_to_d < 0) o_ptr->to_d -= (s16b)randint(-e_ptr->max_to_d);
 
 		if (e_ptr->max_to_a > 0)
-			o_ptr->to_a = MIN(MAX(o_ptr->to_a, randint(e_ptr->max_to_a)),
+			o_ptr->to_a = MIN(MAX(o_ptr->to_a, (s16b)randint(e_ptr->max_to_a)),
 									o_ptr->ac + 5);
-		else if (e_ptr->max_to_a < 0) o_ptr->to_a -= randint(-e_ptr->max_to_a);
+		else if (e_ptr->max_to_a < 0) o_ptr->to_a -= (s16b)randint(-e_ptr->max_to_a);
 
 		if (e_ptr->max_pval > 0)
-			o_ptr->pval = MAX(1, MIN(o_ptr->pval, randint(e_ptr->max_pval)));
-		else if (e_ptr->max_pval < 0) o_ptr->pval -= randint(-e_ptr->max_pval);
+			o_ptr->pval = MAX(1, MIN(o_ptr->pval, (s16b)randint(e_ptr->max_pval)));
+		else if (e_ptr->max_pval < 0) o_ptr->pval -= (s16b)randint(-e_ptr->max_pval);
 
 		/* Hack -- ensure negatives for broken or cursed items */
 		if (cursed_p(o_ptr) || broken_p(o_ptr))
@@ -5603,8 +5603,8 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		case TV_WAND:
 		case TV_FOOD:
 		{
-			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = randint(5);
-			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = randint(3);
+			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = (byte)randint(5);
+			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = (byte)randint(3);
 
 			if (j_ptr->number < 1) j_ptr->number = 1;
 			break;
@@ -5677,7 +5677,7 @@ bool make_gold(object_type *j_ptr, bool good, bool great)
 	base = k_info[OBJ_GOLD_LIST+i].cost;
 
 	/* Determine how much the treasure is "worth" */
-	j_ptr->charges = (base + (8L * randint(base)) + randint(8));
+	j_ptr->charges = (base + (8 * randint(base)) + randint(8));
 
 	/* Apply good or great flags */
 	if (great) j_ptr->charges *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 100 : damroll(7, 4));

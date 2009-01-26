@@ -1350,7 +1350,7 @@ bool make_attack_normal(int m_idx)
 		if ((!m_ptr->monfear) && (rand_int(3)))
 		{
 			/* Set monster fast */
-			set_monster_haste(m_idx, 3 + rand_int(3), FALSE);
+			set_monster_haste(m_idx, 3 + (s16b)rand_int(3), FALSE);
 
 			/* Make monster 'panic' -- move away */
 			set_monster_fear(m_ptr, m_ptr->hp / 3, TRUE);
@@ -2452,7 +2452,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target > 0)
 			{
 				/* Add to the monster haste counter */
-				set_monster_haste(target, n_ptr->hasted + rlev + rand_int(rlev), n_ptr->ml);
+				set_monster_haste((s16b)target, (s16b)(n_ptr->hasted + rlev + rand_int(rlev)), n_ptr->ml);
 			}
 			else if (target < 0)
 			{

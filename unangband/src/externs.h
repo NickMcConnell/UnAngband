@@ -418,7 +418,7 @@ extern void map_area(void);
 extern void wiz_lite(void);
 extern void wiz_dark(void);
 extern void town_illuminate(bool daytime);
-extern void check_attribute_lost(int y, int x, int r, byte los, tester_attribute_func require_attribute, tester_attribute_func has_attribute,
+extern void check_attribute_lost(const int y, const int x, const int r, const byte los, tester_attribute_func require_attribute, tester_attribute_func has_attribute,
 	tester_attribute_func redraw_attribute, modify_attribute_func remove_attribute,	modify_attribute_func reapply_attribute);
 extern void gain_attribute(int y, int x, int r, byte los, modify_attribute_func apply_attribute, tester_attribute_func redraw_attribute);
 extern bool require_halo(int y, int x);

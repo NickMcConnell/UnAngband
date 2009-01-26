@@ -1554,7 +1554,7 @@ bool player_assembly(int item2)
 		i_ptr->sval = tgt_sval;
 		if (src_sval != k_ptr->sval) i_ptr->weight += k_ptr->weight /2;
 		else i_ptr->weight += k_ptr->weight;
-		if (k_info[i_ptr->k_idx].charges) i_ptr->timeout = randint(k_info[i_ptr->k_idx].charges) + k_info[i_ptr->k_idx].charges;
+		if (k_info[i_ptr->k_idx].charges) i_ptr->timeout = (s16b)randint(k_info[i_ptr->k_idx].charges) + k_info[i_ptr->k_idx].charges;
 
 		/* Adjust the weight and carry */
 		if (item2 >= 0)
@@ -1897,7 +1897,7 @@ bool player_activate(int item)
 	}
 
 	/* Time object out */
-	else if (o_ptr->charges) o_ptr->timeout = rand_int(o_ptr->charges)+o_ptr->charges;
+	else if (o_ptr->charges) o_ptr->timeout = (s16b)rand_int(o_ptr->charges)+o_ptr->charges;
 
 	/* Clear racial activation */
 	if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
@@ -2375,36 +2375,36 @@ bool player_apply_rune_or_coating2(int item2)
 						if (cursed_p(j_ptr) || broken_p(j_ptr))
 						{
 							/* Hack -- obtain penalties */
-							if (e_ptr->max_to_h > 0) j_ptr->to_h = MIN(j_ptr->to_h,-randint(e_ptr->max_to_h));
+							if (e_ptr->max_to_h > 0) j_ptr->to_h = MIN(j_ptr->to_h,-(s16b)randint(e_ptr->max_to_h));
 							else j_ptr->to_h = MIN(j_ptr->to_h,0);
 
-							if (e_ptr->max_to_d > 0) j_ptr->to_d = MIN(j_ptr->to_d,-randint(e_ptr->max_to_d));
+							if (e_ptr->max_to_d > 0) j_ptr->to_d = MIN(j_ptr->to_d,-(s16b)randint(e_ptr->max_to_d));
 							else j_ptr->to_d = MIN(j_ptr->to_d,0);
 
-							if (e_ptr->max_to_a > 0) j_ptr->to_a = MIN(j_ptr->to_a,-randint(e_ptr->max_to_a));
+							if (e_ptr->max_to_a > 0) j_ptr->to_a = MIN(j_ptr->to_a,-(s16b)randint(e_ptr->max_to_a));
 							else j_ptr->to_a = MIN(j_ptr->to_a,0);
 
 							/* Hack -- obtain charges */
-							if (e_ptr->max_pval > 0) j_ptr->pval = MIN(j_ptr->pval,-randint(e_ptr->max_pval));
+							if (e_ptr->max_pval > 0) j_ptr->pval = MIN(j_ptr->pval,-(s16b)randint(e_ptr->max_pval));
 						}
 
 						/* Hack -- apply extra bonuses if needed */
 						else
 						{
 							/* Hack -- obtain bonuses */
-							if (e_ptr->max_to_h > 0) j_ptr->to_h = MAX(j_ptr->to_h, randint(e_ptr->max_to_h));
+							if (e_ptr->max_to_h > 0) j_ptr->to_h = MAX(j_ptr->to_h, (s16b)randint(e_ptr->max_to_h));
 							else j_ptr->to_h = MIN(j_ptr->to_h, 0);
 
-							if (e_ptr->max_to_d > 0) j_ptr->to_d = MIN(MAX(j_ptr->to_d, randint(e_ptr->max_to_d)),
+							if (e_ptr->max_to_d > 0) j_ptr->to_d = MIN(MAX(j_ptr->to_d, (s16b)randint(e_ptr->max_to_d)),
 												   (j_ptr->tval == TV_BOW ? 15 : j_ptr->dd * j_ptr->ds + 5));
 							else j_ptr->to_d = MIN(j_ptr->to_d, 0);
 
-							if (e_ptr->max_to_a > 0) j_ptr->to_a = MIN(MAX(j_ptr->to_a, randint(e_ptr->max_to_a)),
+							if (e_ptr->max_to_a > 0) j_ptr->to_a = MIN(MAX(j_ptr->to_a, (s16b)randint(e_ptr->max_to_a)),
 												   j_ptr->ac + 5);
 							else j_ptr->to_a = MIN(j_ptr->to_a, 0);
 
 							/* Hack -- obtain pval */
-							if (e_ptr->max_pval > 0) j_ptr->pval = MAX(1,MIN(j_ptr->pval, randint(e_ptr->max_pval)));
+							if (e_ptr->max_pval > 0) j_ptr->pval = MAX(1,MIN(j_ptr->pval, (s16b)randint(e_ptr->max_pval)));
 							else j_ptr->pval = MIN(j_ptr->pval, 0);
 						}
 

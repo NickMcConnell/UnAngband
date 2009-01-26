@@ -363,7 +363,7 @@ static u16b image_monster(void)
 	c = image_monster_hack[rand_int(sizeof(image_monster_hack) - 1)];
 
 	/* Random color */
-	a = randint(15);
+	a = (byte)randint(15);
 
 	/* Encode */
 	return (PICT(a,c));
@@ -388,7 +388,7 @@ static u16b image_object(void)
 	c = image_object_hack[rand_int(sizeof(image_object_hack) - 1)];
 
 	/* Random color */
-	a = randint(15);
+	a = (byte)randint(15);
 
 	/* Encode */
 	return (PICT(a,c));
@@ -1480,7 +1480,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			else if (r_ptr->flags1 & (RF1_ATTR_MULTI))
 			{
 				/* Multi-hued attr */
-				a = randint(BASE_COLORS - 1);
+				a = (byte)randint(BASE_COLORS - 1);
 
 				/* Normal char */
 				c = dc;
@@ -5482,7 +5482,7 @@ bool require_daylight(int y, int x)
 
 bool has_daylight(int y, int x)
 {
-	bool daytime = level_flag & (LF1_DAYLIGHT);
+	bool daytime = (bool)(level_flag & (LF1_DAYLIGHT));
 	bool outside = (level_flag & (LF1_SURFACE))
 		&& (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE));
 
@@ -5687,8 +5687,8 @@ void cave_set_feat(int y, int x, int feat)
 	feature_type *f_ptr = &f_info[oldfeat];
 	feature_type *f_ptr2 = &f_info[feat];
 
-	bool surface = (level_flag & (LF1_SURFACE));
-	bool daytime = level_flag & (LF1_DAYLIGHT);
+	bool surface = (bool)((level_flag & (LF1_SURFACE)));
+	bool daytime = (bool)(level_flag & (LF1_DAYLIGHT));
 
 	bool halo = (f_ptr->flags2 & FF2_GLOW) != 0;
 	bool halo2 = (f_ptr2->flags2 & FF2_GLOW) != 0;

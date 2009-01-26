@@ -648,7 +648,7 @@ void teleport_player(int dis)
 			sound(MSG_TPOTHER);
 
 			/* Set dodging -- 'random direction' */
-			p_ptr->dodging = rand_int(8);
+			p_ptr->dodging = (byte)rand_int(8);
 
 			/* Redraw state */
 			p_ptr->redraw |= (PR_STATE);
@@ -676,7 +676,7 @@ void teleport_player(int dis)
 	monster_swap(py, px, y, x);
 
 	/* Set dodging -- 'random direction' */
-	p_ptr->dodging = rand_int(8);
+	p_ptr->dodging = (byte)rand_int(8);
 
 	/* Redraw state */
 	p_ptr->redraw |= (PR_STATE);
@@ -10316,7 +10316,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((o_ptr->timeout > 0) && (!artifact_p(o_ptr)))
 			{
 				/* Reduce fuel */
-				o_ptr->timeout -= (250 + randint(250));
+				o_ptr->timeout -= (s16b)(250 + randint(250));
 				if (o_ptr->timeout < 1) o_ptr->timeout = 1;
 
 				/* Notice */
@@ -12106,7 +12106,7 @@ static void calc_starburst(int height, int width, byte *arc_first,
 		dist = ((height * vert_factor) + (width * (90 - vert_factor))) / 90;
 
 		/* Randomize distance (should never be greater than radius) */
-		arc_dist[i] = rand_range(dist / 4, dist / 2);
+		arc_dist[i] = (byte)rand_range(dist / 4, dist / 2);
 
 		/* Keep variability under control (except in special cases). */
 		if ((dist != 0) && (i != 0))

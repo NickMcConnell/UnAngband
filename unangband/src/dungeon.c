@@ -934,7 +934,7 @@ void suffer_disease(bool allow_cure)
 				/* Powerful diseases also drain mana */
 				if (p_ptr->msp && (p_ptr->disease & (DISEASE_POWER)))
 				{
-					p_ptr->csp -= randint(30);
+					p_ptr->csp -= (s16b)randint(30);
 					if (p_ptr->csp < 0) p_ptr->csp = 0;
 
 					/* Update mana */
@@ -3959,7 +3959,7 @@ void play_game(bool new_game)
 		u32b seed;
 
 		/* Basic seed */
-		seed = (time(NULL));
+		seed = (u32b)(time(NULL));
 
 #ifdef SET_UID
 

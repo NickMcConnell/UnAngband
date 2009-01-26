@@ -5996,7 +5996,7 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
 		place_monster_aux(y, x, get_mon_num(monster_level),
-			(rand_int(3)), FALSE, 0L);
+			(bool)(rand_int(3)), FALSE, 0L);
 
 		/* End enforcement of monster selection */
 		cave_ecology.single_ecology = FALSE;
@@ -6208,6 +6208,7 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 			if (cave_ecology.num_ecologies > old_num_ecologies)
 			{
 				cave_ecology.num_ecologies = old_num_ecologies;
+				assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
 				new_num_ecologies = old_num_ecologies + 1;
 			}
 		}
@@ -6215,11 +6216,13 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 
 	/* Vault supports this room */
 	room_info[room].ecology = (1L << ++cave_ecology.num_ecologies);
+	assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
 	room_info[room].deepest_race = cave_ecology.deepest_race[cave_ecology.num_ecologies];
 
 	/* Ecology */
 	cave_ecology.ready = old_ecology;
 	cave_ecology.num_ecologies = new_num_ecologies;
+	assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
 }
 
 
@@ -6320,7 +6323,7 @@ static void build_tower(int y0, int x0, int ymax, int xmax, cptr data)
 
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
 		place_monster_aux(y, x, get_mon_num(monster_level),
-			(rand_int(3)), FALSE, 0L);
+			(bool)(rand_int(3)), FALSE, 0L);
 
 		/* One less monster to place. */
 		monsters_left--;
@@ -9758,6 +9761,7 @@ static void init_ecology(int r_idx)
 	(void)WIPE(&cave_ecology, ecology_type);
 	assert (cave_ecology.ready == FALSE);
 	assert (cave_ecology.valid_hook == FALSE);
+	assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
 
 	/* Count of different non-unique monsters in ecology */
 	k = (MIN_ECOLOGY_RACES / 2) + rand_int((MIN_ECOLOGY_RACES + 1) / 2);
@@ -10663,7 +10667,7 @@ static int alloc_object(int set, int typ, int num)
 		while (num)
 		{
 			bool room;
-			bool surface = (level_flag & (LF1_SURFACE));
+			bool surface = (bool)(level_flag & (LF1_SURFACE));
 
 			/* Paranoia */
 			i++;
@@ -10959,7 +10963,7 @@ static bool cave_gen(void)
 	if (((level_flag & (LF1_TOWER | LF1_SURFACE)) == 0) &&
 		(rand_int(100) < DUN_SPECIAL))
 	{
-		dun->special = randint(MAX_SPECIAL_DUNGEONS);
+		dun->special = (byte)randint(MAX_SPECIAL_DUNGEONS);
 
 		message_add(format("Building special dungeon (%d).", dun->special), MSG_GENERIC);
 

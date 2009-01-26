@@ -4452,7 +4452,7 @@ void build_gamma_table(int gamma)
 		 * Store the value in the table so that the
 		 * floating point pow function isn't needed.
 		 */
-		gamma_table[i] = ((long)(value / 256) * i) / 256;
+		gamma_table[i] = (byte)(((long)(value / 256) * i) / 256);
 	}
 }
 

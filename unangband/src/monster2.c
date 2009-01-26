@@ -2613,7 +2613,7 @@ bool mon_resist_feat(int feat, int r_idx)
 	monster_race *r_ptr;
 	feature_type *f_ptr = &f_info[feat];
 
-	bool daytime = level_flag & LF1_DAYLIGHT;
+	bool daytime = (bool)(level_flag & LF1_DAYLIGHT);
 	bool outside = (level_flag & (LF1_SURFACE))
 		&& (f_ptr->flags3 & (FF3_OUTSIDE));
 
@@ -2931,7 +2931,7 @@ int place_monster_here(int y, int x, int r_idx)
  */
 void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 {
-	bool surface = (level_flag & (LF1_SURFACE));
+	bool surface = (bool)(level_flag & (LF1_SURFACE));
 	bool lite = (m_ptr->mflag & (MFLAG_LITE)) != 0;
 
 	/* Get the feature */
@@ -3643,7 +3643,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	if (slp && r_ptr->sleep)
 	{
 		int val = r_ptr->sleep;
-		n_ptr->csleep = ((val * 2) + randint(val * 10));
+		n_ptr->csleep = ((val * 2) + (s16b)randint(val * 10));
 	}
 
 	/* Hack -- allow uniques to have their stats drained multiple times */
@@ -3780,14 +3780,14 @@ static bool place_monster_group(int y, int x, int r_idx, bool slp,
 		if (r_ptr->level > p_ptr->depth)
 		{
 			adjust = (r_ptr->level - p_ptr->depth) / 2;
-			group_size -= randint(adjust);
+			group_size -= (s16b)randint(adjust);
 		}
 
 		/* Easier monsters, bigger groups */
 		if (p_ptr->depth > r_ptr->level)
 		{
 			adjust = (p_ptr->depth - r_ptr->level) / 2;
-			group_size += randint(adjust);
+			group_size += (s16b)randint(adjust);
 		}
 	}
 
@@ -3957,7 +3957,7 @@ static void place_monster_escort(int y, int x, int leader_idx, bool slp, u32b fl
 
 			/* Place a group of escorts if needed */
 			if (((r_info[escort_idx].level < old_monster_level - 9) || (r_info[escort_idx].flags1 & (RF1_FRIENDS))) &&
-				!place_monster_group(my, mx, escort_idx, slp, (rand_range(3, 5)), flg))
+				!place_monster_group(my, mx, escort_idx, slp, (s16b)(rand_range(3, 5)), flg))
 			{
 				continue;
 			}
@@ -5728,7 +5728,7 @@ void get_monster_ecology(int r_idx)
 
 		/* Add monster to room (base races don't wander around dungeon) */
 		cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L << (++cave_ecology.num_ecologies));
-
+		assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
 		/* Is the current monster deeper */
 		deepest_in_ecology(r_idx);
 
