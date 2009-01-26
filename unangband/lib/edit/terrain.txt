@@ -435,8 +435,9 @@ K:CHASM:141:0
 K:TREE:541:0
 #$ shady ground
 K:SECRET:2:0
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
-F:CAN_CLIMB | CAN_FLY | HIDE_ITEM | SECRET
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ALLOC | ATTR_LITE |
 D:You have found a trap.
 
@@ -647,6 +648,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:16:5
+#$ trap door
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP | MORE |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -674,6 +677,8 @@ K:TUNNEL:64:5
 #$ deep pit
 K:HURT_WATER:155:5
 #$ deep water
+K:HIT_TRAP:17:5
+#$ pit
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | SPIKE | DISARM | TUNNEL |
 F:TRAP | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -701,6 +706,8 @@ K:HURT_POIS:19:5
 #$ poisoned spiked pit
 K:TUNNEL:65:5
 #$ deep spiked pit
+K:HIT_TRAP:18:5
+#$ spiked pit
 K:HURT_WATER:155:5
 #$ deep water
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TUNNEL | TRAP |
@@ -730,6 +737,8 @@ K:TUNNEL:66:5
 #$ deep poisoned spiked pit
 K:HURT_WATER:155:5
 #$ deep water
+K:HIT_TRAP:19:5
+#$ poisoned spiked pit
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TUNNEL | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -749,6 +758,8 @@ K:DEFAULT:1:6
 #$ open floor
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:20:5
+#$ strange rune
 K:TREE:541:6
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -768,6 +779,8 @@ W:2:1:20:0
 S:TELE_AWAY
 K:DEFAULT:1:5
 #$ open floor
+K:HIT_TRAP:21:5
+#$ shimmering portal
 K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
@@ -791,6 +804,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:22:5
+#$ discolored spot
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -813,6 +828,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:23:5
+#$ discolored spot
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -835,6 +852,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:24:5
+#$ spring-loaded trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -856,6 +875,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:25:5
+#$ spring-loaded trap
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -881,6 +902,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:26:5
+#$ spring-loaded trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -904,6 +927,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:27:5
+#$ spring-loaded trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -925,6 +950,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:28:5
+#$ gas trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -948,6 +975,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:29:5
+#$ gas trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -971,6 +1000,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:30:5
+#$ gas trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -992,6 +1023,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:31:5
+#$ gas trap
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -1247,7 +1280,13 @@ K:HURT_ACID:165:0
 #$ acidic vapour
 K:CHASM:141:0
 #$ chasm
-F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | TUNNEL | DOOR |
+K:OPEN:40:0
+#$ jammed door
+K:BASH:40:0
+#$ jammed door
+K:SECRET:40:0
+#$ jammed door
+F:SECRET | NOTICE | REMEMBER | OPEN | BASH | SPIKE | TUNNEL | DOOR |
 F:HURT_ROCK | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_PASS |
 F:PICK_DOOR | ATTR_LITE |
 D:The door appears to be stuck.
@@ -1442,8 +1481,8 @@ O:0
 W:2:1:10:0
 K:DEFAULT:1:0
 #$ open floor
-K:SECRET:32:0
-#$ door
+K:SECRET:48:0
+#$ secret door
 K:OPEN:4:0
 #$ open door
 K:BASH:5:0
@@ -1641,8 +1680,6 @@ K:HURT_ACID:728:40
 #$ acid-marked granite wall
 K:HURT_FIRE:729:40
 #$ burnt granite wall
-K:DOOR:1:40
-#$ open floor
 F:REMEMBER | TUNNEL | WALL | OUTER |
 F:FILLED | HURT_ROCK | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
@@ -1746,6 +1783,8 @@ K:TREE:541:5
 #$ shady ground
 K:SPIKE:65:5
 #$ deep spiked pit
+K:HIT_TRAP:64:5
+#$ deep pit
 K:HURT_WATER:155:5
 #$ deep water
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | SPIKE | DISARM | TRAP |
@@ -1768,6 +1807,8 @@ K:CHASM:141:11
 #$ chasm
 K:TREE:541:11
 #$ shady ground
+K:HIT_TRAP:65:5
+#$ deep spiked pit
 K:HURT_POIS:66:11
 #$ deep poisoned spiked pit
 K:HURT_WATER:155:11
@@ -1793,6 +1834,8 @@ K:CHASM:141:13
 #$ chasm
 K:TREE:541:13
 #$ shady ground
+K:HIT_TRAP:66:5
+#$ deep poisoned spiked pit
 K:HURT_WATER:155:13
 #$ deep water
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -1816,6 +1859,8 @@ K:CHASM:141:12
 #$ chasm
 K:TREE:541:12
 #$ shady ground
+K:HIT_TRAP:67:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1837,6 +1882,8 @@ K:CHASM:141:18
 #$ chasm
 K:TREE:541:18
 #$ shady ground
+K:HIT_TRAP:68:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1858,6 +1905,8 @@ K:CHASM:141:24
 #$ chasm
 K:TREE:541:24
 #$ shady ground
+K:HIT_TRAP:69:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1879,6 +1928,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:70:5
+#$ silent watcher
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1900,6 +1951,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:71:5
+#$ silent watcher
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1921,6 +1974,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:72:5
+#$ silent watcher
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1940,6 +1995,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:73:5
+#$ silent watcher
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -1963,6 +2020,8 @@ K:CHASM:141:10
 #$ chasm
 K:TREE:541:10
 #$ shady ground
+K:HIT_TRAP:74:5
+#$ silent watcher
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -1984,6 +2043,8 @@ K:CHASM:141:15
 #$ chasm
 K:TREE:541:15
 #$ shady ground
+K:HIT_TRAP:75:5
+#$ silent watcher
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2005,6 +2066,8 @@ K:CHASM:141:20
 #$ chasm
 K:TREE:541:20
 #$ shady ground
+K:HIT_TRAP:76:5
+#$ silent watcher
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2025,6 +2088,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:77:5
+#$ tripwire
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2046,6 +2111,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:78:5
+#$ tripwire
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2064,6 +2131,8 @@ K:DEFAULT:1:6
 #$ open floor
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:79:5
+#$ ever burning eye
 K:TREE:541:6
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2085,6 +2154,8 @@ K:DEFAULT:1:8
 #$ open floor
 K:CHASM:141:8
 #$ chasm
+K:HIT_TRAP:80:5
+#$ ever burning eye
 K:TREE:541:8
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2106,6 +2177,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:81:5
+#$ magic symbol
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2128,6 +2201,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:82:5
+#$ magic symbol
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2148,6 +2223,8 @@ K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
 #$ shady ground
+K:HIT_TRAP:83:5
+#$ magic symbol
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2168,6 +2245,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:84:5
+#$ magic symbol
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2186,6 +2265,8 @@ K:DEFAULT:1:6
 #$ open floor
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:85:5
+#$ magic symbol
 K:TREE:541:6
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2206,6 +2287,8 @@ K:DEFAULT:1:6
 #$ open floor
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:86:5
+#$ magic symbol
 K:TREE:541:6
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2221,12 +2304,14 @@ U:56
 #$ granite wall
 O:0
 W:2:3:20:0
-T:LINE_LOS
+T:LINE_LOS:
 S:DARKNESS
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:87:5
+#$ shaft of light
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2248,6 +2333,8 @@ K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:88:5
+#$ ancient hex
 K:TREE:541:5
 #$ shady ground
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -2271,6 +2358,8 @@ K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
 #$ shady ground
+K:HIT_TRAP:89:5
+#$ magic symbol
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2292,6 +2381,8 @@ K:CHASM:141:16
 #$ chasm
 K:TREE:541:16
 #$ shady ground
+K:HIT_TRAP:90:5
+#$ ancient hex
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2313,6 +2404,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:91:5
+#$ murder hole
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2334,6 +2427,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:92:5
+#$ murder hole
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2355,6 +2450,8 @@ K:CHASM:141:8
 #$ chasm
 K:TREE:541:8
 #$ shady ground
+K:HIT_TRAP:93:5
+#$ murder hole
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2376,6 +2473,8 @@ K:CHASM:141:11
 #$ chasm
 K:TREE:541:11
 #$ shady ground
+K:HIT_TRAP:94:5
+#$ murder hole
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -2463,6 +2562,8 @@ K:SPIKE:41:5
 #$ jammed door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:98:5
+#$ trapped door
 F:SECRET | NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR |
 F:TRAP | HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2485,6 +2586,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:99:5
+#$ trapped door (trap door)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2506,6 +2609,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:100:5
+#$ trapped door (pit)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2527,6 +2632,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:101:5
+#$ trapped door (strange rune)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2548,6 +2655,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:102:5
+#$ trapped door (stone visage)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2569,6 +2678,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:103:5
+#$ trapped door (tripwire)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2590,6 +2701,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:104:5
+#$ trapped door (magic symbol)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2611,6 +2724,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:105:5
+#$ trapped door (ancient hex)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2632,6 +2747,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:106:5
+#$ trapped door (murder hole)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2653,6 +2770,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:107:5
+#$ trapped door (loose rock)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2674,6 +2793,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:108:5
+#$ trapped door (silent watcher)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2695,6 +2816,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:109:5
+#$ trapped door (spring-loaded trap)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -2716,6 +2839,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:110:5
+#$ trapped door (gas trap)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -3150,6 +3275,8 @@ K:CHASM:141:5
 #$ chasm
 K:TREE:541:5
 #$ shady ground
+K:HIT_TRAP:132:5
+#$ gas trap
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5128,6 +5255,10 @@ K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
 #$ shady ground
+K:SECRET:237:5
+#$ invisible trap
+K:HIT_TRAP:237:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5142,8 +5273,11 @@ U:56
 O:0
 W:1:1:5:0
 K:DEFAULT:1:0
-K:SECRET:238:0
 #$ open floor
+K:SECRET:238:0
+#$ invisible trap
+K:HIT_TRAP:238:5
+#$ invisible trap
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
@@ -5164,8 +5298,11 @@ W:1:1:5:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0
-K:SECRET:239:0
 #$ chasm
+K:SECRET:239:0
+#$ invisible trap
+K:HIT_TRAP:239:5
+#$ invisible trap
 K:TREE:541:0
 #$ shady ground
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
@@ -5186,8 +5323,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:240:0
 #$ shady ground
+K:SECRET:240:0
+#$ invisible trap
+K:HIT_TRAP:240:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5206,8 +5346,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:241:0
 #$ shady ground
+K:SECRET:241:0
+#$ invisible trap
+K:HIT_TRAP:241:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5226,8 +5369,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:242:0
 #$ shady ground
+K:SECRET:242:0
+#$ invisible trap
+K:HIT_TRAP:242:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5246,8 +5392,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:243:0
 #$ shady ground
+K:SECRET:243:0
+#$ invisible trap
+K:HIT_TRAP:243:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5266,8 +5415,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:244:0
 #$ shady ground
+K:SECRET:244:0
+#$ invisible trap
+K:HIT_TRAP:244:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5286,8 +5438,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:245:0
 #$ shady ground
+K:SECRET:245:0
+#$ invisible trap
+K:HIT_TRAP:245:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5306,8 +5461,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:246:0
 #$ shady ground
+K:SECRET:246:0
+#$ invisible trap
+K:HIT_TRAP:246:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5326,8 +5484,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:247:0
 #$ shady ground
+K:SECRET:247:0
+#$ invisible trap
+K:HIT_TRAP:247:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5346,8 +5507,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:248:0
 #$ shady ground
+K:SECRET:248:0
+#$ invisible trap
+K:HIT_TRAP:248:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5366,6 +5530,9 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:SECRET:249:0
+#$ invisible trap
+K:HIT_TRAP:249:5
+#$ invisible trap
 K:TREE:541:0
 #$ shady ground
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
@@ -5386,8 +5553,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:250:0
 #$ shady ground
+K:SECRET:250:0
+#$ invisible trap
+K:HIT_TRAP:250:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5406,6 +5576,9 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:SECRET:251:0
+#$ invisible trap
+K:HIT_TRAP:251:5
+#$ invisible trap
 K:TREE:541:0
 #$ shady ground
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
@@ -5426,8 +5599,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:252:0
 #$ shady ground
+K:SECRET:252:0
+#$ invisible trap
+K:HIT_TRAP:252:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5446,8 +5622,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:253:0
 #$ shady ground
+K:SECRET:253:0
+#$ invisible trap
+K:HIT_TRAP:253:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5464,8 +5643,11 @@ W:1:1:5:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0
-K:SECRET:254:0
 #$ chasm
+K:SECRET:254:0
+#$ invisible trap
+K:HIT_TRAP:254:5
+#$ invisible trap
 K:TREE:541:0
 #$ shady ground
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
@@ -5486,8 +5668,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:255:0
 #$ shady ground
+K:SECRET:255:0
+#$ invisible trap
+K:HIT_TRAP:255:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5506,8 +5691,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:256:0
 #$ shady ground
+K:SECRET:256:0
+#$ invisible trap
+K:HIT_TRAP:256:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -5769,6 +5957,8 @@ W:30:2:20:0
 S:BALL_ACID
 K:DEFAULT:1:30
 #$ open floor
+K:HIT_TRAP:272:5
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5785,6 +5975,8 @@ W:15:2:20:0
 S:BALL_ELEC
 K:DEFAULT:1:15
 #$ open floor
+K:HIT_TRAP:273:5
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5801,6 +5993,8 @@ W:25:2:20:0
 S:BALL_FIRE
 K:DEFAULT:1:25
 #$ open floor
+K:HIT_TRAP:274:5
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5817,6 +6011,8 @@ W:20:2:20:0
 S:BALL_COLD
 K:DEFAULT:1:20
 #$ open floor
+K:HIT_TRAP:275:5
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5833,6 +6029,8 @@ W:10:2:20:0
 S:BALL_POIS
 K:DEFAULT:1:10
 #$ open floor
+K:HIT_TRAP:276:5
+#$ stone visage
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5849,6 +6047,8 @@ W:45:2:20:0
 S:BALL_NETHR
 K:DEFAULT:1:60
 #$ open floor
+K:HIT_TRAP:277:5
+#$ ancient hex
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5865,6 +6065,8 @@ W:55:2:20:0
 S:BALL_MANA
 K:DEFAULT:1:80
 #$ open floor
+K:HIT_TRAP:278:5
+#$ magic symbol
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5878,10 +6080,12 @@ U:56
 #$ granite wall
 O:0
 W:50:2:20:0
-T:LINE_LOS
+T:LINE_LOS:
 S:BALL_DARK
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:279:5
+#$ shaft of light
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5898,6 +6102,8 @@ W:6:3:20:0
 S:WOUND
 K:DEFAULT:1:6
 #$ open floor
+K:HIT_TRAP:280:5
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5916,6 +6122,8 @@ W:12:3:20:0
 S:A_DEAD
 K:DEFAULT:1:12
 #$ open floor
+K:HIT_TRAP:281:5
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5934,6 +6142,8 @@ W:18:3:20:0
 S:A_OBJECT
 K:DEFAULT:1:18
 #$ open floor
+K:HIT_TRAP:282:5
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5952,6 +6162,8 @@ W:24:3:20:0
 S:A_ELEMENT
 K:DEFAULT:1:24
 #$ open floor
+K:HIT_TRAP:283:5
+#$ surreal painting
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5968,6 +6180,8 @@ W:10:1:20:0
 S:S_ORC
 K:DEFAULT:1:10
 #$ open floor
+K:HIT_TRAP:284:5
+#$ mark of a white hand
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -5984,6 +6198,8 @@ W:55:2:20:0
 S:S_HI_DEMON
 K:DEFAULT:1:80
 #$ open floor
+K:HIT_TRAP:285:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6001,6 +6217,8 @@ W:6:2:20:0
 S:S_SPIDER
 K:DEFAULT:1:6
 #$ open floor
+K:HIT_TRAP:286:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6018,6 +6236,8 @@ W:45:2:20:0
 S:S_HI_DRAGON
 K:DEFAULT:1:60
 #$ open floor
+K:HIT_TRAP:287:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6035,6 +6255,8 @@ W:50:2:20:0
 S:S_HI_UNDEAD
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:288:5
+#$ strange rune
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6184,6 +6406,8 @@ W:2:3:20:0
 T:TRAP:PLASMA:8d6
 K:DEFAULT:1:5
 #$ open floor
+K:HIT_TRAP:295:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6202,6 +6426,8 @@ W:33:3:20:0
 T:TRAP:GRAVITY:8d6
 K:DEFAULT:1:36
 #$ open floor
+K:HIT_TRAP:296:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6220,6 +6446,8 @@ W:31:3:20:0
 T:TRAP:INERTIA:8d6
 K:DEFAULT:1:33
 #$ open floor
+K:HIT_TRAP:297:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6238,6 +6466,8 @@ W:30:3:20:0
 T:TRAP:FORCE:8d6
 K:DEFAULT:1:30
 #$ open floor
+K:HIT_TRAP:298:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6256,6 +6486,8 @@ W:27:3:20:0
 T:TRAP:TIME:8d6
 K:DEFAULT:1:27
 #$ open floor
+K:HIT_TRAP:299:5
+#$ ancient hex
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6274,6 +6506,8 @@ W:12:3:20:0
 T:TRAP:SOUND:8d6
 K:DEFAULT:1:12
 #$ open floor
+K:HIT_TRAP:300:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6292,6 +6526,8 @@ W:18:3:20:0
 T:TRAP:SHARD:8d6
 K:DEFAULT:1:18
 #$ open floor
+K:HIT_TRAP:301:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6310,6 +6546,8 @@ W:15:3:20:0
 T:TRAP:NEXUS:8d6
 K:DEFAULT:1:15
 #$ open floor
+K:HIT_TRAP:302:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6326,6 +6564,8 @@ W:24:3:20:0
 T:TRAP:CHAOS:8d6
 K:DEFAULT:1:24
 #$ open floor
+K:HIT_TRAP:303:5
+#$ glowing glyph
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6344,6 +6584,8 @@ W:21:3:20:0
 T:TRAP:DISENCHANT:8d6
 K:DEFAULT:1:21
 #$ open floor
+K:HIT_TRAP:304:5
+#$ ancient hex
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6406,8 +6648,6 @@ K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0
 #$ chasm
-K:TIMED:1:0
-#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN | FLOOR |
 F:LAKE | CAN_FLY |
 F:ATTR_LITE | TIMED |
@@ -6936,6 +7176,8 @@ K:BASH:315:4
 #$ broken chest
 K:CHASM:141:4
 #$ chasm
+K:HIT_TRAP:332:5
+#$ large wooden chest (murder hole)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6957,6 +7199,8 @@ K:DISARM:329:4
 #$ large wooden chest (locked)
 K:CHASM:141:4
 #$ chasm
+K:HIT_TRAP:333:5
+#$ large wooden chest (spring-loaded trap)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -6978,6 +7222,8 @@ K:DISARM:329:4
 #$ large wooden chest (locked)
 K:CHASM:141:4
 #$ chasm
+K:HIT_TRAP:334:5
+#$ large wooden chest (gas trap)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7130,6 +7376,8 @@ K:DISARM:338:6
 #$ small iron chest (locked)
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:341:5
+#$ small iron chest (magic symbol)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7151,6 +7399,8 @@ K:DISARM:338:6
 #$ small iron chest (locked)
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:342:5
+#$ small iron chest (tripwire)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7174,13 +7424,15 @@ K:HIT_TRAP:342:6
 #$ small iron chest (tripwire)
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:343:5
+#$ small iron chest (ancient hex)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D3 | DROP_GOOD | ATTR_LITE |
 
-N:344:small iron chest (explosive trap)
-G:&:b
+N:344:small iron chest (deadfall)
+G:&:m
 U:56
 #$ granite wall
 O:0
@@ -7195,6 +7447,8 @@ K:DISARM:338:6
 #$ small iron chest (locked)
 K:CHASM:141:6
 #$ chasm
+K:HIT_TRAP:344:5
+#$ small iron chest (deadfall)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | HAS_GOLD |
 F:TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7216,6 +7470,8 @@ K:SECRET:347:8
 #$ large iron chest (locked)
 K:CHASM:141:8
 #$ chasm
+K:HIT_TRAP:345:5
+#$ large iron chest
 F:LOS | PROJECT | MOVE | PLACE | SECRET | NOTICE | REMEMBER | OPEN | BASH |
 F:HAS_ITEM |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7321,6 +7577,8 @@ K:DISARM:347:8
 #$ large iron chest (locked)
 K:CHASM:141:8
 #$ chasm
+K:HIT_TRAP:350:5
+#$ large iron chest (magic symbol)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7342,6 +7600,8 @@ K:DISARM:347:8
 #$ large iron chest (locked)
 K:CHASM:141:8
 #$ chasm
+K:HIT_TRAP:351:5
+#$ large iron chest (tripwire)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7365,13 +7625,15 @@ K:DISARM:347:8
 #$ large iron chest (locked)
 K:CHASM:141:8
 #$ chasm
+K:HIT_TRAP:352:5
+#$ large iron chest (ancient hex)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D2 | DROP_1D3 | DROP_GOOD | ATTR_LITE |
 
-N:353:large iron chest (explosive trap)
-G:&:b
+N:353:large iron chest (deadfall)
+G:&:m
 U:56
 #$ granite wall
 O:0
@@ -7386,6 +7648,8 @@ K:DISARM:347:8
 #$ large iron chest (locked)
 K:CHASM:141:8
 #$ chasm
+K:HIT_TRAP:353:5
+#$ large iron chest (deadfall)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7512,6 +7776,8 @@ K:BASH:315:10
 #$ broken chest
 K:CHASM:141:10
 #$ chasm
+K:HIT_TRAP:359:5
+#$ small steel chest (demonic sign)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7535,6 +7801,8 @@ K:BASH:315:10
 #$ broken chest
 K:CHASM:141:10
 #$ chasm
+K:HIT_TRAP:360:5
+#$ small steel chest (ever burning eye)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7558,13 +7826,15 @@ K:BASH:315:10
 #$ broken chest
 K:CHASM:141:10
 #$ chasm
+K:HIT_TRAP:361:5
+#$ small steel chest (glowing glyph)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
-N:362:small steel chest (explosive trap)
-G:&:b
+N:362:small steel chest (strange rune)
+G:&:o
 U:56
 #$ granite wall
 O:0
@@ -7579,6 +7849,8 @@ K:DISARM:356:10
 #$ small steel chest (locked)
 K:CHASM:141:10
 #$ chasm
+K:HIT_TRAP:362:5
+#$ small steel chest (strange rune)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_GOLD | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7705,6 +7977,8 @@ K:BASH:315:12
 #$ broken chest
 K:CHASM:141:12
 #$ chasm
+K:HIT_TRAP:368:5
+#$ large steel chest (demonic sign)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -7722,8 +7996,8 @@ K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
 #$ large steel chest (locked)
-K:HIT_TRAP:368:12
-#$ large steel chest (demonic sign)
+K:HIT_TRAP:369:12
+#$ large steel chest (ever burning eye)
 K:BASH:315:12
 #$ broken chest
 K:CHASM:141:12
@@ -7745,8 +8019,8 @@ K:OPEN:366:12
 #$ large steel chest (open)
 K:DISARM:365:12
 #$ large steel chest (locked)
-K:HIT_TRAP:368:12
-#$ large steel chest (demonic sign)
+K:HIT_TRAP:370:12
+#$ large steel chest (glowing glyph)
 K:BASH:315:12
 #$ broken chest
 K:CHASM:141:12
@@ -7756,8 +8030,8 @@ F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | CHEST | DROP_1D2 | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
-N:371:large steel chest (explosive trap)
-G:&:b
+N:371:large steel chest (strange rune)
+G:&:o
 U:56
 #$ granite wall
 O:0
@@ -7772,6 +8046,8 @@ K:BASH:315:12
 #$ broken chest
 K:CHASM:141:12
 #$ chasm
+K:HIT_TRAP:371:5
+#$ large steel chest (strange rune)
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | OPEN | BASH | DISARM |
 F:HAS_ITEM | TRAP | HIT_TRAP |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -8278,8 +8554,6 @@ K:CHASM:403:0
 #$ deep salt water
 K:HURT_WATER:472:0
 #$ a wave breaking over sand
-K:TIMED:193:0
-#$ deep sand
 F:LOS | PROJECT | MOVE | PLACE | DROP |
 F:PATH | LAKE | CAN_CLIMB | CAN_FLY | KILL_MOVE |
 F:HURT_WATER | OUTSIDE | ATTR_LITE |
@@ -9137,8 +9411,6 @@ K:DEFAULT:1:0
 #$ open floor
 K:HURT_FIRE:162:0
 #$ smoke
-K:HURT_WATER:1:0
-#$ open floor
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN |
 F:PATH | LAKE | HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_MOVE |
 F:HURT_WATER | HURT_BWATER | ATTR_LITE |
@@ -10762,8 +11034,6 @@ K:PATH:415:0
 #$ open trail
 K:HURT_FIRE:413:0
 #$ fire
-K:NEED_TREE:414:0
-#$ open ground
 K:HURT_WATER:630:0
 #$ a wave breaking over shady ground
 F:LOS | PROJECT | MOVE | PLACE | DROP | RUN |
@@ -11113,8 +11383,6 @@ K:DEFAULT:141:0
 #$ chasm
 K:PATH:140:0
 #$ stone bridge
-K:NEED_TREE:141:0
-#$ chasm
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | MORE |
 F:PATH | RIVER | LAKE | HURT_FIRE | CHASM | CAN_FLY |
 F:MUST_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
@@ -12009,8 +12277,6 @@ K:CHASM:151:0
 #$ waterfall
 K:HURT_COLD:125:0
 #$ unstable ice wall
-K:INSTANT:126:0
-#$ falling water
 K:TIMED:938:0
 #$ rough water
 F:MOVE | DROP | NOTICE | REMEMBER | LESS |
@@ -12046,10 +12312,6 @@ K:DEFAULT:160:0
 #$ falling boiling water
 K:CHASM:227:0
 #$ boiling waterfall
-K:TREE:160:0
-#$ falling boiling water
-K:INSTANT:160:0
-#$ falling boiling water
 K:TIMED:942:0
 #$ steam over geothermal ground
 F:MOVE | PLACE | DROP | NOTICE | REMEMBER | LESS |
@@ -12070,10 +12332,6 @@ K:PATH:210:0
 #$ deep lava under a magma crust
 K:CHASM:214:0
 #$ lava fall
-K:TREE:161:0
-#$ falling lava
-K:INSTANT:161:0
-#$ falling lava
 F:MOVE | PLACE | NOTICE | REMEMBER | LESS |
 F:PATH | LAKE | GLOW | LAVA | DEEP | FILLED | HIDE_ITEM | HIDE_SWIM |
 F:OUTSIDE | ATTR_LITE | INSTANT |
@@ -12092,12 +12350,6 @@ K:CHASM:220:0
 #$ oil fall
 K:HURT_FIRE:191:0
 #$ falling burning oil
-K:USE_FEAT:190:0
-#$ falling oil
-K:TREE:190:0
-#$ falling oil
-K:INSTANT:190:0
-#$ falling oil
 F:MOVE | DROP | NOTICE | REMEMBER | LESS |
 F:LAKE | DEEP | FILLED | HURT_COLD | OIL | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT | SPREAD |
@@ -12116,10 +12368,6 @@ K:CHASM:186:0
 #$ burning oil fall
 K:TIMED:190:0
 #$ falling oil
-K:TREE:191:0
-#$ falling burning oil
-K:INSTANT:191:0
-#$ falling burning oil
 F:MOVE | DROP | NOTICE | REMEMBER | LESS |
 F:LAKE | DEEP | FILLED | HURT_COLD | OIL | CAN_SWIM | HIDE_ITEM | HIDE_SWIM |
 F:USE_FEAT | ATTR_LITE | INSTANT | TIMED | SPREAD |
@@ -12141,8 +12389,6 @@ K:HURT_WATER:485:0
 #$ the crest of a wave over deep water
 K:HURT_COLD:133:0
 #$ deep water under ice
-K:TREE:155:0
-#$ deep water
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER |
 F:PATH | RIVER | LAKE | WATER | DEEP | HURT_COLD | CAN_FLY | CAN_SWIM |
 F:HIDE_ITEM |
@@ -12521,8 +12767,6 @@ K:GET_FEAT:410:0
 #$ pebbles
 K:TREE:538:0
 #$ rock in the shade
-K:INSTANT:409:0
-#$ rock
 F:LOS | PROJECT | PLACE | DROP |
 F:WATER | DEEP | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:GET_FEAT | GROUND | OUTSIDE | EASY_CLIMB | ATTR_LITE |
@@ -12535,12 +12779,8 @@ K:DEFAULT:410:0
 #$ pebbles
 K:CHASM:141:0
 #$ chasm
-K:GET_FEAT:410:0
-#$ pebbles
 K:TREE:561:0
 #$ pebbles in the shade
-K:INSTANT:410:0
-#$ pebbles
 F:LOS | PROJECT | MOVE | PLACE | DROP |
 F:WATER | DEEP | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:GET_FEAT | GROUND | OUTSIDE | ATTR_LITE |
@@ -12693,8 +12933,6 @@ K:CHASM:141:0
 #$ chasm
 K:PATH:198:0
 #$ deep mud under a stone bridge
-K:TREE:201:0
-#$ deep mud
 K:HURT_WATER:484:0
 #$ the crest of a wave over hidden deep water
 K:HURT_COLD:199:0
@@ -12720,8 +12958,6 @@ K:CHASM:141:0
 #$ chasm
 K:PATH:198:0
 #$ deep mud under a stone bridge
-K:TREE:201:0
-#$ deep mud
 K:HURT_WATER:485:0
 #$ the crest of a wave over deep water
 K:HURT_COLD:199:0
@@ -14295,8 +14531,6 @@ K:DEFAULT:56:1
 #$ granite wall
 K:CHASM:141:1
 #$ chasm
-K:TREE:56:1
-#$ granite wall
 K:HURT_FIRE:502:1
 #$ fire
 K:SECRET:761:1
@@ -14537,8 +14771,6 @@ K:DEFAULT:56:40
 #$ granite wall
 K:CHASM:141:40
 #$ chasm
-K:TREE:56:40
-#$ granite wall
 K:SECRET:761:40
 #$ empty shelf
 K:DOOR:887:40
@@ -14622,8 +14854,6 @@ K:DEFAULT:1:1
 #$ open floor
 K:CHASM:141:1
 #$ chasm
-K:TREE:1:1
-#$ open floor
 K:SECRET:456:1
 #$ vines
 K:TUNNEL:456:1
@@ -14766,8 +14996,6 @@ K:OPEN:56:40
 #$ granite wall
 K:INNER:807:40
 #$ stone furnishings
-K:DOOR:1:40
-#$ open floor
 K:SOLID:924:40
 #$ coffers
 F:SECRET | NOTICE | REMEMBER | BASH | TUNNEL | WALL | OUTER |
@@ -14859,8 +15087,6 @@ K:DEFAULT:56:0
 #$ granite wall
 K:CHASM:141:0
 #$ chasm
-K:TREE:56:0
-#$ granite wall
 K:ADJACENT:739:0
 #$ closed lever on a granite wall
 K:PATH:1:0
@@ -14885,8 +15111,6 @@ K:DEFAULT:56:0
 #$ granite wall
 K:CHASM:141:0
 #$ chasm
-K:TREE:56:0
-#$ granite wall
 K:ADJACENT:738:0
 #$ open lever on a granite wall
 K:PATH:1:0
@@ -15451,8 +15675,6 @@ W:35:1:8:0
 T:TRAP:FIRE:4d6
 K:DEFAULT:790:0
 #$ burning wooden bridge over a chasm
-K:HURT_WATER:790:0
-#$ burning wooden bridge over a chasm
 F:LOS | PROJECT | MOVE | PLACE | DROP | REMEMBER | RUN |
 F:PATH | COVERED | HURT_FIRE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | OUTSIDE | ATTR_LITE | SPREAD |
@@ -15644,8 +15866,6 @@ G:x:G
 O:846
 W:48:1:8:0
 K:DEFAULT:800:0
-#$ vine hanging over a chasm
-K:KILL_HUGE:800:0
 #$ vine hanging over a chasm
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
@@ -15907,8 +16127,6 @@ O:0
 W:0:1:20:0
 K:DEFAULT:1:10
 #$ open floor
-K:MORE:1:10
-#$ open floor
 K:SECRET:816:10
 #$ empty well
 F:LOS | PROJECT | MOVE | SECRET | NOTICE | REMEMBER | STAIRS | MORE |
@@ -15923,8 +16141,6 @@ U:56
 O:0
 W:0:1:20:0
 K:DEFAULT:1:10
-#$ open floor
-K:MORE:1:10
 #$ open floor
 F:LOS | PROJECT | NOTICE | REMEMBER | STAIRS | MORE |
 F:HURT_ROCK | CAN_CLIMB | CAN_FLY | CAN_PASS | HIDE_SNEAK |
@@ -16166,8 +16382,6 @@ K:TREE:56:40
 #$ granite wall
 K:SOLID:830:40
 #$ web-covered granite wall
-K:DOOR:1:40
-#$ open floor
 F:REMEMBER | TUNNEL | WALL | OUTER |
 F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
@@ -16208,8 +16422,6 @@ K:SOLID:832:40
 #$ mossy granite wall
 K:STREAMER:56:40
 #$ granite wall
-K:DOOR:1:40
-#$ open floor
 F:REMEMBER | TUNNEL | STREAMER | WALL | OUTER |
 F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:LIVING | ATTR_LITE |
@@ -16248,8 +16460,6 @@ K:TREE:56:40
 #$ granite wall
 K:SOLID:834:40
 #$ scratched granite wall
-K:DOOR:1:40
-#$ open floor
 F:REMEMBER | TUNNEL | WALL | OUTER |
 F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
@@ -16290,8 +16500,6 @@ K:SOLID:836:40
 #$ roughly-hewn granite wall
 K:STREAMER:56:40
 #$ granite wall
-K:DOOR:1:40
-#$ open floor
 F:REMEMBER | TUNNEL | STREAMER | WALL | OUTER |
 F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
@@ -16374,8 +16582,6 @@ K:TREE:56:40
 #$ granite wall
 K:SOLID:840:40
 #$ icy granite wall
-K:DOOR:1:40
-#$ open floor
 K:STREAMER:115:40
 #$ cracked ice wall
 F:REMEMBER | TUNNEL | STREAMER | WALL | OUTER |
@@ -16780,8 +16986,6 @@ K:DEFAULT:572:0
 #$ closed valve
 K:CHASM:141:0
 #$ chasm
-K:TREE:572:0
-#$ closed valve
 F:NOTICE | REMEMBER | WALL |
 F:PATH |
 F:ATTR_LITE | INSTANT | ADJACENT |
@@ -16975,8 +17179,6 @@ K:DOOR:726:40
 #$ locked gate
 K:OPEN:870:40
 #$ opening sliding wall
-K:PATH:853:40
-#$ linked chain
 K:CHASM:780:40
 #$ chain bridge
 F:REMEMBER | OPEN | TUNNEL | WALL | OUTER |
@@ -17019,8 +17221,6 @@ K:TREE:49:40
 #$ pile of rubble
 K:ADJACENT:869:40
 #$ open sliding wall
-K:PATH:853:40
-#$ linked chain
 F:REMEMBER | TUNNEL |
 F:PATH | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
 F:EASY_CLIMB | ATTR_LITE | ADJACENT |
@@ -17040,8 +17240,6 @@ K:TREE:49:40
 #$ pile of rubble
 K:ADJACENT:868:40
 #$ sliding granite wall
-K:PATH:853:40
-#$ linked chain
 F:REMEMBER | TUNNEL |
 F:PATH | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
 F:EASY_CLIMB | ATTR_LITE | ADJACENT |
@@ -17083,8 +17281,6 @@ K:INSTANT:876:0
 #$ cracked floor
 K:LESS:874:0
 #$ trembling pile of rubble
-K:MORE:136:0
-#$ broken floor
 F:LOS | PROJECT | REMEMBER | MORE |
 F:LAKE | CAN_CLIMB | CAN_FLY |
 F:EASY_CLIMB | ATTR_LITE | INSTANT |
@@ -17285,8 +17481,6 @@ K:DEFAULT:56:1
 #$ granite wall
 K:CHASM:141:1
 #$ chasm
-K:TREE:56:1
-#$ granite wall
 K:HURT_FIRE:502:1
 #$ fire
 K:SECRET:32:1
@@ -17308,8 +17502,6 @@ K:DEFAULT:56:1
 #$ granite wall
 K:CHASM:141:1
 #$ chasm
-K:TREE:56:1
-#$ granite wall
 K:HURT_FIRE:502:1
 #$ fire
 K:SECRET:882:1
@@ -17331,8 +17523,6 @@ K:DEFAULT:56:1
 #$ granite wall
 K:CHASM:141:1
 #$ chasm
-K:TREE:56:1
-#$ granite wall
 K:HURT_FIRE:502:1
 #$ fire
 K:SECRET:882:1
@@ -17377,8 +17567,6 @@ K:DEFAULT:56:40
 #$ granite wall
 K:CHASM:141:40
 #$ chasm
-K:TREE:56:40
-#$ granite wall
 K:SECRET:32:40
 #$ door
 K:HURT_ACID:32:40
@@ -17400,8 +17588,6 @@ K:DEFAULT:56:40
 #$ granite wall
 K:CHASM:141:40
 #$ chasm
-K:TREE:56:40
-#$ granite wall
 K:SECRET:761:40
 #$ empty shelf
 K:HURT_ACID:821:40
@@ -17423,8 +17609,6 @@ K:DEFAULT:56:40
 #$ granite wall
 K:CHASM:141:40
 #$ chasm
-K:TREE:56:40
-#$ granite wall
 K:SECRET:761:40
 #$ empty shelf
 K:HURT_ACID:821:40
@@ -18258,8 +18442,6 @@ K:CHASM:151:0
 #$ waterfall
 K:TREE:133:0
 #$ deep water under ice
-K:ERUPT:931:0
-#$ deep icy water
 K:TIMED:125:0
 #$ unstable ice wall
 F:LOS | PROJECT | MOVE | PLACE | DROP | BASH |
@@ -18691,10 +18873,12 @@ U:56
 #$ granite wall
 O:0
 W:20:2:20:0
-T:LINE_LOS
+T:LINE_LOS:
 S:BALL_LITE
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:957:5
+#$ shaft of light
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18708,6 +18892,8 @@ O:0
 W:5:2:20:0
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:958:5
+#$ upwards draft
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18723,6 +18909,8 @@ W:25:2:20:0
 S:ARC_FORCE
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:959:5
+#$ demonic sign
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18740,6 +18928,8 @@ W:50:2:20:0
 S:ARC_HFIRE
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:960:5
+#$ demonic sign
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18755,6 +18945,8 @@ W:8:2:20:0
 T:TRAP:HURT:9d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:961:5
+#$ deadfall
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18772,6 +18964,8 @@ W:16:2:20:0
 T:TRAP:HURT:27d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:962:5
+#$ deadfall
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18789,6 +18983,8 @@ W:4:2:20:0
 T:TRAP:HURT:3d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:963:5
+#$ deadfall
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18806,6 +19002,8 @@ W:2:2:20:0
 T:TRAP:HURT:1d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:964:5
+#$ deadfall
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18822,6 +19020,8 @@ O:0
 W:1:2:20:0
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:965:5
+#$ deadfall
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18837,6 +19037,8 @@ W:10:2:20:0
 T:TRAP:HURT:5d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:966:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18854,6 +19056,8 @@ W:15:2:20:0
 T:TRAP:HURT:15d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:967:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18871,6 +19075,8 @@ W:20:2:20:0
 T:TRAP:HURT:25d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:968:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18888,6 +19094,8 @@ W:30:2:20:0
 T:TRAP:HURT:50d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:969:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18905,6 +19113,8 @@ W:50:2:20:0
 T:TRAP:HURT:75d6
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:970:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18919,6 +19129,8 @@ O:0
 W:50:2:20:0
 K:DEFAULT:1:70
 #$ open floor
+K:HIT_TRAP:971:5
+#$ clockwork mechanism
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
@@ -18940,6 +19152,9 @@ K:CHASM:141:0
 K:TREE:541:0
 #$ shady ground
 K:SECRET:972:0
+#$ invisible trap
+K:HIT_TRAP:972:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -18958,8 +19173,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:973:0
 #$ shady ground
+K:SECRET:973:0
+#$ invisible trap
+K:HIT_TRAP:973:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -18978,8 +19196,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:974:0
 #$ shady ground
+K:SECRET:974:0
+#$ invisible trap
+K:HIT_TRAP:974:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -18998,8 +19219,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:975:0
 #$ shady ground
+K:SECRET:975:0
+#$ invisible trap
+K:HIT_TRAP:975:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -19018,8 +19242,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:976:0
 #$ shady ground
+K:SECRET:976:0
+#$ invisible trap
+K:HIT_TRAP:976:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -19038,8 +19265,11 @@ K:DEFAULT:1:0
 K:CHASM:141:0
 #$ chasm
 K:TREE:541:0
-K:SECRET:977:0
 #$ shady ground
+K:SECRET:977:0
+#$ invisible trap
+K:HIT_TRAP:977:5
+#$ invisible trap
 F:LOS | PROJECT | MOVE | SECRET | TRAP | RUN | HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:PICK_TRAP | ATTR_LITE |
@@ -19061,6 +19291,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:978:5
+#$ trapped door (surreal painting)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19082,6 +19314,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:979:5
+#$ trapped door (ever burning eye)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:GLOW | HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19103,6 +19337,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:980:5
+#$ trapped door (upwards draft)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19124,6 +19360,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:981:5
+#$ trapped door (deadfall)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19135,6 +19373,7 @@ U:56
 #$ granite wall
 O:0
 W:15:9:20:0
+T:LINE_LOS:
 K:DEFAULT:1:5
 #$ open floor
 K:BASH:5:5
@@ -19145,7 +19384,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
-T:LINE_LOS
+K:HIT_TRAP:982:5
+#$ trapped door (shaft of light)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19167,6 +19407,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:983:5
+#$ trapped door (glowing glyph)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:GLOW | HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19188,6 +19430,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:984:5
+#$ trapped door (demonic sign)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19209,6 +19453,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:985:5
+#$ trapped door (Radagast's snare)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19230,6 +19476,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:986:5
+#$ trapped door (siege engine)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19251,6 +19499,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:987:5
+#$ trapped door (clockwork mechanism)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19272,6 +19522,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:988:5
+#$ trapped door (mark of a white hand)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |
@@ -19293,6 +19545,8 @@ K:DISARM:4:5
 #$ open door
 K:CHASM:141:5
 #$ chasm
+K:HIT_TRAP:989:5
+#$ trapped door (shimmering portal)
 F:NOTICE | REMEMBER | OPEN | BASH | SPIKE | DISARM | TUNNEL | DOOR | TRAP |
 F:HIT_TRAP |
 F:HURT_ROCK | CAN_CLIMB | CAN_PASS |

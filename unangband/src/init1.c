@@ -9761,7 +9761,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
 	for (n = 0; n < MAX_FEAT_STATES; n++)
 	{
  		if (f_ptr->state[n].action == FS_FLAGS_END) break;
- 		if (f_ptr->state[n].result == i) continue;
+ 		if (f_ptr->state[n].result == f_ptr->defaults) continue;
 
 		fprintf(fp,"K:%s:%d:%d\n", f_ptr->state[n].action < 32 ? f_info_flags1[f_ptr->state[n].action] :
 							 (f_ptr->state[n].action < 64 ? f_info_flags2[f_ptr->state[n].action - 32] :
