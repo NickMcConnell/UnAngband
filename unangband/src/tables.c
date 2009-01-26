@@ -2858,7 +2858,7 @@ const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2] =
 	  {75, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Antidotes – holds low powered curing potions */
+	/* Bag of Antidotes - holds low powered curing potions */
 	{ {75, 26}, {75, 27}, {75, 28}, {75, 31},
 	  {75, 30}, {75, 34}, {75, 35}, {75, 41},
 	  {75, 42}, {75, 43}, {75, 44}, {75, 45},
@@ -2893,42 +2893,42 @@ const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2] =
 	  {70, 48}, {70, 61}, {70, 65}, {70, 66},
 	  {70, 73}, {70, 77}, {70, 78}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Hedge Magics – holds less useful scrolls */
+	/* Bag of Hedge Magics - holds less useful scrolls */
 	{ {70, 8}, {70, 9}, {70, 10}, {70, 11},
 	  {70, 22}, {70, 24}, {70, 32}, {70, 33},
 	  {70, 34}, {70, 35}, {70, 37}, {70, 39},
 	  {70, 59}, {70, 60}, {70, 62}, {70, 64},
 	  {70, 76}, {70, 79}, {70, 80}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Enchantments – holds enchantment scrolls */
+	/* Bag of Enchantments - holds enchantment scrolls */
 	{ {70, 14}, {70, 16}, {70, 17}, {70, 18},
 	  {70, 20}, {70, 21}, {70, 49}, {70, 50},
 	  {70, 51}, {70, 53}, {70, 54}, {70, 55},
 	  {70, 56}, {70, 57}, {70, 58}, {70, 67},
 	  {70, 68}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Eldritch Magics – holds powerful scrolls */
+	/* Bag of Eldritch Magics - holds powerful scrolls */
 	{ {70, 13}, {70, 15}, {70, 38}, {70, 41},
 	  {70, 42}, {70, 44}, {70, 45}, {70, 46},
 	  {70, 47}, {70, 63}, {70, 70}, {70, 71},
 	  {70, 72}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Lesser Runes – holds weaker runes */
+	/* Bag of Lesser Runes - holds weaker runes */
 	{ {93, 1}, {93, 3}, {93, 5}, {93, 7},
 	  {93, 11}, {93, 12}, {93, 13}, {93, 14},
 	  {93, 15}, {93, 16}, {93, 19}, {93, 21},
 	  {93, 22}, {93, 25}, {93, 26}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Greater Runes – holds more powerful runes */
+	/* Bag of Greater Runes - holds more powerful runes */
 	{ {93, 2}, {93, 4}, {93, 6}, {93, 8},
 	  {93, 9}, {93, 10}, {93, 17}, {93, 18},
 	  {93, 20}, {93, 23}, {93, 24}, {93, 27},
 	  {93, 28}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
-	/* Bag of Maps – holds maps */
+	/* Bag of Maps - holds maps */
 	{ {72, 41}, {72, 29}, {72, 40}, {72, 27},
 	  {72, 33}, {72, 7}, {72, 43}, {72, 44},
 	  {72, 45}, {72, 46}, {72, 59}, {0, 0},
