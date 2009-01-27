@@ -859,7 +859,7 @@ static void display_knowledge_start_at(
 	if (!grp_cnt)
 			prt(format("No %s known.", title), 15, 0);
 
-	FREE((char**)g_names);
+	FREE(g_names);
 	FREE(g_offset);
 	FREE(g_list);
 }

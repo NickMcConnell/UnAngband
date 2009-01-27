@@ -604,7 +604,7 @@ static infoclr *clr[256];
 /*
  * Color info (unused, red, green, blue).
  */
-static byte color_table[256][4];
+static byte color_table_xpj[256][4];
 
 /*
  * The "blank" pixel - used for transparency
@@ -1741,24 +1741,24 @@ static errr Term_xtra_xpj_react(void)
 		/* Check the colors */
 		for (i = 0; i < 256; i++)
 		{
-			if ((color_table[i][0] != angband_color_table[i][0]) ||
-			    (color_table[i][1] != angband_color_table[i][1]) ||
-			    (color_table[i][2] != angband_color_table[i][2]) ||
-			    (color_table[i][3] != angband_color_table[i][3]))
+			if ((color_table_xpj[i][0] != angband_color_table[i][0]) ||
+			    (color_table_xpj[i][1] != angband_color_table[i][1]) ||
+			    (color_table_xpj[i][2] != angband_color_table[i][2]) ||
+			    (color_table_xpj[i][3] != angband_color_table[i][3]))
 			{
 				Pixell pixel;
 
 				/* Save new values */
-				color_table[i][0] = angband_color_table[i][0];
-				color_table[i][1] = angband_color_table[i][1];
-				color_table[i][2] = angband_color_table[i][2];
-				color_table[i][3] = angband_color_table[i][3];
+				color_table_xpj[i][0] = angband_color_table[i][0];
+				color_table_xpj[i][1] = angband_color_table[i][1];
+				color_table_xpj[i][2] = angband_color_table[i][2];
+				color_table_xpj[i][3] = angband_color_table[i][3];
 
 				/* Create pixel */
 				pixel = create_pixel(Metadpy->dpy,
-				                     color_table[i][1],
-				                     color_table[i][2],
-				                     color_table[i][3]);
+				                     color_table_xpj[i][1],
+				                     color_table_xpj[i][2],
+				                     color_table_xpj[i][3]);
 
 				/* Change the foreground */
 				Infoclr_set(clr[i]);
@@ -3266,10 +3266,10 @@ errr init_xpj(int argc, char **argv)
 		Infoclr_set(clr[i]);
 
 		/* Acquire Angband colors */
-		color_table[i][0] = angband_color_table[i][0];
-		color_table[i][1] = angband_color_table[i][1];
-		color_table[i][2] = angband_color_table[i][2];
-		color_table[i][3] = angband_color_table[i][3];
+		color_table_xpj[i][0] = angband_color_table[i][0];
+		color_table_xpj[i][1] = angband_color_table[i][1];
+		color_table_xpj[i][2] = angband_color_table[i][2];
+		color_table_xpj[i][3] = angband_color_table[i][3];
 
 		/* Default to monochrome */
 		pixel = ((i == 0) ? Metadpy->bg : Metadpy->fg);
@@ -3279,9 +3279,9 @@ errr init_xpj(int argc, char **argv)
 		{
 			/* Create pixel */
 			pixel = create_pixel(Metadpy->dpy,
-			                     color_table[i][1],
-			                     color_table[i][2],
-			                     color_table[i][3]);
+			                     color_table_xpj[i][1],
+			                     color_table_xpj[i][2],
+			                     color_table_xpj[i][3]);
 		}
 
 		/* Initialize the color */
