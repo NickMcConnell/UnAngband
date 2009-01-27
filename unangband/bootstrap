@@ -27,5 +27,5 @@ fi
 rm -rf autom4te.cache
 
 # Fire up autotools
-libtoolize --force --copy && aclocal $ACLOCAL_FLAGS && autoheader && automake --include-deps --add-missing --foreign --copy -Wno-portability && autoconf 
+libtoolize --force --copy && aclocal $ACLOCAL_FLAGS && autoheader && automake --add-missing --copy -Wno-portability && autoconf 
 
