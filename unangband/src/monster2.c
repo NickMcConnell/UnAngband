@@ -3157,7 +3157,7 @@ int calc_monster_ac(int m_idx, bool ranged)
 	if ((r_ptr->flags2 & (RF2_ARMOR)) && (ranged))
 	{
 		/* Notice this */
-		if ((m_ptr->ml) && (!l_ptr->flags2 & (RF2_ARMOR))) l_ptr->flags2 |= (RF2_ARMOR);
+		if ((m_ptr->ml) && (!(l_ptr->flags2 & (RF2_ARMOR)))) l_ptr->flags2 |= (RF2_ARMOR);
 
 		/* Hack -- assume a shield provides 1/4 of overall base ac */
 		ac += r_ptr->ac / 4;

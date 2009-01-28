@@ -9195,7 +9195,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 						p_ptr->disease |= (1 << rand_int(DISEASE_TYPES));
 						p_ptr->disease |= (DISEASE_DISEASE);
 					}
-					else if (!p_ptr->disease & (DISEASE_HEAVY | DISEASE_QUICK | DISEASE_POWER)) p_ptr->disease |= (DISEASE_DISEASE);
+					else if (!(p_ptr->disease & (DISEASE_HEAVY | DISEASE_QUICK | DISEASE_POWER))) p_ptr->disease |= (DISEASE_DISEASE);
 					p_ptr->disease &= ~(DISEASE_LIGHT);
 				}
 				/* Moderate disease - 1 disease effect for a long time, or multiple for a short time */
@@ -9960,7 +9960,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are buffeted by winds!");
 			if (dam > randint(200))
 			{
-				if ((!p_ptr->cur_flags2 & (TR2_RES_CONFU)) || (!rand_int(6)))
+				if ((!(p_ptr->cur_flags2 & (TR2_RES_CONFU))) || (!rand_int(6)))
 				{
 					msg_print("You are spun until dizzy!");
 					(void)set_confused(p_ptr->confused + rand_range(2, 3));
