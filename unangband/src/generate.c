@@ -3838,7 +3838,7 @@ static void set_irregular_room_info(int room, int type, bool light, u32b exclude
 			if ((place_flag & (RG1_RANDOM)) != 0)
 			{
 				if (*n_pools >= 2) exclude |= RG1_RANDOM;
-				*pool[(*n_pools)++] = place_feat;
+				(*pool)[(*n_pools)++] = place_feat;
 			}
 		}
 	}
