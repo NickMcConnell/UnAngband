@@ -68,13 +68,6 @@ int usleep(huge usecs)
 
 
 /*
- * Hack -- External functions
- */
-extern struct passwd *getpwuid();
-extern struct passwd *getpwnam();
-
-
-/*
  * Find a default user name from the system.
  */
 void user_name(char *buf, size_t len, int id)

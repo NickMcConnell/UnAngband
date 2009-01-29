@@ -5898,7 +5898,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 				if (this_o_idx) break;
 
 				/* Use a preposition */
-				if (m_ptr->mflag && (MFLAG_OVER))
+				if (m_ptr->mflag & (MFLAG_OVER))
 				{
 					s2 = "above ";
 				}
