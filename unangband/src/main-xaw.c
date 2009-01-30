@@ -531,6 +531,9 @@ static void AngbandOutputPict(AngbandWidget widget, int x, int y, int n,
  */
 static void Initialize(AngbandWidget request, AngbandWidget wnew)
 {
+	/* Unused parameter */
+	(void)request;
+	
 	Display *dpy = XtDisplay(wnew);
 
 	int depth = DefaultDepthOfScreen(XtScreen((Widget) wnew));

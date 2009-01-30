@@ -176,8 +176,8 @@ fi
 
 dnl add some warning flags
 CFLAGS="$CFLAGS -Wall -Wextra -Wformat=0 -Wlogical-op -Wredundant-decls -Wnested-externs"
-dnl some other warnings to test: -Wshadow -Wc++-compat
-dnl generates lots of warnings: -Wconversion
+dnl some other warnings to test: -Wc++-compat -Wno-multichar
+dnl generates lots of warnings: -Wconversion -Wshadow
 dnl unimportant: -Wpointer-arith -Waddress
 dnl don't bother: -Waggregate-return -Wstrict-prototypes -Wpointer-sign
 dnl produces lots of dodgy warnings: -Wunreachable-code

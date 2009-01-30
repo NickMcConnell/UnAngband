@@ -1775,6 +1775,9 @@ static void copy_x11_cont(int x, int y, unsigned int buttons)
  */
 static void handle_button(Time time, int x, int y, int button, bool press)
 {
+	/* Unused parameter */
+	(void)time;
+	
 	/* The co-ordinates are only used in Angband format. */
 	pixel_to_square(&x, &y, x, y);
 
