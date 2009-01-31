@@ -1257,7 +1257,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
  * Note the reckless use of a global for breath weapons.
  *
  */
-bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char buf[40])
+bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char *buf, int buf_size)
 {
 	int method = blow_ptr->method;
 	method_type *method_ptr = &method_info[method];
@@ -1266,7 +1266,6 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char b
 	int d3 = blow_ptr->d_plus;
 	int d4 = 0;
 	int d5 = 0;
-	int buf_s = sizeof(buf);
 
 	/* Initialise the buffer */
 	buf[0] = '\0';
@@ -1347,8 +1346,8 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char b
 		if (max)
 		{
 			/* End */
-			if (max != min) my_strcpy(buf, format("%d-%d", min, max), buf_s);
-			else my_strcpy(buf, format("%d", max), buf_s);
+			if (max != min) my_strcpy(buf, format("%d-%d", min, max), buf_size);
+			else my_strcpy(buf, format("%d", max), buf_size);
 		}
 
 		/* We are done */
@@ -1359,12 +1358,12 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char b
 	if ((d1) && (d2))
 	{
 		/* End */
-		my_strcpy(buf,format("%dd%d",d1,d2), buf_s);
+		my_strcpy(buf,format("%dd%d",d1,d2), buf_size);
 	}
 	else if (d3)
 	{
 		/* End */
-		my_strcpy(buf,format("%d",d3), buf_s);
+		my_strcpy(buf,format("%d",d3), buf_size);
 
 		/* We are done */
 		return (TRUE);
@@ -1374,14 +1373,14 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char b
 	if ((d4) && (d5))
 	{
 		/* End */
-		my_strcat(buf,format("+%dd%d",d1,d2), buf_s);
+		my_strcat(buf,format("+%dd%d",d1,d2), buf_size);
 	}
 
 	/* Add the damage plus */
 	if (d3)
 	{
 		/* End */
-		my_strcat(buf,format("+%d",d3), buf_s);
+		my_strcat(buf,format("+%d",d3), buf_size);
 
 		/* We are done */
 		return (TRUE);
@@ -1604,7 +1603,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				}
 			}
 			/* Get the description */
-			else if (spell_desc_damage(blow_ptr, target, level, buf))
+			else if (spell_desc_damage(blow_ptr, target, level, buf, 40))
 			{
 				text_out(format(" %s %s %s", p[5], buf, p[6]));
 			}
@@ -1706,7 +1705,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 			}
 		}
 		/* Get the description */
-		else if (spell_desc_damage(blow_ptr, SPELL_TARGET_NORMAL, level, buf))
+		else if (spell_desc_damage(blow_ptr, SPELL_TARGET_NORMAL, level, buf, 40))
 		{
 			my_strcpy(p, format(" %s %s", buf, q), p_s);
 		}
@@ -3279,7 +3278,7 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Basic abilities -- damage/ damage multiplier */
 	if (!random && o_ptr->dd && o_ptr->ds)
 	{
-		bool throw = TRUE;
+		bool throw_it = TRUE;
 
 		/* Handle melee & throwing weapon damage. Ammunition handled later. */
 		switch (o_ptr->tval)
@@ -3295,18 +3294,18 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_POTION:
 			case TV_FLASK:
 				/* Hack -- display throwing damage later */
-				throw = FALSE;
+				throw_it = FALSE;
 				break;
 			case TV_SPELL:
 				/* Never thrown */
-				throw = FALSE;
+				throw_it = FALSE;
 				break;
 			default:
 				text_out(format("When %sthrown, it ", (f5 & TR5_THROWING) ? "easily " : ""));
 				break;
 		}
 
-		if (throw)
+		if (throw_it)
 		{
 			text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
 			if (object_bonus_p(o_ptr) || spoil)
