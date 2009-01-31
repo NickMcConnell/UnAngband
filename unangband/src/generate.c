@@ -2358,7 +2358,8 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 				/* Extend north and south */
 				if (temp_flags)
 				{
-					y0--; y3++;
+					if(temp_flags & MAZE_OUTER_N) y0--;
+					if(temp_flags & MAZE_OUTER_S) y3++;
 
 					/* Add extra flags */
 					maze_flags |= temp_flags;
@@ -2376,10 +2377,11 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
 					if (((maze_flags & (MAZE_OUTER_E)) == 0) && (x3 < DUNGEON_WID-1) && ((f_info[cave_feat[y][x3+1]].flags1 & (FF1_OUTER | FF1_SOLID)) != 0)) temp_flags |= MAZE_OUTER_E;
 				}
 
-				/* Extend north and south */
+				/* Extend east and west */
 				if (temp_flags)
 				{
-					y0--; y3++;
+					if(temp_flags & MAZE_OUTER_W) x0--;
+					if(temp_flags & MAZE_OUTER_E) x3++;
 
 					/* Add extra flags */
 					maze_flags |= temp_flags;
@@ -6048,7 +6050,7 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 	cptr t;
 
 	bool old_ecology = cave_ecology.ready;
-	int old_num_ecologies = cave_ecology.num_ecologies;
+	const int old_num_ecologies = cave_ecology.num_ecologies;
 	int new_num_ecologies = old_num_ecologies;
 
 	/* Allow any monster */
