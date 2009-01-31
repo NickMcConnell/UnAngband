@@ -10911,7 +10911,7 @@ static bool cave_gen(void)
 
 	/* Global data */
 	dun = &dun_body;
-	WIPE(dun, dun_data*);
+	WIPE(dun, dun_data);
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
