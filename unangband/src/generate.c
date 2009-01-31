@@ -10911,6 +10911,7 @@ static bool cave_gen(void)
 
 	/* Global data */
 	dun = &dun_body;
+	WIPE(dun, dun_data*);
 
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
@@ -11044,13 +11045,14 @@ static bool cave_gen(void)
 
 	/* Hack -- Build terrain */
 	/* XXX Get rid of this later */
-	if ((zone->fill) && (!dun->special) && (base != FEAT_CHASM)) for (y = 0; y < DUNGEON_HGT; y++)
-	{
-		for (x = 0; x < DUNGEON_WID; x++)
+	if ((zone->fill) && (!dun->special) && (base != FEAT_CHASM))
+		for (y = 0; y < DUNGEON_HGT; y++)
 		{
-			build_terrain(y,x,zone->fill);
+			for (x = 0; x < DUNGEON_WID; x++)
+			{
+				build_terrain(y,x,zone->fill);
+			}
 		}
-	}
 
 	/* Build wilderness borders */
 	if ((level_flag & (LF1_WILD)) != 0)

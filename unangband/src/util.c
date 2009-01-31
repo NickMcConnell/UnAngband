@@ -1255,10 +1255,10 @@ errr macro_add(cptr pat, cptr act)
 errr macro_init(void)
 {
 	/* Macro patterns */
-	macro__pat = C_ZNEW(MACRO_MAX, cptr);
+	macro__pat = (char**)C_ZNEW(MACRO_MAX, cptr);
 
 	/* Macro actions */
-	macro__act = C_ZNEW(MACRO_MAX, cptr);
+	macro__act = (char**)C_ZNEW(MACRO_MAX, cptr);
 
 	/* Success */
 	return (0);
@@ -1553,9 +1553,9 @@ char (*inkey_hack)(int flush_first) = NULL;
  */
 key_event inkey_ex(void)
 {
-	key_event kk;
+	key_event kk = {0, 0, 0, 0};
 
-	key_event ke;
+	key_event ke = {0, 0, 0, 0};
 
 	bool done = FALSE;
 
@@ -1996,7 +1996,7 @@ cptr quark_str(s16b i)
 errr quarks_init(void)
 {
 	/* Quark variables */
-	quark__str = C_ZNEW(QUARK_MAX, cptr);
+	quark__str = (char**)C_ZNEW(QUARK_MAX, cptr);
 
 	/* Success */
 	return (0);
