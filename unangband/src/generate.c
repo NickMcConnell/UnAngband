@@ -1953,7 +1953,6 @@ static bool mark_starburst_shape(int y1, int x1, int y2, int x2, u32b flag)
 	}
 
 	/* Neaten up final arc of circle by comparing it to the first. */
-	if (TRUE)
 	{
 		int diff = arc[arc_num - 1][1] - arc[0][1];
 

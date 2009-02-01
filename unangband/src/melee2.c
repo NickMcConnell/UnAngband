@@ -1805,7 +1805,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 	/* Know player racial abilities if smart or a playable race */
 	else if ((r_ptr->flags2 & (RF2_SMART)) || (r_ptr->flags3 & (RF3_ORC | RF3_TROLL)) ||
-		(r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) || (r_ptr->d_char = 'h'))
+		(r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) || (r_ptr->d_char == 'h'))
 	{
 		update_smart_racial(m_idx);
 	}

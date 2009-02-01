@@ -1483,7 +1483,7 @@ static u32b add_name(header *head, cptr buf)
  */
 errr parse_z_info(char *buf, header *head)
 {
-	maxima *z_info = head->info_ptr;
+	maxima *z_info = (maxima*)head->info_ptr;
 
 	/* Hack - Verify 'M:x:' format */
 	if (buf[0] != 'M') return (PARSE_ERROR_UNDEFINED_DIRECTIVE);
@@ -1979,8 +1979,6 @@ static errr grab_one_method_flag(method_type *method_ptr, cptr what)
 
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
-
-	return (0);
 }
 
 
@@ -2366,8 +2364,6 @@ static errr grab_one_effect_flag(effect_type *effect_ptr, cptr what)
 
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
-
-	return (0);
 }
 
 
@@ -2542,8 +2538,6 @@ static errr grab_one_region_flag(region_info_type *region_ptr, cptr what)
 
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
-
-	return (0);
 }
 
 
@@ -4067,7 +4061,7 @@ static errr build_prob(char *name, names_type *n_ptr)
  */
 errr parse_n_info(char *buf, header *head)
 {
-	names_type *n_ptr = head->info_ptr;
+	names_type *n_ptr = (names_type*)head->info_ptr;
 
 	/*
 	 * This function is called once, when the raw file does not exist.
@@ -8919,7 +8913,7 @@ errr eval_f_power(header *head)
  *
  * We parse the previous "template" file to allow us to include comments.
  */
-errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
+errr emit_info_txt(FILE *fp, FILE *atemplate, char *buf, header *head,
    emit_info_txt_index_func emit_info_txt_index, emit_info_txt_always_func emit_info_txt_always)
 {
 	errr err;
@@ -8936,7 +8930,7 @@ errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
 	error_line = 0;
 
 	/* Parse */
-	while (0 == my_fgets(template, buf, 1024))
+	while (0 == my_fgets(atemplate, buf, 1024))
 	{
 		/* Advance the line number */
 		error_line++;

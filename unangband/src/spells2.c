@@ -4878,7 +4878,7 @@ void earthquake(int cy, int cx, int r)
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int t, y, x, yy, xx, dy, dx;
+	int t, yy, xx, dy, dx;
 
 	bool hurt = FALSE;
 
@@ -4888,12 +4888,15 @@ void earthquake(int cy, int cx, int r)
 	/* Paranoia -- Enforce maximum range */
 	if (r > 12) r = 12;
 
-	/* Clear the "maximal blast" area */
-	for (y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 32; x++)
+		int x, y;
+		/* Clear the "maximal blast" area */
+		for (y = 0; y < 32; y++)
 		{
-			map[y][x] = FALSE;
+			for (x = 0; x < 32; x++)
+			{
+				map[y][x] = FALSE;
+			}
 		}
 	}
 
@@ -4916,10 +4919,10 @@ void earthquake(int cy, int cx, int r)
 			cave_info[yy][xx] &= ~(CAVE_ROOM);
 
 			/* Lose light */
-			cave_info[y][x] &= ~(CAVE_GLOW);
+			cave_info[yy][xx] &= ~(CAVE_GLOW);
 
 			/* Lose light */
-			play_info[y][x] &= ~(PLAY_MARK);
+			play_info[yy][xx] &= ~(PLAY_MARK);
 
 			/* Skip the epicenter */
 			if (!dx && !dy) continue;

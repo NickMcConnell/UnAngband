@@ -316,7 +316,7 @@ static errr init_names(void)
 
 	/* Allocate the "names" array */
 	/* ToDo: Make sure the memory is freed correctly in case of errors */
-	names = C_ZNEW(z_info->a_max, cptr);
+	names = (char**)C_ZNEW(z_info->a_max, cptr);
 
 	for (i = 1 ; i < z_info->a_max; i++)
 	{
@@ -1235,7 +1235,7 @@ static void store_base_power (void)
 static struct item_choice {
 	int threshold;
 	int tval;
-	char *report;
+	const char *report;
 } item_choices[] = {
 	{  6, TV_BOW,		"a missile weapon"},
 	{  9, TV_DIGGING,	"a digger"},
@@ -3860,8 +3860,8 @@ static void add_to_AC(artifact_type *a_ptr, int fixed, int random)
 		/* Strongly inhibit */
 		if (rand_int(INHIBIT_STRONG) > 0)
 		{
-			return;
 			LOG_PRINT1("Failed to add to-AC, value of %d is too high\n", a_ptr->to_a);
+			return;
 		}
 	}
 	else if (a_ptr->to_a > 25)

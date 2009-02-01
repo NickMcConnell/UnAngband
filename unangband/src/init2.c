@@ -425,7 +425,7 @@ static errr init_info_raw(int fd, header *head)
 	head->info_ptr = C_ZNEW(head->info_size, char);
 
 	/* Read the "*_info" array */
-	fd_read(fd, head->info_ptr, head->info_size);
+	fd_read(fd, (char*)head->info_ptr, head->info_size);
 
 	if (head->name_size)
 	{
@@ -680,7 +680,7 @@ static errr init_info(cptr filename, header *head)
 			fd_write(fd, (cptr)head, head->head_size);
 
 			/* Dump the "*_info" array */
-			fd_write(fd, head->info_ptr, head->info_size);
+			fd_write(fd, (char*)head->info_ptr, head->info_size);
 
 			/* Dump the "*_name" array */
 			fd_write(fd, head->name_ptr, head->name_size);
@@ -776,7 +776,7 @@ static errr init_z_info(void)
 	err = init_info("limits", &z_head);
 
 	/* Set the global variables */
-	z_info = z_head.info_ptr;
+	z_info = (maxima*)z_head.info_ptr;
 
 	return (err);
 }
@@ -808,7 +808,7 @@ static errr init_d_info(void)
 	err = init_info("room", &d_head);
 
 	/* Set the global variables */
-	d_info = d_head.info_ptr;
+	d_info = (desc_type*)d_head.info_ptr;
 	d_name = d_head.name_ptr;
 	d_text = d_head.text_ptr;
 
@@ -842,7 +842,7 @@ static errr init_method_info(void)
 	err = init_info("blows", &method_head);
 
 	/* Set the global variables */
-	method_info = method_head.info_ptr;
+	method_info = (method_type*)method_head.info_ptr;
 	method_name = method_head.name_ptr;
 	method_text = method_head.text_ptr;
 
@@ -876,7 +876,7 @@ static errr init_effect_info(void)
 	err = init_info("effect", &effect_head);
 
 	/* Set the global variables */
-	effect_info = effect_head.info_ptr;
+	effect_info = (effect_type*)effect_head.info_ptr;
 	effect_name = effect_head.name_ptr;
 	effect_text = effect_head.text_ptr;
 
@@ -904,7 +904,7 @@ static errr init_region_info(void)
 	err = init_info("region", &region_head);
 
 	/* Set the global variables */
-	region_info = region_head.info_ptr;
+	region_info = (region_info_type*)region_head.info_ptr;
 	region_name = region_head.name_ptr;
 	region_text = region_head.text_ptr;
 
@@ -938,7 +938,7 @@ static errr init_f_info(void)
 	err = init_info("terrain", &f_head);
 
 	/* Set the global variables */
-	f_info = f_head.info_ptr;
+	f_info = (feature_type*)f_head.info_ptr;
 	f_name = f_head.name_ptr;
 	f_text = f_head.text_ptr;
 
@@ -973,7 +973,7 @@ static errr init_k_info(void)
 	err = init_info("object", &k_head);
 
 	/* Set the global variables */
-	k_info = k_head.info_ptr;
+	k_info = (object_kind*)k_head.info_ptr;
 	k_name = k_head.name_ptr;
 	k_text = k_head.text_ptr;
 
@@ -1008,7 +1008,7 @@ static errr init_a_info(void)
 	err = init_info("artifact", &a_head);
 
 	/* Set the global variables */
-	a_info = a_head.info_ptr;
+	a_info = (artifact_type*)a_head.info_ptr;
 	a_name = a_head.name_ptr;
 	a_text = a_head.text_ptr;
 
@@ -1036,7 +1036,7 @@ static errr init_n_info(void)
 
   err = init_info("names", &n_head);
 
-  n_info = n_head.info_ptr;
+  n_info = (names_type*)n_head.info_ptr;
 
   return (err);
 }
@@ -1071,7 +1071,7 @@ static errr init_e_info(void)
 	err = init_info("ego_item", &e_head);
 
 	/* Set the global variables */
-	e_info = e_head.info_ptr;
+	e_info = (ego_item_type*)e_head.info_ptr;
 	e_name = e_head.name_ptr;
 	e_text = e_head.text_ptr;
 
@@ -1105,7 +1105,7 @@ static errr init_x_info(void)
 	err = init_info("flavor", &x_head);
 
 	/* Set the global variables */
-	x_info = x_head.info_ptr;
+	x_info = (flavor_type*)x_head.info_ptr;
 	x_name = x_head.name_ptr;
 	x_text = x_head.text_ptr;
 
@@ -1142,7 +1142,7 @@ static errr init_r_info(void)
 	err = init_info("monster", &r_head);
 
 	/* Set the global variables */
-	r_info = r_head.info_ptr;
+	r_info = (monster_race*)r_head.info_ptr;
 	r_name = r_head.name_ptr;
 	r_text = r_head.text_ptr;
 
@@ -1177,7 +1177,7 @@ static errr init_v_info(void)
 	err = init_info("vault", &v_head);
 
 	/* Set the global variables */
-	v_info = v_head.info_ptr;
+	v_info = (vault_type*)v_head.info_ptr;
 	v_name = v_head.name_ptr;
 	v_text = v_head.text_ptr;
 
@@ -1211,7 +1211,7 @@ static errr init_p_info(void)
 	err = init_info("p_race", &p_head);
 
 	/* Set the global variables */
-	p_info = p_head.info_ptr;
+	p_info = (player_race*)p_head.info_ptr;
 	p_name = p_head.name_ptr;
 	p_text = p_head.text_ptr;
 
@@ -1244,7 +1244,7 @@ static errr init_c_info(void)
 	err = init_info("p_class", &c_head);
 
 	/* Set the global variables */
-	c_info = c_head.info_ptr;
+	c_info = (player_class*)c_head.info_ptr;
 	c_name = c_head.name_ptr;
 	c_text = c_head.text_ptr;
 
@@ -1272,7 +1272,7 @@ static errr init_w_info(void)
 	err = init_info("style", &w_head);
 
 	/* Set the global variables */
-	w_info = w_head.info_ptr;
+	w_info = (weapon_style*)w_head.info_ptr;
 
 	return (err);
 }
@@ -1304,7 +1304,7 @@ static errr init_s_info(void)
 	err = init_info("spell", &s_head);
 
 	/* Set the global variables */
-	s_info = s_head.info_ptr;
+	s_info = (spell_type*)s_head.info_ptr;
 	s_name = s_head.name_ptr;
 	s_text = s_head.text_ptr;
 
@@ -1332,7 +1332,7 @@ static errr init_y_info(void)
 	err = init_info("rune", &y_head);
 
 	/* Set the global variables */
-	y_info = y_head.info_ptr;
+	y_info = (rune_type*)y_head.info_ptr;
 	y_name = y_head.name_ptr;
 	y_text = y_head.text_ptr;
 
@@ -1360,7 +1360,7 @@ static errr init_h_info(void)
 	err = init_info("p_hist", &h_head);
 
 	/* Set the global variables */
-	h_info = h_head.info_ptr;
+	h_info = (hist_type*)h_head.info_ptr;
 	h_text = h_head.text_ptr;
 
 	return (err);
@@ -1388,7 +1388,7 @@ static errr init_t_info(void)
 	err = init_info("dungeon", &t_head);
 
 	/* Set the global variables */
-	t_info = t_head.info_ptr;
+	t_info = (town_type*)t_head.info_ptr;
 	t_name = t_head.name_ptr;
 	t_text = t_head.text_ptr;
 
@@ -1416,7 +1416,7 @@ static errr init_u_info(void)
 	err = init_info("store", &u_head);
 
 	/* Set the global variables */
-	u_info = u_head.info_ptr;
+	u_info = (store_type*)u_head.info_ptr;
 	u_name = u_head.name_ptr;
 	u_text = u_head.text_ptr;
 
@@ -1444,7 +1444,7 @@ static errr init_b_info(void)
 	err = init_info("shop_own", &b_head);
 
 	/* Set the global variables */
-	b_info = b_head.info_ptr;
+	b_info = (owner_type*)b_head.info_ptr;
 	b_name = b_head.name_ptr;
 	b_text = b_head.text_ptr;
 
@@ -1474,7 +1474,7 @@ static errr init_g_info(void)
 	err = init_info("cost_adj", &g_head);
 
 	/* Set the global variables */
-	g_info = g_head.info_ptr;
+	g_info = (byte_hack*)g_head.info_ptr;
 	g_name = g_head.name_ptr;
 	g_text = g_head.text_ptr;
 
@@ -1502,7 +1502,7 @@ static errr init_q_info(void)
 	err = init_info("quest", &q_head);
 
 	/* Set the global variables */
-	q_info = q_head.info_ptr;
+	q_info = (quest_type*)q_head.info_ptr;
 	q_name = q_head.name_ptr;
 	q_text = q_head.text_ptr;
 

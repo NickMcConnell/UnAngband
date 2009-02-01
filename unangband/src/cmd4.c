@@ -528,7 +528,7 @@ static void display_knowledge_start_at(
 
 
 	/* The compact set of group names, in display order */
-	g_names = C_ZNEW(grp_cnt, const char **);
+	g_names = (const char**)C_ZNEW(grp_cnt, const char **);
 	for (i = 0; i < grp_cnt; i++) {
 		int len;
 		g_names[i] = g_funcs.name(g_list[i]);
