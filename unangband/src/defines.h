@@ -208,7 +208,7 @@
  * Maximum amount of starting equipment
  */
 #define MAX_CLASS_ITEMS	10
-#define MAX_COMMON_ITEMS 17
+#define MAX_COMMON_ITEMS 16
 
 
 /*
@@ -668,7 +668,7 @@
 #define COMMAND_ITEM_MAGIC_TRAP	27
 
 
-#define MAX_COMMANDS	100
+#define MAX_COMMANDS	28
 
 
 /*
@@ -4223,7 +4223,7 @@
 #define ELEM_SMOKE    7
 #define ELEM_LITE     8
 
-#define MAX_ELEMENTS   9
+#define MAX_ELEMENTS   8
 
 
 /*
@@ -4242,7 +4242,7 @@
 #define LANG_FOREST	10
 #define LANG_MUSHROOM	11
 #define LANG_NATURAL	12
-#define MAX_LANGUAGES	66
+#define MAX_LANGUAGES	65
 
 
 /*

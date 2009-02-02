@@ -33,7 +33,7 @@
 #define PARSE_ERROR_TOO_MANY_ENTRIES        14
 #define PARSE_ERROR_VAULT_TOO_BIG           15
 
-#define PARSE_ERROR_MAX                     16
+#define PARSE_ERROR_MAX                     15
 
 
 typedef struct header header;
@@ -107,7 +107,7 @@ extern errr init_info_txt(FILE *fp, char *buf, header *head,
 
 extern errr eval_info(eval_info_power_func eval_info_process, header *head);
 
-extern errr emit_info_txt(FILE *fp, FILE *template, char *buf, header *head,
+extern errr emit_info_txt(FILE *fp, FILE *atemplate, char *buf, header *head,
    emit_info_txt_index_func emit_info_txt_index, emit_info_txt_always_func emit_info_txt_always);
 
 #ifdef ALLOW_TEMPLATES

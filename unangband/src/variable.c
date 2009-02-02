@@ -352,6 +352,8 @@ byte angband_color_table[256][4] =
 	{0x00, 180,  180,  0x00},	/* TERM_MUSTARD */
 	{0x00, 160,  192,  208},	/* TERM_BLUE_SLATE */
 	{0x00, 0x00, 176,  255},	/* TERM_DEEP_L_BLUE */
+
+	/* Rest to be filled in when the game loads */
 };
 
 /*
@@ -1078,7 +1080,7 @@ const char *ANGBAND_SYS = "xxx";
  * Hack -- The special Angband "Graphics Suffix"
  * This variable is used to choose an appropriate "graf-xxx" file
  */
-char *ANGBAND_GRAF = "old";
+const char *ANGBAND_GRAF = "old";
 
 /*
  * Path name: The main "lib" directory

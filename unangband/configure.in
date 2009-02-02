@@ -175,7 +175,7 @@ else
 fi
 
 dnl add some warning flags
-CFLAGS="$CFLAGS -Wall -Wextra -Wformat=0 -Wlogical-op -Wredundant-decls -Wnested-externs"
+CFLAGS="$CFLAGS -Wall -Wextra -Wformat=0 -Wlogical-op -Wredundant-decls -Wnested-externs -std=gnu99"
 dnl some other warnings to test: -Wc++-compat -Wno-multichar
 dnl generates lots of warnings: -Wconversion -Wshadow
 dnl unimportant: -Wpointer-arith -Waddress

@@ -337,7 +337,7 @@ extern s16b tips[TIPS_MAX];
 extern s16b tips_start;
 extern s16b tips_end;
 extern const char *ANGBAND_SYS;
-extern char *ANGBAND_GRAF;
+extern const char *ANGBAND_GRAF;
 extern char *ANGBAND_DIR;
 extern char *ANGBAND_DIR_APEX;
 extern char *ANGBAND_DIR_BONE;
