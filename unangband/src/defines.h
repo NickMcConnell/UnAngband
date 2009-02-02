@@ -669,7 +669,7 @@
 #define COMMAND_ITEM_MAGIC_TRAP	28
 
 
-#define MAX_COMMANDS	28
+#define MAX_COMMANDS	29
 
 
 /*
