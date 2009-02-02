@@ -967,7 +967,7 @@ static cptr k_info_flags4[] =
 static cptr k_info_flags5[] =
 {
 	"SHOW_DD",
-	"SHOW_MODS",
+	"SHOW_WEAPON",
 	"SHOW_CHARGE",
 	"SHOW_TURNS",
 	"SHOW_AC",
@@ -1009,6 +1009,10 @@ static cptr k_info_flags6[] =
 	"ARMOUR",
 	"FLAVOR",
 	"NAMED",
+	"SIMPLE",
+	"RESEARCH",
+	"SHOW_MULT",
+	"NO_TIMEOUT",
 	"1_HANDED",
 	"2_HANDED",
 	"OFF_HAND",
@@ -1018,7 +1022,7 @@ static cptr k_info_flags6[] =
 	"EAT_BODY",
 	"EAT_INSECT",
 	"EAT_ANIMAL",
-	"EAT_CURE",
+	"EAT_SMART",
 	"EAT_HEAL",
 	"EAT_MANA",
 	"HAS_ROPE",
@@ -1026,19 +1030,13 @@ static cptr k_info_flags6[] =
 	"RANDOM",
 	"BAD_THROW",
 	"BREAK_THROW",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	""
+	"TITLE",
+	"ADD_NAME",
+	"MOD_NAME",
+	"PREPEND",
+	"IN_FEET",
+	"FORCE_MOD",
+	"NO_TVAL"
 };
 
 
@@ -3628,53 +3626,73 @@ errr parse_k_info(char *buf, header *head)
 		k_ptr->sval = sval;
 		k_ptr->pval = pval;
 
-		if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_ROPE);
-
 		switch (tval)
 		{
 			case TV_FLASK:
 				k_ptr->flags6 |= (TR6_BREAK_THROW);
+				k_ptr->flags6 |= (TR6_ADD_NAME | TR6_MOD_NAME | TR6_FORCE_MOD);
+
+				if (k_ptr->sval == SV_FLASK_BLOOD) k_ptr->flags6 |= (TR6_NAMED);
+				if (k_ptr->sval == SV_FLASK_SLIME) k_ptr->flags6 |= (TR6_NAMED);
+				if (k_ptr->sval == SV_FLASK_BILE) k_ptr->flags6 |= (TR6_NAMED);
+				if (k_ptr->sval == SV_FLASK_WEB) k_ptr->flags6 |= (TR6_NAMED);
+
 				break;
 
-			case TV_POTION:
-					k_ptr->flags6 |= (TR6_BREAK_THROW);
-					break;
+			case TV_SPELL:
+				if ((k_ptr->dd >= 2) || (k_ptr->ds >= 2)) 				k_ptr->flags5 |= (TR5_SHOW_DD | TR5_SHOW_WEAPON);
+				k_ptr->flags6 |= (TR6_NO_TIMEOUT);
+
+				break;
+
 
 			case TV_EGG:
-					k_ptr->flags6 |= (TR6_BREAK_THROW);
+					k_ptr->flags6 |= (TR6_BREAK_THROW | TR6_NAMED);
+					k_ptr->flags6 |= (TR6_EAT_BODY | TR6_EAT_ANIMAL | TR6_EAT_INSECT);
 					break;
 
+			case TV_ARROW:
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_ROPE);
+				break;
+			case TV_SHOT:
 			case TV_BOLT:
-				if (k_ptr->flags6 & (TR6_HAS_ROPE))
-				{
-					k_ptr->flags6 &= ~(TR6_HAS_ROPE);
-					k_ptr->flags6 |= (TR6_HAS_CHAIN);
-				}
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_CHAIN);
 			break;
 
 			case TV_BOW:
-				k_ptr->flags6 |= (TR6_BAD_THROW);
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags6 |= (TR6_BAD_THROW | TR6_SHOW_MULT);
 			break;
 
 			case TV_DIGGING:
-				k_ptr->flags6 |= (TR6_BAD_THROW);
-			break;
-
-			case TV_STAFF:
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
 			break;
 
 			case TV_SWORD:
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_DO_CUTS);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
 				break;
 
 			case TV_HAFTED:
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_DO_STUN);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
 				break;
 
 			case TV_POLEARM:
+				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_CHAIN);
+
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_DO_CUTS);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
 				break;
@@ -3691,8 +3709,167 @@ errr parse_k_info(char *buf, header *head)
 					do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
 				break;
 #endif
-		}
 
+			case TV_FOOD:
+
+				/* HACK - Ordinary food is "boring". Others are flavoured. */
+				if (k_ptr->sval >= SV_FOOD_MIN_FOOD)
+				{
+					k_ptr->flags6 &= ~(TR6_FLAVOR);
+					k_ptr->flags6 |= (TR6_EAT_SMART | TR6_EAT_ANIMAL | TR6_EAT_INSECT);
+				}
+				/* Mushrooms */
+				else
+				{
+					k_ptr->flags6 |= (TR6_FLAVOR | TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+					k_ptr->flags6 |= (TR6_EAT_ANIMAL | TR6_EAT_INSECT);
+				}
+				break;
+
+			case TV_LITE:
+				/* Historically used for candles - now unused */
+				if (k_ptr->sval >= SV_LITE_MAX_LITE) k_ptr->flags6  |= (TR6_FLAVOR | TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+
+				/* HACK - Ordinary lites are "boring" */
+				else k_ptr->flags6 &= ~(TR6_FLAVOR);
+
+				k_ptr->flags5 |= (TR5_SHOW_FUEL);
+				k_ptr->flags6 |= (TR6_NO_TIMEOUT);
+				break;
+
+			case TV_RING:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR);
+
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				break;
+
+			case TV_AMULET:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR);
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+
+				break;
+
+			case TV_STAFF:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR);
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+				k_ptr->flags6 |= (TR6_BAD_THROW);
+				k_ptr->flags5 |= (TR5_SHOW_CHARGE);
+				break;
+
+			case TV_WAND:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR);
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				k_ptr->flags5 |= (TR5_SHOW_CHARGE);
+				break;
+
+			case TV_ROD:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR);
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+
+				break;
+
+
+			case TV_POTION:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR);
+				k_ptr->flags6 |= (TR6_BREAK_THROW);
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				break;
+
+			case TV_SCROLL:
+				/* Flavored */
+				k_ptr->flags6 |= (TR6_FLAVOR | TR6_TITLE);
+				k_ptr->flags6 |= (TR6_ADD_NAME | TR6_MOD_NAME);
+
+				break;
+
+			case TV_PRAYER_BOOK:
+			case TV_MAGIC_BOOK:
+			case TV_SONG_BOOK:
+
+				k_ptr->flags6 |= (TR6_MOD_NAME | TR6_FORCE_MOD);
+				break;
+
+			case TV_RUNESTONE:
+
+				k_ptr->flags6 |= (TR6_MOD_NAME | TR6_FORCE_MOD | TR6_PREPEND);
+				break;
+
+			case TV_SERVICE:
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				break;
+
+			case TV_GLOVES:
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+
+				/* Fall through */
+
+			/* Armour */
+			case TV_BOOTS:
+			case TV_CLOAK:
+			case TV_CROWN:
+			case TV_HELM:
+			case TV_SHIELD:
+			case TV_SOFT_ARMOR:
+			case TV_HARD_ARMOR:
+			case TV_DRAG_ARMOR:
+			{
+				k_ptr->flags5 |= (TR5_SHOW_AC);
+				break;
+			}
+
+			/* Gems */
+			case TV_GEMS:
+			{
+				k_ptr->flags6 |= (TR6_MOD_NAME | TR6_NO_TVAL);
+				break;
+			}
+
+			/* Rope */
+			case TV_ROPE:
+			{
+				k_ptr->flags6 |= (TR6_IN_FEET | TR6_MOD_NAME | TR6_NO_TVAL);
+				break;
+			}
+
+			/* Gold */
+			case TV_GOLD:
+			{
+				k_ptr->flags6 |= (TR6_SIMPLE);
+				break;
+			}
+
+			/* Study item */
+			case TV_STUDY:
+			{
+				k_ptr->flags6 |= (TR6_RESEARCH);
+				break;
+			}
+
+			case TV_BODY:
+			case TV_BONE:
+			{
+				k_ptr->flags6 |= (TR6_NAMED);
+				k_ptr->flags6 |= (TR6_EAT_BODY | TR6_EAT_INSECT);
+				break;
+
+			}
+			case TV_HOLD:
+			case TV_SKIN:
+			case TV_STATUE:
+			case TV_ASSEMBLY:
+			{
+				k_ptr->flags6 |= (TR6_NAMED);
+				break;
+			}
+		}
 	}
 
 	/* Process 'W' for "More Info" (one line only) */

@@ -6337,57 +6337,35 @@ static void process_monster(int m_idx)
 
 	/*** Monster hungry? ***/
 	/*** This is a bit unnecessarily complicated */
+
+	/* We're just hungry */
 	if ((((m_ptr->mflag & (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK)) != 0)
-		|| (m_ptr->hp < m_ptr->maxhp) || (m_ptr->blind)) && !(m_ptr->ty) && !(m_ptr->tx)
+
+	/* or want to recover from something non-critical */
+		|| (m_ptr->hp < m_ptr->maxhp) || (m_ptr->blind)) &&
+
+	/* and we don't have a target */
+		!(m_ptr->ty) && !(m_ptr->tx)
+
+	/* aren't aggressive, and the player can't see us */
 		&& (((m_ptr->mflag & (MFLAG_AGGR)) == 0) || !(player_has_los_bold(m_ptr->fy, m_ptr->fx)) ||
-			(m_ptr->hp < m_ptr->maxhp / 10) || ((m_ptr->blind) && (r_ptr->freq_spell >= 25)))
+
+	/* or if we have a critical requirement */
+			(m_ptr->hp < m_ptr->maxhp / 10) || ((m_ptr->blind) && (r_ptr->freq_spell >= 25))  || (m_ptr->mana < r_ptr->mana / 5))
+
+	/* and are alive or eat bodies */
 		&& (!(r_ptr->flags3 & (RF3_NONLIVING)) || (r_ptr->flags2 & (RF2_EAT_BODY))))
 	{
 		int this_o_idx, next_o_idx, item = 0;
 
-		/* MegaHack -- use cost as an indication of potion quality */
-		int min_cost = 1;
-
 		object_type *o_ptr;
 
+		object_kind *k_ptr;
+
+		bool healing = FALSE;
+		bool mana_recovery = FALSE;
+
 		/* Scan the pile of objects */
-		for (this_o_idx = cave_o_idx[m_ptr->fy][m_ptr->fx]; this_o_idx; this_o_idx = next_o_idx)
-		{
-			/* Get the object */
-			o_ptr = &o_list[this_o_idx];
-
-			/* Get the next object */
-			next_o_idx = o_ptr->next_o_idx;
-
-			/* Only undead cannibals */
-			if ((o_ptr->name3) && (r_info[o_ptr->name3].d_char == r_ptr->d_char) && ((r_ptr->flags3 & (RF3_UNDEAD | RF3_INSECT)) == 0)) continue;
-
-			/* Edible? */
-			switch (o_ptr->tval)
-			{
-				case TV_BODY:
-				case TV_BONE:
-					if (min_cost > 1) continue;
-					if (r_ptr->flags2 & (RF2_EAT_BODY)) item = this_o_idx;
-					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
-					break;
-				case TV_EGG:
-					if (min_cost > 1) continue;
-					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
-					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
-					break;
-				case TV_FOOD:
-					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
-					else if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
-					else if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
-					break;
-				case TV_POTION:
-					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
-					break;
-			}
-		}
-
-		/* Scan the carried objects */
 		for (this_o_idx = cave_o_idx[m_ptr->fy][m_ptr->fx]; this_o_idx; this_o_idx = next_o_idx)
 		{
 			/* Get the object */
@@ -6399,29 +6377,72 @@ static void process_monster(int m_idx)
 			/* Only undead/insect cannibals */
 			if ((o_ptr->name3) && (r_info[o_ptr->name3].d_char == r_ptr->d_char) && ((r_ptr->flags3 & (RF3_UNDEAD | RF3_INSECT)) == 0)) continue;
 
-			/* Edible? */
-			switch (o_ptr->tval)
+			/* Check kind */
+			k_ptr = &k_info[o_ptr->k_idx];
+
+			/* Edible - mana recovery */
+			if ((k_ptr->flags6 & (TR6_EAT_MANA)) && (m_ptr->mana < r_ptr->mana / 5))
 			{
-				case TV_BODY:
-				case TV_BONE:
-					if (min_cost > 1) continue;
-					if (r_ptr->flags2 & (RF2_EAT_BODY)) item = this_o_idx;
-					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
-					break;
-				case TV_EGG:
-					if (min_cost > 1) continue;
-					if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
-					if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
-					break;
-				case TV_FOOD:
-					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
-					else if (!(r_ptr->flags2 & (RF2_EAT_BODY)) & (r_ptr->flags3 & (RF3_ANIMAL))) item = this_o_idx;
-					else if (r_ptr->flags3 & (RF3_INSECT)) item = this_o_idx;
-					break;
-				case TV_POTION:
-					if ((r_ptr->flags2 & (RF2_SMART)) && !(r_ptr->flags3 & (RF3_UNDEAD)) && (k_info[o_ptr->k_idx].cost > min_cost)) { item = this_o_idx; min_cost = k_info[o_ptr->k_idx].cost; }
-					break;
+				item = this_o_idx;
+				mana_recovery = TRUE;
+				break;
 			}
+
+			/* We've found a healing item already - still looking for mana recovery */
+			else if (healing) continue;
+
+			/* Edible - healing */
+			else if ((k_ptr->flags6 & (TR6_EAT_HEAL)) && ((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0))
+			{
+				item = this_o_idx;
+				healing = TRUE;
+			}
+
+			/* General food requirements */
+			else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) item = this_o_idx;
+			else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) item = this_o_idx;
+			else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) item = this_o_idx;
+			else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) item = this_o_idx;
+		}
+
+		/* Scan the carried objects - unless we've found mana recovery */
+		if (!mana_recovery) for (this_o_idx = cave_o_idx[m_ptr->fy][m_ptr->fx]; this_o_idx; this_o_idx = next_o_idx)
+		{
+			/* Get the object */
+			o_ptr = &o_list[this_o_idx];
+
+			/* Get the next object */
+			next_o_idx = o_ptr->next_o_idx;
+
+			/* Only undead/insect cannibals */
+			if ((o_ptr->name3) && (r_info[o_ptr->name3].d_char == r_ptr->d_char) && ((r_ptr->flags3 & (RF3_UNDEAD | RF3_INSECT)) == 0)) continue;
+
+			/* Check kind */
+			k_ptr = &k_info[o_ptr->k_idx];
+
+			/* Edible - mana recovery */
+			if ((k_ptr->flags6 & (TR6_EAT_MANA)) && (m_ptr->mana < r_ptr->mana / 5))
+			{
+				item = this_o_idx;
+				mana_recovery = TRUE;
+				break;
+			}
+
+			/* We've found a healing item already - still looking for mana recovery */
+			else if (healing) continue;
+
+			/* Edible - healing */
+			else if ((k_ptr->flags6 & (TR6_EAT_HEAL)) && ((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0))
+			{
+				item = this_o_idx;
+				healing = TRUE;
+			}
+
+			/* General food requirements */
+			else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) item = this_o_idx;
+			else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) item = this_o_idx;
+			else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) item = this_o_idx;
+			else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) item = this_o_idx;
 		}
 
 		/* Something edible found? */
@@ -6470,6 +6491,9 @@ static void process_monster(int m_idx)
 				{
 					/* Hack -- use item blow routine */
 					process_item_blow(SOURCE_OBJECT, o_ptr->k_idx, o_ptr, m_ptr->fy, m_ptr->fx, TRUE);
+
+					/* Mega Hack -- heal blindness directly */
+					if ((k_info[o_ptr->k_idx].flags6 & (TR6_EAT_HEAL)) && (m_ptr->blind)) m_ptr->blind = 1;
 				}
 			}
 

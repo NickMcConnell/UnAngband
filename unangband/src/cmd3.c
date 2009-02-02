@@ -1360,12 +1360,9 @@ bool item_tester_refill_torch(const object_type *o_ptr)
  */
 bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 {
-	/* Empty flasks are okay */
-	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_FLASK_EMPTY))
-		return (TRUE);
-
-	/* Empty bottles are okay */
-	if ((o_ptr->tval == TV_HOLD) && (o_ptr->sval == SV_HOLD_BOTTLE)
+	/* Empty bottles/flasks are okay */
+	if ((o_ptr->tval == TV_HOLD) &&
+			((o_ptr->sval == SV_HOLD_BOTTLE) || (o_ptr->sval == SV_HOLD_FLASK))
 		 && !(o_ptr->name3))
 		return (TRUE);
 
@@ -1376,6 +1373,12 @@ bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 	/* Torches are okay */
 	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 		return (TRUE);
+
+	/* Firearms are okay */
+	if ((o_ptr->tval == TV_BOW) && (o_ptr->sval/10 == 3) && !(o_ptr->charges))
+	{
+		return(TRUE);
+	}
 
 	/* Assume not okay */
 	return (FALSE);
@@ -1388,7 +1391,7 @@ bool item_tester_empty_flask_or_lite(const object_type *o_ptr)
 bool item_tester_refill_flask(const object_type *o_ptr)
 {
 	/* Flasks are okay */
-	if ((o_ptr->tval == TV_FLASK) && (o_ptr->sval != SV_FLASK_EMPTY))
+	if (o_ptr->tval == TV_FLASK)
 		return (TRUE);
 
 	/* Potions are okay */
@@ -1398,6 +1401,26 @@ bool item_tester_refill_flask(const object_type *o_ptr)
 	/* Assume not okay */
 	return (FALSE);
 }
+
+
+/*
+ * An "item_tester_hook" for refilling lanterns
+ */
+bool item_tester_refill_firearm(const object_type *o_ptr)
+{
+	/* Flasks of gunpowder are okay */
+	if ((o_ptr->tval == TV_FLASK) && (o_ptr->sval == SV_FLASK_GUNPOWDER)) return (TRUE);
+
+	/* Firearms are okay */
+	if ((o_ptr->tval == TV_BOW) && (o_ptr->sval/10 == 3) && (o_ptr->charges))
+	{
+		return(TRUE);
+	}
+
+	/* Assume okay */
+	return (FALSE);
+}
+
 
 
 /*
@@ -1426,6 +1449,10 @@ int cmd_tester_fill_or_fuel(int item)
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
 		return(COMMAND_ITEM_FUEL_TORCH);
+	}
+	else if ((o_ptr->tval == TV_BOW) && (o_ptr->sval/10 == 3))
+	{
+		return(COMMAND_ITEM_FILL_FIREARM);
 	}
 	else
 	{
@@ -1532,6 +1559,7 @@ bool player_refill2(int item2)
 		unstack = TRUE;
 	}
 
+	/* Fuel torch from source */
 	if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_LANTERN))
 	{
 
@@ -1554,6 +1582,7 @@ bool player_refill2(int item2)
 		/* Get feat */
 		if (j_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 	}
+	/* Fuel lantern from source */
 	else if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH))
 	{
 
@@ -1580,6 +1609,29 @@ bool player_refill2(int item2)
 		/* Get feat */
 		if (j_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
 	}
+	/* Fill weapon from source */
+	else if ((o_ptr->tval == TV_BOW) && (o_ptr->sval/10 == 3))
+	{
+		int max_charge = k_info[o_ptr->k_idx].charges;
+
+		/* Message */
+		if (unstack) msg_print("You unstack your weapon.");
+
+		/* Refuel */
+		o_ptr->charges++;
+
+		/* Over-fuel message */
+		if (o_ptr->charges >= max_charge)
+		{
+			o_ptr->charges = max_charge;
+
+			msg_format("The chamber%s %s fully loaded.", max_charge > 1 ? "s" : "", max_charge > 1 ? "are" : "is");
+		}
+
+		/* Get feat */
+		if (j_ptr->ident & (IDENT_STORE)) get_feat = TRUE;
+	}
+	/* Fill an empty container */
 	else
 	{
 		/* Fill empty bottle or flask with the potion */
@@ -1610,8 +1662,37 @@ bool player_refill2(int item2)
 		relite = FALSE;
 	}
 
+	/* Use a charge of gunpowder */
+	if ((o_ptr->tval == TV_BOW) && (o_ptr->sval/10 == 3) && (j_ptr->charges > 1))
+	{
+		/* XXX Hack -- new unstacking code */
+		j_ptr->stackc++;
+
+		/* No spare charges */
+		if (j_ptr->stackc >= j_ptr->number)
+		{
+			/* Use a charge off the stack */
+			j_ptr->charges--;
+
+			/* Reset the stack count */
+			j_ptr->stackc = 0;
+		}
+
+		/* Describe charges in the pack */
+		if (item2 >= 0)
+		{
+			inven_item_charges(item2);
+		}
+
+		/* Describe charges on the floor */
+		else
+		{
+			floor_item_charges(0 - item2);
+		}
+
+	}
 	/* Use fuel from a lantern */
-	if ((j_ptr->tval == TV_LITE) && (j_ptr->sval == SV_LITE_LANTERN))
+	else if ((j_ptr->tval == TV_LITE) && (j_ptr->sval == SV_LITE_LANTERN))
 	{
 		if (j_ptr->number > 1)
 		{

@@ -7596,7 +7596,14 @@ void pick_trap(int y, int x, bool player)
 			/* Get item effect */
 			get_spell(&power, "use", o_ptr, FALSE);
 		}
-		else get_feat_num_hook = vault_trap_floor;
+		/* Picking a floor trap */
+		else
+		{
+			/* Don't need power */
+			need_power = FALSE;
+
+			get_feat_num_hook = vault_trap_floor;
+		}
 	}
 	else
 	{
@@ -7700,7 +7707,7 @@ void pick_trap(int y, int x, bool player)
 			region_type *r_ptr = &region_list[region];
 
 			/* Display if player */
-			if (player)
+			if (player || player_can_see_bold(y,x))
 			{
 				r_ptr->flags1 |= (RE1_DISPLAY  | RE1_NOTICE);
 			}

@@ -499,6 +499,7 @@ extern bool item_tester_empty_flask_or_lite(const object_type *o_ptr);
 extern bool item_tester_refill_torch(const object_type *o_ptr);
 extern bool item_tester_refill_lantern(const object_type *o_ptr);
 extern bool item_tester_refill_flask(const object_type *o_ptr);
+extern bool item_tester_refill_firearm(const object_type *o_ptr);
 extern bool item_tester_light_source(const object_type *o_ptr);
 extern int cmd_tester_fill_or_fuel(int item);
 extern void do_cmd_inven(void);

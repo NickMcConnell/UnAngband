@@ -10059,6 +10059,7 @@ s16b init_region(int who, int what, int type, int dam, int method, int effect, i
 	method_type *method_ptr = &method_info[method];
 
 	s16b region = region_pop();
+	int radius = scale_method(method_ptr->radius, level);
 
 	region_type *r_ptr = &region_list[region];
 
@@ -10068,7 +10069,7 @@ s16b init_region(int who, int what, int type, int dam, int method, int effect, i
 	/* Pick a target */
 	if ((!y1) && (!x1))
 	{
-		 scatter(&y1, &x1, y0, x0, 5, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+		 scatter(&y1, &x1, y0, x0, radius, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
 	}
 
 	/* Initialise region values from parameters passed to this routine */

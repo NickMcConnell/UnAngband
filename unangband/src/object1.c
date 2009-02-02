@@ -110,13 +110,8 @@ static void flavor_assign_random(byte tval)
 		/* Skip objects that already are flavored */
 		if (k_info[i].flavor != 0) continue;
 
-		/* HACK - Ordinary food is "boring" */
-		if ((tval == TV_FOOD) && (k_info[i].sval >= SV_FOOD_MIN_FOOD))
-			continue;
-
-		/* HACK - Ordinary lites are "boring" */
-		if ((tval == TV_LITE) && (k_info[i].sval >= SV_LITE_MAX_LITE))
-			continue;
+		/* Skip objects which don't get a flavor */
+		if ((k_info[i].flags6 & (TR6_FLAVOR)) ==  0) continue;
 
 		if (!flavor_count) quit_fmt("Not enough flavors for tval %d.", tval);
 
@@ -548,8 +543,8 @@ void reset_visuals(bool unused)
  */
 void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int mode)
 {
-	cptr basenm;
-	cptr modstr;
+	const char *basenm;
+	const char *modstr;
 
 	int power;
 
@@ -643,10 +638,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	append_modstr = FALSE;
 
 	/* Assume no need to show "weapon" bonuses */
-	show_weapon = FALSE;
+	show_weapon = (k_ptr->flags5 & (TR5_SHOW_WEAPON)) != 0;
 
 	/* Assume no need to show "armour" bonuses */
-	show_armour = FALSE;
+	show_armour = (k_ptr->flags5 & (TR5_SHOW_AC)) != 0;
 
 	/* Extract default "base" string */
 	basenm = (k_name + k_ptr->name);
@@ -654,358 +649,147 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* Assume no "modifier" string */
 	modstr = "";
 
+	/* Describe 'simple' objects and return */
+	if (k_ptr->flags6 & (TR6_SIMPLE))
+	{
+		my_strcpy(buf, basenm, max);
+		return;
+	}
+
+	/* Get the modstr */
+	if (artifact_p(o_ptr) && aware)
+	{
+		/* Do nothing */
+	}
+	/* Modify the name in various ways */
+	else
+	{
+		bool show_flavor = flavor || (k_ptr->flags6 & (TR6_FORCE_MOD));
+
+		/* Hack for study materials */
+		if (k_ptr->flags6 & (TR6_RESEARCH))
+		{
+			if (o_ptr->pval >= 0) modstr = s_name + s_info[o_ptr->pval].name;
+			else modstr = s_name + s_info[0].name;
+		}
+		else if (k_ptr->flags6 & (TR6_TITLE)) modstr = scroll_adj[o_ptr->sval];
+		else if (k_ptr->flags6 & (TR6_FLAVOR)) modstr = x_text + x_info[flavor].text;
+		else if (k_ptr->flags6 & (TR6_MOD_NAME)) modstr = basenm;
+
+		/* Add the name if required */
+		if (aware && (k_ptr->flags6 & (TR6_ADD_NAME))) append_name = TRUE;
+
+		/* Prepend or append the base name */
+		if (k_ptr->flags6 & (TR6_NO_TVAL))
+		{
+			basenm = "& #~";
+		}
+		else if (k_ptr->flags6 & (TR6_PREPEND))
+		{
+			basenm = (show_flavor ? "& # @~" : "& @~");
+		}
+		/* Append the base name */
+		else if (k_ptr->flags6 & (TR6_MOD_NAME))
+		{
+			basenm = (show_flavor ? "& @~ #" : "& @~");
+		}
+	}
+
 	/* Prep the monster name if required */
-	if (o_ptr->name3)
+	if (k_ptr->flags6 & (TR6_NAMED))
 	{
 		char *s, *t;
 		int state = 0;
 
-		/* Save the monster name */
-		my_strcpy(mon_buf, r_name + r_info[o_ptr->name3].name, sizeof(mon_buf));
-
-		/* Fix up genderised descriptions manually */
-		for (t = s = mon_buf; *s; s++)
+		/* Describe monster */
+		if (o_ptr->name3)
 		{
-			if (*s == '|')
+			/* Save the monster name */
+			my_strcpy(mon_buf, r_name + r_info[o_ptr->name3].name, sizeof(mon_buf));
+
+			/* Fix up genderised descriptions manually */
+			for (t = s = mon_buf; *s; s++)
 			{
-				state++;
-				if (state == 3) state = 0;
+				if (*s == '|')
+				{
+					state++;
+					if (state == 3) state = 0;
+				}
+				else if (!state || (state == 1 /* Male */))
+				{
+					*t++ = *s;
+				}
 			}
-			else if (!state || (state == 1 /* Male */))
+
+			/* Terminate */
+			*t = '\0';
+		}
+
+		/* This particular object isn't named */
+		if (!o_ptr->name3)
+		{
+			switch (o_ptr->tval)
 			{
-				*t++ = *s;
+				case TV_STATUE:
+					modstr = "an ancient god";
+					break;
+				case TV_ASSEMBLY:
+					modstr = "mechanism";
+					break;
+				case TV_SKIN:
+					modstr = "dusty";
+					break;
+				case TV_BODY:
+					modstr = "mummified";
+					break;
+				case TV_FLASK:
+					modstr = "spoiled";
+					break;
+				case TV_HOLD:
+					modstr = "empty";
+					break;
+				case TV_EGG:
+					if (o_ptr->sval == SV_EGG_SPORE)
+					{
+						modstr = "dried";
+						break;
+					}
+					/* Drop down */
+				default:
+					modstr = "broken";
+					break;
 			}
 		}
-
-		/* Terminate */
-		*t = '\0';
-	}
-
-	/* Analyze the object */
-	switch (o_ptr->tval)
-	{
-		/* Some objects are easy to describe */
-		case TV_SPIKE:
-		case TV_INSTRUMENT:
-		case TV_SPELL:
-		case TV_MAP:
+		else if (o_ptr->tval == TV_HOLD)
 		{
-			break;
+			/* Note the container is closed */
+			modstr = "sealed";
 		}
-
-		/* Missiles/Bows/Weapons */
-		case TV_SHOT:
-		case TV_BOLT:
-		case TV_ARROW:
-		case TV_BOW:
-		case TV_HAFTED:
-		case TV_POLEARM:
-		case TV_SWORD:
-		case TV_DIGGING:
+		else if (r_info[o_ptr->name3].flags1 & (RF1_UNIQUE))
 		{
-			show_weapon = TRUE;
-			break;
+			if (o_ptr->tval != TV_STATUE) my_strcat(mon_buf, "'s", sizeof(mon_buf));
+
+			/* Use the mod string */
+			modstr = mon_buf;
+
+			/* Skip a/an */
+			if (basenm[2] == '#') basenm = &basenm[2];
 		}
-
-		/* Armour */
-		case TV_BOOTS:
-		case TV_GLOVES:
-		case TV_CLOAK:
-		case TV_CROWN:
-		case TV_HELM:
-		case TV_SHIELD:
-		case TV_SOFT_ARMOR:
-		case TV_HARD_ARMOR:
-		case TV_DRAG_ARMOR:
+		else
 		{
-			show_armour = TRUE;
-			break;
-		}
-
-		/* Lites (including a few "Specials") */
-		case TV_LITE:
-		{
-			break;
-		}
-
-		/* Amulets (including a few "Specials") */
-		case TV_AMULET:
-		{
-			/* Hack -- Known artifacts */
-			if (artifact_p(o_ptr) && aware) break;
-
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Amulet~" : "& Amulet~");
-
-			break;
-		}
-
-		/* Rings (including a few "Specials") */
-		case TV_RING:
-		{
-			/* Hack -- Known artifacts */
-			if (artifact_p(o_ptr) && aware) break;
-
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Ring~" : "& Ring~");
-
-			break;
-		}
-
-		/* Staffs */
-		case TV_STAFF:
-		{
-
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Staff~" : "& Staff~");
-			show_weapon = TRUE;
-			break;
-		}
-
-		/* Wands */
-		case TV_WAND:
-		{
-
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Wand~" : "& Wand~");
-
-			break;
-		}
-
-		/* Rods */
-		case TV_ROD:
-		{
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Rod~" : "& Rod~");
-
-			break;
-		}
-
-		/* Scrolls */
-		case TV_SCROLL:
-		{
-			/* Color the object */
-			modstr = scroll_adj[o_ptr->sval];
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& Scroll~ titled \"#\"" : "& Scroll~");
-
-			break;
-		}
-
-		/* Potions */
-		case TV_POTION:
-		{
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Potion~" : "& Potion~");
-
-			break;
-		}
-
-		/* Flasks */
-		case TV_FLASK:
-		{
-			append_name = TRUE;
-			basenm = "& Flask~";
-
-			/* Racially mark the object */
-			if (o_ptr->name3)
+			if (o_ptr->tval == TV_STATUE)
 			{
-				modstr = mon_buf;
+				my_strcpy(mon_buf, format("%s %s", is_a_vowel(mon_buf[0]) ? "an" : "a", mon_buf), sizeof(mon_buf));
+			}
+			else if (o_ptr->tval == TV_FLASK)
+			{
 				append_modstr = TRUE;
 			}
 
-			break;
-		}
-
-		/* Food */
-		case TV_FOOD:
-		{
-			/* Ordinary food is "boring" */
-			if (o_ptr->sval >= SV_FOOD_MIN_FOOD) break;
-
-			/* Color the object */
-			modstr = x_text + x_info[flavor].text;
-
-			if (aware) append_name = TRUE;
-			basenm = (flavor ? "& # Mushroom~" : "& Mushroom~");
-
-			break;
-		}
-
-		/* Magic Books */
-		case TV_MAGIC_BOOK:
-		{
-			modstr = basenm;
-			basenm = "& Magic Book~ #";
-			break;
-		}
-
-
-		/* Prayer Books */
-		case TV_PRAYER_BOOK:
-		{
-			modstr = basenm;
-			basenm = "& Prayer Book~ #";
-			break;
-		}
-
-		/* Song Books */
-		case TV_SONG_BOOK:
-		{
-			modstr = basenm;
-			basenm = "& Song Book~ #";
-			break;
-		}
-
-		/* Runestones */
-		case TV_RUNESTONE:
-		{
-			modstr = basenm;
-			basenm = "& # Rune stone~";
-			break;
-		}
-
-		/* Hack -- Rope */
-		case TV_ROPE:
-		{
-			modstr = basenm;
-			basenm = "& #";
-			break;
-		}
-
-		/* Hack -- Research materials */
-		case TV_STUDY:
-		{
-			if (o_ptr->pval >= 0) modstr = s_name + s_info[o_ptr->pval].name;
-			else modstr = s_name + s_info[0].name;
-			break;
-		}
-
-		/* Magical Bags */
-		case TV_BAG:
-		{
-			append_name = TRUE;
-			basenm = "& Magical Bag~";
-			break;
-		}
-
-		/* Services */
-		case TV_SERVICE:
-		{
-			append_name = TRUE;
-			basenm = "& Service~";
-			break;
-		}
-
-
-		/* Hack -- Gold */
-		case TV_GOLD:
-		{
-			my_strcpy(buf, basenm, max);
-			return;
-		}
-
-		/* Gems */
-		case TV_GEMS:
-		{
-			modstr = basenm;
-			basenm = "& #~";
-			break;
-		}
-
-		/* Container */
-		case TV_HOLD:
-		{
-			if (o_ptr->name3 > 0) modstr = "sealed";
-			else modstr = "empty";
-			break;
-		}
-
-		/* Hack -- Body Parts/Skeletons/Skins etc. */
-		case TV_JUNK:
-		case TV_STATUE:
-		case TV_ASSEMBLY:
-		case TV_BODY:
-		case TV_BONE:
-		case TV_EGG:
-		case TV_SKIN:
-		{
-			if (!o_ptr->name3)
-			{
-				switch (o_ptr->tval)
-				{
-					case TV_STATUE:
-						modstr = "an ancient god";
-						break;
-					case TV_ASSEMBLY:
-						modstr = "mechanism";
-						break;
-					case TV_SKIN:
-						modstr = "dusty";
-						break;
-					case TV_BODY:
-						modstr = "mummified";
-						break;
-					case TV_EGG:
-						if (o_ptr->sval == SV_EGG_SPORE)
-						{
-							modstr = "dried";
-							break;
-						}
-						/* Drop down */
-					default:
-						modstr = "broken";
-						break;
-				}
-			}
-			else if (r_info[o_ptr->name3].flags1 & (RF1_UNIQUE))
-			{
-				if (o_ptr->tval != TV_STATUE) my_strcat(mon_buf, "'s", sizeof(mon_buf));
-
-				/* Use the mod string */
-				modstr = mon_buf;
-
-				/* Skip a/an */
-				if (basenm[2] == '#') basenm = &basenm[2];
-			}
-			else
-			{
-				if (o_ptr->tval == TV_STATUE)
-				{
-					 my_strcpy(mon_buf, format("%s %s", is_a_vowel(mon_buf[0]) ? "an" : "a", mon_buf), sizeof(mon_buf));
-				}
-
-				modstr = mon_buf;
-			}
-			break;
-		}
-
-		/* Hack -- Default -- Used in the "inventory" routine */
-		default:
-		{
-			my_strcpy(buf, "(nothing)", max);
-			return;
+			/* Set the mod string */
+			modstr = mon_buf;
 		}
 	}
-
 
 	/* Start dumping the result */
 	t = b = tmp_buf;
@@ -1035,7 +819,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		}
 
 		/* Hack -- rope */
-		else if (o_ptr->tval == TV_ROPE)
+		else if (k_ptr->flags6 & (TR6_IN_FEET))
 		{
 			object_desc_num_macro(t, o_ptr->number);
 			object_desc_str_macro(t, "0 feet of ");
@@ -1147,6 +931,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Pluralizer */
 		if (*s == '~')
 		{
+			/* Don't display if in feet */
+			if (k_ptr->flags6 & (TR6_IN_FEET)) continue;
+
 			/* Add a plural if needed */
 			if (o_ptr->number != 1)
 			{
@@ -1163,8 +950,33 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Modifier */
 		else if (*s == '#')
 		{
+			/* Append title text */
+			if (k_ptr->flags6 & (TR6_TITLE)) object_desc_str_macro(t, "titled \"");
+
 			/* Append the modifier */
 			object_desc_str_macro(t, modstr);
+
+			/* Append title terminator */
+			if (k_ptr->flags6 & (TR6_TITLE)) object_desc_str_macro(t, "\"");
+		}
+
+		/* Base */
+		else if (*s == '@')
+		{
+			int i;
+
+			/* Find base text */
+			for (i = 0; object_group[i].text; i++)
+			{
+				if (object_group[i].tval == k_ptr->tval) break;
+			}
+
+			/* Append base text */
+			if (object_group[i].text)
+			{
+				/* Append the modifier */
+				object_desc_str_macro(t, object_group[i].text);
+			}
 		}
 
 		/* Normal */
@@ -1394,12 +1206,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 	/*
-         * Display object value
-         */
+	 * Display object value
+	 */
 	if (o_ptr->ident & (IDENT_VALUE))
 	{
-
-
 		object_desc_str_macro(t, " worth ");
 		object_desc_num_macro(t,object_value_real(o_ptr));
 		object_desc_str_macro(t, " gold pieces");
@@ -1415,68 +1225,30 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	if (o_ptr->ac) show_armour = TRUE;
 
 	/* Dump base weapon info */
-	switch (o_ptr->tval)
+	if (k_ptr->flags5 & (TR5_SHOW_DD))
 	{
-		/* Spells */
-		case TV_SPELL:
-		{
-			/* Hack -- check damage */
-			if ((o_ptr->dd < 2) && (o_ptr->ds < 2)) break;
-
-			/* Fall through */
-		}
-
-		/* Missiles */
-		case TV_SHOT:
-		case TV_BOLT:
-		case TV_ARROW:
-		{
-			/* Fall through */
-		}
-
-		/* Weapons */
-		case TV_HAFTED:
-		case TV_POLEARM:
-		case TV_SWORD:
-		case TV_STAFF:
-		case TV_DIGGING:
-		{
-			/* Append a "damage" string */
-			object_desc_chr_macro(t, ' ');
-			object_desc_chr_macro(t, p1);
-			object_desc_num_macro(t, o_ptr->dd);
-			object_desc_chr_macro(t, 'd');
-			object_desc_num_macro(t, o_ptr->ds);
-			object_desc_chr_macro(t, p2);
-
-			/* Show mods like a weapon */
-			show_weapon = TRUE;
-
-			/* All done */
-			break;
-		}
-
-		/* Bows */
-		case TV_BOW:
-		{
-			/* Hack -- Extract the "base power" */
-			power = bow_multiplier(o_ptr->sval);
-
-			/* Append a "power" string */
-			object_desc_chr_macro(t, ' ');
-			object_desc_chr_macro(t, p1);
-			object_desc_chr_macro(t, 'x');
-			object_desc_num_macro(t, power);
-			object_desc_chr_macro(t, p2);
-
-			/* Show mods like a weapon */
-			show_weapon = TRUE;
-
-			/* All done */
-			break;
-		}
+		/* Append a "damage" string */
+		object_desc_chr_macro(t, ' ');
+		object_desc_chr_macro(t, p1);
+		object_desc_num_macro(t, o_ptr->dd);
+		object_desc_chr_macro(t, 'd');
+		object_desc_num_macro(t, o_ptr->ds);
+		object_desc_chr_macro(t, p2);
 	}
 
+	/* Dump bow weapon info */
+	if (k_ptr->flags6 & (TR6_SHOW_MULT))
+	{
+		/* Hack -- Extract the "base power" */
+		power = bow_multiplier(o_ptr->sval);
+
+		/* Append a "power" string */
+		object_desc_chr_macro(t, ' ');
+		object_desc_chr_macro(t, p1);
+		object_desc_chr_macro(t, 'x');
+		object_desc_num_macro(t, power);
+		object_desc_chr_macro(t, p2);
+	}
 
 	/* Add the weapon bonuses */
 	if (bonus)
@@ -1552,8 +1324,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 	/* Hack -- Wands and Staffs have charges */
 	if ((charges) &&
-	    ((o_ptr->tval == TV_STAFF) ||
-	     (o_ptr->tval == TV_WAND)))
+	    ((k_ptr->flags5 & (TR5_SHOW_CHARGE)) != 0))
 	{
 		/* Dump " (N charges)" */
 		object_desc_chr_macro(t, ' ');
@@ -1568,7 +1339,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 	/* Hack -- Process Lanterns/Torches */
-	else if ((o_ptr->tval == TV_LITE) && (!artifact_p(o_ptr)))
+	else if ((k_ptr->flags5 & (TR5_SHOW_FUEL)) != 0)
 	{
 		/* Hack -- Turns of light for normal lites */
 		if (o_ptr->charges)
@@ -1610,11 +1381,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		object_desc_chr_macro(t, p2);
 	}
 
-
 	/* Indicate "charging" artifacts/rods */
 	if (o_ptr->timeout)
 	{
-		if (((o_ptr->tval == TV_ROD) || (f3 & (TR3_ACTIVATE))) && (o_ptr->tval != TV_SPELL))
+		if ((k_ptr->flags6 & (TR6_NO_TIMEOUT)) == 0)
 		{
 			/* Hack -- variant timeout stack */
 			if (o_ptr->stackc)

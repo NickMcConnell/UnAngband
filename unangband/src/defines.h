@@ -664,8 +664,9 @@
 #define COMMAND_ITEM_FILL		23
 #define COMMAND_ITEM_FUEL_TORCH	24
 #define COMMAND_ITEM_FUEL_LAMP	25
-#define COMMAND_ITEM_LITE		26
-#define COMMAND_ITEM_MAGIC_TRAP	27
+#define COMMAND_ITEM_FILL_FIREARM	26
+#define COMMAND_ITEM_LITE		27
+#define COMMAND_ITEM_MAGIC_TRAP	28
 
 
 #define MAX_COMMANDS	28
@@ -1915,6 +1916,7 @@
 #define TV_POLEARM      22      /* Axes and Pikes */
 #define TV_SWORD 23      /* Edged Weapons */
 #define TV_INSTRUMENT   24      /* Musical instruments */
+#define TV_FIREARM 25		/* Guns */
 #define TV_BOOTS 30      /* Boots */
 #define TV_GLOVES       31      /* Gloves */
 #define TV_HELM  32      /* Helms */
@@ -2504,12 +2506,15 @@
 /* These are correct */
 /* The "sval" codes for TV_FLASK */
 #define SV_FLASK_OIL      0
+#define SV_FLASK_GUNPOWDER      1
 #define SV_FLASK_ACID     2
 #define SV_FLASK_BLOOD	  3
 #define SV_FLASK_SLIME	  4
 #define SV_FLASK_BILE	  5
 #define SV_FLASK_WEB	  15
-#define SV_FLASK_EMPTY    2
+
+/* The sval codes for containers */
+#define SV_HOLD_FLASK    2
 
 
 /* These may be incorrect */
@@ -3592,9 +3597,9 @@
 #define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
 
 #define TR5_SHOW_DD		0x00000001L	/* Show damage dice */
-#define TR5_SHOW_MODS   0x00000002L /* Show "to-hit" and "to-dam" bonus */
+#define TR5_SHOW_WEAPON 0x00000002L /* Show "to-hit" and "to-dam" bonus */
 #define TR5_SHOW_CHARGE 0x00000004L	/* Show charges */
-#define TR5_SHOW_TURNS	0x00000008L	/* Show turns (of light) */
+#define TR5_SHOW_FUEL	0x00000008L	/* Show turns (of light) */
 #define TR5_SHOW_AC		0x00000010L	/* Show armour class */
 #define TR5_HAS_PVAL	0x00000020L	/* Item has varying pval */
 #define TR5_HAS_BONUS	0x00000040L	/* Item has varying to-hit/to-dam/to-ac */
@@ -3628,6 +3633,10 @@
 #define TR6_ARMOUR		0x00000002L	/* Item is an armour */
 #define TR6_FLAVOR		0x00000004L	/* Item is "flavoured" */
 #define TR6_NAMED		0x00000008L	/* Item is "named" after monster */
+#define TR6_SIMPLE		0x00000010L	/* Item has a 'simple' description */
+#define TR6_RESEARCH	0x00000020L	/* Item is 'researched' */
+#define TR6_SHOW_MULT	0x00000040L	/* Show bow multiplier */
+#define TR6_NO_TIMEOUT	0x00000080L	/* Don't show timeout */
 #define TR6_1_HANDED	0x00000100L	/* Item can be wielded 1-handed. (cmd3.c) */
 #define TR6_2_HANDED	0x00000200L	/* Item can be wielded 2-handed. (cmd3.c) */
 #define TR6_OFF_HAND	0x00000400L	/* Item can be wielded in off-hand (cmd3.c) */
@@ -3637,7 +3646,7 @@
 #define TR6_EAT_BODY	0x00004000L	/* Monster eats if has 'eat body' */
 #define TR6_EAT_INSECT	0x00008000L	/* Monster eats if an insect */
 #define TR6_EAT_ANIMAL	0x00010000L	/* Monster eats if an animal */
-#define TR6_EAT_CURE	0x00020000L	/* Monster eats if looking for a cure */
+#define TR6_EAT_SMART	0x00020000L	/* Monster eats if smart (and hungry) */
 #define TR6_EAT_HEAL	0x00040000L	/* Monster eats if looking for healing */
 #define TR6_EAT_MANA	0x00080000L	/* Monster eats if looking for mana */
 #define TR6_HAS_ROPE    0x00100000L	/* Item has rope attached (cmd2.c) */
@@ -3645,8 +3654,13 @@
 #define TR6_RANDOM		0x00400000L	/* Item has randomly picked effect */
 #define TR6_BAD_THROW	0x00800000L	/* Item is hard to throw */
 #define TR6_BREAK_THROW	0x01000000L	/* Item breaks when thrown */
-
-
+#define TR6_TITLE		0x02000000L	/* Item has a random title */
+#define TR6_ADD_NAME	0x04000000L	/* Add item name if aware */
+#define TR6_MOD_NAME	0x08000000L	/* Use item name as 'modifier' */
+#define TR6_PREPEND		0x10000000L	/* Prepend 'modifier' */
+#define TR6_IN_FEET		0x20000000L	/* Treat as a collective noun */
+#define TR6_FORCE_MOD	0x40000000L	/* Force display of modifier */
+#define TR6_NO_TVAL		0x80000000L	/* Don't display base tval name */
 
 
 /*

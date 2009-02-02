@@ -2637,21 +2637,22 @@ void do_cmd_set_trap_or_spike(void)
 				/* Check if fired */
 				if (j_ptr->tval == TV_BOW)
 				{
-					switch(j_ptr->sval)
+					switch(j_ptr->sval / 10)
 					{
-						case SV_LONG_BOW:
-						case SV_SHORT_BOW:
+						case 1:
 						{
 							if (i_ptr->tval != TV_ARROW) trap_allowed = FALSE;
 							break;
 						}
-					    case SV_HAND_XBOW:
-						case SV_LIGHT_XBOW:
-						case SV_HEAVY_XBOW:
+					    case 2:
 						{
 							if (i_ptr->tval != TV_BOLT) trap_allowed = FALSE;
 							break;
 						}
+					    case 3:
+					    {
+							if (i_ptr->tval != TV_SHOT) trap_allowed = FALSE;
+					    }
 						default:
 						{
 							if (!is_known_throwing_item(i_ptr)) trap_allowed = FALSE;
@@ -3961,6 +3962,12 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 
 		/* Take a turn */
 		p_ptr->energy_use = 100 / p_ptr->num_fire;
+
+		/* Check for charged weapon */
+		if (inventory[INVEN_BOW].sval/10 == 3)
+		{
+			inventory[INVEN_BOW].charges--;
+		}
 	}
 	else
 	{
@@ -4210,6 +4217,14 @@ void do_cmd_throw_fire(bool fire)
 		if (p_ptr->num_fire <= 0)
 		{
 			msg_print("You lack the skill to fire a weapon.");
+
+			return;
+		}
+
+		/* Check for charged weapon */
+		if ((inventory[INVEN_BOW].sval/10 == 3) && (inventory[INVEN_BOW].charges <= 0))
+		{
+			msg_print("You must refill your weapon with gunpowder.");
 
 			return;
 		}

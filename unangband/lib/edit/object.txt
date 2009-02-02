@@ -31,11 +31,13 @@ V:0.6.3
 
 ##### Non-kind (contains the "pile" picture) #####
 
-N:0:<pile>
+N:0:(nothing)
 G:&:w
 I:0:0:0
 W:0:0:0:0
 P:0:0d0:0:0:0
+F:SIMPLE
+
 
 ##### Mushrooms #####
 
@@ -178,6 +180,7 @@ I:80:16:0
 W:15:500:1:75
 A:15/1
 P:0:0d0:0:0:0
+F:EAT_HEAL
 
 ##### Normal Food #####
 
@@ -236,6 +239,7 @@ I:80:20:0
 W:10:500:1:75
 A:15/1
 P:0:0d0:0:0:0
+F:EAT_MANA
 
 N:29:& Apple~
 G:,:g
@@ -1862,9 +1866,14 @@ P:0:0d0:0:0:0
 Y:19:1
 F:SLOW_DIGEST
 
-### 231 - Unused ###
-
-#$# 231 - Unused ###
+N:231:Gunpowder
+G:!:G
+I:77:1:0
+W:15:20:10:30
+A:15/1
+P:0:1d1:0:0:0
+F:THROWING |
+F:SHOW_CHARGE
 
 N:232:Naivety
 G:!:w
@@ -1910,6 +1919,7 @@ A:0/1:1/1:3/1
 P:0:1d1:0:0:0
 Y:3:1
 F:THROWING |
+F:EAT_HEAL
 
 N:238:Clumsiness
 G:!:w
@@ -1937,6 +1947,7 @@ A:5/1
 P:0:1d1:0:0:0
 Y:3:2
 F:THROWING |
+F:EAT_HEAL
 
 N:241:Cure Critical Wounds
 G:!:w
@@ -1946,6 +1957,7 @@ A:10/1
 P:0:1d1:0:0:0
 Y:3:4
 F:THROWING |
+F:EAT_HEAL
 
 # Note level appears hack to force this to be a good drop.
 
@@ -1957,6 +1969,7 @@ A:25/1:45/1
 P:0:1d1:0:0:0
 Y:24:3
 F:THROWING |
+F:EAT_HEAL
 
 N:243:Constitution and Charisma
 G:!:w
@@ -2077,6 +2090,7 @@ A:1/1
 P:0:1d1:0:0:0
 Y:20:1
 F:THROWING |
+F:EAT_HEAL
 
 N:258:Berserk Strength
 G:!:w
@@ -2086,6 +2100,7 @@ A:3/1
 P:0:1d1:0:0:0
 Y:23:2
 F:THROWING |
+F:EAT_HEAL
 
 N:259:Boldness
 G:!:w
@@ -2158,6 +2173,7 @@ A:25/1:50/1
 P:0:1d1:0:0:0
 Y:17:3
 F:THROWING |
+F:EAT_MANA
 
 N:267:Infra-vision
 G:!:w
@@ -3503,6 +3519,7 @@ A:52/4:60/4
 P:0:1d1:0:0:0
 Y:24:5
 F:THROWING |
+F:EAT_HEAL
 
 N:421:Self Knowledge
 G:!:w
@@ -3633,11 +3650,16 @@ P:0:1d1:0:0:0
 Y:27:5
 F:THROWING |
 
+N:433:& set~ of Elven Dueling Pistols
+G:}:r
+I:19:33:1
+W:19:2:50:1200
+A:25/4
+P:0:1d1:0:0:0
+F:SHOW_MULT | SHOW_WEAPON | SHOW_CHARGE
+F:SHOTS
+
 ### New light hafted weapon ###
-
-### 433 - Unused ###
-
-#$# 433 - Unused ###
 
 N:434:& Dart~
 G:/:r
@@ -3647,15 +3669,24 @@ A:0/2
 P:0:1d3:0:0:0
 F:THROWING |
 
+N:435:& Dwarven Longarm~
+G:}:r
+I:19:37:0
+W:30:1:75:2000
+A:30/4
+P:0:1d1:0:0:0
+F:SHOW_MULT | SHOW_WEAPON | SHOW_CHARGE
+
+N:436:& Orcish Blunderbuss~
+G:}:r
+I:19:35:0
+W:20:2:100:800
+A:20/3
+P:0:1d1:0:0:0
+F:SHOW_MULT | SHOW_WEAPON | SHOW_CHARGE
+
+
 ### Three new types of ammo ###
-
-### 435 - Unused ###
-
-### 436 - Unused ###
-
-#$# 435 - Unused ###
-
-#$# 436 - Unused ###
 
 N:437:& Adamantite Shot~
 G:{:G
@@ -5193,6 +5224,7 @@ A:15/2
 P:0:1d1:0:0:0
 Y:3:5
 F:THROWING |
+F:EAT_HEAL
 
 N:651:Cure All Wounds
 G:!:w
@@ -5202,6 +5234,7 @@ A:35/2:45/1
 P:0:1d1:0:0:0
 Y:3:6
 F:THROWING |
+F:EAT_HEAL
 
 N:652:*Cure All Wounds*
 G:!:w
@@ -5211,6 +5244,7 @@ A:45/2:55/1
 P:0:1d1:0:0:0
 Y:3:7
 F:THROWING |
+F:EAT_HEAL
 
 N:653:Remove Fear & Poison
 G:!:w
@@ -6755,6 +6789,7 @@ A:3/1
 P:0:1d1:0:0:0
 Y:3:3
 F:THROWING |
+F:EAT_HEAL
 
 N:861:Cure Serious Wounds
 G:_:w

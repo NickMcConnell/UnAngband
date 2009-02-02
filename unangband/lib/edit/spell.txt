@@ -3913,15 +3913,9 @@ P:0:0
 F:INC_CON | INC_CHR | CURE_CON | CURE_CHR |
 L:1d30+30
 
-#Unused
-#N:313:Charisma
-#A:75:53:1
-#L:1d30+30
-#F:CURE_CHR | INC_CHR
-
-### 313 - Unused ###
-
-#$# 313 - Unused ###
+N:313:Gunpowder
+A:77:1:1
+B:EXPLODE:EXPLODE:10d10
 
 N:314:Augmentation
 A:75:55:1

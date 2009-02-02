@@ -47,20 +47,7 @@
  */
 int bow_multiplier(int sval)
 {
-	switch (sval)
-	{
-		case SV_SLING:
-		case SV_SHORT_BOW:
-		case SV_HAND_XBOW:
-			return (2);
-		case SV_LONG_BOW:
-		case SV_LIGHT_XBOW:
-			return (3);
-		case SV_HEAVY_XBOW:
-			return (4);
-		default:
-			return (0); /* instruments, etc. */
-	}
+	return (sval % 10);
 }
 
 
@@ -3340,34 +3327,46 @@ void list_object(const object_type *o_ptr, int mode)
 		if (f1 & (TR1_MIGHT)) mult += o_ptr->pval;
 
 		/* Analyze the launcher */
-		switch (o_ptr->sval)
+		switch (o_ptr->sval / 10)
 		{
-			/* Sling and ammo */
-			case SV_SLING:
-			{
-				/* Hack -- slings now act like 'throwers' */
-				text_out("shots or thrown items");
-				break;
-			}
-
 			/* Short Bow and Arrow */
-			case SV_SHORT_BOW:
-			case SV_LONG_BOW:
+			case 1:
 			{
 				text_out("arrows");
 				break;
 			}
 
 			/* Light Crossbow and Bolt */
-			case SV_HAND_XBOW:
-			case SV_LIGHT_XBOW:
-			case SV_HEAVY_XBOW:
+			case 2:
 			{
 				text_out("bolts");
 				break;
 			}
+
+			/* Firearms */
+			case 3:
+			{
+				text_out("shots");
+				break;
+			}
+
+			/* Sling and ammo */
+			default:
+			{
+				/* Hack -- slings now act like 'throwers' */
+				text_out("shots or thrown items");
+				break;
+			}
+
 		}
 		text_out(format(" by %d.  ", mult));
+
+		if (o_ptr->sval / 10 == 3)
+		{
+			int max_charge = k_info[o_ptr->k_idx].charges;
+
+			text_out(format("It requires gunpowder to reload and can fit %d charge%s.  ",max_charge, max_charge > 1 ? "s" : ""));
+		}
 	}
 
 	/* Extra powers */
@@ -5940,20 +5939,17 @@ s32b object_power(const object_type *o_ptr)
 			 * weapon.  Could make this dynamic based on k_info if desired.
 			 */
 
-			if (o_ptr->sval == SV_SLING)
-			{
-				p += AVG_SLING_AMMO_DAMAGE;
-			}
-			else if (o_ptr->sval == SV_SHORT_BOW ||
-					 o_ptr->sval == SV_LONG_BOW)
+			if (o_ptr->sval / 10 == 1)
 			{
 				p += AVG_BOW_AMMO_DAMAGE;
 			}
-			else if (o_ptr->sval == SV_HAND_XBOW ||
-					 o_ptr->sval == SV_LIGHT_XBOW ||
-					 o_ptr->sval == SV_HEAVY_XBOW)
+			else if (o_ptr->sval / 10 == 2)
 			{
 				p += AVG_XBOW_AMMO_DAMAGE;
+			}
+			else
+			{
+				p += AVG_SLING_AMMO_DAMAGE;
 			}
 
 			mult = bow_multiplier(o_ptr->sval);

@@ -3738,29 +3738,33 @@ static void calc_bonuses(void)
 		p_ptr->num_fire = 1;
 
 		/* Analyze the launcher */
-		switch (o_ptr->sval)
+		switch (o_ptr->sval / 10)
 		{
 			/* Sling and ammo */
-			case SV_SLING:
+			case 0:
 			{
 				/* Hack -- slings now act like 'throwers' */
 				break;
 			}
 
 			/* Bows */
-			case SV_SHORT_BOW:
-			case SV_LONG_BOW:
+			case 1:
 			{
 				p_ptr->ammo_tval = TV_ARROW;
 				break;
 			}
 
 			/* Crossbows */
-			case SV_HAND_XBOW:
-			case SV_LIGHT_XBOW:
-			case SV_HEAVY_XBOW:
+			case 2:
 			{
 				p_ptr->ammo_tval = TV_BOLT;
+				break;
+			}
+
+			/* Firearms */
+			case 3:
+			{
+				p_ptr->ammo_tval = TV_SHOT;
 				break;
 			}
 		}

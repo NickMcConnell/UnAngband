@@ -170,7 +170,7 @@ T:0-4:gaze~ at &
 W:3:0:0
 M:20
 F:MISS | KILL | PLAY | MAGIC | JUMP |
-F:MELEE | RANGED | EYESIGHT
+F:MELEE | RANGED | EYESIGHT | LOS
 D:gaze~:one target
 
 N:18:WAIL
@@ -452,7 +452,7 @@ D:strike~:$ enemy
 N:52:EXPLODE
 T:0-9999:explodes!
 R:2
-F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC | SELF |
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC | SELF | EXPAND
 F:RANGED |
 D::& and all enemies adjacent to &
 
@@ -659,7 +659,7 @@ D:affect~ an area:
 N:77:SCATTER
 T:0-9999:scatter~ * around &
 W:4:0:0
-M:20
+R:5
 U:3+1/10
 F:GRID | ITEM | KILL | PLAY | SELF | MAGIC | SCATTER |
 D:scatter~ magic around &:$ enemies
@@ -721,16 +721,50 @@ M:8
 F:BEAM | GRID | KILL | PLAY | ITEM | LOS
 D::one direction
 
+N:85:SCATTER_PASS
+T:0-9999:scatter~ * around &
+W:4:0:0
+R:20
+U:3+1/10
+F:GRID | ITEM | KILL | PLAY | SELF | MAGIC | SCATTER | PASS
+D:scatter~ magic around &:$ enemies
 
-#$# 85 - Unused ###
+N:86:MIST
+T:0-9999:call~ * around &
+T:0-9999:summon~ * around &
+T:0-9999:create~ * around &
+W:3:0:0
+R:1+1/10
+M:1
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | MAGIC | SAFE | MYST
+D:surround~ & with mist:
 
-#$# 86 - Unused ###
+N:87:STARE
+T:0-9999:stare~ at &
+I:0:0:20
+W:5:0:0
+A:30:60
+R:20
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+F:LOS
+D:stare~:
 
-#$# 87 - Unused ###
+N:88:LINE_WIDE
+T:0-9999:creat||es| a wide path of *
+W:4:0:0
+M:10
+R:1
+F:BEAM | GRID | KILL | PLAY | ITEM | FLOW
+D::one direction
 
-#$# 88 - Unused ###
-
-#$# 89 - Unused ###
+N:89:ARC_40_SHORT
+T:0-9999:create~ a broad, short arc of * at &
+I:0:0:20
+W:5:0:0
+A:40:60
+R:6
+F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+D:create~ a short arc:
 
 #$# 90 - Unused ###
 
