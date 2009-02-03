@@ -779,7 +779,7 @@ s16b get_mon_num(int level)
 			{
 				u32b match;
 
-				if (cave_ecology.use_ecology <= DUN_ROOMS)
+				if (cave_ecology.use_ecology < DUN_ROOMS)
 				{
 					match = (room_info[cave_ecology.use_ecology].ecology);
 				}

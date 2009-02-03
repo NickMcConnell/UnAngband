@@ -5908,7 +5908,8 @@ s32b object_power(const object_type *o_ptr)
 	/* Lookup the item if not yet cached */
 	k_idx = o_ptr->k_idx;
 
-	assert (k_idx = lookup_kind(o_ptr->tval, o_ptr->sval));
+	if(o_ptr->k_idx<=0)
+		k_idx = lookup_kind(o_ptr->tval, o_ptr->sval);
 
 	/* Get the object kind */
 	k_ptr = &k_info[k_idx];
