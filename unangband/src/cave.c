@@ -5075,7 +5075,7 @@ void town_illuminate(bool daytime)
 /*
  * Hack -- Really change the feature
  */
-void cave_set_feat_aux(int y, int x, int feat)
+void cave_set_feat_aux(const int y, const int x, int feat)
 {
 	/* Set if blocks los */
 	bool los = cave_floor_bold(y,x);
@@ -5678,7 +5678,7 @@ void set_level_flags(int feat)
 /*
  * Change the "feat" flag for a grid, and notice/redraw the grid
  */
-void cave_set_feat(int y, int x, int feat)
+void cave_set_feat(const int y, const int x, int feat)
 {
 	int i;
 
@@ -5991,7 +5991,7 @@ int feat_state(int feat, int action)
  * Takes a location and action and changes the feature at that
  * location through applying the given action.
  */
-void cave_alter_feat(int y, int x, int action)
+void cave_alter_feat(const int y, const int x, int action)
 {
 	int newfeat;
 

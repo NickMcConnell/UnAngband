@@ -2075,7 +2075,11 @@ static void player_birth_quickstart(quickstart_type *q_ptr)
 	int i;
 	
 	/* Copy across the quickstart structure */
-	p_ptr->psex = q_ptr->psex;
+	/* HACK: assuming sp_ptr has been set, user has selected a gender in get_player_sex.
+	 * otherwise: overwrite */
+	if(sp_ptr==0)
+		p_ptr->psex = q_ptr->psex;
+
 	p_ptr->pshape = p_ptr->prace = q_ptr->prace;
 	p_ptr->pclass = q_ptr->pclass;
 	p_ptr->pstyle = q_ptr->pstyle;

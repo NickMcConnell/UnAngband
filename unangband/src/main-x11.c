@@ -1429,7 +1429,7 @@ static errr Infofnt_text_non(int x, int y, cptr str, int len)
 /*
  * Hack -- cursor color
  */
-static infoclr *xor;
+static infoclr *cxor;
 
 /*
  * Actual color table
@@ -2139,7 +2139,7 @@ static errr Term_xtra_x11(int n, int v)
  */
 static errr Term_curs_x11(int x, int y)
 {
-	XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
+	XDrawRectangle(Metadpy->dpy, Infowin->win, cxor->gc,
 			 x * Infofnt->wid + Infowin->ox,
 			 y * Infofnt->hgt + Infowin->oy,
 			 Infofnt->wid - 1, Infofnt->hgt - 1);
@@ -2154,7 +2154,7 @@ static errr Term_curs_x11(int x, int y)
  */
 static errr Term_bigcurs_x11(int x, int y)
 {
-	XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
+	XDrawRectangle(Metadpy->dpy, Infowin->win, cxor->gc,
 			 x * Infofnt->wid + Infowin->ox,
 			 y * Infofnt->hgt + Infowin->oy,
 			 Infofnt->twid - 1, Infofnt->hgt - 1);
@@ -2593,8 +2593,8 @@ errr init_x11(int argc, char **argv)
 
 
 	/* Prepare cursor color */
-	xor = ZNEW(infoclr);
-	Infoclr_set(xor);
+	cxor = ZNEW(infoclr);
+	Infoclr_set(cxor);
 	Infoclr_init_ppn(Metadpy->fg, Metadpy->bg, "xor", 0);
 
 

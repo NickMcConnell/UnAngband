@@ -594,7 +594,7 @@ static void (*draw_block)(void *tiles[PJ_MAX],
 /*
  * Hack -- cursor color
  */
-static infoclr *xor;
+static infoclr *cxor;
 
 /*
  * Actual color table
@@ -1840,7 +1840,7 @@ static errr Term_curs_xpj(int x, int y)
 	/* Are we on the main window? */
 	if (Term->data == &data[0])
 	{
-		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
+		XDrawRectangle(Metadpy->dpy, Infowin->win, cxor->gc,
 		               x * P_TILE_SIZE + y * P_TILE_SIZE / 2 +
 		               P_TILE_SIZE  / 4 + Infowin->ox,
 		               y * P_TILE_SIZE + P_TILE_SIZE / 2 + Infowin->oy,
@@ -1848,7 +1848,7 @@ static errr Term_curs_xpj(int x, int y)
 	}
 	else
 	{
-		XDrawRectangle(Metadpy->dpy, Infowin->win, xor->gc,
+		XDrawRectangle(Metadpy->dpy, Infowin->win, cxor->gc,
 		               x * Infofnt->wid + Infowin->ox,
 		               y * Infofnt->hgt + Infowin->oy,
 		               Infofnt->wid - 1, Infofnt->hgt - 1);
@@ -3251,8 +3251,8 @@ errr init_xpj(int argc, char **argv)
 
 
 	/* Prepare cursor color */
-	xor = ZNEW(infoclr);
-	Infoclr_set(xor);
+	cxor = ZNEW(infoclr);
+	Infoclr_set(cxor);
 	Infoclr_init_ppn(Metadpy->fg, Metadpy->bg, "xor", 0);
 
 
