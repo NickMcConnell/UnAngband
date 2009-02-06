@@ -442,14 +442,19 @@ errr process_pref_file_command(char *buf)
 	/* Process "F:<num>:<a>/<c>:<under>:<flags>" -- attr/char for terrain features, plus flags for lighting etc. */
 	else if (buf[0] == 'F')
 	{
+		int t = tokenize(buf+2, 5, zz);
+
 		/* Mega-hack -- feat supports lighting 'yes' or 'no' */
-		if (tokenize(buf+2, 5, zz) == 5)
+		if (t >= 3)
 		{
 			feature_type *f_ptr;
 
 			i = (huge)strtol(zz[0], NULL, 0);
 			if ((i < 0) || (i >= z_info->f_max)) return (1);
 			f_ptr = &f_info[i];
+
+			/* Clear current flags */
+			f_ptr->flags3 &= ~(FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL);
 
 			/* Get color */
 			if (read_byte_or_char(zz[1], &a, &c))
@@ -461,19 +466,21 @@ errr process_pref_file_command(char *buf)
 			      f_ptr->x_char = (char)a;
 			else  f_ptr->x_char = c;
 
-			/* Get graphic 'under' the main graphic */
-			n3 = strtol(zz[3], NULL, 0);
-			if (n3) f_ptr->under = n3;
+			if (t >= 4)
+			{
+				/* Get graphic 'under' the main graphic */
+				n3 = strtol(zz[3], NULL, 0);
+				if (n3) f_ptr->under = n3;
 
-			/* Clear current flags */
-			f_ptr->flags3 &= ~(FF3_ATTR_LITE | FF3_ATTR_ITEM | FF3_ATTR_DOOR | FF3_ATTR_WALL);
-
-			/* Get feature flags */
-			if (strstr("A", zz[4])) f_ptr->flags3 |= (FF3_ATTR_LITE);
-			else if (strstr("F", zz[4])) f_ptr->flags3 |= (FF3_ATTR_ITEM);
-			else if (strstr("D", zz[4])) f_ptr->flags3 |= (FF3_ATTR_DOOR);
-			else if (strstr("W", zz[4])) f_ptr->flags3 |= (FF3_ATTR_WALL);
-
+				if (t >= 4)
+				{
+					/* Get feature flags */
+					if (strstr("A", zz[4])) f_ptr->flags3 |= (FF3_ATTR_LITE);
+					else if (strstr("F", zz[4])) f_ptr->flags3 |= (FF3_ATTR_ITEM);
+					else if (strstr("D", zz[4])) f_ptr->flags3 |= (FF3_ATTR_DOOR);
+					else if (strstr("W", zz[4])) f_ptr->flags3 |= (FF3_ATTR_WALL);
+				}
+			}
 			return (0);
 		}
 	}
@@ -597,7 +604,14 @@ errr process_pref_file_command(char *buf)
 		if (tokenize(buf+2, 2, zz) == 2)
 		{
 			j = (byte)strtol(zz[0], NULL, 0) % 128;
-			n1 = strtol(zz[1], NULL, 0);
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      n1 = a;
+			else  n1 = (byte)color_char_to_attr(c);
+
+			msg_format("%d",n1);
+
 			if ((j < 0) || (j >= 128)) return (1);
 			if (n1) tval_to_attr[j] = n1;
 			return (0);
@@ -739,7 +753,12 @@ errr process_pref_file_command(char *buf)
 		if (tokenize(buf+2, 2, zz) == 2)
 		{
 			u16b type = (u16b)strtol(zz[0], NULL, 0);
-			int color = color_char_to_attr(zz[1][0]);
+			int color;
+
+			/* Get color */
+			if (read_byte_or_char(zz[1], &a, &c))
+			      color = a;
+			else  color = (byte)color_char_to_attr(c);
 
 			/* Ignore illegal color */
 			if (color < 0) return (1);
@@ -1115,7 +1134,9 @@ static errr process_pref_file_aux(cptr name)
 		/* ToDo: Add better error messages */
 		msg_format("Error %d in line %d of file '%s'.", err, line, name);
 		msg_format("Parsing '%s'", old);
+		msg_format("Press any key to continue.");
 		message_flush();
+		anykey();
 	}
 
 	/* Close the file */

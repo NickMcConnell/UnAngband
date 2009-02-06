@@ -3630,7 +3630,7 @@ errr parse_k_info(char *buf, header *head)
 		{
 			case TV_FLASK:
 				k_ptr->flags6 |= (TR6_BREAK_THROW);
-				k_ptr->flags6 |= (TR6_ADD_NAME | TR6_MOD_NAME | TR6_FORCE_MOD);
+				k_ptr->flags6 |= (TR6_ADD_NAME | TR6_MOD_NAME);
 
 				if (k_ptr->sval == SV_FLASK_BLOOD) k_ptr->flags6 |= (TR6_NAMED);
 				if (k_ptr->sval == SV_FLASK_SLIME) k_ptr->flags6 |= (TR6_NAMED);
