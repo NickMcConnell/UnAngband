@@ -2122,7 +2122,7 @@ errr parse_method_info(char *buf, header *head)
 		if (n1 >= MAX_METHOD_DESCRIPTIONS) return (PARSE_ERROR_GENERIC);
 
 		/* Find either a minus sign or colon */
-		for (t = s = buf + 2; *t && (*t != '-') && (*t != '<') && (*t != ':'); ++t) /* loop */;
+		for (t = buf + 2, s = buf + 2; *t && (*t != '-') && (*t != '<') && (*t != ':'); ++t) /* loop */;
 
 		/* Parse max */
 		if ((*t == '-') || (*t == '<'))
@@ -2131,7 +2131,7 @@ errr parse_method_info(char *buf, header *head)
 			*t++ = '\0';
 
 			method_ptr->desc[n1].max = atoi(t);
-			if (!method_ptr->desc[n1].max)
+			if (!method_ptr->desc[n1].max) return (PARSE_ERROR_GENERIC);
 
 			/* Find the colon */
 			for (; *t && (*t != ':'); ++t) /* loop */;

@@ -112,7 +112,7 @@ F:MELEE | TOUCH |
 D::
 
 N:9:BUTT
-T:10-20:0:trample~ &
+T:10-20:trample~ &
 T:0-9:butt~ &
 F:MISS |
 F:MELEE | STUN | TOUCH |
@@ -126,7 +126,7 @@ F:MELEE | CUTS | TOUCH |
 D::
 
 N:11:ENGULF
-T:0-50:0:envelope~ &
+T:0-50:envelope~ &
 T:0-9999:engulf~ &
 F:MISS |
 F:MELEE | TOUCH |
@@ -164,8 +164,8 @@ F:MELEE | RANGED | TOUCH |
 D:spit~:one target
 
 N:17:GAZE
-T:20-30:0:gaze~ terribly at &
-T:5-30:0:gaze~ upon &
+T:20-30:gaze~ terribly at &
+T:5-30:gaze~ upon &
 T:0-4:gaze~ at &
 W:3:0:0
 M:20
