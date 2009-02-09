@@ -4196,7 +4196,6 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 		if ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
 		{
 			s32b mult, div, new_exp, new_exp_frac;
-			byte new_level;
 
 			/* 10 + killed monster level */
 			mult = 10 + r_ptr->level;
@@ -4206,9 +4205,6 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 
 			/* Give some experience for the kill */
 			new_exp = ((long)r_ptr->mexp * mult) / div;
-
-			/* Base adjustment */
-			new_level = -1;
 
 			/* Handle fractional experience */
 			new_exp_frac = ((((long)r_ptr->mexp * mult) % div)
