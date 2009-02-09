@@ -4276,7 +4276,7 @@ void fake_bag_item(object_type *i_ptr, int sval, int slot)
 	/* Initially no item */
 	i_ptr->k_idx = 0;
 
-	assert (sval <= SV_BAG_MAX_BAGS && slot <= INVEN_BAG_TOTAL);
+	assert (sval < SV_BAG_MAX_BAGS && slot < INVEN_BAG_TOTAL);
 
 	/* Get bag kind from lookup kind cache */
 	i_ptr->k_idx = bag_kinds_cache[sval][slot];
