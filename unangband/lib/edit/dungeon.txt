@@ -799,7 +799,7 @@ Q:51:528
 L:48:0:420:0:528:0:the
 L:49:56:0:0:0:0:the
 L:53:56:0:0:522:0:the
-S:806:0:0:0:0:0:0:0:the
+S:806:0:0:0:0:0:0:0
 D:A single slab of grey stone covered with bones sits here, deep in the Dimholt woods.
 D:  Beyond, you can see the pale, flickering torches that light the Dark Door of the
 D: Dead --- the entrance to the Paths of the Dead.  You can leave supplies here on the
