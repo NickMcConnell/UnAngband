@@ -3882,7 +3882,7 @@
 #define RF2_INVISIBLE	0x00000010      /* Monster avoids vision */
 #define RF2_COLD_BLOOD	0x00000020      /* Monster avoids infra */
 #define RF2_EMPTY_MIND	0x00000040      /* Monster avoids telepathy */
-#define RF2_WEIRD_MIND	0x00000080      /* Monster avoids telepathy? */
+#define RF2_WEIRD_MIND	0x00000080      /* Some (80%) monsters avoid telepathy */
 #define RF2_MULTIPLY	0x00000100      /* Monster reproduces */
 #define RF2_REGENERATE	0x00000200      /* Monster regenerates */
 #define RF2_CAN_SWIM	0x00000400      /* Monster can swim */
