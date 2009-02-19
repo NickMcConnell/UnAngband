@@ -3,6 +3,7 @@ use strict;
 
 use Data::Dumper;
 use CGI::Pretty qw/:standard :html4 *ul/;
+use Carp qw(longmess);
 
 ###############################################################################
 # Dumps context of txt files into slightly more readable html, includes
@@ -74,6 +75,11 @@ my %filenames =
 		html => "effect.html",
 		debug => "effect.pl.txt"
 	},
+	region => {
+		txt => "lib/edit/region.txt",
+		html => "region.html",
+		debug => "region.pl.txt"
+	},
 );
 
 # a few useful globals for parsing
@@ -90,26 +96,6 @@ my $params5 = "$fmid:$fmid:$fmid:$fmid:$fend";
 my $params6 = "$fmid:$fmid:$fmid:$fmid:$fmid:$fend";
 my $params7 = "$fmid:$fmid:$fmid:$fmid:$fmid:$fmid:$fend";
 my $params8 = "$fmid:$fmid:$fmid:$fmid:$fmid:$fmid:$fmid:$fend";
-
-# useful shortcuts for html output
-sub id_link {
-	my $target = shift;
-	my $base = shift;
-
-	$base = "" if(not defined $base);
-
-	return a({href=>"$base#$target"}, ">>$target");
-}
-
-sub name_link {
-	my $target = shift;
-	my $name = shift;
-	my $base = shift;
-
-	$base = "" if(not defined $base);
-
-	return a({href=>"$base#$target"}, "$name ($target)");
-}
 
 # some sane styles
 my $styles = <<END;
@@ -139,6 +125,56 @@ my $styles = <<END;
 	}
 </style>
 END
+
+# useful shortcuts for html output
+sub id_link {
+	my $target = shift;
+	my $base = shift;
+
+	$base = "" if(not defined $base);
+
+	return a({href=>"$base#$target"}, ">>$target");
+}
+
+sub name_link {
+	my $target = shift;
+	my $name = shift;
+	my $base = shift;
+
+	$base = "" if(not defined $base);
+
+	print longmess() if not defined $name;
+	
+	return a({href=>"$base#$target"}, "$name ($target)");
+}
+
+sub terrain_link($\@) {
+	my $idx = shift;
+	my @terrains = @{ (shift) };
+	
+	return name_link($idx, $terrains[$idx]->{name}, $filenames{terrain}{html});
+}
+
+sub monster_link($\@) {
+	my $idx = shift;
+	my @monsters = @{ (shift) };
+	
+	return name_link($idx, $monsters[$idx]->{name}, $filenames{monster}{html});
+}
+
+sub vault_link($\@) {
+	my $idx = shift;
+	my @vaults = @{ (shift) };
+	
+	return name_link($idx, $vaults[$idx]->{name}, $filenames{vault}{html});
+}
+
+sub store_link($\@) {
+	my $idx = shift;
+	my @stores = @{ (shift) };
+	
+	return name_link($idx, $stores[$idx]->{name}, $filenames{store}{html});
+}
 
 ##########
 # Dungeons!
@@ -236,34 +272,6 @@ sub parse_dungeons($) {
 	close(FILEIN);
 
 	return @dungeons;
-}
-
-sub terrain_link($\@) {
-	my $idx = shift;
-	my @terrains = @{ (shift) };
-	
-	return name_link($idx, $terrains[$idx]->{name}, $filenames{terrain}{html});
-}
-
-sub monster_link($\@) {
-	my $idx = shift;
-	my @monsters = @{ (shift) };
-	
-	return name_link($idx, $monsters[$idx]->{name}, $filenames{monster}{html});
-}
-
-sub vault_link($\@) {
-	my $idx = shift;
-	my @vaults = @{ (shift) };
-	
-	return name_link($idx, $vaults[$idx]->{name}, $filenames{vault}{html});
-}
-
-sub store_link($\@) {
-	my $idx = shift;
-	my @stores = @{ (shift) };
-	
-	return name_link($idx, $stores[$idx]->{name}, $filenames{store}{html});
 }
 
 sub dump_dungeons_nearby($\@) {
@@ -849,7 +857,6 @@ sub blow_map_link($\%) {
 	return name_link($blows_map{$name}->{idx}, $name, $filenames{blow}{html});
 }
 
-# for the moment, we just return $name
 sub effect_map_link($\%) {
 	my $name = shift;
 	my %effects_map = %{ (shift) };
@@ -1625,6 +1632,91 @@ sub dump_effects($\@) {
 	print FILETXT Dumper(\@effects) if $perldump;
 }
 
+##########
+# regions
+##########
+
+sub parse_regions($) {
+	my $filein = shift;
+	
+	open FILEIN, $filein or die "cannot open $filein: $!\n";
+
+	my @regions;
+	my $idx = -1;
+
+	foreach(<FILEIN>) {
+		chomp;
+		if(/^#/) {
+			#print FILEOUT "$_\n";
+		}
+		elsif(/^\s*$/) {
+			#print FILEOUT "$_\n";
+		}
+		elsif(/^V:/) {
+			; #discard
+		}
+		elsif(/^N:$params2$/) {
+			$idx = $1;
+			$regions[$idx]{idx} = $1;
+			$regions[$idx]{name} = $2;
+		}
+		elsif(/^G:(.):(.)$/) {
+			$regions[$idx]{d_char} = $1;
+			$regions[$idx]{d_attr} = $2;
+		}
+		elsif(/^I:$params1$/) {
+			$regions[$idx]{delay_reset} = $1;
+		}
+	}
+
+	close(FILEIN);
+	
+	return @regions;
+}
+
+sub dump_regions($\@) {
+	my $fileout = shift;
+	my @regions = @{ (shift) };
+	
+	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
+	
+	print FILEOUT
+		start_html(-title=>'regions'),
+		h1("region.txt"),
+		$styles,
+	;
+	
+	# link collection
+	foreach my $region ( @regions ) {
+		# array is sparse
+		next if not $region;
+
+		print FILEOUT id_link($region->{idx})." ";
+	}
+
+	# all the data blocks
+	foreach my $region( @regions ) {
+		# array is still sparse
+		next if not $region;
+	
+		print FILEOUT
+			a({name=>"$region->{idx}"}, h3("$region->{name} ($region->{idx})")),
+			start_ul;
+	
+		print FILEOUT li("Looks like ".strong($region->{d_char})." coloured ".strong($region->{d_attr}))
+			if defined $region->{d_char};
+		print FILEOUT li("Delay between blows: ".strong($region->{delay_reset}))
+			if defined $region->{delay_reset};
+		
+		print FILEOUT end_ul;
+
+	}
+	print FILEOUT end_html;
+
+	open FILETXT, ">$filenames{region}{debug}" if $perldump;
+	print FILETXT Dumper(\@regions) if $perldump;
+}
+
 #notes:
 my $notes=<<END;
 
@@ -1656,29 +1748,53 @@ sub idx2name(\@) {
 	return %names;
 }
 
+print "Parse Dungeons...\n";
 my @dungeons = parse_dungeons("<$filenames{dungeon}{txt}");
+print "Parse Stores...\n";
 my @stores = parse_stores("<$filenames{store}{txt}");
+print "Parse Monsters...\n";
 my @monsters = parse_monsters("<$filenames{monster}{txt}");
+print "Parse Terrain...\n";
 my @terrains = parse_terrains("<$filenames{terrain}{txt}");
+print "Parse Vaults...\n";
 my @vaults = parse_vaults("<$filenames{vault}{txt}");
+print "Parse Objects...\n";
 my @objects = parse_objects("<$filenames{object}{txt}");
+print "Parse Shop Owners...\n";
 my @shop_owners = parse_shop_owners("<$filenames{shop_owner}{txt}");
+print "Parse Rooms...\n";
 my @rooms = parse_rooms("<$filenames{room}{txt}");
+print "Parse Blows...\n";
 my @blows = parse_blows("<$filenames{blow}{txt}");
+print "Parse Effects...\n";
 my @effects = parse_effects("<$filenames{effect}{txt}");
+print "Parse Regions...\n";
+my @regions = parse_regions("<$filenames{region}{txt}");
 
 my %blows_map = idx2name(@blows);
 my %effects_map = idx2name(@effects);
 
+print "Writing Dungeons...\n";
 dump_dungeons(">$filenames{dungeon}{html}", @dungeons, @monsters, @terrains, @vaults, @stores);
+print "Writing Stores...\n";
 dump_stores(">$filenames{store}{html}", @stores);
+print "Writing Monsters...\n";
 dump_monsters(">$filenames{monster}{html}", @monsters);
+print "Writing Terrain...\n";
 dump_terrains(">$filenames{terrain}{html}", @terrains, %blows_map, %effects_map);
+print "Writing Vaults...\n";
 dump_vaults(">$filenames{vault}{html}", @vaults);
+print "Writing Objects...\n";
 dump_objects(">$filenames{object}{html}", @objects);
+print "Writing Shop Owners...\n";
 dump_shop_owners(">$filenames{shop_owner}{html}", @shop_owners, @stores);
+print "Writing Rooms...\n";
 dump_rooms(">$filenames{room}{html}", @rooms);
+print "Writing Blows...\n";
 dump_blows(">$filenames{blow}{html}", @blows);
+print "Writing Effects...\n";
 dump_effects(">$filenames{effect}{html}", @effects);
+print "Writing Regions...\n";
+dump_regions(">$filenames{region}{html}", @regions);
 
 
