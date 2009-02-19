@@ -1587,6 +1587,24 @@ sub parse_effects($) {
 			$effects[$idx]{idx} = $1;
 			$effects[$idx]{name} = $2;
 		}
+		elsif(/^I:$params3$/) {
+			$effects[$idx]{power} = $1;
+			$effects[$idx]{dam_max} = $2;
+			$effects[$idx]{dam_max_powerful} = $2;
+		}
+		elsif(/^D:$params7$/) {
+			$effects[$idx]{info}[0] = $1;
+			$effects[$idx]{info}[1] = $2;
+			$effects[$idx]{info}[2] = $3;
+			$effects[$idx]{info}[3] = $4;
+			$effects[$idx]{info}[4] = $5;
+			$effects[$idx]{info}[5] = $6;
+			$effects[$idx]{info}[6] = $7;
+		}
+		# F: and T: aren't used either, can't be bothered parsing
+		else {
+			print "Huh?:".$_."\n";
+		}
 	}
 
 	close(FILEIN);
@@ -1622,7 +1640,18 @@ sub dump_effects($\@) {
 		print FILEOUT
 			a({name=>"$effect->{idx}"}, h3("$effect->{name} ($effect->{idx})")),
 			start_ul;
-	
+
+		# I: is always 0:0:0 so I can't be bothered outputting it
+
+		if (defined $effect->{info}) {
+			my $stuff = "";
+			for(my $i=0; $i<7; $i++) {
+				my $info = $effect->{info}[$i];
+				$stuff = $stuff.li($info);
+			}
+			print FILEOUT "Descriptions: ".ol({-start=>0}, $stuff);
+		}
+
 		print FILEOUT end_ul;
 
 	}
@@ -1633,7 +1662,7 @@ sub dump_effects($\@) {
 }
 
 ##########
-# regions
+# Regions
 ##########
 
 sub parse_regions($) {
@@ -1667,6 +1696,19 @@ sub parse_regions($) {
 		elsif(/^I:$params1$/) {
 			$regions[$idx]{delay_reset} = $1;
 		}
+		elsif(/^B:$params1$/) {
+			$regions[$idx]{method} = $1;
+		}
+		elsif(/^F:$params1$/) {
+			if($regions[$idx]{flags1}) {
+				$regions[$idx]{flags1} = $regions[$idx]{flags1}." ".$1;
+			} else {
+				$regions[$idx]{flags1} = $1;
+			}
+		}
+		else {
+			print "Huh?:".$_."\n";
+		}
 	}
 
 	close(FILEIN);
@@ -1674,9 +1716,10 @@ sub parse_regions($) {
 	return @regions;
 }
 
-sub dump_regions($\@) {
+sub dump_regions($\@\%) {
 	my $fileout = shift;
 	my @regions = @{ (shift) };
+	my %blows_map = %{ (shift) };
 	
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
@@ -1707,6 +1750,10 @@ sub dump_regions($\@) {
 			if defined $region->{d_char};
 		print FILEOUT li("Delay between blows: ".strong($region->{delay_reset}))
 			if defined $region->{delay_reset};
+		print FILEOUT li("Blow method: ".blow_map_link($region->{method}, %blows_map))
+			if defined $region->{method};
+		print FILEOUT li("Flags: ".strong($region->{flags1}))
+			if defined $region->{flags1};
 		
 		print FILEOUT end_ul;
 
@@ -1795,6 +1842,6 @@ dump_blows(">$filenames{blow}{html}", @blows);
 print "Writing Effects...\n";
 dump_effects(">$filenames{effect}{html}", @effects);
 print "Writing Regions...\n";
-dump_regions(">$filenames{region}{html}", @regions);
+dump_regions(">$filenames{region}{html}", @regions, %blows_map);
 
 
