@@ -148,6 +148,14 @@ Generated via txt2html.pl; do not edit
 -->
 END
 
+# nice little trim function
+sub trim {
+    return trim2( $_ ) if not @_;
+    return map { local $_ = $_; s/^\s+//, s/\s+$//; $_ } @_
+        if defined wantarray;
+    for ( @_ ) { s/^\s+//, s/\s+$// }
+}
+
 # useful shortcuts for html output
 sub id_link {
 	my $target = shift;
@@ -252,6 +260,12 @@ sub dump_perl($\@) {
 	close FILETXT;
 }
 
+sub generic_item_header($) {
+	my $item = shift;
+
+	return a({name=>"$item->{idx}"}, h3("$item->{name} ($item->{idx})"));
+}
+
 ##########
 # Dungeons!
 ##########
@@ -271,7 +285,6 @@ sub parse_dungeons($) {
 		elsif(/^\s*$/) { } #discard
 		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
-			#$idx++;
 			$idx = $1;
 			$num_zones = 0;
 			$dungeons[$idx]{idx} = $1;
@@ -331,8 +344,7 @@ sub parse_dungeons($) {
 			$dungeons[$idx]{store}[7] = $8;
 		}
 		elsif(/^D:$params1$/) {
-			$dungeons[$idx]{text} = "" if not defined $dungeons[$idx]{text};
-			$dungeons[$idx]{text} = $dungeons[$idx]{text}.$1;
+			$dungeons[$idx]{text} .= $1
 		}
 		else {
 			print "Huh?:".$_."\n";
@@ -396,7 +408,6 @@ sub dump_dungeons_store($\@\@) {
 	
 	foreach my $store (@{ $dungeon->{store} }) {
 		if(not $store eq "0") {
-			#$string = $string."," if not ($string eq "");
 			push @string,
 				# rather hacky and assumes only a single DEFAULT entry in terrain, but should work
 				store_link($terrains[$store]->{state}[0]->{power}, @stores)
@@ -429,7 +440,7 @@ sub dump_dungeons($\@\@\@\@\@) {
 		next if not $dungeon;
 	
 		print FILEOUT
-			a({name=>"$dungeon->{idx}"}, h3("$dungeon->{name} ($dungeon->{idx})")),
+			generic_item_header($dungeon),
 			start_ul;
 	
 		print FILEOUT dump_dungeons_nearby($dungeon, @dungeons) if $dungeon->{nearby};
@@ -488,7 +499,6 @@ sub parse_stores($) {
 		elsif(/^\s*$/) { } #discard
 		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
-			#$idx++;
 			$idx = $1;
 			$stores[$idx]{idx} = $1;
 			$stores[$idx]{name} = $2;
@@ -514,9 +524,8 @@ sub parse_stores($) {
 	return @stores;
 }
 
-sub dump_stores_sell($\@) {
+sub dump_stores_sell($) {
 	my $store = shift;
-	my @stores = @{ (shift) };
 	my @string;
 	
 	foreach my $sell (@{ $store->{sell} }) {
@@ -546,11 +555,11 @@ sub dump_stores($\@) {
 		next if not $store;
 	
 		print FILEOUT
-			a({name=>"$store->{idx}"}, h3("$store->{name} ($store->{idx})")),
+			generic_item_header($store),
 			start_ul;
 	
 		print FILEOUT li("Base buy: ".strong($store->{base})) if $store->{base};
-		print FILEOUT dump_stores_sell($store, @stores) if $store->{sell};
+		print FILEOUT dump_stores_sell($store) if $store->{sell};
 		print FILEOUT end_ul;
 
 	}
@@ -584,11 +593,7 @@ sub parse_monsters($) {
 			$num_blows = 0;
 		}
 		elsif(/^D:$params1$/) {
-			if($monsters[$idx]{text}) {
-				$monsters[$idx]{text} = $monsters[$idx]{text}.$1;
-			} else {
-				$monsters[$idx]{text} = $1;
-			}
+			$monsters[$idx]{text} .= $1;
 		}
 		elsif(/^G:(.):(.)$/) {
 			$monsters[$idx]{d_char} = $1;
@@ -631,18 +636,10 @@ sub parse_monsters($) {
 			$num_blows++;
 		}
 		elsif(/^F:$params1$/) {
-			if($monsters[$idx]{flags}) {
-				$monsters[$idx]{flags} = $monsters[$idx]{flags}." ".$1;
-			} else {
-				$monsters[$idx]{flags} = $1;
-			}
+			$monsters[$idx]{flags} .= $1;
 		}
 		elsif(/^S:$params1$/) {
-			if($monsters[$idx]{spell_flags}) {
-				$monsters[$idx]{spell_flags} = $monsters[$idx]{spell_flags}." ".$1;
-			} else {
-				$monsters[$idx]{spell_flags} = $1;
-			}
+			push @{ $monsters[$idx]{spell_flags} }, trim split(/\|/, $1);
 		}
 		else {
 			print "Huh?:".$_."\n";
@@ -670,10 +667,22 @@ sub dump_monsters_blows($\%) {
 	return li("Blows: ".ul(@string));
 }
 
-sub dump_monsters($\@\%) {
+sub dump_monsters_spellflags($\%) {
+	my @spell_flags = @{ (shift) };
+	my %blows_map = %{ (shift) };
+	my @string;
+	
+	foreach my $flag (@spell_flags) {
+		push @string, " ".blow_map_link($flag, %blows_map);
+	}
+	return join "", @string;
+}
+
+sub dump_monsters($\@\%\%) {
 	my $fileout = shift;
 	my @monsters = @{ (shift) };
 	my %effects_map = %{ (shift) };
+	my %blows_map = %{ (shift) };
 	
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
@@ -687,7 +696,7 @@ sub dump_monsters($\@\%) {
 		next if not $monster;
 	
 		print FILEOUT
-			a({name=>"$monster->{idx}"}, h3("$monster->{name} ($monster->{idx})")),
+			generic_item_header($monster),
 			start_ul;
 		
 		print FILEOUT
@@ -712,13 +721,13 @@ sub dump_monsters($\@\%) {
 		print FILEOUT
 			li("Monster spell power ".strong($monster->{spell_power})
 				.(" and mana ".strong($monster->{mana})))
-			.li("Innate spell frequencey ".strong($monster->{freq_innate})
-				." and other spell frequency ".strong($monster->{freq_spell}))
+			.($monster->{freq_innate} != 0 ? li("Innate spell frequencey ".strong($monster->{freq_innate})) : "")
+			.($monster->{freq_spell} != 0 ? li("Other spell frequency ".strong($monster->{freq_spell})) : "")
 		if $monster->{spell_power};
+		
 		print FILEOUT dump_monsters_blows($monster, %effects_map) if $monster->{monster_blow};
 		print FILEOUT li("Flags: ".strong($monster->{flags})) if $monster->{flags};
-		print FILEOUT li("Spell Flags: ".strong($monster->{spell_flags})) if $monster->{spell_flags};
-		#print $monster->{d_char}."\n";
+		print FILEOUT li("Spell Flags: ".dump_monsters_spellflags($monster->{spell_flags}, %blows_map)) if $monster->{spell_flags};
 
 		print FILEOUT end_ul;
 
@@ -1786,7 +1795,7 @@ dump_dungeons(">$outdir$filenames{dungeon}{html}", @dungeons, @monsters, @terrai
 print "Writing Stores...\n";
 dump_stores(">$outdir$filenames{store}{html}", @stores);
 print "Writing Monsters...\n";
-dump_monsters(">$outdir$filenames{monster}{html}", @monsters, %effects_map);
+dump_monsters(">$outdir$filenames{monster}{html}", @monsters, %effects_map, %blows_map);
 print "Writing Terrain...\n";
 dump_terrains(">$outdir$filenames{terrain}{html}", @terrains, %blows_map, %effects_map);
 print "Writing Vaults...\n";
