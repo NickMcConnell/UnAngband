@@ -217,6 +217,7 @@ sub effect_map_link($\%) {
 	my $name = shift;
 	my %effects_map = %{ (shift) };
 	
+	#print "Eh?: $name\n" if not defined $effects_map{$name}->{idx};
 	return name_link($effects_map{$name}->{idx}, $name, $filenames{effect}{html});
 }
 
@@ -651,14 +652,15 @@ sub parse_monsters($) {
 	return @monsters;
 }
 
-sub dump_monsters_blows($\%) {
+sub dump_monsters_blows($\%\%) {
 	my $monster = shift;
+	my %blows_map = %{ (shift) };
 	my %effects_map = %{ (shift) };
 	my @string;
 	
 	foreach my $blow (@{ $monster->{monster_blow} }) {
 		push @string, li(
-			strong($blow->{method})
+			blow_map_link($blow->{method}, %blows_map)
 			.($blow->{effect} ? " causes ".effect_map_link($blow->{effect}, %effects_map) : "")
 			.($blow->{dice} ? " and ".strong($blow->{dice})." damage" : "")
 		);
@@ -725,7 +727,7 @@ sub dump_monsters($\@\%\%) {
 			.($monster->{freq_spell} != 0 ? li("Other spell frequency ".strong($monster->{freq_spell})) : "")
 		if $monster->{spell_power};
 		
-		print FILEOUT dump_monsters_blows($monster, %effects_map) if $monster->{monster_blow};
+		print FILEOUT dump_monsters_blows($monster, %blows_map, %effects_map) if $monster->{monster_blow};
 		print FILEOUT li("Flags: ".strong($monster->{flags})) if $monster->{flags};
 		print FILEOUT li("Spell Flags: ".dump_monsters_spellflags($monster->{spell_flags}, %blows_map)) if $monster->{spell_flags};
 
@@ -776,11 +778,7 @@ sub parse_terrains($) {
 			$terrains[$idx]{d_attr} = $2;
 		}
 		elsif(/^F:$params1$/) {
-			if($terrains[$idx]{flags}) {
-				$terrains[$idx]{flags} = $terrains[$idx]{flags}." ".$1;
-			} else {
-				$terrains[$idx]{flags} = $1;
-			}
+			$terrains[$idx]{flags} .= $1
 		}
 		elsif(/^W:$params4$/) {
 			$terrains[$idx]{level} = $1;
@@ -829,11 +827,7 @@ sub parse_terrains($) {
 			$terrains[$idx]{spell} = $1;
 		}
 		elsif(/^D:$params1$/) {
-			if($terrains[$idx]{text}) {
-				$terrains[$idx]{text} = $terrains[$idx]{text}.$1;
-			} else {
-				$terrains[$idx]{text} = $1;
-			}
+			$terrains[$idx]{text} .= $1
 		}
 		else {
 			print "Huh?:".$_."\n";
@@ -879,7 +873,7 @@ sub dump_terrains($\@\%\%) {
 		next if not $terrain;
 	
 		print FILEOUT
-			a({name=>"$terrain->{idx}"}, h3("$terrain->{name} ($terrain->{idx})")),
+			generic_item_header($terrain),
 			start_ul;
 
 		print FILEOUT li("Looks like ".strong($terrain->{d_char})." coloured ".strong($terrain->{d_attr}));
@@ -936,11 +930,7 @@ sub parse_vaults($) {
 		}
 		elsif(/^D:$params1$/) {
 			# descriptions are somewhat special in this one, we need to reinsert eols.
-			if($vaults[$idx]{text}) {
-				$vaults[$idx]{text} = $vaults[$idx]{text}.$1."\n";
-			} else {
-				$vaults[$idx]{text} = $1."\n";
-			}
+			$vaults[$idx]{text} .= $1."\n"
 		}
 		elsif(/^X:$params6$/) {
 			$vaults[$idx]{typ} = $1;
@@ -976,7 +966,7 @@ sub dump_vaults($\@) {
 		next if not $vault;
 	
 		print FILEOUT
-			a({name=>"$vault->{idx}"}, h3("$vault->{name} ($vault->{idx})")),
+			generic_item_header($vault),
 			start_ul;
 
 		print FILEOUT
@@ -986,8 +976,6 @@ sub dump_vaults($\@) {
 			.li("Width: ".strong($vault->{wid}))
 			.li("Min Level: ".strong($vault->{min_lev}))
 			.li("Max Level: ".strong($vault->{max_lev}))
-			#.li(": ".strong($monster->{}))
-			#.li(": ".strong($monster->{}))
 		;
 
 		print FILEOUT end_ul;
@@ -1044,7 +1032,7 @@ sub dump_objects($\@) {
 		next if not $object;
 	
 		print FILEOUT
-			a({name=>"$object->{idx}"}, h3("$object->{name} ($object->{idx})")),
+			generic_item_header($object),
 			start_ul;
 	
 		print FILEOUT end_ul;
@@ -1073,7 +1061,7 @@ sub parse_shop_owners($) {
 		elsif(/^\s*$/) { } #discard
 		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params3$/) {
-			# this breaks if a store has more then 10 idx per store
+			# WARNING: this breaks if a store has more then 10 idx per store
 			$idx = "$1$2";
 			$shop_owners[$idx]{store} = $1;
 			$shop_owners[$idx]{idx} = $2;
@@ -1120,6 +1108,7 @@ sub dump_shop_owners($\@\@) {
 		# array is still sparse
 		next if not $shop_owner;
 	
+		# non-generic item header since this is a little special...
 		print FILEOUT
 			a({name=>"$shop_owner->{store}:$shop_owner->{idx}"},
 				h3("$shop_owner->{name} ($shop_owner->{store}:$shop_owner->{idx})")),
@@ -1174,38 +1163,24 @@ sub parse_rooms($) {
 			$rooms[$idx]{level_max} = $8;
 		}
 		elsif(/^A:$fend$/) {
-			$rooms[$idx]{name1} = $1 if not $1;
+			# A: is often "", so if it's null we might as well not add it
+			$rooms[$idx]{name1} = $1 if not $1 eq "";
 		}
 		elsif(/^B:$fend$/) {
-			$rooms[$idx]{name2} = $1 if not $1;
+			# B: is often "", so if it's null we might as well not add it
+			$rooms[$idx]{name2} = $1 if not $1 eq "";
 		}
 		elsif(/^D:$fend$/) {
-			if($rooms[$idx]{text}) {
-				$rooms[$idx]{text} = $rooms[$idx]{text}.$1;
-			} else {
-				$rooms[$idx]{text} = $1 if not $1;
-			}
+			$rooms[$idx]{text} .= $1;
 		}
 		elsif(/^S:$params1$/) {
-			if($rooms[$idx]{flags}) {
-				$rooms[$idx]{flags} = $rooms[$idx]{flags}.$1;
-			} else {
-				$rooms[$idx]{flags} = $1;
-			}
+			$rooms[$idx]{flags} .= $1;
 		}
 		elsif(/^P:$params1$/) {
-			if($rooms[$idx]{p_flag}) {
-				$rooms[$idx]{p_flag} = $rooms[$idx]{p_flag}.$1;
-			} else {
-				$rooms[$idx]{p_flag} = $1;
-			}
+			$rooms[$idx]{p_flag} .= $1;
 		}
 		elsif(/^L:$params1$/) {
-			if($rooms[$idx]{l_flag}) {
-				$rooms[$idx]{l_flag} = $rooms[$idx]{l_flag}.$1;
-			} else {
-				$rooms[$idx]{l_flag} = $1;
-			}
+			$rooms[$idx]{l_flag} .= $1;
 		}
 		elsif(/^G:$params1$/) {
 			$rooms[$idx]{r_char} = $1;
@@ -1223,11 +1198,7 @@ sub parse_rooms($) {
 			$rooms[$idx]{theme}[3] = $5;
 		}
 		elsif(/^R:$params1$/) {
-			if($rooms[$idx]{r_flag}) {
-				$rooms[$idx]{r_flag} = $rooms[$idx]{r_flag}.$1;
-			} else {
-				$rooms[$idx]{r_flag} = $1;
-			}
+			$rooms[$idx]{r_flag} .= $1;
 		}
 		else {
 			print "Huh?:".$_."\n";
@@ -1239,9 +1210,10 @@ sub parse_rooms($) {
 	return @rooms;
 }
 
-sub dump_rooms($\@) {
+sub dump_rooms($\@\@) {
 	my $fileout = shift;
 	my @rooms = @{ (shift) };
+	my @terrains = @{ (shift) };
 	
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
@@ -1255,7 +1227,7 @@ sub dump_rooms($\@) {
 		next if not $room;
 	
 		print FILEOUT
-			a({name=>"$room->{idx}"}, h3("$room->{name} ($room->{idx})")),
+			generic_item_header($room),
 			start_ul;
 	
 		print FILEOUT
@@ -1267,9 +1239,7 @@ sub dump_rooms($\@) {
 			.li("Frequency of this entry if conditions not met: ", strong($room->{not_chance}))
 			.li("Minimum level: ", strong($room->{level_min}))
 			.li("Maximum level: ", strong($room->{level_max}))
-			#.li(": ", strong($room->{}))
-			#.li(": ", strong($room->{}))
-			;
+		;
 		print FILEOUT li("Name1: ", strong($room->{name1})) if $room->{name1};
 		print FILEOUT li("Name2: ", strong($room->{name2})) if $room->{name2};
 		print FILEOUT li("Room (special) flags: ", strong($room->{flags})) if $room->{flags};
@@ -1278,21 +1248,23 @@ sub dump_rooms($\@) {
 		print FILEOUT li("Add races of this character: ", strong($room->{r_char})) if $room->{r_char};
 		print FILEOUT li("Add items of tval ".strong($room->{tval})." between sval "
 			.strong($room->{min_sval})." and ".strong($room->{max_sval})) if $room->{tval};
-		# code does fancy tricks to exctract values from the terrain "features" array, probably
-		# should at least do a lookup
-		print FILEOUT li("Feature:".strong($room->{feat}).ul(
-			li("Theme ".strong($room->{theme}[0]))
-			.li("Theme ".strong($room->{theme}[1]))
-			.li("Theme ".strong($room->{theme}[2]))
-			.li("Theme ".strong($room->{theme}[3]))))
-			if $room->{feat};
+
+		print FILEOUT li("Feature: ".terrain_link($room->{feat}, @terrains))
+		if defined $room->{feat} and $room->{feat} != 0;
+		print FILEOUT li("Tunnel Feature: ".terrain_link($room->{theme}[0], @terrains))
+		if defined $room->{theme}[0] and $room->{theme}[0] != 0;
+		print FILEOUT li("Doorway Feature ".terrain_link($room->{theme}[1], @terrains))
+		if defined $room->{theme}[1] and $room->{theme}[1] != 0;
+		print FILEOUT li("Trap Feature ".terrain_link($room->{theme}[2], @terrains))
+		if defined $room->{theme}[2] and $room->{theme}[2] != 0;
+		print FILEOUT li("Chasm Bridge Feature ".terrain_link($room->{theme}[3], @terrains))
+		if defined $room->{theme}[3] and $room->{theme}[3] != 0;
+		
 		print FILEOUT li("Restrict to levels with these monster types: ", strong($room->{r_flag})) if $room->{r_flag};
-		#print FILEOUT li(": ", strong($room->{})) if $room->{};
 		
 		print FILEOUT end_ul;
 		
 		print FILEOUT p($room->{text}) if $room->{text};
-
 	}
 	print FILEOUT generic_footer;
 
@@ -1323,11 +1295,7 @@ sub parse_blows($) {
 			$blows[$idx]{name} = $2;
 		}
 		elsif(/^F:$params1$/) {
-			if($blows[$idx]{flags}) {
-				$blows[$idx]{flags} = $blows[$idx]{flags}." ".$1;
-			} else {
-				$blows[$idx]{flags} = $1;
-			}
+			$blows[$idx]{flags} .= $1;
 		}
 		elsif(/^T:$params2$/) {
 			$blows[$idx]{desc}[$num_desc]{text} = $2;
@@ -1388,22 +1356,23 @@ sub parse_blows($) {
 
 sub dump_blows_desc($) {
 	my $blow = shift;
-	my $string = "";
+	my @string;
 	
 	foreach my $desc (@{ $blow->{desc} }) {
-		$string = $string.li(
+		push @string, li(
 			strong($desc->{min})
-			."-".strong($desc->{max})
+			." - ".strong($desc->{max})
 			.": ".strong($desc->{text})
 		);
 	}
 	
-	return li("Descriptions: ".ul($string));
+	return li("Descriptions: ".ul(@string));
 }
 
-sub dump_blows($\@) {
+sub dump_blows($\@\%) {
 	my $fileout = shift;
 	my @blows = @{ (shift) };
+	my %effects_map = %{ (shift) };
 	
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
@@ -1417,8 +1386,9 @@ sub dump_blows($\@) {
 		next if not $blow;
 	
 		print FILEOUT
-			a({name=>"$blow->{idx}"}, h3("$blow->{name} ($blow->{idx})")),
+			generic_item_header($blow),
 			start_ul;
+		
 		print FILEOUT li("Flags: ".strong($blow->{flags})) if defined $blow->{flags};
 		print FILEOUT dump_blows_desc($blow) if defined $blow->{desc};
 		print FILEOUT li("Info 1: ".strong($blow->{info1})) if $blow->{info1};
@@ -1433,10 +1403,11 @@ sub dump_blows($\@) {
 		print FILEOUT li("Ammo tval:".strong($blow->{ammo_tval})." sval:".strong($blow->{ammo_sval}))
 			if defined $blow->{ammo_tval} && $blow->{ammo_tval}!=0 && $blow->{ammo_sval}!=0;
 		print FILEOUT
-			li("Monster spell/breath damage: multipler ".strong($blow->{dam_mult})
-				.", divisor ".strong($blow->{dam_div})
-				.", variance ".strong($blow->{dam_var})
-				." resisted by ".strong($blow->{d_res}))
+			li("Monster spell/breath damage:"
+				.($blow->{dam_mult}!=0 ? " multipler ".strong($blow->{dam_mult}) : "")
+				.($blow->{dam_div}!=0 ? " divisor ".strong($blow->{dam_div}) : "")
+				.($blow->{dam_var}!=0 ? " variance ".strong($blow->{dam_var}) : "")
+				.($blow->{d_res} eq "" ? "" : " resisted by ".effect_map_link($blow->{d_res}, %effects_map)))
 			if defined $blow->{dam_mult};
 		print FILEOUT
 			li("Monster spell desirability:"
@@ -1457,7 +1428,6 @@ sub dump_blows($\@) {
 		print FILEOUT li("Number: ".strong($blow->{number})) if defined $blow->{number};
 
 		print FILEOUT end_ul;
-
 	}
 	print FILEOUT generic_footer;
 
@@ -1527,22 +1497,20 @@ sub dump_effects($\@) {
 		next if not $effect;
 	
 		print FILEOUT
-			a({name=>"$effect->{idx}"}, h3("$effect->{name} ($effect->{idx})")),
+			generic_item_header($effect),
 			start_ul;
 
 		# I: is always 0:0:0 so I can't be bothered outputting it
 
 		if (defined $effect->{info}) {
-			my $stuff = "";
+			my @stuff;
 			for(my $i=0; $i<7; $i++) {
-				my $info = $effect->{info}[$i];
-				$stuff = $stuff.li($info);
+				push @stuff, li($effect->{info}[$i]);
 			}
-			print FILEOUT "Descriptions: ".ol({-start=>0}, $stuff);
+			print FILEOUT "Descriptions: ".ol({-start=>0}, @stuff);
 		}
 
 		print FILEOUT end_ul;
-
 	}
 	print FILEOUT generic_footer;
 
@@ -1582,11 +1550,7 @@ sub parse_regions($) {
 			$regions[$idx]{method} = $1;
 		}
 		elsif(/^F:$params1$/) {
-			if($regions[$idx]{flags1}) {
-				$regions[$idx]{flags1} = $regions[$idx]{flags1}." ".$1;
-			} else {
-				$regions[$idx]{flags1} = $1;
-			}
+			$regions[$idx]{flags1} .= $1." "
 		}
 		else {
 			print "Huh?:".$_."\n";
@@ -1615,7 +1579,7 @@ sub dump_regions($\@\%) {
 		next if not $region;
 	
 		print FILEOUT
-			a({name=>"$region->{idx}"}, h3("$region->{name} ($region->{idx})")),
+			generic_item_header($region),
 			start_ul;
 	
 		print FILEOUT li("Looks like ".strong($region->{d_char})." coloured ".strong($region->{d_attr}))
@@ -1628,7 +1592,6 @@ sub dump_regions($\@\%) {
 			if defined $region->{flags1};
 		
 		print FILEOUT end_ul;
-
 	}
 	print FILEOUT generic_footer;
 
@@ -1680,7 +1643,7 @@ sub dump_spells($\@) {
 		next if not $spell;
 	
 		print FILEOUT
-			a({name=>"$spell->{idx}"}, h3("$spell->{name} ($spell->{idx})")),
+			generic_item_header($spell),
 			start_ul;
 	
 		print FILEOUT end_ul;
@@ -1805,9 +1768,9 @@ dump_objects(">$outdir$filenames{object}{html}", @objects);
 print "Writing Shop Owners...\n";
 dump_shop_owners(">$outdir$filenames{shop_owner}{html}", @shop_owners, @stores);
 print "Writing Rooms...\n";
-dump_rooms(">$outdir$filenames{room}{html}", @rooms);
+dump_rooms(">$outdir$filenames{room}{html}", @rooms, @terrains);
 print "Writing Blows...\n";
-dump_blows(">$outdir$filenames{blow}{html}", @blows);
+dump_blows(">$outdir$filenames{blow}{html}", @blows, %effects_map);
 print "Writing Effects...\n";
 dump_effects(">$outdir$filenames{effect}{html}", @effects);
 print "Writing Regions...\n";
@@ -1815,4 +1778,4 @@ dump_regions(">$outdir$filenames{region}{html}", @regions, %blows_map);
 print "Writing Spells...\n";
 dump_spells(">$outdir$filenames{spell}{html}", @spells);
 
-
+#TODO: probably should dump an index file at some point.
