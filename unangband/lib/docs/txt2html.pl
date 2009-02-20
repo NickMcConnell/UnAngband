@@ -28,57 +28,74 @@ my %filenames =
 	dungeon => {
 		txt => "lib/edit/dungeon.txt",
 		html => "dungeon.html",
-		debug => "dungeon.pl.txt"
+		debug => "dungeon.pl.txt",
+		desc => "Dungeons",
 	},
 	store => {
 		txt => "lib/edit/store.txt",
 		html => "store.html",
-		debug => "store.pl.txt"
+		debug => "store.pl.txt",
+		desc => "Stores",
 	},
 	monster => {
 		txt => "lib/edit/monster.txt",
 		html => "monster.html",
-		debug => "monster.pl.txt"
+		debug => "monster.pl.txt",
+		desc => "Monsters",
 	},
 	terrain => {
 		txt => "lib/edit/terrain.txt",
 		html => "terrain.html",
-		debug => "terrain.pl.txt"
+		debug => "terrain.pl.txt",
+		desc => "Terrain",
 	},
 	vault => {
 		txt => "lib/edit/vault.txt",
 		html => "vault.html",
-		debug => "vault.pl.txt"
+		debug => "vault.pl.txt",
+		desc => "Vaults",
 	},
 	object => {
 		txt => "lib/edit/object.txt",
 		html => "object.html",
-		debug => "object.pl.txt"
+		debug => "object.pl.txt",
+		desc => "Objects",
 	},
 	shop_owner => {
 		txt => "lib/edit/shop_own.txt",
 		html => "shop_owner.html",
-		debug => "shop_owner.pl.txt"
+		debug => "shop_owner.pl.txt",
+		desc => "Shop Owners",
 	},
 	room => {
 		txt => "lib/edit/room.txt",
 		html => "room.html",
-		debug => "room.pl.txt"
+		debug => "room.pl.txt",
+		desc => "Rooms",
 	},
 	blow => {
 		txt => "lib/edit/blows.txt",
 		html => "blow.html",
-		debug => "blow.pl.txt"
+		debug => "blow.pl.txt",
+		desc => "Blows",
 	},
 	effect => {
 		txt => "lib/edit/effect.txt",
 		html => "effect.html",
-		debug => "effect.pl.txt"
+		debug => "effect.pl.txt",
+		desc => "Effects",
 	},
 	region => {
 		txt => "lib/edit/region.txt",
 		html => "region.html",
-		debug => "region.pl.txt"
+		debug => "region.pl.txt",
+		desc => "Regions",
+	},
+	spell => {
+		txt => "lib/edit/spell.txt",
+		html => "spell.html",
+		debug => "spell.pl.txt",
+		desc => "Spells",
 	},
 );
 
@@ -176,6 +193,46 @@ sub store_link($\@) {
 	return name_link($idx, $stores[$idx]->{name}, $filenames{store}{html});
 }
 
+# some useful page layout helper funcs
+sub generic_header($) {
+	my $file = shift;
+
+	return start_html(-title=>$filenames{$file}{desc}),
+		h1($filenames{$file}{desc}),
+		$styles,
+	;
+}
+
+sub generic_links(\@) {
+	my @collection = @{ (shift) };
+	my @return;
+
+	# link collection
+	foreach my $item ( @collection ) {
+		# array is sparse
+		next if not $item;
+	
+		push @return, id_link($item->{idx})." ";
+	}
+	return @return;
+}
+
+sub generic_footer() {
+	return end_html;
+}
+
+# and a quick debugging func
+sub dump_perl($\@) {
+	my $file = shift;
+	my @collection = @{ (shift) };
+
+	return if not $perldump;
+
+	open FILETXT, ">$filenames{$file}{debug}";
+	print FILETXT Dumper(\@collection);
+	close FILETXT;
+}
+
 ##########
 # Dungeons!
 ##########
@@ -191,15 +248,9 @@ sub parse_dungeons($) {
 	
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			#$idx++;
 			$idx = $1;
@@ -294,12 +345,12 @@ sub dump_dungeons_zones($\@\@\@\@) {
 	my @monsters = @{ (shift) };
 	my @terrains = @{ (shift) };
 	my @vaults   = @{ (shift) };
-	my $string   = "";
+	my @string   ;
 
 	#FIXME: really need to make this make more sense, real english would be good
 	foreach my $zone (@{ $dungeon->{zones} }) {
-		$string = $string.li("Zone "
-			.strong($zone->{name} ? "$zone->{name} $dungeon->{name} " : "")
+		push @string, li(
+			"Zone ".strong($zone->{name} ? "$zone->{name} $dungeon->{name} " : "")
 			."level ".strong($zone->{level})
 			." filled with ".terrain_link($zone->{fill}, @terrains). " (big:"
 			.terrain_link($zone->{big}, @terrains)
@@ -315,31 +366,28 @@ sub dump_dungeons_zones($\@\@\@\@) {
 		);
 	}
 	
-	return li("Zones: ".ul($string));
+	return li("Zones: ".ul(@string));
 }
 
-sub dump_dungeons_store($\@\@\@) {
+sub dump_dungeons_store($\@\@) {
 	my $dungeon = shift;
-	my @dungeons = @{ (shift) };
 	my @terrains = @{ (shift) };
 	my @stores = @{ (shift) };
-	my $string = "";
+	my @string;
 	
 	foreach my $store (@{ $dungeon->{store} }) {
 		if(not $store eq "0") {
 			#$string = $string."," if not ($string eq "");
-			$string = $string
+			push @string,
 				# rather hacky and assumes only a single DEFAULT entry in terrain, but should work
-				.store_link($terrains[$store]->{state}[0]->{power}, @stores)
+				store_link($terrains[$store]->{state}[0]->{power}, @stores)
 				." (".terrain_link($store, @terrains).") ";
 		}
 	}
 	
-	if($string eq "") {
-		return "";
-	} else {
-		return li("Stores: ".$string);
-	}
+	return li("Stores: ", @string) if scalar @string != 0;
+	# else
+	return "";
 }
 
 sub dump_dungeons($\@\@\@\@\@) {
@@ -353,18 +401,8 @@ sub dump_dungeons($\@\@\@\@\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Dungeons'),
-		h1('dungeons.txt'),
-		$styles,
-	;
-	
-	# link collection
-	foreach my $dungeon ( @dungeons ) {
-		# array is sparse
-		next if not $dungeon;
-	
-		print FILEOUT id_link($dungeon->{idx})." ";
-	}
+		generic_header("dungeon"),
+		generic_links(@dungeons);
 	
 	# all the data blocks
 	foreach my $dungeon ( @dungeons ) {
@@ -400,23 +438,16 @@ sub dump_dungeons($\@\@\@\@\@) {
 			.name_link($dungeon->{replace_with}, $dungeons[$dungeon->{replace_with}]->{name})
 		) if $dungeon->{replace_with};
 		print FILEOUT dump_dungeons_zones($dungeon, @dungeons, @monsters, @terrains, @vaults) if $dungeon->{zones};
-		print FILEOUT dump_dungeons_store($dungeon, @dungeons, @terrains, @stores) if $dungeon->{store};
+		print FILEOUT dump_dungeons_store($dungeon, @terrains, @stores) if $dungeon->{store};
 	
 		print FILEOUT end_ul;
 
 		print FILEOUT p($dungeon->{text}) if $dungeon->{text};
-		#print FILEOUT p(table({-width=>"100%"},
-		#	Tr(
-		#	td(a({name=>"#$dungeon->{idx}"}, h3("$dungeon->{name} ($dungeon->{idx})"))),
-		#	td()
-		#	),
-		#));
 	}
 	
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">dungeon.pl.txt" if $perldump;
-	print FILETXT Dumper(\@dungeons) if $perldump;
+	dump_perl("dungeon", @dungeons);
 }
 
 ##########
@@ -434,15 +465,9 @@ sub parse_stores($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			#$idx++;
 			$idx = $1;
@@ -473,17 +498,17 @@ sub parse_stores($) {
 sub dump_stores_sell($\@) {
 	my $store = shift;
 	my @stores = @{ (shift) };
-	my $string = "";
+	my @string;
 	
 	foreach my $sell (@{ $store->{sell} }) {
-		$string = $string.li(
+		push @string, li(
 			strong($sell->{count})
 			." items of type ".strong($sell->{tval})
 			." subtype ".strong($sell->{sval})
 		);
 	}
 	
-	return li("Sell Items: ".ul($string));
+	return li("Sell Items: ".ul(@string));
 }
 
 sub dump_stores($\@) {
@@ -493,18 +518,8 @@ sub dump_stores($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Stores'),
-		h1('stores.txt'),
-		$styles,
-	;
-	
-	# link collection
-	foreach my $store ( @stores ) {
-		# array is sparse
-		next if not $store;
-
-		print FILEOUT id_link($store->{idx})." ";#a({href=>"#$store->{idx}"}, ">>$store->{idx}")." ";
-	}
+		generic_header("store"),
+		generic_links(@stores);
 	
 	# all the data blocks
 	foreach my $store( @stores ) {
@@ -520,10 +535,9 @@ sub dump_stores($\@) {
 		print FILEOUT end_ul;
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{store}{debug}" if $perldump;
-	print FILETXT Dumper(\@stores) if $perldump;
+	dump_perl("store", @stores);
 }
 
 ##########
@@ -541,15 +555,9 @@ sub parse_monsters($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$monsters[$idx]{idx} = $1;
@@ -596,21 +604,11 @@ sub parse_monsters($) {
 		}
 		elsif(/^B:(?:$fmid:)*(?:$fmid:)*$fend$/) {
 			# game slices and dices the dice value up, but there's no need for us to
-			if(not defined $1) {
-				#print "$idx $1:$2:$3\n";
-				$monsters[$idx]{monster_blow}[$num_blows]{method} = $3;
-			}
-			elsif(not defined $2) {
-				#print "$idx $1:$2:$3\n";
-				$monsters[$idx]{monster_blow}[$num_blows]{method} = $1;
-				$monsters[$idx]{monster_blow}[$num_blows]{effect} = $3;
-			}
-			else {
-				#print "$idx $1:$2:$3\n";
-				$monsters[$idx]{monster_blow}[$num_blows]{method} = $1;
-				$monsters[$idx]{monster_blow}[$num_blows]{effect} = $2;
-				$monsters[$idx]{monster_blow}[$num_blows]{dice} = $3;
-			}
+			( undef,
+				$monsters[$idx]{monster_blow}[$num_blows]{method},
+				$monsters[$idx]{monster_blow}[$num_blows]{effect},
+				$monsters[$idx]{monster_blow}[$num_blows]{dice}
+			) = split(/:/);
 			$num_blows++;
 		}
 		elsif(/^F:$params1$/) {
@@ -638,18 +636,18 @@ sub parse_monsters($) {
 }
 
 sub dump_monsters_blows($) {
-	my $monster  = shift;
-	my $string   = "";
+	my $monster = shift;
+	my @string;
 	
 	foreach my $blow (@{ $monster->{monster_blow} }) {
-		$string = $string.li(
+		push @string, li(
 			strong($blow->{method})
 			.($blow->{effect} ? " causes ".strong($blow->{effect}) : "")
 			.($blow->{dice} ? " and ".strong($blow->{dice})." damage" : "")
 		);
 	}
 	
-	return li("Blows: ".ul($string));
+	return li("Blows: ".ul(@string));
 }
 
 sub dump_monsters($\@) {
@@ -659,19 +657,9 @@ sub dump_monsters($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Monsters'),
-		h1("monster.txt"),
-		$styles,
-	;
+		generic_header("monster"),
+		generic_links(@monsters);
 	
-	# link collection
-	foreach my $monster ( @monsters ) {
-		# array is sparse
-		next if not $monster;
-
-		print FILEOUT id_link($monster->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $monster( @monsters ) {
 		# array is still sparse
@@ -715,10 +703,9 @@ sub dump_monsters($\@) {
 
 		print FILEOUT p($monster->{text}) if $monster->{text};
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{monster}{debug}" if $perldump;
-	print FILETXT Dumper(\@monsters) if $perldump;
+	dump_perl("monster", @monsters);
 }
 
 ##########
@@ -736,15 +723,9 @@ sub parse_terrains($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$terrains[$idx]{idx} = $1;
@@ -873,19 +854,9 @@ sub dump_terrains($\@\%\%) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Terrain'),
-		h1("terrain.txt"),
-		$styles,
-	;
+		generic_header("terrain"),
+		generic_links(@terrains);
 	
-	# link collection
-	foreach my $terrain ( @terrains ) {
-		# array is sparse
-		next if not $terrain;
-
-		print FILEOUT id_link($terrain->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $terrain( @terrains ) {
 		# array is still sparse
@@ -921,10 +892,9 @@ sub dump_terrains($\@\%\%) {
 
 		print FILEOUT p($terrain->{text}) if $terrain->{text};
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{terrain}{debug}" if $perldump;
-	print FILETXT Dumper(\@terrains) if $perldump;
+	dump_perl("terrain", @terrains);
 }
 
 ##########
@@ -941,15 +911,9 @@ sub parse_vaults($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$vaults[$idx]{idx} = $1;
@@ -988,19 +952,9 @@ sub dump_vaults($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'vault'),
-		h1("vault.txt"),
-		$styles,
-	;
+		generic_header("vault"),
+		generic_links(@vaults);
 	
-	# link collection
-	foreach my $vault ( @vaults ) {
-		# array is sparse
-		next if not $vault;
-
-		print FILEOUT id_link($vault->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $vault( @vaults ) {
 		# array is still sparse
@@ -1025,10 +979,9 @@ sub dump_vaults($\@) {
 
 		print FILEOUT pre($vault->{text});
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{vault}{debug}" if $perldump;
-	print FILETXT Dumper(\@vaults) if $perldump;
+	dump_perl("vault", @vaults);
 }
 
 ##########
@@ -1045,15 +998,9 @@ sub parse_objects($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$objects[$idx]{idx} = $1;
@@ -1073,19 +1020,9 @@ sub dump_objects($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'object'),
-		h1("object.txt"),
-		$styles,
-	;
+		generic_header("object"),
+		generic_links(@objects);
 	
-	# link collection
-	foreach my $object ( @objects ) {
-		# array is sparse
-		next if not $object;
-
-		print FILEOUT id_link($object->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $object( @objects ) {
 		# array is still sparse
@@ -1098,10 +1035,9 @@ sub dump_objects($\@) {
 		print FILEOUT end_ul;
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{object}{debug}" if $perldump;
-	print FILETXT Dumper(\@objects) if $perldump;
+	dump_perl("object", @objects);
 }
 
 ##########
@@ -1118,15 +1054,9 @@ sub parse_shop_owners($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params3$/) {
 			# this breaks if a store has more then 10 idx per store
 			$idx = "$1$2";
@@ -1160,12 +1090,9 @@ sub dump_shop_owners($\@\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Shop Owners'),
-		h1("shop_own.txt"),
-		$styles,
-	;
+		generic_header("shop_owner");
 	
-	# link collection
+	# specific link collection since shop_owner is a little special
 	foreach my $shop_owner ( @shop_owners ) {
 		# array is sparse
 		next if not $shop_owner;
@@ -1191,16 +1118,14 @@ sub dump_shop_owners($\@\@) {
 			.li("Min Greed/Inflation: ".strong($shop_owner->{min_inflate}))
 			.li("Haggle Unit/haggleper: ".strong($shop_owner->{haggle_per}))
 			.li("Insult limit: ".strong($shop_owner->{insult_max}))
-			#.li(": ".strong($shop_owner->{}))
 			;
 	
 		print FILEOUT end_ul;
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{shop_owner}{debug}" if $perldump;
-	print FILETXT Dumper(\@shop_owners) if $perldump;
+	dump_perl("shop_owner", @shop_owners);
 }
 
 ##########
@@ -1217,15 +1142,9 @@ sub parse_rooms($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params8$/) {
 			$idx++;
 			$rooms[$idx]{idx} = $idx;
@@ -1312,19 +1231,9 @@ sub dump_rooms($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Rooms'),
-		h1("room.txt"),
-		$styles,
-	;
+		generic_header("room"),
+		generic_links(@rooms);
 	
-	# link collection
-	foreach my $room ( @rooms ) {
-		# array is sparse
-		next if not $room;
-
-		print FILEOUT id_link($room->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $room( @rooms ) {
 		# array is still sparse
@@ -1370,10 +1279,9 @@ sub dump_rooms($\@) {
 		print FILEOUT p($room->{text}) if $room->{text};
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{room}{debug}" if $perldump;
-	print FILETXT Dumper(\@rooms) if $perldump;
+	dump_perl("room", @rooms);
 }
 
 ##########
@@ -1391,15 +1299,9 @@ sub parse_blows($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$blows[$idx]{idx} = $1;
@@ -1491,19 +1393,9 @@ sub dump_blows($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Blows'),
-		h1("blows.txt"),
-		$styles,
-	;
+		generic_header("blow"),
+		generic_links(@blows);
 	
-	# link collection
-	foreach my $blow ( @blows ) {
-		# array is sparse
-		next if not $blow;
-
-		print FILEOUT id_link($blow->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $blow( @blows ) {
 		# array is still sparse
@@ -1553,10 +1445,9 @@ sub dump_blows($\@) {
 		print FILEOUT end_ul;
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{blow}{debug}" if $perldump;
-	print FILETXT Dumper(\@blows) if $perldump;
+	dump_perl("blow", @blows);
 }
 
 ##########
@@ -1573,15 +1464,9 @@ sub parse_effects($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$effects[$idx]{idx} = $1;
@@ -1619,19 +1504,9 @@ sub dump_effects($\@) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'Effects'),
-		h1("effect.txt"),
-		$styles,
-	;
+		generic_header("effect"),
+		generic_links(@effects);
 	
-	# link collection
-	foreach my $effect ( @effects ) {
-		# array is sparse
-		next if not $effect;
-
-		print FILEOUT id_link($effect->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $effect( @effects ) {
 		# array is still sparse
@@ -1655,10 +1530,9 @@ sub dump_effects($\@) {
 		print FILEOUT end_ul;
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{effect}{debug}" if $perldump;
-	print FILETXT Dumper(\@effects) if $perldump;
+	dump_perl("effect", @effects);
 }
 
 ##########
@@ -1675,15 +1549,9 @@ sub parse_regions($) {
 
 	foreach(<FILEIN>) {
 		chomp;
-		if(/^#/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^\s*$/) {
-			#print FILEOUT "$_\n";
-		}
-		elsif(/^V:/) {
-			; #discard
-		}
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
 		elsif(/^N:$params2$/) {
 			$idx = $1;
 			$regions[$idx]{idx} = $1;
@@ -1724,19 +1592,9 @@ sub dump_regions($\@\%) {
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
 	print FILEOUT
-		start_html(-title=>'regions'),
-		h1("region.txt"),
-		$styles,
-	;
+		generic_header("region"),
+		generic_links(@regions);
 	
-	# link collection
-	foreach my $region ( @regions ) {
-		# array is sparse
-		next if not $region;
-
-		print FILEOUT id_link($region->{idx})." ";
-	}
-
 	# all the data blocks
 	foreach my $region( @regions ) {
 		# array is still sparse
@@ -1758,16 +1616,66 @@ sub dump_regions($\@\%) {
 		print FILEOUT end_ul;
 
 	}
-	print FILEOUT end_html;
+	print FILEOUT generic_footer;
 
-	open FILETXT, ">$filenames{region}{debug}" if $perldump;
-	print FILETXT Dumper(\@regions) if $perldump;
+	dump_perl("region", @regions);
 }
 
-#notes:
-my $notes=<<END;
+##########
+# Spells
+##########
 
-END
+sub parse_spells($) {
+	my $filein = shift;
+	
+	open FILEIN, $filein or die "cannot open $filein: $!\n";
+
+	my @spells;
+	my $idx = -1;
+
+	foreach(<FILEIN>) {
+		chomp;
+		if(/^#/) { }       #discard
+		elsif(/^\s*$/) { } #discard
+		elsif(/^V:/) { }   #discard
+		elsif(/^N:$params2$/) {
+			$idx = $1;
+			$spells[$idx]{idx} = $1;
+			$spells[$idx]{name} = $2;
+		}
+	}
+
+	close(FILEIN);
+	
+	return @spells;
+}
+
+sub dump_spells($\@) {
+	my $fileout = shift;
+	my @spells = @{ (shift) };
+	
+	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
+	
+	print FILEOUT
+		generic_header("spell"),
+		generic_links(@spells);
+	
+	# all the data blocks
+	foreach my $spell( @spells ) {
+		# array is still sparse
+		next if not $spell;
+	
+		print FILEOUT
+			a({name=>"$spell->{idx}"}, h3("$spell->{name} ($spell->{idx})")),
+			start_ul;
+	
+		print FILEOUT end_ul;
+
+	}
+	print FILEOUT generic_footer;
+
+	dump_perl("spell", @spells);
+}
 
 ##########
 # Some Data::Dumper stuff
@@ -1817,6 +1725,8 @@ print "Parse Effects...\n";
 my @effects = parse_effects("<$filenames{effect}{txt}");
 print "Parse Regions...\n";
 my @regions = parse_regions("<$filenames{region}{txt}");
+print "Parse Spells...\n";
+my @spells = parse_spells("<$filenames{spell}{txt}");
 
 my %blows_map = idx2name(@blows);
 my %effects_map = idx2name(@effects);
@@ -1843,5 +1753,7 @@ print "Writing Effects...\n";
 dump_effects(">$filenames{effect}{html}", @effects);
 print "Writing Regions...\n";
 dump_regions(">$filenames{region}{html}", @regions, %blows_map);
+print "Writing Spells...\n";
+dump_spells(">$filenames{spell}{html}", @spells);
 
 
