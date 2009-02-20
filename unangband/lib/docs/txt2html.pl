@@ -141,6 +141,11 @@ my $styles = <<END;
 		background-color: white;
 	}
 </style>
+<!--
+********** WARNING *********
+Generated via txt2html.pl; do not edit
+********** WARNING *********
+-->
 END
 
 # useful shortcuts for html output
@@ -191,6 +196,20 @@ sub store_link($\@) {
 	my @stores = @{ (shift) };
 	
 	return name_link($idx, $stores[$idx]->{name}, $filenames{store}{html});
+}
+
+sub blow_map_link($\%) {
+	my $name = shift;
+	my %blows_map = %{ (shift) };
+	
+	return name_link($blows_map{$name}->{idx}, $name, $filenames{blow}{html});
+}
+
+sub effect_map_link($\%) {
+	my $name = shift;
+	my %effects_map = %{ (shift) };
+	
+	return name_link($effects_map{$name}->{idx}, $name, $filenames{effect}{html});
 }
 
 # some useful page layout helper funcs
@@ -328,15 +347,15 @@ sub parse_dungeons($) {
 sub dump_dungeons_nearby($\@) {
 	my $dungeon = shift;
 	my @dungeons = @{ (shift) };
-	my $string = "";
+	my @string;
 	
 	foreach my $loc (@{ $dungeon->{nearby} }) {
 		if(not $loc eq "0") {
-			$string = $string.a({href=>"#$loc"}, "$dungeons[$loc]->{name} ($loc)")." ";
+			push @string, a({href=>"#$loc"}, "$dungeons[$loc]->{name} ($loc)")." ";
 		}
 	}
 	
-	return li("Nearby Locations: ".$string);
+	return li("Nearby Locations: ", @string);
 }
 
 sub dump_dungeons_zones($\@\@\@\@) {
@@ -352,9 +371,9 @@ sub dump_dungeons_zones($\@\@\@\@) {
 		push @string, li(
 			"Zone ".strong($zone->{name} ? "$zone->{name} $dungeon->{name} " : "")
 			."level ".strong($zone->{level})
-			." filled with ".terrain_link($zone->{fill}, @terrains). " (big:"
+			." filled with ".terrain_link($zone->{fill}, @terrains). ", big:"
 			.terrain_link($zone->{big}, @terrains)
-			." small:".terrain_link($zone->{small}, @terrains).")"
+			.", small:".terrain_link($zone->{small}, @terrains)
 			.(($zone->{guard}!=0) || ($zone->{tower}!=0) ? " containing" : "")
 			.($zone->{guard}!=0
 				? " quest monster ".monster_link($zone->{guard}, @monsters)
@@ -381,7 +400,7 @@ sub dump_dungeons_store($\@\@) {
 			push @string,
 				# rather hacky and assumes only a single DEFAULT entry in terrain, but should work
 				store_link($terrains[$store]->{state}[0]->{power}, @stores)
-				." (".terrain_link($store, @terrains).") ";
+				." ( ".terrain_link($store, @terrains).") ";
 		}
 	}
 	
@@ -635,14 +654,15 @@ sub parse_monsters($) {
 	return @monsters;
 }
 
-sub dump_monsters_blows($) {
+sub dump_monsters_blows($\%) {
 	my $monster = shift;
+	my %effects_map = %{ (shift) };
 	my @string;
 	
 	foreach my $blow (@{ $monster->{monster_blow} }) {
 		push @string, li(
 			strong($blow->{method})
-			.($blow->{effect} ? " causes ".strong($blow->{effect}) : "")
+			.($blow->{effect} ? " causes ".effect_map_link($blow->{effect}, %effects_map) : "")
 			.($blow->{dice} ? " and ".strong($blow->{dice})." damage" : "")
 		);
 	}
@@ -650,9 +670,10 @@ sub dump_monsters_blows($) {
 	return li("Blows: ".ul(@string));
 }
 
-sub dump_monsters($\@) {
+sub dump_monsters($\@\%) {
 	my $fileout = shift;
 	my @monsters = @{ (shift) };
+	my %effects_map = %{ (shift) };
 	
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
@@ -694,7 +715,7 @@ sub dump_monsters($\@) {
 			.li("Innate spell frequencey ".strong($monster->{freq_innate})
 				." and other spell frequency ".strong($monster->{freq_spell}))
 		if $monster->{spell_power};
-		print FILEOUT dump_monsters_blows($monster) if $monster->{monster_blow};
+		print FILEOUT dump_monsters_blows($monster, %effects_map) if $monster->{monster_blow};
 		print FILEOUT li("Flags: ".strong($monster->{flags})) if $monster->{flags};
 		print FILEOUT li("Spell Flags: ".strong($monster->{spell_flags})) if $monster->{spell_flags};
 		#print $monster->{d_char}."\n";
@@ -818,31 +839,17 @@ sub parse_terrains($) {
 sub dump_terrains_state($\@) {
 	my $terrain = shift;
 	my @terrains = @{ (shift) };
-	my $string = "";
+	my @string;
 	
 	foreach my $state (@{ $terrain->{state} }) {
-		$string = $string.li(
+		push @string, li(
 			strong($state->{action})
 			." resulting in ".terrain_link($state->{result}, @terrains)
 			.($state->{power} != 0 ? " at power ".strong($state->{power}) : "")
 		);
 	}
 	
-	return li("States: ".ul($string));
-}
-
-sub blow_map_link($\%) {
-	my $name = shift;
-	my %blows_map = %{ (shift) };
-	
-	return name_link($blows_map{$name}->{idx}, $name, $filenames{blow}{html});
-}
-
-sub effect_map_link($\%) {
-	my $name = shift;
-	my %effects_map = %{ (shift) };
-	
-	return name_link($effects_map{$name}->{idx}, $name, $filenames{effect}{html});
+	return li("States: ".ul(@string));
 }
 
 sub dump_terrains($\@\%\%) {
@@ -886,7 +893,6 @@ sub dump_terrains($\@\%\%) {
 
 		# the following assumes there is only one spell trap per S: line
 		print FILEOUT li("Trap Spell: ".blow_map_link($terrain->{spell}, %blows_map)) if $terrain->{spell};
-		#print FILEOUT li("Trap Spell: ".strong($terrain->{spell})) if $terrain->{spell};
 		
 		print FILEOUT end_ul;
 
@@ -1432,7 +1438,6 @@ sub dump_blows($\@) {
 				." d_esc=".strong($blow->{d_esc})
 				." d_tact=".strong($blow->{d_tact})
 				." d_range=".strong($blow->{d_range}))
-				#." d_=".strong($blow->{d_})
 			if defined $blow->{d_base};
 		print FILEOUT
 			li("Arc ".strong($blow->{arc})
@@ -1689,6 +1694,12 @@ sub my_filter {
 $Data::Dumper::Sortkeys = \&my_filter;
 
 ##########
+# Make CGI::Pretty work better
+##########
+
+push @CGI::Pretty::AS_IS,qw(strong a);
+
+##########
 # Main...
 ##########
 
@@ -1775,7 +1786,7 @@ dump_dungeons(">$outdir$filenames{dungeon}{html}", @dungeons, @monsters, @terrai
 print "Writing Stores...\n";
 dump_stores(">$outdir$filenames{store}{html}", @stores);
 print "Writing Monsters...\n";
-dump_monsters(">$outdir$filenames{monster}{html}", @monsters);
+dump_monsters(">$outdir$filenames{monster}{html}", @monsters, %effects_map);
 print "Writing Terrain...\n";
 dump_terrains(">$outdir$filenames{terrain}{html}", @terrains, %blows_map, %effects_map);
 print "Writing Vaults...\n";
