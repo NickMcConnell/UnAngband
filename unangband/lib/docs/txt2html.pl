@@ -26,73 +26,73 @@ my $perldump = 0;
 my %filenames =
 (
 	dungeon => {
-		txt => "lib/edit/dungeon.txt",
+		txt => "dungeon.txt",
 		html => "dungeon.html",
 		debug => "dungeon.pl.txt",
 		desc => "Dungeons",
 	},
 	store => {
-		txt => "lib/edit/store.txt",
+		txt => "store.txt",
 		html => "store.html",
 		debug => "store.pl.txt",
 		desc => "Stores",
 	},
 	monster => {
-		txt => "lib/edit/monster.txt",
+		txt => "monster.txt",
 		html => "monster.html",
 		debug => "monster.pl.txt",
 		desc => "Monsters",
 	},
 	terrain => {
-		txt => "lib/edit/terrain.txt",
+		txt => "terrain.txt",
 		html => "terrain.html",
 		debug => "terrain.pl.txt",
 		desc => "Terrain",
 	},
 	vault => {
-		txt => "lib/edit/vault.txt",
+		txt => "vault.txt",
 		html => "vault.html",
 		debug => "vault.pl.txt",
 		desc => "Vaults",
 	},
 	object => {
-		txt => "lib/edit/object.txt",
+		txt => "object.txt",
 		html => "object.html",
 		debug => "object.pl.txt",
 		desc => "Objects",
 	},
 	shop_owner => {
-		txt => "lib/edit/shop_own.txt",
+		txt => "shop_own.txt",
 		html => "shop_owner.html",
 		debug => "shop_owner.pl.txt",
 		desc => "Shop Owners",
 	},
 	room => {
-		txt => "lib/edit/room.txt",
+		txt => "room.txt",
 		html => "room.html",
 		debug => "room.pl.txt",
 		desc => "Rooms",
 	},
 	blow => {
-		txt => "lib/edit/blows.txt",
+		txt => "blows.txt",
 		html => "blow.html",
 		debug => "blow.pl.txt",
 		desc => "Blows",
 	},
 	effect => {
-		txt => "lib/edit/effect.txt",
+		txt => "effect.txt",
 		html => "effect.html",
 		debug => "effect.pl.txt",
 		desc => "Effects",
 	},
 	region => {
-		txt => "lib/edit/region.txt",
+		txt => "region.txt",
 		html => "region.html",
 		debug => "region.pl.txt",
 		desc => "Regions",
 	},
 	spell => {
-		txt => "lib/edit/spell.txt",
+		txt => "spell.txt",
 		html => "spell.html",
 		debug => "spell.pl.txt",
 		desc => "Spells",
@@ -1703,57 +1703,96 @@ sub idx2name(\@) {
 	return %names;
 }
 
+my $indir = "";
+my $outdir = "";
+
+# probe for input directory, only handle the obvious cases
+# we're in the lib/edit directory
+if ( -e $filenames{dungeon}{txt} ) {
+	; # indir is ok
+}
+# we're another directory in lib/
+elsif ( -e "../edit/$filenames{dungeon}{txt}" ) {
+	$indir = "../edit/";
+}
+# we're in the lib directory
+elsif ( -e "edit/$filenames{dungeon}{txt}" ) {
+	$indir = "edit/";
+}
+# we're in the lib directory
+elsif ( -e "lib/edit/$filenames{dungeon}{txt}" ) {
+	$indir = "lib/edit/";
+}
+# we're possibly in the src directory!?
+elsif ( -e "../lib/edit/$filenames{dungeon}{txt}" ) {
+	$indir = "../lib/edit/";
+}
+else {
+	die "Could not find $filenames{dungeon}{txt}\n";
+}
+
+# set the output dir
+$outdir = "../docs" if $indir eq ""; # manual for already being in lib/edit
+$outdir = $indir."txt2html/";
+$outdir =~ s/edit/docs/;
+# create it if it doesn't exist
+mkdir $outdir;
+
+# Start!
+print "Parsing from: $indir\n";
+print "Writing to:   $outdir\n";
+
 print "Parse Dungeons...\n";
-my @dungeons = parse_dungeons("<$filenames{dungeon}{txt}");
+my @dungeons = parse_dungeons("<$indir$filenames{dungeon}{txt}");
 print "Parse Stores...\n";
-my @stores = parse_stores("<$filenames{store}{txt}");
+my @stores = parse_stores("<$indir$filenames{store}{txt}");
 print "Parse Monsters...\n";
-my @monsters = parse_monsters("<$filenames{monster}{txt}");
+my @monsters = parse_monsters("<$indir$filenames{monster}{txt}");
 print "Parse Terrain...\n";
-my @terrains = parse_terrains("<$filenames{terrain}{txt}");
+my @terrains = parse_terrains("<$indir$filenames{terrain}{txt}");
 print "Parse Vaults...\n";
-my @vaults = parse_vaults("<$filenames{vault}{txt}");
+my @vaults = parse_vaults("<$indir$filenames{vault}{txt}");
 print "Parse Objects...\n";
-my @objects = parse_objects("<$filenames{object}{txt}");
+my @objects = parse_objects("<$indir$filenames{object}{txt}");
 print "Parse Shop Owners...\n";
-my @shop_owners = parse_shop_owners("<$filenames{shop_owner}{txt}");
+my @shop_owners = parse_shop_owners("<$indir$filenames{shop_owner}{txt}");
 print "Parse Rooms...\n";
-my @rooms = parse_rooms("<$filenames{room}{txt}");
+my @rooms = parse_rooms("<$indir$filenames{room}{txt}");
 print "Parse Blows...\n";
-my @blows = parse_blows("<$filenames{blow}{txt}");
+my @blows = parse_blows("<$indir$filenames{blow}{txt}");
 print "Parse Effects...\n";
-my @effects = parse_effects("<$filenames{effect}{txt}");
+my @effects = parse_effects("<$indir$filenames{effect}{txt}");
 print "Parse Regions...\n";
-my @regions = parse_regions("<$filenames{region}{txt}");
+my @regions = parse_regions("<$indir$filenames{region}{txt}");
 print "Parse Spells...\n";
-my @spells = parse_spells("<$filenames{spell}{txt}");
+my @spells = parse_spells("<$indir$filenames{spell}{txt}");
 
 my %blows_map = idx2name(@blows);
 my %effects_map = idx2name(@effects);
 
 print "Writing Dungeons...\n";
-dump_dungeons(">$filenames{dungeon}{html}", @dungeons, @monsters, @terrains, @vaults, @stores);
+dump_dungeons(">$outdir$filenames{dungeon}{html}", @dungeons, @monsters, @terrains, @vaults, @stores);
 print "Writing Stores...\n";
-dump_stores(">$filenames{store}{html}", @stores);
+dump_stores(">$outdir$filenames{store}{html}", @stores);
 print "Writing Monsters...\n";
-dump_monsters(">$filenames{monster}{html}", @monsters);
+dump_monsters(">$outdir$filenames{monster}{html}", @monsters);
 print "Writing Terrain...\n";
-dump_terrains(">$filenames{terrain}{html}", @terrains, %blows_map, %effects_map);
+dump_terrains(">$outdir$filenames{terrain}{html}", @terrains, %blows_map, %effects_map);
 print "Writing Vaults...\n";
-dump_vaults(">$filenames{vault}{html}", @vaults);
+dump_vaults(">$outdir$filenames{vault}{html}", @vaults);
 print "Writing Objects...\n";
-dump_objects(">$filenames{object}{html}", @objects);
+dump_objects(">$outdir$filenames{object}{html}", @objects);
 print "Writing Shop Owners...\n";
-dump_shop_owners(">$filenames{shop_owner}{html}", @shop_owners, @stores);
+dump_shop_owners(">$outdir$filenames{shop_owner}{html}", @shop_owners, @stores);
 print "Writing Rooms...\n";
-dump_rooms(">$filenames{room}{html}", @rooms);
+dump_rooms(">$outdir$filenames{room}{html}", @rooms);
 print "Writing Blows...\n";
-dump_blows(">$filenames{blow}{html}", @blows);
+dump_blows(">$outdir$filenames{blow}{html}", @blows);
 print "Writing Effects...\n";
-dump_effects(">$filenames{effect}{html}", @effects);
+dump_effects(">$outdir$filenames{effect}{html}", @effects);
 print "Writing Regions...\n";
-dump_regions(">$filenames{region}{html}", @regions, %blows_map);
+dump_regions(">$outdir$filenames{region}{html}", @regions, %blows_map);
 print "Writing Spells...\n";
-dump_spells(">$filenames{spell}{html}", @spells);
+dump_spells(">$outdir$filenames{spell}{html}", @spells);
 
 
