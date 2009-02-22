@@ -1009,6 +1009,15 @@ sub parse_objects($) {
 			$objects[$idx]{idx} = $1;
 			$objects[$idx]{name} = $2;
 		}
+		elsif(/^G:(.):(.)$/) {
+			$objects[$idx]{d_char} = $1;
+			$objects[$idx]{d_attr} = $2;
+		}
+		elsif(/^I:$params3$/) {
+			$objects[$idx]{tval} = $1;
+			$objects[$idx]{sval} = $2;
+			$objects[$idx]{pval} = $3;
+		}
 	}
 
 	close(FILEIN);
@@ -1035,6 +1044,9 @@ sub dump_objects($\@) {
 			generic_item_header($object),
 			start_ul;
 	
+		print FILEOUT
+			li("Looks like ".strong($object->{d_char})." coloured ".strong($object->{d_attr}))
+		;
 		print FILEOUT end_ul;
 
 	}
