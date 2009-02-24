@@ -1948,13 +1948,13 @@
 #define TV_GOLD  100     /* Gold or higher tvals can only be picked up by players */
 #define TV_GEMS  101
 
-/* The "sval" codes for TV_SKELETON */
+/* The "sval" codes for TV_BONE */
 #define SV_BONE_SKULL 1
 #define SV_BONE_BONE  2
 #define SV_BONE_SKELETON     3
 #define SV_BONE_TEETH 4
 
-/* The "sval" codes for TV_HOLDs */
+/* The "sval" codes for TV_HOLD */
 #define SV_HOLD_BOTTLE       1
 #define SV_HOLD_BOX   3
 #define SV_HOLD_CAGE  4
@@ -2215,7 +2215,7 @@
 #define SV_DRAGON_POWER		30
 
 /* These are correct */
-/* The sval codes for TV_LITE */
+/* The "sval" codes for TV_LITE */
 #define SV_LITE_TORCH		0
 #define SV_LITE_LANTERN		1
 #define SV_LITE_GALADRIEL	4
@@ -2250,7 +2250,7 @@
 #define SV_AMULET_SERPENTS      23
 
 /* These may be incorrect */
-/* The sval codes for TV_RING */
+/* The "sval" codes for TV_RING */
 #define SV_RING_WOE				0
 #define SV_RING_AGGRAVATION		1
 #define SV_RING_WEAKNESS		2
@@ -2514,6 +2514,7 @@
 #define SV_FLASK_WEB	  15
 
 /* The sval codes for containers */
+/* The "sval" codes for TV_HOLD */
 #define SV_HOLD_FLASK    2
 
 

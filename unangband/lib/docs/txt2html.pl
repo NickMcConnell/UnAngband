@@ -2,7 +2,7 @@
 use strict;
 
 use Data::Dumper;
-use CGI::Pretty qw/:standard :html4 *ul/;
+use CGI::Pretty qw/:standard *ul/;
 use Carp qw(longmess);
 
 ###############################################################################
@@ -96,6 +96,12 @@ my %filenames =
 		html => "spell.html",
 		debug => "spell.pl.txt",
 		desc => "Spells",
+	},
+	c => {
+		defines => "defines.h",
+	},
+	defines_TV => {
+		html => "defines.html",
 	},
 );
 
@@ -525,24 +531,40 @@ sub parse_stores($) {
 	return @stores;
 }
 
-sub dump_stores_sell($) {
+sub dump_stores_sell($\@) {
 	my $store = shift;
+	my @TV = @{ (shift) };
 	my @string;
 	
 	foreach my $sell (@{ $store->{sell} }) {
-		push @string, li(
-			strong($sell->{count})
-			." items of type ".strong($sell->{tval})
-			." subtype ".strong($sell->{sval})
-		);
+		if (defined @TV[$sell->{tval}]->{item}[$sell->{sval}]) {
+			my %tval = %{ @TV[$sell->{tval}] };
+			my %sval = %{ @TV[$sell->{tval}]->{item}[$sell->{sval}] };
+			push @string, li(
+				strong($sell->{count})." "
+				.a({-href=>"$filenames{defines_TV}{html}#$tval{idx}_$sval{idx}"}, "$sval{name} ($sval{idx})")
+			);
+		}
+		else {
+			my %tval = %{ @TV[$sell->{tval}] };
+			die "huh?" if not defined $tval{idx};
+			
+			push @string, li(
+				strong($sell->{count})
+				." items of type "
+				.a({-href=>"$filenames{defines_TV}{html}#$tval{idx}"}, "$tval{name} ($tval{idx})")
+				." subtype ".strong($sell->{sval})
+			);
+		}
 	}
 	
 	return li("Sell Items: ".ul(@string));
 }
 
-sub dump_stores($\@) {
+sub dump_stores($\@\@) {
 	my $fileout = shift;
 	my @stores = @{ (shift) };
+	my @TV = @{ (shift) };
 	
 	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
 	
@@ -560,7 +582,7 @@ sub dump_stores($\@) {
 			start_ul;
 	
 		print FILEOUT li("Base buy: ".strong($store->{base})) if $store->{base};
-		print FILEOUT dump_stores_sell($store) if $store->{sell};
+		print FILEOUT dump_stores_sell($store, @TV) if $store->{sell};
 		print FILEOUT end_ul;
 
 	}
@@ -1667,6 +1689,152 @@ sub dump_spells($\@) {
 }
 
 ##########
+# The defines from the .h file
+##########
+
+sub parse_defines_TV($\%) {
+	my $filein = shift;
+	my $defines = shift; #%{ (shift) };
+	
+	open FILEIN, $filein or die "cannot open $filein: $!\n";
+
+	foreach(<FILEIN>) {
+		chomp;
+		if(/#define\s+TV_([A-Z_]+)\s+([0-9]+)\s*(.*)$/) {
+			#print "works? $1\n";
+			$defines->{TV}[$2]{name} = $1;
+			$defines->{TV}[$2]{idx} = $2;
+			$defines->{TV}[$2]{comment} = $3 if not $3 eq "";
+			$defines->{TV}[$2]{comment} =~ s/\/\*\s+(.*)\s+\*\//$1/ if $defines->{TV}[$2]{comment};
+		}
+	}
+
+	close(FILEIN);
+}
+
+# this is much more painful then the TV one...
+sub parse_defines_SV($\%) {
+	my $filein = shift;
+	my $defines = shift; #%{ (shift) };
+	
+	open FILEIN, $filein or die "cannot open $filein: $!\n";
+
+	my @section;
+	
+	foreach(<FILEIN>) {
+		chomp;
+		if(/\/\*\s*The "sval" (?:codes|values) for (TV_[A-Z\/_]+)\s*\*\//) {
+			#my $section_name_long = $1;
+			my @section_name = split(/\//, $1);
+			@section = ();
+			die "something odd with SV" if not defined $section_name[0];
+			foreach my $sec ( @section_name ) {
+				$sec =~ s/TV_(.*)/$1/;
+				my $sec_num = undef;
+				foreach my $item ( @{ $defines->{TV} } ) {
+					#print $item->{name}."\n" if defined $item;
+					$sec_num = $item->{idx} if defined $item and $item->{name} eq $sec;
+				}
+				die "'TV_$sec' not valid" if not defined $sec_num;
+				push @section, $sec_num;
+			}
+			#print "section is @section\n" if defined $section[0];
+		}
+		elsif(/#define\s+SV_([A-Z_]+)\s+([0-9]+)\s*(.*)$/) {
+			# paranoia
+			my $name = $1;
+			my $idx = $2;
+			my $comment = $3;
+			
+			#print "works? $name $idx\n";
+			if (defined $section[0]) {
+				foreach my $sec (@section) {
+					#print "works2? $name $idx\n";
+					die "duplicate item $name $idx found in section $defines->{TV}[$sec]{name} $sec"
+						if defined $defines->{TV}[$sec]{item}[$idx];
+					$defines->{TV}[$sec]{item}[$idx]{name} = $name;
+					$defines->{TV}[$sec]{item}[$idx]{idx} = $idx;
+					$defines->{TV}[$sec]{item}[$idx]{comment} = $comment if not $comment eq "";
+					$defines->{TV}[$sec]{item}[$idx]{comment} =~ s/\/\*\s+(.*)\s+\*\//$1/
+						if $defines->{TV}[$sec]{item}[$idx]{comment};
+				}
+			}
+		}
+		elsif(/^ \* Special "sval" limit --/) {
+			# this is the "end" of the real SV_? values and beginning of random max/min stuff
+			@section = ();
+		}
+	}
+
+	close(FILEIN);
+}
+
+sub dump_defines($\%) {
+	my $fileout = shift;
+	my %defines = %{ (shift) };
+	
+	open FILEOUT, $fileout or die "cannot open $fileout: $!\n";
+	
+	print FILEOUT
+		start_html(-title=>"Random Defines"),
+		h1("Random Defines"),
+		$styles,
+		start_ul;#,
+		#generic_links(@spells);
+
+	foreach my $tval ( @{ $defines{TV} } ) {
+		# array is sparse
+		next if not $tval;
+		
+		print FILEOUT
+			li(a({-href=>"#$tval->{idx}"}, "$tval->{idx} $tval->{name}"));
+	}
+	print FILEOUT end_ul;
+
+
+	foreach my $tval ( @{ $defines{TV} } ) {
+		# array is still sparse
+		next if not $tval;
+		
+		print FILEOUT
+			generic_item_header($tval),
+			start_ul;
+			#li(a({-href=>"#$tval->{idx}"}, "$tval->{idx} $tval->{name}"));
+		foreach my $sval ( @{ $tval->{item} } ) {
+			# even THIS array is sparse!?
+			next if not $sval;
+			
+			print FILEOUT
+				li(a({name=>"$tval->{idx}_$sval->{idx}"},
+					"$sval->{name} ($sval->{idx})"
+					.($sval->{comment} ? ": ".strong($sval->{comment}) : "")
+				))
+			;
+		}
+		print FILEOUT end_ul;
+	}
+	# all the data blocks
+	#foreach my $spell( @spells ) {
+	#	# array is still sparse
+	#	next if not $spell;
+	
+	#	print FILEOUT
+	#		generic_item_header($spell),
+	#		start_ul;
+	
+	#	print FILEOUT end_ul;
+
+	#}
+	print FILEOUT generic_footer;
+
+	open FILETXT, ">defines.txt";
+	print FILETXT Dumper(\%defines);
+	close FILETXT;
+	
+	#dump_perl("spell", @spells);
+}
+
+##########
 # Some Data::Dumper stuff
 ##########
 
@@ -1699,6 +1867,7 @@ sub idx2name(\@) {
 }
 
 my $indir = "";
+my $srcdir = "";
 my $outdir = "";
 
 # probe for input directory, only handle the obvious cases
@@ -1733,9 +1902,27 @@ $outdir =~ s/edit/docs/;
 # create it if it doesn't exist
 mkdir $outdir;
 
+if ( $indir eq "" ) {
+	$srcdir = "../../src"; # manual for already being in lib/edit
+}
+elsif ( $indir eq "../edit/") {
+	$srcdir = "../../src";
+}
+else {
+	$srcdir = $indir;
+	$srcdir =~ s#lib/edit#src#;
+}
+
 # Start!
-print "Parsing from: $indir\n";
-print "Writing to:   $outdir\n";
+print "Parsing txt from: $indir\n";
+print "Parsing src from: $srcdir\n";
+print "Writing html to:  $outdir\n";
+
+my %defines;
+
+parse_defines_TV("<$srcdir/defines.h", %defines);
+parse_defines_SV("<$srcdir/defines.h", %defines);
+dump_defines(">$outdir/defines.html", %defines);
 
 print "Parse Dungeons...\n";
 my @dungeons = parse_dungeons("<$indir$filenames{dungeon}{txt}");
@@ -1768,7 +1955,7 @@ my %effects_map = idx2name(@effects);
 print "Writing Dungeons...\n";
 dump_dungeons(">$outdir$filenames{dungeon}{html}", @dungeons, @monsters, @terrains, @vaults, @stores);
 print "Writing Stores...\n";
-dump_stores(">$outdir$filenames{store}{html}", @stores);
+dump_stores(">$outdir$filenames{store}{html}", @stores, @{ $defines{TV} });
 print "Writing Monsters...\n";
 dump_monsters(">$outdir$filenames{monster}{html}", @monsters, %effects_map, %blows_map);
 print "Writing Terrain...\n";
