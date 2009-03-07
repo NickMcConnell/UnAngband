@@ -1213,6 +1213,13 @@ static errr rd_extra(void)
 	else
 	{
 		strip_bytes(38 * 2);
+
+		/* Hack to prevent characters imported from previous version starving to death */
+		p_ptr->food = PY_FOOD_FULL - 1;
+
+		/* Hack to prevent characters imported from previous version being exhausted */
+		p_ptr->rest = PY_REST_FULL - 1;
+
 #if 0
 		rd_s16b(&p_ptr->msleep);
 		rd_s16b(&p_ptr->petrify);
