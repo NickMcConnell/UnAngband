@@ -1303,7 +1303,7 @@ bool make_attack_normal(int m_idx)
 					}
 
 					/* Apply the stun */
-					if (k) (void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(k,10)) : k);
+					if (k) inc_timed(TMD_STUN, p_ptr->timed[TMD_STUN] ? randint(MIN(k,10)) : k, TRUE);
 
 				}
 			}
@@ -1323,7 +1323,7 @@ bool make_attack_normal(int m_idx)
 				disturb(1, 0);
 
 				/* Message */
-				if (!p_ptr->timed[TMD_PSLEEP]) msg_format("%^s misses you.", m_name);
+				if (!(p_ptr->timed[TMD_PSLEEP])) msg_format("%^s misses you.", m_name);
 			}
 		}
 

@@ -23,7 +23,7 @@
  */
 bool set_timed(int idx, int v, bool notify)
 {
-	timed_effect *effect;
+	const timed_effect *effect;
 
 	/* Hack -- Force good values */
 	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
@@ -42,10 +42,10 @@ bool set_timed(int idx, int v, bool notify)
 			return set_cut(v);
 
 		case TMD_POISONED:
-			return set_stun(v);
+			return set_poisoned(v);
 
 		case TMD_SLOW_POISON:
-			return set_stun(v);
+			return set_slow_poison(v);
 
 		case TMD_AFRAID:
 			return set_afraid(v);
@@ -1004,16 +1004,17 @@ bool set_food(int v)
 	}
 
 	/* Food increase */
-	if (new_aux >= old_aux)
+	if ((new_aux > old_aux) || ((v > p_ptr->food) && (new_aux == old_aux)))
 	{
 		/* Describe the state */
 		switch (new_aux)
 		{
 			/* Weak */
+			case 0:
 			case 1:
 			case 2:
 			{
-				msg_print("You are still weak.");
+				msg_print("You are still starving.");
 				break;
 			}
 

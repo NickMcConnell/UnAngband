@@ -1098,7 +1098,7 @@ static void decrease_timeouts(void)
 				decr = (p_ptr->timed[i] > 1000) ? 0 : adjust;
 
 				/* Some rooms make wounds magically worse */
-				if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
+				if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) decr = -1;
 
 				break;
 			}
@@ -1108,7 +1108,7 @@ static void decrease_timeouts(void)
 				decr = p_ptr->timed[TMD_SLOW_POISON] ? 0 : adjust;
 
 				/* Some rooms make wounds magically worse */
-				if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
+				if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) decr = -1;
 
 				break;
 			}
@@ -1121,7 +1121,7 @@ static void decrease_timeouts(void)
 			case TMD_PSLEEP:
 			{
 				/* Goes in other direction */
-				adjust = -1;
+				decr = -1;
 
 				break;
 			}
