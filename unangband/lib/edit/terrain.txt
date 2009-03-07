@@ -1483,7 +1483,7 @@ O:0
 W:2:1:10:0
 K:DEFAULT:1:0
 #$ open floor
-K:SECRET:48:0
+K:SECRET:32:0
 #$ secret door
 K:OPEN:4:0
 #$ open door
