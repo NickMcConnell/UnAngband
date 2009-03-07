@@ -206,8 +206,8 @@ struct term
 	u16b key_xtra;
 	u16b key_size;
 
-	size_t wid;
-	size_t hgt;
+	byte wid;
+	byte hgt;
 
 	byte y1;
 	byte y2;
