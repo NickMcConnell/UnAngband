@@ -1633,9 +1633,9 @@ cptr likert(int x, int y, byte *attr)
  * Quick table to display skills
  */
 typedef struct {
-	byte skill;
+	int skill;
 	const char *name;
-	byte div;
+	int div;
 } skill_table_entry;
 
 skill_table_entry skill_table[] =
