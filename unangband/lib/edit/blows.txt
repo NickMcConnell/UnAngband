@@ -477,7 +477,7 @@ T:0-9999:throw~ a dart at &
 W:0:23:4
 M:6
 F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
-D:create~ a dagger:one target
+D:create~ a dart:one target
 
 N:56:DAGGER
 T:0-9999:throw~ a dagger at &
@@ -725,7 +725,7 @@ N:85:SCATTER_PASS
 T:0-9999:scatter~ * around &
 W:4:0:0
 R:20
-U:3+1/10
+U:1
 F:GRID | ITEM | KILL | PLAY | SELF | MAGIC | SCATTER | PASS
 D:scatter~ magic around &:$ enemies
 
@@ -766,7 +766,12 @@ R:6
 F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 D:create~ a short arc:
 
-#$# 90 - Unused ###
+N:90:BEAM_MINOR
+T:0-9999:shoot~ * from % fingers at &
+W:2:0:0
+M:6
+F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
+D::a beam
 
 #$# 91 - Unused ###
 
