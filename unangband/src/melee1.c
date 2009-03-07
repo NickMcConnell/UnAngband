@@ -597,7 +597,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		}
 
 		/* Player condition */
-		if ((p_ptr->blind) || (p_ptr->confused) || (p_ptr->image) || (p_ptr->shero))
+		if ((p_ptr->timed[TMD_BLIND]) || (p_ptr->timed[TMD_CONFUSED]) || (p_ptr->timed[TMD_IMAGE]) || (p_ptr->timed[TMD_BERSERK]))
 			blocking /= 2;
 	}
 
@@ -659,7 +659,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		}
 
 		/* Shield counts for double */
-		if (p_ptr->shield) ac += 50;
+		if (p_ptr->timed[TMD_SHIELD]) ac += 50;
 
 		/* Ill winds help a lot */
 		if ((p_ptr->cur_flags4 & (TR4_WINDY)) ||
@@ -1065,7 +1065,7 @@ bool make_attack_normal(int m_idx)
 	if (r_ptr->flags1 & (RF1_NEVER_BLOW)) return (FALSE);
 
 	/* Player in stastis */
-	if (p_ptr->stastis) return (FALSE);
+	if (p_ptr->timed[TMD_STASTIS]) return (FALSE);
 
 	/* Total armor */
 	ac = p_ptr->ac + p_ptr->to_a;
@@ -1141,7 +1141,7 @@ bool make_attack_normal(int m_idx)
 			disturb(1, 1);
 
 			/* Hack -- Apply "protection from evil" */
-			if ((p_ptr->protevil > 0) &&
+			if ((p_ptr->timed[TMD_PROTEVIL] > 0) &&
 			    (r_ptr->flags3 & (RF3_EVIL)) &&
 			    (p_ptr->lev >= rlev) &&
 			    ((rand_int(100) + p_ptr->lev) > 50))
@@ -1278,7 +1278,7 @@ bool make_attack_normal(int m_idx)
 					}
 
 					/* Apply the cut */
-					if (k) (void)set_cut(p_ptr->cut + k);
+					if (k) (void)set_cut(p_ptr->timed[TMD_CUT] + k);
 				}
 
 				/* Handle stun */
@@ -1303,7 +1303,7 @@ bool make_attack_normal(int m_idx)
 					}
 
 					/* Apply the stun */
-					if (k) (void)set_stun(p_ptr->stun ? p_ptr->stun + randint(MIN(k,10)) : k);
+					if (k) (void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(k,10)) : k);
 
 				}
 			}
@@ -1323,7 +1323,7 @@ bool make_attack_normal(int m_idx)
 				disturb(1, 0);
 
 				/* Message */
-				if (!p_ptr->psleep) msg_format("%^s misses you.", m_name);
+				if (!p_ptr->timed[TMD_PSLEEP]) msg_format("%^s misses you.", m_name);
 			}
 		}
 
@@ -1863,7 +1863,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	int summon_lev = 0;
 
 	/* Is the player blind */
-	bool blind = (p_ptr->blind ? TRUE : FALSE);
+	bool blind = (p_ptr->timed[TMD_BLIND] ? TRUE : FALSE);
 
 	bool seen;	/* Source seen */
 	bool known;	/* Either source or target seen */
@@ -2264,7 +2264,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Player is blind */
-	if (p_ptr->blind) atk_flg |= (ATK_DESC_HEARD);
+	if (p_ptr->timed[TMD_BLIND]) atk_flg |= (ATK_DESC_HEARD);
 
 	/* Player is indirect */
 	if (!direct) atk_flg |= (ATK_DESC_INDIRECT);
@@ -2456,9 +2456,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 			else if (target < 0)
 			{
-				if (p_ptr->stastis) /* No effect */ ;
-				else if (p_ptr->fast) set_fast(p_ptr->fast + rand_int(rlev/3));
-				else set_fast(p_ptr->fast + rlev);
+				if (p_ptr->timed[TMD_STASTIS]) /* No effect */ ;
+				else if (p_ptr->timed[TMD_FAST]) inc_timed(TMD_FAST,rand_int(rlev/3), TRUE);
+				else inc_timed(TMD_FAST, rlev, TRUE);
 			}
 
 			break;
@@ -2516,7 +2516,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if (target < 0)
 			{
 				/* Player mana is worth more */
-				if (p_ptr->stastis) /* No effect */ ;
+				if (p_ptr->timed[TMD_STASTIS]) /* No effect */ ;
 				else if (p_ptr->csp < p_ptr->msp)
 				{
 					p_ptr->csp = p_ptr->csp + damroll((spower / 15) + 1,5);
@@ -2643,7 +2643,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if (target < 0)
 			{
 				/* We regain lost hitpoints */
-				if (!p_ptr->stastis) hp_player(damroll(spower, 8));
+				if (!p_ptr->timed[TMD_STASTIS]) hp_player(damroll(spower, 8));
 
 				/* Lose some mana (high-level monsters are more efficient) */
 				cost = 1 + spower * 3 / (5 + 2 * rlev / 5);
@@ -2741,20 +2741,20 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				k = 0;
 
 				/* Hack -- always cure paralyzation first */
-				if ((p_ptr->paralyzed) && !(p_ptr->stastis))
+				if ((p_ptr->timed[TMD_PARALYZED]) && !(p_ptr->timed[TMD_STASTIS]))
 				{
-					set_paralyzed(0);
+					clear_timed(TMD_PARALYZED, TRUE);
 					break;
 				}
 
 				/* Count ailments */
-				if (p_ptr->cut) k++;
-				if (p_ptr->stun) k++;
-				if (p_ptr->poisoned) k++;
-				if (p_ptr->blind) k++;
-				if (p_ptr->afraid) k++;
-				if (p_ptr->confused) k++;
-				if (p_ptr->image) k++;
+				if (p_ptr->timed[TMD_CUT]) k++;
+				if (p_ptr->timed[TMD_STUN]) k++;
+				if (p_ptr->timed[TMD_POISONED]) k++;
+				if (p_ptr->timed[TMD_BLIND]) k++;
+				if (p_ptr->timed[TMD_AFRAID]) k++;
+				if (p_ptr->timed[TMD_CONFUSED]) k++;
+				if (p_ptr->timed[TMD_IMAGE]) k++;
 				if (p_ptr->food < PY_FOOD_WEAK) k++;
 
 				/* High level monsters restore stats and experience if nothing worse ails the player */
@@ -2772,19 +2772,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Stastis */
-				if (p_ptr->stastis) /* No effect */ ;
+				if (p_ptr->timed[TMD_STASTIS]) /* No effect */ ;
 
 				/* Pick a random ailment */
 				else if (k)
 				{
 					/* Check what to restore - note paranoia checks */
-					if ((p_ptr->cut) && (k) && (rand_int(k--))) { set_cut(0); set_stun(0); }
-					else if ((p_ptr->stun) && (k) && (rand_int(k--))) { set_stun(0); set_cut(0); }
-					else if ((p_ptr->poisoned) && (k) && (rand_int(k--))) set_poisoned(0);
-					else if ((p_ptr->blind) && (k) && (rand_int(k--))) set_blind(0);
-					else if ((p_ptr->afraid) && (k) && (rand_int(k--))) set_afraid(0);
-					else if ((p_ptr->confused) && (k) && (rand_int(k--))) set_confused(0);
-					else if ((p_ptr->image) && (k) && (rand_int(k--))) set_image(0);
+					if ((p_ptr->timed[TMD_CUT]) && (k) && (rand_int(k--))) { set_cut(0); set_stun(0); }
+					else if ((p_ptr->timed[TMD_STUN]) && (k) && (rand_int(k--))) { set_stun(0); set_cut(0); }
+					else if ((p_ptr->timed[TMD_POISONED]) && (k) && (rand_int(k--))) set_poisoned(0);
+					else if ((p_ptr->timed[TMD_BLIND]) && (k) && (rand_int(k--))) clear_timed(TMD_BLIND, TRUE);
+					else if ((p_ptr->timed[TMD_AFRAID]) && (k) && (rand_int(k--))) set_afraid(0);
+					else if ((p_ptr->timed[TMD_CONFUSED]) && (k) && (rand_int(k--))) clear_timed(TMD_CONFUSED, TRUE);
+					else if ((p_ptr->timed[TMD_IMAGE]) && (k) && (rand_int(k--))) clear_timed(TMD_IMAGE, TRUE);
 					else if ((p_ptr->food < PY_FOOD_WEAK) && (k) && (rand_int(k--))) set_food(PY_FOOD_MAX -1);
 					else if ((rlev < 30) || (k <= 0)) /* Nothing */ ;
 					else if ((p_ptr->stat_cur[A_STR] != p_ptr->stat_max[A_STR]) && (k) && (rand_int(k--))) do_res_stat(A_STR);
@@ -3054,7 +3054,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS))) player_can_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,0x0L);
 					if ((p_ptr->cur_flags4 & (TR4_ANCHOR))) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_ANCHOR);
 				}
-				else if (rand_int(100) < p_ptr->skill_sav)
+				else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 				{
 					msg_print("You resist the effects!");
 
@@ -3162,8 +3162,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			disturb(1, 0);
 			msg_format("%^s tries to blank your mind.", m_name);
 
-			if (p_ptr->stastis) /* No effect */ ;
-			else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+			if (p_ptr->timed[TMD_STASTIS]) /* No effect */ ;
+			else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 			{
 				msg_print("You resist the effects!");
 
@@ -3171,9 +3171,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 			else
 			{
-				(void)set_amnesia(p_ptr->amnesia + rlev / 8 + 4 + rand_int(4));
-
-				msg_print("Your memories fade.");
+				inc_timed(TMD_AMNESIA, rlev / 8 + 4 + rand_int(4), TRUE);
 
 				if (who > 0) update_smart_save(who, FALSE);
 			}
@@ -3188,7 +3186,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!direct) break;
 			if (target == 0) break;
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				if (p_ptr->csp)
 				{
@@ -3328,9 +3326,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((target < 0) && (!seen)) msg_print("You feel something focusing on your mind.");
 			else msg_format("%^s gazes deep into %s eyes.", m_name, t_poss);
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (rand_int(100) < p_ptr->skill_sav)
+				if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 				{
 					msg_print("You resist the effects!");
 
@@ -3341,7 +3339,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					msg_print("Your mind is blasted by psionic energy.");
 					if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
 					{
-						(void)set_confused(p_ptr->confused + rand_int(4) + 4);
+						inc_timed(TMD_CONFUSED, rand_int(4) + 4, TRUE);
 						if (!player_not_flags(who, 0x0L, TR2_RES_CONFU, 0x0L, 0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
@@ -3394,22 +3392,22 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else if (known) msg_format("%^s casts a deceptive illusion at %s.",m_name,t_name);
 			}
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				if (p_ptr->cur_flags2 & (TR2_RES_CHAOS))
 				{
-					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
-						(void)set_image(p_ptr->image + rand_int(4) + 1);
+						inc_timed(TMD_IMAGE, rand_int(4) + 1, TRUE);
 					}
 					else msg_print("You refuse to be deceived.");
 
 					/* Sometimes notice */
 					player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 				}
-				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
 					msg_print("You refuse to be deceived.");
 
@@ -3417,7 +3415,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 				else
 				{
-					(void)set_image(p_ptr->image + rand_int(4) + 4);
+					inc_timed(TMD_IMAGE, rand_int(4) + 4, TRUE);
 
 					/* Always notice */
 					if (!player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L) && who)
@@ -3474,9 +3472,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				k = 5;
 			}
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (rand_int(rlev / 2 + 70) < p_ptr->skill_sav)
+				if (rand_int(rlev / 2 + 70) < p_ptr->skills[SKILL_SAVE])
 				{
 					msg_format("You resist the effects%c",
 					      (spower < 30 ?  '.' : '!'));
@@ -3492,10 +3490,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					project_p(who, what, y, x, get_dam(spower, attack), GF_HURT);
 
 					/* Cut the player depending on strength of spell. */
-					if (k == 1) (void)set_cut(p_ptr->cut + 8 + damroll(2, 4));
-					if (k == 2) (void)set_cut(p_ptr->cut + 23 + damroll(3, 8));
-					if (k == 3) (void)set_cut(p_ptr->cut + 46 + damroll(4, 12));
-					if (k == 4) (void)set_cut(p_ptr->cut + 95 + damroll(8, 15));
+					if (k == 1) (void)set_cut(p_ptr->timed[TMD_CUT] + 8 + damroll(2, 4));
+					if (k == 2) (void)set_cut(p_ptr->timed[TMD_CUT] + 23 + damroll(3, 8));
+					if (k == 3) (void)set_cut(p_ptr->timed[TMD_CUT] + 46 + damroll(4, 12));
+					if (k == 4) (void)set_cut(p_ptr->timed[TMD_CUT] + 95 + damroll(8, 15));
 					if (k == 5) (void)set_cut(1200);
 
 					if (who > 0) update_smart_save(who, FALSE);
@@ -3573,10 +3571,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster bless counter */
 				n_ptr->bless += n_ptr->bless + rlev + rand_int(rlev);
 			}
-			else if ((target < 0) && !(p_ptr->stastis))
+			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				/* Set blessing */
-				set_blessed(p_ptr->blessed + rlev);
+				inc_timed(TMD_BLESSED, rlev, TRUE);
 			}
 
 			break;
@@ -3606,10 +3604,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster haste counter */
 				n_ptr->berserk += n_ptr->berserk + rlev + rand_int(rlev);
 			}
-			else if ((target < 0) && !(p_ptr->stastis))
+			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				/* Set blessing */
-				set_shero(p_ptr->shero + rlev);
+				inc_timed(TMD_BERSERK, rlev, TRUE);
 			}
 
 			break;
@@ -3639,10 +3637,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster shield counter */
 				n_ptr->shield += n_ptr->shield + rlev + rand_int(rlev);
 			}
-			else if ((target < 0) && !(p_ptr->stastis))
+			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				/* Set blessing */
-				set_shield(p_ptr->shield + rlev);
+				inc_timed(TMD_SHIELD, rlev, TRUE);
 			}
 
 			break;
@@ -3672,14 +3670,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Add to the monster haste counter */
 				n_ptr->oppose_elem += n_ptr->oppose_elem + rlev + rand_int(rlev);
 			}
-			else if ((target < 0) && !(p_ptr->stastis))
+			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				/* Set opposition */
-				set_oppose_acid(p_ptr->oppose_acid + rlev);
-				set_oppose_cold(p_ptr->oppose_cold + rlev);
-				set_oppose_elec(p_ptr->oppose_elec + rlev);
-				set_oppose_fire(p_ptr->oppose_fire + rlev);
-				set_oppose_pois(p_ptr->oppose_pois + rlev);
+				inc_timed(TMD_OPP_ACID, rlev, FALSE);
+				inc_timed(TMD_OPP_COLD, rlev, FALSE);
+				inc_timed(TMD_OPP_ELEC, rlev, FALSE);
+				inc_timed(TMD_OPP_FIRE, rlev, FALSE);
+				inc_timed(TMD_OPP_POIS, rlev, FALSE);
 			}
 
 			break;
@@ -3696,8 +3694,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target < 0)
 			{
-				if (p_ptr->stastis) /* No effect */;
-				else if (rand_int(rlev / 2 + 70) > p_ptr->skill_sav)
+				if (p_ptr->timed[TMD_STASTIS]) /* No effect */;
+				else if (rand_int(rlev / 2 + 70) > p_ptr->skills[SKILL_SAVE])
 				{
 					/* Reduce food abruptly.  */
 					(void)set_food(p_ptr->food - (p_ptr->food/4));
@@ -3754,15 +3752,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a fearful illusion.", m_name);
 			else if (known) msg_format("%^s casts a fearful illusion at %s.",m_name,t_name);
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
 				{
-					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
-						(void)set_afraid(p_ptr->afraid + rand_int(4) + 1);
+						(void)set_afraid(p_ptr->timed[TMD_AFRAID] + rand_int(4) + 1);
 
 						/* Always notice */
 						if (!player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L) && who)
@@ -3781,14 +3779,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						}
 					}
 				}
-				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
 					msg_print("You refuse to be frightened.");
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
 				{
-					(void)set_afraid(p_ptr->afraid + rand_int(4) + 4);
+					(void)set_afraid(p_ptr->timed[TMD_AFRAID] + rand_int(4) + 4);
 
 					/* Always notice */
 					if (!player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L) && who)
@@ -3817,15 +3815,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
 			else if (known) msg_format("%^s casts a spell, burning %s eyes.", m_name, t_poss);
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
 				{
-					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
-						(void)set_blind(p_ptr->blind + rand_int(6) + 1);
+						inc_timed(TMD_BLIND, rand_int(6) + 1, TRUE);
 
 						/* Always notice */
 						if (!player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L) && who)
@@ -3844,7 +3842,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						}
 					}
 				}
-				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
 					msg_print("You resist the effects!");
 
@@ -3852,7 +3850,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 				else
 				{
-					(void)set_blind(p_ptr->blind + 12 + rlev / 4 + rand_int(4));
+					inc_timed(TMD_BLIND, 12 + rlev / 4 + rand_int(4), TRUE);
 
 					/* Always notice */
 					if (!player_not_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L) && who)
@@ -3883,15 +3881,15 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if ((target < 0) || ((target == 0) && (known))) msg_format("%^s casts a mesmerising illusion.", m_name);
 			else if (known) msg_format("%^s creates a mesmerising illusion for %s.", m_name, t_name);
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
 				if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
 				{
-					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
-						(void)set_confused(p_ptr->confused + rand_int(5) + 1);
+						inc_timed(TMD_CONFUSED, rand_int(5) + 1, 1);
 
 						/* Always notice */
 						if (!player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
@@ -3910,14 +3908,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						}
 					}
 				}
-				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
 					msg_print("You disbelieve the feeble spell.");
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
 				{
-					(void)set_confused(p_ptr->confused + rlev / 8 + 4 + rand_int(4));
+					inc_timed(TMD_CONFUSED, rlev / 8 + 4 + rand_int(4), TRUE);
 
 					/* Always notice */
 					if (!player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
@@ -3947,18 +3945,18 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			else if ((blind) && (known)) msg_format ("%^s mumbles.",m_name);
 			else if (known) msg_format("%^s drains power from %s muscles.", m_name, t_poss);
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
+				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 				{
-					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
-						(void)set_slow(p_ptr->slow + rand_int(3) + 1);
+						inc_timed(TMD_SLOW, rand_int(3) + 1, TRUE);
 
 						/* Player is temporarily resistant */
-						if (p_ptr->free_act)
+						if (p_ptr->timed[TMD_FREE_ACT])
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -3973,7 +3971,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_print("You are unaffected!");
 
 						/* Player is temporarily resistant */
-						if (p_ptr->free_act)
+						if (p_ptr->timed[TMD_FREE_ACT])
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -3984,14 +3982,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						}
 					}
 				}
-				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
 					msg_print("You resist the effects!");
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
 				{
-					(void)set_slow(p_ptr->slow + rand_int(4) + 4 + rlev / 25);
+					inc_timed(TMD_SLOW, rand_int(4) + 4 + rlev / 25, TRUE);
 
 					/* Always notice */
 					if (!player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
@@ -4020,19 +4018,19 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if ((blind) && (known)) msg_format ("%^s mumbles.",m_name);
 			else if (known) msg_format("%^s stares deeply into %s muscles.", m_name, t_poss);
 
-			if ((target < 0) && !(p_ptr->stastis))
+			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->free_act))
+				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 				{
-					if (powerful && (rand_int(100) > p_ptr->skill_sav))
+					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
 						msg_format("%^s power overcomes your resistance.", m_poss);
 
-						if (!p_ptr->slow) (void)set_slow(p_ptr->slow + rand_int(4) + 1);
-						else set_paralyzed(p_ptr->paralyzed + 1);
+						if (!p_ptr->timed[TMD_SLOW]) inc_timed(TMD_SLOW, rand_int(4) + 1, 1);
+						else inc_timed(TMD_PARALYZED, 1, TRUE);
 
 						/* Player is temporarily resistant */
-						if (p_ptr->free_act)
+						if (p_ptr->timed[TMD_FREE_ACT])
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -4047,7 +4045,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_print("You are unaffected!");
 
 						/* Player is temporarily resistant */
-						if (p_ptr->free_act)
+						if (p_ptr->timed[TMD_FREE_ACT])
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -4058,14 +4056,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						}
 					}
 				}
-				else if (rand_int(100) < (powerful ? p_ptr->skill_sav * 2 / 3 : p_ptr->skill_sav))
+				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
 					msg_print("You resist the effects!");
 					if (who > 0) update_smart_save(who, TRUE);
 				}
 				else
 				{
-					(void)set_paralyzed(p_ptr->paralyzed + rand_int(4) + 4);
+					inc_timed(TMD_PARALYZED, rand_int(4) + 4, TRUE);
 
 					/* Always notice */
 					if (!player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)

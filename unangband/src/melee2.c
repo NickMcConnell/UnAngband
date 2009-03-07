@@ -561,7 +561,7 @@ static int find_resist(u32b smart, int effect)
 			else
 			{
 				if (smart & (SM_GOOD_SAVE)) a += 30;
-				if (p_ptr->afraid) a += 50;
+				if (p_ptr->timed[TMD_AFRAID]) a += 50;
 			}
 			return (a);
 		}
@@ -629,7 +629,7 @@ static int find_resist(u32b smart, int effect)
 			else
 			{
 				if (smart & (SM_GOOD_SAVE)) a += 5;
-				if (p_ptr->afraid) a += 5;
+				if (p_ptr->timed[TMD_AFRAID]) a += 5;
 			}
 			return (a);
 		}
@@ -708,7 +708,7 @@ static int find_resist(u32b smart, int effect)
 			else
 			{
 				if (smart & (SM_GOOD_SAVE)) a += 30;
-				if (p_ptr->afraid) a += 50;
+				if (p_ptr->timed[TMD_AFRAID]) a += 50;
 			}
 			return (a);
 		}
@@ -721,7 +721,7 @@ static int find_resist(u32b smart, int effect)
 			else
 			{
 				if (smart & (SM_GOOD_SAVE)) a += 30;
-				if (p_ptr->blind) a += 50;
+				if (p_ptr->timed[TMD_BLIND]) a += 50;
 			}
 			return (a);
 		}
@@ -734,7 +734,7 @@ static int find_resist(u32b smart, int effect)
 			else
 			{
 				if (smart & (SM_GOOD_SAVE)) a += 30;
-				if (p_ptr->confused) a += 50;
+				if (p_ptr->timed[TMD_CONFUSED]) a += 50;
 			}
 			return (a);
 		}
@@ -745,11 +745,11 @@ static int find_resist(u32b smart, int effect)
 		{
 			if (smart & (SM_FREE_ACT)) a = 100;
 			else if (smart & (SM_PERF_SAVE)) a = 100;
-			else if (p_ptr->paralyzed) a = 80;
+			else if (p_ptr->timed[TMD_PARALYZED]) a = 80;
 			else
 			{
 				if (smart & (SM_GOOD_SAVE)) a += 30;
-				if (p_ptr->slow) a += 50;
+				if (p_ptr->timed[TMD_SLOW]) a += 50;
 			}
 			return (a);
 		}
@@ -6015,7 +6015,7 @@ static void process_monster(int m_idx)
 	 * also makes them cold-blooded.
 	 */
 	if (!(p_ptr->cur_lite) && ((r_ptr->flags2 & (RF2_NEED_LITE)) ||
-			((r_ptr->d_char != 'e') && (p_ptr->invis))))
+			((r_ptr->d_char != 'e') && (p_ptr->timed[TMD_INVIS]))))
 	{
 		/* Character is not directly visible */
 		if (!player_can_fire_bold(m_ptr->fy, m_ptr->fx))
@@ -6026,7 +6026,7 @@ static void process_monster(int m_idx)
 
 		/* Character is in darkness and monster is active */
 		else if ((m_ptr->mflag & (MFLAG_ACTV)) && ((!(cave_info[p_ptr->py][p_ptr->px] & (CAVE_LITE)))
-				|| ((r_ptr->d_char != 'e') && (p_ptr->invis))))
+				|| ((r_ptr->d_char != 'e') && (p_ptr->timed[TMD_INVIS]))))
 		{
 			/* Lite up */
 			if ((r_ptr->flags2 & (RF2_NEED_LITE)) && !(m_ptr->mflag & (MFLAG_LITE)))
@@ -6093,11 +6093,11 @@ static void process_monster(int m_idx)
 		}
 		/* Invisible monsters notice if the player can see invisible */
 		else if ((((r_ptr->flags2 & (RF2_INVISIBLE)) != 0) || (m_ptr->tim_invis)) &&
-					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis) ||
+					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->timed[TMD_SEE_INVIS]) ||
 					 (((r_ptr->flags2 & (RF2_COLD_BLOOD)) == 0) && (p_ptr->see_infra >= m_ptr->cdis))))
 		{
 			/* Tell allies as well */
-			if (((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis))
+			if (((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->timed[TMD_SEE_INVIS]))
 			{
 				update_smart_learn(m_idx, (SM_SEE_INVIS));
 			}
@@ -6162,11 +6162,11 @@ static void process_monster(int m_idx)
 		}
 		/* Invisible monsters notice if the player can see invisible */
 		else if ((((r_ptr->flags2 & (RF2_INVISIBLE)) != 0) || (m_ptr->tim_invis)) &&
-					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis) ||
+					(((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->timed[TMD_SEE_INVIS]) ||
 					 (((r_ptr->flags2 & (RF2_COLD_BLOOD)) == 0) && (p_ptr->see_infra >= m_ptr->cdis))))
 		{
 			/* Tell allies as well */
-			if (((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->tim_invis))
+			if (((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) || (p_ptr->timed[TMD_SEE_INVIS]))
 			{
 				update_smart_learn(m_idx, (SM_SEE_INVIS));
 			}

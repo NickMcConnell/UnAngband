@@ -199,7 +199,7 @@ bool redraw_torch_lit_gain(int y, int x)
 void apply_torch_lit(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_TLIT);
-	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_torch_lit(int y, int x)
@@ -212,7 +212,7 @@ void remove_torch_lit(int y, int x)
 void reapply_torch_lit(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_TLIT);
-	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -1047,7 +1047,7 @@ void display_monlist(void)
 	}
 
 	/* If hallucinating, we can't see any monsters */
-	if (p_ptr->image)
+	if (p_ptr->timed[TMD_IMAGE])
 	{
 		c_prt(TERM_SLATE, "You're too confused to see straight!", 0, 0);
 		return;
@@ -1995,7 +1995,7 @@ void update_mon(int m_idx, bool full)
 		}
 
 		/* Normal line of sight, and not blind */
-		if ((!p_ptr->blind) && (player_has_los_bold(fy, fx)))
+		if ((!p_ptr->timed[TMD_BLIND]) && (player_has_los_bold(fy, fx)))
 		{
 			bool do_invisible = FALSE;
 			bool do_cold_blood = FALSE;
@@ -2335,7 +2335,7 @@ static void player_position()
 	if (((f_ptr->flags3 & (FF3_ALLOC)) != 0) &&
 		((f_ptr->flags1 & (FF1_TRAP)) == 0))
 	{
-		msg_format("You %s %s %s.", p_ptr->blind || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
+		msg_format("You %s %s %s.", p_ptr->timed[TMD_BLIND] || no_lite()? "feel" : "see", is_a_vowel((f_name + f_ptr->name)[0]) ? "an" : "a",
 			f_name + f_ptr->name);
 
 		play_info[y][x] |= (PLAY_MARK);
@@ -2344,7 +2344,7 @@ static void player_position()
 	}
 
 	/* If blind, silently notice what the player is on */
-	else if ((p_ptr->blind || no_lite()) && ((play_info[y][x] & (PLAY_MARK)) == 0) &&
+	else if ((p_ptr->timed[TMD_BLIND] || no_lite()) && ((play_info[y][x] & (PLAY_MARK)) == 0) &&
 		((f_info[cave_feat[y][x]].flags1 & (FF1_NOTICE)) != 0))
 	{
 		play_info[y][x] |= (PLAY_MARK);

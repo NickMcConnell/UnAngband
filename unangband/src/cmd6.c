@@ -66,6 +66,7 @@
 bool do_cmd_item(int command)
 {
 	int item;
+	int i;
 
 	/* Did we cancel out of command */
 	bool result;
@@ -73,30 +74,94 @@ bool do_cmd_item(int command)
 	/* Flags we can use the item from */
 	u16b flags = cmd_item_list[command].use_from;
 
-	/* Check some conditions */
-	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BLIND)) && (p_ptr->blind))
+	/* Check some timed effects */
+	for (i = 0; i < TMD_CONDITION_MAX; i++)
 	{
-		msg_print("You can't see anything.");
+		if ((cmd_item_list[command].timed_conditions & (1L << i)) && (p_ptr->timed[i]))
+		{
+			msg_format("%s", timed_effects[i].on_condition);
+			return (FALSE);
+		}
+	}
+
+	/* Check some conditions - need skill to fire bow */
+	if ((cmd_item_list[command].conditions & (CONDITION_SKILL_FIRE)) && (p_ptr->num_fire <= 0))
+	{
+		msg_print("You lack the skill to fire a weapon.");
 		return (FALSE);
 	}
 
+	/* Check some conditions - need skill to fire bow */
+	if ((cmd_item_list[command].conditions & (CONDITION_SKILL_THROW)) && (p_ptr->num_throw <= 0))
+	{
+		msg_print("You lack the skill to throw a weapon.");
+		return (FALSE);
+	}
+
+	/* Check for charged weapon */
+	if ((cmd_item_list[command].conditions & (CONDITION_GUN_CHARGED)) &&
+			(inventory[INVEN_BOW].sval/10 == 3) && (inventory[INVEN_BOW].charges <= 0))
+	{
+		msg_print("You must refill your weapon with gunpowder.");
+
+		return (FALSE);
+	}
+
+	/* Check if we are holding a song */
+	if ((cmd_item_list[command].conditions & (CONDITION_HOLD_SONG)) && (p_ptr->held_song))
+	{
+		/* Verify */
+		if (!get_check(format("Continue singing %s?", s_name + s_info[p_ptr->held_song].name)))
+		{
+			/* Redraw the state */
+			p_ptr->redraw |= (PR_STATE);
+
+			p_ptr->held_song = 0;
+		}
+	}
+
+	/* Cannot cast spells if illiterate */
+	if ((cmd_item_list[command].conditions & (CONDITION_LITERATE)) && ((c_info[p_ptr->pclass].spell_first > PY_MAX_LEVEL))
+		&& (p_ptr->pstyle != WS_MAGIC_BOOK) && (p_ptr->pstyle != WS_PRAYER_BOOK) && (p_ptr->pstyle != WS_SONG_BOOK))
+	{
+		msg_print("You cannot read books.");
+		return (FALSE);
+	}
+
+	/* Check some conditions - need lite */
 	if ((cmd_item_list[command].conditions & (CONDITION_LITE)) && (no_lite()))
 	{
 		msg_print("You have no light to read by.");
 		return (FALSE);
 	}
 
-	if ((cmd_item_list[command].conditions & (CONDITION_NOT_BERSERK)) && (p_ptr->shero))
+	/* Check some conditions - no wind */
+	if ((cmd_item_list[command].conditions & (CONDITION_NO_WIND)) && ((p_ptr->cur_flags4 & (TR4_WINDY)
+				|| room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))))
 	{
-		msg_print("You are too enraged!");
+		msg_print("It is too windy around you!");
 		return (FALSE);
 	}
 
-	/* Amnesia */
-	if ((cmd_item_list[command].conditions & (CONDITION_NOT_FORGET)) && (p_ptr->amnesia))
+	/* Check some conditions - no wind */
+	if (cmd_item_list[command].conditions & (CONDITION_NEED_SPELLS))
 	{
-		msg_print("You have forgotten how!");
-		return (FALSE);
+		/* Cannot learn more spells */
+		if (!(p_ptr->new_spells))
+		{
+			msg_print("You cannot learn anything more yet.");
+			return (FALSE);
+		}
+
+		/* Message if needed */
+		else
+		{
+			/* Hack */
+			p_ptr->old_spells = 0;
+
+			/* Message */
+			calc_spells();
+		}
 	}
 
 	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
@@ -118,17 +183,17 @@ bool do_cmd_item(int command)
 	if (command == COMMAND_ITEM_FUEL_TORCH || command == COMMAND_ITEM_FUEL_LAMP)
 		p_ptr->command_wrk = (USE_INVEN);
 
-	/* Restrict choices to tval */
+	/* Restrict choices to hook function */
 	item_tester_hook = cmd_item_list[command].item_tester_hook;
 
-	/* Restrict choices to food */
+	/* Restrict choices to tval */
 	item_tester_tval = cmd_item_list[command].item_tester_tval;
 
 	/* Get an item */
 	if (!get_item(&item, cmd_item_list[command].item_query, cmd_item_list[command].item_not_found, flags & ~(USE_BAGS))) return (FALSE);
 
-	/* Get the item from a bag */
-	if (flags & (USE_BAGC))
+	/* Get the item from a bag or quiver */
+	if ((flags & (USE_BAGC)) || (IS_QUIVER_SLOT(item)))
 	{
 		object_type *o_ptr;
 
@@ -152,6 +217,14 @@ bool do_cmd_item(int command)
 			{
 				if ((flags & (USE_BAGS)) == 0) return (FALSE);
 			}
+		}
+
+		/* In a quiver? */
+		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
+		{
+			/* A cursed quiver disables the use of non-cursed ammo */
+			msg_print("Your quiver is cursed!");
+			return (FALSE);
 		}
 	}
 
@@ -610,10 +683,10 @@ bool player_use_staff(int item)
 	lev = k_info[o_ptr->k_idx].level;
 
 	/* Base chance of success */
-	chance = p_ptr->skill_dev;
+	chance = p_ptr->skills[SKILL_DEVICE];
 
 	/* Confusion hurts skill */
-	if (p_ptr->confused) chance = chance / 2;
+	if (p_ptr->timed[TMD_CONFUSED]) chance = chance / 2;
 
 	/* Check for speciality */
 	if (p_ptr->pstyle == WS_STAFF)
@@ -864,10 +937,10 @@ bool player_aim_wand(int item)
 	lev = k_info[o_ptr->k_idx].level;
 
 	/* Base chance of success */
-	chance = p_ptr->skill_dev;
+	chance = p_ptr->skills[SKILL_DEVICE];
 
 	/* Confusion hurts skill */
-	if (p_ptr->confused) chance = chance / 2;
+	if (p_ptr->timed[TMD_CONFUSED]) chance = chance / 2;
 
 	/* Check for speciality */
 	if (p_ptr->pstyle == WS_WAND)
@@ -1122,10 +1195,10 @@ bool player_zap_rod(int item)
 	lev = k_info[o_ptr->k_idx].level;
 
 	/* Base chance of success */
-	chance = p_ptr->skill_dev;
+	chance = p_ptr->skills[SKILL_DEVICE];
 
 	/* Confusion hurts skill */
-	if (p_ptr->confused) chance = chance / 2;
+	if (p_ptr->timed[TMD_CONFUSED]) chance = chance / 2;
 
 	/* High level objects are harder */
 	chance = chance - ((lev > 50) ? 50 : lev);
@@ -1626,10 +1699,10 @@ bool player_assemble(int item)
 	if (o_ptr->name3) lev = r_info[o_ptr->name3].level;
 
 	/* Base chance of success */
-	chance = p_ptr->skill_dev;
+	chance = p_ptr->skills[SKILL_DEVICE];
 
 	/* Confusion hurts skill */
-	if (p_ptr->confused) chance = chance / 2;
+	if (p_ptr->timed[TMD_CONFUSED]) chance = chance / 2;
 
 	/* High level objects are harder */
 	chance = chance - ((lev > 50) ? 50 : lev);
@@ -1737,10 +1810,10 @@ bool player_activate(int item)
 	if (artifact_p(o_ptr)) lev = a_info[o_ptr->name1].level;
 
 	/* Base chance of success */
-	chance = p_ptr->skill_dev;
+	chance = p_ptr->skills[SKILL_DEVICE];
 
 	/* Confusion hurts skill */
-	if (p_ptr->confused) chance = chance / 2;
+	if (p_ptr->timed[TMD_CONFUSED]) chance = chance / 2;
 
 	/* High level objects are harder */
 	chance = chance - ((lev > 50) ? 50 : lev);

@@ -978,6 +978,8 @@ static void wiz_create_artifact(int a_idx)
  */
 static void do_cmd_wiz_cure_all(void)
 {
+	int i;
+
 	/* Remove curses */
 	(void)remove_all_curse();
 
@@ -1005,20 +1007,11 @@ static void do_cmd_wiz_cure_all(void)
 	/* Remove diseases */
 	p_ptr->disease = 0;
 
-	/* Cure stuff */
-	(void)set_blind(0);
-	(void)set_confused(0);
-	(void)set_poisoned(0);
-	(void)set_afraid(0);
-	(void)set_paralyzed(0);
-	(void)set_image(0);
-	(void)set_amnesia(0);
-	(void)set_cursed(0);
-	(void)set_msleep(0);
-	(void)set_petrify(0);
-	(void)set_stun(0);
-	(void)set_cut(0);
-	(void)set_slow(0);
+	/* Remove all timed effects */
+	for (i = 0; i < TMD_MAX; i++)
+	{
+		set_timed(i, 0, TRUE);
+	}
 
 	/* No longer hungry */
 	(void)set_food(PY_FOOD_MAX - 1);

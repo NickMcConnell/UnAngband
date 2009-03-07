@@ -613,7 +613,7 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 	}
 
 	/* Handle "blind" or "asleep" */
-	else if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
+	else if ((p_ptr->timed[TMD_BLIND]) || (p_ptr->timed[TMD_PSLEEP] >= PY_SLEEP_ASLEEP))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -676,8 +676,8 @@ void modify_grid_boring_view(byte *a, char *c, int y, int x, byte cinfo, byte pi
 void modify_grid_unseen_view(byte *a, char *c)
 {
 	/* Handle "blind", "asleep" and night time*/
-	if (p_ptr->blind
-		|| p_ptr->psleep >= PY_SLEEP_ASLEEP
+	if ((p_ptr->timed[TMD_BLIND])
+		|| p_ptr->timed[TMD_PSLEEP] >= PY_SLEEP_ASLEEP
 		|| !(level_flag & (LF1_DAYLIGHT)))
 	{
 		/* Mega-hack */
@@ -740,7 +740,7 @@ void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, by
 	}
 
 	/* Handle "blind" or "asleep" */
-	else if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
+	else if ((p_ptr->timed[TMD_BLIND]) || (p_ptr->timed[TMD_PSLEEP] >= PY_SLEEP_ASLEEP))
 	{
 		/* Mega-hack */
 		if (*a & 0x80)
@@ -993,7 +993,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 	s16b m_idx;
 
-	s16b image = p_ptr->image;
+	s16b image = p_ptr->timed[TMD_IMAGE];
 
 	int floor_num = 0;
 
@@ -1549,7 +1549,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		monster_race *r_ptr = &r_info[0];
 
 		/* Hack - can't see invisible player due to see_invis */
-		if ((p_ptr->invis) && !(p_ptr->tim_invis) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)))
+		if ((p_ptr->timed[TMD_INVIS]) && !(p_ptr->timed[TMD_SEE_INVIS]) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)))
 		{
 			/* Use underlying attribute/char */
 		}
@@ -1583,7 +1583,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		else if (arg_graphics == GRAPHICS_NONE)
 		{
 			/* Invisible players are 'clear' */
-			if (p_ptr->invis)
+			if (p_ptr->timed[TMD_IMAGE])
 			{
 				/* Use underlying attr */
 			}
@@ -3996,7 +3996,7 @@ void update_view(void)
 	/*** Step 3 -- Complete the algorithm ***/
 
 	/* Handle blindness */
-	if ((p_ptr->blind) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
+	if ((p_ptr->timed[TMD_BLIND]) || (p_ptr->timed[TMD_PSLEEP] >= PY_SLEEP_ASLEEP))
 	{
 		/* Process "new" grids */
 		for (i = 0; i < fast_view_n; i++)
@@ -5456,7 +5456,7 @@ bool redraw_halo_gain(int y, int x)
 void apply_halo(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
-	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_halo(int y, int x)
@@ -5468,7 +5468,7 @@ void remove_halo(int y, int x)
 void reapply_halo(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
-	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -5505,7 +5505,7 @@ bool redraw_daylight_gain(int y, int x)
 void apply_daylight(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_HALO);
-	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
 void remove_daylight(int y, int x)
@@ -5517,7 +5517,7 @@ void remove_daylight(int y, int x)
 void reapply_daylight(int y, int x)
 {
 	cave_info[y][x] |= (CAVE_DLIT);
-	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->blind)) play_info[y][x] |= (PLAY_SEEN);
+	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
 
@@ -6801,7 +6801,7 @@ void disturb(int stop_search, int wake_up)
 	}
 
 	/* Wake the player if requested */
-	if (wake_up && p_ptr->psleep)
+	if (wake_up && p_ptr->timed[TMD_PSLEEP])
 	{
 		/* Cancel */
 		set_psleep(0);

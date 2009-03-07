@@ -3226,10 +3226,10 @@ static int get_tag(int *cp, char tag)
 		if (p_ptr->command_cmd == 'f')
 		{
 			/* Ammo groups are taken from the missile weapon */
-			switch (p_ptr->ammo_tval)
+			switch (p_ptr->fire_command)
 			{
-				case TV_BOLT:	group = QUIVER_GROUP_BOLTS;	break;
-				case TV_ARROW:	group = QUIVER_GROUP_ARROWS;	break;
+				case COMMAND_ITEM_FIRE_XBOW:	group = QUIVER_GROUP_BOLTS;	break;
+				case COMMAND_ITEM_FIRE_BOW:	group = QUIVER_GROUP_ARROWS;	break;
 				default:	group = QUIVER_GROUP_SHOTS;	break;
 			}
 		}

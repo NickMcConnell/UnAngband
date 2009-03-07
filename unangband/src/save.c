@@ -651,8 +651,6 @@ static void wr_extra(void)
 	/* Dump the stats (maximum and current) */
 	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_max[i]);
 	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_cur[i]);
-	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_inc_tim[i]);
-	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_dec_tim[i]);
 	for (i = 0; i < A_MAX; ++i) wr_s16b(p_ptr->stat_birth[i]);
 
 	/* Ignore the transient stats */
@@ -694,46 +692,21 @@ static void wr_extra(void)
 		wr_u16b(p_ptr->familiar_attr[i]);
 	}
 
-	/* Write the timers */
-	wr_s16b(p_ptr->msleep);
-	wr_s16b(p_ptr->petrify);
-	wr_s16b(p_ptr->stastis);
+	/* Write some important values */
 	wr_s16b(p_ptr->sc);
-	wr_s16b(p_ptr->cursed);
-	wr_s16b(p_ptr->amnesia);
-	wr_s16b(p_ptr->blind);
-	wr_s16b(p_ptr->paralyzed);
-	wr_s16b(p_ptr->confused);
 	wr_s16b(p_ptr->food);
 	wr_s16b(p_ptr->rest);
-	wr_s16b(p_ptr->psleep);
 	wr_s16b(p_ptr->energy);
-	wr_s16b(p_ptr->fast);
-	wr_s16b(p_ptr->slow);
-	wr_s16b(p_ptr->afraid);
-	wr_s16b(p_ptr->cut);
-	wr_s16b(p_ptr->stun);
-	wr_s16b(p_ptr->poisoned);
-	wr_s16b(p_ptr->image);
-	wr_s16b(p_ptr->protevil);
-	wr_s16b(p_ptr->invis);
-	wr_s16b(p_ptr->hero);
-	wr_s16b(p_ptr->shero);
-	wr_s16b(p_ptr->shield);
-	wr_s16b(p_ptr->blessed);
-	wr_s16b(p_ptr->tim_invis);
-	wr_s16b(p_ptr->word_recall);
-	wr_s16b(p_ptr->see_infra);
-	wr_s16b(p_ptr->tim_infra);
-	wr_s16b(p_ptr->oppose_fire);
-	wr_s16b(p_ptr->oppose_cold);
-	wr_s16b(p_ptr->oppose_acid);
-	wr_s16b(p_ptr->oppose_elec);
-	wr_s16b(p_ptr->oppose_pois);
-	wr_s16b(p_ptr->oppose_water);
-	wr_s16b(p_ptr->oppose_lava);
-	wr_s16b(p_ptr->free_act);
 
+	/* Dump the "player timer" entries */
+	tmp16u = TMD_MAX;
+	wr_u16b(tmp16u);
+	for (i = 0; i < tmp16u; i++)
+	{
+		wr_s16b(p_ptr->timed[i]);
+	}
+
+	/* Write some other player values */
 	wr_byte(p_ptr->charging);
 	wr_byte(p_ptr->climbing);
 	wr_byte(p_ptr->searching);

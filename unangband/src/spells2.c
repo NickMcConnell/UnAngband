@@ -677,18 +677,18 @@ void self_knowledge_aux(bool spoil, bool random)
 	int vn;
 
 	bool healthy = TRUE;
-
-	if (p_ptr->blind)
+#if 0
+	if (p_ptr->timed[TMD_BLIND])
 	{
 		text_out("You cannot see.  ");
 		healthy = FALSE;
 	}
-	if (p_ptr->confused)
+	if (p_ptr->timed[TMD_CONFUSED])
 	{
 		text_out("You are confused.  ");
 		healthy = FALSE;
 	}
-	if (p_ptr->afraid)
+	if (p_ptr->timed[TMD_AFRAID])
 	{
 		text_out("You are terrified.  ");
 		healthy = FALSE;
@@ -698,17 +698,17 @@ void self_knowledge_aux(bool spoil, bool random)
 		text_out("You are bleeding.  ");
 		healthy = FALSE;
 	}
-	if (p_ptr->stun)
+	if (p_ptr->timed[TMD_STUN])
 	{
 		text_out("You are stunned.  ");
 		healthy = FALSE;
 	}
-	if (p_ptr->poisoned)
+	if (p_ptr->timed[TMD_POISONED])
 	{
 		text_out("You are poisoned.  ");
 		healthy = FALSE;
 	}
-	if (p_ptr->image)
+	if (p_ptr->timed[TMD_IMAGE])
 	{
 		text_out("You are hallucinating.  ");
 		healthy = FALSE;
@@ -718,7 +718,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		text_out("You are suffering from amnesia.  ");
 		healthy = FALSE;
 	}
-	if (p_ptr->cursed)
+	if (p_ptr->timed[TMD_CURSED])
 	{
 		text_out("You are cursed.  ");
 		healthy = FALSE;
@@ -733,7 +733,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		text_out("You are petrified.  ");
 		healthy = FALSE;
 	}
-
+#endif
 	if (p_ptr->disease)
 	{
 		char output[1024];
@@ -823,20 +823,20 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("You suffer from no afflictions.  ");
 	}
-
-	if (p_ptr->blessed)
+#if 0
+	if (p_ptr->timed[TMD_BLESSED])
 	{
 		text_out("You feel rightous.  ");
 	}
-	if (p_ptr->hero)
+	if (p_ptr->timed[TMD_HERO])
 	{
 		text_out("You feel heroic.  ");
 	}
-	if (p_ptr->shero)
+	if (p_ptr->timed[TMD_BERSERK])
 	{
 		text_out("You are in a battle rage.  ");
 	}
-	if ((p_ptr->protevil) || (p_ptr->shield) || (p_ptr->hero) || (p_ptr->shero))
+	if ((p_ptr->protevil) || (p_ptr->shield) || (p_ptr->timed[TMD_HERO]) || (p_ptr->timed[TMD_BERSERK]))
 	{
 
 		text_out("You are protected ");
@@ -845,7 +845,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		vn = 0;
 
 		if (p_ptr->protevil) vp[vn++]="from evil";
-		if ((p_ptr->hero) || (p_ptr->shero)) vp[vn++]="from fear";
+		if ((p_ptr->timed[TMD_HERO]) || (p_ptr->timed[TMD_BERSERK])) vp[vn++]="from fear";
 		if (p_ptr->shield) vp[vn++]="by a mystic sheild";
 
 		/* Scan */
@@ -863,7 +863,7 @@ void self_knowledge_aux(bool spoil, bool random)
 		if (n) text_out(".  ");
 
 	}
-
+#endif
 	if (p_ptr->climbing)
 	{
 		text_out("You are climbing over an obstacle.  ");
@@ -886,7 +886,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("You will soon be returned to a nearby location.  ");
 	}
-
+#if 0
 	/* Hack -- timed abilities that may also be from equipment */
 	if (p_ptr->tim_infra)
 	{
@@ -903,7 +903,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	vn = 0;
 
 	if (p_ptr->invis) vp[vn++] = "invisible";
-	if (p_ptr->free_act) vp[vn++] = "protected from paralysis and magical slowing";
+	if (p_ptr->timed[TMD_FREE_ACT]) vp[vn++] = "protected from paralysis and magical slowing";
 
 	for (n = 0; n < A_CHR; n++)
 	{
@@ -960,7 +960,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out(".  ");
 	}
-
+#endif
 	text_out("\n");
 
 	/* Hack -- racial effects */
@@ -4644,7 +4644,7 @@ void destroy_area(int y1, int x1, int r, bool full)
 		if ((p_ptr->cur_flags2 & (TR2_RES_BLIND | TR2_RES_LITE)) == 0)
 		{
 			/* Become blind */
-			(void)set_blind(p_ptr->blind + 10 + randint(10));
+			inc_timed(TMD_BLIND,10 + randint(10), TRUE);
 
 			/* Always notice */
 			equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
@@ -4755,14 +4755,14 @@ void entomb(int cy, int cx, byte invalid)
 				{
 					msg_format("You are bashed by %s!", f_name + f_info[cave_feat[cy][cx]].name);
 					damage = damroll(10, 4);
-					(void)set_stun(p_ptr->stun + randint(50));
+					inc_timed(TMD_STUN, randint(50), TRUE);
 					break;
 				}
 				case 3:
 				{
 					msg_format("You are crushed between the %s and ceiling!", f_name + f_info[cave_feat[cy][cx]].name);
 					damage = damroll(10, 4);
-					(void)set_stun(p_ptr->stun + randint(50));
+					inc_timed(TMD_STUN, randint(50), TRUE);
 					break;
 				}
 			}
@@ -6501,24 +6501,33 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	/* SF2 - timed abilities and modifying level */
 	if ((s_ptr->flags2 & (SF2_CURSE_WEAPON)) && (curse_weapon())) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_CURSE_ARMOR)) && (curse_armor())) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_INFRA)) && (set_tim_infra(p_ptr->tim_infra + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_HERO)) && (set_hero(p_ptr->hero + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_SHERO)) && (set_shero(p_ptr->shero + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_BLESS)) && (set_blessed(p_ptr->blessed + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_SHIELD)) && (set_shield(p_ptr->shield + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_INVIS)) && (set_invis(p_ptr->invis + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (set_tim_invis(p_ptr->tim_invis + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (set_protevil(p_ptr->protevil + lasts + (level== 0 ? 3 * p_ptr->lev : 0)))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (set_cursed(p_ptr->cursed / 2))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (set_cursed(0))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (set_oppose_fire(p_ptr->oppose_fire + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (set_oppose_cold(p_ptr->oppose_cold + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_ACID)) && (set_oppose_acid(p_ptr->oppose_acid + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (set_oppose_elec(p_ptr->oppose_elec + lasts))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (set_oppose_pois(p_ptr->oppose_pois + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_INFRA)) && (inc_timed(TMD_INFRA, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_HERO)) && (inc_timed(TMD_HERO, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SHERO)) && (inc_timed(TMD_BERSERK, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_BLESS)) && (inc_timed(TMD_BLESSED, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SHIELD)) && (inc_timed(TMD_SHIELD, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_INVIS)) && (inc_timed(TMD_INVIS, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (inc_timed(TMD_SEE_INVIS, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (inc_timed(TMD_PROTEVIL, lasts + (level== 0 ? 3 * p_ptr->lev : 0), TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (set_timed(TMD_CURSED, p_ptr->timed[TMD_CURSED] / 2, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (clear_timed(TMD_CURSED, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (inc_timed(TMD_OPP_FIRE, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (inc_timed(TMD_OPP_COLD, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_ACID)) && (inc_timed(TMD_OPP_ACID, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (inc_timed(TMD_OPP_ELEC, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (inc_timed(TMD_OPP_POIS, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (inc_timed(TMD_OPP_POIS, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_STR)) && (inc_timed(TMD_INC_STR, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_STR)) && (inc_timed(TMD_INC_SIZ, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_INT)) && (inc_timed(TMD_INC_INT, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_WIS)) && (inc_timed(TMD_INC_WIS, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_DEX, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_AGI, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_CON)) && (inc_timed(TMD_INC_CON, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF3_INC_CHR)) && (inc_timed(TMD_INC_CHR, lasts, TRUE))) obvious = TRUE;
 
 	/* SF3 - free action only */
-	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (set_free_act(p_ptr->free_act + lasts))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (inc_timed(TMD_FREE_ACT, lasts, TRUE))) obvious = TRUE;
 
 	if (s_ptr->flags2 & (SF2_AGGRAVATE))
 	{
@@ -6564,7 +6573,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	{
 		if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) == 0)
 		{
-			if (set_cut(p_ptr->cut + lasts))
+			if (inc_timed(TMD_CUT, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6583,7 +6592,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	{
 		if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
 		{
-			if (set_stun(p_ptr->stun + lasts))
+			if (inc_timed(TMD_STUN, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6600,10 +6609,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_POISON))
 	{
-		if (((p_ptr->cur_flags2 & (TR2_RES_POIS)) == 0) && !(p_ptr->oppose_pois) &&
+		if (((p_ptr->cur_flags2 & (TR2_RES_POIS)) == 0) && !(p_ptr->timed[TMD_OPP_POIS]) &&
 			(p_ptr->cur_flags4 & (TR4_IM_POIS)) == 0)
 		{
-			if (set_poisoned(p_ptr->poisoned + lasts))
+			if (inc_timed(TMD_POISONED, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6611,7 +6620,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,TR4_IM_POIS);
 			}
 		}
-		else if (!p_ptr->oppose_pois) /* && (obvious) */
+		else if (!p_ptr->timed[TMD_OPP_POIS]) /* && (obvious) */
 		{
 			/* Always notice */
 			if (p_ptr->cur_flags4 & (TR4_IM_POIS)) equip_can_flags(0x0L,TR2_RES_POIS,0x0L,0x0L);
@@ -6625,7 +6634,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	{
 		if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0)
 		{
-			if (set_blind(p_ptr->blind + lasts))
+			if (inc_timed(TMD_BLIND, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6642,9 +6651,9 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_FEAR))
 	{
-		if (((p_ptr->cur_flags2 & (TR2_RES_FEAR)) == 0) && (!p_ptr->hero) && (!p_ptr->shero))
+		if (((p_ptr->cur_flags2 & (TR2_RES_FEAR)) == 0) && (!p_ptr->timed[TMD_HERO]) && (!p_ptr->timed[TMD_BERSERK]))
 		{
-			if (set_afraid(p_ptr->afraid + lasts))
+			if (set_afraid(p_ptr->timed[TMD_AFRAID] + lasts))
 			{
 				obvious = TRUE;
 
@@ -6652,7 +6661,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
 			}
 		}
-		else if ((!p_ptr->hero)&&(!p_ptr->shero)) /* && (obvious) */
+		else if ((!p_ptr->timed[TMD_HERO])&&(!p_ptr->timed[TMD_BERSERK])) /* && (obvious) */
 		{
 			/* Always notice */
 			equip_can_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
@@ -6663,7 +6672,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	{
 		if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
 		{
-			if (set_confused(p_ptr->confused + lasts))
+			if (inc_timed(TMD_CONFUSED, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6682,7 +6691,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	{
 		if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
 		{
-			if (set_image(p_ptr->image + lasts))
+			if (inc_timed(TMD_IMAGE, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6699,9 +6708,9 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_PARALYZE))
 	{
-		if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0) && !(p_ptr->free_act))
+		if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0) && !(p_ptr->timed[TMD_FREE_ACT]))
 		{
-			if (set_paralyzed(p_ptr->paralyzed + lasts))
+			if (inc_timed(TMD_PARALYZED, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6712,15 +6721,15 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		else /* if (obvious) */
 		{
 			/* Always notice */
-			if (!p_ptr->free_act) equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+			if (!p_ptr->timed[TMD_FREE_ACT]) equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_SLOW))
 	{
-		if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0) && !(p_ptr->free_act))
+		if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) == 0) && !(p_ptr->timed[TMD_FREE_ACT]))
 		{
-			if (set_slow(p_ptr->slow + lasts))
+			if (inc_timed(TMD_SLOW, lasts, TRUE))
 			{
 				obvious = TRUE;
 
@@ -6731,57 +6740,19 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		else /* if (obvious) */
 		{
 			/* Always notice */
-			if (!p_ptr->free_act) equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+			if (!p_ptr->timed[TMD_FREE_ACT]) equip_can_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
 		}
 	}
 
 	if (s_ptr->flags2 & (SF2_HASTE))
 	{
-		if ((p_ptr->fast) && (set_fast(p_ptr->fast + rand_int(s_ptr->l_side/3)))) obvious = TRUE;
-		else if (set_fast(p_ptr->fast + lasts + level)) obvious = TRUE;
+		if (inc_timed(TMD_FAST, p_ptr->timed[TMD_FAST] ? rand_int(s_ptr->l_side/3): lasts + level, TRUE)) obvious = TRUE;
 	}
 
 	if (s_ptr->flags2 & (SF2_RECALL))
 	{
 		set_recall();
 		obvious = TRUE;
-	}
-
-	/* SF3 - duration specified, so temporary stat increase */
-	if (lasts)
-	{
-  	        if (s_ptr->flags3 & (SF3_INC_STR))
-		  {
-		    if (set_stat_inc_tim(lasts, A_STR)) obvious = TRUE;
-		    if (set_stat_inc_tim(lasts, A_SIZ)) obvious = TRUE;
-		  }
-		if ((s_ptr->flags3 & (SF3_INC_INT)) && (set_stat_inc_tim(lasts, A_INT))) obvious = TRUE;
-		if ((s_ptr->flags3 & (SF3_INC_WIS)) && (set_stat_inc_tim(lasts, A_WIS))) obvious = TRUE;
-		if (s_ptr->flags3 & (SF3_INC_DEX))
-		  {
-		    if (set_stat_inc_tim(lasts, A_DEX)) obvious = TRUE;
-		    if (set_stat_inc_tim(lasts, A_AGI)) obvious = TRUE;
-		  }
-		if ((s_ptr->flags3 & (SF3_INC_CON)) && (set_stat_inc_tim(lasts, A_CON))) obvious = TRUE;
-		if ((s_ptr->flags3 & (SF3_INC_CHR)) && (set_stat_inc_tim(lasts, A_CHR))) obvious = TRUE;
-	}
-	/* SF3 - no duration specified, so permanent stat increase */
-	else
-	{
-		if (s_ptr->flags3 & (SF3_INC_STR))
-		  {
-		    if (do_inc_stat(A_STR)) obvious = TRUE;
-		    if (do_inc_stat(A_SIZ)) obvious = TRUE;
-		  }
-		if ((s_ptr->flags3 & (SF3_INC_INT)) && (do_inc_stat(A_INT))) obvious = TRUE;
-		if ((s_ptr->flags3 & (SF3_INC_WIS)) && (do_inc_stat(A_WIS))) obvious = TRUE;
-		if (s_ptr->flags3 & (SF3_INC_DEX))
-		  {
-		    if (do_inc_stat(A_DEX)) obvious = TRUE;
-		    if (do_inc_stat(A_AGI)) obvious = TRUE;
-		  }
-		if ((s_ptr->flags3 & (SF3_INC_CON)) && (do_inc_stat(A_CON))) obvious = TRUE;
-		if ((s_ptr->flags3 & (SF3_INC_CHR)) && (do_inc_stat(A_CHR))) obvious = TRUE;
 	}
 
 	/* SF3 - healing self, and untimed improvements */
@@ -6800,38 +6771,37 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (set_slow(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (set_amnesia(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (clear_timed(TMD_SLOW, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (clear_timed(TMD_AMNESIA, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (remove_curse())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_PFIX_CUTS)) && (set_cut(p_ptr->cut / 2))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (set_cut(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_PFIX_STUN)) && (set_stun(p_ptr->stun / 2))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (set_stun(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (set_poisoned(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (set_confused(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_CUTS)) && (pfix_timed(TMD_CUT, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (clear_timed(TMD_CUT, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_PFIX_STUN)) && (pfix_timed(TMD_STUN, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (clear_timed(TMD_STUN, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (clear_timed(TMD_POISONED, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (clear_timed(TMD_CONFUSED, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_FOOD)) && (set_food(PY_FOOD_MAX -1))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (set_afraid(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (set_petrify(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_BLIND)) && (set_blind(0))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_IMAGE)) && (set_image(0))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (clear_timed(TMD_AFRAID, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_BLIND)) && (clear_timed(TMD_BLIND, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_IMAGE)) && (clear_timed(TMD_IMAGE, TRUE))) obvious = TRUE;
 
 
 	if (s_ptr->flags3 & (SF3_DEC_EXP))
 	{
 		/* Undead races are healed instead */
 		if (p_ptr->cur_flags4 & TR4_UNDEAD
-			&& !p_ptr->blessed)
+			&& !p_ptr->timed[TMD_BLESSED])
 		{
 			obvious = hp_player(300);
 
 			equip_can_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
 		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0
-				 || p_ptr->blessed
+				 || p_ptr->timed[TMD_BLESSED]
 				 || p_ptr->exp == 0)
 		{
-			if (!p_ptr->blessed && p_ptr->exp > 0)
+			if (!p_ptr->timed[TMD_BLESSED] && p_ptr->exp > 0)
 				equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
 			equip_not_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
@@ -6896,7 +6866,7 @@ bool process_spell_blow_shot_hurl(int type)
 		case SPELL_SHOT_HACK:
 		{
 			/* Fire */
-			do_cmd_fire();
+			do_cmd_item(p_ptr->fire_command);
 
 			/* Cancelled */
 			if (!p_ptr->energy_use) return (FALSE);
@@ -6906,7 +6876,7 @@ bool process_spell_blow_shot_hurl(int type)
 		case SPELL_HURL_HACK:
 		{
 			/* Fire */
-			do_cmd_throw();
+			do_cmd_item(COMMAND_ITEM_THROW);
 
 			/* Cancelled */
 			if (!p_ptr->energy_use) return (FALSE);
@@ -7150,32 +7120,32 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_PFIX_CONF:
 			{
 				*cancel = FALSE;
-				if (set_confused(p_ptr->confused / 2)) obvious = TRUE;
+				if (pfix_timed(TMD_CONFUSED, TRUE)) obvious = TRUE;
 				break;
 			}
 			case SPELL_PFIX_POIS:
 			{
 				*cancel = FALSE;
-				if (set_poisoned(p_ptr->poisoned / 2)) obvious = TRUE;
+				if (pfix_timed(TMD_POISONED, TRUE)) obvious = TRUE;
 				break;
 			}
 			case SPELL_SLOW_POIS:
 			{
 				*cancel = FALSE;
-				if (set_slow_poison(p_ptr->slow_poison + lasts)) obvious = TRUE;
+				if (set_slow_poison(p_ptr->timed[TMD_SLOW_POISON] + lasts)) obvious = TRUE;
 				break;
 			}
 			case SPELL_SLOW_DIGEST:
 			{
 				*cancel = FALSE;
-				if (set_slow_digest(p_ptr->slow_digest + lasts)) obvious = TRUE;
+				if (inc_timed(TMD_SLOW_DIGEST, lasts, TRUE)) obvious = TRUE;
 				break;
 			}
 			case SPELL_SLOW_META:
 			{
 				*cancel = FALSE;
-				if (set_slow_poison(p_ptr->slow_poison + lasts)) obvious = TRUE;
-				if (set_slow_digest(p_ptr->slow_digest + lasts)) obvious = TRUE;
+				if (inc_timed(TMD_SLOW_DIGEST, lasts, TRUE)) obvious = TRUE;
+				if (inc_timed(TMD_SLOW_POISON, lasts, TRUE)) obvious = TRUE;
 				break;
 			}
 			case SPELL_IDENT_PACK:

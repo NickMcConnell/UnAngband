@@ -549,19 +549,19 @@ static void sense_inventory(void)
 	/*** Check for "sensing" ***/
 
 	/* No sensing when confused */
-	if (p_ptr->confused) return;
+	if (p_ptr->timed[TMD_CONFUSED]) return;
 
 	/* No sensing when paralyzed */
-	if (p_ptr->paralyzed) return;
+	if (p_ptr->timed[TMD_PARALYZED]) return;
 
 	/* No sensing when in stastis */
-	if (p_ptr->stastis) return;
+	if (p_ptr->timed[TMD_STASTIS]) return;
 
 	/* No sensing when asleep */
-	if (p_ptr->psleep > PY_SLEEP_ASLEEP) return;
+	if (p_ptr->timed[TMD_PSLEEP] > PY_SLEEP_ASLEEP) return;
 
 	/* No sensing when knocked out */
-	if (p_ptr->stun > 100) return;
+	if (p_ptr->timed[TMD_STUN] > 100) return;
 
 	if (cp_ptr->sense_squared)
 	{
@@ -863,67 +863,67 @@ void suffer_disease(bool allow_cure)
 
 			case DISEASE_THIRST:
 			{
-				(void)set_food(p_ptr->food - randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				set_food(p_ptr->food - randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
 				break;
 			}
 
 			case DISEASE_CUT:
 			{
-				(void)set_cut(p_ptr->cut + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_CUT, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				break;
 			}
 
 			case DISEASE_STUN:
 			{
-				(void)set_stun(p_ptr->stun + randint(p_ptr->disease & (DISEASE_POWER) ? 40 : 10) + 2);
+				inc_timed(TMD_STUN,randint(p_ptr->disease & (DISEASE_POWER) ? 40 : 10) + 2, FALSE);
 				break;
 			}
 
 			case DISEASE_POISON:
 			{
-				(void)set_poisoned(p_ptr->poisoned + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_POISONED, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				break;
 			}
 
 			case DISEASE_BLIND:
 			{
-				(void)set_blind(p_ptr->blind + randint(p_ptr->disease & (DISEASE_POWER) ? 40 : 10) + 2);
+				inc_timed(TMD_BLIND, randint(p_ptr->disease & (DISEASE_POWER) ? 40 : 10) + 2, FALSE);
 				break;
 			}
 
 			case DISEASE_FEAR:
 			{
-				(void)set_afraid(p_ptr->afraid + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_AFRAID, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				break;
 			}
 
 			case DISEASE_CONFUSE:
 			{
-				(void)set_confused(p_ptr->confused + randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1);
+				inc_timed(TMD_CONFUSED, randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1, FALSE);
 				break;
 			}
 
 			case DISEASE_HALLUC:
 			{
-				(void)set_image(p_ptr->image + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_IMAGE, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				break;
 			}
 
 			case DISEASE_AMNESIA:
 			{
-				(void)set_amnesia(p_ptr->amnesia + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_AMNESIA, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				break;
 			}
 
 			case DISEASE_CURSE:
 			{
-				(void)set_cursed(p_ptr->cursed + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_CURSED, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				break;
 			}
 
 			case DISEASE_SLOW:
 			{
-				(void)set_slow(p_ptr->slow + randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				inc_timed(TMD_SLOW, randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10, FALSE);
 				/* Also slightly reduce agility. */
 				dec_stat(A_AGI, p_ptr->disease & (DISEASE_POWER) ? randint(3) : 1);
 				break;
@@ -953,27 +953,25 @@ void suffer_disease(bool allow_cure)
 
 			case DISEASE_SLEEP:
 			{
-				(void)set_msleep(p_ptr->msleep + randint(p_ptr->disease & (DISEASE_POWER) ? 40 : 10) + 2);
+				inc_timed(TMD_MSLEEP, randint(p_ptr->disease & (DISEASE_POWER) ? 40 : 10) + 2, FALSE);
 				break;
 			}
 
 			case DISEASE_PETRIFY:
 			{
-				(void)set_petrify(p_ptr->petrify + randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1);
+				inc_timed(TMD_PETRIFY, randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1, FALSE);
 				break;
 			}
 
 			case DISEASE_PARALYZE:
 			{
-				(void)set_paralyzed(p_ptr->paralyzed + randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1);
-				disturb(0,0);
+				inc_timed(TMD_PARALYZED, randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1, TRUE);
 				break;
 			}
 
 			case DISEASE_STASTIS:
 			{
-				(void)set_stastis(p_ptr->stastis + randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1);
-				disturb(0,0);
+				inc_timed(TMD_STASTIS, randint(p_ptr->disease & (DISEASE_POWER) ? 10 : 3) + 1, TRUE);
 				break;
 			}
 		}
@@ -1009,7 +1007,7 @@ void suffer_disease(bool allow_cure)
 			if (!(p_ptr->disease & (DISEASE_LIGHT))) aggravate_monsters(-1);
 
 			/* Paralyze if heavy */
-			if (p_ptr->disease & (DISEASE_HEAVY)) (void)set_paralyzed(p_ptr->paralyzed + randint(3) + 1);
+			if (p_ptr->disease & (DISEASE_HEAVY)) inc_timed(TMD_PARALYZED, randint(3) + 1, TRUE);
 
 			/* Not a pleasant cure but nonetheless */
 			p_ptr->disease &= (DISEASE_HEAVY | DISEASE_PERMANENT);
@@ -1073,6 +1071,66 @@ void suffer_disease(bool allow_cure)
 
 		p_ptr->redraw |= (PR_DISEASE);
 	}
+}
+
+
+
+/*
+ * Helper for process_world -- decrement p_ptr->timed[] fields.
+ */
+static void decrease_timeouts(void)
+{
+	int adjust = (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
+	int i;
+
+	/* Decrement all effects that can be done simply */
+	for (i = 0; i < TMD_MAX; i++)
+	{
+		int decr = 1;
+		if (!p_ptr->timed[i])
+			continue;
+
+		switch (i)
+		{
+			case TMD_CUT:
+			{
+				/* Hack -- check for truly "mortal" wound */
+				decr = (p_ptr->timed[i] > 1000) ? 0 : adjust;
+
+				/* Some rooms make wounds magically worse */
+				if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
+
+				break;
+			}
+
+			case TMD_POISONED:
+			{
+				decr = p_ptr->timed[TMD_SLOW_POISON] ? 0 : adjust;
+
+				/* Some rooms make wounds magically worse */
+				if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
+
+				break;
+			}
+			case TMD_STUN:
+			{
+				decr = adjust;
+				break;
+			}
+
+			case TMD_PSLEEP:
+			{
+				/* Goes in other direction */
+				adjust = -1;
+
+				break;
+			}
+		}
+		/* Decrement the effect */
+		dec_timed(i, decr, FALSE);
+	}
+
+	return;
 }
 
 
@@ -1239,7 +1297,7 @@ static void process_world(void)
 		if (m_cnt > max_m_cnt) odds += 4 * (m_cnt - max_m_cnt);
 
 		/* Fewer monsters if stealthy, more if deep */
-		odds += p_ptr->skill_stl * 2;
+		odds += p_ptr->skills[SKILL_STEALTH] * 2;
 		odds -= p_ptr->depth / 2;
 
 		/* Check for creature generation */
@@ -1248,7 +1306,7 @@ static void process_world(void)
 			bool slp = FALSE;
 
 			/* Sneaky characters make monsters sleepy */
-			if (p_ptr->skill_stl > rand_int(100)) slp = TRUE;
+			if (p_ptr->skills[SKILL_STEALTH] > rand_int(100)) slp = TRUE;
 
 			/* Make a new monster */
 			(void)alloc_monster(MAX_SIGHT + 5, slp);
@@ -1256,9 +1314,9 @@ static void process_world(void)
 	}
 
 	/*** Stastis ***/
-	if (p_ptr->stastis)
+	if (p_ptr->timed[TMD_STASTIS])
 	{
-		(void)set_stastis(p_ptr->stastis - 1);
+		(void)set_stastis(p_ptr->timed[TMD_STASTIS] - 1);
 
 		/* Update dynamic terrain */
 		update_dyna();
@@ -1295,7 +1353,7 @@ static void process_world(void)
 	}
 
 	/* If paralyzed, we drown in shallow, deep or filled */
-	if ((p_ptr->paralyzed || (p_ptr->stun >=100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP)) &&
+	if ((p_ptr->timed[TMD_PARALYZED] || (p_ptr->timed[TMD_STUN] >=100) || (p_ptr->timed[TMD_PSLEEP] >= PY_SLEEP_ASLEEP)) &&
 		(f_ptr->flags2 & (FF2_DEEP | FF2_SHALLOW | FF2_FILLED)))
 	{
 		/* Get the mimiced feature */
@@ -1314,23 +1372,23 @@ static void process_world(void)
 	}
 
 	/* Take damage from poison */
-	if ((p_ptr->poisoned) && (!p_ptr->slow_poison))
+	if ((p_ptr->timed[TMD_POISONED]) && (!p_ptr->timed[TMD_SLOW_POISON]))
 	{
 		/* Take damage */
 		take_hit(SOURCE_POISON, 0, 1);
 	}
 
 	/* Take damage from cuts */
-	if (p_ptr->cut)
+	if (p_ptr->timed[TMD_CUT])
 	{
 		/* Mortal wound or Deep Gash */
-		if (p_ptr->cut > 200)
+		if (p_ptr->timed[TMD_CUT] > 200)
 		{
 			i = 3;
 		}
 
 		/* Severe cut */
-		else if (p_ptr->cut > 100)
+		else if (p_ptr->timed[TMD_CUT] > 100)
 		{
 			i = 2;
 		}
@@ -1349,7 +1407,7 @@ static void process_world(void)
 
 	/* Tire normally */
 	/* XXX We exclude situations where we adjust this counter elsewhere */
-	if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->paralyzed || p_ptr->stastis || (p_ptr->stun >= 100)) ||
+	if (!(p_ptr->resting || p_ptr->searching || p_ptr->running || p_ptr->timed[TMD_PARALYZED] || p_ptr->timed[TMD_STASTIS] || (p_ptr->timed[TMD_STUN] >= 100)) ||
 			(f_ptr->flags2 & (FF2_FILLED)))
 	{
 		(void)set_rest(p_ptr->rest - p_ptr->tiring);
@@ -1374,7 +1432,7 @@ static void process_world(void)
 			if (p_ptr->regen_mana > 0) i += 30 * p_ptr->regen_mana;
 
 			/* Slow digestion takes less food */
-			if ((p_ptr->slow_digest) || (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
+			if ((p_ptr->timed[TMD_SLOW_DIGEST]) || (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
 
 			/* Minimal digestion */
 			if (i < 1) i = 1;
@@ -1425,14 +1483,14 @@ static void process_world(void)
 		if (p_ptr->food < PY_FOOD_FAINT)
 		{
 			/* Faint occasionally */
-			if (!p_ptr->paralyzed && (rand_int(100) < 10))
+			if (!p_ptr->timed[TMD_PARALYZED] && (rand_int(100) < 10))
 			{
 				/* Message */
 				msg_print("You faint from the lack of food.");
 				disturb(1, 0);
 
 				/* Hack -- faint (bypass free action) */
-				(void)set_paralyzed(p_ptr->paralyzed + 1 + rand_int(5));
+				inc_timed(TMD_PARALYZED, 1 + rand_int(5), TRUE);
 			}
 		}
 
@@ -1440,14 +1498,14 @@ static void process_world(void)
 		if (p_ptr->rest < PY_REST_FAINT)
 		{
 			/* Faint occasionally */
-			if (!p_ptr->paralyzed && (rand_int(100) < 10))
+			if (!p_ptr->timed[TMD_PARALYZED] && (rand_int(100) < 10))
 			{
 				/* Message */
 				msg_print("You faint from exhaustion.");
 				disturb(1, 0);
 
 				/* Hack -- faint (bypass free action) */
-				(void)set_paralyzed(p_ptr->paralyzed + 1 + rand_int(5));
+				inc_timed(TMD_PARALYZED, 1 + rand_int(5), TRUE);
 			}
 		}
 	}
@@ -1467,10 +1525,10 @@ static void process_world(void)
 	}
 
 	/* Various things interfere with healing */
-	if (p_ptr->paralyzed) regen_amount = 0;
-	if ((p_ptr->poisoned)  && (!p_ptr->slow_poison)) regen_amount = 0;
-	if (p_ptr->stun) regen_amount = 0;
-	if (p_ptr->cut) regen_amount = 0;
+	if (p_ptr->timed[TMD_PARALYZED]) regen_amount = 0;
+	if ((p_ptr->timed[TMD_POISONED])  && (!p_ptr->timed[TMD_SLOW_POISON])) regen_amount = 0;
+	if (p_ptr->timed[TMD_STUN]) regen_amount = 0;
+	if (p_ptr->timed[TMD_CUT]) regen_amount = 0;
 	if (p_ptr->disease & (DISEASE_DRAIN_HP)) regen_amount = 0;
 	if ((p_ptr->cur_flags3 & (TR3_DRAIN_HP)) != 0) regen_amount = 0;
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) regen_amount = 0;
@@ -1481,232 +1539,10 @@ static void process_world(void)
 		regenhp(regen_amount * (p_ptr->regen_hp + 1));
 	}
 
-
 	/*** Timeout Various Things ***/
-
-	/* Hack -- Hallucinating */
-	if (p_ptr->image)
-	{
-		(void)set_image(p_ptr->image - 1);
-	}
-
-	/* Blindness */
-	if (p_ptr->blind)
-	{
-		(void)set_blind(p_ptr->blind - 1);
-	}
-
-	/* Amnesia */
-	if (p_ptr->amnesia)
-	{
-		(void)set_amnesia(p_ptr->amnesia - 1);
-	}
-
-	/* Monster curses */
-	if (p_ptr->cursed)
-	{
-		(void)set_cursed(p_ptr->cursed - 1);
-	}
-
-	/* Petrification */
-	if (p_ptr->petrify)
-	{
-		(void)set_petrify(p_ptr->petrify - 1);
-	}
-
-	/* Monster induced sleep */
-	if (p_ptr->msleep)
-	{
-		(void)set_msleep(p_ptr->msleep - 1);
-
-		if (p_ptr->psleep < PY_SLEEP_DROWSY) (void)set_psleep(PY_SLEEP_DROWSY);
-	}
-
-	/* Player induced sleep -- hack: goes in other direction */
-	if (p_ptr->psleep)
-	{
-		(void)set_psleep(p_ptr->psleep + 1);
-	}
-
-	/* Times invisible */
-	if (p_ptr->invis)
-	{
-		(void)set_invis(p_ptr->invis - 1);
-	}
-
-	/* Times see-invisible */
-	if (p_ptr->tim_invis)
-	{
-		(void)set_tim_invis(p_ptr->tim_invis - 1);
-	}
-
-	/* Timed infra-vision */
-	if (p_ptr->tim_infra)
-	{
-		(void)set_tim_infra(p_ptr->tim_infra - 1);
-	}
-
-	/* Paralysis */
-	if (p_ptr->paralyzed)
-	{
-		(void)set_paralyzed(p_ptr->paralyzed - 1);
-	}
-
-	/* Confusion */
-	if (p_ptr->confused)
-	{
-		(void)set_confused(p_ptr->confused - 1);
-	}
-
-	/* Afraid */
-	if (p_ptr->afraid)
-	{
-		(void)set_afraid(p_ptr->afraid - 1);
-	}
-
-	/* Temporary stat increase */
-	for (i = 0; i < A_MAX; i++)
-	{
-		if (p_ptr->stat_inc_tim[i])
-		{
-			(void)set_stat_inc_tim(p_ptr->stat_inc_tim[i] - 1, i);
-		}
-	}
-
-	/* Temporary stat decrease */
-	for (i = 0; i < A_MAX; i++)
-	{
-		if (p_ptr->stat_dec_tim[i])
-		{
-			(void)set_stat_dec_tim(p_ptr->stat_dec_tim[i] - 1, i);
-		}
-	}
-
-	/* Fast */
-	if (p_ptr->fast)
-	{
-		(void)set_fast(p_ptr->fast - 1);
-	}
-
-	/* Fast */
-	if (p_ptr->fast)
-	{
-		(void)set_fast(p_ptr->fast - 1);
-	}
-
-	/* Slow */
-	if (p_ptr->slow)
-	{
-		(void)set_slow(p_ptr->slow - 1);
-	}
-
-	/* Protection from evil */
-	if (p_ptr->protevil)
-	{
-		(void)set_protevil(p_ptr->protevil - 1);
-	}
-
-	/* Heroism */
-	if (p_ptr->hero)
-	{
-		(void)set_hero(p_ptr->hero - 1);
-	}
-
-	/* Super Heroism */
-	if (p_ptr->shero)
-	{
-		(void)set_shero(p_ptr->shero - 1);
-	}
-
-	/* Blessed */
-	if (p_ptr->blessed)
-	{
-		(void)set_blessed(p_ptr->blessed - 1);
-	}
-
-	/* Shield */
-	if (p_ptr->shield)
-	{
-		(void)set_shield(p_ptr->shield - 1);
-	}
-
-	/* Oppose Acid */
-	if (p_ptr->oppose_acid)
-	{
-		(void)set_oppose_acid(p_ptr->oppose_acid - 1);
-	}
-
-	/* Oppose Lightning */
-	if (p_ptr->oppose_elec)
-	{
-		(void)set_oppose_elec(p_ptr->oppose_elec - 1);
-	}
-
-	/* Oppose Fire */
-	if (p_ptr->oppose_fire)
-	{
-		(void)set_oppose_fire(p_ptr->oppose_fire - 1);
-	}
-
-	/* Oppose Cold */
-	if (p_ptr->oppose_cold)
-	{
-		(void)set_oppose_cold(p_ptr->oppose_cold - 1);
-	}
-
-	/* Oppose Poison */
-	if (p_ptr->oppose_pois)
-	{
-		(void)set_oppose_pois(p_ptr->oppose_pois - 1);
-	}
-
-	/* Free action */
-	if (p_ptr->free_act)
-	{
-		(void)set_free_act(p_ptr->free_act - 1);
-	}
-
-
-	/*** Poison and Stun and Cut ***/
-
-	/* Poison */
-	if ((p_ptr->poisoned) && (!p_ptr->slow_poison))
-	{
-		int adjust = (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
-
-		/* Some rooms make wounds magically worse */
-		if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
-
-		/* Apply some healing */
-		(void)set_poisoned(p_ptr->poisoned - adjust);
-	}
-
-	/* Stun */
-	if (p_ptr->stun)
-	{
-		int adjust = (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
-
-		/* Apply some healing */
-		(void)set_stun(p_ptr->stun - adjust);
-	}
-
-	/* Cut */
-	if (p_ptr->cut)
-	{
-		int adjust = (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
-
-		/* Hack -- Truly "mortal" wound */
-		if (p_ptr->cut > 1000) adjust = 0;
-
-		/* Some rooms make wounds magically worse */
-		if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_BLOODY)) adjust = -1;
-
-		/* Apply some healing */
-		(void)set_cut(p_ptr->cut - adjust);
-	}
+	decrease_timeouts();
 
 	/*** Process Light ***/
-
 	/* Check for light being wielded */
 	o_ptr = &inventory[INVEN_LITE];
 
@@ -2222,23 +2058,10 @@ static void process_world(void)
 		p_ptr->exp = p_ptr->max_exp;
 
 		/* No maladies */
-		p_ptr->blind = 0;
-		p_ptr->confused = 0;
-		p_ptr->poisoned = 0;
-		p_ptr->afraid = 0;
-		p_ptr->paralyzed = 0;
-		p_ptr->image = 0;
-		p_ptr->slow = 0;
-		p_ptr->stun = 0;
-		p_ptr->paralyzed = 0;
-		p_ptr->cut = 0;
-		p_ptr->psleep = 0;
-		p_ptr->msleep = 0;
-		p_ptr->petrify = 0;
-		p_ptr->stastis = 0;
-		p_ptr->cursed = 0;
-		p_ptr->amnesia = 0;
-		p_ptr->disease = 0;
+		for (i = 0; i < TMD_MAX; i++)
+		{
+			p_ptr->timed[i] = 0;
+		}
 
 		/* Fully healed */
 		p_ptr->chp = p_ptr->mhp;
@@ -2632,21 +2455,21 @@ static void process_command(void)
 		/* Gain new spells/prayers */
 		case 'G':
 		{
-			do_cmd_study();
+			do_cmd_item(COMMAND_ITEM_STUDY);
 			break;
 		}
 
 		/* Browse a book */
 		case 'b':
 		{
-			do_cmd_browse();
+			do_cmd_item(COMMAND_ITEM_BROWSE);
 			break;
 		}
 
 		/* Cast a spell */
 		case 'm':
 		{
-			do_cmd_cast();
+			do_cmd_item(COMMAND_ITEM_CAST_SPELL);
 			break;
 		}
 
@@ -2690,14 +2513,14 @@ static void process_command(void)
 		/* Fire an item */
 		case 'f':
 		{
-			do_cmd_fire();
+			do_cmd_item(p_ptr->fire_command);
 			break;
 		}
 
 		/* Throw an item */
 		case 'v':
 		{
-			do_cmd_throw();
+			do_cmd_item(COMMAND_ITEM_THROW);
 			break;
 		}
 
@@ -2984,7 +2807,7 @@ static void process_command(void)
 			}
 			else if (p_ptr->command_cmd_ex.mousebutton == BUTTON_MOVE)
 			{
-				if (p_ptr->confused)
+				if (p_ptr->timed[TMD_CONFUSED])
 				{
 					do_cmd_walk();
 				}
@@ -3199,11 +3022,11 @@ static void process_player(void)
 			/* Stop resting */
 			if ((p_ptr->chp == p_ptr->mhp) &&
 			    (p_ptr->csp == p_ptr->msp) &&
-			    !p_ptr->blind && !p_ptr->confused &&
-			    !p_ptr->poisoned && !p_ptr->afraid &&
-			    !p_ptr->stun && !p_ptr->cut &&
-			    !p_ptr->slow && !p_ptr->paralyzed &&
-			    !p_ptr->image && !p_ptr->word_recall &&
+			    !p_ptr->timed[TMD_BLIND] && !p_ptr->timed[TMD_CONFUSED] &&
+			    !p_ptr->timed[TMD_POISONED] && !p_ptr->timed[TMD_AFRAID] &&
+			    !p_ptr->timed[TMD_STUN] && !p_ptr->timed[TMD_CUT] &&
+			    !p_ptr->timed[TMD_SLOW] && !p_ptr->timed[TMD_PARALYZED] &&
+			    !p_ptr->timed[TMD_IMAGE] && !p_ptr->word_recall &&
 			    (p_ptr->rest > PY_REST_FULL))
 			{
 				disturb(0, 0);
@@ -3307,7 +3130,7 @@ static void process_player(void)
 		/* Paralyzed or Knocked Out */
 		else
 #endif
-		if ((p_ptr->paralyzed) || (p_ptr->stun >= 100) || (p_ptr->psleep >= PY_SLEEP_ASLEEP))
+		if ((p_ptr->timed[TMD_PARALYZED]) || (p_ptr->timed[TMD_STUN] >= 100) || (p_ptr->timed[TMD_PSLEEP] >= PY_SLEEP_ASLEEP))
 		{
 			/* Get the feature */
 			feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
@@ -3423,7 +3246,7 @@ static void process_player(void)
 			if (p_ptr->held_song)
 			{
 				/* Cast the spell */
-			    if (do_cmd_cast_aux(p_ptr->held_song, spell_power(p_ptr->held_song), ((p_ptr->pstyle == WS_INSTRUMENT)?"play":"sing"), "song"))
+			    if (player_cast_spell(p_ptr->held_song, spell_power(p_ptr->held_song), ((p_ptr->pstyle == WS_INSTRUMENT)?"play":"sing"), "song"))
 					/* Hack -- if not aborted, always use a full turn */
 					p_ptr->energy_use = 100;
 			}
@@ -3435,7 +3258,7 @@ static void process_player(void)
 			p_ptr->player_turn++;
 
 			/* Hack -- constant hallucination */
-			if (p_ptr->image) p_ptr->redraw |= (PR_MAP);
+			if (p_ptr->timed[TMD_IMAGE]) p_ptr->redraw |= (PR_MAP);
 
 			/* Shimmer monsters if needed */
 			if (shimmer_monsters)
@@ -4241,20 +4064,11 @@ void play_game(bool new_game)
 				p_ptr->csp = p_ptr->msp;
 				p_ptr->csp_frac = 0;
 
-				/* Hack -- Healing */
-				(void)set_blind(0);
-				(void)set_confused(0);
-				(void)set_poisoned(0);
-				(void)set_afraid(0);
-				(void)set_paralyzed(0);
-				(void)set_amnesia(0);
-				(void)set_cursed(0);
-				(void)set_image(0);
-				(void)set_stun(0);
-				(void)set_cut(0);
-
-				(void)set_msleep(0);
-				(void)set_psleep(0);
+				/* Hack -- Clear all timers */
+				for (i = 0; i < TMD_MAX; i++)
+				{
+					p_ptr->timed[i] = 0;
+				}
 
 				/* Hack -- Prevent starvation */
 				(void)set_food(PY_FOOD_MAX - 1);

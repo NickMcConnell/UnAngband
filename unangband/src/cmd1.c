@@ -722,11 +722,11 @@ void search(void)
 	int range = 1;
 
 	/* Start with base search ability, modified by depth */
-	chance = 10 + (2 * p_ptr->skill_srh) - p_ptr->depth;
+	chance = 10 + (2 * p_ptr->skills[SKILL_SEARCH]) - p_ptr->depth;
 
 	/* Penalize various conditions */
-	if (p_ptr->blind || no_lite()) chance = chance / 10;
-	if (p_ptr->confused || p_ptr->image) chance = chance / 10;
+	if (p_ptr->timed[TMD_BLIND] || no_lite()) chance = chance / 10;
+	if (p_ptr->timed[TMD_BLIND] || p_ptr->timed[TMD_IMAGE]) chance = chance / 10;
 
 	/* Increase searching range sometimes */
 	if (chance >= rand_range(40,  70)) range++;
@@ -1489,7 +1489,7 @@ byte py_pickup(int py, int px, int pickup)
 	int can_pickup = 0;
 	bool call_function_again = FALSE;
 
-	bool blind = (p_ptr->blind || no_lite());
+	bool blind = (p_ptr->timed[TMD_BLIND] || no_lite());
 	bool msg = TRUE;
 
 	feature_type *f_ptr = &f_info[cave_feat[py][px]];
@@ -1836,7 +1836,7 @@ bool avoid_trap(int y, int x)
 		case TERM_ORANGE:
 		{
 			/* Avoid by being strange */
-			if ((p_ptr->confused) || (p_ptr->image)) return (TRUE);
+			if ((p_ptr->timed[TMD_CONFUSED]) || (p_ptr->timed[TMD_IMAGE])) return (TRUE);
 			break;
 		}
 		/* Spring loaded trap */
@@ -1868,7 +1868,7 @@ bool avoid_trap(int y, int x)
 		case TERM_L_DARK:
 		{
 			/* Avoid by being invisible */
-			if (p_ptr->invis) return (TRUE);
+			if (p_ptr->timed[TMD_INVIS]) return (TRUE);
 			break;
 		}
 		/* Strange visage */
@@ -1971,7 +1971,7 @@ bool avoid_trap(int y, int x)
 		case TERM_MAGENTA:
 		{
 			/* Avoid by being blind or unable to read */
-			if (p_ptr->blind) return (TRUE);
+			if (p_ptr->timed[TMD_BLIND]) return (TRUE);
 			break;
 		}
 		/* Demonic sign */
@@ -2898,7 +2898,7 @@ void py_attack(int dir)
 	}
 
 	/* Handle player fear */
-	if (p_ptr->afraid)
+	if (p_ptr->timed[TMD_AFRAID])
 	{
 		/* Message */
 		msg_format("You are too afraid to attack %s!", m_name);
@@ -2988,7 +2988,7 @@ void py_attack(int dir)
 		 */
 		if (p_ptr->blocking) bonus += 20;
 
-		chance = (p_ptr->skill_thn + (bonus * BTH_PLUS_ADJ));
+		chance = (p_ptr->skills[SKILL_TO_HIT_MELEE] + (bonus * BTH_PLUS_ADJ));
 
 		/* Test for hit */
 		if (!test_hit_norm(chance, calc_monster_ac(cave_m_idx[y][x], FALSE), m_ptr->ml))
@@ -3219,7 +3219,7 @@ void py_attack(int dir)
 				if (fumble)
 				{
 					/* Fumble stun */
-					(void)set_stun(p_ptr->stun + do_stun);
+					(void)set_stun(p_ptr->timed[TMD_STUN] + do_stun);
 				}
 				/* Avoid overflow */
 				else if ((do_stun + m_ptr->stunned) / (r_ptr->level / 10 + 1) > 875)
@@ -3244,7 +3244,7 @@ void py_attack(int dir)
 				if (fumble)
 				{
 					/* Fumble cuts */
-					(void)set_cut(p_ptr->cut + do_cuts);
+					(void)set_cut(p_ptr->timed[TMD_CUT] + do_cuts);
 				}
 				else if ((m_ptr->cut + do_cuts) / (r_ptr->level / 10 + 1) > 255)
 				{
@@ -3520,7 +3520,7 @@ void move_player(int dir)
 	}
 
 	/* Petrified */
-	else if (p_ptr->petrify)
+	else if (p_ptr->timed[TMD_PETRIFY])
 	{
 		/* Disturb the player */
 		disturb(0, 0);
@@ -3725,8 +3725,8 @@ void move_player(int dir)
 		p_ptr->climbing = 0;
 
 		/* Spontaneous Searching */
-		if ((p_ptr->skill_srh >= 50) ||
-		    (0 == rand_int(50 - p_ptr->skill_srh)))
+		if ((p_ptr->skills[SKILL_SEARCH] >= 50) ||
+		    (0 == rand_int(50 - p_ptr->skills[SKILL_SEARCH])))
 		{
 			search();
 		}

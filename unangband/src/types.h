@@ -140,6 +140,7 @@ typedef struct quiver_group_type quiver_group_type;
 typedef struct ecology_type ecology_type;
 typedef struct do_cmd_item_type do_cmd_item_type;
 typedef struct color_type color_type;
+typedef struct timed_effect timed_effect;
 
 
 
@@ -1674,6 +1675,8 @@ struct player_type
 	s16b stat_cur[A_MAX];   /* Current "natural" stat values */
 	s16b stat_birth[A_MAX];	/* Birth "maximal" stat values */
 
+	s16b timed[TMD_MAX];
+#if 0
 	s16b stat_inc_tim[A_MAX];      /* Timed -- Stat increase */
 	s16b stat_dec_tim[A_MAX];      /* Timed -- Stat decrease */
 
@@ -1715,7 +1718,7 @@ struct player_type
 
 	s16b oppose_water;       /* Timed -- oppose water */
 	s16b oppose_lava;       /* Timed -- oppose lava */
-
+#endif
 	s16b word_recall;       /* Word of recall counter */
 	s16b word_return;		/* Word of return counter */
 	s16b return_y;			/* Player return location */
@@ -1901,6 +1904,8 @@ struct player_type
 
 	s16b see_infra; /* Infravision range */
 
+	s16b skills[SKILL_MAX];
+#if 0
 	s16b skill_dis; /* Skill: Disarming */
 	s16b skill_dev; /* Skill: Magic Devices */
 	s16b skill_sav; /* Skill: Saving throw */
@@ -1910,7 +1915,7 @@ struct player_type
 	s16b skill_thn; /* Skill: To hit (normal) */
 	s16b skill_thb; /* Skill: To hit (shooting) */
 	s16b skill_tht; /* Skill: To hit (throwing) */
-
+#endif
 	s16b regen_hp;	/* Hitpoint regeneration rate */
 	s16b regen_mana;/* Mana regeneration rate */
 	s16b glowing;	/* Light radius bonus from items */
@@ -1924,7 +1929,7 @@ struct player_type
 
 	byte ammo_mult; /* Ammo multiplier */
 
-	byte ammo_tval; /* Ammo variety */
+	byte fire_command; /* Command to choose when firing */
 
 	s16b pspeed;    /* Current speed */
 	s16b tiring;    /* Current rate of tiring */
@@ -2088,6 +2093,7 @@ struct do_cmd_item_type
 
 	u16b use_from;						/* Where item can be used from */
 	u32b conditions;					/* Restrictions on what state the player must be in */
+	u32b timed_conditions;				/* Restrictions on what timed effects the player may not have */
 
 	byte next_command;					/* The next command to use */
 	int (*next_command_eval)(int item);	/* The next command to use - evaluation function */
@@ -2104,5 +2110,20 @@ struct color_type
 	char name[32];              /* Color name */
 
 	byte color_translate[MAX_ATTR];       /* Index for various in-game translations */
+};
+
+
+/*
+ * Player timed effects.
+ */
+struct timed_effect
+{
+  const char *on_begin;
+  const char *on_end;
+  const char *on_increase;
+  const char *on_decrease;
+  const char *on_condition;
+  u32b flag_redraw, flag_update;
+  int msg;
 };
 

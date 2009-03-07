@@ -1104,8 +1104,13 @@ static errr rd_extra(void)
 	/* Read the stat info */
 	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_max[i]);
 	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_cur[i]);
-	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_inc_tim[i]);
-	for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->stat_dec_tim[i]);
+
+	/* Read the old temporary information */
+	if (older_than(0, 6, 3, 4))
+	{
+		for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->timed[i]);
+		for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->timed[i + a_max]);
+	}
 
 	character_quickstart = TRUE;
 
@@ -1180,46 +1185,77 @@ static errr rd_extra(void)
 	}
 
 	/* Read the timers */
-	rd_s16b(&p_ptr->msleep);
-	rd_s16b(&p_ptr->petrify);
-	rd_s16b(&p_ptr->stastis);
-	rd_s16b(&p_ptr->sc);
-	rd_s16b(&p_ptr->cursed);
-	rd_s16b(&p_ptr->amnesia);
-	rd_s16b(&p_ptr->blind);
-	rd_s16b(&p_ptr->paralyzed);
-	rd_s16b(&p_ptr->confused);
-	rd_s16b(&p_ptr->food);
-	rd_s16b(&p_ptr->rest);
-	rd_s16b(&p_ptr->psleep);
-	rd_s16b(&p_ptr->energy);
-	rd_s16b(&p_ptr->fast);
-	rd_s16b(&p_ptr->slow);
-	rd_s16b(&p_ptr->afraid);
-	rd_s16b(&p_ptr->cut);
-	rd_s16b(&p_ptr->stun);
-	rd_s16b(&p_ptr->poisoned);
-	rd_s16b(&p_ptr->image);
-	rd_s16b(&p_ptr->protevil);
-	rd_s16b(&p_ptr->invis);
-	rd_s16b(&p_ptr->hero);
-	rd_s16b(&p_ptr->shero);
-	rd_s16b(&p_ptr->shield);
-	rd_s16b(&p_ptr->blessed);
-	rd_s16b(&p_ptr->tim_invis);
-	rd_s16b(&p_ptr->word_recall);
-	rd_s16b(&p_ptr->see_infra);
-	rd_s16b(&p_ptr->tim_infra);
-	rd_s16b(&p_ptr->oppose_fire);
-	rd_s16b(&p_ptr->oppose_cold);
-	rd_s16b(&p_ptr->oppose_acid);
-	rd_s16b(&p_ptr->oppose_elec);
-	rd_s16b(&p_ptr->oppose_pois);
-	rd_s16b(&p_ptr->oppose_water);
-	rd_s16b(&p_ptr->oppose_lava);
+	if (!older_than(0, 6, 3, 4))
+	{
+		/* Read in some important values which were mixed in with the timers */
+		rd_s16b(&p_ptr->sc);
+		rd_s16b(&p_ptr->food);
+		rd_s16b(&p_ptr->rest);
+		rd_s16b(&p_ptr->energy);
 
-	rd_s16b(&p_ptr->free_act);
+		/* Read the player timer array */
+		rd_u16b(&tmp16u);
 
+		/* Incompatible save files */
+		if (tmp16u > TMD_MAX)
+		{
+			note(format("Too many (%u) timer entries!", tmp16u));
+			return (-1);
+		}
+
+		/* Read in the timers */
+		for (i = 0; i < tmp16u; i++)
+		{
+			rd_s16b(&(p_ptr->timed[i]));
+		}
+	}
+	/* Hack - just wipe everything */
+	else
+	{
+		strip_bytes(38 * 2);
+#if 0
+		rd_s16b(&p_ptr->msleep);
+		rd_s16b(&p_ptr->petrify);
+		rd_s16b(&p_ptr->stastis);
+		rd_s16b(&p_ptr->sc);
+		rd_s16b(&p_ptr->cursed);
+		rd_s16b(&p_ptr->amnesia);
+		rd_s16b(&p_ptr->blind);
+		rd_s16b(&p_ptr->paralyzed);
+		rd_s16b(&p_ptr->confused);
+		rd_s16b(&p_ptr->food);
+		rd_s16b(&p_ptr->rest);
+		rd_s16b(&p_ptr->psleep);
+		rd_s16b(&p_ptr->energy);
+		rd_s16b(&p_ptr->fast);
+		rd_s16b(&p_ptr->slow);
+		rd_s16b(&p_ptr->afraid);
+		rd_s16b(&p_ptr->cut);
+		rd_s16b(&p_ptr->stun);
+		rd_s16b(&p_ptr->poisoned);
+		rd_s16b(&p_ptr->image);
+		rd_s16b(&p_ptr->protevil);
+		rd_s16b(&p_ptr->invis);
+		rd_s16b(&p_ptr->hero);
+		rd_s16b(&p_ptr->shero);
+		rd_s16b(&p_ptr->shield);
+		rd_s16b(&p_ptr->blessed);
+		rd_s16b(&p_ptr->tim_invis);
+		rd_s16b(&p_ptr->word_recall);
+		rd_s16b(&p_ptr->see_infra);
+		rd_s16b(&p_ptr->tim_infra);
+		rd_s16b(&p_ptr->oppose_fire);
+		rd_s16b(&p_ptr->oppose_cold);
+		rd_s16b(&p_ptr->oppose_acid);
+		rd_s16b(&p_ptr->oppose_elec);
+		rd_s16b(&p_ptr->oppose_pois);
+		rd_s16b(&p_ptr->oppose_water);
+		rd_s16b(&p_ptr->oppose_lava);
+		rd_s16b(&p_ptr->free_act);
+#endif
+	}
+
+	/* Read some other state values */
 	rd_byte(&p_ptr->charging);
 	rd_byte(&p_ptr->climbing);
 	rd_byte(&p_ptr->searching);
@@ -1227,6 +1263,7 @@ static errr rd_extra(void)
 	rd_byte(&p_ptr->reserves);
 	rd_byte(&tmp8u);	/* oops */
 
+	/* Read in the disease */
 	rd_u32b(&p_ptr->disease);
 
 	/* # of player turns */

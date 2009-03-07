@@ -474,27 +474,27 @@ static void do_cmd_travel(void)
 
 	if (level_flag & (LF1_SURFACE))
 	{
-		if (p_ptr->blind)
+		if (p_ptr->timed[TMD_BLIND])
 		{
 			msg_print("You can't read any maps.");
 		}
-		else if (p_ptr->confused)
+		else if (p_ptr->timed[TMD_CONFUSED])
 		{
 			msg_print("You are too confused.");
 		}
-		else if (p_ptr->petrify)
+		else if (p_ptr->timed[TMD_PETRIFY])
 		{
 			msg_print("You are petrified.");
 		}
-		else if (p_ptr->afraid)
+		else if (p_ptr->timed[TMD_AFRAID])
 		{
 			msg_print("You are too afraid.");
 		}
-		else if (p_ptr->image)
+		else if (p_ptr->timed[TMD_IMAGE])
 		{
 			msg_print("The mice don't want you to leave.");
 		}
-		else if ((p_ptr->poisoned) || (p_ptr->cut) || (p_ptr->stun))
+		else if ((p_ptr->timed[TMD_POISONED]) || (p_ptr->timed[TMD_CUT]) || (p_ptr->timed[TMD_STUN]))
 		{
 			msg_print("You need to recover from any poison, cuts or stun damage.");
 		}
@@ -1150,11 +1150,11 @@ static bool do_cmd_open_aux(int y, int x)
 		}
 
 		/* Disarm factor */
-		i = p_ptr->skill_dis;
+		i = p_ptr->skills[SKILL_DISARM];
 
 		/* Penalize some conditions */
-		if (p_ptr->blind || no_lite()) i = i / 10;
-		if (p_ptr->confused || p_ptr->image) i = i / 10;
+		if (p_ptr->timed[TMD_BLIND] || no_lite()) i = i / 10;
+		if (p_ptr->timed[TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) i = i / 10;
 
 		/* Extract the lock power */
 		j = f_info[cave_feat[y][x]].power;
@@ -1518,7 +1518,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	/* Verify legality */
 	if (!do_cmd_test(y, x, FS_TUNNEL)) return (FALSE);
 
-	i = p_ptr->skill_dig;
+	i = p_ptr->skills[SKILL_DIGGING];
 
 	j = f_info[cave_feat[y][x]].power;
 
@@ -1554,7 +1554,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	else if (f_info[cave_feat[y][x]].flags2 & (FF2_CAN_DIG))
 	{
 		/* Dig */
-		if (p_ptr->skill_dig > rand_int(20 * j))
+		if (p_ptr->skills[SKILL_DIGGING] > rand_int(20 * j))
 		{
 			sound(MSG_DIG);
 
@@ -1591,7 +1591,7 @@ static bool do_cmd_tunnel_aux(int y, int x)
 	else
 	{
 		/* Tunnel -- much harder */
-		if (p_ptr->skill_dig > (j + rand_int(40 * j)))
+		if (p_ptr->skills[SKILL_DIGGING] > (j + rand_int(40 * j)))
 		{
 			sound(MSG_DIG);
 
@@ -1758,11 +1758,11 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 	name = (f_name + f_info[cave_feat[y][x]].name);
 
 	/* Get the "disarm" factor */
-	i = p_ptr->skill_dis;
+	i = p_ptr->skills[SKILL_DISARM];
 
 	/* Penalize some conditions */
-	if (p_ptr->blind || no_lite()) i = i / 10;
-	if (p_ptr->confused || p_ptr->image) i = i / 10;
+	if (p_ptr->timed[TMD_BLIND] || no_lite()) i = i / 10;
+	if (p_ptr->timed[TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) i = i / 10;
 
 	/* XXX XXX XXX Variable power? */
 
@@ -2079,7 +2079,7 @@ static bool do_cmd_bash_aux(int y, int x, bool charging)
 		msg_print("You are off-balance.");
 
 		/* Hack -- Lose balance ala paralysis */
-		(void)set_paralyzed(p_ptr->paralyzed + 2 + rand_int(2));
+		inc_timed(TMD_PARALYZED, 2 + rand_int(2), TRUE);
 	}
 
 	/* Result */
@@ -2599,7 +2599,7 @@ void do_cmd_set_trap_or_spike(void)
 			bool trap_allowed = TRUE;
 
 			/* Hack */
-			int tmp = p_ptr->skill_dis;
+			int tmp = p_ptr->skills[SKILL_DISARM];
 
 			object_type object_type_body;
 
@@ -2677,7 +2677,7 @@ void do_cmd_set_trap_or_spike(void)
 			if (j_ptr->tval == TV_DIGGING)
 			{
 				/* Hack -- use tunnelling skill to build trap */
-				p_ptr->skill_dis = p_ptr->skill_dig;
+				p_ptr->skills[SKILL_DISARM] = p_ptr->skills[SKILL_DIGGING];
 
 				/* Restrict an item */
 				item_tester_tval = TV_SPIKE;
@@ -2777,7 +2777,7 @@ void do_cmd_set_trap_or_spike(void)
 			}
 
 			/* Reset skill - hacked for pit traps */
-			p_ptr->skill_dis = tmp;
+			p_ptr->skills[SKILL_DISARM] = tmp;
 		}
 	}
 }
@@ -2915,7 +2915,7 @@ void do_cmd_run(void)
 	int y, x, dir;
 
 	/* Hack XXX XXX XXX */
-	if (p_ptr->confused)
+	if (p_ptr->timed[TMD_CONFUSED])
 	{
 		msg_print("You are too confused!");
 		return;
@@ -2970,7 +2970,7 @@ void do_cmd_pathfind(int y, int x)
 	int dummy = 1;
 
 	/* Hack XXX XXX XXX */
-	if (p_ptr->confused)
+	if (p_ptr->timed[TMD_CONFUSED])
 	{
 		msg_print("You are too confused!");
 		return;
@@ -3041,7 +3041,7 @@ void do_cmd_hold(void)
 	}
 
 	/* Spontaneous Searching */
-	if ((p_ptr->skill_srh >= 25) || (0 == rand_int(25 - p_ptr->skill_srh)))
+	if ((p_ptr->skills[SKILL_SEARCH] >= 25) || (0 == rand_int(25 - p_ptr->skills[SKILL_SEARCH])))
 	{
 		search();
 	}
@@ -3166,7 +3166,7 @@ void do_cmd_rest(void)
 	if (p_ptr->command_arg == -3)
 	{
 		p_ptr->command_arg = PY_SLEEP_ASLEEP;
-		set_psleep(1);
+		set_timed(TMD_PSLEEP, 1, FALSE);
 	}
 
 	/* Save the rest code */
@@ -3282,7 +3282,7 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
  *
  * Note that Bows of "Extra Shots" give an extra shot.
  */
-void do_cmd_fire_or_throw_selected(int item, bool fire)
+void player_fire_or_throw_selected(int item, bool fire)
 {
 	int item2 = 0;
 	int i = 0;
@@ -3400,7 +3400,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		bow_to_h = inventory[INVEN_BOW].to_h;
 		bow_to_d = inventory[INVEN_BOW].to_d;
 
-		ranged_skill = p_ptr->skill_thb;
+		ranged_skill = p_ptr->skills[SKILL_TO_HIT_BOW];
 
 		/* Base range XXX XXX */
 		tdis = 6 + 3 * p_ptr->ammo_mult;
@@ -3413,7 +3413,7 @@ void do_cmd_fire_or_throw_selected(int item, bool fire)
 		bow_to_h = i_ptr->to_h;
 		bow_to_d = i_ptr->to_d;
 
-		ranged_skill = p_ptr->skill_tht;
+		ranged_skill = p_ptr->skills[SKILL_TO_HIT_THROW];
 
 		/* Badly balanced big weapons waste the throwing skill.
 	 	Various junk (non-weapons) does not have to_hit,
@@ -4185,122 +4185,22 @@ bool item_tester_hook_throwable(const object_type *o_ptr)
 
 
 /*
- * Throw or fire an object from the pack or floor.
- * See do_cmd_fire_selected.
+ * Player throws an item.
  */
-void do_cmd_throw_fire(bool fire)
+bool player_throw(int item)
 {
-	int item;
+	player_fire_or_throw_selected(item, FALSE);
 
-	object_type *o_ptr;
-
-	cptr q, s;
-
-	/* Berserk */
-	if (p_ptr->shero)
-	{
-		msg_print("You are too enraged!");
-		return;
-	}
-
-	/* Some items and some rooms blow missiles around */
-	if (p_ptr->cur_flags4 & (TR4_WINDY)
-			|| room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))
-	{
-		msg_print("It is too windy around you!");
-		return;
-	}
-
-	if (fire)
-	{
-		/* Check for valid throws */
-		if (p_ptr->num_fire <= 0)
-		{
-			msg_print("You lack the skill to fire a weapon.");
-
-			return;
-		}
-
-		/* Check for charged weapon */
-		if ((inventory[INVEN_BOW].sval/10 == 3) && (inventory[INVEN_BOW].charges <= 0))
-		{
-			msg_print("You must refill your weapon with gunpowder.");
-
-			return;
-		}
-
-		/* Require proper missile */
-		item_tester_tval = p_ptr->ammo_tval;
-
-		/* Require throwing weapon */
-		if (!item_tester_tval)
-			item_tester_hook = is_known_throwing_item;
-	}
-	else
-	{
-		/* Check for valid throws */
-		if (p_ptr->num_throw <= 0)
-		{
-			msg_print("You lack the skill to throw a weapon.");
-
-			return;
-		}
-
-		/* Require an item that can be thrown at all */
-		item_tester_hook = item_tester_hook_throwable;
-	}
-
-	/* Get an item */
-	q = fire ? "Fire which item? " : "Throw which item? ";
-	s = fire ? "You have nothing to fire." : "You have nothing to throw.";
-	if (!get_item(&item, q, s, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG)))
-		return;
-
-	/* Get the object */
-	if (item >= 0)
-	{
-		o_ptr = &inventory[item];
-
-		/* A cursed quiver disables the use of non-cursed ammo */
-		if (IS_QUIVER_SLOT(item) && p_ptr->cursed_quiver && !cursed_p(o_ptr))
-		{
-			msg_print("Your quiver is cursed!");
-			return;
-		}
-	}
-	else
-	{
-		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr))
-		return;
-	}
-
-	if (fire && p_ptr->num_fire)
-		do_cmd_fire_or_throw_selected(item, TRUE);
-	else
-		do_cmd_fire_or_throw_selected(item, FALSE);
+	return TRUE;
 }
 
 
 /*
- * Fire an object from the pack or floor.
+ * Player fires an item.
  */
-void do_cmd_fire(void)
+bool player_fire(int item)
 {
-	do_cmd_throw_fire(TRUE);
-}
+	player_fire_or_throw_selected(item, TRUE);
 
-
-/*
- * Throw an object from the pack or floor.
- */
-void do_cmd_throw(void)
-{
-	do_cmd_throw_fire(FALSE);
+	return TRUE;
 }

@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	3
-#define VERSION_EXTRA	3
+#define VERSION_EXTRA	4
 
 /*
  * Oldest version number that can still be imported
@@ -667,40 +667,96 @@
 #define COMMAND_ITEM_FILL_FIREARM	26
 #define COMMAND_ITEM_LITE		27
 #define COMMAND_ITEM_MAGIC_TRAP	28
+#define COMMAND_ITEM_THROW		29
+#define COMMAND_ITEM_FIRE_SLING		30
+#define COMMAND_ITEM_FIRE_BOW		31
+#define COMMAND_ITEM_FIRE_XBOW		32
+#define COMMAND_ITEM_FIRE_GUN		33
+#define COMMAND_ITEM_CAST_SPELL		34
+#define COMMAND_ITEM_STUDY			35
+#define COMMAND_ITEM_BROWSE			36
 
-
-#define MAX_COMMANDS	29
+#define MAX_COMMANDS	37
 
 
 /*
- * Conditional checks to ensure player status does not prevent commands
+ * Conditional checks to ensure player status does not prevent commands.
+ *
+ * Note the timed effects below form a separate 'timed conditions' set of
+ * restrictions.
  */
-#define CONDITION_NOT_BLIND		0x00000001L
-#define CONDITION_LITE			0x00000002L
-#define CONDITION_NOT_BERSERK	0x00000004L
-#define CONDITION_NOT_FORGET	0x00000008L
+#define CONDITION_LITE			0x00000001L	/* Player has enough light to read by */
+#define CONDITION_NO_WIND		0x00000002L	/* Player is not in a windy location */
+#define CONDITION_SKILL_FIRE		0x00000004L	/* Player has enough skill to fire weapon */
+#define CONDITION_SKILL_THROW	0x00000008L	/* Player has enough skill to throw weapons */
+#define CONDITION_GUN_CHARGED	0x00000010L	/* Player's gun is loaded with a charge of gunpowder */
+#define CONDITION_LITERATE		0x00000020L	/* Player can read books */
+#define CONDITION_HOLD_SONG		0x00000040L	/* Player can choose to change the song they're singing */
+#define CONDITION_NEED_SPELLS	0x00000080L	/* Player must have new spells to learn */
 
 
 
+/*** Constants for accessing the player struct ***/
 
+/*
+ * Timed effects
+ *
+ * Only the first 32 timed effects can be used to restrict some commands from
+ * being used.
+ */
+enum
+{
+	TMD_INC_STR = 0, TMD_INC_INT, TMD_INC_WIS, TMD_INC_DEX, TMD_INC_CON, TMD_INC_CHR, TMD_INC_AGI, TMD_INC_SIZ,
+	TMD_DEC_STR, TMD_DEC_INT, TMD_DEC_WIS, TMD_DEC_DEX, TMD_DEC_CON, TMD_DEC_CHR, TMD_DEC_AGI, TMD_DEC_SIZ,
+	TMD_FAST, TMD_SLOW, TMD_BLIND, TMD_PARALYZED, TMD_CONFUSED,
+	TMD_AFRAID, TMD_IMAGE, TMD_POISONED, TMD_CUT, TMD_STUN, TMD_CURSED, TMD_AMNESIA, TMD_PETRIFY, TMD_STASTIS,
+	TMD_MSLEEP, TMD_PSLEEP, TMD_PROTEVIL, TMD_INVIS, TMD_HERO, TMD_BERSERK, TMD_SHIELD, TMD_BLESSED, TMD_SEE_INVIS,
+	TMD_INFRA, TMD_OPP_ACID, TMD_OPP_ELEC, TMD_OPP_FIRE, TMD_OPP_COLD, TMD_OPP_POIS, TMD_OPP_LAVA, TMD_OPP_WATER, TMD_OPP_CONF,
+	TMD_SLOW_POISON, TMD_SLOW_DIGEST, TMD_WORD_RECALL, TMD_WORD_RETURN, TMD_DELAY_SPELL,
+	TMD_FREE_ACT, TMD_TELEPATHY, TMD_STONESKIN, TMD_TERROR, TMD_SPRINT,
+
+	TMD_MAX
+};
+
+#define TMD_CONDITION_MAX 32
+
+
+/*
+ * Skill indexes
+ */
+enum
+{
+	SKILL_DISARM,			/* Skill: Disarming */
+	SKILL_DEVICE,			/* Skill: Magic Devices */
+	SKILL_SAVE,				/* Skill: Saving throw */
+	SKILL_STEALTH,			/* Skill: Stealth factor */
+	SKILL_DIGGING,			/* Skill: Searching ability */
+	SKILL_SEARCH,	/* Skill: Searching frequency */
+	SKILL_TO_HIT_MELEE,		/* Skill: To hit (normal) */
+	SKILL_TO_HIT_BOW,		/* Skill: To hit (shooting) */
+	SKILL_TO_HIT_THROW,		/* Skill: To hit (throwing) */
+
+	SKILL_MAX
+};
 
 
 /*
  * Indexes of the various "stats" (hard-coded by savefiles, etc).
  */
-#define A_STR	0
-#define A_INT	1
-#define A_WIS	2
-#define A_DEX	3
-#define A_CON	4
-#define A_CHR	5
-#define A_AGI	6
-#define A_SIZ	7
+enum
+{
+	A_STR = 0,
+	A_INT,
+	A_WIS,
+	A_DEX,
+	A_CON,
+	A_CHR,
+	A_AGI,
+	A_SIZ,
 
-/*
- * Total number of stats.
- */
-#define A_MAX	8
+	A_MAX
+};
+
 
 /*
  * Player sex constants (hard-coded by save-files, arrays, etc)

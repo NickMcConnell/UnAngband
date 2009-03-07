@@ -2,7 +2,7 @@
 
 /* Code for the "mindless borg", an aid to profiling the game.
  *
- * Copyright (c) 2001 
+ * Copyright (c) 2001
  * Leon Marrick, Ben Harrison, James E. Wilson, Robert A. Koeneke
  *
  * This software may be copied and distributed for educational, research,
@@ -119,23 +119,10 @@ void do_cmd_borg(void)
 		p_ptr->exp = p_ptr->max_exp;
 
 		/* No maladies */
-		p_ptr->blind = 0;
-		p_ptr->confused = 0;
-		p_ptr->poisoned = 0;
-		p_ptr->afraid = 0;
-		p_ptr->paralyzed = 0;
-		p_ptr->image = 0;
-		p_ptr->slow = 0;
-		p_ptr->stun = 0;
-		p_ptr->paralyzed = 0;
-		p_ptr->cut = 0;
-		p_ptr->psleep = 0;
-		p_ptr->msleep = 0;
-		p_ptr->petrify = 0;
-		p_ptr->stastis = 0;
-		p_ptr->cursed = 0;
-		p_ptr->amnesia = 0;
-		p_ptr->disease = 0;
+		for (i = 0; i < TMD_MAX; i++)
+		{
+			set_timed(i, 0, FALSE);
+		}
 
 		/* Fully healed */
 		p_ptr->chp = p_ptr->mhp;
@@ -183,7 +170,7 @@ void do_cmd_borg(void)
 
 	/* Change level when needed. */
 	if (count_change_level > 0) count_change_level--;
-	else 
+	else
 	{
 		/* Jump around dungeons */
 		if (adult_campaign)
@@ -196,12 +183,12 @@ void do_cmd_borg(void)
 
 				/* New dungeon */
 				p_ptr->dungeon = (s16b)rand_int(z_info->t_max);
-				
+
 				/* Get the zone */
 				get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-			
+
 				if (zone->fill) break;
-				
+
 			}
 
 			/* New depth */
@@ -223,7 +210,7 @@ void do_cmd_borg(void)
 
 	/* Teleport when needed. */
 	if (count_teleport > 0) count_teleport--;
-	else 
+	else
 	{
 		teleport_hook = NULL;
 		teleport_player(rand_range(20, 200));
@@ -253,18 +240,18 @@ void do_cmd_borg(void)
 		}
 	}
 
-	/* 
-	 * Look at next grid.  Assume the dungeon to be surrounded by a 
+	/*
+	 * Look at next grid.  Assume the dungeon to be surrounded by a
 	 * wall that the character cannot pass.
 	 */
 	y = p_ptr->py + ddy_ddd[borg_dir];
 	x = p_ptr->px + ddx_ddd[borg_dir];
 
-	/* 
-	 * If grid in our current direction of travel is not passable, or 
+	/*
+	 * If grid in our current direction of travel is not passable, or
 	 * sometimes even if it is, choose a passable adjacent grid at random.
 	 */
-	if ((cave_feat[y][x] > FEAT_RUBBLE) || 
+	if ((cave_feat[y][x] > FEAT_RUBBLE) ||
 	   ((cave_info[y][x] & (CAVE_ROOM)) && (rand_int(8) == 0)))
 	{
 		/* Look all around */

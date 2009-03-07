@@ -105,6 +105,8 @@ extern const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES];
 extern const do_cmd_item_type cmd_item_list[MAX_COMMANDS];
 extern const familiar_type familiar_race[MAX_FAMILIARS];
 extern const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES];
+extern const timed_effect timed_effects[TMD_MAX];
+
 
 /* variable.c */
 extern cptr copyright;
@@ -485,8 +487,9 @@ extern void do_cmd_hold(void);
 extern void do_cmd_pickup(void);
 extern void do_cmd_rest(void);
 extern int breakage_chance(object_type *o_ptr);
-extern void do_cmd_fire(void);
-extern void do_cmd_throw(void);
+extern bool item_tester_hook_throwable(const object_type *o_ptr);
+extern bool player_fire(int item);
+extern bool player_throw(int item);
 extern int set_routes(s16b *routes, int max_num, int from);
 extern int actual_route(int dun);
 
@@ -552,11 +555,12 @@ extern void do_knowledge_dungeons(void);
 /* cmd5.c */
 extern int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known);
 extern bool inven_book_okay(const object_type *o_ptr);
-extern bool do_cmd_browse_object(object_type *o_ptr);
-extern void do_cmd_browse(void);
-extern void do_cmd_study(void);
-extern bool do_cmd_cast_aux(int spell, int plev, cptr p, cptr t);
-extern void do_cmd_cast(void);
+extern bool player_browse_object(object_type *o_ptr);
+extern bool player_browse(int item);
+extern bool player_study(int item);
+extern bool player_cast_spell(int spell, int plev, cptr p, cptr t);
+extern bool inven_cast_okay(const object_type *o_ptr);
+extern bool player_cast(int item);
 
 /* cmd6.c */
 extern bool do_cmd_item(int item);
@@ -1118,45 +1122,21 @@ extern void window_stuff(void);
 extern void handle_stuff(void);
 
 /* xtra2.c */
-extern bool set_blind(int v);
-extern bool set_confused(int v);
+extern bool set_timed(int idx, int v, bool notify);
+extern bool inc_timed(int idx, int v, bool notify);
+extern bool dec_timed(int idx, int v, bool notify);
+extern bool clear_timed(int idx, bool notify);
+extern bool pfix_timed(int idx, bool notify);
 extern bool set_poisoned(int v);
 extern bool set_slow_poison(int v);
-extern bool set_slow_digest(int v);
 extern bool set_afraid(int v);
-extern bool set_paralyzed(int v);
-extern bool set_image(int v);
-extern bool set_amnesia(int v);
-extern bool set_cursed(int v);
-extern bool set_petrify(int v);
-extern bool set_stastis(int v);
-extern bool set_msleep(int v);
-extern bool set_psleep(int v);
-extern cptr desc_stat_imp[A_MAX];
-extern cptr desc_stat_imp_end[A_MAX];
-extern bool set_stat_inc_tim(int v, int i);
-extern cptr desc_stat_dec[A_MAX];
-extern bool set_stat_dec_tim(int v, int i);
-extern bool set_fast(int v);
-extern bool set_slow(int v);
-extern bool set_shield(int v);
-extern bool set_blessed(int v);
-extern bool set_hero(int v);
-extern bool set_shero(int v);
-extern bool set_protevil(int v);
-extern bool set_free_act(int v);
-extern bool set_invis(int v);
-extern bool set_tim_invis(int v);
-extern bool set_tim_infra(int v);
-extern bool set_oppose_acid(int v);
-extern bool set_oppose_elec(int v);
-extern bool set_oppose_fire(int v);
-extern bool set_oppose_cold(int v);
-extern bool set_oppose_pois(int v);
 extern bool set_stun(int v);
 extern bool set_cut(int v);
 extern bool set_food(int v);
 extern bool set_rest(int v);
+extern bool set_msleep(int v);
+extern bool set_psleep(int v);
+extern bool set_stastis(int v);
 extern void improve_familiar(void);
 extern void check_experience(void);
 extern void gain_exp(s32b amount);

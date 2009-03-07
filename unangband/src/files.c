@@ -1630,19 +1630,43 @@ cptr likert(int x, int y, byte *attr)
 
 
 /*
+ * Quick table to display skills
+ */
+typedef struct {
+	byte skill;
+	const char *name;
+	byte div;
+} skill_table_entry;
+
+skill_table_entry skill_table[] =
+{
+		{SKILL_TO_HIT_MELEE, "Fighting", 12 },
+		{SKILL_TO_HIT_BOW, "Shooting", 12 },
+		{SKILL_TO_HIT_THROW, "Throwing", 12 },
+		{SKILL_STEALTH, "Stealth", 1},
+		{SKILL_SAVE, "Save Throw", 6},
+		{SKILL_DISARM, "Disarming", 6},
+		{SKILL_DEVICE, "Devices", 6},
+		{SKILL_SEARCH, "Searching", 6},
+		{SKILL_DIGGING, "Digging", 6},
+		{-1, "", 0}
+};
+
+
+
+/*
  * Prints some "extra" information on the screen.
  */
 static void display_player_xtra_info(void)
 {
 	int i;
+
 	s32b tmpl;
 	int col, row;
 	int hit, dam, hit_real;
 	int style_hit, style_dam, style_crit;
 	u32b style;
 	int base, plus;
-	int xthn, xthb, xtht, xsrh, xdig;
-	int xdis, xdev, xsav, xstl;
 	byte likert_attr;
 
 	object_type *o_ptr;
@@ -1892,10 +1916,10 @@ static void display_player_xtra_info(void)
 	if (p_ptr->searching) i += 10;
 
 	/* Hack -- Visually "undo" temp speed */
-	if (p_ptr->fast) i -= 10;
+	if (p_ptr->timed[TMD_FAST]) i -= 10;
 
 	/* Hack -- Visually "undo" temp slowing */
-	if (p_ptr->slow) i += 10;
+	if (p_ptr->timed[TMD_SLOW]) i += 10;
 
 	/* Fast */
 	if (i > 110)
@@ -1952,9 +1976,6 @@ static void display_player_xtra_info(void)
 	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
 	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
 	hit_real += o_ptr->to_h;
-
-	/* Fighting Skill (with current weapon) */
-	xthn = p_ptr->skill_thn + (hit_real * BTH_PLUS_ADJ);
 
 	/* Melee attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -2076,9 +2097,6 @@ static void display_player_xtra_info(void)
 	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
 	hit_real += o_ptr->to_h;
 
-	/* Shooting Skill (with current bow) */
-	xthb = p_ptr->skill_thb + (hit_real * BTH_PLUS_ADJ);
-
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 	Term_putstr(col+5, 14, -1, TERM_L_BLUE, format("%12s", buf));
 
@@ -2111,9 +2129,6 @@ static void display_player_xtra_info(void)
 	dam += style_dam;
 	hit_real += style_hit;
 
-	/* Throwing Skill */
-	xtht = p_ptr->skill_tht + (hit_real * BTH_PLUS_ADJ);
-
 	Term_putstr(col, 16, -1, TERM_WHITE, "Throw");
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 	Term_putstr(col+5, 16, -1, TERM_L_BLUE, format("%12s", buf));
@@ -2132,49 +2147,13 @@ static void display_player_xtra_info(void)
 	/* Right */
 	col = 59;
 
-	/* Basic abilities */
-	xdis = p_ptr->skill_dis;
-	xdev = p_ptr->skill_dev;
-	xsav = p_ptr->skill_sav;
-	xstl = p_ptr->skill_stl;
-	xsrh = p_ptr->skill_srh;
-	xdig = p_ptr->skill_dig;
-
-	put_str("Fighting", 10, col);
-	desc = likert(xthn, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 10, col+11);
-
-	put_str("Shooting", 11, col);
-	desc = likert(xthb, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 11, col+11);
-
-	put_str("Throwing", 12, col);
-	desc = likert(xtht, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 12, col+11);
-
-	put_str("Stealth", 13, col);
-	desc = likert(xstl, 1, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 13, col+11);
-
-	put_str("Save Throw", 14, col);
-	desc = likert(xsav, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 14, col+11);
-
-	put_str("Disarming", 15, col);
-	desc = likert(xdis, 8, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 15, col+11);
-
-	put_str("Devices", 16, col);
-	desc = likert(xdev, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 16, col+11);
-
-	put_str("Searching", 17, col);
-	desc = likert(xsrh, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 17, col+11);
-
-	put_str("Digging", 18, col);
-	desc = likert(xdig, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), 18, col+11);
+	/* Enumerate through skills */
+	for (i = 0; skill_table[i].skill >= 0; i++)
+	{
+		put_str(skill_table[i].name, 10 + i, col);
+		desc = likert(p_ptr->skills[skill_table[i].skill], skill_table[i].div, &likert_attr);
+		c_put_str(likert_attr, format("%9s", desc), 10 + i, col+11);
+	}
 
 	/* History */
 	Term_gotoxy(1, 20);
@@ -3122,15 +3101,15 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 
 		/* Temporary Bonus */
 		sprintf(buf, "%+3d",
-				(p_ptr->stat_inc_tim[i] ? 5 : 0)
-				- (p_ptr->stat_dec_tim[i] ? 5 : 0));
+				(p_ptr->timed[i] ? 5 : 0)
+				- (p_ptr->timed[i + A_MAX] ? 5 : 0));
 		c_put_str(TERM_L_BLUE, buf, row+i, col+21);
 
 		/* Resulting "modified" maximum value */
 		cnv_stat(p_ptr->stat_top[i], buf);
-		if (p_ptr->stat_inc_tim[i] && !p_ptr->stat_dec_tim[i])
+		if (p_ptr->timed[i] && !p_ptr->timed[i + A_MAX])
 		  c_put_str(TERM_L_BLUE, buf, row+i, col+25);
-		else if (p_ptr->stat_dec_tim[i] && !p_ptr->stat_inc_tim[i])
+		else if (p_ptr->timed[i + A_MAX] && !p_ptr->timed[i])
 		  c_put_str(TERM_ORANGE, buf, row+i, col+25);
 		else
 		  c_put_str(TERM_L_GREEN, buf, row+i, col+25);

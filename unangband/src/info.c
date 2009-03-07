@@ -5391,10 +5391,10 @@ void object_usage(int slot)
 	if (!o_ptr->k_idx) return;
 
 	/* No sensing when confused */
-	if (p_ptr->confused) return;
+	if (p_ptr->timed[TMD_CONFUSED]) return;
 
 	/* No sensing when hallucinating */
-	if (p_ptr->image) return;
+	if (p_ptr->timed[TMD_CONFUSED]) return;
 
 	if ((o_ptr->usage)<MAX_SHORT) o_ptr->usage++;
 
@@ -5548,10 +5548,10 @@ void equip_can_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 	f4 &= ~(nf4);
 
 	/* Hack --- exclude temporary effect flags */
-	if (p_ptr->tim_infra) f1 &= ~(TR1_INFRA);
-	if (p_ptr->hero || p_ptr->shero) f2 &= ~(TR2_RES_FEAR);
-	if (p_ptr->tim_invis) f3 &= ~(TR3_SEE_INVIS);
-	if (p_ptr->blessed) f3 &= ~(TR3_HOLD_LIFE);
+	if (p_ptr->timed[TMD_INFRA]) f1 &= ~(TR1_INFRA);
+	if ((p_ptr->timed[TMD_HERO]) || (p_ptr->timed[TMD_BERSERK])) f2 &= ~(TR2_RES_FEAR);
+	if (p_ptr->timed[TMD_SEE_INVIS]) f3 &= ~(TR3_SEE_INVIS);
+	if (p_ptr->timed[TMD_BLESSED]) f3 &= ~(TR3_HOLD_LIFE);
 
 	/* Exclude known flags */
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
