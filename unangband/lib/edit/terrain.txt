@@ -3971,7 +3971,7 @@ F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
 F:HURT_FIRE | ACID | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | ATTR_LITE | SPREAD |
 
-N:457:fine net over a shallow pit
+N:167:fine net over a shallow pit
 G:^:U
 O:0
 W:0:0:0:0

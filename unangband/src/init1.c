@@ -2144,7 +2144,7 @@ errr parse_method_info(char *buf, header *head)
 		*t++ = '\0';
 
 		/* Hack -- allow greater than */
-		if (*s == '>') *s++;
+		if (*s == '>') s++;
 
 		/* Parse min */
 		method_ptr->desc[n1].min = atoi(s);

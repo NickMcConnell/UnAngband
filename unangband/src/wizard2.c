@@ -476,14 +476,14 @@ static void wiz_reroll_item(object_type *o_ptr)
 		}
 
 		/* Apply good magic, but first clear object */
-		else if (ch == 'g' || ch == 'g')
+		else if (ch == 'g' || ch == 'G')
 		{
 			object_prep(i_ptr, o_ptr->k_idx);
 			apply_magic(i_ptr, p_ptr->depth, FALSE, TRUE, FALSE);
 		}
 
 		/* Apply great magic, but first clear object */
-		else if (ch == 'e' || ch == 'e')
+		else if (ch == 'e' || ch == 'E')
 		{
 			object_prep(i_ptr, o_ptr->k_idx);
 			apply_magic(i_ptr, p_ptr->depth, FALSE, TRUE, TRUE);
@@ -813,7 +813,7 @@ static void do_cmd_wiz_play(void)
 			wiz_statistics(i_ptr);
 		}
 
-		if (ch == 'r' || ch == 'r')
+		if (ch == 'r' || ch == 'R')
 		{
 			wiz_reroll_item(i_ptr);
 		}

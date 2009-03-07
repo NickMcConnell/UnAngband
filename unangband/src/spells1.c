@@ -3396,7 +3396,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 	teleport_hook = NULL;
 
 	/* Hack -- prevent smoke/vapour etc on floors unless a feature or non-player object causes this */
-	if (((who != SOURCE_FEATURE) || (who != SOURCE_OBJECT)) &&
+	if (((who != SOURCE_FEATURE) && (who != SOURCE_OBJECT)) &&
 			((f_ptr->flags1 & (FF1_FLOOR)) != 0))
 	{
 		burnout = TRUE;

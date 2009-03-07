@@ -1430,7 +1430,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 					/* Needs line of sight, and (hack) sometimes line of fire. */
 					see_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS |
-							(m_idx + turn) % 2 ? CAVE_XLOF : 0);
+							((m_idx + turn) % 2 ? CAVE_XLOF : 0));
 				}
 				/*
 				 * Sometimes check for line of fire
@@ -4367,11 +4367,8 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 		 * looks like it will get the monster to the character - or away
 		 * from him - most effectively.
 		 */
-		for (i = 0; i <= 8; i++)
+		for (i = 0; i < 8; i++)
 		{
-			/* Out of options */
-			if (i == 8) break;
-
 			/* Get the actual direction */
 			dir = side_dirs[dir0][i];
 

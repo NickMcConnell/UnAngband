@@ -1369,7 +1369,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	if (flag & (MAZE_DEAD | MAZE_POOL))
 	{
 		/* Less dead ends if not surrounded by wall */
-		int n = ydim * xdim - ((flag & (MAZE_WALL)) == 0) ? 2 * ydim + 2 * xdim - 4 : 0;
+		int n = ydim * xdim - ( ((flag & (MAZE_WALL)) == 0) ? 2 * ydim + 2 * xdim - 4 : 0);
 
 		int loops = (flag & (MAZE_LOOP)) ?  1 /* n / 4 */ : 0;
 		int flood = (flag & (MAZE_FLOOD)) ? n / 4 : 0;

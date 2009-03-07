@@ -1365,7 +1365,7 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		/* Add a class suffix to some monsters */
 		if (/* r_ptr->flags9 & (RF9_LEVEL_CLASS) */ FALSE)
 		{
-			if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_MAGE)) != 0)) suffix = "shaman";
+			if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_PRIEST)) != 0)) suffix = "shaman";
 			else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARCHER)) != 0)) suffix = "ranger";
 			else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "warrior mage";
 			else if ((r_ptr->flags2 & (RF2_MAGE)) != 0) suffix = "mage";

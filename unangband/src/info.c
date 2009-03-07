@@ -5429,7 +5429,7 @@ void object_usage(int slot)
 		p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 
 	}
-	else if ((!o_ptr->feeling) && (!o_ptr->ident & (IDENT_SENSE)) && (o_ptr->usage > 5) && (o_ptr->usage % 5 == 0)
+	else if ((!o_ptr->feeling) && (!(o_ptr->ident & (IDENT_SENSE))) && (o_ptr->usage > 5) && (o_ptr->usage % 5 == 0)
 		&& (rand_int(100) < 30))
 	{
 		/* Valid "tval" codes */

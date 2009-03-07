@@ -23,7 +23,7 @@
  */
 bool set_timed(int idx, int v, bool notify)
 {
-	const timed_effect *effect;
+	timed_effect *effect;
 
 	/* Hack -- Force good values */
 	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
@@ -1294,7 +1294,7 @@ bool set_rest(int v)
  */
 void improve_aware(void)
 {
-	int i;
+	int i, ii;
 	int awareness = -1;
 
 	/* Hack -- Check for id'ed */
@@ -1325,21 +1325,20 @@ void improve_aware(void)
 
 			/* Recalculate bonuses */
 			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW);
-		}
-	}
 
-	/* Check inventory */
-	for (i = 0; i < INVEN_TOTAL; i++)
-	{
-		if (((k_info[inventory[i].k_idx].aware & (AWARE_CLASS)) != 0) &&
-		((k_info[inventory[i].k_idx].aware & (AWARE_CLASS)) != 0))
-		{
-			/* Become aware of object */
-			object_aware(&inventory[i], FALSE);
-		}
+			/* Check inventory */
+			for (ii = 0; ii < INVEN_TOTAL; ii++)
+			{
+				if (inventory[ii].k_idx == i)
+				{
+					/* Become aware of object */
+					object_aware(&inventory[ii], FALSE);
+				}
 
-		/* Notice stuff */
-		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+				/* Notice stuff */
+				p_ptr->notice |= (PN_COMBINE | PN_REORDER);
+			}
+		}
 	}
 }
 
@@ -2041,7 +2040,7 @@ bool check_quest(quest_event *qe1_ptr, bool advance)
 	bool questor = FALSE;
 
 	return (FALSE);
-	
+
 	for (i = 0; i < MAX_Q_IDX; i++)
 	{
 		quest_type *q_ptr = &(q_list[i]);

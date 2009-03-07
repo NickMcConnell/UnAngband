@@ -89,7 +89,7 @@ static int default_join_cmp(const void *a, const void *b)
 static int default_group(int oid) { return default_join[oid].gid; }
 
 
-static int *obj_group_order;
+static int *obj_group_order = 0;
 /*
  * Description of each monster group.
  */
