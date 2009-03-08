@@ -734,6 +734,10 @@ static void wr_extra(void)
 	wr_u32b(seed_flavor);
 	wr_u32b(seed_town);
 
+	/* Write the "dungeon debugging seeds" */
+	wr_u32b(seed_dungeon);
+	wr_u32b(seed_last_dungeon);
+
 	/* Special stuff */
 	wr_u16b(p_ptr->panic_save);
 	wr_u16b(p_ptr->total_winner);

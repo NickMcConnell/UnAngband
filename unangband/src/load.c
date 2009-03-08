@@ -1291,6 +1291,18 @@ static errr rd_extra(void)
 	rd_u32b(&seed_flavor);
 	rd_u32b(&seed_town);
 
+	/* Hack - for debugging dungeon generation */
+	if (!older_than(0,6,3,5))
+	{
+		rd_u32b(&seed_dungeon);
+		rd_u32b(&seed_last_dungeon);
+	}
+	else
+	{
+		seed_dungeon = 0L;
+		seed_last_dungeon = 0L;
+	}
+
 	/* Special stuff */
 	rd_u16b(&p_ptr->panic_save);
 	rd_u16b(&p_ptr->total_winner);

@@ -3813,6 +3813,9 @@ void play_game(bool new_game)
 		/* Hack -- seed for town layout */
 		seed_town = rand_int(0x10000000);
 
+		/* Hack -- don't do seeded dungeons */
+		seed_dungeon = 0;
+
 		/* Hack -- seed for random artifacts */
 		if (adult_reseed_artifacts)
 			seed_randart = rand_int(0x10000000);

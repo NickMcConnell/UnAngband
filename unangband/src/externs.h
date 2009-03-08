@@ -141,6 +141,8 @@ extern s16b character_xtra;
 extern u32b seed_randart;
 extern u32b seed_flavor;
 extern u32b seed_town;
+extern u32b seed_dungeon;
+extern u32b seed_last_dungeon;
 extern s16b num_repro;
 extern s16b object_level;
 extern s16b monster_level;

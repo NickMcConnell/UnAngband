@@ -1699,6 +1699,16 @@ void do_cmd_debug(void)
 			break;
 		}
 
+		/* Regenerate level - Use last dungeon seed if specified */
+		case 'L':
+		{
+			seed_dungeon = seed_last_dungeon;
+			p_ptr->leaving = TRUE;
+
+			msg_format("Generating %slevel.", seed_dungeon ? "last " : "");
+			break;
+		}
+
 		/* Magic Mapping */
 		case 'm':
 		{
@@ -1741,6 +1751,27 @@ void do_cmd_debug(void)
 			do_cmd_wiz_summon(p_ptr->command_arg);
 			break;
 		}
+
+		/* Seed dungeon generation */
+		case 'S':
+		{
+			char out_val[32];
+
+			/* Default */
+			my_strcpy(out_val, "", sizeof(out_val));
+
+			/* Ask the user for a response */
+			if (!get_string("Dungeon seed (0 to stop seeding, 1 for random): ", out_val, sizeof(out_val))) return;
+
+			/* Extract a number */
+			seed_dungeon = atol(out_val);
+
+			/* Pick random value if requested */
+			if (seed_dungeon == 1) seed_dungeon = rand_int(0x10000000);
+
+			break;
+		}
+
 
 		/* Teleport */
 		case 't':

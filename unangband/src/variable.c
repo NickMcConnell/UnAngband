@@ -11,7 +11,7 @@
  * source code are released under the Gnu Public License. See www.fsf.org
  * for current GPL license details. Addition permission granted to
  * incorporate modifications in all Angband variants as defined in the
- * Angband variants FAQ. See rec.games.roguelike.angband for FAQ.
+ * Angband variants FAQ.  rec.games.roguelike.angband for FAQ.
  */
 
 #include "angband.h"
@@ -89,6 +89,9 @@ u32b seed_randart;	      /* Hack -- consistent random artifacts */
 
 u32b seed_flavor;	       /* Hack -- consistent object colors */
 u32b seed_town;		 /* Hack -- consistent town layout */
+
+u32b seed_dungeon;		/* Hack -- consistent current dungeon */
+u32b seed_last_dungeon;		/* Hack -- consistent current dungeon */
 
 s16b num_repro;		 /* Current reproducer count */
 s16b object_level;	      /* Current object creation level */
