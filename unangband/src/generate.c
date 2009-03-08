@@ -11972,6 +11972,19 @@ void generate_cave(void)
 
 		}
 
+		/* Are we using seeded dungeon generation? */
+		if (seed_dungeon)
+		{
+			/* Hack -- use the "complex" RNG */
+			Rand_quick = FALSE;
+
+			/* Store the dungeon seed */
+			seed_last_dungeon = seed_dungeon;
+
+			/* Get new seed */
+			seed_dungeon = rand_int(0x10000000);
+		}
+
 		/* Accept */
 		if (okay) break;
 
@@ -11990,19 +12003,6 @@ void generate_cave(void)
 		/* Wipe the regions */
 		wipe_region_piece_list();
 		wipe_region_list();
-
-		/* Are we using seeded dungeon generation? */
-		if (seed_dungeon)
-		{
-			/* Hack -- use the "complex" RNG */
-			Rand_quick = FALSE;
-
-			/* Store the dungeon seed */
-			seed_last_dungeon = seed_dungeon;
-
-			/* Get new seed */
-			seed_dungeon = rand_int(0x10000000);
-		}
 	}
 
 

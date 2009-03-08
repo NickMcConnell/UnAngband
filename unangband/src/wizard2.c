@@ -1758,7 +1758,7 @@ void do_cmd_debug(void)
 			char out_val[32];
 
 			/* Default */
-			my_strcpy(out_val, "", sizeof(out_val));
+			sprintf(out_val, "%ld", seed_last_dungeon);
 
 			/* Ask the user for a response */
 			if (!get_string("Dungeon seed (0 to stop seeding, 1 for random): ", out_val, sizeof(out_val))) return;
