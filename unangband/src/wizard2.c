@@ -1702,7 +1702,7 @@ void do_cmd_debug(void)
 		/* Regenerate level - Use last dungeon seed if specified */
 		case 'L':
 		{
-			seed_dungeon = seed_last_dungeon;
+			if (seed_last_dungeon) seed_dungeon = seed_last_dungeon;
 			p_ptr->leaving = TRUE;
 
 			msg_format("Generating %slevel.", seed_dungeon ? "last " : "");
