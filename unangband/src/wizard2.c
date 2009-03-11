@@ -1016,6 +1016,9 @@ static void do_cmd_wiz_cure_all(void)
 	/* No longer hungry */
 	(void)set_food(PY_FOOD_MAX - 1);
 
+	/* No longer tired */
+	(void)set_rest(PY_REST_MAX - 1);
+
 	/* Redraw everything */
 	do_cmd_redraw();
 }
