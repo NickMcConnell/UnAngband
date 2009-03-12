@@ -1434,7 +1434,7 @@ static void do_cmd_wiz_query(void)
 		{
 			case 'g': mask |= (CAVE_GLOW); break;
 			case 'r': mask |= (CAVE_ROOM); break;
-	      	        case 'd': mask |= (CAVE_DLIT); break;
+			case 'd': mask |= (CAVE_DLIT); break;
 			case 'l': mask |= (CAVE_HALO); break;
 			case 't': mask |= (CAVE_TLIT); break;
 			case 'x': mask |= (CAVE_CLIM); break;
@@ -1588,7 +1588,14 @@ void do_cmd_debug(void)
 		/* Hack -- Help */
 		case '?':
 		{
-			do_cmd_help();
+			/* Save the screen */
+			screen_save();
+
+			/* Show stats help */
+			(void)show_file("debug.txt", NULL, 0, 0);
+
+			/* Load the screen */
+			screen_load();
 			break;
 		}
 
@@ -1650,7 +1657,6 @@ void do_cmd_debug(void)
 			do_cmd_wiz_ecology();
 			break;
 		}
-
 
 		/* View item info */
 		case 'f':
