@@ -4,6 +4,7 @@ use strict;
 use Data::Dumper;
 use CGI::Pretty qw/:standard *ul/;
 use Carp qw(longmess);
+use GraphViz;
 
 ###############################################################################
 # Dumps context of txt files into slightly more readable html, includes
@@ -28,6 +29,7 @@ my %filenames =
 	dungeon => {
 		txt => "dungeon.txt",
 		html => "dungeon.html",
+		graph => "dungeon.png",
 		debug => "dungeon.pl.txt",
 		desc => "Dungeons",
 	},
@@ -485,6 +487,54 @@ sub dump_dungeons($\@\@\@\@\@) {
 	print FILEOUT generic_footer;
 
 	dump_perl("dungeon", @dungeons);
+}
+
+sub graph_dungeons($\@\@) {
+	my $fileout  = shift;
+	my @dungeons = @{ (shift) };
+	my @monsters = @{ (shift) };
+
+	my $g = GraphViz->new(concentrate => 1, epsilon => 1);
+
+	# all the data nodes
+	foreach my $dungeon ( @dungeons ) {
+		# array is still sparse
+		next if not $dungeon;
+
+		my $colour = "white";
+		$colour = "green" if $dungeon->{store} && $dungeon->{store}->[1]!=0; # if the area has a couple of stores, it's probably safeish
+		$g->add_node($dungeon->{name}, color=>$colour);
+	}
+
+	# all the data links
+	foreach my $dungeon ( @dungeons ) {
+		# array is still sparse
+		next if not $dungeon;
+
+		foreach my $loc (@{ $dungeon->{nearby} }) {
+			if(not $loc eq "0") {
+				#push @string, a({href=>"#$loc"}, "$dungeons[$loc]->{name} ($loc)")." ";
+				$g->add_edge($dungeon->{name} => $dungeons[$loc]->{name});
+			}
+		}
+
+		$g->add_edge($dungeon->{name} => $dungeons[$dungeon->{replace_with}]->{name},
+			style=>"dashed",
+			color=>"blue",
+			fontcolor=>"blue",
+			label=>"$dungeons[$dungeon->{replace_ifvisited}]->{name}",#visited:
+		)
+		if $dungeon->{replace_with};
+
+		$g->add_edge($dungeon->{name} => $dungeons[$dungeon->{quest_opens}]->{name},
+			style=>"dashed",
+			color=>"red",
+			fontcolor=>"red",
+			label=>"$monsters[$dungeon->{quest_monster}]->{name}",#killed:
+		)
+		if $dungeon->{quest_monster};
+	}
+	$g->as_png($fileout);
 }
 
 ##########
@@ -1040,6 +1090,12 @@ sub parse_objects($) {
 			$objects[$idx]{sval} = $2;
 			$objects[$idx]{pval} = $3;
 		}
+		elsif(/^W:$params4$/) {
+			$objects[$idx]{level} = $1;
+			$objects[$idx]{charges} = $2;
+			$objects[$idx]{weight} = $3;
+			$objects[$idx]{cost} = $3;
+		}
 	}
 
 	close(FILEIN);
@@ -1068,6 +1124,9 @@ sub dump_objects($\@) {
 	
 		print FILEOUT
 			li("Looks like ".strong($object->{d_char})." coloured ".strong($object->{d_attr}))
+			.li("Item type ".strong($object->{tval})
+			." subtype ".strong($object->{sval})
+			.($object->{pval} != 0 ? " extra information ".strong($object->{pval}) : ""))
 		;
 		print FILEOUT end_ul;
 
@@ -1953,6 +2012,7 @@ my %blows_map = idx2name(@blows);
 my %effects_map = idx2name(@effects);
 
 print "Writing Dungeons...\n";
+graph_dungeons("$outdir$filenames{dungeon}{graph}", @dungeons, @monsters);
 dump_dungeons(">$outdir$filenames{dungeon}{html}", @dungeons, @monsters, @terrains, @vaults, @stores);
 print "Writing Stores...\n";
 dump_stores(">$outdir$filenames{store}{html}", @stores, @{ $defines{TV} });
