@@ -4999,8 +4999,8 @@ enum
  * PROJECT_THRU is set this is always true.
  */
 #define cave_passable_bold(Y,X,R) \
-	(((R & (PROJECT_THRU)) != 0) ? (TRUE) : \
-	 (!(cave_info[Y][X] & ((R & (PROJECT_LOS)) != 0 ? CAVE_XLOS : CAVE_XLOF))))
+	((((R) & (PROJECT_THRU)) != 0) ? (TRUE) : \
+	 (!(cave_info[(Y)][(X)] & (((R) & (PROJECT_LOS)) != 0 ? CAVE_XLOS : CAVE_XLOF))))
 
 
 

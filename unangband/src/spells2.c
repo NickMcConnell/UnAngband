@@ -8794,7 +8794,7 @@ bool region_iterate(s16b region, bool region_iterator(int y, int x, int d, s16b 
  */
 bool region_iterate_distance(s16b region, int y, int x, int d, bool gt, bool region_iterator(int y, int x, int d, s16b region))
 {
-	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
+	method_type *method_ptr = &method_info[region_list[region].method];
 	s16b this_region_piece, next_region_piece = 0;
 	bool seen = FALSE;
 
@@ -9402,9 +9402,12 @@ bool region_iterate_movement(s16b region, void region_iterator(int y, int x, int
 	if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
 	{
 #endif
+	if ((r_ptr->y1 != ty) || (r_ptr->x1 != tx))
+	{
 		r_ptr->y1 = ty;
 		r_ptr->x1 = tx;
 		update_facing = TRUE;
+	}
 #if 0
 	}
 #endif
@@ -9419,9 +9422,12 @@ bool region_iterate_movement(s16b region, void region_iterator(int y, int x, int
 		if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || (generic_los(ty, tx, r_ptr->y1, r_ptr->x1, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
 		{
 #endif
-			r_ptr->y0 = ty;
-			r_ptr->x0 = tx;
-			update_facing = TRUE;
+			if ((r_ptr->y0 != ty) || (r_ptr->x0 != tx))
+			{
+				r_ptr->y0 = ty;
+				r_ptr->x0 = tx;
+				update_facing = TRUE;
+			}
 #if 0
 		}
 #endif
@@ -9525,7 +9531,7 @@ bool region_iterate_movement(s16b region, void region_iterator(int y, int x, int
 void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 {
 	region_type *r_ptr = &region_list[region];
-	method_type *method_ptr = &method_info[region_info[r_ptr->type].method];
+	method_type *method_ptr = &method_info[r_ptr->method];
 	int r = rand_int(100);
 	int i, dir;
 	int grids = 0;
@@ -9548,6 +9554,7 @@ void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 
 		/* Count passable grids */
 		if (cave_passable_bold(yy, xx, method_ptr->flags1)) grids++;
+
 	}
 
 	/*
@@ -9563,11 +9570,11 @@ void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 	{
 		/* Try to get a target (nearest or next-nearest monster) */
 		get_closest_monster(randint(2), y, x,
-			ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? 0x01 : 0x02);
+			ty, tx, (method_ptr->flags1 & (PROJECT_LOS)) != 0 ? 0x01 : 0x02);
 	}
 
-	/* No valid target, or monster is in an impassable grid */
-	if (((*ty == 0) && (*tx == 0)) || (!cave_passable_bold(*ty, *tx, method_ptr->flags1)))
+	/* No valid target, targetting self, or monster is in an impassable grid */
+	if (((*ty == 0) && (*tx == 0)) || ((*ty == y) && (*tx == x)) || (!cave_passable_bold(*ty, *tx, method_ptr->flags1)))
 	{
 		/* Move randomly */
 		dir = randint(9);
@@ -9622,22 +9629,21 @@ void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 	*tx = x + ddx[dir];
 
 	/* Require passable grids */
-	if (!cave_passable_bold(*ty, *tx, method_ptr->flags1))
+	if ((cave_passable_bold(*ty, *tx, method_ptr->flags1)) == 0)
 	{
-		int i;
 		int k = 0;
 
 		/* Is at least one adjacent grid passable? */
 		for (i = 1; i < 9; i++)
 		{
-			int yy = y + ddy[dir];
-			int xx = x + ddx[dir];
+			int yy = y + ddy[i];
+			int xx = x + ddx[i];
 
-			if ((cave_passable_bold(yy, xx, method_ptr->flags1)) && (rand_int(++k))) dir = i;
+			if (((cave_passable_bold(yy, xx, method_ptr->flags1)) != 0) && (!rand_int(++k))) dir = i;
 		}
 
 		/* No grids passable, we're stuck */
-		if (!cave_passable_bold(y, x, method_ptr->flags1)) dir = randint(9);
+		if ((k == 0) && ((cave_passable_bold(y, x, method_ptr->flags1)) != 0)) dir = randint(9);
 
 		/* Extract adjacent (legal) location */
 		*ty = y + ddy[dir];
@@ -9700,7 +9706,7 @@ void region_move_vector_hook(int y, int x, int d, s16b region, int *ty, int *tx)
  */
 void region_move_spread_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 {
-	method_type *method_ptr = &method_info[region_info[region_list[region].type].method];
+	method_type *method_ptr = &method_info[region_list[region].method];
 	int dir = rand_int(12);
 
 	(void)d;
