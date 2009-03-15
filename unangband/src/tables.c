@@ -3680,3 +3680,19 @@ const timed_effect timed_effects[TMD_MAX] =
 			"You are running too quickly",
 			0, PU_BONUS, MSG_SPEED },
 };
+
+
+const skill_table_entry skill_table[] =
+{
+		{SKILL_TO_HIT_MELEE, "Fighting", 12 },
+		{SKILL_TO_HIT_BOW, "Shooting", 12 },
+		{SKILL_TO_HIT_THROW, "Throwing", 12 },
+		{SKILL_STEALTH, "Stealth", 1},
+		{SKILL_SAVE, "Save Throw", 6},
+		{SKILL_DISARM, "Disarming", 6},
+		{SKILL_DEVICE, "Devices", 6},
+		{SKILL_SEARCH, "Searching", 6},
+		{SKILL_DIGGING, "Digging", 6},
+		{-1, "", 0}
+};
+

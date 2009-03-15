@@ -5241,45 +5241,43 @@ errr parse_p_info(char *buf, header *head)
 	/* Process 'R' for "Racial Skills" (one line only) */
 	else if (buf[0] == 'R')
 	{
-		int dis, dev, sav, stl, srh, dig, tht, thn, thb;
-
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Scan for the values */
-		if (9 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d:%d:%d",
-			    &dis, &dev, &sav, &stl,
-			    &srh, &dig, &tht, &thn, &thb)) return (PARSE_ERROR_GENERIC);
+		/* Parse every entry textually */
+		for (s = buf + 2, i = 0; *s && (i < SKILL_MAX); (s = t), i++)
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ':'); ++t) /* loop */;
 
-		/* Save the values */
-		pr_ptr->r_dis = dis;
-		pr_ptr->r_dev = dev;
-		pr_ptr->r_sav = sav;
-		pr_ptr->r_stl = stl;
-		pr_ptr->r_srh = srh;
-		pr_ptr->r_dig = dig;
-		pr_ptr->r_tht = tht;
-		pr_ptr->r_thn = thn;
-		pr_ptr->r_thb = thb;
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+			}
+
+			/* Parse this entry */
+			pr_ptr->r_skill[i] = atoi(s);
+		}
 	}
 
 	/* Process 'X' for "Extra Info" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int exp, infra, r_idx, slot;
+		int exp, infra, r_idx, innate;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
 		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-			    &exp, &infra, &r_idx, &slot)) return (PARSE_ERROR_GENERIC);
+			    &exp, &infra, &r_idx, &innate)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		pr_ptr->r_exp = exp;
 		pr_ptr->infra = infra;
 		pr_ptr->r_idx = r_idx;
-		pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD] = slot;
+		pr_ptr->innate = innate;
 	}
 
 	/* Hack -- Process 'I' for "info" and such */
@@ -5361,35 +5359,6 @@ errr parse_p_info(char *buf, header *head)
 		}
 	}
 
-	/* Process 'O' for "Built-in Objects" (one line only) */
-	else if (buf[0] == 'O')
-	{
-		i = 0;
-
-		/* There better be a current pr_ptr */
-		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
-
-		/* Parse every entry textually */
-		for (s = buf + 2; *s && (i < END_EQUIPMENT - INVEN_WIELD); )
-		{
-			/* Find the end of this entry */
-			for (t = s; *t && (*t != ':'); ++t) /* loop */;
-
-			/* Nuke and skip any dividers */
-			if (*t)
-			{
-				*t++ = '\0';
-			}
-
-			/* Parse this entry */
-			pr_ptr->slots[i] = atoi(s);
-
-			/* Start the next entry */
-			s = t;
-			i++;
-		}
-	}
-
 	/* Hack -- Process 'C' for class choices */
 	else if (buf[0] == 'C')
 	{
@@ -5434,7 +5403,7 @@ errr parse_c_info(char *buf, header *head)
 {
 	int i, j;
 
-	char *s;
+	char *s, *t;
 
 	/* Current entry */
 	static player_class *pc_ptr = NULL;
@@ -5519,51 +5488,47 @@ errr parse_c_info(char *buf, header *head)
 	/* Process 'C' for "Class Skills" (one line only) */
 	else if (buf[0] == 'C')
 	{
-		int dis, dev, sav, stl, srh, dig, tht, thn, thb;
-
-		/* There better be a current pc_ptr */
+		/* There better be a current pr_ptr */
 		if (!pc_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Scan for the values */
-		if (9 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d:%d:%d",
-			    &dis, &dev, &sav, &stl,
-			    &srh, &dig, &tht, &thn, &thb)) return (PARSE_ERROR_GENERIC);
+		/* Parse every entry textually */
+		for (s = buf + 2, i = 0; *s && (i < SKILL_MAX); (s = t), i++)
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ':'); ++t) /* loop */;
 
-		/* Save the values */
-		pc_ptr->c_dis = dis;
-		pc_ptr->c_dev = dev;
-		pc_ptr->c_sav = sav;
-		pc_ptr->c_stl = stl;
-		pc_ptr->c_srh = srh;
-		pc_ptr->c_dig = dig;
-		pc_ptr->c_tht = tht;
-		pc_ptr->c_thn = thn;
-		pc_ptr->c_thb = thb;
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+			}
+
+			/* Parse this entry */
+			pc_ptr->c_skill_base[i] = atoi(s);
+		}
 	}
 
 	/* Process 'X' for "Extra Skills" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int dis, dev, sav, stl, srh, dig, tht, thn, thb;
-
-		/* There better be a current pc_ptr */
+		/* There better be a current pr_ptr */
 		if (!pc_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
-		/* Scan for the values */
-		if (9 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d:%d:%d",
-			    &dis, &dev, &sav, &stl,
-			    &srh, &dig, &tht, &thn, &thb)) return (PARSE_ERROR_GENERIC);
+		/* Parse every entry textually */
+		for (s = buf + 2, i = 0; *s && (i < SKILL_MAX); (s = t), i++)
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ':'); ++t) /* loop */;
 
-		/* Save the values */
-		pc_ptr->x_dis = dis;
-		pc_ptr->x_dev = dev;
-		pc_ptr->x_sav = sav;
-		pc_ptr->x_stl = stl;
-		pc_ptr->x_srh = srh;
-		pc_ptr->x_dig = dig;
-		pc_ptr->x_tht = tht;
-		pc_ptr->x_thn = thn;
-		pc_ptr->x_thb = thb;
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+			}
+
+			/* Parse this entry */
+			pc_ptr->c_skill_improv[i] = atoi(s);
+		}
 	}
 
 	/* Process 'I' for "Info" (one line only) */
@@ -10142,7 +10107,6 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 {
 	int n;
 	bool introduced = FALSE;
-	bool output = FALSE;
 
 	/* Current entry */
 	player_race *pr_ptr = (player_race*)head->info_ptr + i;
@@ -10165,15 +10129,22 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	/* Finish stats output */
 	fprintf(fp, "\n");
 
-	/* Output 'R' for "Racial Skills" (one line only) */
-	fprintf(fp, "R:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
-		    pr_ptr->r_dis, pr_ptr->r_dev, pr_ptr->r_sav, pr_ptr->r_stl,
-		    pr_ptr->r_srh, pr_ptr->r_dig, pr_ptr->r_tht, pr_ptr->r_thn, pr_ptr->r_thb);
+	/* Output 'R' for "Race Skills" (one line only) */
+	fprintf(fp, "R:");
+
+	/* Iterate through line */
+	for(n = 0; n < SKILL_MAX; n++)
+	{
+		fprintf(fp, "%d", pr_ptr->r_skill[n]);
+	}
+
+	/* Terminate line */
+	fprintf(fp, "\n");
 
 	/* Output 'X' for "Extra Info" (one line only) */
-	if (pr_ptr->r_exp || pr_ptr->infra || pr_ptr->r_idx || pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD])
+	if (pr_ptr->r_exp || pr_ptr->infra || pr_ptr->r_idx || pr_ptr->innate)
 	{
-		fprintf(fp, "X:%d:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx, pr_ptr->slots[END_EQUIPMENT - INVEN_WIELD]);
+		fprintf(fp, "X:%d:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx, pr_ptr->innate);
 	}
 
 	/* Output 'I' for "Info" (one line only) */
@@ -10199,27 +10170,6 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	emit_flags_32(fp, "F:", pr_ptr->flags2, k_info_flags2);
 	emit_flags_32(fp, "F:", pr_ptr->flags3, k_info_flags3);
 	emit_flags_32(fp, "F:", pr_ptr->flags4, k_info_flags4);
-
-	/* Check if 'O' required */
-	for (n = 0; n < END_EQUIPMENT - INVEN_WIELD; n++)
-	{
-		if (pr_ptr->slots[n]) output = TRUE;
-	}
-
-	if (output)
-	{
-		/* Start object slots output */
-		fprintf(fp, "O");
-
-		/* Output stats */
-		for (n = 0; n < END_EQUIPMENT - INVEN_WIELD; n++)
-		{
-			fprintf(fp, ":%d", pr_ptr->slots[n]);
-		}
-
-		/* Finish object slots output */
-		fprintf(fp, "\n");
-	}
 
 	/* Only output classes for starting races */
 	if (i< z_info->g_max)
@@ -10278,14 +10228,28 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "\n");
 
 	/* Output 'C' for "Class Skills" (one line only) */
-	fprintf(fp, "C:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
-		    pc_ptr->c_dis, pc_ptr->c_dev, pc_ptr->c_sav, pc_ptr->c_stl,
-		    pc_ptr->c_srh, pc_ptr->c_dig, pc_ptr->c_tht, pc_ptr->c_thn, pc_ptr->c_thb);
+	fprintf(fp, "C:");
 
-	/* Output 'X' for "eXtra Skills" (one line only) */
-	fprintf(fp, "X:%d:%d:%d:%d:%d:%d:%d:%d:%d\n",
-		    pc_ptr->x_dis, pc_ptr->x_dev, pc_ptr->x_sav, pc_ptr->x_stl,
-		    pc_ptr->x_srh, pc_ptr->x_dig, pc_ptr->x_tht, pc_ptr->x_thn, pc_ptr->x_thb);
+	/* Iterate through line */
+	for(n = 0; n < SKILL_MAX; n++)
+	{
+		fprintf(fp, "%d", pc_ptr->c_skill_base[n]);
+	}
+
+	/* Terminate line */
+	fprintf(fp, "\n");
+
+	/* Output 'X' for "Class Skill Improvements" (one line only) */
+	fprintf(fp, "X:");
+
+	/* Iterate through line */
+	for(n = 0; n < SKILL_MAX; n++)
+	{
+		fprintf(fp, "%d", pc_ptr->c_skill_improv[n]);
+	}
+
+	/* Terminate line */
+	fprintf(fp, "\n");
 
 	/* Output 'I' for "Info" (one line only) */
 	fprintf(fp, "I:%d:%ld:%d:%d:%d\n", pc_ptr->c_exp, pc_ptr->sense_base, pc_ptr->sense_div, pc_ptr->sense_type, pc_ptr->sense_squared);

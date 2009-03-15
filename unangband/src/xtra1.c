@@ -3143,32 +3143,11 @@ static void calc_bonuses(void)
 	/* Base infravision (purely racial) */
 	p_ptr->see_infra = rp_ptr->infra;
 
-	/* Base skill -- disarming */
-	p_ptr->skills[SKILL_DISARM] = rp_ptr->r_dis + cp_ptr->c_dis;
-
-	/* Base skill -- magic devices */
-	p_ptr->skills[SKILL_DEVICE] = rp_ptr->r_dev + cp_ptr->c_dev;
-
-	/* Base skill -- saving throw */
-	p_ptr->skills[SKILL_SAVE] = rp_ptr->r_sav + cp_ptr->c_sav;
-
-	/* Base skill -- stealth */
-	p_ptr->skills[SKILL_STEALTH] = rp_ptr->r_stl + cp_ptr->c_stl;
-
-	/* Base skill -- searching ability */
-	p_ptr->skills[SKILL_SEARCH] = 5 + rp_ptr->r_srh + cp_ptr->c_srh;
-
-	/* Base skill -- digging */
-	p_ptr->skills[SKILL_DIGGING] = rp_ptr->r_dig + cp_ptr->c_dig;;
-
-	/* Base skill -- combat (normal) */
-	p_ptr->skills[SKILL_TO_HIT_MELEE] = rp_ptr->r_thn + cp_ptr->c_thn;
-
-	/* Base skill -- combat (shooting) */
-	p_ptr->skills[SKILL_TO_HIT_BOW] = rp_ptr->r_thb + cp_ptr->c_thb;
-
-	/* Base skill -- combat (throwing) */
-	p_ptr->skills[SKILL_TO_HIT_THROW] = rp_ptr->r_tht + cp_ptr->c_tht;
+	/* Add the skill modifiers */
+	for (i = 0; i < SKILL_MAX; i++)
+	{
+		p_ptr->skills[i] = rp_ptr->r_skill[i] + cp_ptr->c_skill_base[i]	+ (cp_ptr->c_skill_improv[i] * p_ptr->lev / 10);
+	}
 
 	/* Base regeneration */
 	p_ptr->regen_hp = 0;
@@ -3187,35 +3166,17 @@ static void calc_bonuses(void)
 		/* Base infravision (purely racial) */
 		p_ptr->see_infra += shape_ptr->infra;
 
-		/* Base skill -- disarming */
-		p_ptr->skills[SKILL_DISARM] += shape_ptr->r_dis;
-
-		/* Base skill -- magic devices */
-		p_ptr->skills[SKILL_DEVICE] += shape_ptr->r_dev;
-
-		/* Base skill -- saving throw */
-		p_ptr->skills[SKILL_SAVE] += shape_ptr->r_sav;
-
-		/* Base skill -- stealth */
-		p_ptr->skills[SKILL_STEALTH] += shape_ptr->r_stl;
-
-		/* Base skill -- searching ability */
-		p_ptr->skills[SKILL_SEARCH] += shape_ptr->r_srh;
-
-		/* Base skill -- digging ability */
-		p_ptr->skills[SKILL_DIGGING] += shape_ptr->r_dig;
-
-		/* Base skill -- combat (normal) */
-		p_ptr->skills[SKILL_TO_HIT_MELEE] += shape_ptr->r_thn;
-
-		/* Base skill -- combat (shooting) */
-		p_ptr->skills[SKILL_TO_HIT_BOW] += shape_ptr->r_thb;
-
-		/* Base skill -- combat (throwing) */
-		p_ptr->skills[SKILL_TO_HIT_THROW] += shape_ptr->r_tht;
+		/* Add the skill modifiers */
+		for (i = 0; i < SKILL_MAX; i++) p_ptr->skills[i] += shape_ptr->r_skill[i];
 
 		/* Add the stat modifiers */
 		for (i = 0; i < A_MAX; i++) p_ptr->stat_add[i] += shape_ptr->r_adj[i];
+	}
+
+	/* Prepare the shape 'object' */
+	if (p_info[p_ptr->pshape].innate)
+	{
+		object_prep(&inventory[INVEN_SELF], p_info[p_ptr->pshape].innate);
 	}
 
 	/*** Analyze player ***/
@@ -3670,33 +3631,6 @@ static void calc_bonuses(void)
 
 	/* Affect Skill -- digging (STR) */
 	p_ptr->skills[SKILL_DIGGING] += adj_str_dig[p_ptr->stat_ind[A_STR]];
-
-	/* Affect Skill -- disarming (Level, by Class) */
-	p_ptr->skills[SKILL_DISARM] += (cp_ptr->x_dis * p_ptr->lev / 10);
-
-	/* Affect Skill -- magic devices (Level, by Class) */
-	p_ptr->skills[SKILL_DEVICE] += (cp_ptr->x_dev * p_ptr->lev / 10);
-
-	/* Affect Skill -- saving throw (Level, by Class) */
-	p_ptr->skills[SKILL_SAVE] += (cp_ptr->x_sav * p_ptr->lev / 10);
-
-	/* Affect Skill -- stealth (Level, by Class) */
-	p_ptr->skills[SKILL_STEALTH] += (cp_ptr->x_stl * p_ptr->lev / 10);
-
-	/* Affect Skill -- search ability (Level, by Class) */
-	p_ptr->skills[SKILL_SEARCH] += (cp_ptr->x_srh * p_ptr->lev / 10);
-
-	/* Affect Skill -- digging ability (Level, by Class) */
-	p_ptr->skills[SKILL_DIGGING] += (cp_ptr->x_dig * p_ptr->lev / 10);
-
-	/* Affect Skill -- combat (normal) (Level, by Class) */
-	p_ptr->skills[SKILL_TO_HIT_MELEE] += (cp_ptr->x_thn * p_ptr->lev / 10);
-
-	/* Affect Skill -- combat (shooting) (Level, by Class) */
-	p_ptr->skills[SKILL_TO_HIT_BOW] += (cp_ptr->x_thb * p_ptr->lev / 10);
-
-	/* Affect Skill -- combat (throwing) (Level, by Class) */
-	p_ptr->skills[SKILL_TO_HIT_THROW] += (cp_ptr->x_tht * p_ptr->lev / 10);
 
 	/* Limit Skill -- digging from 1 up */
 	if (p_ptr->skills[SKILL_DIGGING] < 1) p_ptr->skills[SKILL_DIGGING] = 1;

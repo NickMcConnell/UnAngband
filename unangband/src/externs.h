@@ -106,6 +106,7 @@ extern const do_cmd_item_type cmd_item_list[MAX_COMMANDS];
 extern const familiar_type familiar_race[MAX_FAMILIARS];
 extern const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES];
 extern const timed_effect timed_effects[TMD_MAX];
+extern const skill_table_entry skill_table[];
 
 
 /* variable.c */

@@ -603,7 +603,7 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    if (rp_ptr->r_tht > rp_ptr->r_thb)
+						    if (rp_ptr->r_skill[SKILL_TO_HIT_THROW] > rp_ptr->r_skill[SKILL_TO_HIT_THROW])
 							{
 							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
 							}
@@ -646,7 +646,7 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    if (rp_ptr->r_tht > rp_ptr->r_thb)
+							  if (rp_ptr->r_skill[SKILL_TO_HIT_THROW] > rp_ptr->r_skill[SKILL_TO_HIT_THROW])
 						      {
 							k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
 						      }
@@ -1134,8 +1134,6 @@ static void race_aux_hook(birth_menu r_str)
 	char s[50];
 	byte likert_attr;
 	cptr desc;
-	int xthn, xthb, xtht, xsrh, xdig;
-	int xdis, xdev, xsav, xstl;
 
 	/* Get the race */
 	race = r_str.choice;
@@ -1178,52 +1176,14 @@ static void race_aux_hook(birth_menu r_str)
 	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
 	Term_putstr(RACE_AUX2_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
 
-	/* Skills - scaled up to exaggerate differences */
-	xthn = rp_ptr->r_thn * 2 + 24;
-	xthb = rp_ptr->r_thb * 2 + 24;
-	xtht = rp_ptr->r_tht * 2 + 24;
-	xdis = rp_ptr->r_dis * 2 + 16;
-	xdev = rp_ptr->r_dev * 2 + 12;
-	xsav = rp_ptr->r_sav * 2 + 12;
-	xstl = rp_ptr->r_stl * 2 + 2;
-	xsrh = rp_ptr->r_srh * 2 + 12;
-	xdig = rp_ptr->r_dig * 2 + 2;
-
-	put_str("Fighting", TABLE_ROW, RACE_AUX2_COL);
-	desc = likert(xthn, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW, RACE_AUX2_COL+11);
-
-	put_str("Shooting", TABLE_ROW + 1, RACE_AUX2_COL);
-	desc = likert(xthb, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 1, RACE_AUX2_COL+11);
-
-	put_str("Throwing", TABLE_ROW + 2, RACE_AUX2_COL);
-	desc = likert(xtht, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 2, RACE_AUX2_COL+11);
-
-	put_str("Stealth", TABLE_ROW + 3, RACE_AUX2_COL);
-	desc = likert(xstl, 1, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 3, RACE_AUX2_COL+11);
-
-	put_str("Save Throw", TABLE_ROW + 4, RACE_AUX2_COL);
-	desc = likert(xsav, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 4, RACE_AUX2_COL+11);
-
-	put_str("Disarming", TABLE_ROW + 5, RACE_AUX2_COL);
-	desc = likert(xdis, 8, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 5, RACE_AUX2_COL+11);
-
-	put_str("Devices", TABLE_ROW + 6, RACE_AUX2_COL);
-	desc = likert(xdev, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 6, RACE_AUX2_COL+11);
-
-	put_str("Searching", TABLE_ROW + 7, RACE_AUX2_COL);
-	desc = likert(xsrh, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 7, RACE_AUX2_COL+11);
-
-	put_str("Digging", TABLE_ROW + 8, RACE_AUX2_COL);
-	desc = likert(xdig, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 8, RACE_AUX2_COL+11);
+	/* Enumerate through skills */
+	/* Note these are scaled up to exaggerate differences between races */
+	for (i = 0; skill_table[i].skill >= 0; i++)
+	{
+		put_str(skill_table[i].name, TABLE_ROW + i, CLASS_AUX2_COL);
+		desc = likert(p_ptr->skills[skill_table[i].skill] * 2 + 2 * skill_table[i].div, skill_table[i].div, &likert_attr);
+		c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + i, CLASS_AUX2_COL+11);
+	}
 }
 
 
@@ -1292,8 +1252,6 @@ static void class_aux_hook(birth_menu c_str)
 	char s[128];
 	byte likert_attr;
 	cptr desc;
-	int xthn, xthb, xtht, xsrh, xdig;
-	int xdis, xdev, xsav, xstl;
 
 	/* Get the class */
 	class_idx = c_str.choice;
@@ -1336,53 +1294,13 @@ static void class_aux_hook(birth_menu c_str)
 	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
 	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
 
-
-	/* Skills */
-	xthn = rp_ptr->r_thn + cp_ptr->c_thn + cp_ptr->x_thn;
-	xthb = rp_ptr->r_thb + cp_ptr->c_thb + cp_ptr->x_thb;
-	xtht = rp_ptr->r_tht + cp_ptr->c_dis + cp_ptr->x_tht;
-	xdis = rp_ptr->r_dis + cp_ptr->c_dis + cp_ptr->x_dis;
-	xdev = rp_ptr->r_dev + cp_ptr->c_dev + cp_ptr->x_dev;
-	xsav = rp_ptr->r_sav + cp_ptr->c_sav + cp_ptr->x_sav;
-	xstl = rp_ptr->r_stl + cp_ptr->c_stl + cp_ptr->x_stl;
-	xsrh = rp_ptr->r_srh + cp_ptr->c_srh + cp_ptr->x_srh;
-	xdig = rp_ptr->r_dig + cp_ptr->c_dig + cp_ptr->x_dig;
-
-	put_str("Fighting", TABLE_ROW, CLASS_AUX2_COL);
-	desc = likert(xthn, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW, CLASS_AUX2_COL+11);
-
-	put_str("Shooting", TABLE_ROW + 1, CLASS_AUX2_COL);
-	desc = likert(xthb, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 1, CLASS_AUX2_COL+11);
-
-	put_str("Throwing", TABLE_ROW + 2, CLASS_AUX2_COL);
-	desc = likert(xtht, 12, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 2, CLASS_AUX2_COL+11);
-
-	put_str("Stealth", TABLE_ROW + 3, CLASS_AUX2_COL);
-	desc = likert(xstl, 1, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 3, CLASS_AUX2_COL+11);
-
-	put_str("Save Throw", TABLE_ROW + 4, CLASS_AUX2_COL);
-	desc = likert(xsav, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 4, CLASS_AUX2_COL+11);
-
-	put_str("Disarming", TABLE_ROW + 5, CLASS_AUX2_COL);
-	desc = likert(xdis, 8, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 5, CLASS_AUX2_COL+11);
-
-	put_str("Devices", TABLE_ROW + 6, CLASS_AUX2_COL);
-	desc = likert(xdev, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 6, CLASS_AUX2_COL+11);
-
-	put_str("Searching", TABLE_ROW + 7, CLASS_AUX2_COL);
-	desc = likert(xsrh, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 7, CLASS_AUX2_COL+11);
-
-	put_str("Digging", TABLE_ROW + 8, CLASS_AUX2_COL);
-	desc = likert(xdig, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 8, CLASS_AUX2_COL+11);
+	/* Enumerate through skills */
+	for (i = 0; skill_table[i].skill >= 0; i++)
+	{
+		put_str(skill_table[i].name, TABLE_ROW + i, CLASS_AUX2_COL);
+		desc = likert(p_ptr->skills[skill_table[i].skill], skill_table[i].div, &likert_attr);
+		c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + i, CLASS_AUX2_COL+11);
+	}
 }
 
 

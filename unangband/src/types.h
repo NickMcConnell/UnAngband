@@ -117,7 +117,7 @@ typedef struct quest_type quest_type;
 typedef struct owner_type owner_type;
 typedef struct store_type store_type;
 typedef store_type *store_type_ptr;
-typedef struct player_magic player_magic;
+typedef struct skill_table_entry skill_table_entry;
 typedef struct player_sex player_sex;
 typedef struct player_race player_race;
 typedef struct player_class player_class;
@@ -1305,6 +1305,17 @@ struct store_type
 
 
 /*
+ * Quick table to display skills
+ */
+struct skill_table_entry
+{
+	int skill;
+	const char *name;
+	int div;
+};
+
+
+/*
  * Player sex info
  */
 struct player_sex
@@ -1325,6 +1336,8 @@ struct player_race
 
 	s16b r_adj[A_MAX];      /* Racial stat bonuses */
 
+	s16b r_skill[SKILL_MAX];	/* Racial skill bonus */
+#if 0
 	s16b r_dis;     /* disarming */
 	s16b r_dev;     /* magic devices */
 	s16b r_sav;     /* saving throw */
@@ -1334,8 +1347,9 @@ struct player_race
 	s16b r_tht;     /* combat (throwing) */
 	s16b r_thn;     /* combat (normal) */
 	s16b r_thb;     /* combat (shooting) */
-
+#endif
 	s16b r_idx;	/* Monster index */
+
 	byte r_exp;     /* Race experience factor */
 	byte unused;	/* Unused */
 
@@ -1353,6 +1367,8 @@ struct player_race
 	byte infra;     /* Infra-vision range */
 	byte home;	/* Home town */
 
+	s16b innate;	/* Hack - used to prepare body for innate abilities */
+
 	u32b choice;    /* Legal class choices */
 
 	s16b hist;      /* Starting history index */
@@ -1362,7 +1378,9 @@ struct player_race
 	u32b flags3;    /* Racial Flags, set 3 */
 	u32b flags4;    /* Racial Flags, set 4 */
 
+#if 0
 	s16b slots[END_EQUIPMENT - INVEN_WIELD + 1];	/* Slot occupied by a shape 'object' */
+#endif
 };
 
 
@@ -1378,7 +1396,9 @@ struct start_item
 	s16b charge_min;/* Minimum charges */
 	s16b charge_max;/* Maximum charges */
 	byte social_min;/* Minimum social class to be given this */
-	byte social_max;/* Maximum social class to be given this */};
+	byte social_max;/* Maximum social class to be given this */
+};
+
 
 /*
  * Player class info
@@ -1390,6 +1410,9 @@ struct player_class
 
 	s16b c_adj[A_MAX];      /* Class stat modifier */
 
+	s16b c_skill_base[SKILL_MAX];	/* Starting skill level */
+	s16b c_skill_improv[SKILL_MAX]; /* Increase in skill every 10 levels */
+#if 0
 	s16b c_dis;     /* class disarming */
 	s16b c_dev;     /* class magic devices */
 	s16b c_sav;     /* class saving throws */
@@ -1409,7 +1432,7 @@ struct player_class
 	s16b x_tht;     /* extra to hit (throwing) */
 	s16b x_thn;     /* extra to hit (normal) */
 	s16b x_thb;     /* extra to hit (bows) */
-
+#endif
 	s16b c_exp;     /* Class experience factor */
 
 	u16b max_attacks;	/* Maximum possible attacks */

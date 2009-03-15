@@ -1630,31 +1630,6 @@ cptr likert(int x, int y, byte *attr)
 
 
 /*
- * Quick table to display skills
- */
-typedef struct {
-	int skill;
-	const char *name;
-	int div;
-} skill_table_entry;
-
-skill_table_entry skill_table[] =
-{
-		{SKILL_TO_HIT_MELEE, "Fighting", 12 },
-		{SKILL_TO_HIT_BOW, "Shooting", 12 },
-		{SKILL_TO_HIT_THROW, "Throwing", 12 },
-		{SKILL_STEALTH, "Stealth", 1},
-		{SKILL_SAVE, "Save Throw", 6},
-		{SKILL_DISARM, "Disarming", 6},
-		{SKILL_DEVICE, "Devices", 6},
-		{SKILL_SEARCH, "Searching", 6},
-		{SKILL_DIGGING, "Digging", 6},
-		{-1, "", 0}
-};
-
-
-
-/*
  * Prints some "extra" information on the screen.
  */
 static void display_player_xtra_info(void)

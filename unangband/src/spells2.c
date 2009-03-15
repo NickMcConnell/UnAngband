@@ -5574,23 +5574,6 @@ void change_shape(int shape, int level)
 		msg_format("You change into a %s.", p_name + p_info[shape].name);
 	}
 
-	/* Wield 'built-in' equipment for this shape */
-	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
-	{
-		/* Wield 'built-in' equipment */
-		if (p_info[shape].slots[i - INVEN_WIELD])
-		{
-			/* Wield the spell */
-			wield_spell(i, p_info[shape].slots[i - INVEN_WIELD], 0, level, k_info[i].tval != TV_SPELL ? p_info[shape].r_idx : 0);
-
-			/* Mark as 'built-in' item */
-			inventory[i].ident |= (IDENT_STORE);
-
-			/* Important - to prefent overflow of items, we must check for pack overflow after every item is wielded */
-			overflow_pack();
-		}
-	}
-
 	/* Update stuff */
 	p_ptr->update |= (PU_BONUS);
 
