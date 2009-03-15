@@ -907,25 +907,25 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	{
 		/* Nothing */
 	}
-	else if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_plus))
+	else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_plus))
 	{
 		/* End */
-		text_out(format(" for %dd%d+%d turns",s_ptr->l_dice,s_ptr->l_side,s_ptr->l_plus));
+		text_out(format(" for %dd%d+%d turns",s_ptr->lasts_dice,s_ptr->lasts_side,s_ptr->lasts_plus));
 	}
-	else if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_side == 1))
+	else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_side == 1))
 	{
 		/* End */
-		text_out(format(" for %d turn%s",s_ptr->l_dice, s_ptr->l_dice != 1 ? "s" : ""));
+		text_out(format(" for %d turn%s",s_ptr->lasts_dice, s_ptr->lasts_dice != 1 ? "s" : ""));
 	}
-	else if ((s_ptr->l_dice) && (s_ptr->l_side))
+	else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 	{
 		/* End */
-		text_out(format(" for %dd%d turns",s_ptr->l_dice,s_ptr->l_side));
+		text_out(format(" for %dd%d turns",s_ptr->lasts_dice,s_ptr->lasts_side));
 	}
-	else if (s_ptr->l_plus)
+	else if (s_ptr->lasts_plus)
 	{
 		/* End */
-		text_out(format(" for %d turn%s",s_ptr->l_plus, s_ptr->l_plus != 1 ? "s" : ""));
+		text_out(format(" for %d turn%s",s_ptr->lasts_plus, s_ptr->lasts_plus != 1 ? "s" : ""));
 	}
 
 	/* Collect cure effects */
@@ -1642,25 +1642,25 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 	my_strcpy(p, "", p_s);
 
 	/* Roll out the duration */
-	if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_plus))
+	if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_plus))
 	{
 		/* End */
-		my_strcpy(p,format(" dur %dd%d+%d",s_ptr->l_dice,s_ptr->l_side,s_ptr->l_plus), p_s);
+		my_strcpy(p,format(" dur %dd%d+%d",s_ptr->lasts_dice,s_ptr->lasts_side,s_ptr->lasts_plus), p_s);
 	}
-	else if ((s_ptr->l_dice) && (s_ptr->l_side) && (s_ptr->l_side == 1))
+	else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_side == 1))
 	{
 		/* End */
-		my_strcpy(p,format(" dur %d",s_ptr->l_dice), p_s);
+		my_strcpy(p,format(" dur %d",s_ptr->lasts_dice), p_s);
 	}
-	else if ((s_ptr->l_dice) && (s_ptr->l_side))
+	else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 	{
 		/* End */
-		my_strcpy(p,format(" dur %dd%d",s_ptr->l_dice,s_ptr->l_side), p_s);
+		my_strcpy(p,format(" dur %dd%d",s_ptr->lasts_dice,s_ptr->lasts_side), p_s);
 	}
-	else if (s_ptr->l_plus)
+	else if (s_ptr->lasts_plus)
 	{
 		/* End */
-		my_strcpy(p,format(" dur %d",s_ptr->l_plus), p_s);
+		my_strcpy(p,format(" dur %d",s_ptr->lasts_plus), p_s);
 	}
 
 	/* Examine (and count) the actual attacks */
@@ -1676,7 +1676,7 @@ void spell_info(char *p, int p_s, int spell, bool use_level)
 		if (!method) continue;
 
 		/* Hack -- heroism/berserk strength */
-		if (((s_ptr->l_dice) || (s_ptr->l_side) || (s_ptr->l_plus)) && (effect == GF_HEAL_PERC)) continue;
+		if (((s_ptr->lasts_dice) || (s_ptr->lasts_side) || (s_ptr->lasts_plus)) && (effect == GF_HEAL_PERC)) continue;
 
 		/* Default */
 		if (!strlen(q)) q = "dam";

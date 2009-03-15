@@ -6046,6 +6046,59 @@ static int thaumacurse(bool verbose, int power)
 
 
 /*
+ * Get damage from casting spell
+ */
+static int spell_damage(spell_blow *blow_ptr, int level, u32b flg, bool player)
+{
+	int damage = 0;
+
+	/* Use player hit points */
+	if ((player) && (flg & (PR2_BREATH)))
+	{
+		/* Damage uses current hit points */
+		damage = p_ptr->chp * damage / 300;
+	}
+	/* Damage uses dice roll */
+	else
+	{
+		/* Roll out the damage */
+		if (blow_ptr->d_side)
+		{
+			damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
+		}
+
+		/* Roll out level dependent damage */
+		if (blow_ptr->l_side)
+		{
+			damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
+		}
+
+		/* Add constant damage */
+		damage += blow_ptr->d_plus;
+
+		/* Add level dependent damage */
+		if (blow_ptr->l_plus)
+		{
+			/* Mega-hack - dispel evil/undead etc. */
+			if (!level)
+			{
+				damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
+			}
+			else
+			{
+				damage += blow_ptr->l_plus * level / blow_ptr->levels;
+			}
+		}
+
+		/* Add boosted damage */
+		if (player) damage += p_ptr->boost_spell_power;
+	}
+
+	return (damage);
+}
+
+
+/*
  *      Process a spell.
  *
  *      Returns -1 iff the spell did something obvious.
@@ -6085,7 +6138,6 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 	{
 		spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
 		int method = blow_ptr->method;
-		int damage = 0;
 		int effect = blow_ptr->effect;
 
 		method_type *method_ptr = &method_info[method];
@@ -6097,6 +6149,8 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 
 		s16b region = 0;
 
+		int i;
+
 		/* Hack -- no more attacks */
 		if (!method) break;
 
@@ -6106,56 +6160,20 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
 
-		/* Use player hit points */
-		if (method_ptr->flags2 & (PR2_BREATH))
-		{
-			/* Damage uses current hit points */
-			damage = p_ptr->chp * damage / 300;
-		}
-		/* Damage uses dice roll */
-		else
-		{
-			/* Roll out the damage */
-			if (blow_ptr->d_side)
-			{
-				damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
-			}
-
-			/* Roll out level dependent damage */
-			if (blow_ptr->l_side)
-			{
-				damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
-			}
-
-			/* Add constant damage */
-			damage += blow_ptr->d_plus;
-
-			/* Add level dependent damage */
-			if (blow_ptr->l_plus)
-			{
-				/* Mega-hack - dispel evil/undead etc. */
-				if (!level)
-				{
-					damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
-				}
-				else
-				{
-					damage += blow_ptr->l_plus * level / blow_ptr->levels;
-				}
-			}
-
-			/* Add boosted damage */
-			damage += p_ptr->boost_spell_power;
-		}
-
 		/* Special case for eaten spells */
 		if (eaten && (method != RBM_SPIT) && (method != RBM_BREATH))
 		{
 			int d = (method == RBM_VOMIT) ? rand_int(8) : 8;
+			int dam = 0;
+
 			ty = py + ddy_ddd[d];
 			tx = px + ddx_ddd[d];
 
-			if (project_one(who, what, ty, tx, damroll(num, damage), effect, flg)) obvious = TRUE;
+			/* Roll out the damage */
+			for (i = 0; i < num; i++) dam += spell_damage(blow_ptr, level, method_ptr->flags2, TRUE);
+
+			/* Apply once */
+			if (project_one(who, what, ty, tx, dam, effect, flg)) obvious = TRUE;
 
 			continue;
 		}
@@ -6195,13 +6213,16 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 				(s_ptr->type == SPELL_SET_TRAP) ? s_ptr->param : p_ptr->spell_trap;
 
 			/* Get a newly initialized region */
-			region = init_region(who, what, ri, damage, method, effect, level, py, px, ty, tx);
+			region = init_region(who, what, ri, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE), method, effect, level, py, px, ty, tx);
 
 			/* Get the region */
 			r_ptr = &region_list[region];
 
 			/* Hack -- we delay subsequent regions from the same spell casting until the first has expired */
 			r_ptr->delay = delay;
+
+			/* Hack -- we only apply one attack to determine region shape. */
+			num = 1;
 
 			/* Delaying casting of a spell */
 			if ((p_ptr->delay_spell) || (p_ptr->spell_trap))
@@ -6214,13 +6235,13 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			}
 
 			/* Set the life span according to the duration */
-			else if ((s_ptr->l_dice) && (s_ptr->l_side))
+			else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 			{
-				r_ptr->lifespan = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+				r_ptr->lifespan = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
 			}
-			else if (s_ptr->l_plus)
+			else if (s_ptr->lasts_plus)
 			{
-				r_ptr->lifespan = s_ptr->l_plus;
+				r_ptr->lifespan = s_ptr->lasts_plus;
 			}
 
 			/* Increase delay - we predict effects of acceleration/deceleration */
@@ -6256,8 +6277,12 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			if ((!ap_cnt) && (r_ptr->effect != GF_FEATURE)) r_ptr->flags1 |= (RE1_DISPLAY);
 		}
 
-		/* Projection method */
-		obvious |= project_method(who, what, method, effect, damage, level, py, px, ty, tx, region, flg);
+		/* Apply multiple times */
+		for (i = 0; i < num; i++)
+		{
+			/* Projection method */
+			obvious |= project_method(who, what, method, effect, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE), level, py, px, ty, tx, region, flg);
+		}
 
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
@@ -6304,13 +6329,13 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	char *s = buf;
 
 	/* Roll out the duration */
-	if ((s_ptr->l_dice) && (s_ptr->l_side))
+	if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 	{
-		lasts = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+		lasts = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
 	}
 	else
 	{
-		lasts = s_ptr->l_plus;
+		lasts = s_ptr->lasts_plus;
 	}
 
 	/* Process the flags that apply to equipment */
@@ -6799,7 +6824,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags2 & (SF2_HASTE))
 	{
-		if (inc_timed(TMD_FAST, p_ptr->timed[TMD_FAST] ? rand_int(s_ptr->l_side/3): lasts + level, TRUE)) obvious = TRUE;
+		if (inc_timed(TMD_FAST, p_ptr->timed[TMD_FAST] ? rand_int(s_ptr->lasts_side/3): lasts + level, TRUE)) obvious = TRUE;
 	}
 
 	if (s_ptr->flags2 & (SF2_RECALL))
@@ -6959,13 +6984,13 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 	int dir;
 
 	/* Roll out the duration */
-	if ((s_ptr->l_dice) && (s_ptr->l_side))
+	if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 	{
-		lasts = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+		lasts = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
 	}
 	else
 	{
-		lasts = s_ptr->l_plus;
+		lasts = s_ptr->lasts_plus;
 	}
 
 	/* Has another effect? */
@@ -7782,13 +7807,13 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 				if (return_time)
 				{
 					/* Roll out the duration */
-					if ((s_ptr->l_dice) && (s_ptr->l_side))
+					if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 					{
-						p_ptr->word_return = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+						p_ptr->word_return = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
 					}
 					else
 					{
-						p_ptr->word_return = s_ptr->l_plus;
+						p_ptr->word_return = s_ptr->lasts_plus;
 					}
 				}
 
@@ -7808,7 +7833,7 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 
 		case SPELL_CONCENTRATE_LIFE:
 		{
-			p_ptr->boost_spell_power = s_ptr->l_plus = concentrate_power(p_ptr->py, p_ptr->px,
+			p_ptr->boost_spell_power = concentrate_power(p_ptr->py, p_ptr->px,
 					5 + level / 10, forreal, FALSE, concentrate_life_hook);
 			break;
 		}
@@ -7943,13 +7968,13 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 				p_ptr->spell_trap = s_ptr->param;
 
 				/* Set the delay */
-				if ((s_ptr->l_dice) && (s_ptr->l_side))
+				if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 				{
-					p_ptr->delay_spell = damroll(s_ptr->l_dice, s_ptr->l_side) + s_ptr->l_plus;
+					p_ptr->delay_spell = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
 				}
-				else if (s_ptr->l_plus)
+				else if (s_ptr->lasts_plus)
 				{
-					p_ptr->delay_spell = s_ptr->l_plus;
+					p_ptr->delay_spell = s_ptr->lasts_plus;
 				}
 			}
 		}

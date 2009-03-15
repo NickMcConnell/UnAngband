@@ -6318,7 +6318,7 @@ errr parse_s_info(char *buf, header *head)
 			*t++ = '\0';
 
 			/* Extract the lasts dice */
-			s_ptr->l_dice = atoi(s);
+			s_ptr->lasts_dice = atoi(s);
 
 			/* Analyze the second field */
 			for (s = t; *t && (*t != '+'); t++) /* loop */;
@@ -6327,13 +6327,13 @@ errr parse_s_info(char *buf, header *head)
 			if (*t == 'd') *t++ = '\0';
 
 			/* Extract the damage sides and plus */
-			s_ptr->l_side = atoi(s);
-			s_ptr->l_plus = atoi(t);
+			s_ptr->lasts_side = atoi(s);
+			s_ptr->lasts_plus = atoi(t);
 		}
 		else
 		{
 			/* Extract the lasts plus */
-			s_ptr->l_plus = atoi(s);
+			s_ptr->lasts_plus = atoi(s);
 		}
 	}
 
@@ -10478,10 +10478,10 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	}
 
 	/* Output 'L' for lasts */
-	if (s_ptr->l_dice || s_ptr->l_side || s_ptr->l_plus)
+	if (s_ptr->lasts_dice || s_ptr->lasts_side || s_ptr->lasts_plus)
 	{
 		fprintf(fp, "L:%dd%d+%d\n",
-				s_ptr->l_dice, s_ptr->l_side, s_ptr->l_plus);
+				s_ptr->lasts_dice, s_ptr->lasts_side, s_ptr->lasts_plus);
 	}
 
 	/* Output 'D' for "Description" */

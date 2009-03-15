@@ -1512,9 +1512,9 @@ struct spell_type
 	s16b type;
 	s16b param;
 
-	byte l_dice;
-	byte l_side;
-	s16b l_plus;
+	byte lasts_dice;
+	byte lasts_side;
+	s16b lasts_plus;
 
 	spell_appears appears[MAX_SPELL_APPEARS];
 	spell_cast cast[MAX_SPELL_CASTERS];
