@@ -431,8 +431,13 @@ static void wr_xtra(int k_idx)
 	object_kind *k_ptr = &k_info[k_idx];
 
 	/* Write awareness */
-	wr_byte(k_ptr->aware);
+	wr_u16b(k_ptr->aware);
+
+	/* Write sval guess */
 	wr_byte(k_ptr->guess);
+
+	/* Activations ever */
+	wr_u16b(k_ptr->ever_used);
 
 	/* Activations */
 	wr_u16b(k_ptr->used);
@@ -1295,9 +1300,7 @@ static bool wr_savefile_new(void)
                 wr_u32b(n_ptr->not_flags3);
                 wr_u32b(n_ptr->not_flags4);
 
-                /* Oops */
-                wr_byte(e_info[i].aware);
-                wr_byte(0);
+                wr_u16b(e_info[i].aware);
 
                 /* Oops */
                	wr_byte(0);

@@ -166,9 +166,9 @@ static void load_prev_data(void)
 /*
  * Adjust a stat by an amount.
  *
- * The "auto_roll" flag selects maximal changes for use 
+ * The "auto_roll" flag selects maximal changes for use
  * with the auto-roller initialization code
- * or minimal for the point-based character generation.  
+ * or minimal for the point-based character generation.
  * Otherwise, semi-random changes will occur.
  */
 static int adjust_stat(int value, int amount, int auto_roll)
@@ -187,7 +187,7 @@ static int adjust_stat(int value, int amount, int auto_roll)
 		/* Apply reward */
 		for (i = 0; i < amount; i++)
 		{
-			value = calc_inc_stat(value, auto_roll); 
+			value = calc_inc_stat(value, auto_roll);
 		}
 
 		return (value);
@@ -374,15 +374,15 @@ static void player_wipe(void)
 		normal_quickstart.psval = p_ptr->psval;
 		normal_quickstart.pschool = p_ptr->pschool;
 		normal_quickstart.birth_au = p_ptr->birth_au;
-		
+
 		/* Copy across the stats */
 		for (i = 0; i < A_MAX; i++)
 		{
 			/* Set up the stats */
 			normal_quickstart.stat_birth[i] = p_ptr->stat_birth[i];
-		}		
+		}
 	}
-	
+
 	/* Wipe the player */
 	(void)WIPE(p_ptr, player_type);
 
@@ -436,9 +436,12 @@ static void player_wipe(void)
 		/* Reset "guess" */
 		k_ptr->guess = 0;
 
-		/* Reset "tried" and "runes learnt on unaware objects" */
-		k_ptr->aware &= ~(AWARE_TRIED | AWARE_RUNES);
-		
+		/* Clear player activations */
+		k_ptr->used = 0;
+
+		/* Reset "object knowledge" */
+		k_ptr->aware &= ~(AWARE_SEEN | AWARE_FLAVOR | AWARE_TRIED | AWARE_MASTER | AWARE_SENSEX);
+
 		/* Reset "flavor" if flavor not fixed */
 		if ((k_ptr->flavor) && !(x_info[k_ptr->flavor].sval)) k_ptr->aware &= ~(AWARE_FLAVOR);
 	}
@@ -462,7 +465,6 @@ static void player_wipe(void)
 		/* Clear player kills */
 		l_ptr->pkills = 0;
 	}
-
 
 	/* Hack -- no ghosts */
 	r_info[z_info->r_max-1].max_num = 0;
@@ -627,7 +629,7 @@ static void player_outfit(void)
 							break;
 						}
 					}
-					break;	
+					break;
 				}
 
 				case TV_SHOT:
@@ -702,7 +704,7 @@ static void player_outfit(void)
 			/* Prepare the item */
 			object_prep(i_ptr, k_idx);
 			i_ptr->number = (byte)rand_range(e_ptr->number_min, e_ptr->number_max);
-			i_ptr->origin = ORIGIN_BIRTH; 
+			i_ptr->origin = ORIGIN_BIRTH;
 
 			/* Modify the charges */
 			if ((e_ptr->charge_min) && (e_ptr->charge_max)) i_ptr->charges = (s16b)rand_range(e_ptr->charge_min, e_ptr->charge_max);
@@ -789,7 +791,7 @@ static void player_outfit(void)
 					/* Reorder quiver, refresh slot */
 					slot = reorder_quiver(slot);
 
-					/* We have used up all the object */					
+					/* We have used up all the object */
 					i_ptr->number = 0;
 				}
 			}
@@ -897,7 +899,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 	for (i = TABLE_ROW; i < Term->hgt; i++)
 	{
 		/* Clear */
-		Term_erase(col, i, Term->wid - wid);	
+		Term_erase(col, i, Term->wid - wid);
 	}
 
 	/* Choose */
@@ -970,7 +972,7 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 		if (ke.key == '*')
 		{
 			int count = 0;
-			
+
 			/* Select a legal choice at random */
 			while (count++ < 100)
 			{
@@ -1380,7 +1382,7 @@ static void class_aux_hook(birth_menu c_str)
 
 	put_str("Digging", TABLE_ROW + 8, CLASS_AUX2_COL);
 	desc = likert(xdig, 6, &likert_attr);
-	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 8, CLASS_AUX2_COL+11);	
+	c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + 8, CLASS_AUX2_COL+11);
 }
 
 
@@ -1408,11 +1410,11 @@ static bool get_player_class(void)
 
 		/* 'Ghosted' entries unavailable for intermediate players */
 		if (birth_intermediate && ghost) continue;
-		
+
 		/* Save the string */
 		classes[k].name = c_name + c_info[i].name;
 		classes[k].choice = i;
-		
+
 		/* Save the ghosting */
 		classes[k++].ghost = ghost;
 	}
@@ -1499,12 +1501,12 @@ static bool get_player_style(void)
 			styles[j++].ghost = FALSE;
 		}
 	}
-	
+
 	/* Has one choice */
 	if (j == 1)
 	{
 		p_ptr->pstyle = styles[0].choice;
-		
+
 		return (TRUE);
 	}
 
@@ -1542,7 +1544,7 @@ static bool get_player_book(void)
 	 * we use this to determine whether we check sval < SV_BOOK_MAX_GOOD
 	 * or sval >= SV_BOOK_MIN_GOOD */
 	bool max_good = FALSE;
-	
+
 	/*** Player book speciality ***/
 
 	int bookc = 0;
@@ -1550,7 +1552,7 @@ static bool get_player_book(void)
 	object_kind *k_ptr;
 
 	int tval=0;
-	
+
 	cptr help = NULL;
 
 	switch (p_ptr->pstyle)
@@ -1571,7 +1573,7 @@ static bool get_player_book(void)
 			tval = TV_SONG_BOOK;
 			help = "songs.txt";
 			break;
-			
+
 		default:
 			return (FALSE);
 	}
@@ -1583,7 +1585,7 @@ static bool get_player_book(void)
 
 		/* Hack -- ignore books that the player has not seen yet */
 		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
-		
+
 		/* Hack -- count one of non-dungeon books per school */
 		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL /* != SV_BOOK_SCHOOL - 1 */)) continue;
 
@@ -1601,13 +1603,13 @@ static bool get_player_book(void)
 
 	/* Analyse books */
 	for (i = 0;i<z_info->k_max;i++)
-	{	
+	{
 		/* Check spells with pre-requisites */
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
 		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
-		
+
 		/* Hack -- count one of non-dungeon books per school */
 		if (max_good && k_ptr->sval >= SV_BOOK_MAX_GOOD && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
 
@@ -1616,11 +1618,11 @@ static bool get_player_book(void)
 
 		/* Correct tval */
 		if (k_ptr->tval == tval)
-		{		
+		{
 			/* Save the string. Note offset to skip 'of ' */
 			books[j].name = k_name + k_ptr->name + 3;
 			books[j].choice = k_ptr->sval;
-			books[j++].ghost = 
+			books[j++].ghost =
 				(max_good && k_ptr->sval >= SV_BOOK_MAX_GOOD)
 				|| (!max_good && k_ptr->sval < SV_BOOK_MIN_GOOD);
 		}
@@ -1676,7 +1678,7 @@ static bool get_player_school(void)
 
 	cptr text = NULL;
 	cptr help = NULL;
-	
+
 	switch (p_ptr->pstyle)
 	{
 		case WS_MAGIC_BOOK:
@@ -1690,7 +1692,7 @@ static bool get_player_school(void)
 		case WS_SONG_BOOK:
 			tval = TV_SONG_BOOK;
 			break;
-			
+
 		default:
 			tval = c_info[p_ptr->pclass].spell_book;
 			break;
@@ -1702,19 +1704,19 @@ static bool get_player_school(void)
 			text = "school";
 			help = "schools.txt";
 			break;
-	
+
 		case TV_PRAYER_BOOK:
 			text = "religion";
 			help = "religions.txt";
 			break;
-	
+
 		case TV_SONG_BOOK:
 			text = "college";
 			help = "colleges.txt";
 			break;
 	}
-	
-	
+
+
 	/* No spell book style */
 	if (!tval) return (TRUE);
 
@@ -1737,7 +1739,7 @@ static bool get_player_school(void)
 	for (i = 0;i<z_info->k_max;i++)
 	{
 		k_ptr = &k_info[i];
-		
+
 		/* Hack -- count one of non-dungeon books per school */
 		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
 
@@ -1748,13 +1750,13 @@ static bool get_player_school(void)
 			if (k_ptr->sval - (k_ptr->sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 != p_ptr->psval) continue;
 		}
 
-		if (k_ptr->tval == tval)		
+		if (k_ptr->tval == tval)
 		{
 			/* Save the string. Note offset to skip 'of ' */
 			schools[k].name = k_name + k_ptr->name + 3;
 			schools[k].choice = k_ptr->sval - SV_BOOK_SCHOOL + 1;
 			schools[k].ghost = FALSE;
-			
+
 			/* Mega-hack for ghosting starting mages/rangers/artisans */
 			switch (p_ptr->pclass)
 			{
@@ -1768,16 +1770,16 @@ static bool get_player_school(void)
 					int num;
 					object_type *o_ptr;
 					object_type object_type_body;
-					
+
 					/* Get the object */
 					o_ptr = &object_type_body;
-					
+
 					/* Check if there are valid spells in the 'first' book */
 					object_prep(o_ptr, lookup_kind(tval, k_ptr->sval - 3));
-					
+
 					fill_book(o_ptr, book, &num);
 					schools[k].ghost = TRUE;
-					
+
 					for (j=0; j < num; j++)
 					{
 						if (spell_legible(book[j])) schools[k].ghost = FALSE;
@@ -1785,7 +1787,7 @@ static bool get_player_school(void)
 					break;
 				}
 			}
-			
+
 			k++;
 		}
 	}
@@ -1834,7 +1836,7 @@ static bool get_player_roller(void)
 	{
 		{TRUE, "Just roll", 0},
 		{FALSE, "Choose minimum", 1},
-		{FALSE,	"Spend points", 2},		
+		{FALSE,	"Spend points", 2},
 	};
 
 	/*** Player roller choice ***/
@@ -1851,7 +1853,7 @@ static bool get_player_roller(void)
 	{
 		case INVALID_CHOICE:
 			return (FALSE);
-	
+
 		case 0:
 			birth_point_based = FALSE;
 			birth_auto_roller = FALSE;
@@ -1978,7 +1980,7 @@ static bool get_player_keyboard(void)
 		{FALSE, "Desktop", 0},
 		{FALSE, "Laptop", 1}
 	};
-	
+
 	/*** Player roller choice ***/
 
 	/* Extra info */
@@ -2018,7 +2020,7 @@ static bool get_player_quickstart(void)
 		{FALSE, "Yes", 0},
 		{FALSE, "No", 1}
 	};
-	
+
 	/*** Player roller choice ***/
 
 	/* Extra info */
@@ -2048,9 +2050,9 @@ static bool get_player_quickstart(void)
 
 /*
  * Structure used for a beginner quickstart.
- * 
+ *
  * Race is Maia, class is Istari, no speciality.
- * 
+ *
  * All stats start at 15.
  */
 quickstart_type beginner_quickstart =
@@ -2073,7 +2075,7 @@ quickstart_type beginner_quickstart =
 static void player_birth_quickstart(quickstart_type *q_ptr)
 {
 	int i;
-	
+
 	/* Copy across the quickstart structure */
 	/* HACK: assuming sp_ptr has been set, user has selected a gender in get_player_sex.
 	 * otherwise: overwrite */
@@ -2085,7 +2087,7 @@ static void player_birth_quickstart(quickstart_type *q_ptr)
 	p_ptr->pstyle = q_ptr->pstyle;
 	p_ptr->psval = q_ptr->psval;
 	p_ptr->pschool = q_ptr->pschool;
-	
+
 	/* Set up the class and race */
 	sp_ptr = &sex_info[p_ptr->psex];
 	rp_ptr = &p_info[p_ptr->prace];
@@ -2118,7 +2120,7 @@ static void player_birth_quickstart(quickstart_type *q_ptr)
 
 	/* Fully rested */
 	p_ptr->csp = p_ptr->msp;
-	
+
 	/* Set up secondary stats */
 	p_ptr->town = rp_ptr->home;
 	p_ptr->dungeon = 7;
@@ -2175,10 +2177,10 @@ static bool player_birth_aux_1(void)
 
 		/* Clean up */
 		clear_question();
-		
+
 		/* Answered these questions for good */
 		birth_first_time = FALSE;
-		
+
 		/* Build the filename */
 		path_build(buf, 1024, ANGBAND_DIR_USER, "Startup.prf");
 
@@ -2208,11 +2210,11 @@ static bool player_birth_aux_1(void)
 
 		/* Dump startup options */
 		fprintf(fff, "%c:%s\n", birth_intermediate ? 'Y' : 'X', option_name(OPT_birth_intermediate));
-		
+
 		/* Close */
 		my_fclose(fff);
 	}
-	
+
 	/* Allow quickstart? */
 	else if (character_quickstart)
 	{
@@ -2221,7 +2223,7 @@ static bool player_birth_aux_1(void)
 
 		/* Clean up */
 		clear_question();
-		
+
 		/* Don't show choice any longer */
 		character_quickstart = FALSE;
 
@@ -2230,14 +2232,14 @@ static bool player_birth_aux_1(void)
 		{
 			/* Quick start the character */
 			player_birth_quickstart(&normal_quickstart);
-		
+
 			return (TRUE);
 		}
 	}
-	
+
 	/* Not quickstarting */
 	birth_quickstart = FALSE;
-	
+
 	Term_putstr(QUESTION_COL, HEADER_ROW, -1, TERM_L_BLUE,
 		    "Please select your character from the menu below.");
 
@@ -2252,10 +2254,10 @@ static bool player_birth_aux_1(void)
 	{
 		/* Quick start the character */
 		player_birth_quickstart(&beginner_quickstart);
-		
+
 		return (TRUE);
 	}
-	
+
 	/* Choose the players race */
 	if (!get_player_race()) return (FALSE);
 
@@ -2271,7 +2273,7 @@ static bool player_birth_aux_1(void)
 	/* Choose the style */
 	if (!get_player_style()) return (FALSE);
 
-	/* Choose the book */	
+	/* Choose the book */
 	if ((p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))
 	{
 		/* Clean up */
@@ -2295,7 +2297,7 @@ static bool player_birth_aux_1(void)
 
 	/* Clean up */
 	clear_question();
-	
+
 	/* Choose the roller */
 	if (!get_player_roller()) return (FALSE);
 
@@ -2873,7 +2875,7 @@ static bool player_birth_aux(void)
 	{
 		/* Already rolled stats */
 	}
-	
+
 	/* Point-based */
 	else if (birth_point_based)
 	{
@@ -2913,7 +2915,7 @@ static bool player_birth_aux(void)
 
 void roll_hp_table(void)
 {
-  int i, j, min_value, max_value; 
+  int i, j, min_value, max_value;
   int random_levels = PY_MAX_LEVEL - 2;
 
   /* Minimum hitpoints at highest level - 1 */
@@ -2938,19 +2940,19 @@ void roll_hp_table(void)
 	}
 
       /* Require "valid" hitpoints at various levels */
-      if (p_ptr->player_hp[random_levels/5] - 10 <= min_value/5) 
+      if (p_ptr->player_hp[random_levels/5] - 10 <= min_value/5)
 	continue;
-      if (p_ptr->player_hp[random_levels/5] - 10 >= max_value/5) 
-	continue;
-
-      if (p_ptr->player_hp[random_levels/2] - 10 <= min_value/2) 
-	continue;
-      if (p_ptr->player_hp[random_levels/2] - 10 >= max_value/2) 
+      if (p_ptr->player_hp[random_levels/5] - 10 >= max_value/5)
 	continue;
 
-      if (p_ptr->player_hp[random_levels] - 10 <= min_value) 
+      if (p_ptr->player_hp[random_levels/2] - 10 <= min_value/2)
 	continue;
-      if (p_ptr->player_hp[random_levels] - 10 >= max_value) 
+      if (p_ptr->player_hp[random_levels/2] - 10 >= max_value/2)
+	continue;
+
+      if (p_ptr->player_hp[random_levels] - 10 <= min_value)
+	continue;
+      if (p_ptr->player_hp[random_levels] - 10 >= max_value)
 	continue;
 
       /* Acceptable */
@@ -2958,7 +2960,7 @@ void roll_hp_table(void)
     }
 
   /* Set level 50 hitdice */
-  p_ptr->player_hp[PY_MAX_LEVEL - 1] = 
+  p_ptr->player_hp[PY_MAX_LEVEL - 1] =
     p_ptr->player_hp[random_levels] + 10;
 }
 
@@ -2972,7 +2974,7 @@ void roll_hp_table(void)
 void player_birth(void)
 {
 	int n;
-	
+
 	/* Wipe the player */
 	player_wipe();
 
@@ -3001,7 +3003,7 @@ void player_birth(void)
 	message_add("====================", MSG_GENERIC);
 	message_add("  ", MSG_GENERIC);
 	message_add(" ", MSG_GENERIC);
-	
+
 	/* Hack - don't display above for easy_more */
 	if (easy_more)
 	{
@@ -3009,7 +3011,7 @@ void player_birth(void)
 		msg_print(" ");
 		message_flush();
 	}
-	
+
 	/* Initialise birth tips */
 	if (adult_beginner)
 	{
@@ -3030,20 +3032,20 @@ void player_birth(void)
 
 		/* Style tips */
 		queue_tip(format("style%d.txt", p_ptr->pstyle));
-		
+
 		/* Specialists get tval tips */
 		if (style2tval[p_ptr->pstyle])
 		{
-			queue_tip(format("tval%d.txt", style2tval[p_ptr->pstyle]));		
+			queue_tip(format("tval%d.txt", style2tval[p_ptr->pstyle]));
 		}
 	}
-	
+
 	/* Hack -- assume the new shape */
 	change_shape(p_ptr->prace, p_ptr->lev);
 
 	/* Hack -- outfit the player */
 	player_outfit();
-	
+
 	/* Hack -- set the dungeon. */
 	if (adult_campaign) p_ptr->dungeon = 1;
 	else p_ptr->dungeon = z_info->t_max - 2;

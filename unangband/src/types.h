@@ -559,7 +559,7 @@ struct object_kind
 	byte chance[4]; /* Allocation chance(s) */
 
 	byte level;     /* Level */
-	byte extra;     /* Something */
+	byte guess;     /* Guessed "sval" */
 
 	byte d_attr;    /* Default object attribute */
 	char d_char;    /* Default object character */
@@ -575,10 +575,10 @@ struct object_kind
 	byte runest;   /* Rune type */
 	byte runesc;   /* Rune count */
 
-	byte guess;
-	byte aware;     /* The player is "aware" of the item. */
+	u16b aware;     /* The player is "aware" of the item. */
 
-	s16b used;	/* Number of times used */
+	s16b used;		/* Number of times used in this life */
+	s16b ever_used;	/* Number of times used 'ever' */
 };
 
 
@@ -727,7 +727,7 @@ struct ego_item_type
 	byte runest;   /* Rune type */
 	byte runesc;   /* Rune count */
 
-    byte aware;
+    u16b aware;
 
     s16b activation;/* Activation to use */
     u16b time;      /* Activation time */

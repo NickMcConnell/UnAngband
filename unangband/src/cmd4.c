@@ -1693,7 +1693,7 @@ static void do_cmd_knowledge_objects(void)
 	objects = C_ZNEW(z_info->k_max * 2, int);
 
 	for(i = 0; i < z_info->k_max; i++) {
-		if((k_info[i].aware & (AWARE_EXISTS)) || k_info[i].flavor || cheat_lore) {
+		if((k_info[i].aware & (AWARE_EXISTS)) || (k_info[i].flavor) || cheat_lore) {
 			int c = obj_group_order[k_info[i].tval];
 			if(c >= 0 && object_group[c].text) {
 				if ((k_info[i].aware & (AWARE_EXISTS)) || (cheat_lore))

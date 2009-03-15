@@ -2499,6 +2499,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 
 			/* Object is used */
 			if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+			if (k_info[o_ptr->k_idx].ever_used < MAX_SHORT) k_info[o_ptr->k_idx].ever_used++;
 
 			/* Scan through all four blows */
 			for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)

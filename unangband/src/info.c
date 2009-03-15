@@ -3392,13 +3392,13 @@ void list_object(const object_type *o_ptr, int mode)
 		vn = 0;
 
 		/* Detailled explaination */
-		detail = (k_info[o_ptr->k_idx].used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
+		detail = (k_info[o_ptr->k_idx].ever_used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
 
 		/* Activates */
 		if (f3 & TR3_ACTIVATE)
 		{
 			vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
-			charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+			charge = (k_info[o_ptr->k_idx].ever_used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 			time = o_ptr->charges;
 			randtime = o_ptr->charges;
 
@@ -3444,7 +3444,7 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_ROD:
 				vp[vn] = "When zapped, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
 				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
-				charge = (k_info[o_ptr->k_idx].used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
+				charge = (k_info[o_ptr->k_idx].ever_used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 				time = o_ptr->charges;
 				randtime = o_ptr->charges;
 				break;
@@ -3710,8 +3710,8 @@ void list_object(const object_type *o_ptr, int mode)
 	if ((!random) && (k_info[o_ptr->k_idx].runesc))
 	{
 		/* Show runes */
-		if (spoil || (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].aware & (AWARE_RUNEX))) ||
-				(k_info[o_ptr->k_idx].aware & (AWARE_RUNES)))
+		if (spoil || (object_aware_p(o_ptr) && (k_info[o_ptr->k_idx].aware & (AWARE_RUNES))) ||
+				(k_info[o_ptr->k_idx].aware & (AWARE_RUNEX)))
 		{
 			for (i = 0; object_group[i].tval; i++)
 			{
@@ -3731,7 +3731,7 @@ void list_object(const object_type *o_ptr, int mode)
 			/* Check for other recipes */
 			for (i = 0; i < z_info->k_max; i++)
 			{
-				if (((spoil) || (k_info[i].aware & (AWARE_RUNEX))) &&
+				if (((spoil) || (k_info[i].aware & (AWARE_RUNES | AWARE_RUNEX))) &&
 						(k_info[i].runest == k_info[o_ptr->k_idx].runest) &&
 						(k_info[i].runesc < k_info[o_ptr->k_idx].runesc) &&
 						(k_info[i].tval == k_info[o_ptr->k_idx].tval))
@@ -3755,7 +3755,7 @@ void list_object(const object_type *o_ptr, int mode)
 			/* Check for rune upgrades */
 			for (i = 0; i < z_info->k_max; i++)
 			{
-				if (((spoil) || (k_info[i].aware & (AWARE_RUNEX))) &&
+				if (((spoil) || (k_info[i].aware & (AWARE_RUNES | AWARE_RUNEX))) &&
 						(k_info[i].runest == k_info[o_ptr->k_idx].runest) &&
 						(k_info[i].runesc > k_info[o_ptr->k_idx].runesc) &&
 						(k_info[i].tval == k_info[o_ptr->k_idx].tval))

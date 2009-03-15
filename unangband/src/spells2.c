@@ -3449,7 +3449,7 @@ bool ident_spell_sense(void)
 	/* Sense non-wearable items */
 	if (!feel)
 	{
-		int i, j;
+		int i, j, k;
 
 		/* Check bags */
 		for (i = 0; i < SV_BAG_MAX_BAGS; i++)
@@ -3462,6 +3462,29 @@ bool ident_spell_sense(void)
 			  {
 			    o_ptr->feeling = MAX_INSCRIP + i;
 			    feel = 1;
+
+			    if (object_aware_p(o_ptr)) k_info[o_ptr->k_idx].aware |= (AWARE_SENSE);
+			    else if (k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware |= (AWARE_SENSEX);
+
+			    /* Mark all such objects sensed */
+			    /* Check world */
+			    for (k = 0; k < o_max; k++)
+			    {
+					if ((o_list[k].k_idx == o_ptr->k_idx) && !(o_list[k].feeling))
+					{
+						o_list[k].feeling = o_ptr->feeling;
+					}
+			    }
+
+				/* Check inventory */
+				for (k = 0; k < INVEN_TOTAL; k++)
+				{
+					if ((inventory[k].k_idx == o_ptr->k_idx) && !(inventory[k].feeling))
+					{
+						inventory[k].feeling = o_ptr->feeling;
+					}
+				}
+
 			  }
 		}
 	}
@@ -3723,7 +3746,7 @@ bool ident_spell_runes(void)
 	o_ptr->ident |= (IDENT_RUNES);
 
 	/* Make the object aware if player knows the rune recipe */
-	if (k_info[o_ptr->k_idx].aware & (AWARE_RUNEX))
+	if (k_info[o_ptr->k_idx].aware & (AWARE_RUNES))
 	{
 		object_aware(o_ptr, item < 0);
 	}
@@ -3748,11 +3771,37 @@ bool ident_spell_runes(void)
 			   o_name);
 	}
 
-	/* Aware of runes */
-	k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
+	/* Learn the rune recipe if the object is aware */
+	if (object_aware_p(o_ptr))
+	{
+		k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
+	}
+	/* Otherwise associate flavor with the object */
+	else if (k_info[o_ptr->k_idx].flavor)
+	{
+		int k;
 
-	/* Learn kind rune recipe */
-	if (object_aware_p(o_ptr)) k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+		k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+
+	    /* Mark all such objects sensed */
+	    /* Check world */
+	    for (k = 0; k < o_max; k++)
+	    {
+			if (o_list[k].k_idx == o_ptr->k_idx)
+			{
+				o_list[k].ident |= (IDENT_RUNES);
+			}
+	    }
+
+		/* Check inventory */
+		for (k = 0; k < INVEN_TOTAL; k++)
+		{
+			if (inventory[k].k_idx == o_ptr->k_idx)
+			{
+				inventory[k].ident |= (IDENT_RUNES);
+			}
+		}
+	}
 
 	/* Add ego item rune awareness */
 	if ((object_named_p(o_ptr)) && (o_ptr->name2))

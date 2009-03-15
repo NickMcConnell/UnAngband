@@ -384,6 +384,7 @@ bool player_eat_food(int item)
 			}
 
 			if ((ident) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
+			if ((ident) && (k_info[o_ptr->k_idx].ever_used < MAX_SHORT)) k_info[o_ptr->k_idx].ever_used++;
 
 			break;
 		}
@@ -500,6 +501,7 @@ bool player_quaff_potion(int item)
 	}
 
 	if ((ident) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
+	if ((ident) && (k_info[o_ptr->k_idx].ever_used < MAX_SHORT)) k_info[o_ptr->k_idx].ever_used++;
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -604,6 +606,7 @@ bool player_read_scroll(int item)
 	}
 
 	if ((ident) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
+	if ((ident) && (k_info[o_ptr->k_idx].ever_used < MAX_SHORT)) k_info[o_ptr->k_idx].ever_used++;
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -785,6 +788,7 @@ bool player_use_staff(int item)
 	}
 
 	if ((ident) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
+	if ((ident) && (k_info[o_ptr->k_idx].ever_used < MAX_SHORT)) k_info[o_ptr->k_idx].ever_used++;
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -1040,6 +1044,7 @@ bool player_aim_wand(int item)
 	}
 
 	if ((ident) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
+	if ((ident) && (k_info[o_ptr->k_idx].ever_used < MAX_SHORT)) k_info[o_ptr->k_idx].ever_used++;
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -1292,6 +1297,7 @@ bool player_zap_rod(int item)
 	}
 
 	if ((ident) && (k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
+	if ((ident) && (k_info[o_ptr->k_idx].ever_used < MAX_SHORT)) k_info[o_ptr->k_idx].ever_used++;
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -1918,6 +1924,7 @@ bool player_activate(int item)
 
 	/* Used the object */
 	if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+	if (k_info[o_ptr->k_idx].ever_used < MAX_SHORT) k_info[o_ptr->k_idx].ever_used++;
 
 	/* Tire the player */
 	if ((item == INVEN_SELF) || (o_ptr->tval == TV_SPELL))

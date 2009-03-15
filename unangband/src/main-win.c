@@ -994,7 +994,7 @@ static void term_getsize(term_data *td)
 
 		if (td->tile_wid < td->font_wid) td->tile_wid = td->font_wid;
 		if (td->tile_hgt < td->font_hgt) td->tile_hgt = td->font_hgt;
-		
+
 		/* Hack -- avoid erasing "leading" spaces */
 		if ((use_graphics) && (use_dbltile || use_trptile))
 		{
@@ -1002,7 +1002,7 @@ static void term_getsize(term_data *td)
 		}
 		else
 		{
-			Term->never_lwipe = FALSE;			
+			Term->never_lwipe = FALSE;
 		}
 
 	}
@@ -2083,7 +2083,7 @@ static errr Term_xtra_win_react(void)
 		{
 			Term->always_draw = FALSE;
 		}
-		
+
 		/* Hack -- avoid erasing "leading" spaces */
 		if (use_dbltile || use_trptile)
 		{
@@ -2091,7 +2091,7 @@ static errr Term_xtra_win_react(void)
 		}
 		else
 		{
-			Term->never_lwipe = FALSE;			
+			Term->never_lwipe = FALSE;
 		}
 
 		if (use_graphics_nice)
@@ -2721,7 +2721,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 			x /= 2;
 
 		x2 = (x - y) * tw2 / 2 + ((td->rows - ROW_MAP) * tw2 / (use_trptile ? 6 : (use_dbltile ? 4 : 2))) + w2 * (COL_MAP-1) + td->size_ow1;
-		y2 = (y + x) * th2 / 4 + h2 * ROW_MAP + td->size_ow2 - (y + x) / 2; 
+		y2 = (y + x) * th2 / 4 + h2 * ROW_MAP + td->size_ow2 - (y + x) / 2;
 	}
 	else
 	{
@@ -2832,7 +2832,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 				SetStretchBltMode(hdc, COLORONCOLOR);
 
 				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
-				{ 
+				{
 					if (!(x))
 					{
 						/* Copy the terrain picture from the bitmap to the window */
@@ -3819,7 +3819,7 @@ static void process_menus(WORD wCmd)
 				play_game(TRUE);
 
 				/* Hack -- set as last file name */
-				
+
 
 				quit(NULL);
 			}
@@ -4319,7 +4319,7 @@ static void process_menus(WORD wCmd)
 
 			/* Cancel "use_dbltile" */
 			use_dbltile = FALSE;
-			
+
 			/* Hack -- avoid erasing "leading" spaces */
 			if (use_graphics)
 			{
@@ -4709,7 +4709,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				return 0;
 			}
 
-			if ((term_readytoload) && !(game_in_progress))	
+			if ((term_readytoload) && !(game_in_progress))
 			{
 				term_readytoload = FALSE;
 				strcpy(savefile,arg_lastsavefile);
@@ -4761,7 +4761,7 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				Term_mousepress(xPos,yPos,button);
 			}
 
-			if ((term_readytoload) && !(game_in_progress))	
+			if ((term_readytoload) && !(game_in_progress))
 			{
 				term_readytoload = FALSE;
 				strcpy(savefile,arg_lastsavefile);

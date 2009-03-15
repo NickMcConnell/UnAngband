@@ -2297,12 +2297,28 @@ static errr rd_savefile_new_aux(void)
 	{
 		object_kind *k_ptr = &k_info[i];
 
-		rd_byte(&k_ptr->aware);
+		byte tmp8u;
+
+		if (older_than(0,6,3,6))
+		{
+			rd_byte(&tmp8u);
+			k_ptr->aware = tmp8u;
+		}
+		else
+		{
+			rd_u16b(&k_ptr->aware);
+		}
 		rd_byte(&k_ptr->guess);
 
 		/* Activations */
-		rd_s16b(&k_ptr->used);
+		rd_s16b(&k_ptr->ever_used);
 
+		/* Hack - reset activations this lifetime */
+		if (!older_than(0,6,3,6))
+		{
+			/* Activations ever */
+			rd_s16b(&k_ptr->used);
+		}
 	}
 	if (arg_fiddle) note("Loaded Object Memory");
 
@@ -2420,8 +2436,7 @@ static errr rd_savefile_new_aux(void)
 		rd_u32b(&n_ptr->not_flags3);
 		rd_u32b(&n_ptr->not_flags4);
 
-		rd_byte(&e_info[i].aware);
-		rd_byte(&tmp8u);
+		rd_u16b(&(e_info[i].aware));
 
 		/* Oops */
 		rd_byte(&tmp8u);

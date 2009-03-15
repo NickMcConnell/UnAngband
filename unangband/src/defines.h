@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	3
-#define VERSION_EXTRA	5
+#define VERSION_EXTRA	6
 
 /*
  * Oldest version number that can still be imported
@@ -3395,14 +3395,17 @@ enum
 /*
  * Special Awareness Flags
  */
-#define AWARE_SEEN		0x01	/* Item "seen" this game. */
-#define AWARE_FLAVOR	0x02	/* Item "flavor" is known this game. */
-#define AWARE_EXISTS	0x04	/* Item is known to exist in a game. */
-#define AWARE_TRIED		0x08	/* Item has been tried. */
-#define AWARE_RUNES		0x10	/* Item runes are known. */
-#define AWARE_RUNEX		0x10	/* Item runes are known to be associated with a particular flavor. */
-#define AWARE_MASTER	0x20	/* Item has been mastered. */
-#define AWARE_CLASS		0x40	/* Item "flavor" will be known when the item is known to exist. */
+#define AWARE_SEEN		0x0001	/* Item "seen" this game. */
+#define AWARE_FLAVOR	0x0002	/* Item "flavor" is known this game. */
+#define AWARE_EXISTS	0x0004	/* Item is known to exist in a game. */
+#define AWARE_TRIED		0x0008	/* Item has been tried. */
+#define AWARE_RUNES		0x0010	/* Item runes are known. */
+#define AWARE_RUNEX		0x0020	/* Item runes are known to be associated with a particular flavor. */
+#define AWARE_MASTER	0x0040	/* Item has been mastered. */
+#define AWARE_CLASS		0x0080	/* Item "flavor" will be known when the item is known to exist. */
+#define AWARE_SENSE		0x0100	/* Item "sense" is known */
+#define AWARE_SENSEX	0x0200	/* Item "sense" is known to be associated with a particular flavor. */
+
 
 
 /*

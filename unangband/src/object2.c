@@ -757,7 +757,7 @@ void object_mental(object_type *o_ptr, bool floor)
 	o_ptr->ident |= (IDENT_MENTAL);
 
 	/* And we learn the rune recipe if any */
-	k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+	k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
 
 	/* And we learn the ego rune recipe if any */
 	if (o_ptr->name2) e_info[o_ptr->name2].aware |= (AWARE_RUNES);
@@ -929,6 +929,13 @@ void object_aware(object_type *o_ptr, bool floor)
 	/* No longer tried */
 	k_ptr->aware &= ~(AWARE_TRIED);
 
+	/* No longer sensed */
+	if (k_ptr->aware & (AWARE_SENSEX))
+	{
+		k_ptr->aware |= (AWARE_SENSE);
+		k_ptr->aware &= ~(AWARE_SENSEX);
+	}
+
 	/* Auto-inscribe */
 	if (o_ptr->name2)
 	{
@@ -949,9 +956,10 @@ void object_aware(object_type *o_ptr, bool floor)
 	k_info[o_ptr->k_idx].aware |= (AWARE_FLAVOR);
 
 	/* Learn rune recipe if runes known */
-	if (k_info[o_ptr->k_idx].aware & (AWARE_RUNES))
+	if (k_info[o_ptr->k_idx].aware & (AWARE_RUNEX))
 	{
-		k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+		k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
+		k_info[o_ptr->k_idx].aware &= ~(AWARE_RUNEX);
 	}
 
 	/* Hack -- fully aware of the coating effects */
@@ -1935,6 +1943,37 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr, bool floor)
 
 			/* Hack -- Decrease the weight -- will be increased later */
 			p_ptr->total_weight -= (j_ptr->number * j_ptr->weight);
+		}
+
+		/* Aware of object? */
+		if (!object_aware_p(j_ptr))
+		{
+			int k;
+
+			k_info[j_ptr->k_idx].aware |= (AWARE_SENSEX);
+
+		    /* Mark all such objects sensed */
+		    /* Check world */
+		    for (k = 0; k < o_max; k++)
+		    {
+				if ((o_list[k].k_idx == j_ptr->k_idx) && !(o_list[k].feeling))
+				{
+					o_list[k].feeling = o_ptr->sval + MAX_INSCRIP;
+				}
+		    }
+
+			/* Check inventory */
+			for (k = 0; k < INVEN_TOTAL; k++)
+			{
+				if ((inventory[k].k_idx == j_ptr->k_idx) && !(inventory[k].feeling))
+				{
+					inventory[k].feeling = o_ptr->sval + MAX_INSCRIP;
+				}
+			}
+		}
+		else
+		{
+			k_info[j_ptr->k_idx].aware |= (AWARE_SENSE);
 		}
 
 		/* Combine and re-order again */
@@ -3766,6 +3805,45 @@ int value_check_aux6(object_type *o_ptr)
 
 	o_ptr->ident |= (IDENT_RUNES);
 
+	/* Learn the rune recipe if the object is aware */
+	if (object_aware_p(o_ptr))
+	{
+		k_info[o_ptr->k_idx].aware |= (AWARE_RUNES);
+	}
+	/* Otherwise associate flavor with the object */
+	else if (k_info[o_ptr->k_idx].flavor)
+	{
+		int k;
+
+		k_info[o_ptr->k_idx].aware |= (AWARE_RUNEX);
+
+	    /* Mark all such objects sensed */
+	    /* Check world */
+	    for (k = 0; k < o_max; k++)
+	    {
+			if (o_list[k].k_idx == o_ptr->k_idx)
+			{
+				o_list[k].ident |= (IDENT_RUNES);
+			}
+	    }
+
+		/* Check inventory */
+		for (k = 0; k < INVEN_TOTAL; k++)
+		{
+			if (inventory[k].k_idx == o_ptr->k_idx)
+			{
+				inventory[k].ident |= (IDENT_RUNES);
+			}
+		}
+	}
+
+	/* Add ego item rune awareness */
+	if ((object_named_p(o_ptr)) && (o_ptr->name2))
+	{
+		/* Learn ego runes */
+		e_info[o_ptr->name2].aware |= (AWARE_RUNES);
+	}
+
 	/* No feeling */
 	return (0);
 }
@@ -4133,6 +4211,25 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 
 	/* Skip empty slots */
 	if (!o_ptr->k_idx) return (0);
+
+	/* Sensed this kind? */
+	if (k_info[o_ptr->tval].aware & (AWARE_SENSEX))
+	{
+		int i, j;
+
+		/* Check bags */
+		for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+
+		/* Find slot */
+		for (j = 0; j < INVEN_BAG_TOTAL; j++)
+		{
+			if ((bag_holds[i][j][0] == o_ptr->tval)
+				&& (bag_holds[i][j][1] == o_ptr->sval))
+			  {
+			    o_ptr->feeling = MAX_INSCRIP + i;
+			  }
+		}
+	}
 
 	/* Valid "tval" codes */
 	switch (o_ptr->tval)
@@ -5078,14 +5175,14 @@ static bool kind_is_good(int k_idx)
 		case TV_MAGIC_BOOK:
 		case TV_PRAYER_BOOK:
 		{
-			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && !(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
+			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && ((k_ptr->aware & (AWARE_SEEN)) == 0)) return (TRUE);
 			return (FALSE);
 		}
 
 		/* Books -- high level books are good if not seen previously */
 		case TV_SONG_BOOK:
 		{
-			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && !(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
+			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && ((k_ptr->aware & (AWARE_SEEN)) == 0)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -5093,7 +5190,7 @@ static bool kind_is_good(int k_idx)
 		case TV_BAG:
 		case TV_RUNESTONE:
 		{
-			if (!(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
+			if ((k_ptr->aware & (AWARE_SEEN)) == 0) return (TRUE);
 			return (FALSE);
 		}
 
@@ -5633,6 +5730,12 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 
 	/* Apply obvious flags */
 	object_obvious_flags(j_ptr, TRUE);
+
+	/* Rune magic on this kind */
+	if ((k_info[j_ptr->k_idx].flavor) && !(object_aware_p(j_ptr)) && (k_info[j_ptr->k_idx].aware & (AWARE_RUNEX)))
+	{
+		j_ptr->ident |= (IDENT_RUNES);
+	}
 
 	/* Success */
 	return (TRUE);
