@@ -580,6 +580,7 @@ errr get_obj_num_prep(void)
 				case TV_STAFF:
 				case TV_WAND:
 				case TV_FOOD:
+				case TV_MUSHROOM:
 				{
 					if (object_level > level + 9) chance /= 3;
 					else if (object_level > level + 4) chance /= 2;
@@ -1115,7 +1116,10 @@ static s32b object_value_base(const object_type *o_ptr)
 	switch (o_ptr->tval)
 	{
 		/* Un-aware Food */
-		case TV_FOOD: return (5L);
+		case TV_FOOD: return (1L);
+
+		/* Un-aware Mushrooms */
+		case TV_MUSHROOM: return (5L);
 
 		/* Un-aware Potions */
 		case TV_POTION: return (20L);
@@ -1667,6 +1671,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		/* Food and Potions and Scrolls */
 		case TV_SPIKE:
 		case TV_FOOD:
+		case TV_MUSHROOM:
 		case TV_POTION:
 		case TV_SCROLL:
 		case TV_RUNESTONE:
@@ -5045,9 +5050,7 @@ static bool kind_is_shroom(int k_idx)
 {
 	object_kind *k_ptr = &k_info[k_idx];
 
-	if (k_ptr->tval != TV_FOOD) return (FALSE);
-
-	if (k_ptr->sval >= SV_FOOD_MIN_FOOD) return (FALSE);
+	if (k_ptr->tval != TV_MUSHROOM) return (FALSE);
 
 	return (TRUE);
 }
@@ -5452,6 +5455,7 @@ static bool kind_is_race(int k_idx)
 
 		/* Food */
 		case TV_FOOD:
+		case TV_MUSHROOM:
 		{
 			/* Hack -- monster equipment only has limited food */
 			if (hack_monster_equip & (RF8_DROP_FOOD)) return (FALSE);
@@ -5570,7 +5574,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 
 		if (food_type > 0)
 		{
-			k_idx = lookup_kind(TV_FOOD,food_type-1);
+			k_idx = lookup_kind(TV_MUSHROOM,food_type-1);
 
 			/* Handle failure */
 			if (!k_idx) return (FALSE);
@@ -5699,6 +5703,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		case TV_STAFF:
 		case TV_WAND:
 		case TV_FOOD:
+		case TV_MUSHROOM:
 		{
 			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = (byte)randint(5);
 			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = (byte)randint(3);
@@ -7621,9 +7626,8 @@ void pick_trap(int y, int x, bool player)
 					pick_attr = TERM_L_WHITE;	/* Stone visage */
 					break;
 
-				case TV_FOOD:
-					if (o_list[cave_o_idx[y][x]].sval < SV_FOOD_MIN_FOOD) pick_attr = TERM_GREEN;		/* Gas trap */
-					else pick_attr = TERM_L_PURPLE;	/* Loose rock */
+				case TV_MUSHROOM:
+					pick_attr = TERM_GREEN;		/* Gas trap */
 					break;
 
 				case TV_RUNESTONE:

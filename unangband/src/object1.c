@@ -113,7 +113,7 @@ static void flavor_assign_random(byte tval)
 		/* Skip objects which don't get a flavor */
 		if ((k_info[i].flags6 & (TR6_FLAVOR)) ==  0) continue;
 
-		if (!flavor_count) quit_fmt("Not enough flavors for tval %d.", tval);
+		if (!flavor_count) quit_fmt("Not enough flavors for tval %d (at object %d).", tval, i);
 
 		/* Select a flavor */
 		choice = rand_int(flavor_count);
@@ -195,7 +195,7 @@ void flavor_init(void)
 	flavor_assign_random(TV_STAFF);
 	flavor_assign_random(TV_WAND);
 	flavor_assign_random(TV_ROD);
-	flavor_assign_random(TV_FOOD);
+	flavor_assign_random(TV_MUSHROOM);
 	flavor_assign_random(TV_POTION);
 	flavor_assign_random(TV_SCROLL);
 
@@ -1357,7 +1357,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	}
 
 	/* Hack -- Process food/fuel */
-	else if ((cheat_peek) && ((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_FLASK)))
+	else if ((cheat_peek) && ((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_MUSHROOM) || (o_ptr->tval == TV_FLASK)))
 	{
 		/* Dump " (N charges)" */
 		object_desc_chr_macro(t, ' ');

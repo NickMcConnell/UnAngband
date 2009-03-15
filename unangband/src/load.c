@@ -276,6 +276,10 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->tval);
 	rd_byte(&o_ptr->sval);
 
+	/* Fix mushroom tval change */
+	if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval < 32))
+		o_ptr->sval = TV_MUSHROOM;
+
 	/* Special pval */
 	rd_s16b(&o_ptr->pval);
 
@@ -301,7 +305,7 @@ static errr rd_item(object_type *o_ptr)
 
 	/* Hack -- fix missing charges from flasks of oil */
 	if ((o_ptr->tval == TV_FLASK
-		 || o_ptr->tval == TV_FOOD)
+		 || o_ptr->tval == TV_FOOD || o_ptr->tval == TV_MUSHROOM)
 		&& !o_ptr->charges)
 		o_ptr->charges = k_info[o_ptr->k_idx].charges;
 

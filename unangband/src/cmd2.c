@@ -227,9 +227,9 @@ static bool auto_consume_okay(const object_type *o_ptr)
 	/* Inedible */
 	if (!item_tester_hook_food_edible(o_ptr)) return (FALSE);
 
-	/* Hack -- normal food is fine except gorging meet, etc. */
+	/* Hack -- normal food is fine except gorging meat, etc. */
 	/* You can inscribe them with !< to prevent this however */
-	if ((o_ptr->tval == TV_FOOD) && (o_ptr->sval >= SV_FOOD_MIN_FOOD)
+	if ((o_ptr->tval == TV_FOOD)
 		 && (o_ptr->sval != SV_FOOD_WAYBREAD)
 		 && (o_ptr->sval != SV_FOOD_SPRIG_OF_ATHELAS)
 		 && (o_ptr->sval != SV_FOOD_COOKED_MEET)
@@ -3209,7 +3209,7 @@ int breakage_chance(object_type *o_ptr)
 		case TV_SPELL:
 		case TV_POTION:
 		case TV_HOLD:
-		case TV_FOOD:
+		case TV_MUSHROOM:
 		case TV_JUNK:
 		case TV_SKIN:
 		case TV_EGG:
@@ -3221,6 +3221,7 @@ int breakage_chance(object_type *o_ptr)
 		/* Often break */
 		case TV_SCROLL:
 		case TV_BONE:
+		case TV_FOOD:
 		{
 			return (50);
 		}

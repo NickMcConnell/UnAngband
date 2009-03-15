@@ -1995,6 +1995,7 @@ enum
 #define TV_MAP		72
 #define TV_POTION       75
 #define TV_FLASK 77
+#define TV_MUSHROOM	79
 #define TV_FOOD  80
 #define TV_STUDY	85
 #define TV_MAGIC_BOOK   90
@@ -2616,10 +2617,7 @@ enum
 #define SV_FOOD_SPRIG_OF_ATHELAS	        43
 
 
-/*
- * Special "sval" limit -- first "normal" food
- */
-#define SV_FOOD_MIN_FOOD	32
+
 
 /*
  * Special "sval" limit -- last "normal" lite

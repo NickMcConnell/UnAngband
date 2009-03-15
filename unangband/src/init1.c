@@ -3711,19 +3711,15 @@ errr parse_k_info(char *buf, header *head)
 #endif
 
 			case TV_FOOD:
+				/* Ordinary food is "boring". */
+				k_ptr->flags6 &= ~(TR6_FLAVOR);
+				k_ptr->flags6 |= (TR6_EAT_SMART | TR6_EAT_ANIMAL | TR6_EAT_INSECT);
+				break;
 
-				/* HACK - Ordinary food is "boring". Others are flavoured. */
-				if (k_ptr->sval >= SV_FOOD_MIN_FOOD)
-				{
-					k_ptr->flags6 &= ~(TR6_FLAVOR);
-					k_ptr->flags6 |= (TR6_EAT_SMART | TR6_EAT_ANIMAL | TR6_EAT_INSECT);
-				}
-				/* Mushrooms */
-				else
-				{
-					k_ptr->flags6 |= (TR6_FLAVOR | TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
-					k_ptr->flags6 |= (TR6_EAT_ANIMAL | TR6_EAT_INSECT);
-				}
+			/* Mushrooms */
+			case TV_MUSHROOM:
+				k_ptr->flags6 |= (TR6_FLAVOR | TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				k_ptr->flags6 |= (TR6_EAT_ANIMAL | TR6_EAT_INSECT);
 				break;
 
 			case TV_LITE:
@@ -6926,7 +6922,7 @@ errr parse_u_info(char *buf, header *head)
 			/* Alchemist */
 			case STORE_ALCHEMY:
 			{
-				u_ptr->tvals_will_buy[0] = TV_FOOD; /* Was mushrooms only */
+				u_ptr->tvals_will_buy[0] = TV_MUSHROOM;
 				u_ptr->tvals_will_buy[1] = TV_SCROLL;
 				u_ptr->tvals_will_buy[2] = TV_POTION;
 				u_ptr->tvals_will_buy[3] = TV_RUNESTONE;

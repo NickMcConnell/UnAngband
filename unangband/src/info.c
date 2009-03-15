@@ -3431,14 +3431,14 @@ void list_object(const object_type *o_ptr, int mode)
 				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
 				break;
 
+			case TV_MUSHROOM:
+				vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+
+				/* Fall through */
 			case TV_FOOD:
 				vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
 				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
-				if (o_ptr->sval < SV_FOOD_MIN_FOOD)
-				{
-					vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
-					vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
-				}
 				break;
 
 			case TV_ROD:
@@ -3583,6 +3583,7 @@ void list_object(const object_type *o_ptr, int mode)
 					text_out(detail ? format("provides %d units of nourishment", o_ptr->charges * o_ptr->weight) : "provides nourishment");
 					switch (o_ptr->tval)
 					{
+						case TV_MUSHROOM:
 						case TV_FOOD:
 							break;
 						case TV_EGG:
@@ -6506,6 +6507,7 @@ s32b object_power(const object_type *o_ptr)
 
 			/* Fall through */
 		}
+		case TV_MUSHROOM:
 		case TV_FOOD:
 		{
 			if (((f2 & (TR2_IGNORE_WATER)) != 0) && ((kf2 & (TR2_IGNORE_WATER)) == 0)) p += 2;

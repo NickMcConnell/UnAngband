@@ -5733,6 +5733,7 @@ static void enchant_item(byte tval, int plev)
 			}
 		/* XXX Odd junk, but can't be food */
 		case TV_FOOD:
+		case TV_MUSHROOM:
 			{
 				kind = lookup_kind(TV_JUNK,3);
 				break;
@@ -7686,12 +7687,8 @@ bool item_tester_hook_magic_trap(const object_type *o_ptr)
 	/* Check based on tval */
 	switch(o_ptr->tval)
 	{
-		/* Undead can't eat normal food */
-		case TV_FOOD:
-			/* Normal food doesn't do much in a trap */
-			if (o_ptr->sval >= SV_FOOD_MIN_FOOD) return (FALSE);
-
 		/* All these are good */
+		case TV_MUSHROOM:
 		case TV_HAFTED:
 		case TV_SWORD:
 		case TV_POLEARM:

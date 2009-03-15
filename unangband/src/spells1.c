@@ -4677,7 +4677,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					if (kind->tval == TV_STATUE) summon_char_type = 'g';
 
 					/* Hack -- animate food */
-					if ((kind->tval == TV_FOOD) && (kind->sval >= SV_FOOD_MIN_FOOD)) summon_char_type = '!';
+					if (kind->tval == TV_FOOD) summon_char_type = '!';
 
 					/* Hack -- animate spikes */
 					if (kind->tval == TV_SPIKE) summon_char_type = '|';
@@ -10287,7 +10287,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				if (!o_ptr->k_idx) continue;
 
 				/* Skip non-food objects */
-				if (o_ptr->tval != TV_FOOD) continue;
+				if ((o_ptr->tval != TV_FOOD) && (o_ptr->tval != TV_MUSHROOM)) continue;
 
 				/* Get a description */
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);

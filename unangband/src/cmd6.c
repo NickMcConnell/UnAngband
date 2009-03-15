@@ -260,14 +260,18 @@ bool item_tester_hook_food_edible(const object_type *o_ptr)
 	/* Check based on tval */
 	switch(o_ptr->tval)
 	{
-		/* Undead can't eat normal food */
-		case TV_FOOD:
-			/* Undead cannot eat food, except harmful mushrooms */
-			if (!(p_ptr->cur_flags4 & TR4_UNDEAD)
-				|| kind_is_harmful_shroom(o_ptr->k_idx))
-				return (TRUE);
+	    /* Undead can eat harmful mushrooms */
+	    case TV_MUSHROOM:
+		    if (kind_is_harmful_shroom(o_ptr->k_idx)) return (TRUE);
 
+		/* Fall through */
+
+		/* Undead can't eat normal food */
+	    case TV_FOOD:
+			/* Undead cannot eat food, except harmful mushrooms */
+			if (!(p_ptr->cur_flags4 & TR4_UNDEAD)) return (TRUE);
 			break;
+
 
 		/* Eggs can be eaten by animals and hungry people */
 		case TV_EGG:
@@ -2063,9 +2067,7 @@ bool item_tester_hook_apply(const object_type *o_ptr)
 {
 	switch(o_ptr->tval)
 	{
-		case TV_FOOD:
-			if (o_ptr->sval < SV_FOOD_MIN_FOOD) return (TRUE);
-			break;
+		case TV_MUSHROOM:
 		case TV_POTION:
 		case TV_FLASK:
 		case TV_RUNESTONE:

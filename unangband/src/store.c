@@ -424,6 +424,7 @@ static void mass_produce(object_type *o_ptr, bool allow_discount)
 	{
 		/* Food, Flasks, and Lites */
 		case TV_FOOD:
+		case TV_MUSHROOM:
 		case TV_FLASK:
 		case TV_LITE:
 		{

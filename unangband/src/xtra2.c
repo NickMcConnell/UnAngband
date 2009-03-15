@@ -2718,6 +2718,7 @@ bool monster_death(int m_idx)
 					break;
 				}
 
+				case TV_MUSHROOM:
 				case TV_FOOD:
 				{
 					if (rand_int(100) < 50) hack_monster_equip |= (RF8_DROP_FOOD);

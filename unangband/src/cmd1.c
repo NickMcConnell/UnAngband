@@ -2456,25 +2456,19 @@ bool discharge_trap(int y, int x, int ty, int tx)
 			case TV_SCROLL:
 			case TV_FLASK:
 			case TV_LITE:
-			case TV_FOOD:
+			case TV_MUSHROOM:
 			{
-				/* For everything except boring food */
-				if ((o_ptr->tval != TV_FOOD) || (o_ptr->sval < SV_FOOD_MIN_FOOD))
-				{
-					/* Get item effect */
-					get_spell(&power, "use", o_ptr, FALSE);
+				/* Get item effect */
+				get_spell(&power, "use", o_ptr, FALSE);
 
-					/* Decrease the item */
-					floor_item_increase(cave_o_idx[y][x], -1);
-					floor_item_optimize(cave_o_idx[y][x]);
+				/* Decrease the item */
+				floor_item_increase(cave_o_idx[y][x], -1);
+				floor_item_optimize(cave_o_idx[y][x]);
 
-					/* Disarm if runs out */
-					if (!cave_o_idx[y][x]) cave_alter_source_feat(y,x,FS_DISARM);
+				/* Disarm if runs out */
+				if (!cave_o_idx[y][x]) cave_alter_source_feat(y,x,FS_DISARM);
 
-					break;
-				}
-
-				/* Boring food falls through */
+				break;
 			}
 
 			default:

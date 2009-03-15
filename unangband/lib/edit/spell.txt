@@ -226,7 +226,7 @@ P:0:0
 B:AIM:SLEEP:1/1
 
 N:14:Slow Poison
-A:80:12:1
+A:79:12:1
 A:90:33:3
 A:90:2:2
 A:90:53:2
@@ -1464,7 +1464,7 @@ D:An image of your surroundings forms in your mind...
 N:96:Cure Serious Wounds
 A:55:31:1
 A:75:35:1
-A:80:16:1
+A:79:16:1
 A:91:6:5
 A:92:4:6
 C:2:7:5:38:4
@@ -1502,7 +1502,7 @@ F:CURE_CUTS | CURE_STUN |
 
 N:99:Restoration
 A:66:20:1
-A:80:19:1
+A:79:19:1
 A:91:6:8
 A:91:12:4
 A:99:10:1
@@ -2468,7 +2468,7 @@ L:1d10+10
 
 N:180:Philtre of Fearlessness
 A:75:28:1
-A:80:14:1
+A:79:14:1
 A:90:13:3
 A:90:52:7
 C:1:1:2:25:4
@@ -3424,84 +3424,84 @@ B:BOLT:SOUND:7d8+(1d8)/4
 
 N:256:Poison
 A:75:81:1
-A:80:0:1
+A:79:0:1
 P:0:0
 B:SELF:POISON:10
 
 N:257:Blindness
 A:75:7:1
-A:80:1:1
+A:79:1:1
 P:0:0
 B:SELF:BLIND_WEAK:20
 
 N:258:Paranoia
-A:80:2:1
+A:79:2:1
 P:0:0
 B:SELF:FEAR_WEAK:10
 
 N:259:Confusion
 A:75:9:1
-A:80:3:1
+A:79:3:1
 P:0:0
 B:SELF:CONFUSE_WEAK:10
 
 N:260:Hallucination
-A:80:4:1
+A:79:4:1
 P:0:0
 B:SELF:HALLU:10
 S:CURE_DISEASE:16
 L:1d10+10
 
 N:261:Paralyzation
-A:80:5:1
+A:79:5:1
 P:0:0
 B:SELF:PARALYZE:5
 L:1d10+10
 
 N:262:Poisonous Food
-A:80:6:1
+A:79:6:1
 P:0:0
 B:SELF:LOSE_STR:6d6
 
 N:263:Poisonous Food
-A:80:7:1
+A:79:7:1
 P:0:0
 B:SELF:LOSE_CON:6d6
 
 N:264:Poisonous Food
-A:80:9:1
+A:79:9:1
 P:0:0
 B:SELF:LOSE_WIS:8d6
 
 N:265:Poisonous Food
-A:80:8:1
+A:79:8:1
 P:0:0
 B:SELF:LOSE_INT:8d6
 
 N:266:Poisonous Food
-A:80:10:1
+A:79:10:1
 P:0:0
 B:SELF:LOSE_CON:10d10
 
 N:267:Poisonous Food
-A:80:11:1
+A:79:11:1
 P:0:0
 B:SELF:DISEASE:10d10
 
 N:268:Cure Blindness
-A:80:13:1
+A:79:13:1
 P:0:0
 F:CURE_BLIND |
 S:CURE_DISEASE:13
 
 N:269:Cure Confusion
-A:80:15:1
+A:79:15:1
 P:0:0
 F:CURE_CONF |
 S:CURE_DISEASE:14
 
 N:270:Restore Strength and Size
-A:80:17:1
+A:79:17:1
 A:90:4:8
 C:1:16:28:95:160
 C:3:20:36:95:100
@@ -3515,7 +3515,7 @@ F:CURE_STR |
 S:CURE_DISEASE:3
 
 N:271:Restore Constition and Charisma
-A:80:18:1
+A:79:18:1
 A:90:4:9
 C:1:20:36:95:160
 C:3:24:44:95:100
@@ -3544,7 +3544,7 @@ B:SCATTER:LITE_WEAK:1/1
 F:HOLD_SONG |
 
 N:273:Slow Metabolism
-A:80:23:1
+A:79:23:1
 A:90:45:3
 A:90:16:3
 A:90:53:2
@@ -3643,7 +3643,7 @@ B:SCATTER:NOTHING
 L:10+1d10
 
 N:280:Mana
-A:80:20:1
+A:79:20:1
 P:0:0
 B:SELF:GAIN_MANA:4d5
 S:CURE_DISEASE:24
@@ -5388,13 +5388,13 @@ P:461:0
 B:8WAY_III:ELEC:110+4/1
 
 N:463:Cure Cuts
-A:80:21:1
+A:79:21:1
 P:0:0
 F:CURE_CUTS |
 S:CURE_DISEASE:8
 
 N:464:Cure Stun
-A:80:22:1
+A:79:22:1
 P:0:0
 F:CURE_STUN |
 S:CURE_DISEASE:9

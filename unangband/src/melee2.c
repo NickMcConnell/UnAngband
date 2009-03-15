@@ -6486,7 +6486,8 @@ static void process_monster(int m_idx)
 
 				/* Apply good potion / mushroom effect */
 				/* We assume anything that will eat bad mushrooms is immune to their effects */
-				if (((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_POTION)) && (k_info[o_ptr->k_idx].cost))
+				if (((o_ptr->tval == TV_FOOD) || (o_ptr->tval == TV_MUSHROOM) ||
+						(o_ptr->tval == TV_POTION)) && (k_info[o_ptr->k_idx].cost))
 				{
 					/* Hack -- use item blow routine */
 					process_item_blow(SOURCE_OBJECT, o_ptr->k_idx, o_ptr, m_ptr->fy, m_ptr->fx, TRUE);
