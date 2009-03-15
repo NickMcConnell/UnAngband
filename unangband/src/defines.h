@@ -1066,7 +1066,7 @@ enum
 #define GF_SUFFOCATE 	99
 #define GF_HUNGER	100
 #define GF_DISEASE	101
-#define GF_LOSE_MANA	102
+#define GF_HURT_MANA	102
 #define GF_WOUND	103
 #define GF_BATTER	104
 #define GF_BLIND_WEAK	105
@@ -1109,6 +1109,9 @@ enum
 #define GF_INVISIBILITY	142
 #define GF_DELAY_POISON	143
 #define GF_STICKS_TO_SNAKES	144
+#define GF_LOSE_MANA	145
+#define GF_LOSE_MANA_PERC	146
+
 
 
 

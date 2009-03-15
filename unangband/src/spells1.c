@@ -6756,6 +6756,22 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					take_hit(SOURCE_PLAYER_VAMP_DRAIN, m_ptr->r_idx, do_heal);
 				}
 			}
+			else if (who > SOURCE_MONSTER_START)
+			{
+				if (dam > 0)
+				{
+					feed_monster(who);
+
+					/* Heal */
+					m_ptr->hp += dam;
+
+					/* No overflow */
+					if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+					/* Redraw (later) if needed */
+					if (p_ptr->health_who == who) p_ptr->redraw |= (PR_HEALTH);
+				}
+			}
 			break;
 		}
 
@@ -11281,6 +11297,35 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Injure the player unless undead. We assume monsters switch this off when required. */
+		case GF_VAMP_DRAIN:
+		{
+			if (!(p_ptr->cur_flags4 & (TR4_UNDEAD)))
+			{
+				obvious = TRUE;
+				take_hit(who, what, dam);
+
+				/* Always notice */
+				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+
+				if (dam > 0)
+				{
+					feed_monster(who);
+
+					/* Heal */
+					m_ptr->hp += dam;
+
+					/* No overflow */
+					if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+
+					/* Redraw (later) if needed */
+					if (p_ptr->health_who == who) p_ptr->redraw |= (PR_HEALTH);
+				}
+			}
+
+			break;
+		}
+
 		/* Teleport the player -- use dam as power*/
 		case GF_AWAY_JUMP:
 		case GF_AWAY_ALL:
@@ -11353,7 +11398,50 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Lose a percentage of total mana */
+		case GF_LOSE_MANA_PERC:
+		{
+			if (p_ptr->msp > 100) dam = p_ptr->msp * dam / 100;
+
+			/* Fall through */
+		}
 		case GF_LOSE_MANA:
+		{
+			/* Drain the mana */
+			if (dam > p_ptr->csp)
+			{
+				p_ptr->csp = 0;
+				p_ptr->csp_frac = 0;
+
+				msg_print("Your mana is gone!");
+
+				/* Notice no mana */
+				update_smart_learn(who, SM_IMM_MANA);
+			}
+			else
+			{
+				p_ptr->csp -= dam;
+				msg_print("Your mana drains away.");
+
+				/* Monster notices */
+				update_smart_forget(who, SM_IMM_MANA);
+			}
+
+			/* Update mana */
+			p_ptr->update |= (PU_MANA);
+
+			/* Redraw mana */
+			p_ptr->redraw |= (PR_MANA);
+
+			/* Window stuff */
+			p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
+
+			dam = 0;
+
+			break;
+		}
+
+		case GF_HURT_MANA:
 		{
 			int drain;
 
