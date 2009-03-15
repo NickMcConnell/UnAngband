@@ -3532,7 +3532,7 @@ bool push_aside(int fy, int fx, monster_type *n_ptr)
 	if (turn % 2 == 0) dir += 10;
 
 	/* Check all directions radiating out from the initial direction. */
-	for (i = 0; i < 7; i++)
+	for (i = 0; i < 8; i++)
 	{
 		int side_dir = side_dirs[dir][i];
 
@@ -4367,8 +4367,10 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 		 * looks like it will get the monster to the character - or away
 		 * from him - most effectively.
 		 */
-		for (i = 0; i < 8; i++)
+		for (i = 0; i <= 8; i++)
 		{
+			if (i == 8) break;
+
 			/* Get the actual direction */
 			dir = side_dirs[dir0][i];
 
