@@ -708,6 +708,9 @@ bool player_browse(int item)
 	/* Get the item's sval */
 	sval = o_ptr->sval;
 
+	/* Save the screen */
+	screen_save();
+
 	/* Browse the object */
 	if (player_browse_object(o_ptr))
 	{

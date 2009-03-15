@@ -16647,21 +16647,21 @@ U:56
 #$ granite wall
 O:0
 W:1:1:17:0
-K:DEFAULT:766:10
+K:DEFAULT:766:5
 #$ pile of wood
-K:TUNNEL:1:10
+K:TUNNEL:1:5
 #$ open floor
-K:HURT_FIRE:502:10
+K:HURT_FIRE:502:5
 #$ fire
-K:CHASM:141:10
+K:CHASM:141:5
 #$ chasm
-K:TREE:701:10
+K:TREE:701:5
 #$ impassable tree trunk
-K:SOLID:842:10
+K:SOLID:842:5
 #$ wooden wall
-K:INNER:864:10
+K:INNER:864:5
 #$ wooden wall
-K:DOOR:1:10
+K:DOOR:1:5
 #$ open floor
 F:REMEMBER | BASH | TUNNEL | OUTER |
 F:HURT_FIRE |

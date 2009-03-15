@@ -6099,6 +6099,9 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		/* Hack -- no more attacks */
 		if (!method) break;
 
+		/* Hack -- fix number */
+		if (!num) num = 1;
+
 		/* Hack -- get new target if last target is dead / missing */
 		if ((ap_cnt) && !(target_okay())) p_ptr->command_dir = 0;
 
@@ -6151,7 +6154,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			ty = py + ddy_ddd[d];
 			tx = px + ddx_ddd[d];
 
-			if (project_one(who, what, ty, tx, damroll(damage, num), effect, flg)) obvious = TRUE;
+			if (project_one(who, what, ty, tx, damroll(num, damage), effect, flg)) obvious = TRUE;
 
 			continue;
 		}
@@ -8756,6 +8759,14 @@ void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
 		int y = GRID_Y(gp[i]);
 		int x = GRID_X(gp[i]);
 
+		region_type *r_ptr = &region_list[region];
+
+		/* Hack -- don't overwrite the 'parent' trap */
+		if (r_ptr->flags1 & (RE1_HIT_TRAP))
+		{
+			if ((y == r_ptr->y0) && (x == r_ptr->x0) && (f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP))) continue;
+		}
+
 		/* Update the region piece with the grid details */
 		region_piece_insert(y, x, gd[i], region);
 	}
@@ -9290,6 +9301,7 @@ void trigger_region(int y, int x, bool move)
 		if ((move ? ((r_ptr->flags1 & (RE1_TRIGGER_MOVE)) != 0) : ((r_ptr->flags1 & (RE1_TRIGGER_DROP)) != 0)) &&
 				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0) && (!r_ptr->delay))
 		{
+			/* Handle avoidable traps */
 			if (r_ptr->flags1 & (RE1_HIT_TRAP))
 			{
 				/* Some traps are avoidable by monsters */
@@ -9302,7 +9314,11 @@ void trigger_region(int y, int x, bool move)
 				{
 					return;
 				}
+			}
 
+			/* A real trap */
+			if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
+			{
 				/* Discharge the trap */
 				discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
 			}
