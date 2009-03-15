@@ -2306,14 +2306,12 @@ void do_cmd_alter(void)
 		more = do_cmd_bash_aux(y, x);
 	}
 #endif
-#if 0
 	/* Tunnel through walls */
 	else if (f_info[feat].flags1 & (FF1_TUNNEL))
 	{
 		/* Tunnel */
 		more = do_cmd_tunnel_aux(y, x);
 	}
-#endif
 #if 0
 
 	/* Close open doors */
