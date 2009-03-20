@@ -976,7 +976,7 @@ extern void cave_temp_mark(int y, int x, bool room);
 extern void spread_cave_temp(int y1, int x1, int range, bool room);
 extern void lite_room(int y1, int x1);
 extern void unlite_room(int y1, int x1);
-extern void change_shape(int shape, int level);
+extern void change_shape(int shape);
 extern bool concentrate_water_hook(const int y, const int x, const bool modify);
 extern bool concentrate_life_hook(const int y, const int x, const bool modify);
 extern bool concentrate_light_hook(const int y, const int x, const bool modify);

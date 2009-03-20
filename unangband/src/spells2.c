@@ -5546,25 +5546,8 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 /*
  *  Change shape. Add 'built-in' equipment for that shape.
  */
-void change_shape(int shape, int level)
+void change_shape(int shape)
 {
-	int i;
-
-	/* Remove 'built-in' equipment for old shape */
-	if (p_ptr->pshape != shape)
-	{
-		/* Wipe 'built-in' equipment for this shape */
-		for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
-		{
-			/* Currently has a 'built-in' item */
-			if (inventory[i].ident & (IDENT_STORE))
-			{
-				/* Wipe the slot */
-				object_wipe(&inventory[i]);
-			}
-		}
-	}
-
 	/* Set new shape */
 	p_ptr->pshape = shape;
 
@@ -7219,14 +7202,14 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_CHANGE_SHAPE:
 			{
 				*cancel = FALSE;
-				change_shape(s_ptr->param, level);
+				change_shape(s_ptr->param);
 				obvious = TRUE;
 				break;
 			}
 			case SPELL_REVERT_SHAPE:
 			{
 				*cancel = FALSE;
-				change_shape(p_ptr->prace, level);
+				change_shape(p_ptr->prace);
 				obvious = TRUE;
 				break;
 			}
@@ -8861,6 +8844,40 @@ void region_refresh(s16b region)
 
 
 /*
+ * Hook for setting temp grids for region
+ */
+bool region_mark_temp_hook(int y, int x, int d, s16b region)
+{
+	(void)d;
+	(void)region;
+
+	/* Verify space */
+	if (temp_n == TEMP_MAX) return (FALSE);
+
+	/* Mark the grid */
+	play_info[y][x] |= (PLAY_TEMP);
+
+	/* Add it to the marked set */
+	temp_y[temp_n] = y;
+	temp_x[temp_n] = x;
+	temp_n++;
+
+	/* Notice elsewhere */
+	return (FALSE);
+}
+
+
+/*
+ * Set PLAY_TEMP on all grids in region
+ */
+void region_mark_temp(s16b region)
+{
+	region_iterate(region, region_mark_temp_hook);
+}
+
+
+
+/*
  * Updates a region based on the shape of the defined projection.
  */
 void region_update(s16b region)
@@ -9782,7 +9799,7 @@ void process_region(s16b region)
 	int range = scale_method(method_ptr->max_range, r_ptr->level);
 	int radius = scale_method(method_ptr->radius, r_ptr->level);
 
-	int i, j;
+	int i, j, k;
 	int path_n = 0;
 	u16b path_g[99];
 
@@ -9912,7 +9929,13 @@ void process_region(s16b region)
 		int ty = r_ptr->y1;
 		int tx = r_ptr->x1;
 
-		/* Hack - remove previous list of grids */
+		/* Hack - fix range */
+		range = range ? range : MAX_RANGE;
+
+		/* Hack - mark grids with temp flags. Used to ensure wall grids are next to previous wall grids */
+		region_mark_temp(region);
+
+		/* Remove previous list of grids */
 		region_delete(region);
 
 		/* Calculate the projection path -- require orthogonal movement */
@@ -9920,7 +9943,7 @@ void process_region(s16b region)
 			&ty, &tx, PROJECT_PASS | PROJECT_THRU | PROJECT_ORTH);
 
 		/* Require a working projection path */
-		if ((path_n > r_ptr->age) || (path_n == range))
+		if ((path_n > r_ptr->age) || (path_n > range))
 		{
 			/* Remember delay factor */
 			int old_delay = op_ptr->delay_factor;
@@ -9929,29 +9952,40 @@ void process_region(s16b region)
 			int axis;
 
 			/* Get center grid (walls travel one grid per turn) */
-			int y0 = GRID_Y(path_g[(path_n > r_ptr->age) ? r_ptr->age : path_n]);
-			int x0 = GRID_X(path_g[(path_n > r_ptr->age) ? r_ptr->age : path_n]);
+			int y0 = GRID_Y(path_g[(r_ptr->age > range) ? range : r_ptr->age]);
+			int x0 = GRID_X(path_g[(r_ptr->age > range) ? range : r_ptr->age]);
 
 			/* Set delay to half normal */
 			op_ptr->delay_factor /= 2;
 
 			/*
-			 * If the center grid is both projectable and in LOS
-			 * from the origin of the effect, zap it.
+			 * If the center grid is both projectable and next to a previous wall grid, zap it.
 			 */
-			if ((cave_passable_bold(y0, x0, method_ptr->flags1)) &&
-				(generic_los(r_ptr->y0, r_ptr->x0, y0, x0, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+			if (cave_passable_bold(y0, x0, method_ptr->flags1))
 			{
-				zaps++;
-				region_piece_insert(y0, x0, r_ptr->damage, region);
+				bool near_old_wall = FALSE;
+
+				for (i = 0; (i < 8) && (!near_old_wall); i++)
+				{
+					int y = y0 + ddy_ddd[i];
+					int x = x0 + ddx_ddd[i];
+
+					if (play_info[y][x] & (PLAY_TEMP)) near_old_wall = TRUE;
+				}
+
+				if (near_old_wall)
+				{
+					zaps++;
+					region_piece_insert(y0, x0, r_ptr->damage, region);
+				}
 			}
 
 			/* If this wall spreads out from the origin, */
-			if (radius >= 1)
+			if (radius > 0)
 			{
-				/* Get the directions of spread (angular dir is 150% of this) */
-				int minor_axis1 = (major_axis +  60) % 240;
-				int minor_axis2 = (major_axis + 180) % 240;
+				/* Get the directions of spread (angles are twice this) */
+				int minor_axis1 = (major_axis +  45) % 180;
+				int minor_axis2 = (major_axis + 135) % 180;
 
 				/* Process the left, then right-hand sides of the wall */
 				for (i = 0; i < 2; i++)
@@ -9967,7 +10001,7 @@ void process_region(s16b region)
 					{
 						/* Calculate the projection path */
 						path_n = project_path(path_g, radius, y0, x0, &ty, &tx,
-							PROJECT_PASS | PROJECT_THRU);
+							PROJECT_PASS | PROJECT_THRU | PROJECT_ORTH);
 
 						/* Check all the grids */
 						for (j = 0; j < path_n; j++)
@@ -9977,14 +10011,25 @@ void process_region(s16b region)
 							tx = GRID_X(path_g[j]);
 
 							/*
-							 * If this grid is both projectable and in LOS
-							 * from the origin of the effect, zap it.
+							 * If this grid is both projectable, and next to a previous wall grid, zap it.
 							 */
-							if ((cave_passable_bold(ty, tx, method_ptr->flags1)) &&
-							    (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+							if (cave_passable_bold(ty, tx, method_ptr->flags1))
 							{
-								zaps++;
-								region_piece_insert(ty, tx, r_ptr->damage, region);
+								bool near_old_wall = FALSE;
+
+								for (k = 0; (k < 8) && (!near_old_wall); k++)
+								{
+									int y = ty + ddy_ddd[k];
+									int x = tx + ddx_ddd[k];
+
+									if (play_info[y][x] & (PLAY_TEMP)) near_old_wall = TRUE;
+								}
+
+								if (near_old_wall)
+								{
+									zaps++;
+									region_piece_insert(ty, tx, r_ptr->damage, region);
+								}
 							}
 						}
 					}
@@ -10006,6 +10051,15 @@ void process_region(s16b region)
 		{
 			r_ptr->age = AGE_LIFELESS;
 		}
+
+		/* Refresh temp grids */
+		for (i =  0; i < temp_n; i++)
+		{
+			lite_spot(temp_y[i], temp_x[i]);
+		}
+
+		/* Clear temporary grids */
+		clear_temp_array();
 	}
 
 	/* Apply seeker effect */

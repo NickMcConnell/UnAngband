@@ -2958,9 +2958,6 @@ void player_birth(void)
 		}
 	}
 
-	/* Hack -- assume the new shape */
-	change_shape(p_ptr->prace, p_ptr->lev);
-
 	/* Hack -- outfit the player */
 	player_outfit();
 
