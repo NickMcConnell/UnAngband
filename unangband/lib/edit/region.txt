@@ -79,7 +79,6 @@ F:SOURCE_FEATURE | TRIGGER_OPEN | TRIGGER_CLOSE
 
 N:3:strange rune
 G:x:o
-#U:1 + 1/10
 F:TRIGGER_MOVE | HIT_TRAP
 
 N:4:spring-loaded trap
@@ -132,39 +131,25 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:15:fine net
 G:x:U
-#R:1 + 1/10
-#F:4WAY | 4WAX | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:16:surreal painting
 G:x:p
-#R:1 + 1/10
-#A:40:60
-#F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 #Terrain glows.
 
 N:17:ever burning eye
 G:x:v
-#R:20
-#A:20:60
-#F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
-#F:LOS |
 F:CLOCKWISE | COUNTER_CLOCKWISE
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:18:upwards draft
 G:x:t
-#R:1 + 1/10
-#F:4WAY | 4WAX | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:19:deadfall
 G:x:m
-#R:3 + 1/10
-#A:30:60
-#F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 #Terrain doesn't glow - this allows trap to be avoided in darkness
@@ -172,61 +157,40 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:20:shaft of light
 G:x:Y
-#M:1+1/10
-#F:BEAM | GRID | ITEM | KILL | PLAY
-#F:LOS 
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 #Terrain glows
 
 N:21:glowing glyph
 G:x:M
-#U:4 + 1/10
-#F:SCATTER | GRID | ITEM | KILL | PLAY | MAGIC
-#F:LOS 
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:22:demonic sign
 G:x:T
-#R:10
-#A:30:60
-#F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
+I:110
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:23:Radagast's snare
 G:x:V
-#U:2 + 1/10
-#F:SCATTER
-#F:GRID | ITEM | KILL | PLAY | MAGIC
 F:TRIGGER_MOVE | HIT_TRAP
 
 N:24:siege engine
 G:x:I
-#R:12
-#F:BEAM | GRID | ITEM | KILL | PLAY
 F:PROJECTION | TRIGGER_AIM
 
 N:25:clockwork mechanism
 G:x:i
-#R:8
-#F:BEAM | GRID | ITEM | KILL | PLAY
 F:PROJECTION | AUTOMATIC
 
 N:26:mark of a white hand
 G:x:z
-#R:6
-#A:20:60
-#F:ARC | BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:PROJECTION
 
 #Fixed source and destination.
 
 N:27:shimmering portal
 G:x:Z
-#U:2
-#M:100
 F:PROJECTION | AUTOMATIC | SHINING
-#F:GRID | ITEM | KILL | PLAY | MAGIC |
 
 # Boulders are released by a deadfall and act as slow
 # moving projections towards the target.
