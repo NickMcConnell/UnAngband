@@ -2629,6 +2629,22 @@ errr parse_region_info(char *buf, header *head)
 		region_ptr->delay_reset = (u16b)delay;
 	}
 
+	/* Process 'C' for "Child region" (one line only) */
+	else if (buf[0] == 'C')
+	{
+		int child;
+
+		/* There better be a current region_ptr */
+		if (!region_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d",
+				&child)) return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		region_ptr->child_region = (u16b)child;
+	}
+
 	/* Process 'B' for "Blows" */
 	else if (buf[0] == 'B')
 	{

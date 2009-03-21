@@ -942,6 +942,8 @@ struct region_info_type
 	u32b text;      /* Text (offset) */
 
 	s16b method;	/* Instead of affecting all grids in region, use this method, if defined. */
+	s16b child_region;	/* Instead of affecting all grids in region, create a region with this type instead. */
+
 	s16b delay_reset;		/* Number of turns to reset counter to when countdown has finished */
 
 	u32b flags1;	/* Region bitflags */
@@ -971,6 +973,7 @@ struct region_type
 	byte facing;		/* Region facing */
 
 	s16b damage;		/* Damage */
+	s16b child_region;	/* Child region */
 
 	s16b delay;     	/* Number of turns effect has left */
 	s16b delay_reset;	/* Number of turns to reset counter to when countdown has finished */

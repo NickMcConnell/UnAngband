@@ -9338,8 +9338,28 @@ void trigger_region(int y, int x, bool move)
 				}
 			}
 
+			/* Create a child region */
+			if (r_ptr->child_region)
+			{
+				int child_region = 0;
+				bool obvious = FALSE;
+
+				/* Get a newly initialized region */
+				child_region = init_region(r_ptr->who, r_ptr->what, r_ptr->child_region, r_ptr->damage, r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->y0, r_ptr->x0, y, x);
+
+				/* Projection method */
+				obvious |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
+
+				/* Hack -- lifespan */
+				region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
+
+				/* Display newly created regions. Allow features to be seen underneath. */
+				if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
+				if (obvious) region_list[child_region].flags1 |= (RE1_NOTICE);
+			}
+
 			/* A real trap */
-			if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
+			else if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
 			{
 				/* Discharge the trap */
 				discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
@@ -10189,6 +10209,7 @@ s16b init_region(int who, int what, int type, int dam, int method, int effect, i
 	/* Initialise region values from region info type */
 	r_ptr->flags1 = ri_ptr->flags1;
 	r_ptr->delay_reset = ri_ptr->delay_reset;
+	r_ptr->child_region = ri_ptr->child_region;
 
 	/* Exclude one of clockwise and counter clockwise */
 	if ((r_ptr->flags1 & (RE1_CLOCKWISE)) &&

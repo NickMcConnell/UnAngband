@@ -259,6 +259,7 @@ static void wr_region(const region_type *r_ptr)
 	wr_byte(r_ptr->facing);		/* Region facing */
 
 	wr_s16b(r_ptr->damage);
+	wr_s16b(r_ptr->child_region);
 
 	wr_s16b(r_ptr->delay);     /* Number of turns effect has left */
 	wr_s16b(r_ptr->delay_reset);			/* Number of turns to reset counter to when countdown has finished */

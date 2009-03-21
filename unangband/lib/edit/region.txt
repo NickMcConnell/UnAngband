@@ -32,6 +32,7 @@
 # G: char : attr
 # I: delay between blows
 # B: blow method
+# C: child region
 # F: flags
 
 # D: description
@@ -127,6 +128,8 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:14:magic symbol
 G:x:B
+C:30
+I:5
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:15:fine net
@@ -141,7 +144,7 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:17:ever burning eye
 G:x:v
-F:CLOCKWISE | COUNTER_CLOCKWISE
+F:CLOCKWISE | COUNTER_CLOCKWISE | SHINING
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:18:upwards draft
@@ -150,6 +153,7 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:19:deadfall
 G:x:m
+C:28
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 #Terrain doesn't glow - this allows trap to be avoided in darkness
@@ -157,17 +161,18 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:20:shaft of light
 G:x:Y
-F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+F:PROJECTION | TRIGGER_MOVE | HIT_TRAP | SHINING
 
 #Terrain glows
 
 N:21:glowing glyph
 G:x:M
-F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+F:PROJECTION | TRIGGER_MOVE | HIT_TRAP | SHINING
 
 N:22:demonic sign
 G:x:T
-I:110
+C:38
+I:15
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:23:Radagast's snare

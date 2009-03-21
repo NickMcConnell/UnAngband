@@ -542,6 +542,11 @@ static void rd_region(region_type *r_ptr)
 
 	rd_s16b(&r_ptr->damage);
 
+	if (!older_than(0,6,3,7))
+	{
+		rd_s16b(&r_ptr->child_region);
+	}
+
 	rd_s16b(&r_ptr->delay);		     /* Number of turns effect has left */
 	rd_s16b(&r_ptr->delay_reset);			/* Number of turns to reset counter to when countdown has finished */
 	rd_s16b(&r_ptr->age);			/* Number of turns effect has been alive */
