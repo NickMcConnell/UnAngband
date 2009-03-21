@@ -723,7 +723,7 @@ extern void screen_roff(const monster_race *r_ptr, const monster_lore *l_ptr);
 extern void display_roff(const monster_race *r_ptr, const monster_lore *l_ptr);
 extern void screen_monster_look(const int m_idx);
 extern void display_monster_look(const int m_idx);
-extern void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter);
+extern void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter, int who);
 
 /* monster2.c */
 extern s16b poly_r_idx(int y, int x, int r_idx);

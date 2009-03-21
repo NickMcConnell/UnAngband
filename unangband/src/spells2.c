@@ -6229,7 +6229,8 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 					/* Decelerating */
 					if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (i > r_ptr->lifespan / 2)))
 					{
-						delay_current *= 2;
+						delay_current += delay_current / 3;
+						if (delay_current < 3) delay_current += 1;
 					}
 				}
 			}
@@ -6250,11 +6251,37 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			obvious |= project_method(who, what, method, effect, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE), level, py, px, ty, tx, region, flg);
 		}
 
+		/* Some region tidy up required */
+		if (region)
+		{
+			region_type *r_ptr = &region_list[region];
+
+			/*
+			 * Hack -- Some regions' source is target.
+			 *
+			 * This is used to prevent projections which have no apparent source from weirdly jumping around
+			 * the map, because the target stops being projectable from the invisible source. We set the source
+			 * for the projection here, and then keep the source in sync with the target if it moves.
+			 */
+			if ((r_ptr->flags1 & (RE1_MOVE_SOURCE)) &&
+					(method_ptr->flags1 & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX | PROJECT_JUMP)) &&
+					((method_ptr->flags1 & (PROJECT_ARC | PROJECT_STAR)) == 0) && (r_ptr->first_piece))
+			{
+				/* Set source to first projectable location */
+				r_ptr->y0 = region_piece_list[r_ptr->first_piece].y;
+				r_ptr->x0 = region_piece_list[r_ptr->first_piece].x;
+
+				/* Set target to same */
+				r_ptr->y1 = r_ptr->y0;
+				r_ptr->x1 = r_ptr->x0;
+			}
+
+			/* Notice region? */
+			if (obvious && !ap_cnt) r_ptr->flags1 |= (RE1_NOTICE);
+		}
+
 		/* Hack -- haven't cancelled */
 		*cancel = FALSE;
-
-		/* Notice region? */
-		if (obvious && region && !ap_cnt) region_list[region].flags1 |= (RE1_NOTICE);
 	}
 
 	/* Player successfully delayed casting */
@@ -9455,40 +9482,46 @@ bool region_iterate_movement(s16b region, void region_iterator(int y, int x, int
 	/* Move the destination */
 	region_iterator(r_ptr->y1, r_ptr->x1, 0, region, &ty, &tx);
 
-	/* Ensure new destination is projectable from source */
-#if 0
-	if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || (generic_los(r_ptr->y0, r_ptr->x0, ty, tx, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
-	{
-#endif
+	/* Attempt at efficiency */
 	if ((r_ptr->y1 != ty) || (r_ptr->x1 != tx))
 	{
 		r_ptr->y1 = ty;
 		r_ptr->x1 = tx;
 		update_facing = TRUE;
 	}
-#if 0
-	}
-#endif
 
 	/* Move the source if requested */
 	if (r_ptr->flags1 & (RE1_MOVE_SOURCE))
 	{
-		/* Move the source */
-		region_iterator(r_ptr->y0, r_ptr->x0, 0, region, &ty, &tx);
-#if 0
-		/* Ensure new source is projectable from destination */
-		if (((r_ptr->flags1 & (RE1_PROJECTION)) == 0) || (generic_los(ty, tx, r_ptr->y1, r_ptr->x1, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF)))
+		/*
+		 * Hack -- Some regions' source is target.
+		 *
+		 * This is used to prevent projections which have no apparent source from weirdly jumping around
+		 * the map, because the target stops being projectable from the invisible source. We set the source
+		 * for the projection as the target when initialized, and then keep the source in sync with the target
+		 * here.
+		 */
+		if ((method_ptr->flags1 & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX | PROJECT_JUMP)) &&
+				((method_ptr->flags1 & (PROJECT_ARC | PROJECT_STAR)) == 0))
 		{
-#endif
-			if ((r_ptr->y0 != ty) || (r_ptr->x0 != tx))
-			{
-				r_ptr->y0 = ty;
-				r_ptr->x0 = tx;
-				update_facing = TRUE;
-			}
-#if 0
+			/* Set source to target */
+			ty = r_ptr->y1;
+			tx = r_ptr->x1;
 		}
-#endif
+
+		else
+		{
+			/* Move the source */
+			region_iterator(r_ptr->y0, r_ptr->x0, 0, region, &ty, &tx);
+		}
+
+		/* Attempt at efficiency */
+		if ((r_ptr->y0 != ty) || (r_ptr->x0 != tx))
+		{
+			r_ptr->y0 = ty;
+			r_ptr->x0 = tx;
+			update_facing = TRUE;
+		}
 	}
 
 	/* Update the facing */
@@ -9628,7 +9661,7 @@ void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 	{
 		/* Try to get a target (nearest or next-nearest monster) */
 		get_closest_monster(randint(2), y, x,
-			ty, tx, (method_ptr->flags1 & (PROJECT_LOS)) != 0 ? 0x01 : 0x02);
+			ty, tx, (method_ptr->flags1 & (PROJECT_LOS)) != 0 ? 0x01 : 0x02, r_ptr->who);
 	}
 
 	/* No valid target, targetting self, or monster is in an impassable grid */
@@ -9839,7 +9872,8 @@ void process_region(s16b region)
 	/* Decelerating */
 	if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (r_ptr->age > r_ptr->lifespan / 2)))
 	{
-		r_ptr->delay_reset *= 2;
+		r_ptr->delay_reset += r_ptr->delay_reset / 3;
+		if (r_ptr->delay_reset < 3) r_ptr->delay_reset += 1;
 	}
 
 	/* Reset count */

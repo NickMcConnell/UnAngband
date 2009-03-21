@@ -2117,7 +2117,7 @@ void screen_monster_look(const int m_idx)
  *
  * Set ty and tx to zero on failure.
  */
-void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameters)
+void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameters, int who)
 {
 	monster_type *m_ptr;
 
@@ -2132,8 +2132,8 @@ void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter
 	bool player = FALSE;
 
 	/* Allocate some arrays */
-	monster_dist = C_ZNEW(z_info->m_max, int);
-	monster_index = C_ZNEW(z_info->m_max, int);
+	monster_dist = C_ZNEW(z_info->m_max + 1, int);
+	monster_index = C_ZNEW(z_info->m_max + 1, int);
 
 	/* Note that we're looking from the character's grid */
 	if ((y0 == p_ptr->py) && (x0 == p_ptr->px)) player = TRUE;
@@ -2153,6 +2153,15 @@ void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter
 
 		/* Paranoia -- skip "dead" monsters */
 		if (!m_ptr->r_idx) continue;
+
+		/* Skip the caster */
+		if (who == i) continue;
+
+		/* Skip allies */
+		if ((who > SOURCE_MONSTER_START) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0)) continue;
+
+		/* Skip player allies */
+		if ((who <= SOURCE_PLAYER_START) && ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) continue;
 
 		/* Check for visibility */
 		if (parameters & (0x04))
@@ -2196,6 +2205,13 @@ void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter
 		monster_index[monster_count++] = i;
 	}
 
+	/* Check the player? */
+	if (who > SOURCE_PLAYER_START)
+	{
+		monster_dist[monster_count] = distance(y0, x0, p_ptr->py, p_ptr->px);
+		monster_index[monster_count++] = -1;
+	}
+
 	/* Not enough monsters found */
 	if (monster_count <= n)
 	{
@@ -2237,12 +2253,22 @@ void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter
 	/* Get the nth closest monster's index */
 	r_idx = monster_index[n];
 
-	/* Get the monster */
-	m_ptr = &m_list[r_idx];
+	/* Going for the player */
+	if (r_idx < 0)
+	{
+		/* Set the target to player's location */
+		*ty = p_ptr->py;
+		*tx = p_ptr->px;
+	}
+	else
+	{
+		/* Get the monster */
+		m_ptr = &m_list[r_idx];
 
-	/* Set the target to its location */
-	*ty = m_ptr->fy;
-	*tx = m_ptr->fx;
+		/* Set the target to its location */
+		*ty = m_ptr->fy;
+		*tx = m_ptr->fx;
+	}
 
 	/* Free some arrays */
 	FREE(monster_dist);

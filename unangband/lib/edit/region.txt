@@ -255,7 +255,7 @@ F:ATTR_EFFECT
 
 N:35:wave
 G:*:b
-I:25
+I:1
 F:AUTOMATIC | WALL | RANDOM | DECELERATE
 F:ATTR_EFFECT
 
@@ -266,7 +266,7 @@ G:*:r
 I:64
 F:AUTOMATIC | ACCELERATE | RANDOM
 B:BALL_MINOR
-F:ATTR_EFFECT
+F:ATTR_EFFECT | MOVE_SOURCE
 
 # Chains of monster seeking attacks - Used by Chain Lightning
 
