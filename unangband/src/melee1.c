@@ -801,15 +801,16 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			continue;
 		}
 
+		/* Handle tense changes */
+		if (*s == '|')
+		{
+			continue;
+		}
+
 		/* String ends in punctuation? */
-		if ((*s == '.') || (*s == '!') || (*s == '?'))
+		else if ((*s == '.') || (*s == '!') || (*s == '?'))
 		{
 			punctuate = FALSE;
-		}
-		/* Otherwise, need to end the string with punctuation */
-		else
-		{
-			punctuate = TRUE;
 		}
 
 		/* Handle the target*/
