@@ -194,7 +194,7 @@ X:4:5:0:0
 Z:2:2
 G:h
 S:264:515:265:266:772:773:0:0
-L:0:0:411:155:0:0:0:SURFACE | TOWN | FEATURE:
+L:0:0:411:155:0:0:0:SURFACE | TOWN | FEATURE:the town of
 D:Here your adventure begins.  You can travel to Farmer Maggot's Farm or
 D: the East Road from here --- the easiest route by far is the East Road
 D: and then to Bree.  Press < to travel from any town, or when near the
@@ -224,7 +224,7 @@ X:1:12:0:0
 G:h
 R:ANIMAL
 S:904:0:0:0:0:0:0:0
-L:0:0:435:420:0:0:0:SURFACE | TOWN | FEATURE:
+L:0:0:435:420:0:0:0:SURFACE | TOWN | FEATURE:the
 D:The road ahead is long but straight; it takes you to beyond the edge of
 D: the Shire to Bree.  Choose your path carefully!  Once your feet take
 D: you further, it may be a while before you return to Hobbiton, older,
@@ -239,9 +239,9 @@ Q:6:111
 G:,
 R:ANIMAL
 S:507:0:0:0:0:0:0:0
-L:2:0:435:0:4:0:0:SURFACE | TOWN | FEATURE | MORE:
-L:3:114:0:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:6:114:0:0:111:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:2:0:435:0:4:0:0:SURFACE | TOWN | FEATURE | MORE:Farmer
+L:3:114:0:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:the cellars of
+L:6:114:0:0:111:0:0:FEATURE | ROOMS | TUNNELS | LESS:cellars' back exit in the
 D:The barnyard of Farmer Maggot's farm looks littered and deserted, and
 D: you hear vicious barking muffled as if by great distance.  The trap
 D: doors of the famous farm cellars are open; to climb down, press '>'
@@ -252,7 +252,7 @@ X:5:7:0:0
 G:h
 R:ANIMAL
 S:903:0:0:0:0:0:0:0
-L:0:0:435:153:0:0:0:SURFACE | TOWN | FEATURE:
+L:0:0:435:153:0:0:0:SURFACE | TOWN | FEATURE:the
 D:This is the farthest you've been from the Shire --- ahead, dark clouds
 D: gather.  Choose your path carefully!  Once you cross the Brandywine to
 D: Buckland, it may be a while before you return to Hobbiton, and in some
@@ -265,23 +265,23 @@ Q:6:546
 G:h
 R:ANIMAL
 S:8:9:10:11:12:13:268:778
-L:0:0:420:408:0:0:0:SURFACE | TOWN | FEATURE:
+L:0:0:420:408:0:0:0:SURFACE | TOWN | FEATURE:Bucklebury town in
 
 N:8:Old Forest
 X:7:10:0:0
 Q:9:622
 R:PLANT
-L:6:420:420:153:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:7:420:420:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:8:420:420:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:10:0:420:153:622:0:0:TOWN | FEATURE | LESS:
+L:6:420:420:153:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:Bonfire Glade in the
+L:7:420:420:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:a knoll in the
+L:8:420:420:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:Withywindle river in the
+L:10:0:420:153:622:0:0:TOWN | FEATURE | LESS:a willow clearing in the
 
 N:9:Bombadil's house
 X:8:0:0:0
 G:H
 S:514:776:0:0:0:0:0:0
-L:11:0:420:153:307:0:0:SURFACE | TOWN | FEATURE | MORE:
-L:12:56:1:420:307:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:11:0:420:153:307:0:0:SURFACE | TOWN | FEATURE | MORE:Tom
+L:12:56:1:420:307:0:0:FEATURE | ROOMS | TUNNELS | LESS:the basement under Tom
 D:Goldberry's gifts can be found at her pool.
 
 # TODO: perhaps split them: 5--17 initially, weak guardian at the bottom.
@@ -305,9 +305,9 @@ Q:2:546
 Y:440:28
 W:440:28
 S:8:9:10:11:12:13:268:775
-L:0:0:407:408:0:0:0:SURFACE | TOWN | FEATURE | MORE:
-L:1:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:4:56:0:0:620:0:0:ROOMS | TUNNELS | LESS:
+L:0:0:407:408:0:0:0:SURFACE | TOWN | FEATURE | MORE:the town of
+L:1:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:sewers of
+L:4:56:0:0:620:0:0:ROOMS | TUNNELS | LESS:the dump outside
 D:Life goes as usual in Bree.  Men and hobbits trade peacefully together,
 D: despite the strange men recently coming from the south.  Regrettably,
 D: hobbits from the outskirts of the town can't help feeling unsafe since
@@ -319,17 +319,17 @@ D: the grates.
 
 N:13:Trollshaws Forest
 X:12:16:0:0
-L:4:420:420:155:343:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:5:419:0:0:344:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:6:56:0:0:345:0:0:ROOMS | TUNNELS | LESS:
+L:4:420:420:155:343:0:0:SURFACE | FEATURE | TUNNELS | MORE:a hill in
+L:5:419:0:0:344:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:the Troll Clearing in
+L:6:56:0:0:345:0:0:ROOMS | TUNNELS | LESS:the Troll Cave in
 
 N:14:Midgewater Marshes
 X:12:15:0:0
 G:R
 R:INSECT
-L:10:435:153:199:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:11:56:0:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:17:56:0:153:215:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:10:435:153:199:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:the
+L:11:56:0:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:the
+L:17:56:0:153:215:0:0:FEATURE | ROOMS | TUNNELS | LESS:the
 
 # Goes upwards
 # No guardian at the top, but worth exploring due to treasure at the top
@@ -339,14 +339,14 @@ X:10:14:16:0
 Y:449:28
 W:449:28
 S:954:0:0:0:0:0:0:0
-L:17:420:56:49:0:31:0:SURFACE | TOWER | FEATURE | TUNNELS:
-L:18:56:0:0:0:31:0:TOWER | LESS | MORE:
-L:30:0:407:0:0:31:0:TOWER | TOWN | FEATURE | LESS:
+L:17:420:56:49:0:31:0:SURFACE | TOWER | FEATURE | TUNNELS:the hill of
+L:18:56:0:0:0:31:0:TOWER | LESS | MORE:the tower of
+L:30:0:407:0:0:31:0:TOWER | TOWN | FEATURE | LESS:the crown of
 
 N:16:Ford to Rivendell
 X:13:15:17:0
 W:453:28
-L:8:420:154:126:0:0:0:SURFACE | FEATURE | TUNNELS:
+L:8:420:154:126:0:0:0:SURFACE | FEATURE | TUNNELS:the
 D:River Bruinen runs here swiftly over its rocky bed.  From the nearby
 D: sources in Misty Mountains down to the ford, the river is under the
 D: rule of the Lord of Rivendell.  The hidden valley of Rivendell is not
@@ -355,7 +355,7 @@ D: yet visible from here.
 N:17:Rivendell
 X:16:18:29:46
 S:267:9:10:11:519:13:268:513
-L:0:0:420:155:0:0:0:SURFACE | TOWN | FEATURE:
+L:0:0:420:155:0:0:0:SURFACE | TOWN | FEATURE:the stronghold of
 D:This is the Last Homely House on the Edge of the Wild, full of laughter
 D: and singing.  Evil things do not come into the Rivendell valley.
 
@@ -368,10 +368,10 @@ Q:19:173
 Z:47:24
 G:k
 R:HURT_LITE
-L:5:420:56:56:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:6:56:0:153:52:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:7:56:0:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:13:56:0:154:173:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:5:420:56:56:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:a path through
+L:6:56:0:153:52:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:Front Perch atop
+L:7:56:0:153:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:Goblin Town under
+L:13:56:0:154:173:0:0:FEATURE | ROOMS | TUNNELS | LESS:the Big Cavern under
 D:The High Pass over Misty Mountains is said to be the easiest road east
 D: to Mirkwood and further towards Smaug's lair.  Easiest does not mean
 D: easy.  It is too steep and too high to be even attempted when fresh
@@ -383,7 +383,7 @@ N:19:house of Beorn
 X:18:21:0:0
 R:ANIMAL
 S:269:0:0:0:0:0:0:0
-L:15:0:435:0:566:0:0:SURFACE | TOWN | FEATURE:
+L:15:0:435:0:566:0:0:SURFACE | TOWN | FEATURE:the
 D:Beorn lives in a big hall with a veranda.  He is not fond of guests.
 
 # canines dungeon, shops closed until Great Grey Wolf killed
@@ -395,9 +395,9 @@ Y:1366:21
 W:173:24
 G:C
 S:503:12:515:956:512:0:0:0
-L:10:0:420:408:0:0:0:SURFACE | TOWN | FEATURE | MORE:
-L:11:419:436:422:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:13:436:407:404:1366:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:10:0:420:408:0:0:0:SURFACE | TOWN | FEATURE | MORE:the
+L:11:419:436:422:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:the
+L:13:436:407:404:1366:0:0:FEATURE | ROOMS | TUNNELS | LESS:the
 D:Wolves are howling around.  Woodmen keep hidden inside their fenced
 D: village on the western edge of Mirkwood.
 
@@ -406,11 +406,11 @@ X:19:20:22:0
 G:l
 R:CAN_CLIMB
 S:270:271:503:11:12:504:505:0
-L:13:420:56:153:637:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:14:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:25:0:1:155:0:0:0:TOWN | FEATURE | LESS | MORE:
-L:26:56:155:0:1082:0:0:FEATURE | ROOMS | TUNNELS | LESS:
-D: Dark shapes scuttle in the shadows, once on the right, once on the left
+L:13:420:56:153:637:0:0:SURFACE | FEATURE | TUNNELS | MORE:a road through
+L:14:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:Elvenking's halls in
+L:25:0:1:155:0:0:0:TOWN | FEATURE | LESS | MORE:the Storage Cellars under
+L:26:56:155:0:1082:0:0:FEATURE | ROOMS | TUNNELS | LESS:the Great Hall under
+D:Dark shapes scuttle in the shadows, once on the right, once on the left
 D: side of the road through Mirkwood the Great.  Odours of decay assail
 D: your nostrils and you hear something clicking or hissing every now and
 D: then.  Occasionally, an errant breeze stirs the heavy air and then you
@@ -435,7 +435,7 @@ X:21:25:28:0
 Z:24:24
 G:t
 R:CAN_SWIM
-L:17:155:407:49:475:0:0:SURFACE | FEATURE | TUNNELS:
+L:17:155:407:49:475:0:0:SURFACE | FEATURE | TUNNELS:the
 D:Smaug has laid waste to Lake-town.  The townsfolk gather, angry at you
 D: for disturbing his lair.  What is left of the songs of treasures and
 D: splendour you set out with?
@@ -445,7 +445,7 @@ D: splendour you set out with?
 N:24:the Dale
 X:21:25:28:0
 S:509:516:517:11:12:13:506:508
-L:0:0:530:153:0:0:0:SURFACE | TOWN | FEATURE:
+L:0:0:530:153:0:0:0:SURFACE | TOWN | FEATURE:that marketplace of
 D:The people of burnt Lake-town have elected to rebuild the nearby ancient
 D: Dale as their new abode.  Visit the statue to collect a reward from the
 D: grateful townsfolk.
@@ -458,10 +458,10 @@ Q:24:475
 Z:26:24
 G:B
 R:DRAGON
-L:26:435:56:154:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
-L:27:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:28:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:36:56:0:0:475:0:0:ROOMS | TUNNELS | LESS:
+L:26:435:56:154:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the
+L:27:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:western passage into the
+L:28:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the tunnels of
+L:36:56:0:0:475:0:0:ROOMS | TUNNELS | LESS:the Bottommost Hall under
 D:There is a sudden flash of gold and flame in the air... Smaug has taken
 D: flight.  You desperately cower for cover on the open mountainside... he
 D: wheels once, twice over you and departs.  In the distance, you see
@@ -475,7 +475,7 @@ Q:27:235
 Z:27:27
 G:C
 R:ESCORT
-L:30:414:56:153:235:0:0:DESTROYED | SURFACE | BATTLE | FEATURE | TUNNELS:
+L:30:414:56:153:235:0:0:DESTROYED | SURFACE | BATTLE | FEATURE | TUNNELS:the Battle of
 D:Five great armies have gathered at the promise of Smaug's riches hidden
 D: in the Lonely Mountain.
 
@@ -484,7 +484,7 @@ D: in the Lonely Mountain.
 N:27:vaults of Erebor
 X:24:0:0:0
 S:897:898:899:900:901:902:0:0
-L:21:0:56:1:0:0:0:DESTROYED | SURFACE | TOWN | FEATURE:
+L:21:0:56:1:0:0:0:DESTROYED | SURFACE | TOWN | FEATURE:the
 D:The innermost vaults of the dwarven city of Erebor, ripped open by the
 D: casting down of the mountainside by Thorin Oakenshield, which crushed
 D: many orcs and wargs and let the dwarves issue forth and turn the tide
@@ -577,7 +577,7 @@ Q:35:1313
 Z:35:35
 G::
 R:PLANT
-L:20:420:420:420:1313:0:0:SURFACE | FEATURE | TUNNELS:
+L:20:420:420:420:1313:0:0:SURFACE | FEATURE | TUNNELS:the
 D:Fangorn is a dark and mysterious forest, but Mirkwood across Anduin is
 D: even darker.  In Fangorn the trees are rumoured to be alive and eager
 D: to strangle trespassers with their roots, but in Dol Guldur, wise
@@ -618,9 +618,9 @@ Z:38:38
 G:p
 R:WARRIOR
 S:271:516:517:519:504:511:509:508
-L:8:0:533:529:1310:49:0:SURFACE | TOWER | TOWN | FEATURE:
-L:9:56:0:0:0:49:0:TOWER | LESS | MORE:
-L:27:56:0:0:1311:49:0:TOWER | LESS:
+L:8:0:533:529:1310:49:0:SURFACE | TOWER | TOWN | FEATURE:the town of
+L:9:56:0:0:0:49:0:TOWER | LESS | MORE:the town of
+L:27:56:0:0:1311:49:0:TOWER | LESS:the town of
 D:The slumbering city of Edoras.  King Theoden has gathered many warriors
 D: around him, but seeks less than wise council...
 
@@ -632,8 +632,8 @@ N:38:Hornburg
 X:50:0:0:0
 Q:36:249
 G:t
-R:ESCORT
-L:22:420:56:155:249:49:0:DESTROYED | SURFACE | TOWER | BATTLE | FEATURE | TUNNELS:
+R:TROLL
+L:22:420:56:155:249:49:0:DESTROYED | SURFACE | TOWER | BATTLE | FEATURE | TUNNELS:the Siege of
 L:23:420:56:155:249:49:0:TOWER | BATTLE | FEATURE | LESS | MORE:
 L:40:420:56:155:249:49:0:TOWER | BATTLE | FEATURE | LESS:
 D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand
@@ -661,7 +661,7 @@ D: mines behind them are home to only fouler things.
 N:40:west gates of Moria
 X:29:46:0:0
 W:52:27
-L:33:49:397:56:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
+L:33:49:397:56:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the
 L:34:56:393:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
 L:36:56:393:393:639:0:0:FEATURE | ROOMS | TUNNELS | LESS:
 D:Balin has returned to Moria and sealed the ancient door so that it's
@@ -690,7 +690,8 @@ N:42:the mines of Moria
 X:0:0:0:0
 Q:45:1277
 S:805:0:0:0:0:0:0:0
-L:22:56:0:0:0:0:0:DESTROYED | SURFACE | ROOMS | TUNNELS | MORE:
+L:22:56:0:0:0:0:0:DESTROYED | ROOMS | TUNNELS | MORE:
+L:23:56:0:0:0:0:0:ROOMS | TUNNELS | MORE | LESS
 L:30:0:1:56:1277:0:0:TOWN | FEATURE | LESS:
 D:There is a thunderous roar and rocks tumble about you.  You are plunged
 D: into darkness.  Your heart shudders; the dust finally settles. 
@@ -703,7 +704,7 @@ N:43:east Moria entrance
 X:20:0:0:0
 Q:39:262
 Z:44:27
-L:13:411:607:49:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:
+L:13:411:607:49:0:0:0:SURFACE | FEATURE | TUNNELS | MORE:Kheled-Zaram at the
 L:14:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
 L:24:56:0:0:262:0:0:ROOMS | TUNNELS | LESS:
 D:The old dwarven doors to Moria are broken open and only foul air and
@@ -718,7 +719,7 @@ D: you expect deadlier perils soon.
 N:44:east gates of Moria
 X:20:0:0:0
 Z:45:45
-L:36:411:607:49:262:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS:
+L:36:411:607:49:262:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS:the
 D:The door to Moria is closed from this direction, as Balin has returned
 D: to Moria to claim his bequest with dragon-gold.  Traces of orc camps on
 D: the shores of Kheled-Zaram and months old troll carcasses tell the
@@ -747,9 +748,9 @@ Q:20:140
 Z:47:24
 G:o
 R:GIANT
-L:7:544:56:148:140:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:8:56:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:33:56:145:0:297:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:7:544:56:148:140:0:0:SURFACE | FEATURE | TUNNELS | MORE:the
+L:8:56:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:Orc Camp across
+L:33:56:145:0:297:0:0:FEATURE | ROOMS | TUNNELS | LESS:Ogre Camp beneath
 D:Legend has it that Mount Redhorn, called also Caradhras, is Morgoth's
 D: minion.  If so, it appears asleep at the moment: the Redhorn Gate,
 D: torturous and treacherous in winter, is clearly visible and calm. 
@@ -763,10 +764,10 @@ X:17:39:0:0
 Q:48:1272
 G:C
 R:GIANT
-L:20:451:56:148:140:0:0:SURFACE | FEATURE | TUNNELS | MORE:
-L:21:56:144:145:473:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:22:56:144:145:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:40:56:144:145:1272:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:20:451:56:148:140:0:0:SURFACE | FEATURE | TUNNELS | MORE | TOWER:the blizzard-covered
+L:21:56:144:145:473:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE | TOWER:a vanishing path below
+L:22:56:144:145:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE | TOWER:the snowy slopes of
+L:40:56:144:145:1272:0:0:FEATURE | ROOMS | TUNNELS | LESS | TOWER:the peak of
 D:Legend has it that this mighty mountain is Morgoth's minion.  In good
 D: weather you'd laugh at the childish tales, confidently traversing the
 D: nearby pass.  Now, however, the storms of the mountain echo around you
@@ -798,9 +799,9 @@ Q:51:528
 G:W
 R:UNDEAD
 S:806:0:0:0:0:0:0:0
-L:48:0:420:0:528:0:0:DESTROYED | SURFACE | TOWN | FEATURE | MORE:
-L:49:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:53:56:0:0:522:0:0:ROOMS | TUNNELS | LESS:
+L:48:0:420:0:528:0:0:DESTROYED | SURFACE | TOWN | FEATURE | MORE:the
+L:49:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the
+L:53:56:0:0:522:0:0:ROOMS | TUNNELS | LESS:the
 D:A single slab of grey stone covered with bones sits here, deep in the
 D: Dimholt woods.  Beyond, you can see the pale, flickering torches that
 D: light the Dark Door of the Dead --- the entrance to the Paths of the
@@ -823,13 +824,13 @@ N:52:Pelennor Fields
 X:51:0:0:0
 G:W
 R:ESCORT
-L:43:435:411:420:535:0:0:DESTROYED | SURFACE | BATTLE | FEATURE | TUNNELS:
+L:43:435:411:420:535:0:0:SURFACE | BATTLE | FEATURE | TUNNELS:the Battle of
 
 N:53:Mount Mindolluin
 X:51:0:0:0
 R:ANIMAL
 S:777:0:0:0:0:0:0:0
-L:3:0:410:56:0:0:0:SURFACE | TOWN | FEATURE:
+L:3:0:410:56:0:0:0:SURFACE | TOWN | FEATURE:southern slopes of
 D:A white tree has found root here, among snows of mountain Mindolluin
 D: above Minas Tirith, a descendant of the sapling rescued from Numenor by
 D: King Isildur.  Come closer...
@@ -894,8 +895,8 @@ L:55:407:218:208:511:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS:
 N:61:Plains of Gorgoroth
 X:60:62:0:0
 G:o
-L:48:441:201:431:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
-L:54:56:209:0:595:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:48:441:201:431:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the
+L:54:56:209:0:595:0:0:FEATURE | ROOMS | TUNNELS | LESS:beneath the
 
 N:62:Orodruin
 X:61:63:0:0
@@ -927,7 +928,7 @@ N:64:Numenor
 X:17:0:0:0
 G:G
 R:CAN_SWIM
-L:35:403:400:49:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
+L:35:403:400:49:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the sunken city of
 L:36:399:56:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
 L:48:399:56:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS:
 
@@ -937,9 +938,9 @@ N:65:Elemental Evil
 X:17:0:0:0
 G:E
 R:PRIEST
-L:21:425:141:141:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
-L:22:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:40:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:
+L:21:425:141:141:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the Temple of
+L:22:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:depths of the Temple of
+L:40:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:bottom of the Temple of
 
 # TODO: add guardian or remove
 
@@ -947,9 +948,9 @@ N:66:Crystal Castle
 X:17:0:0:0
 G:g
 R:MAGE
-L:30:56:144:145:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
-L:31:148:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:45:148:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS:
+L:30:56:144:145:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the
+L:31:148:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:the
+L:45:148:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS:the
 
 #N:67 unused
 
@@ -960,10 +961,10 @@ L:45:148:145:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS:
 N:68:ruins of Angmar
 X:17:69:0:0
 R:UNDEAD
-L:30:425:141:141:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:
-L:31:56:141:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:
-L:50:56:0:0:535:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:51:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:
+L:30:425:141:141:0:0:0:DESTROYED | SURFACE | FEATURE | ROOMS | TUNNELS | MORE:the
+L:31:56:141:0:0:0:0:FEATURE | ROOMS | TUNNELS | LESS | MORE:the
+L:50:56:0:0:535:0:0:ROOMS | TUNNELS | LESS | MORE:the
+L:51:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:the
 
 # The non-campaign starting dungeon.
 # Must always be second to last position
@@ -972,9 +973,9 @@ N:69:Angband
 X:68:0:0:0
 Q:70:547
 S:8:9:10:11:12:13:14:15
-L:0:0:407:0:0:0:0:SURFACE | TOWN | FEATURE | MORE:
-L:1:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:60:56:0:0:547:0:0:ROOMS | TUNNELS | LESS:
+L:0:0:407:0:0:0:0:SURFACE | TOWN | FEATURE | MORE:the Siege Camp around
+L:1:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the Dungeon of
+L:60:56:0:0:547:0:0:ROOMS | TUNNELS | LESS:the Seat of Morgoth in
 D:It feels like home...
 
 # Must always be last position
