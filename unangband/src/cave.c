@@ -5566,8 +5566,61 @@ void reapply_climb(int y, int x)
 }
 
 
-
 static int old_feat;
+
+
+
+/*
+ * Chasm edge -> chasm functions
+ */
+bool require_chasm_edge(int y, int x)
+{
+	return (((f_info[cave_feat[y][x]].flags2 & (FF2_CHASM)) != 0) && (cave_feat[y][x] != FEAT_CHASM));
+}
+
+bool has_chasm_edge(int y, int x)
+{
+	return ((cave_feat[y][x] != FEAT_NONE) &&
+			((f_info[cave_feat[y][x]].flags2 & (FF2_CHASM)) == 0) &&
+			 ((f_info[cave_feat[y][x]].flags2 & (FF2_COVERED)) == 0));
+}
+
+bool redraw_chasm_edge_loss(int y, int x)
+{
+	(void)y;
+	(void)x;
+
+	return (FALSE);
+}
+
+bool redraw_chasm_edge_gain(int y, int x)
+{
+	(void)y;
+	(void)x;
+
+	return (FALSE);
+}
+
+void apply_chasm_edge(int y, int x)
+{
+	if (cave_feat[y][x] == FEAT_CHASM)
+	{
+		cave_set_feat_aux(y, x, FEAT_CHASM_E);
+	}
+}
+
+void remove_chasm_edge(int y, int x)
+{
+	old_feat = cave_feat[y][x];
+
+	cave_set_feat_aux(y, x, FEAT_CHASM);
+}
+
+void reapply_chasm_edge(int y, int x)
+{
+	cave_set_feat_aux(y, x, old_feat);
+}
+
 
 /*
  * Need tree functions
@@ -5610,55 +5663,6 @@ void reapply_tree(int y, int x)
 	cave_set_feat_aux(y, x, old_feat);
 }
 
-/*
- * Chasm edge functions
- */
-bool require_chasm_edge(int y, int x)
-{
-	return ((f_info[cave_feat[y][x]].flags2 & (FF2_CHASM)) != 0);
-}
-
-bool has_chasm_edge(int y, int x)
-{
-	return ((cave_feat[y][x] != FEAT_NONE) &&
-		 (((f_info[cave_feat[y][x]].flags2 & (FF2_CHASM)) != 0) ||
-		 ((f_info[cave_feat[y][x]].flags2 & (FF2_COVERED)) != 0)));
-}
-
-bool redraw_chasm_edge_loss(int y, int x)
-{
-	(void)y;
-	(void)x;
-
-	return (FALSE);
-}
-
-bool redraw_chasm_edge_gain(int y, int x)
-{
-	(void)y;
-	(void)x;
-
-	return (FALSE);
-}
-
-void apply_chasm_edge(int y, int x)
-{
-	(void)y;
-	(void)x;
-}
-
-void remove_chasm_edge(int y, int x)
-{
-	old_feat = cave_feat[y][x];
-
-	cave_set_feat_aux(y, x, FEAT_CHASM);
-}
-
-void reapply_chasm_edge(int y, int x)
-{
-	cave_set_feat_aux(y, x, old_feat);
-}
-
 
 void set_level_flags(int feat)
 {
@@ -5673,6 +5677,7 @@ void set_level_flags(int feat)
 	if (f_ptr->flags2 & (FF2_CHASM)) level_flag |= (LF1_CHASM);
 	if (f_ptr->flags3 & (FF3_LIVING)) level_flag |= (LF1_LIVING);
 }
+
 
 
 /*
@@ -5711,6 +5716,9 @@ void cave_set_feat(const int y, const int x, int feat)
 	bool trap = (f_ptr->flags1 & (FF1_TRAP)) !=0;
 	bool trap2 = (f_ptr2->flags1 & (FF1_TRAP)) !=0;
 
+	bool chasm_edge = ((f_ptr->flags2 & (FF2_CHASM | FF2_COVERED)) ==0) && (cave_feat[y][x] != FEAT_NONE);
+	bool chasm_edge2 = (f_ptr2->flags2 & (FF2_CHASM | FF2_COVERED)) ==0;
+
 	/* Change the feature */
 	cave_set_feat_aux(y,x,feat);
 
@@ -5730,6 +5738,12 @@ void cave_set_feat(const int y, const int x, int feat)
 	if (climb && !climb2)
 	{
 		check_attribute_lost(y, x, 1, 0, require_climb, has_climb, redraw_climb_loss, remove_climb, reapply_climb);
+	}
+
+	/* Handle removing chasms */
+	if (chasm_edge && !chasm_edge2)
+	{
+		check_attribute_lost(y, x, 1, 0, require_chasm_edge, has_chasm_edge, redraw_chasm_edge_loss, remove_chasm_edge, reapply_chasm_edge);
 	}
 
 	/* Handle destroying "need_tree" terrain */
@@ -5833,40 +5847,6 @@ void cave_set_feat(const int y, const int x, int feat)
 	/* Set the level flags based on the feature */
 	set_level_flags(feat);
 
-	/*
-	 * Handle removal of orphaned chasm edges. This is a pretting
-	 * up function, and not necessary, but it makes chasms look a lot
-	 * better. It doesn't work quite the same way as the other 'attribute'
-	 * functions above.
-	 */
-	if (f_ptr2->flags2 & (FF2_CHASM))
-	{
-		check_attribute_lost(y, x, 1, 0, require_chasm_edge, has_chasm_edge, redraw_chasm_edge_loss, remove_chasm_edge, reapply_chasm_edge);
-	}
-
-	/*
-	 * Tidy up chasms, to ensure that they have an edge.
-	 */
-	else if (has_chasm_edge(y, x))
-	{
-		for (i = 0; i < 8; i++)
-		{
-			int yy = y + ddy_ddd[i];
-			int xx = x + ddx_ddd[i];
-
-     		/* Ignore annoying locations */
-			if (!in_bounds_fully(yy, xx)) continue;
-
-			if (f_info[cave_feat[yy][xx]].flags2 == FEAT_CHASM)
-			{
-				/* Restore the grid */
-				cave_set_feat_aux(yy,xx,FEAT_CHASM_E);
-
-				break;
-			}
-		}
-	}
-
 	/* Handle creating "glowing" terrain */
 	if (!halo && halo2)
 	{
@@ -5883,6 +5863,12 @@ void cave_set_feat(const int y, const int x, int feat)
 	if (!climb && climb2)
 	{
 		gain_attribute(y, x, 2, 0, apply_climb, redraw_climb_gain);
+	}
+
+	/* Handle creating chasms */
+	if (!chasm_edge && chasm_edge2)
+	{
+		gain_attribute(y, x, 1, 0, apply_chasm_edge, redraw_chasm_edge_gain);
 	}
 
 	/* Handle gold/items */
