@@ -4757,7 +4757,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 						screen_save();
 
 						/* Recall on screen */
-						/*screen_region(r_ptr);*/
+						screen_region(r_ptr);
 
 						/* Hack -- Complete the prompt (again) */
 						Term_addstr(-1, TERM_WHITE, format("  [r,s,%s]", info));

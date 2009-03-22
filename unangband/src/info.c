@@ -1412,7 +1412,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 
 		const spell_blow *blow_ptr = &s_ptr->blow[m];
 
-		feature_type *f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
+		feature_type *f_ptr;
 
 		method  = blow_ptr->method;
 		effect  = blow_ptr->effect;
@@ -1489,6 +1489,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 		{
 			char buf[80];
 			cptr name;
+
+			f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
 
 			name = f_name + f_ptr->name;
 
@@ -1584,6 +1586,8 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 			/* Hack -- feature */
 			if (effect == GF_FEATURE)
 			{
+				f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
+
 				if (!(f_ptr->flags1 & (FF1_MOVE)))
 				{
 					text_out(format(" %s 4d8 %s", p[5], p[6]));
@@ -8046,6 +8050,7 @@ void screen_feature_roff(int f_idx)
 
 }
 
+
 /*
  * Hack -- describe the given feature in the current "term" window
  */
@@ -8073,3 +8078,389 @@ void display_feature_roff(int f_idx)
 	feature_roff_top(f_idx);
 }
 
+
+/*
+ * Hack -- display region information.
+ */
+void describe_region_basic(region_type *r_ptr)
+{
+	int n, vn;
+	cptr vp[128];
+
+	int i;
+
+	int rad, arc, rng;
+
+	cptr p[7];
+
+	method_type *method_ptr;
+	effect_type *effect_ptr;
+
+	feature_type *f_ptr;
+
+	text_out("This is a");
+
+	/* Collect sight and movement */
+	vn = 0;
+
+	/* Collect basic behaviour */
+	if (r_ptr->flags1 & (RE1_CLOCKWISE | RE1_COUNTER_CLOCKWISE)) vp[vn++] = "spinning";
+	if (r_ptr->flags1 & (RE1_SPREAD)) vp[vn++] = "spreading";
+	if (((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) &&
+			(((r_ptr->flags1 & (RE1_DECELERATE)) == 0) || (r_ptr->age < r_ptr->lifespan / 2))) vp[vn++] = "accelerating";
+	if (((r_ptr->flags1 & (RE1_DECELERATE)) != 0) &&
+			(((r_ptr->flags1 & (RE1_ACCELERATE)) == 0) || (r_ptr->age > r_ptr->lifespan / 2))) vp[vn++] = "decelerating";
+
+	/* Collect shape */
+	vp[vn++] = region_name + region_info[r_ptr->type].name;
+
+	/* Vowel? */
+	if (is_a_vowel(vp[0][0])) text_out("n ");
+	else text_out(" ");
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n)
+			{
+				if (r_ptr->flags1 & (RE1_RANDOM))
+				{
+					text_out("randomly ");
+					if (vn == 1) text_out("moving ");
+				}
+			}
+			else if ((n) && (n < vn-2)) text_out(", ");
+			else if (n == vn - 2) text_out(" ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+
+	vn = 0;
+
+	/* Collect behaviour */
+	if (r_ptr->flags1 & (RE1_SHINING)) vp[vn++] = "shines with its own light";
+	if (r_ptr->flags1 & (RE1_SEEKER)) vp[vn++] = "seeks out nearby enemies";
+	if (r_ptr->flags1 & (RE1_WALL)) vp[vn++] = "advances in a straight line";
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" which ");
+			else if ((n) && (n < vn-1)) text_out(", ");
+			else text_out(" ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+
+	vn = 0;
+
+	/* Collect future behaviour */
+	if ((r_ptr->flags1 & (RE1_CLOCKWISE)) && (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))) vp[vn++] = "change direction";
+	if (((r_ptr->flags1 & (RE1_DECELERATE)) != 0) &&
+			((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) && (r_ptr->age > r_ptr->lifespan / 2)) vp[vn++] = "begin to decelerate";
+	if (((r_ptr->flags1 & (RE1_MOVE_SOURCE)) == 0) &&
+			((r_ptr->flags1 & (RE1_SEEKER | RE1_SCALAR_VECTOR | RE1_SPREAD | RE1_WALL)) == 0)) vp[vn++] = "remain stationary";
+
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" and will ");
+			else if ((n) && (n < vn-1)) text_out(", ");
+			else text_out(" ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+
+	vn = 0;
+
+	/* End this sentence */
+	text_out(".  It ");
+
+	if (r_ptr->flags1 & (RE1_AUTOMATIC)) text_out("automatically ");
+
+	/* Get method details */
+	method_ptr = &method_info[r_ptr->method];
+	effect_ptr = &effect_info[r_ptr->effect];
+
+	rad = scale_method(method_ptr->radius, r_ptr->level);
+	arc = method_ptr->arc;
+	rng = scale_method(method_ptr->max_range, r_ptr->level);
+
+	/* Initilise the output string */
+	for (i = 0; i < 5; i++)
+	{
+		p[i] = NULL;
+	}
+
+	/* Initialise more output string */
+	p[5] = "for";
+	p[6] = "damage";
+
+	/* Get method info text */
+	p[0] = method_text + method_ptr->info[0];
+	p[3] = method_text + method_ptr->info[1];
+
+	/* Hack -- nothing */
+	if (!strlen(p[0])) p[0] = NULL;
+	if (!strlen(p[3])) p[3] = NULL;
+
+	/* Get effect info text */
+	for (i = 0; i < 6; i++)
+	{
+		/* Something to write */
+		if (strlen(effect_text + effect_ptr->info[i]))
+		{
+			/* Hack -- allow effect text to blank out method text */
+			if ((effect_text + effect_ptr->info[i])[0] == '/')
+			{
+				p[i+1] = NULL;
+			}
+			else
+			{
+				p[i+1] = effect_text + effect_ptr->info[i];
+			}
+		}
+	}
+
+	/* Hack -- handle features */
+	if (r_ptr->effect == GF_FEATURE)
+	{
+		char buf[80];
+		cptr name;
+
+		f_ptr = &f_info[f_info[r_ptr->damage].mimic];
+
+		name = f_name + f_ptr->name;
+
+		p[2] = buf;
+		sprintf(buf,"%ss %s",name,f_ptr->flags1 & (FF1_MOVE) ? "under" : "around" );
+	}
+
+	/* Describe the method */
+	if (p[0])
+	{
+		text_out(p[0]);
+		if (rng || arc || rad) text_out(" of ");
+		if (rng) text_out (format( "range %d",rng));
+		if (rng && (arc || rad)) text_out(" and ");
+		if (arc) text_out (format( "%d degrees",arc));
+		if ((rng || arc) && rad) text_out(" and ");
+		if (rad) text_out (format( "radius %d",rad));
+
+		text_out(" to");
+		if (p[1])
+		{
+			text_out(" ");
+			text_out(p[1]);
+		}
+		if (p[2])
+		{
+			text_out(" ");
+			text_out(p[2]);
+		}
+		if (p[3])
+		{
+			text_out(" ");
+			text_out(p[3]);
+		}
+	}
+	else
+	{
+		if (p[1])
+		{
+			text_out(p[1]);
+			text_out("s");
+		}
+		else text_out("affects");
+
+		if (p[2])
+		{
+			text_out(" ");
+			text_out(p[2]);
+		}
+		if (p[3])
+		{
+			text_out(" ");
+			text_out(p[3]);
+		}
+		if (rng) text_out (format( " of range %d",rng));
+
+		if (rad) text_out (format( " %s radius %d",rng ? "and" : "of", rad));
+	}
+
+	if (p[4])
+	{
+		text_out(" ");
+		text_out(p[4]);
+	}
+
+	if (r_ptr->flags1 & (RE1_TRIGGER_MOVE)) vp[vn++] = "movement";
+	if (r_ptr->flags1 & (RE1_TRIGGER_DROP)) vp[vn++] = "throwing an item into the area of effect";
+	if ((r_ptr->flags1 & (RE1_TRIGGER_OPEN)) && !(r_ptr->age)) vp[vn++] = "opening a lever";
+	if ((r_ptr->flags1 & (RE1_TRIGGER_OPEN)) && !(r_ptr->age)) vp[vn++] = "unbarring magic";
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" and is triggered by ");
+			else if ((n) && (n < vn-1)) text_out(", ");
+			else text_out(" ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+	}
+
+	vn = 0;
+
+	if (r_ptr->flags1 & (RE1_TRIGGER_CLOSE)) vp[vn++] = "closing a lever";
+	if (r_ptr->flags1 & (RE1_TRIGGER_CLOSE)) vp[vn++] = "wizard lock magic";
+
+	/* Describe innate attacks */
+	if (vn)
+	{
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (!n) text_out(" is stopped by ");
+			else if ((n) && (n < vn-1)) text_out(", ");
+			else text_out(" ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+
+		if (!r_ptr->age) text_out("when triggered");
+	}
+
+	/* Trigger recharges */
+	if (((r_ptr->flags1 & (RE1_AUTOMATIC)) == 0) && (r_ptr->delay || r_ptr->delay_reset)) text_out("recharging ");
+
+	/* Time to take effect */
+	if (r_ptr->delay)
+	{
+		text_out(format("in %d.%d turns", r_ptr->delay / 10, r_ptr->delay % 10));
+
+		if (r_ptr->delay_reset) text_out(" and then ");
+	}
+
+	/* Time to take effect */
+	if (r_ptr->delay_reset)
+	{
+		text_out(format("every %d.%d turns", r_ptr->delay_reset / 10, r_ptr->delay_reset % 10));
+	}
+
+	/* End sentence */
+	text_out(".  ");
+}
+
+
+/*
+ * Hack -- display region information
+ *
+ *
+ * This function should only be called with the cursor placed at the
+ * left edge of the screen or line, on a cleared line, in which the output is
+ * to take place.  One extra blank line is left after the recall.
+ */
+void describe_region(region_type *r_ptr)
+{
+
+	/* Describe the movement and level of the monster */
+	describe_region_basic(r_ptr);
+
+	/* All done */
+	text_out("\n");
+}
+
+
+
+
+/*
+ * Hack -- Display the "name" and "attr/chars" of a region
+ */
+void region_top(const region_type *r_ptr)
+{
+	/* Clear the top line */
+	Term_erase(0, 0, 255);
+
+	/* Reset the cursor */
+	Term_gotoxy(0, 0);
+
+	/* Dump the name */
+	Term_addstr(-1, TERM_L_BLUE, region_name + region_info[r_ptr->type].name);
+}
+
+
+/*
+ * Display an object at the top of the screen
+ */
+void screen_region(region_type *r_ptr)
+{
+	/* Flush messages */
+	message_flush();
+
+	/* Set text_out hook */
+	text_out_hook = text_out_to_screen;
+
+	/* Begin recall */
+	Term_gotoxy(0, 1);
+
+	/* Actually display the region */
+	describe_region(r_ptr);
+
+	/* Display item name */
+	region_top(r_ptr);
+}
+
+
+/*
+ * Hack -- describe the given region in the current "term" window
+ */
+void display_region(region_type *r_ptr)
+{
+	int y;
+
+	/* Erase the window */
+	for (y = 0; y < Term->hgt; y++)
+	{
+		/* Erase the line */
+		Term_erase(0, y, 255);
+	}
+
+	/* Begin recall */
+	Term_gotoxy(0, 1);
+
+	/* Output to the screen */
+	text_out_hook = text_out_to_screen;
+
+	/* Recall feature */
+	describe_region(r_ptr);
+
+	/* Describe feature  */
+	region_top(r_ptr);
+}
