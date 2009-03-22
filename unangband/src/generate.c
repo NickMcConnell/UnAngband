@@ -7138,6 +7138,8 @@ static bool add_tunnel(int y, int x, int feat)
 		dun->tunn_feat[dun->tunn_n] = feat;
 		dun->tunn_n++;
 
+		play_info[y][x] |= (PLAY_TEMP);
+
 		if ((cheat_room) && !(dun->tunn_n % 100)) message_add(format("Tunnel length %d.", dun->tunn_n), MSG_GENERIC);
 
 		return (TRUE);
@@ -7288,6 +7290,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int door_r = 0;
 	int old_row_dir = 0;
 	int old_col_dir = 0;
+	int deadends = 0;
 
 	bool flood_tunnel = FALSE;
 	bool door_flag = FALSE;
@@ -7422,7 +7425,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		}
 
 		/* Try moving randomly if we seem stuck. */
-		else if ((row1 != tmp_row) && (col1 != tmp_col))
+		else if ((row1 != tmp_row) || (col1 != tmp_col))
 		{
 			desperation++;
 
@@ -7570,6 +7573,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				if (style & (TUNNEL_PATH)) correct_dir_timer = 1;
 			}
 
+			/* Clear temp flags */
+			for (i = last_turn; i < dun->tunn_n; i++)
+			{
+				play_info[dun->tunn[i].y][dun->tunn[i].x] &= ~(PLAY_TEMP);
+			}
+
 			/* Fall back to last turn */
 			dun->tunn_n = last_turn;
 			dun->door_n = last_door;
@@ -7597,6 +7606,29 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 
 		/* Avoid "solid" granite walls */
 		if (f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_SOLID)) continue;
+
+		/* Avoid itself  */
+		if (play_info[tmp_row][tmp_col] & (PLAY_TEMP))
+		{
+			deadends++;
+
+			/* Short dead ends allowed */
+			if (deadends > 5)
+			{
+				continue;
+			}
+
+			/* Accept the location */
+			row1 = tmp_row;
+			col1 = tmp_col;
+
+			continue;
+		}
+		/* Slowly clear dead end counter */
+		else if (deadends > 0)
+		{
+			deadends--;
+		}
 
 		/* Pierce "outer" walls of rooms */
 		if ((f_info[cave_feat[tmp_row][tmp_col]].flags1 & (FF1_OUTER)) &&
@@ -7799,6 +7831,101 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 
 				/* End tunnel if required */
 				if (start_room != end_room) break;
+			}
+		}
+
+		/* Handle corridor intersections or overlaps */
+		else if (((play_info[tmp_row][tmp_col] & (PLAY_SAFE)) != 0) && ((style & (TUNNEL_PATH)) == 0))
+		{
+			bool pillar = FALSE;
+
+			/* Accept the location */
+			row1 = tmp_row;
+			col1 = tmp_col;
+
+			/* Prevent us following corridor length */
+			if ((door_flag) && !(allow_overrun))
+			{
+				if ((overrun_flag) || (dun->door_n > first_door + 6))
+				{
+					if (cheat_room) message_add(format("Overrun in doors from %d. Aborting.", part1), MSG_GENERIC);
+
+					abort_and_cleanup = TRUE;
+					break;
+				}
+
+				overrun_flag = TRUE;
+			}
+
+			/* Allowed left hand side door */
+			if (!(door_flag) || (--door_l > 0))
+			{
+				/* Add 'left-hand' door */
+				if (style & (TUNNEL_LARGE_L))
+				{
+					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
+					{
+						/* Hack -- add regular pillars to some width 3 corridors */
+						if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
+							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
+					}
+
+					/* Allow door in next grid */
+					if (!door_flag) door_l = 3;
+				}
+			}
+
+			/* Allowed left hand side door */
+			if (!(door_flag) || (--door_r > 0))
+			{
+				/* Add 'right-hand' door */
+				if (style & (TUNNEL_LARGE_R))
+				{
+
+					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
+					{
+						/* Allow door in next grid */
+						if (!door_flag) door_r = 3;
+					}
+				}
+				else
+				{
+					pillar = FALSE;
+				}
+			}
+
+			/* Collect legal door locations */
+			if ((!door_flag) && (!pillar))
+			{
+				/* Save the door location */
+				add_door(row1, col1);
+
+				/* No door in next grid */
+				door_flag = TRUE;
+
+				/* Haven't overrun doors yet */
+				overrun_flag = FALSE;
+			}
+
+			/* Force decoration in next grid */
+			decor_flag = FALSE;
+
+			/* Hack -- allow pre-emptive tunnel termination */
+			if ((rand_int(100) >= DUN_TUN_CON) && (dun->door_n < 3))
+			{
+				/* Distance between row1 and start_row */
+				tmp_row = row1 - start_row;
+				if (tmp_row < 0) tmp_row = (-tmp_row);
+
+				/* Distance between col1 and start_col */
+				tmp_col = col1 - start_col;
+				if (tmp_col < 0) tmp_col = (-tmp_col);
+
+				/* Terminate the tunnel */
+				if ((tmp_row > 10) || (tmp_col > 10))
+				{
+					break;
+				}
 			}
 		}
 
@@ -8143,100 +8270,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			decor_flag = TRUE;
 		}
 
-		/* Handle corridor intersections or overlaps */
-		else if ((style & (TUNNEL_PATH)) == 0)
-		{
-			bool pillar = FALSE;
-
-			/* Accept the location */
-			row1 = tmp_row;
-			col1 = tmp_col;
-
-			/* Prevent us following corridor length */
-			if ((door_flag) && !(allow_overrun))
-			{
-				if ((overrun_flag) || (dun->door_n > first_door + 6))
-				{
-					if (cheat_room) message_add(format("Overrun in doors from %d. Aborting.", part1), MSG_GENERIC);
-
-					abort_and_cleanup = TRUE;
-					break;
-				}
-
-				overrun_flag = TRUE;
-			}
-
-			/* Allowed left hand side door */
-			if (!(door_flag) || (--door_l > 0))
-			{
-				/* Add 'left-hand' door */
-				if (style & (TUNNEL_LARGE_L))
-				{
-					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
-					{
-						/* Hack -- add regular pillars to some width 3 corridors */
-						if ((((tmp_row + tmp_col) % ((style % 4) + 2)) == 0)
-							&& ((style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R))== 0)) pillar = TRUE;
-					}
-
-					/* Allow door in next grid */
-					if (!door_flag) door_l = 3;
-				}
-			}
-
-			/* Allowed left hand side door */
-			if (!(door_flag) || (--door_r > 0))
-			{
-				/* Add 'right-hand' door */
-				if (style & (TUNNEL_LARGE_R))
-				{
-
-					if (add_door(tmp_row + col_dir, tmp_col - row_dir))
-					{
-						/* Allow door in next grid */
-						if (!door_flag) door_r = 3;
-					}
-				}
-				else
-				{
-					pillar = FALSE;
-				}
-			}
-
-			/* Collect legal door locations */
-			if ((!door_flag) && (!pillar))
-			{
-				/* Save the door location */
-				add_door(row1, col1);
-
-				/* No door in next grid */
-				door_flag = TRUE;
-
-				/* Haven't overrun doors yet */
-				overrun_flag = FALSE;
-			}
-
-			/* Force decoration in next grid */
-			decor_flag = FALSE;
-
-			/* Hack -- allow pre-emptive tunnel termination */
-			if ((rand_int(100) >= DUN_TUN_CON) && (dun->door_n < 3))
-			{
-				/* Distance between row1 and start_row */
-				tmp_row = row1 - start_row;
-				if (tmp_row < 0) tmp_row = (-tmp_row);
-
-				/* Distance between col1 and start_col */
-				tmp_col = col1 - start_col;
-				if (tmp_col < 0) tmp_col = (-tmp_col);
-
-				/* Terminate the tunnel */
-				if ((tmp_row > 10) || (tmp_col > 10))
-				{
-					break;
-				}
-			}
-		}
 
 		/* Record old directions to check for dead ends */
 		old_row_dir = row_dir;
@@ -8337,6 +8370,12 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			cave_set_feat(y, x, dun->solid_feat[i]);
 		}
 
+		/* Clear temp flags */
+		for (i = 0; i < dun->tunn_n; i++)
+		{
+			play_info[dun->tunn[i].y][dun->tunn[i].x] &= ~(PLAY_TEMP);
+		}
+
 		return FALSE;
 	}
 
@@ -8401,6 +8440,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		/* Get the grid */
 		y = dun->tunn[i].y;
 		x = dun->tunn[i].x;
+
+		/* Clear temp flags */
+		play_info[y][x] &= ~(PLAY_TEMP);
+
+		/* Allow doors in tunnels */
+		if (dun->tunn_feat[i] > 0)
+		{
+			/* Mark as a saved corridor */
+			play_info[y][x] |= (PLAY_SAFE);
+		}
 
 		/* Apply feature - note hack */
 		if (dun->tunn_feat[i] > 1)
@@ -10619,6 +10668,9 @@ static bool place_tunnels()
 			}
 		}
 
+		/* Retrying */
+		if ((cheat_room) && (!(retries % DUN_TRIES))) message_add(format("Retrying %d.", retries), MSG_GENERIC);
+
 		/* Check if we have finished. All partition numbers will be the same. */
 		for (i = 1; i < dun->cent_n; i++)
 		{
@@ -10648,6 +10700,15 @@ static bool place_tunnels()
 			if ((!count) && (f_info[cave_feat[y + ddy_ddd[k]][x + ddx_ddd[k]]].flags1 & (FF1_SECRET))) break;
 
 			k = (4 + k + dk) % 4;
+		}
+	}
+
+	/* Hack -- Clear play safe grids */
+	for (y = 0; y < DUNGEON_HGT; y++)
+	{
+		for (x = 0; x < DUNGEON_WID; x++)
+		{
+			play_info[y][x] = 0;
 		}
 	}
 
