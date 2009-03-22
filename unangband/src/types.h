@@ -208,16 +208,15 @@ struct dungeon_zone
 	u32b name;     /* Text (offset) */
 
 	s16b level;
-	s16b fill;
+	s16b special;
 
-	s16b big;
-	s16b small;
+	s16b base;		/* Base terrain */
+	s16b fill;		/* Terrain drawn over by */
+	s16b big;		/* 'Big' terrain */
+	s16b small;		/* 'Little' terrain */
 
 	u16b guard;
 	s16b tower;
-
-	s16b special;	/* Special level */
-	s16b unused;
 
 	u32b flags1;	/* Level flags */
 	u32b flags2;	/* Room flags for whole level */

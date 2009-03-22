@@ -3225,10 +3225,10 @@ enum
 #define LF1_DESTROYED	0x00000040L
 #define LF1_LIVING  	0x00000080L
 #define LF1_SEWER 	0x00000100L
-#define LF1_SURFACE	0x00000200L
+#define LF1_SURFACE	0x00000200L	/* 'Surface' level - can see stuff in the distance */
 #define LF1_DAYLIGHT	0x00000400L
-#define LF1_TOWER	0x00000800L
-#define LF1_BATTLE	0x00001000L
+#define LF1_TOWER	0x00000800L	/* Ascend instead of descend */
+#define LF1_BATTLE	0x00001000L	/* Battlefield */
 #define LF1_VAULT	0x00002000L	/* Vault level */
 #define LF1_DUNGEON	0x00004000L	/* Dungeon level */
 #define LF1_STRONGHOLD	0x00008000L	/* Stronghold (giant/dwarf) level */
@@ -3239,7 +3239,7 @@ enum
 #define LF1_TOWN	0x00100000L	/* Town level */
 #define LF1_WILD	0x00200000L	/* Wilderness level */
 #define LF1_LABYRINTH	0x00400000L	/* Labyrinth level */
-#define LF1_FEATURE	0x00800000L	/* Chambers level */
+#define LF1_ISLANDS	0x00800000L	/* Island level */
 #define LF1_CHAMBERS	0x01000000L	/* Chambers level */
 #define LF1_DARK	0x02000000L	/* Dark room */
 #define LF1_QUEST	0x04000000L	/* Quest level */

@@ -6824,9 +6824,9 @@ void init_level_flags(void)
 	level_flag = zone->flags1;
 
 	/* Daylight if surface */
-	if ((level_flag & (LF1_SURFACE)) && (turn % (10L * TOWN_DAWN) < (10L * TOWN_DAWN) / 2))
+	if ((level_flag & (LF1_DAYLIGHT)) && (turn % (10L * TOWN_DAWN) >= (10L * TOWN_DAWN) / 2))
 	{
-		level_flag |= (LF1_DAYLIGHT);
+		level_flag &= ~(LF1_DAYLIGHT);
 	}
 
 	/* Add 'guardian' level flags */

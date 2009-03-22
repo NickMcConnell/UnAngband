@@ -161,7 +161,7 @@ static cptr d_info_lflags[] =
 	"TOWN",
 	"WILD",
 	"RUIN",
-	"FEATURE",
+	"ISLANDS",
 	"CHAMBERS",
 	"DARK",
 	"QUEST",
@@ -6721,7 +6721,7 @@ errr parse_t_info(char *buf, header *head)
 	/* Process 'L' for "Levels" (up to four lines) */
 	else if (buf[0] == 'L')
 	{
-		int name,level,fill,big,small,guard,tower,special;
+		int name,level,base,fill,big,small,guard,tower,special;
 
 		/* There better be a current t_ptr */
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -6730,11 +6730,12 @@ errr parse_t_info(char *buf, header *head)
 		if (zone == MAX_DUNGEON_ZONES) return (PARSE_ERROR_GENERIC);
 
 		/* Scan for the values */
-		if (7 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d",
-			&level, &fill, &big, &small, &guard, &tower, &special)) return (PARSE_ERROR_GENERIC);
+		if (8 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d:%d",
+			&level, &base, &fill, &big, &small, &guard, &tower, &special)) return (PARSE_ERROR_GENERIC);
 
-		/* Find the 8th colon, the one before flags (if any) */
+		/* Find the 9th colon, the one before flags (if any) */
 		s = strchr(buf, ':');
+		s = strchr(s+1, ':');
 		s = strchr(s+1, ':');
 		s = strchr(s+1, ':');
 		s = strchr(s+1, ':');
@@ -6794,6 +6795,7 @@ errr parse_t_info(char *buf, header *head)
 		/* Save the values */
 		t_ptr->zone[zone].name = name;
 		t_ptr->zone[zone].level = level;
+		t_ptr->zone[zone].base = base;
 		t_ptr->zone[zone].fill = fill;
 		t_ptr->zone[zone].big = big;
 		t_ptr->zone[zone].small = small;
@@ -10652,7 +10654,7 @@ errr emit_t_info_index(FILE *fp, header *head, int i)
 
 		if ((n) && (zone_ptr->level <= t_ptr->zone[n-1].level)) continue;
 
-		fprintf(fp, "L:%d:%d:%d:%d:%d:%d:%d:", zone_ptr->level, zone_ptr->fill, zone_ptr->big, zone_ptr->small, zone_ptr->guard, zone_ptr->tower, zone_ptr->special);
+		fprintf(fp, "L:%d:%d:%d:%d:%d:%d:%d:%d:", zone_ptr->level, zone_ptr->base, zone_ptr->fill, zone_ptr->big, zone_ptr->small, zone_ptr->guard, zone_ptr->tower, zone_ptr->special);
 
 		/* XXX We don't use the emit flags routine to ensure these flags stay on one line */
 		for (l = 0; l < 32; l++)
