@@ -9080,7 +9080,7 @@ errr eval_r_power(header *head)
 				for (j = 1; new_power > j; new_power -= j * j, j++);
 
 				/* Set rarity */
-				r_ptr->rarity = j;
+				if (r_ptr->rarity) r_ptr->rarity = j;
 #endif /* ALLOW_TEMPLATES_OUTPUT */
 			}
 		}
