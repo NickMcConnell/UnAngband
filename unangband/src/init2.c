@@ -1383,6 +1383,12 @@ static errr init_t_info(void)
 	/* Save a pointer to the parsing function */
 	t_head.parse_info_txt = parse_t_info;
 
+#ifdef ALLOW_TEMPLATES_OUTPUT
+
+	/* Save a pointer to the evaluate power function*/
+	t_head.emit_info_txt_index = emit_t_info_index;
+#endif /* ALLOW_TEMPLATES_OUTPUT */
+
 #endif /* ALLOW_TEMPLATES */
 
 	err = init_info("dungeon", &t_head);

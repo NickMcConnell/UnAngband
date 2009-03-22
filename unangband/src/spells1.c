@@ -7626,24 +7626,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (seen) obvious = TRUE;
 
-			/* Hack -- no chasm/trap doors/down stairs on quest/bottom levels */
-			if ((level_flag & (LF1_MORE)) == 0)
-			{
-				note = "falls into a chasm.";
+			note = " falls from sight.";
 
-				/* Hack -- prevent 'weird' messages */
-				if (dam == 0) obvious = FALSE;
-
-				/* Should probably make the monster fall back
-				 * into the chasm.
-				 */
-			}
-			else
-			{
-				note = " falls from sight.";
-
-				do_more = TRUE;
-			}
+			do_more = TRUE;
 
 			break;
 		}
@@ -11025,35 +11010,38 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				take_hit(who, what, dam);
 			}
 
-			/* Hack -- no chasm/trap doors on quest/bottom levels */
-			if (((level_flag & (LF1_QUEST)) == 0)
-				|| (typ == GF_FALL_MORE
+			/* Always leave level */
+			p_ptr->leaving = TRUE;
+
+			/* Require ability to go deeper or higher */
+			if (((typ == GF_FALL_MORE)
 					&& (level_flag & (LF1_MORE)))
-				|| (typ == GF_FALL_LESS
-					&& (level_flag & (LF1_MORE))))
+				|| ((typ == GF_FALL_LESS)
+					&& (level_flag & (LF1_LESS))))
 			{
-				/* Mark grid for later processing. */
-				cave_temp_mark(y, x, FALSE);
+				/* Hack -- tower level decreases depth */
+				if ((typ == GF_FALL_MORE
+						  && !(level_flag & (LF1_TOWER)))
+						 || (typ == GF_FALL_LESS
+							 && level_flag & (LF1_TOWER)))
+				{
+					/* New depth */
+					p_ptr->depth++;
+				}
+				else
+				{
+					/* New depth */
+					p_ptr->depth--;
+				}
 			}
-			/* Hack -- tower level decreases depth */
-			else if ((typ == GF_FALL_MORE
-					  && !(level_flag & (LF1_TOWER)))
-					 || (typ == GF_FALL_LESS
-						 && level_flag & (LF1_TOWER)))
+			/* Hack -- hidden Mario areas */
+			else if (t_info[p_ptr->dungeon].chasm)
 			{
-				/* New depth */
-				p_ptr->depth++;
+				/* New dungeon */
+				p_ptr->dungeon = t_info[p_ptr->dungeon].chasm;
 
-				/* Leaving */
-				p_ptr->leaving = TRUE;
-			}
-			else
-			{
-				/* New depth */
-				p_ptr->depth--;
-
-				/* Leaving */
-				p_ptr->leaving = TRUE;
+				/* Minimum depth */
+				p_ptr->depth = min_depth(p_ptr->dungeon);
 			}
 
 			/* Clear stairs */

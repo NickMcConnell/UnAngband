@@ -6824,6 +6824,7 @@ void disturb(int stop_search, int wake_up)
  */
 void init_level_flags(void)
 {
+	town_type *t_ptr = &t_info[p_ptr->dungeon];
 	dungeon_zone *zone=&t_info[0].zone[0];
 	int guard;
 
@@ -6831,95 +6832,24 @@ void init_level_flags(void)
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Get the guardian */
-	guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
+	guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone);
 
-	/* Set night and day level flag */
-	level_flag = (p_ptr->depth == min_depth(p_ptr->dungeon) ?
-				  (turn % (10L * TOWN_DAWN) < (10L * TOWN_DAWN) / 2 ?
-				   LF1_SURFACE | LF1_DAYLIGHT
-				   : LF1_SURFACE)
-				  : 0);
+	/* Set base level flags */
+	level_flag = zone->flags1;
 
-	/* Add 'common' level flags */
-	if (zone->tower) level_flag |= (LF1_TOWER);
+	/* Daylight if surface */
+	if ((level_flag & (LF1_SURFACE)) && (turn % (10L * TOWN_DAWN) < (10L * TOWN_DAWN) / 2))
+	{
+		level_flag |= (LF1_DAYLIGHT);
+	}
+
+	/* Add 'guardian' level flags */
 	if (guard && (r_info[guard].max_num > 0)) level_flag |= (LF1_GUARDIAN);
 
-	/* Define town */
-	if (!zone->fill) level_flag |= LF1_TOWN;
-
-	/* Define wilderness */
-	if ((zone->fill) && ((f_info[zone->fill].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
-	if ((zone->big) && ((f_info[zone->big].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
-	if ((zone->small) && ((f_info[zone->small].flags1 & (FF1_WALL)) != 0)) level_flag |= LF1_FEATURE;
-
-	/* No dungeon, no stairs */
-	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	/* Allow downstairs to be created on bottom level if the quest guardian has been killed */
+	if (((level_flag & (LF1_SURFACE)) == 0) && (p_ptr->depth == max_depth(p_ptr->dungeon)) &&
+		(t_ptr->quest_opens) && (r_info[t_ptr->quest_monster].max_num == 0))
 	{
-		/* Do nothing */;
+		level_flag |= (LF1_MORE);
 	}
-
-	/* Towers */
-	else if (level_flag & (LF1_TOWER))
-	{
-		/* Base of tower */
-		if (p_ptr->depth == min_depth(p_ptr->dungeon))
-		{
-			/* Do nothing -- We place upstairs as a hack */;
-		}
-
-		/* Top of tower */
-		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
-		{
-			level_flag |= (LF1_MORE);
-		}
-
-		/* In tower */
-		else
-		{
-			level_flag |= (LF1_LESS | LF1_MORE);
-		}
-	}
-	/* Others */
-	else
-	{
-		/* Surface -- must go down */
-		if (p_ptr->depth == min_depth(p_ptr->dungeon))
-		{
-			level_flag |= (LF1_MORE);
-		}
-
-		/* Bottom of dungeon -- must go up */
-		else if (p_ptr->depth == max_depth(p_ptr->dungeon))
-		{
-			level_flag |= (LF1_LESS);
-		}
-
-		/* Middle of dungeon */
-		else
-		{
-			level_flag |= (LF1_LESS | LF1_MORE);
-		}
-	}
-
-	/* At the moment, all levels have rooms and corridors */
-	level_flag |= (LF1_ROOMS | LF1_TUNNELS);
-
-	/* Hack -- All levels deeper than 20 on surface are 'destroyed' */
-	if ((p_ptr->depth > 20) && (level_flag & (LF1_SURFACE))) level_flag |= (LF1_DESTROYED);
-
-	/* Hack -- All levels with escorts are 'battlefields' */
-	if (t_info[p_ptr->dungeon].r_flag <= 32)
-	{
-		if (RF1_ESCORT & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
-		if (RF1_ESCORTS & (1L << (t_info[p_ptr->dungeon].r_flag-1))) level_flag |= (LF1_BATTLE);
-	}
-
-	/* Surface battlefields don't have rooms, but do have paths across the level */
-	if (((level_flag & (LF1_SURFACE)) != 0) && ((level_flag & (LF1_BATTLE)) != 0)) level_flag &= ~(LF1_ROOMS);
-
-	/* Non-destroyed surface locations don't have rooms, but do have paths across the level */
-	if (((level_flag & (LF1_SURFACE)) != 0) && ((level_flag & (LF1_DESTROYED)) == 0)) level_flag &= ~(LF1_ROOMS);
-
-	/* Towers don't have rooms or tunnels */
-	if (((level_flag & (LF1_TOWER)) != 0) && ((level_flag & (LF1_SURFACE)) == 0)) level_flag &= ~(LF1_ROOMS | LF1_TUNNELS);
 }

@@ -215,6 +215,12 @@ struct dungeon_zone
 
 	u16b guard;
 	s16b tower;
+
+	s16b special;	/* Special level */
+	s16b unused;
+
+	u32b flags1;	/* Level flags */
+	u32b flags2;	/* Room flags for whole level */
 };
 
 
@@ -243,7 +249,11 @@ struct town_type
 	u16b town_lockup_ifvisited;
 
 	byte r_char;    /* Add races of this char */
-	byte r_flag;    /* Add races with this flag */
+	u16b r_flag;    /* Add races with this flag */
+	byte unused;	/* Unused */
+
+	s16b chasm;		/* Hidden 'chasm' exit */
+
 	byte attained_depth; /* Absolute, not from dungeon surface */
 	byte visited;
 

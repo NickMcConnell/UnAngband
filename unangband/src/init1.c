@@ -6465,16 +6465,31 @@ static errr grab_one_town_race_flag(town_type *t_ptr, cptr what)
 {
 	t_ptr->r_flag = 1;
 
-	if (grab_one_offset(&t_ptr->r_flag, r_info_flags1, what) == 0)
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags1, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&t_ptr->r_flag, r_info_flags2, what) == 0)
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags2, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&t_ptr->r_flag, r_info_flags3, what) == 0)
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags3, what) == 0)
 		return (0);
 
-	if (grab_one_offset(&t_ptr->r_flag, r_info_flags4, what) == 0)
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags4, what) == 0)
+		return (0);
+
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags5, what) == 0)
+		return (0);
+
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags6, what) == 0)
+		return (0);
+
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags7, what) == 0)
+		return (0);
+
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags8, what) == 0)
+		return (0);
+
+	if (grab_one_offset_u16b(&t_ptr->r_flag, r_info_flags9, what) == 0)
 		return (0);
 
 	/* Oops */
@@ -6490,6 +6505,26 @@ static bool monster_not_unique(int monster_id)
 						   && r_info[monster_id].flags1 & RF1_UNIQUE);
 }
 
+
+/*
+ * Grab one level flag in an desc_type from a textual string
+ */
+static errr grab_one_zone_flag(dungeon_zone *zone_ptr, cptr what)
+{
+	if (grab_one_flag(&zone_ptr->flags1, d_info_lflags, what) == 0)
+		return (0);
+
+	if (grab_one_flag(&zone_ptr->flags2, d_info_sflags, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown dungeon zone flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+
 /*
  * Initialize the "t_info" array, by parsing an ascii "template" file
  */
@@ -6497,7 +6532,7 @@ errr parse_t_info(char *buf, header *head)
 {
 	int i;
 
-	char *s;
+	char *s, *t;
 
 	/* Current entry */
 	static town_type *t_ptr = NULL;
@@ -6667,10 +6702,26 @@ errr parse_t_info(char *buf, header *head)
 		t_ptr->replace_ifvisited = replace_ifvisited;
 	}
 
+	/* Process 'Q' for "Quests" (one line only) */
+	else if (buf[0] == 'C')
+	{
+		int chasm;
+
+		/* There better be a current t_ptr */
+		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Scan for the values */
+		if (1 != sscanf(buf+2, "%d", &chasm))
+			return (PARSE_ERROR_GENERIC);
+
+		/* Save the values */
+		t_ptr->chasm = chasm;
+	}
+
 	/* Process 'L' for "Levels" (up to four lines) */
 	else if (buf[0] == 'L')
 	{
-		int name,level,fill,big,small,guard,tower;
+		int name,level,fill,big,small,guard,tower,special;
 
 		/* There better be a current t_ptr */
 		if (!t_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -6679,10 +6730,10 @@ errr parse_t_info(char *buf, header *head)
 		if (zone == MAX_DUNGEON_ZONES) return (PARSE_ERROR_GENERIC);
 
 		/* Scan for the values */
-		if (6 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d",
-			&level, &fill, &big, &small, &guard, &tower)) return (PARSE_ERROR_GENERIC);
+		if (7 != sscanf(buf+2, "%d:%d:%d:%d:%d:%d:%d",
+			&level, &fill, &big, &small, &guard, &tower, &special)) return (PARSE_ERROR_GENERIC);
 
-		/* Find the 7th colon, the one before text (if any) */
+		/* Find the 8th colon, the one before flags (if any) */
 		s = strchr(buf, ':');
 		s = strchr(s+1, ':');
 		s = strchr(s+1, ':');
@@ -6690,6 +6741,36 @@ errr parse_t_info(char *buf, header *head)
 		s = strchr(s+1, ':');
 		s = strchr(s+1, ':');
 		s = strchr(s+1, ':');
+		s = strchr(s+1, ':');
+
+		/* Parse every entry textually */
+		if (s) for (s++; *s; )
+		{
+			bool last_entry = FALSE;
+
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|') && (*t != ':'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				if (*t == ':') last_entry = TRUE;
+
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|' || *t == ':') t++;
+			}
+
+			/* Hack -- handle empty flags */
+			if (!strlen(s)) continue;
+
+			/* Parse this entry */
+			if (0 != grab_one_zone_flag(&(t_ptr->zone[zone]), s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+
+			if (last_entry) break;
+		}
 
 		/* Verify that colon */
 		if (!s) {
@@ -6697,10 +6778,13 @@ errr parse_t_info(char *buf, header *head)
 		}
 		else {
 		  /* Take care it displays properly */
-		  if (strlen(s+1) > 25)
+		  if (strlen(s) > 25)
+		  {
+			  quit(format("%s", s));
 		    return (PARSE_ERROR_GENERIC);
+		  }
 		  /* Store the level name */
-		  if (!(name = add_name(head, s+1)))
+		  if (!(name = add_name(head, s)))
 		    return (PARSE_ERROR_OUT_OF_MEMORY);
 		}
 
@@ -6715,6 +6799,7 @@ errr parse_t_info(char *buf, header *head)
 		t_ptr->zone[zone].small = small;
 		t_ptr->zone[zone].guard = guard;
 		t_ptr->zone[zone].tower = tower;
+		t_ptr->zone[zone].special = special;
 
 		/* Find the next empty zone slot (if any) */
 		zone++;
@@ -9535,14 +9620,14 @@ errr emit_d_info_always(FILE *fp, header *head)
 
 		/* Output 'R' for "Race flag" */
 		if ((d_ptr->r_flag > 0) && (d_ptr->r_flag <= 32)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-1]);
-		else if ((d_ptr->r_flag > 32) && (d_ptr->r_flag <= 64)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-33]);
-		else if ((d_ptr->r_flag > 64) && (d_ptr->r_flag <= 96)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-65]);
-		else if ((d_ptr->r_flag > 96) && (d_ptr->r_flag <= 128)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-97]);
-		else if ((d_ptr->r_flag > 128) && (d_ptr->r_flag <= 160)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-129]);
-		else if ((d_ptr->r_flag > 160) && (d_ptr->r_flag <= 192)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-161]);
-		else if ((d_ptr->r_flag > 192) && (d_ptr->r_flag <= 224)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-193]);
-		else if ((d_ptr->r_flag > 224) && (d_ptr->r_flag <= 256)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-225]);
-		else if ((d_ptr->r_flag > 256) && (d_ptr->r_flag <= 288)) fprintf(fp, "R:%s\n", r_info_flags1[d_ptr->r_flag-257]);
+		else if ((d_ptr->r_flag > 32) && (d_ptr->r_flag <= 64)) fprintf(fp, "R:%s\n", r_info_flags2[d_ptr->r_flag-33]);
+		else if ((d_ptr->r_flag > 64) && (d_ptr->r_flag <= 96)) fprintf(fp, "R:%s\n", r_info_flags3[d_ptr->r_flag-65]);
+		else if ((d_ptr->r_flag > 96) && (d_ptr->r_flag <= 128)) fprintf(fp, "R:%s\n", r_info_flags4[d_ptr->r_flag-97]);
+		else if ((d_ptr->r_flag > 128) && (d_ptr->r_flag <= 160)) fprintf(fp, "R:%s\n", r_info_flags5[d_ptr->r_flag-129]);
+		else if ((d_ptr->r_flag > 160) && (d_ptr->r_flag <= 192)) fprintf(fp, "R:%s\n", r_info_flags6[d_ptr->r_flag-161]);
+		else if ((d_ptr->r_flag > 192) && (d_ptr->r_flag <= 224)) fprintf(fp, "R:%s\n", r_info_flags7[d_ptr->r_flag-193]);
+		else if ((d_ptr->r_flag > 224) && (d_ptr->r_flag <= 256)) fprintf(fp, "R:%s\n", r_info_flags8[d_ptr->r_flag-225]);
+		else if ((d_ptr->r_flag > 256) && (d_ptr->r_flag <= 288)) fprintf(fp, "R:%s\n", r_info_flags9[d_ptr->r_flag-257]);
 
 		fprintf(fp,"\n");
 
@@ -10151,7 +10236,7 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	/* Iterate through line */
 	for(n = 0; n < SKILL_MAX; n++)
 	{
-		fprintf(fp, "%d", pr_ptr->r_skill[n]);
+		fprintf(fp, "%d%s", pr_ptr->r_skill[n], n < SKILL_MAX - 1 ? ":" : "");
 	}
 
 	/* Terminate line */
@@ -10249,7 +10334,7 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 	/* Iterate through line */
 	for(n = 0; n < SKILL_MAX; n++)
 	{
-		fprintf(fp, "%d", pc_ptr->c_skill_base[n]);
+		fprintf(fp, "%d%s", pc_ptr->c_skill_base[n], n < SKILL_MAX - 1 ? ":" : "");
 	}
 
 	/* Terminate line */
@@ -10261,7 +10346,7 @@ errr emit_c_info_index(FILE *fp, header *head, int i)
 	/* Iterate through line */
 	for(n = 0; n < SKILL_MAX; n++)
 	{
-		fprintf(fp, "%d", pc_ptr->c_skill_improv[n]);
+		fprintf(fp, "%d%s", pc_ptr->c_skill_improv[n], n < SKILL_MAX - 1 ? ":" : "");
 	}
 
 	/* Terminate line */
@@ -10475,7 +10560,144 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 
 
 /*
- * Emit the "o_info" array into an ascii "template" file
+ * Emit the "t_info" array into an ascii "template" file
+ */
+errr emit_t_info_index(FILE *fp, header *head, int i)
+{
+	int n,l;
+
+	bool display = FALSE;
+
+	/* Current entry */
+	town_type *t_ptr = (town_type*)head->info_ptr + i;
+
+	/* Output 'N' for "New/Number/Name" */
+	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + t_ptr->name);
+
+	/* Output 'X' for "Nearby" (one line only) */
+	fprintf(fp,"X:%d:%d:%d:%d\n",t_ptr->nearby[0], t_ptr->nearby[1],t_ptr->nearby[2], t_ptr->nearby[3]);
+
+	/* Output 'C' for "Chasm" (one line only) */
+	if (t_ptr->chasm) fprintf(fp,"C:%d\n",t_ptr->chasm);
+
+	/* Output 'Q' for "Quest" (one line only) */
+	if (t_ptr->quest_opens)
+	{
+		fprintf(fp,"Q:%d:%d\n",t_ptr->quest_opens, t_ptr->quest_monster);
+	}
+
+	/* Output 'Y' for "Lock shops" (one line only) */
+	if (t_ptr->town_lockup_monster)
+	{
+		fprintf(fp,"Y:%d:%d\n",t_ptr->town_lockup_monster, t_ptr->town_lockup_ifvisited);
+	}
+
+	/* Output 'Z' for "Replace with" (one line only) */
+	if (t_ptr->replace_with)
+	{
+		fprintf(fp,"Z:%d:%d\n",t_ptr->replace_with, t_ptr->replace_ifvisited);
+	}
+
+	/* Output 'W' for "Replace guardian with" (one line only) */
+	if (t_ptr->replace_guardian)
+	{
+		fprintf(fp,"W:%d:%d\n",t_ptr->replace_guardian, t_ptr->guardian_ifvisited);
+	}
+
+	/* Output 'G' for "Graphics" (one line only) */
+	if (t_ptr->r_char)
+	{
+		fprintf(fp,"G:%c\n",t_ptr->r_char);
+	}
+
+	/* Output 'R' for "Race flag" */
+	if ((t_ptr->r_flag > 0) && (t_ptr->r_flag <= 32)) fprintf(fp, "R:%s\n", r_info_flags1[t_ptr->r_flag-1]);
+	else if ((t_ptr->r_flag > 32) && (t_ptr->r_flag <= 64)) fprintf(fp, "R:%s\n", r_info_flags2[t_ptr->r_flag-33]);
+	else if ((t_ptr->r_flag > 64) && (t_ptr->r_flag <= 96)) fprintf(fp, "R:%s\n", r_info_flags3[t_ptr->r_flag-65]);
+	else if ((t_ptr->r_flag > 96) && (t_ptr->r_flag <= 128)) fprintf(fp, "R:%s\n", r_info_flags4[t_ptr->r_flag-97]);
+	else if ((t_ptr->r_flag > 128) && (t_ptr->r_flag <= 160)) fprintf(fp, "R:%s\n", r_info_flags5[t_ptr->r_flag-129]);
+	else if ((t_ptr->r_flag > 160) && (t_ptr->r_flag <= 192)) fprintf(fp, "R:%s\n", r_info_flags6[t_ptr->r_flag-161]);
+	else if ((t_ptr->r_flag > 192) && (t_ptr->r_flag <= 224)) fprintf(fp, "R:%s\n", r_info_flags7[t_ptr->r_flag-193]);
+	else if ((t_ptr->r_flag > 224) && (t_ptr->r_flag <= 256)) fprintf(fp, "R:%s\n", r_info_flags8[t_ptr->r_flag-225]);
+	else if ((t_ptr->r_flag > 256) && (t_ptr->r_flag <= 288)) fprintf(fp, "R:%s\n", r_info_flags9[t_ptr->r_flag-257]);
+
+
+	/* Iterate through stores */
+	for(n = 0; n < 8; n++)
+	{
+		if (t_ptr->store[n]) display = TRUE;
+	}
+
+	/* Stores to display? */
+	if (display)
+	{
+		/* Output 'S' for "Shops" (one line only) */
+		fprintf(fp, "S:");
+
+		/* Iterate through line */
+		for(n = 0; n < 8; n++)
+		{
+			fprintf(fp, "%d%s", t_ptr->store[n], n < 7 ? ":" : "");
+		}
+
+		/* Terminate line */
+		fprintf(fp, "\n");
+	}
+
+	/* Iterate through dungeon zones */
+	for(n = 0; n < MAX_DUNGEON_ZONES; n++)
+	{
+		dungeon_zone *zone_ptr = &t_ptr->zone[n];
+		bool intro = FALSE;
+
+		if ((n) && (zone_ptr->level <= t_ptr->zone[n-1].level)) continue;
+
+		fprintf(fp, "L:%d:%d:%d:%d:%d:%d:%d:", zone_ptr->level, zone_ptr->fill, zone_ptr->big, zone_ptr->small, zone_ptr->guard, zone_ptr->tower, zone_ptr->special);
+
+		/* XXX We don't use the emit flags routine to ensure these flags stay on one line */
+		for (l = 0; l < 32; l++)
+		{
+			if ((zone_ptr->flags1 & (1L << l)) != 0)
+			{
+				if (intro) fprintf(fp, " | ");
+				fprintf(fp, "%s", d_info_lflags[l]);
+
+				intro = TRUE;
+			}
+		}
+
+		for (l = 0; l < 32; l++)
+		{
+			if ((zone_ptr->flags2 & (1L << l)) != 0)
+			{
+				if (intro) fprintf(fp, " | ");
+				fprintf(fp, "%s", d_info_sflags[l]);
+
+				intro = TRUE;
+			}
+		}
+
+		/* Describe zone */
+		fprintf(fp, ":%s", head->name_ptr + zone_ptr->name);
+
+		/* Terminate line */
+		fprintf(fp, "\n");
+	}
+
+
+	/* Output 'D' for "Description" */
+	emit_desc(fp, "D:", head->text_ptr + t_ptr->text);
+
+	fprintf(fp,"\n");
+
+	/* Success */
+	return (0);
+}
+
+
+
+/*
+ * Emit the "effect_info" array into an ascii "template" file
  */
 errr emit_effect_info_index(FILE *fp, header *head, int i)
 {

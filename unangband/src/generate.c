@@ -115,8 +115,6 @@
 
 /*
  * Special dungeon values */
-#define DUN_SPECIAL    	3       /* Chance in 100 of having a special dungeon */
-
 #define SPECIAL_EERIE		1		/* Islands of rock over a chasm */
 #define SPECIAL_GREAT_HALL	2		/* An open area with large square pillars & rooms */
 #define SPECIAL_GREAT_CAVE	3		/* An open area with large natural pillars & rooms */
@@ -10962,10 +10960,9 @@ static bool cave_gen(void)
 	if (cheat_room) message_add("*** Starting generating dungeon. ***", MSG_GENERIC);
 
 	/* Various special level types. Only deep in dungeon */
-	if (((level_flag & (LF1_TOWER | LF1_SURFACE)) == 0) &&
-		(rand_int(100) < DUN_SPECIAL))
+	if (zone->special)
 	{
-		dun->special = (byte)randint(MAX_SPECIAL_DUNGEONS);
+		dun->special = zone->special;
 
 		message_add(format("Building special dungeon (%d).", dun->special), MSG_GENERIC);
 
@@ -11346,6 +11343,10 @@ static bool cave_gen(void)
 	{
 		room_info[1].flags = (ROOM_ICKY);
 	}
+
+	/* Hack -- set flags on dungeon */
+	/* XXX Important that this occurs after placing the player */
+	room_info[0].flags |= zone->flags2;
 
 	/* Generation successful */
 	return(TRUE);
