@@ -9927,8 +9927,8 @@ static void place_tower()
 	/* Hack -- descending player always in tower */
 	if ((level_flag & LF1_SURFACE) && ((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0))
 	{
-		/* Clear previous contents, add dungeon entrance */
-		place_random_stairs(y, x, FEAT_MORE);
+		/* Clear previous contents, add stairs up */
+		place_random_stairs(y, x, FEAT_LESS);
 
 		/* Have created stairs */
 		p_ptr->create_stair = 0;
