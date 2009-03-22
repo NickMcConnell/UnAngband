@@ -4312,6 +4312,8 @@ static bool target_set_interactive_accept(int y, int x)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
+	s16b this_region_piece, next_region_piece = 0;
+
 
 	/* Player grids are always interesting */
 	if (cave_m_idx[y][x] < 0) return (TRUE);
@@ -4328,6 +4330,24 @@ static bool target_set_interactive_accept(int y, int x)
 
 		/* Visible monsters */
 		if (m_ptr->ml) return (TRUE);
+	}
+
+	/* Scan all regions in the grid */
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+		region_type *r_ptr = &region_list[rp_ptr->region];
+
+		/* Get the next region */
+		next_region_piece = rp_ptr->next_in_grid;
+
+		/* Skip dead regions */
+		if (!r_ptr->type) continue;
+
+		/* Displaying region */
+		if (((cheat_hear) || ((r_ptr->flags1 & (RE1_NOTICE)) != 0)) &&
+				((play_info[y][x] & (PLAY_REGN | PLAY_SEEN)) != 0) &&
+						((r_ptr->flags1 & (RE1_DISPLAY)) != 0)) return (TRUE);
 	}
 
 	/* Scan all objects in the grid */
@@ -4452,6 +4472,9 @@ static void target_set_interactive_prepare(int mode)
 key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr info)
 {
 	s16b this_o_idx, next_o_idx = 0;
+
+	s16b this_region_piece, next_region_piece = 0;
+	s16b this_region = 0;
 
 	cptr s1, s2, s3;
 
@@ -4697,6 +4720,103 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 				}
 			}
 		}
+
+		/* Regions */
+		for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+			region_type *r_ptr = &region_list[rp_ptr->region];
+
+			/* Get the next region */
+			next_region_piece = rp_ptr->next_in_grid;
+
+			/* Skip dead regions */
+			if (!r_ptr->type) continue;
+
+			/* Used for refreshing regions */
+			this_region = rp_ptr->region;
+
+			/* Displaying region */
+			if (((cheat_hear) || ((r_ptr->flags1 & (RE1_NOTICE)) != 0)) &&
+					((play_info[y][x] & (PLAY_REGN | PLAY_SEEN)) != 0) &&
+							((r_ptr->flags1 & (RE1_DISPLAY)) != 0))
+			{
+				bool recall = FALSE;
+
+				/* Not boring */
+				boring = FALSE;
+
+				/* Interact */
+				while (1)
+				{
+					/* Recall */
+					if (recall)
+					{
+						/* Save screen */
+						screen_save();
+
+						/* Recall on screen */
+						/*screen_region(r_ptr);*/
+
+						/* Hack -- Complete the prompt (again) */
+						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+
+						/* Command */
+						query = inkey_ex();
+
+						/* Load screen */
+						screen_load();
+					}
+
+					/* Normal */
+					else
+					{
+						/* Describe the object */
+						sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3,
+								format("%s %s",is_a_vowel((region_name + region_info[r_ptr->type].name)[0]) ? "an" : "a",
+										region_name + region_info[r_ptr->type].name), info);
+						prt(out_val, 0, 0);
+
+						/* Place cursor */
+						move_cursor_relative(y, x);
+
+						/* Command */
+						query = inkey_ex();
+					}
+
+					/* Normal commands */
+					if (query.key != 'r') break;
+
+					/* Toggle recall */
+					recall = !recall;
+				}
+
+				/* Stop on everything but "return"/"space" */
+				if ((query.key != '\n') && (query.key != '\r') && (query.key != ' ')) break;
+
+				/* Sometimes stop at "space" key */
+				if ((query.key == ' ') && !(mode & (TARGET_LOOK))) break;
+
+				/* Hide region on "space" key */
+				if ((query.key == ' '))
+				{
+					/* Hide this region */
+					r_ptr->flags1 &= ~(RE1_DISPLAY);
+
+					/* Refresh all grids */
+					region_refresh(this_region);
+				}
+
+				/* Change the intro */
+				s1 = "It is ";
+
+				/* Preposition */
+				s2 = "on ";
+			}
+		}
+
+		/* Double break */
+		if (this_region_piece) break;
 
 		/* Assume not floored */
 		floored = FALSE;
@@ -5056,6 +5176,22 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 
 		/* Stop on everything but "return" */
 		if ((query.key != '\n') && (query.key != '\r')) break;
+	}
+
+	/* Were looking at regions */
+	if (this_region)
+	{
+		/* Redisplay all regions */
+		for (this_region = 0; this_region < region_max; this_region++)
+		{
+			region_list[this_region].flags1 |= (RE1_DISPLAY);
+		}
+
+		/* Refresh all regions */
+		for (this_region = 0; this_region < region_max; this_region++)
+		{
+			region_refresh(this_region);
+		}
 	}
 
 	/* Keep going */

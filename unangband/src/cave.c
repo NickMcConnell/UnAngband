@@ -1324,9 +1324,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 			if (!r_ptr->type) continue;
 
 			/* Displaying region */
-			if (((r_ptr->flags1 & (RE1_DISPLAY)) != 0) &&
-					(((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) ||
-							((r_ptr->flags1 & (RE1_DISPLAY)) != 0)))
+			if (((cheat_hear) || ((r_ptr->flags1 & (RE1_NOTICE)) != 0)) &&
+					((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) &&
+							((r_ptr->flags1 & (RE1_DISPLAY)) != 0))
 			{
 				/* Display the effect */
 				if (r_ptr->flags1 & (RE1_ATTR_EFFECT))
