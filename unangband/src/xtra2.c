@@ -4474,7 +4474,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 	s16b this_o_idx, next_o_idx = 0;
 
 	s16b this_region_piece, next_region_piece = 0;
-	s16b this_region = 0;
 
 	cptr s1, s2, s3;
 
@@ -4531,7 +4530,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 			/* Repeat forever */
 			continue;
 		}
-
 
 		/* Actual monsters */
 		if (cave_m_idx[y][x] > 0)
@@ -4733,9 +4731,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 			/* Skip dead regions */
 			if (!r_ptr->type) continue;
 
-			/* Used for refreshing regions */
-			this_region = rp_ptr->region;
-
 			/* Displaying region */
 			if (((cheat_hear) || ((r_ptr->flags1 & (RE1_NOTICE)) != 0)) &&
 					((play_info[y][x] & (PLAY_REGN | PLAY_SEEN)) != 0) &&
@@ -4745,6 +4740,12 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 
 				/* Not boring */
 				boring = FALSE;
+
+				/* Bring region to 'top' */
+				region_highlight(rp_ptr->region);
+
+				/* And refresh */
+				region_refresh(rp_ptr->region);
 
 				/* Interact */
 				while (1)
@@ -4759,7 +4760,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 						/*screen_region(r_ptr);*/
 
 						/* Hack -- Complete the prompt (again) */
-						Term_addstr(-1, TERM_WHITE, format("  [r,%s]", info));
+						Term_addstr(-1, TERM_WHITE, format("  [r,s,%s]", info));
 
 						/* Command */
 						query = inkey_ex();
@@ -4772,7 +4773,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 					else
 					{
 						/* Describe the object */
-						sprintf(out_val, "%s%s%s%s [r,%s]", s1, s2, s3,
+						sprintf(out_val, "%s%s%s%s [r,s,%s]", s1, s2, s3,
 								format("%s %s",is_a_vowel((region_name + region_info[r_ptr->type].name)[0]) ? "an" : "a",
 										region_name + region_info[r_ptr->type].name), info);
 						prt(out_val, 0, 0);
@@ -4792,19 +4793,17 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 				}
 
 				/* Stop on everything but "return"/"space" */
-				if ((query.key != '\n') && (query.key != '\r') && (query.key != ' ')) break;
+				if ((query.key != '\n') && (query.key != '\r') && (query.key != ' ') && (query.key != 's')) break;
 
 				/* Sometimes stop at "space" key */
 				if ((query.key == ' ') && !(mode & (TARGET_LOOK))) break;
 
-				/* Hide region on "space" key */
-				if ((query.key == ' '))
+				/* Hide this region */
+				if (query.key == 's')
 				{
-					/* Hide this region */
 					r_ptr->flags1 &= ~(RE1_DISPLAY);
 
-					/* Refresh all grids */
-					region_refresh(this_region);
+					region_refresh(rp_ptr->region);
 				}
 
 				/* Change the intro */
@@ -4812,6 +4811,7 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 
 				/* Preposition */
 				s2 = "on ";
+
 			}
 		}
 
@@ -5178,22 +5178,6 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 		if ((query.key != '\n') && (query.key != '\r')) break;
 	}
 
-	/* Were looking at regions */
-	if (this_region)
-	{
-		/* Redisplay all regions */
-		for (this_region = 0; this_region < region_max; this_region++)
-		{
-			region_list[this_region].flags1 |= (RE1_DISPLAY);
-		}
-
-		/* Refresh all regions */
-		for (this_region = 0; this_region < region_max; this_region++)
-		{
-			region_refresh(this_region);
-		}
-	}
-
 	/* Keep going */
 	return (query);
 }
@@ -5479,6 +5463,8 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 	char info[80];
 
 	int room = -1;
+
+	s16b this_region;
 
 	/* Get the real range */
 	if (!range) range = MAX_SIGHT;
@@ -6095,6 +6081,18 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 
 		/* Handle stuff */
 		handle_stuff();
+	}
+
+	/* Redisplay all regions */
+	for (this_region = 0; this_region < region_max; this_region++)
+	{
+		region_list[this_region].flags1 |= (RE1_DISPLAY);
+	}
+
+	/* Refresh all regions */
+	for (this_region = 0; this_region < region_max; this_region++)
+	{
+		region_refresh(this_region);
 	}
 
 	/* Recenter around player */

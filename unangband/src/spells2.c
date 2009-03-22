@@ -8871,6 +8871,74 @@ void region_refresh(s16b region)
 
 
 /*
+ * Highlight the region. We do this by moving the first region pieces to the top of the stack.
+ */
+bool region_highlight_hook(int y, int x, int d, s16b region)
+{
+	s16b this_region_piece, next_region_piece = 0;
+
+	s16b prev_region_piece = 0;
+
+	(void)d;
+
+	/* Iterate through stack of grids */
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr;
+
+		/* Get the object */
+		rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_grid;
+
+		/* Done */
+		if (region_piece_list[this_region_piece].region == region)
+		{
+			if (prev_region_piece == 0)
+			{
+				cave_region_piece[y][x] = next_region_piece;
+			}
+			else
+			{
+				region_piece_type *i_ptr;
+
+				/* Previous object */
+				i_ptr = &region_piece_list[prev_region_piece];
+
+				/* Remove from list */
+				i_ptr->next_in_grid = next_region_piece;
+			}
+
+			/* Remember first on stack */
+			rp_ptr->next_in_grid = next_region_piece;
+
+			/* Bring to top of stack */
+			cave_region_piece[y][x] = this_region_piece;
+
+			/* Done */
+			break;
+		}
+
+		/* Save prev_o_idx */
+		prev_region_piece = this_region_piece;
+	}
+
+	return(FALSE);
+}
+
+
+/*
+ * Highlight the region
+ */
+void region_highlight(s16b region)
+{
+	region_iterate(region, region_highlight_hook);
+}
+
+
+
+/*
  * Hook for setting temp grids for region
  */
 bool region_mark_temp_hook(int y, int x, int d, s16b region)

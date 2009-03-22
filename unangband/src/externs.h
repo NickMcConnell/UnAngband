@@ -1003,6 +1003,7 @@ extern void compact_regions(int size);
 extern void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region);
 extern void region_delete(s16b region);
 extern void region_refresh(s16b region);
+extern void region_highlight(s16b region);
 extern void region_update(s16b region);
 extern void region_terminate(s16b region);
 extern void trigger_region(int y, int x, bool move);
