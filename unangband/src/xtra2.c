@@ -1546,7 +1546,7 @@ static void improve_stat(void)
 		/* Load screen */
 		screen_load();
 	}
-#if 0
+
 	/* Improve how many stats with level gain */
 	for (stat_gain_selected = 0; stat_gain_selected < count; stat_gain_selected++)
 	{
@@ -1569,13 +1569,13 @@ static void improve_stat(void)
 		/* Increase */
 		inc_stat(stat_gain_selection[stat_gain_selected]);
 
+#if 0
 		/* Message */
 		msg_format("You feel %s%s.",p,desc_stat_imp[stat_gain_selection[stat_gain_selected]]);
-
+#endif
 		/* Hack --- restore stat */
 		if (tmp) p_ptr->stat_cur[stat_gain_selection[stat_gain_selected]] = tmp;
 	}
-#endif
 }
 
 
