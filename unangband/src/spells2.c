@@ -6129,11 +6129,12 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		/* Special case for eaten spells */
 		if (eaten && (method != RBM_SPIT) && (method != RBM_BREATH))
 		{
-			int d = (method == RBM_VOMIT) ? rand_int(8) : 8;
 			int dam = 0;
 
-			ty = py + ddy_ddd[d];
-			tx = px + ddx_ddd[d];
+			dir = (method == RBM_VOMIT) ? ddd[rand_int(8)] : 5;
+
+			ty = py + 99 * ddy[dir];
+			tx = px + 99 * ddx[dir];
 
 			/* Roll out the damage */
 			for (i = 0; i < num; i++) dam += spell_damage(blow_ptr, level, method_ptr->flags2, TRUE);
@@ -9442,15 +9443,19 @@ void trigger_region(int y, int x, bool move)
 				/* Get a newly initialized region */
 				child_region = init_region(r_ptr->who, r_ptr->what, r_ptr->child_region, r_ptr->damage, r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->y0, r_ptr->x0, y, x);
 
-				/* Projection method */
-				obvious |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
+				/* Paranoia */
+				if (child_region)
+				{
+					/* Projection method */
+					obvious |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
 
-				/* Hack -- lifespan */
-				region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
+					/* Hack -- lifespan */
+					region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
 
-				/* Display newly created regions. Allow features to be seen underneath. */
-				if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
-				if (obvious) region_list[child_region].flags1 |= (RE1_NOTICE);
+					/* Display newly created regions. Allow features to be seen underneath. */
+					if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
+					if (obvious) region_list[child_region].flags1 |= (RE1_NOTICE);
+				}
 			}
 
 			/* A real trap */

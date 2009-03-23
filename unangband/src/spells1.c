@@ -12477,7 +12477,7 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 		path_n = project_path(path_g, rng, y0, x0, &y1, &x1, flg);
 
 		/* Project along the path */
-		for (i = 0; (i < path_n) && i < (grid_s); ++i)
+		for (i = 0; (i < path_n) && (i < grid_s); ++i)
 		{
 			int oy = y;
 			int ox = x;
@@ -13725,8 +13725,6 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	{
 		if (!blind) notice = TRUE;
 	}
-
-	grid[0] = 0;
 
 	/* Determine projection shape */
 	notice |= project_shape(grid, gd, &grids, 256, rad, rng, y0, x0, y1, x1, dam, typ, flg, degrees, source_diameter);

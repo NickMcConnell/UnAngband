@@ -2917,7 +2917,7 @@ enum
 
 
 /* Actual projections */
-#define PR1_PROJECT 0xFFFFFFFF & (PROJECT_SELF)
+#define PR1_PROJECT 0xFFFFFFFF
 #define PR2_PROJECT	(PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL | PR2_SCATTER)
 
 

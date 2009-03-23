@@ -2101,7 +2101,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 
 		int power = 0;
 
-		/* By default, don't apply terrain */
+		/* By default, don't apply terrain or show messages */
 		apply_terrain = FALSE;
 
 		switch (o_ptr->tval)
@@ -2536,20 +2536,26 @@ bool discharge_trap(int y, int x, int ty, int tx)
 	/* Regular traps / terrain */
 	if (apply_terrain)
 	{
+		/* Hack - Block murder holes here to use up ammunition */
+		bool blocked = (f_ptr->flags1 & (FF1_TRAP)) && (f_ptr->d_attr == TERM_L_RED) && (p_ptr->blocking);
+
+		const char *text = f_text + f_ptr->text;
+
 		/* Player on source of terrain */
 		if ((y == p_ptr->py) && (x == p_ptr->px))
 		{
-			const char *text = f_text + f_ptr->text;
-
 			/* Player floats on terrain */
 			if (player_ignore_terrain(feat)) return (FALSE);
-
-			/* Message */
-			if (strlen(text)) msg_format("%s",text);
 		}
 
-		/* Hack - Block murder holes here to use up ammunition */
-		if ((f_ptr->flags1 & (FF1_TRAP)) && (f_ptr->d_attr == TERM_L_RED))
+		/* Blocked message */
+		if (blocked) msg_print("You knock aside the arrow.");
+
+		/* Message */
+		else if (strlen(text)) msg_format("%s",text);
+
+		/* Blocked the attack - no effect */
+		if (blocked)
 		{
 			/* Do nothing */
 		}

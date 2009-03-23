@@ -710,6 +710,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	int mod = 0;
 
 	bool punctuate = TRUE;
+	bool uppercase = FALSE;
 
 	int state = 0;
 	int match = (flg & (ATK_DESC_TENSE)) != 0 ? 1 : 2;
@@ -811,6 +812,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 		else if ((*s == '.') || (*s == '!') || (*s == '?'))
 		{
 			punctuate = FALSE;
+			uppercase = TRUE;
 		}
 
 		/* Handle the target*/
@@ -819,7 +821,15 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			/* Append the name */
 			cptr u = t_name;
 
-			while (*u) *t++ = *u++;
+			while (*u)
+			{
+				*t++ = *u++;
+				if (uppercase)
+				{
+					if ((*t >= 'a') && (*t <= 'z')) *t -= 32;
+					uppercase = FALSE;
+				}
+			}
 		}
 
 		/* Handle the target */
@@ -828,7 +838,15 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			/* Append the name */
 			cptr u = target < 0 ? "are" : "is";
 
-			while (*u) *t++ = *u++;
+			while (*u)
+			{
+				*t++ = *u++;
+				if (uppercase)
+				{
+					if ((*t >= 'a') && (*t <= 'z')) *t -= 32;
+					uppercase = FALSE;
+				}
+			}
 		}
 
 		/* Handle effect */
@@ -836,7 +854,16 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 		{
 			/* Append the name */
 			cptr u = effect_text + effect_info[effect].desc[0];
-			while (*u) *t++ = *u++;
+
+			while (*u)
+			{
+				*t++ = *u++;
+				if (uppercase)
+				{
+					if ((*t >= 'a') && (*t <= 'z')) *t -= 32;
+					uppercase = FALSE;
+				}
+			}
 		}
 
 		/* Handle participle */
@@ -860,7 +887,15 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			}
 
 			/* Copy */
-			while (*u) *t++ = *u++;
+			while (*u)
+			{
+				*t++ = *u++;
+				if (uppercase)
+				{
+					if ((*t >= 'a') && (*t <= 'z')) *t -= 32;
+					uppercase = FALSE;
+				}
+			}
 		}
 
 		/* Tensor */
@@ -875,6 +910,12 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 		{
 			/* Copy */
 			*t++ = *s;
+
+			if (uppercase)
+			{
+				if ((*t >= 'a') && (*t <= 'z')) *t -= 32;
+				uppercase = FALSE;
+			}
 		}
 	}
 
@@ -2251,16 +2292,13 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Centre on caster */
 	if (method_ptr->flags1 & (PROJECT_SELF))
 	{
-		if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY))
-		{
-			y = m_ptr->fy;
-			x = m_ptr->fx;
+		y = fy;
+		x = fx;
 
-			if (who > SOURCE_MONSTER_START)
-			{
-				what = who;
-				who = SOURCE_SELF;
-			}
+		if (who > SOURCE_MONSTER_START)
+		{
+			what = who;
+			who = SOURCE_SELF;
 		}
 	}
 
@@ -2316,9 +2354,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Any effect? */
 	if (result >= 0)
 	{
-		/* Describe the attack */
-		msg_format("%^s %s", m_name, atk_desc);
-
 		/* Blow projects something? */
 		if ((method_ptr->flags1 & (PR1_PROJECT)) ||
 				(method_ptr->flags2 & (PR2_PROJECT)))
