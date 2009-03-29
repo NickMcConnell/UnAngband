@@ -3429,7 +3429,7 @@ errr parse_f_info(char *buf, header *head)
 	/* Process 'T' for "Traps" (one line only) */
 	else if (buf[0] == 'T')
 	{
-		int n1;
+		int n1, n2;
 
 		/* There better be a current f_ptr */
 		if (!f_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -3458,14 +3458,20 @@ errr parse_f_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze the effect */
-		for (n1 = 0; n1 < z_info->effect_max; n1++)
+		/* Zero length effect */
+		if (*s == '\0')
 		{
-			if (streq(s, effect_name + effect_info[n1].name)) break;
+			n2 = 0;
 		}
-
+		
+		/* Analyze the effect */
+		else for (n2 = 0; n2 < z_info->effect_max; n2++)
+		{
+			if (streq(s, effect_name + effect_info[n2].name)) break;
+		}
+		
 		/* Invalid region */
-		if (n1 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
+		if (n2 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the third field */
 		for (s = t; *t && (*t != 'd'); t++) /* loop */;
@@ -3474,7 +3480,8 @@ errr parse_f_info(char *buf, header *head)
 		if (*t == 'd') *t++ = '\0';
 
 		/* Save the effect */
-		f_ptr->blow.effect = n1;
+		f_ptr->blow.method = n1;
+		f_ptr->blow.effect = n2;
 
 		/* Extract the damage dice and sides */
 		f_ptr->blow.d_dice = atoi(s);
@@ -4980,13 +4987,19 @@ errr parse_r_info(char *buf, header *head)
 		/* Terminate the field (if necessary) */
 		if (*t == ':') *t++ = '\0';
 
-		/* Analyze the method */
-		for (n2 = 0; n2 < z_info->effect_max; n2++)
+		/* Zero length effect */
+		if (*s == '\0')
+		{
+			n2 = 0;
+		}
+		
+		/* Analyze the effect */
+		else for (n2 = 0; n2 < z_info->effect_max; n2++)
 		{
 			if (streq(s, effect_name + effect_info[n2].name)) break;
 		}
-
-		/* Invalid method */
+		
+		/* Invalid effect */
 		if (n2 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
 		/* Analyze the third field */
