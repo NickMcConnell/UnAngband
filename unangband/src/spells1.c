@@ -3803,8 +3803,6 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			/* Jam doors */
 			while (f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))
 			{
-				int feat = cave_feat[y][x];
-
 				/* Jam the door */
 				cave_alter_feat(y, x, FS_SPIKE);
 
@@ -3913,8 +3911,6 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Raise water */
 		case GF_RAISE:
 		{
-			int feat = cave_feat[y][x];
-
 			if (f_info[feat].flags2 & (FF2_WATER) && !((f_info[feat].flags2 & (FF2_CHASM)) ||
 				(f_info[feat].flags1 & (FF1_LESS)) || (f_info[feat].flags2 & (FF2_FILLED))))
 			{
@@ -3929,8 +3925,6 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		/* Lower water */
 		case GF_LOWER:
 		{
-			int feat = cave_feat[y][x];
-
 			if (prefix(f_name+f_info[feat].name,"stone bridge"))
 			{
 				/* Hack -- change bridges to prevent exploits */
@@ -4223,6 +4217,104 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		case GF_DESTROY:
+		case GF_QUAKE:
+		{
+			/* Burn or turn outside grids to rubble only */
+			bool burn = FALSE;
+
+			/* Wall (or floor) type */
+			int t = rand_int(200);
+
+			/* Lose room and vault */
+			cave_info[y][x] &= ~(CAVE_ROOM);
+
+			/* Lose light */
+			cave_info[y][x] &= ~(CAVE_GLOW);
+
+			/* Lose knowledge */
+			play_info[y][x] &= ~(PLAY_MARK);
+
+			/* Granite */
+			if (t < 20)
+			{
+				/* Create granite wall */
+				feat = FEAT_WALL_EXTRA;
+			}
+
+			/* Quartz */
+			else if ((t < 70) && (typ == GF_DESTROY))
+			{
+				/* Create quartz vein */
+				feat = FEAT_QUARTZ;
+			}
+
+			/* Magma */
+			else if ((t < 100) && (typ == GF_DESTROY))
+			{
+				/* Create magma vein */
+				feat = FEAT_MAGMA;
+			}
+
+			/* Rubble */
+			else if ((t < 120) && ((f_info[feat].flags1 & (FF1_WALL)) == 0))
+			{
+				/* Create rubble */
+				feat = FEAT_RUBBLE;
+			}
+
+			/* Chasm */
+			else if (f_info[feat].flags2 & (FF2_CHASM))
+			{
+				break;
+			}
+
+			/* Burn stuff - 20% of the time */
+			else if ((typ == GF_DESTROY) && (f_info[feat].flags2 & (FF2_HURT_FIRE)) && !(t % 5))
+			{
+				burn = TRUE;
+				feat = feat_state(feat, FS_HURT_FIRE);
+			}
+
+			/* Tunnel stuff - 33% of the time */
+			else if ((f_info[feat].flags1 & (FF1_TUNNEL)) && !(t % 3))
+			{
+				burn = TRUE;
+				feat = feat_state(feat, FS_TUNNEL);
+			}
+
+			/* Bash stuff - 50% of the time */
+			else if ((f_info[feat].flags1 & (FF1_BASH)) && !(t % 2))
+			{
+				burn = TRUE;
+				feat = feat_state(feat, FS_BASH);
+			}
+
+			/* Fallen rocks */
+			else if ((t < 130) && ((f_info[feat].flags1 & (FF1_WALL)) == 0))
+			{
+				/* Create magma vein */
+				feat = FEAT_ROCK;
+			}
+
+			/* Outside grids */
+			if ((!burn) && (f_info[feat].flags3 & (FF3_OUTSIDE)))
+			{
+				if (t < 30)
+				{
+					cave_set_feat(y,x,FEAT_RUBBLE);
+				}
+			}
+			/* Inside grids */
+			else if (feat != cave_feat[y][x])
+			{
+				/* Change the feature */
+				cave_set_feat(y, x, feat);
+			}
+
+			break;
+		}
+
 		default:
 
 			dam=0;
@@ -4283,6 +4375,15 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 	/* Prevent warning */
 	(void)who;
+
+	/* Hack - some effects delete the whole stack */
+	if ((typ == GF_DESTROY) || (typ == GF_QUAKE))
+	{
+		delete_object(y, x);
+
+		/* Notice elsewhere */
+		return (FALSE);
+	}
 
 	/* Scan all objects in the grid */
 	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
@@ -7815,7 +7916,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Melee attack - shatter */
 		case GF_SHATTER:
 		{
-			earthquake(y, x, 8);
+			/* XXX Hack */
+			make_attack_ranged(who, 101, y, x);
 
 			break;
 		}
@@ -10895,13 +10997,13 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (who > SOURCE_MONSTER_START)
 			{
 				/* Radius 8 earthquake centered at the monster */
-				if (dam > 23) earthquake(m_ptr->fy, m_ptr->fx, 8);
+				if (dam > 23) make_attack_ranged(who, 101, m_ptr->fy, m_ptr->fx);
 			}
 
 			else
 			{
 				/* Radius 8 earthquake centered at the player */
-				if (dam > 23) earthquake(p_ptr->py, p_ptr->px, 8);
+				if (dam > 23) make_attack_ranged(who, 101, p_ptr->py, p_ptr->px);
 
 			}
 
@@ -12034,6 +12136,16 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 				else if (r_ptr->flags3 & (RF3_RES_NEXUS)) do_dist /= 2;
 			}
 			break;
+		}
+
+		/* Delete monsters */
+		case GF_DESTROY:
+		case GF_QUAKE:
+		{
+			if (affect_monster)
+			{
+				delete_monster(y,x);
+			}
 		}
 	}
 
@@ -13511,6 +13623,9 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 		}
 	}
 
+	/* Clear the "temp" array  (paranoia is good) */
+	clear_temp_array();
+
 	/* Check features */
 	if (flg & (PROJECT_GRID))
 	{
@@ -13643,7 +13758,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			x = GRID_X(grid[i]);
 
 			/* Grid must be marked. */
-			if (!(play_info[y][x] & (PLAY_TEMP))) continue;
+			if ((play_info[y][x] & (PLAY_TEMP)) == 0) continue;
 
 			/* Affect marked grid */
 			if (project_t(who, what, y, x, gd[i], typ)) notice = TRUE;
@@ -13695,10 +13810,10 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	int grids = 0;
 
 	/* Coordinates of the affected grids */
-	u16b grid[256];
+	u16b grid[1024];
 
 	/* Distance to each of the affected grids. */
-	s16b gd[256];
+	s16b gd[1024];
 
 	/* Does the player notice the effect */
 	bool notice = FALSE;
@@ -13727,7 +13842,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	}
 
 	/* Determine projection shape */
-	notice |= project_shape(grid, gd, &grids, 256, rad, rng, y0, x0, y1, x1, dam, typ, flg, degrees, source_diameter);
+	notice |= project_shape(grid, gd, &grids, 1024, rad, rng, y0, x0, y1, x1, dam, typ, flg, degrees, source_diameter);
 
 	/* We're not getting distances */
 	if ((flg & (PROJECT_CHCK)) ==  0)

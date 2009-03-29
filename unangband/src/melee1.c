@@ -1243,6 +1243,10 @@ bool make_attack_normal(int m_idx)
 			if (rand_int(100)<damage)
 			{
 				int slot;
+				int y = m_ptr->fy;
+				int x = m_ptr->fx;
+
+				object_type *o_ptr;
 
 				/* Pick a (possibly empty) inventory slot */
 				switch (randint(6))
@@ -1255,8 +1259,26 @@ bool make_attack_normal(int m_idx)
 					default: slot = INVEN_FEET; break;
 				}
 
+				/* Get object */
+				o_ptr = &inventory[slot];
+
 				/* Object used? */
-				object_usage(slot);
+				if (o_ptr->k_idx) object_usage(slot);
+
+				/* Apply additional effect from activation */
+				if (o_ptr->k_idx && auto_activate(o_ptr))
+				{
+					/* Make item strike */
+					process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
+							o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x, TRUE, FALSE);
+				}
+
+				/* Apply additional effect from coating*/
+				else if (o_ptr->k_idx && coated_p(o_ptr))
+				{
+					/* Make item strike */
+					process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE, TRUE);
+				}
 			}
 
 			/* Player armor reduces total damage */
@@ -2456,13 +2478,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	{
 	switch (attack)
 	{
-		/* RF4_QUAKE --- Earthquake */
-		case 96+5:
-		{
-			earthquake(y, x, 8);
-			break;
-		}
-
 		/* RF4_AURA */
 		case 96+7:
 		{

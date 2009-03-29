@@ -4552,178 +4552,6 @@ bool mass_banishment(int who, int what, int y, int x)
 
 
 /*
- * The spell of destruction
- *
- * This spell "deletes" monsters (instead of "killing" them).
- *
- * Later we may use one function for both "destruction" and
- * "earthquake" by using the "full" to select "destruction".
- */
-void destroy_area(int y1, int x1, int r, bool full)
-{
-	int y, x, k, t;
-
-	bool flag = FALSE;
-
-	/* Prevent compiler warning */
-	(void)full;
-
-	/* Big area of affect */
-	for (y = (y1 - r); y <= (y1 + r); y++)
-	{
-		for (x = (x1 - r); x <= (x1 + r); x++)
-		{
-			/* Skip illegal grids */
-			if (!in_bounds_fully(y, x)) continue;
-
-			/* Extract the distance */
-			k = distance(y1, x1, y, x);
-
-			/* Stay in the circle of death */
-			if (k > r) continue;
-
-			/* Lose room and vault */
-			cave_info[y][x] &= ~(CAVE_ROOM);
-
-			/* Lose light */
-			cave_info[y][x] &= ~(CAVE_GLOW);
-
-			/* Lose knowledge */
-			play_info[y][x] &= ~(PLAY_MARK);
-
-			/* Hack -- Notice player affect */
-			if (cave_m_idx[y][x] < 0)
-			{
-				/* Hurt the player later */
-				flag = TRUE;
-
-				/* Do not hurt this grid */
-				continue;
-			}
-
-			/* Hack -- Skip the epicenter */
-			if ((y == y1) && (x == x1)) continue;
-
-			/* Delete the monster (if any) */
-			delete_monster(y, x);
-
-			/* Destroy "outside" grids */
-			if ((cave_valid_bold(y,x)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
-			{
-				/* Delete objects */
-				delete_object(y, x);
-
-				/* Burn stuff */
-				if (f_info[cave_feat[y][x]].flags2 & (FF2_HURT_FIRE))
-				{
-					cave_alter_feat(y,x,FS_HURT_FIRE);
-				}
-				/* Chasm */
-				else if (f_info[cave_feat[y][x]].flags2 & (FF2_CHASM))
-				{
-					/* Nothing */
-				}
-				/* Rubble */
-				else if (rand_int(100) < 15)
-				{
-					/* Create magma vein */
-					cave_set_feat(y,x,FEAT_RUBBLE);
-				}
-
-			}
-			/* Destroy "valid" grids */
-			else if (cave_valid_bold(y, x))
-			{
-				int feat = FEAT_FLOOR;
-
-				/* Delete objects */
-				delete_object(y, x);
-
-				/* Wall (or floor) type */
-				t = rand_int(200);
-
-				/* Burn stuff */
-				if (f_info[cave_feat[y][x]].flags2 & (FF2_HURT_FIRE))
-				{
-					feat = feat_state(cave_feat[y][x], FS_HURT_FIRE);
-				}
-
-				/* Granite */
-				else if (t < 20)
-				{
-					/* Create granite wall */
-					feat = FEAT_WALL_EXTRA;
-				}
-
-				/* Quartz */
-				else if (t < 70)
-				{
-					/* Create quartz vein */
-					feat = FEAT_QUARTZ;
-				}
-
-				/* Magma */
-				else if (t < 100)
-				{
-					/* Create magma vein */
-					feat = FEAT_MAGMA;
-				}
-
-				/* Rubble */
-				else if (t < 130)
-				{
-					/* Create magma vein */
-					feat = FEAT_RUBBLE;
-				}
-
-				/* Change the feature */
-				cave_set_feat(y, x, feat);
-			}
-		}
-	}
-
-
-	/* Hack -- Affect player */
-	if (flag)
-	{
-		/* Message */
-		msg_print("There is a searing blast of light!");
-
-		/* Blind the player */
-		if ((p_ptr->cur_flags2 & (TR2_RES_BLIND | TR2_RES_LITE)) == 0)
-		{
-			/* Become blind */
-			inc_timed(TMD_BLIND,10 + randint(10), TRUE);
-
-			/* Always notice */
-			equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
-
-			/* Always notice */
-			equip_not_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
-		}
-		else
-		{
-			/* Sometimes notice */
-			if (((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0) && (rand_int(100)<50)) equip_can_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
-
-			/* Sometimes notice */
-			if (((p_ptr->cur_flags2 & (TR2_RES_LITE)) != 0) && (rand_int(100)<50)) equip_can_flags(0x0L,TR2_RES_LITE,0x0L,0x0L);
-		}
-	}
-
-
-	/* Fully update the visuals */
-	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
-
-	/* Redraw map */
-	p_ptr->redraw |= (PR_MAP);
-
-	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST | PW_MAP);
-}
-
-
-/*
  * Entomb a player or monster in a location known to be impassable.
  *
  * Players take a lot of damage.
@@ -4904,215 +4732,6 @@ void entomb(int cy, int cx, byte invalid)
 		}
 	}
 }
-
-
-
-/*
- * Induce an "earthquake" of the given radius at the given location.
- *
- * This will turn some walls into floors and some floors into walls.
- *
- * The player will take damage and "jump" into a safe grid if possible,
- * otherwise, he will "tunnel" through the rubble instantaneously.
- *
- * Monsters will take damage, and "jump" into a safe grid if possible,
- * otherwise they will be "buried" in the rubble, disappearing from
- * the level in the same way that they do when banished.
- *
- * Note that players and monsters (except eaters of walls and passers
- * through walls) will never occupy the same grid as a wall (or door).
- */
-void earthquake(int cy, int cx, int r)
-{
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
-	int t, yy, xx, dy, dx;
-
-	bool hurt = FALSE;
-
-	bool map[32][32];
-
-
-	/* Paranoia -- Enforce maximum range */
-	if (r > 12) r = 12;
-
-	{
-		int x, y;
-		/* Clear the "maximal blast" area */
-		for (y = 0; y < 32; y++)
-		{
-			for (x = 0; x < 32; x++)
-			{
-				map[y][x] = FALSE;
-			}
-		}
-	}
-
-	/* Check around the epicenter */
-	for (dy = -r; dy <= r; dy++)
-	{
-		for (dx = -r; dx <= r; dx++)
-		{
-			/* Extract the location */
-			yy = cy + dy;
-			xx = cx + dx;
-
-			/* Skip illegal grids */
-			if (!in_bounds_fully(yy, xx)) continue;
-
-			/* Skip distant grids */
-			if (distance(cy, cx, yy, xx) > r) continue;
-
-			/* Lose room and vault */
-			cave_info[yy][xx] &= ~(CAVE_ROOM);
-
-			/* Lose light */
-			cave_info[yy][xx] &= ~(CAVE_GLOW);
-
-			/* Lose light */
-			play_info[yy][xx] &= ~(PLAY_MARK);
-
-			/* Skip the epicenter */
-			if (!dx && !dy) continue;
-
-			/* Skip most grids */
-			if (rand_int(100) < 85) continue;
-
-			/* Damage this grid */
-			map[16+yy-cy][16+xx-cx] = TRUE;
-
-			/* Hack -- Take note of player damage */
-			if ((yy == py) && (xx == px)  && !(f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE))) hurt = TRUE;
-		}
-	}
-
-	if (hurt)
-	{
-		/* Entomb the player */
-		entomb(py,px, 0x00);
-	}
-
-	/* Examine the quaked region */
-	for (dy = -r; dy <= r; dy++)
-	{
-		for (dx = -r; dx <= r; dx++)
-		{
-			/* Extract the location */
-			yy = cy + dy;
-			xx = cx + dx;
-
-			/* Skip unaffected grids */
-			if (!map[16+yy-cy][16+xx-cx]) continue;
-
-			/* Entomb monster */
-			if (cave_m_idx[yy][xx] > 0)
-			{
-				byte invalid = 0x00;
-
-				int i;
-
-				/* Determine invalid directions */
-				for (i = 0; i < 8; i++)
-					if (map[16+yy-cy+ddy_ddd[i]][16+xx-cx+ddx_ddd[i]]) invalid |= 1 << i;
-
-				/* Entomb the monster */
-				entomb(yy, xx, invalid);
-			}
-		}
-	}
-
-	/* XXX XXX XXX */
-
-	/* New location */
-	py = p_ptr->py;
-	px = p_ptr->px;
-
-	/* Important -- no wall on player */
-	map[16+py-cy][16+px-cx] = FALSE;
-
-	/* Examine the quaked region */
-	for (dy = -r; dy <= r; dy++)
-	{
-		for (dx = -r; dx <= r; dx++)
-		{
-			/* Extract the location */
-			yy = cy + dy;
-			xx = cx + dx;
-
-			/* Skip unaffected grids */
-			if (!map[16+yy-cy][16+xx-cx]) continue;
-
-			/* Paranoia -- never affect player */
-			if ((yy == py) && (xx == px)) continue;
-
-			/* Destroy "outside" grids */
-			if ((cave_valid_bold(yy,xx)) && (f_info[cave_feat[yy][xx]].flags3 & (FF3_OUTSIDE)))
-			{
-				/* Delete objects */
-				delete_object(yy, xx);
-
-				/* Bash stuff */
-				if (f_info[cave_feat[yy][xx]].flags1 & (FF1_BASH))
-				{
-					cave_alter_feat(yy,xx,FS_BASH);
-				}
-			}
-			/* Destroy location (if valid) */
-			else if (cave_valid_bold(yy, xx))
-			{
-				int feat = FEAT_FLOOR;
-
-				bool floor = cave_floor_bold(yy, xx);
-
-				/* Delete objects */
-				delete_object(yy, xx);
-
-				/* Wall (or floor) type */
-				t = (floor ? rand_int(100) : 200);
-
-				/* Granite */
-				if (t < 20)
-				{
-					/* Create granite wall */
-					feat = FEAT_WALL_EXTRA;
-				}
-
-				/* Quartz */
-				else if (t < 70)
-				{
-					/* Create quartz vein */
-					feat = FEAT_QUARTZ;
-				}
-
-				/* Magma */
-				else if (t < 100)
-				{
-					/* Create magma vein */
-					feat = FEAT_MAGMA;
-				}
-
-				/* Change the feature */
-				cave_set_feat(yy, xx, feat);
-			}
-		}
-	}
-
-
-	/* Fully update the visuals */
-	p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
-
-	/* Redraw map */
-	p_ptr->redraw |= (PR_MAP);
-
-	/* Update the health bar */
-	p_ptr->redraw |= (PR_HEALTH);
-
-	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST | PW_MAP);
-}
-
-
 
 
 /*
@@ -6014,7 +5633,7 @@ static int thaumacurse(bool verbose, int power)
 /*
  * Get damage from casting spell
  */
-static int spell_damage(spell_blow *blow_ptr, int level, u32b flg, bool player)
+static int spell_damage(spell_blow *blow_ptr, int level, u32b flg, bool player, bool forreal)
 {
 	int damage = 0;
 
@@ -6030,13 +5649,21 @@ static int spell_damage(spell_blow *blow_ptr, int level, u32b flg, bool player)
 		/* Roll out the damage */
 		if (blow_ptr->d_side)
 		{
-			damage += damroll(blow_ptr->d_dice, blow_ptr->d_side);
+			int dd = blow_ptr->d_dice;
+			int ds = blow_ptr->d_side;
+
+			/* Determine damage */
+			damage += (forreal) ? damroll(dd, ds) : ((ds > 1) ? (dd * (ds + 1) / 2) : (dd * ds));
 		}
 
 		/* Roll out level dependent damage */
 		if (blow_ptr->l_side)
 		{
-			damage += damroll(blow_ptr->l_dice * level / blow_ptr->levels, blow_ptr->l_side);
+			int dd = blow_ptr->l_dice * level / blow_ptr->levels;
+			int ds = blow_ptr->l_side;
+
+			/* Determine damage */
+			damage += (forreal) ? damroll(dd, ds) : ((ds > 1) ? (dd * (ds + 1) / 2) : (dd * ds));
 		}
 
 		/* Add constant damage */
@@ -6137,7 +5764,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 			tx = px + 99 * ddx[dir];
 
 			/* Roll out the damage */
-			for (i = 0; i < num; i++) dam += spell_damage(blow_ptr, level, method_ptr->flags2, TRUE);
+			for (i = 0; i < num; i++) dam += spell_damage(blow_ptr, level, method_ptr->flags2, TRUE, TRUE);
 
 			/* Apply once */
 			if (project_one(who, what, ty, tx, dam, effect, flg)) obvious = TRUE;
@@ -6180,7 +5807,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 				(s_ptr->type == SPELL_SET_TRAP) ? s_ptr->param : p_ptr->spell_trap;
 
 			/* Get a newly initialized region */
-			region = init_region(who, what, ri, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE), method, effect, level, py, px, ty, tx);
+			region = init_region(who, what, ri, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE, TRUE), method, effect, level, py, px, ty, tx);
 
 			/* Get the region */
 			r_ptr = &region_list[region];
@@ -6249,7 +5876,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 		for (i = 0; i < num; i++)
 		{
 			/* Projection method */
-			obvious |= project_method(who, what, method, effect, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE), level, py, px, ty, tx, region, flg);
+			obvious |= project_method(who, what, method, effect, spell_damage(blow_ptr, level, method_ptr->flags2, TRUE, TRUE), level, py, px, ty, tx, region, flg);
 		}
 
 		/* Some region tidy up required */
@@ -7093,20 +6720,6 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				obvious = TRUE;
 				break;
 			}
-			case SPELL_EARTHQUAKE:
-			{
-				earthquake(p_ptr->py,p_ptr->px, s_ptr->param);
-				*cancel = FALSE;
-				obvious = TRUE;
-				break;
-			}
-			case SPELL_DESTRUCTION:
-			{
-				destroy_area(p_ptr->py,p_ptr->px, s_ptr->param, TRUE);
-				*cancel = FALSE;
-				obvious = TRUE;
-				break;
-			}
 			case SPELL_CURE_DISEASE:
 			{
 				u32b v;
@@ -7902,7 +7515,7 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 					get_spell(&power, "use", o_ptr, FALSE);
 
 					/* Modify power */
-					p_ptr->boost_spell_power = process_item_blow(0, 0, o_ptr, 0, 0, FALSE);
+					p_ptr->boost_spell_power = process_item_blow(0, 0, o_ptr, 0, 0, FALSE, FALSE);
 
 					/*
 					 * This hack is so ugly, I'm going to have to shower afterwards.
@@ -8023,9 +7636,12 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 /*
  * Apply spell from an item as a blow to one grid and monsters/players, but not objects.
  *
+ * If one grid is false, we apply the full from the player to the target grid.
+ * Otherwise we only affect the targetted grid.
+ *
  * XXX We assume that there is only 1 item in the stack at present.
  */
-int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal)
+int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal, bool one_grid)
 {
 	int power = 0;
 	bool obvious = FALSE;
@@ -8065,40 +7681,42 @@ int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool 
 		/* Scan through all four blows */
 		for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
 		{
+			/* Get the blow */
+			spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
+
 			/* Extract the attack infomation */
-			int effect = s_ptr->blow[ap_cnt].effect;
-			int method = s_ptr->blow[ap_cnt].method;
-			int d_dice = s_ptr->blow[ap_cnt].d_dice;
-			int d_side = s_ptr->blow[ap_cnt].d_side;
-			int d_plus = s_ptr->blow[ap_cnt].d_plus;
+			int effect = blow_ptr->effect;
+			int method = blow_ptr->method;
+
+			method_type *method_ptr = &method_info[method];
+
+			int i;
+			int num  = scale_method(method_ptr->number, p_ptr->lev);
 
 			/* Hack -- no more attacks */
 			if (!method) break;
 
-			/* Mega hack -- dispel evil/undead objects */
-			if (!d_side)
-			{
-				d_plus += 25 * d_dice;
-			}
-
-			/* Roll out the damage */
-			if ((d_dice) && (d_side))
-			{
-				if (forreal)
-					damage += damroll(d_dice, d_side) + d_plus;
-				else
-					damage += d_side > 1 ? (d_dice * (d_side + 1)) / 2 + d_plus : d_dice * d_side + d_plus;
-			}
-			else
-			{
-				damage += d_plus;
-			}
+			/* Determine damage */
+			damage += spell_damage(blow_ptr, 0, 0L, FALSE, forreal) / (coated_p(o_ptr) ? 5 : 1);
 
 			/* Reapply apply damage? */
 			if (forreal)
 			{
-				/* Apply damage as projection */
-				obvious |= project_one(who, what, y, x, (coated_p(o_ptr) ? damage / 5 : damage), effect, flg);
+				/* Affected only one grid */
+				if (one_grid)
+				{
+					/* Apply damage as projection */
+					obvious |= project_one(who, what, y, x, damage, effect, flg);
+				}
+				else
+				{
+					/* Apply damage as a real projection */
+					for (i = 0; i < num; i++)
+					{
+						/* Projection method */
+						obvious |= project_method(who, what, method, effect, damage, 0, p_ptr->py, p_ptr->px, y, x, 0, flg);
+					}
+				}
 
 				/* We've applied the damage */
 				damage = 0;

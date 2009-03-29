@@ -751,3 +751,12 @@ I:0:0:0
 T:gaining mana
 D:drain~:mana from::::percent of spell points:mana %
 
+N:147:DESTROY
+I:0:0:0
+T:gaining mana
+D:destroy~::::::
+
+N:148:QUAKE
+I:0:0:0
+T:gaining mana
+D:shake~::the foundations::::

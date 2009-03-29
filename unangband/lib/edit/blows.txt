@@ -773,9 +773,23 @@ M:6
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC |
 D::a beam
 
-#$# 91 - Unused ###
+N:91:QUAKE_AREA
+T:0-9999:call~ * around &
+T:0-9999:summon~ * around &
+T:0-9999:create~ * around &
+W:3:0:0
+R:10
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | PASS | HIDE
+D:surround~ & with magic:
 
-#$# 92 - Unused ###
+N:92:DESTROY_AREA
+T:0-9999:call~ * around &
+T:0-9999:summon~ * around &
+T:0-9999:create~ * around &
+W:3:0:0
+R:15
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | PASS | HIDE
+D:surround~ & with magic:
 
 #$# 93 - Unused ###
 
@@ -819,10 +833,16 @@ F:ADD_AMMO |
 D::
 
 N:101:QUAKE
+T:0-9999:call~ * around &
+T:0-9999:summon~ * around &
+T:0-9999:create~ * around &
+W:3:0:0
+R:8
+X:0:0:0:QUAKE
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | SELF | PASS | HIDE
+D:surround~ & with magic:
 I:0:8:0
 C:40:0:0:5:0:0:100
-F:SPECIAL_CASE |
-D::
 
 N:102:EXPLODE
 T:0-9999:explodes!
@@ -1807,7 +1827,7 @@ D::
 N:176:CURSE
 I:0:6:0
 W:4:0:0
-X:3:2:6:
+X:3:2:6:CURSE
 C:45:0:0:0:0:0:100
 F:SPECIAL_CASE |
 D::
@@ -1821,7 +1841,7 @@ D::
 N:178:MIND_BLAST
 I:0:6:0
 W:3:0:0
-X:3:2:6:
+X:3:2:6:MENTAL
 C:30:0:0:0:0:0:100
 F:SPECIAL_CASE |
 D::

@@ -515,7 +515,9 @@ C:9:37:30:95:30
 C:10:37:30:95:30
 C:11:33:21:80:35
 P:0:0
-S:DESTRUCTION:15
+B:DESTROY_AREA:DESTROY:0
+B:DESTROY_AREA:BLIND_WEAK:1d10+10
+D:There is a searing blast of light!
 
 N:33:Dispel Magic
 A:65:69:1
@@ -582,7 +584,8 @@ C:8:11:9:55:5
 C:10:30:28:60:16
 C:11:20:18:60:24
 P:0:0
-S:EARTHQUAKE:10
+B:QUAKE_AREA:QUAKE:0
+D:The earth tremors around you!
 
 N:38:Word of Recall
 A:66:13:1
@@ -1255,7 +1258,8 @@ C:9:21:17:50:3
 C:11:11:9:55:5
 P:125:0
 F:HOLD_SONG |
-S:EARTHQUAKE:10
+B:QUAKE_AREA:QUAKE:0
+D:The earth tremors around you!
 
 N:82:Sense Surroundings
 A:10:13:1
@@ -1573,7 +1577,9 @@ C:5:40:40:80:100
 C:8:37:30:95:10
 C:11:35:35:80:115
 P:37:0
-S:DESTRUCTION:15
+B:DESTROY_AREA:DESTROY:0
+B:DESTROY_AREA:BLIND_WEAK:1d10+10
+D:There is a searing blast of light!
 
 N:105:Annihilation
 A:65:25:1
@@ -4312,7 +4318,7 @@ A:38:6:1
 A:38:13:1
 A:75:70:1
 P:0:0
-B:BREATH_20::ELEC:4/1
+B:BREATH_20:ELEC:4/1
 F:OPP_ELEC |
 L:1d20+20
 D:You breathe lightning.

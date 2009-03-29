@@ -2227,7 +2227,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 								if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
 								{
 									/* Make item strike */
-									process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, o_ptr, y, x, TRUE);
+									process_item_blow(SOURCE_PLAYER_TRAP, o_ptr->k_idx, o_ptr, y, x, TRUE, TRUE);
 
 									/* Hack -- Remove coating on original */
 									if ((!coated_p(o_ptr)) && (o_ptr->feeling == INSCRIP_COATED)) o_ptr->feeling = 0;
@@ -2783,8 +2783,14 @@ bool auto_activate(const object_type *o_ptr)
 	/* Extract the flags */
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
+	/* Auto-activate on blow */
+	if ((f3 & (TR3_ACT_ON_BLOW)) != 0) return (TRUE);
+
 	/* Check if can activate */
-	if ((f3 & (TR3_ACTIVATE)) == 0) return (FALSE);
+	if ((f3 & (TR3_ACTIVATE | TR3_UNCONTROLLED)) == 0) return (FALSE);
+
+	/* Check if uncontrolled */
+	if ((f3 & (TR3_UNCONTROLLED)) && (uncontrolled_p(o_ptr))) return (TRUE);
 
 	/* No inscription */
 	if (!o_ptr->note) return (FALSE);
@@ -2848,8 +2854,6 @@ void py_attack(int dir)
 	char m_name[80];
 
 	bool fear = FALSE;
-
-	bool do_quake = FALSE;
 
 	bool was_asleep;
 
@@ -2957,6 +2961,9 @@ void py_attack(int dir)
 	/* Attack once for each legal blow */
 	while (blows++ < num_blows)
 	{
+		/* Paranoia - ensure monster still exists */
+		if (cave_m_idx[y][x] <= 0) break;
+
 		/* Get weapon slot */
 		slot = weapon_slot(melee_style,blows,charging);
 
@@ -3115,20 +3122,6 @@ void py_attack(int dir)
 
 				/* Check usage */
 				object_usage(slot);
-
-				/* Note -- must happen after above flags updated */
-				if (((p_ptr->cur_flags3 & (TR3_ACT_ON_BLOW)) != 0) && (k > 50))
-				{
-					do_quake = TRUE;
-
-					/* Always notice */
-					equip_can_flags(0x0L,0x0L,TR3_ACT_ON_BLOW,0x0L);
-				}
-				else if ((p_ptr->cur_flags3 & (TR3_ACT_ON_BLOW)) == 0)
-				{
-					/* Sometimes notice */
-					equip_not_flags(0x0L,0x0L,TR3_ACT_ON_BLOW,0x0L);
-				}
 
 				/* Adjust for equipment/stats to_d bounded by dice */
 				k += MIN(p_ptr->to_d,
@@ -3316,7 +3309,7 @@ void py_attack(int dir)
 			{
 				/* Make item strike */
 				process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
-						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x, TRUE);
+						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x, TRUE, FALSE);
 			}
 
 			/* Apply additional effect from coating*/
@@ -3332,7 +3325,7 @@ void py_attack(int dir)
 				}
 
 				/* Make item strike */
-				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE);
+				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE, TRUE);
 			}
 
 			/* Fumbling or coating backfiring */
@@ -3355,9 +3348,6 @@ void py_attack(int dir)
 		/* Message */
 		message_format(MSG_FLEE, cave_m_idx[m_ptr->fy][m_ptr->fx], "%^s flees in terror!", m_name);
 	}
-
-	/* Mega-Hack -- apply earthquake brand */
-	if (do_quake) earthquake(p_ptr->py, p_ptr->px, 10);
 
 	/* Charging uses full turn */
 	if (charging) p_ptr->energy_use = 100;

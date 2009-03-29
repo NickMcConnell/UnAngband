@@ -1111,6 +1111,8 @@ enum
 #define GF_STICKS_TO_SNAKES	144
 #define GF_LOSE_MANA	145
 #define GF_LOSE_MANA_PERC	146
+#define GF_DESTROY	147
+#define GF_QUAKE	148
 
 
 
@@ -1336,6 +1338,7 @@ enum
 #define FEAT_CHASM_WEB 459
 
 #define FEAT_GROUND 407
+#define FEAT_ROCK	409
 #define FEAT_GROUND_EMPTY 414
 #define FEAT_GRASS 411
 #define FEAT_TREE      420
@@ -1699,8 +1702,8 @@ enum
 #define SPELL_SUMMON_RACE       11
 #define SPELL_SUMMON_GROUP_IDX     12
 #define SPELL_CREATE_KIND     13
-#define SPELL_EARTHQUAKE      14
-#define SPELL_DESTRUCTION     15
+#define SPELL_XXX1      14
+#define SPELL_XXX2     15
 #define SPELL_CURE_DISEASE	16
 #define SPELL_PFIX_CONF		17
 #define SPELL_PFIX_POIS		18

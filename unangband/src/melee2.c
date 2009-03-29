@@ -6490,7 +6490,7 @@ static void process_monster(int m_idx)
 						(o_ptr->tval == TV_POTION)) && (k_info[o_ptr->k_idx].cost))
 				{
 					/* Hack -- use item blow routine */
-					process_item_blow(SOURCE_OBJECT, o_ptr->k_idx, o_ptr, m_ptr->fy, m_ptr->fx, TRUE);
+					process_item_blow(SOURCE_OBJECT, o_ptr->k_idx, o_ptr, m_ptr->fy, m_ptr->fx, TRUE, TRUE);
 
 					/* Mega Hack -- heal blindness directly */
 					if ((k_info[o_ptr->k_idx].flags6 & (TR6_EAT_HEAL)) && (m_ptr->blind)) m_ptr->blind = 1;
