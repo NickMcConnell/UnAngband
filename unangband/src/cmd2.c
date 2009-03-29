@@ -3926,7 +3926,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 			{
 				/* Make item strike */
 				process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
-						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x,  TRUE, play_info[y][x] & (PLAY_FIRE) == 0);
+						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x,  TRUE, (play_info[y][x] & (PLAY_FIRE)) == 0);
 			}
 
 			/* Apply additional effect from coating*/

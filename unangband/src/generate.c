@@ -11591,7 +11591,9 @@ static bool cave_gen(void)
 	/* Ensure guardian monsters */
 	if ((level_flag & (LF1_GUARDIAN)) != 0)
 	{
-		int y, x, guard;
+		int y = 0;
+		int x = 0;
+		int guard;
 		int count = 0;
 
 		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);

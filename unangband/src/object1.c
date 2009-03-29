@@ -702,7 +702,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		int state = 0;
 
 		/* Describe monster */
-		if (o_ptr->name3)
+		if (o_ptr->name3 > 0)
 		{
 			/* Save the monster name */
 			my_strcpy(mon_buf, r_name + r_info[o_ptr->name3].name, sizeof(mon_buf));
@@ -723,6 +723,13 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 			/* Terminate */
 			*t = '\0';
+		}
+		
+		/* Describe player */
+		else if (o_ptr->name3 < 0)
+		{
+			/* Save the monster name */
+			my_strcpy(mon_buf, "your", sizeof(mon_buf));
 		}
 
 		/* This particular object isn't named */
@@ -836,6 +843,12 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		else if (named && artifact_p(o_ptr))
 		{
 			object_desc_str_macro(t, "The ");
+		}
+		
+		/* Hack -- belongs to the player */
+		else if ((k_ptr->flags6 & (TR6_NAMED)) && (o_ptr->name3 < 0))
+		{
+			/* Nothing */
 		}
 
 		/* Hack -- A single one, and next character will be a vowel */
@@ -3393,6 +3406,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	bool use_feath = ((mode & (USE_FEATH)) ? TRUE : FALSE);
 	bool use_quiver = ((mode & (USE_QUIVER)) ? TRUE: FALSE);
 	bool use_self = ((mode & (USE_SELF)) ? TRUE: FALSE);
+	bool use_skin = ((mode & (USE_SKIN)) ? TRUE: FALSE);
 
 	bool allow_inven = FALSE;
 	bool allow_equip = FALSE;
@@ -3458,6 +3472,8 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	/* Hack -- The quiver is displayed in the equipment window */
 	if (use_quiver) use_equip = TRUE;
 
+	/* Hack -- The skin is displayed in the equipment window */
+	if (use_skin) use_equip = TRUE;
 
 	/* Full equipment */
 	e1 = INVEN_WIELD;
@@ -3469,6 +3485,46 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	/* Restrict the beginning of the equipment */
 	if (use_quiver) e1 = INVEN_QUIVER;
 
+	/* Set up skin */
+	if (use_skin)
+	{
+		/* Get monster race */
+		monster_race *r_ptr = &r_info[rp_ptr->r_idx];
+		
+		/* Get skin type */
+		j = r_ptr->flags8 & (RF8_HAS_SCALE) ? SV_SKIN_SCALE_COAT :
+			(r_ptr->flags8 & (RF8_HAS_FEATHER) ? SV_SKIN_FEATHER_COAT : 
+			(r_ptr->flags8 & (RF8_HAS_FUR) ? SV_SKIN_FUR_COAT : SV_SKIN_SKIN)); 
+		
+		/* Get bare skin */
+		k = lookup_kind(TV_SKIN, j);
+		
+		/* Set up bare skin */
+		for (i = INVEN_LEFT; i <= INVEN_FEET; i++)
+		{
+			object_type *o_ptr = &inventory[i];
+			
+			/* Hack -- Skip light source */
+			if (i == INVEN_LITE) continue;
+			
+			/* Bare skin */
+			if (!o_ptr->k_idx)
+			{
+				/* Set up skin */
+				object_prep(o_ptr, k);
+				
+				/* And remove weight */
+				o_ptr->weight = 0;
+				
+				/* And belong to the player */
+				o_ptr->name3 = -1;
+				
+				/* And store it - hack used later to identify which slots to clear */
+				o_ptr->ident |= (IDENT_STORE);
+			}
+		}
+	}
+	
 	/* Restrict equipment indexes */
 	while ((e1 <= e2) && (!get_item_okay(e1))) e1++;
 	while ((e1 <= e2) && (!get_item_okay(e2))) e2--;
@@ -4210,6 +4266,28 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 	}
 
+	/* Remove skin */
+	if (use_skin)
+	{
+		/* Set up bare skin */
+		for (i = INVEN_LEFT; i <= INVEN_FEET; i++)
+		{
+			object_type *o_ptr = &inventory[i];
+			
+			/* Hack -- Skip light source */
+			if (i == INVEN_LITE) continue;
+
+			/* Hack -- Skip item */
+			if (i == (*cp)) continue;
+			
+			/* Bare skin */
+			if (o_ptr->ident & (IDENT_STORE))
+			{
+				/* Set up skin */
+				object_wipe(o_ptr);
+			}
+		}
+	}
 
 	/* Fix the screen if necessary */
 	if (p_ptr->command_see)

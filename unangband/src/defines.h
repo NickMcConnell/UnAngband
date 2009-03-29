@@ -2005,6 +2005,7 @@ enum
 #define TV_PRAYER_BOOK  91
 #define TV_SONG_BOOK    92
 #define TV_RUNESTONE    93
+#define TV_TATTOO		94
 #define TV_RACE	 97	/* Used for racial activations */
 #define TV_BAG		98	/* Containers for other items */
 #define TV_SERVICE	99	/* Services have special meanings in stores */
@@ -2113,6 +2114,10 @@ enum
 #define SV_BLADE_COLD		34
 #define SV_STONESKIN		35
 #define SV_DRAGONSCALES  36
+
+#define SV_RUNIC_TATTOO		0
+#define SV_WOAD				2
+
 
 
 
@@ -3057,6 +3062,8 @@ enum
 #define USE_FEATH		0x00000080L	/* Allow features (hurt by fire) */
 #define USE_BAGC		0x00000100L	/* Allow bag contents */
 #define USE_BAGS		0x00000200L	/* Allow whole of bag */
+#define USE_SKIN		0x00000400L	/* Allow bare skin */
+
 
 
 

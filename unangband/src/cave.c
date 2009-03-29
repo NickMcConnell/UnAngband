@@ -5045,7 +5045,9 @@ void town_illuminate(bool daytime)
 	/* Megahack --- darkness brings out the bad guys */
 	if ((character_loaded) && (!daytime) && actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)].cur_num <= 0))
 	{
-		int y, x, count = 0;
+		int y = 0;
+		int x = 0;
+		int count = 0;
 
 		/* Pick a location */
 		while (++count < 1000)

@@ -2090,6 +2090,8 @@ bool item_tester_hook_coating(const object_type *o_ptr)
 		case TV_POLEARM:
 		case TV_ARROW:
 		case TV_BOLT:
+		case TV_SHIELD:
+		case TV_SKIN:
 			if (o_ptr->weight < 1000) return (TRUE);
 	}
 
@@ -2184,6 +2186,21 @@ bool player_apply_rune_or_coating2(int item2)
 	/* Use feat */
 	if (o_ptr->ident & (IDENT_STORE)) use_feat = TRUE;
 
+	/* Get rune */
+	if (o_ptr->tval == TV_RUNESTONE)
+	{
+		rune = o_ptr->sval;
+		tval = -1;
+		sval = -1;
+	}
+	else
+	{
+		rune = -1;
+		tval = o_ptr->tval;
+		sval = o_ptr->sval;
+		aware = ( k_info[o_ptr->k_idx].aware & (AWARE_FLAVOR) ) != 0;
+	}
+
 	/* Get the item (in the pack) */
 	if (item2 >= 0)
 	{
@@ -2196,6 +2213,15 @@ bool player_apply_rune_or_coating2(int item2)
 		j_ptr = &o_list[0 - item2];
 	}
 
+	/* Set up tattoo */
+	if ((j_ptr->ident & (IDENT_STORE)) && (item2 >= 0))
+	{
+		i = lookup_kind(TV_SPELL, rune >= 0 ? SV_RUNIC_TATTOO : SV_WOAD);
+		
+		/* Prepare tattoo */
+		object_prep(j_ptr, i);
+	}
+	
 	/* Remove coating */
 	if ((coated_p(j_ptr)) && ((j_ptr->xtra1 != o_ptr->tval) || (j_ptr->xtra2 != o_ptr->sval)))
 	{
@@ -2222,21 +2248,6 @@ bool player_apply_rune_or_coating2(int item2)
 
 		/* Sense the item? */
 		return (FALSE);
-	}
-
-	/* Get rune */
-	if (o_ptr->tval == TV_RUNESTONE)
-	{
-		rune = o_ptr->sval;
-		tval = -1;
-		sval = -1;
-	}
-	else
-	{
-		rune = -1;
-		tval = o_ptr->tval;
-		sval = o_ptr->sval;
-		aware = ( k_info[o_ptr->k_idx].aware & (AWARE_FLAVOR) ) != 0;
 	}
 
 	/* Overwrite runes */
@@ -2560,6 +2571,7 @@ bool player_apply_rune_or_coating2(int item2)
 	    }
 	}
 
+	
 	return (TRUE);
 }
 

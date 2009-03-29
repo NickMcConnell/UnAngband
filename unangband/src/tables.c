@@ -3200,10 +3200,10 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			item_tester_hook_apply, 0, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), 0L, 0L, 0, cmd_tester_rune_or_coating},
 
 	{ player_apply_rune_or_coating2, 'y', "Apply rune to which item? ", "You have nothing to apply runes to.",
-			NULL, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR), 0L, 0L, 0, NULL},
+			NULL, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR | USE_SKIN), 0L, 0L, 0, NULL},
 
 	{ player_apply_rune_or_coating2, 'y', "Coat which item? ", "You have nothing which will hold a coating.",
-			item_tester_hook_coating, 0, (USE_INVEN | USE_EQUIP | USE_FLOOR), 0L, 0L, 0, NULL},
+			item_tester_hook_coating, 0, (USE_INVEN  | USE_EQUIP | USE_FLOOR | USE_SKIN), 0L, 0L, 0, NULL},
 
 	{ player_wield, 'w', "Wear/Wield which item? ", "You have nothing you can wear or wield.",
 			item_tester_hook_wear, 0, (USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGC), 0L, 0L, 0, NULL},
