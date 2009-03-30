@@ -724,7 +724,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			/* Terminate */
 			*t = '\0';
 		}
-		
+
 		/* Describe player */
 		else if (o_ptr->name3 < 0)
 		{
@@ -844,7 +844,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			object_desc_str_macro(t, "The ");
 		}
-		
+
 		/* Hack -- belongs to the player */
 		else if ((k_ptr->flags6 & (TR6_NAMED)) && (o_ptr->name3 < 0))
 		{
@@ -3490,41 +3490,41 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	{
 		/* Get monster race */
 		monster_race *r_ptr = &r_info[rp_ptr->r_idx];
-		
+
 		/* Get skin type */
 		j = r_ptr->flags8 & (RF8_HAS_SCALE) ? SV_SKIN_SCALE_COAT :
-			(r_ptr->flags8 & (RF8_HAS_FEATHER) ? SV_SKIN_FEATHER_COAT : 
-			(r_ptr->flags8 & (RF8_HAS_FUR) ? SV_SKIN_FUR_COAT : SV_SKIN_SKIN)); 
-		
+			(r_ptr->flags8 & (RF8_HAS_FEATHER) ? SV_SKIN_FEATHER_COAT :
+			(r_ptr->flags8 & (RF8_HAS_FUR) ? SV_SKIN_FUR_COAT : SV_SKIN_SKIN));
+
 		/* Get bare skin */
 		k = lookup_kind(TV_SKIN, j);
-		
+
 		/* Set up bare skin */
 		for (i = INVEN_LEFT; i <= INVEN_FEET; i++)
 		{
 			object_type *o_ptr = &inventory[i];
-			
+
 			/* Hack -- Skip light source */
 			if (i == INVEN_LITE) continue;
-			
+
 			/* Bare skin */
 			if (!o_ptr->k_idx)
 			{
 				/* Set up skin */
 				object_prep(o_ptr, k);
-				
+
 				/* And remove weight */
 				o_ptr->weight = 0;
-				
+
 				/* And belong to the player */
 				o_ptr->name3 = -1;
-				
+
 				/* And store it - hack used later to identify which slots to clear */
 				o_ptr->ident |= (IDENT_STORE);
 			}
 		}
 	}
-	
+
 	/* Restrict equipment indexes */
 	while ((e1 <= e2) && (!get_item_okay(e1))) e1++;
 	while ((e1 <= e2) && (!get_item_okay(e2))) e2--;
@@ -4270,16 +4270,16 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	if (use_skin)
 	{
 		/* Set up bare skin */
-		for (i = INVEN_LEFT; i <= INVEN_FEET; i++)
+		for (i = INVEN_NECK; i <= INVEN_FEET; i++)
 		{
 			object_type *o_ptr = &inventory[i];
-			
+
 			/* Hack -- Skip light source */
 			if (i == INVEN_LITE) continue;
 
 			/* Hack -- Skip item */
 			if (i == (*cp)) continue;
-			
+
 			/* Bare skin */
 			if (o_ptr->ident & (IDENT_STORE))
 			{

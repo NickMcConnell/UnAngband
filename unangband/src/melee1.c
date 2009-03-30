@@ -1281,33 +1281,6 @@ bool make_attack_normal(int m_idx)
 				}
 			}
 
-			/* 50% chance of using either ring in defence */
-			if (TRUE)
-			{
-				int y = m_ptr->fy;
-				int x = m_ptr->fx;
-
-				object_type *o_ptr;
-
-				/* Get object */
-				o_ptr = &inventory[rand_int(100) < 50 ? INVEN_LEFT : INVEN_RIGHT];
-
-				/* Apply additional effect from activation */
-				if (o_ptr->k_idx && auto_activate(o_ptr))
-				{
-					/* Make item strike */
-					process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
-							o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x, TRUE, FALSE);
-				}
-
-				/* Apply additional effect from coating*/
-				else if (o_ptr->k_idx && coated_p(o_ptr))
-				{
-					/* Make item strike */
-					process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE, TRUE);
-				}
-			}
-
 			/* Player armor reduces total damage */
 			damage -= (damage * ((p_ptr->ac + p_ptr->to_a < 150) ? p_ptr->ac + p_ptr->to_a: 150) / 250);
 
