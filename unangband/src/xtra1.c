@@ -3078,6 +3078,8 @@ static void calc_bonuses(void)
 
 	u32b f1, f2, f3, f4;
 
+	player_race *shape_ptr = &p_info[p_ptr->pshape];
+
 	/*** Memorize ***/
 
 	/* Save the old speed */
@@ -3168,8 +3170,6 @@ static void calc_bonuses(void)
 	/* Apply bonuses if shape differs from race */
 	if (p_ptr->prace != p_ptr->pshape)
 	{
-		player_race *shape_ptr = &p_info[p_ptr->pshape];
-
 		/* Base infravision (purely racial) */
 		p_ptr->see_infra += shape_ptr->infra;
 
@@ -4056,12 +4056,11 @@ static void calc_bonuses(void)
 
 	}
 
-	/*** Handle racial prohibitions ***/
-	p_ptr->cur_flags1 &= ~(rp_ptr->cancel_flags1);
-	p_ptr->cur_flags2 &= ~(rp_ptr->cancel_flags2);
-	p_ptr->cur_flags3 &= ~(rp_ptr->cancel_flags3);
-	p_ptr->cur_flags4 &= ~(rp_ptr->cancel_flags4);
-
+	/*** Handle shape prohibitions ***/
+	p_ptr->cur_flags1 &= ~(shape_ptr->cancel_flags1);
+	p_ptr->cur_flags2 &= ~(shape_ptr->cancel_flags2);
+	p_ptr->cur_flags3 &= ~(shape_ptr->cancel_flags3);
+	p_ptr->cur_flags4 &= ~(shape_ptr->cancel_flags4);
 
 	/*** Notice changes ***/
 

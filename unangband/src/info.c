@@ -5626,11 +5626,13 @@ void equip_not_flags(u32b f1,u32b f2,u32b f3, u32b f4)
 
 	object_type *i_ptr;
 
-	/*** Handle racial prohibitions ***/
-	f1 &= ~(rp_ptr->cancel_flags1);
-	f2 &= ~(rp_ptr->cancel_flags2);
-	f3 &= ~(rp_ptr->cancel_flags3);
-	f4 &= ~(rp_ptr->cancel_flags4);
+	player_race *shape_ptr = &p_info[p_ptr->pshape];
+
+	/*** Handle shape prohibitions ***/
+	f1 &= ~(shape_ptr->cancel_flags1);
+	f2 &= ~(shape_ptr->cancel_flags2);
+	f3 &= ~(shape_ptr->cancel_flags3);
+	f4 &= ~(shape_ptr->cancel_flags4);
 
 	/* Mark equipment with not flags*/
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
