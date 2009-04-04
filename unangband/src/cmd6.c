@@ -164,19 +164,6 @@ bool do_cmd_item(int command)
 		}
 	}
 
-	/* Hack -- prepare a fake item for innate racial abilities of the current shape */
-	if ((command == COMMAND_ITEM_ACTIVATE) && (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)))
-	{
-		/* Prepare a 'fake' object */
-		object_prep(&inventory[INVEN_SELF], lookup_kind(TV_RACE, 0));
-
-		/* Object is known */
-		object_known(&inventory[INVEN_SELF]);
-
-		/* Hack -- set sval */
-		inventory[INVEN_SELF].sval = p_ptr->pshape;
-	}
-
 	/* Hack --- fuel equipment from inventory */
 	if (command == COMMAND_ITEM_FUEL)
 		p_ptr->command_wrk = (USE_EQUIP); /* TODO: this one does not work here */
@@ -1882,9 +1869,6 @@ bool player_activate(int item)
 		/* Clear styles */
 		p_ptr->cur_style &= ~((1L << WS_WAND) | (1L << WS_STAFF));
 
-		/* Clear racial activation */
-		if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
-
 		return (TRUE);
 	}
 
@@ -1982,9 +1966,6 @@ bool player_activate(int item)
 
 	/* Time object out */
 	else if (o_ptr->charges) o_ptr->timeout = (s16b)rand_int(o_ptr->charges)+o_ptr->charges;
-
-	/* Clear racial activation */
-	if (p_info[p_ptr->pshape].flags3 & (TR3_ACTIVATE)) object_wipe(&inventory[INVEN_SELF]);
 
 	/* Window stuff */
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
@@ -2217,11 +2198,11 @@ bool player_apply_rune_or_coating2(int item2)
 	if ((j_ptr->ident & (IDENT_STORE)) && (item2 >= 0))
 	{
 		i = lookup_kind(TV_SPELL, rune >= 0 ? SV_RUNIC_TATTOO : SV_WOAD);
-		
+
 		/* Prepare tattoo */
 		object_prep(j_ptr, i);
 	}
-	
+
 	/* Remove coating */
 	if ((coated_p(j_ptr)) && ((j_ptr->xtra1 != o_ptr->tval) || (j_ptr->xtra2 != o_ptr->sval)))
 	{
@@ -2571,7 +2552,7 @@ bool player_apply_rune_or_coating2(int item2)
 	    }
 	}
 
-	
+
 	return (TRUE);
 }
 

@@ -3177,6 +3177,9 @@ static void calc_bonuses(void)
 	if (p_info[p_ptr->pshape].innate)
 	{
 		object_prep(&inventory[INVEN_SELF], p_info[p_ptr->pshape].innate);
+
+		/* Fully know abilities */
+		inventory[INVEN_SELF].ident |= (IDENT_MENTAL);
 	}
 
 	/*** Analyze player ***/
@@ -3209,8 +3212,11 @@ static void calc_bonuses(void)
 	/*** Analyze equipment ***/
 
 	/* Scan the equipment */
-	for (i = INVEN_WIELD; i < END_EQUIPMENT; i++)
+	for (i = INVEN_WIELD; i <= END_EQUIPMENT; i++)
 	{
+		/* Hack -- for self */
+		if (i == END_EQUIPMENT) i = INVEN_SELF;
+
 		o_ptr = &inventory[i];
 
 		/* Skip non-objects */

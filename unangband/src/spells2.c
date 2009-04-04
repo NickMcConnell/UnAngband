@@ -963,49 +963,34 @@ void self_knowledge_aux(bool spoil, bool random)
 #endif
 	text_out("\n");
 
-	/* Hack -- racial effects */
-	if ((!random) && (rp_ptr->flags1 || rp_ptr->flags2 || rp_ptr->flags3 || rp_ptr->flags4))
-	{
-		text_out("Your race affects you.  ");
-
-		list_object_flags(rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags1,rp_ptr->flags4, 1, 1);
-
-		text_out("\n");
-	}
-
 	/* Get player flags */
 	player_flags(&t1,&t2,&t3,&t4);
 
-	/* Eliminate race flags */
-	t1 &= ~(rp_ptr->flags1);
-	t2 &= ~(rp_ptr->flags2);
-	t3 &= ~(rp_ptr->flags3);
-	t4 &= ~(rp_ptr->flags4);
-
-	/* Hack -- shape effects */
-	if (p_ptr->prace != p_ptr->pshape)
+	/* Hack -- race / shape effects */
+	if (!random)
 	{
-		player_race *shape_ptr = &p_info[p_ptr->pshape];
 		bool intro = FALSE;
 
+		object_flags(&inventory[INVEN_SELF], &f1, &f2, &f3, &f4);
+
 		/* Hack -- shape flags */
-		if ((!random) && (shape_ptr->flags1 || shape_ptr->flags2 || shape_ptr->flags3 || shape_ptr->flags4))
+		if ((!random) && (f1 || f2 || f3 || f4))
 		{
-			if (!intro) text_out("Your shape affects you.  ");
+			if (!intro) text_out(format("Your %s affects you.  ", p_ptr->prace != p_ptr->pshape ? "shape" : "race"));
 
 			intro = TRUE;
 
-			list_object_flags(shape_ptr->flags1,shape_ptr->flags1,shape_ptr->flags1,shape_ptr->flags4, 1, 1);
+			list_object_flags(f1, f2, f3, f4, 1, 1);
 		}
 
 		/* Intro? */
 		if (intro) text_out("\n");
 
 		/* Eliminate shape flags */
-		t1 &= ~(shape_ptr->flags1);
-		t2 &= ~(shape_ptr->flags2);
-		t3 &= ~(shape_ptr->flags3);
-		t4 &= ~(shape_ptr->flags4);
+		t1 &= ~(f1);
+		t2 &= ~(f2);
+		t3 &= ~(f3);
+		t4 &= ~(f4);
 	}
 
 	/* Hack -- class effects */

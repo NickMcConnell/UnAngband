@@ -2807,7 +2807,7 @@ G:[:U
 I:10:38:7
 W:0:0:0:0
 P:0:5d5:0:0:0
-F:TUNNEL |
+F:TUNNEL | ANCHOR
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 F:IGNORE_THEFT |
 
@@ -2821,15 +2821,6 @@ P:0:1d5:0:0:0
 F:STEALTH | BRAND_POIS |
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 F:IGNORE_THEFT |
-
-# This is used as the activatable object when the player is activating themself.
-
-N:342:Yourself
-G:@:w
-I:97:0:0
-W:0:0:0:0
-P:0:0d0:0:0:0
-F:ACTIVATE |
 
 N:343:& # Flask~
 G:!:w
@@ -3717,7 +3708,6 @@ F:IGNORE_ACID |
 
 ##### Items 445 to 479 reserved (old "terrain" objects) #####
 
-
 ### The Rogue Returns ###
 
 N:440:of Tricks
@@ -3748,60 +3738,213 @@ W:24:0:30:800
 A:24/8
 P:0:1d1:0:0:0
 
-##### And here starts the gold/gems #####
+##### Racial Objects #####
 
+# These are used to set up many racial abilities. 
 
-### 445 - Unused ###
+N:445:Man of Bree
+G:@:w
+I:97:0:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:MAN |
 
-### 446 - Unused ###
+N:446:Wood Elf
+G:@:w
+I:97:1:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:SUST_DEX | RES_LITE |
+F:ELF |
 
-### 447 - Unused ###
+N:447:Hobbit
+G:@:w
+I:97:2:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:HOLD_LIFE
 
-### 448 - Unused ###
+N:448:Shadow Fairy
+G:@:w
+I:97:3:1
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:REGEN_MANA |
+F:DEMON | ELF |
 
-### 449 - Unused ###
+N:449:Dwarf
+G:@:w
+I:97:4:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_BLIND |
+F:DWARF |
 
-### 450 - Unused ###
+N:450:Dunadan
+G:@:w
+I:97:5:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:SUST_CON |
+F:MAN |
 
-### 451 - Unused ###
+N:451:High Elf
+G:@:w
+I:97:6:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_LITE |
+F:SEE_INVIS |
+F:ELF |
 
-### 452 - Unused ###
+N:452:Maia
+G:@:w
+I:97:7:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:REGEN_HP | ACTIVATE |
+F:DEMON | ELF |
 
-### 453 - Unused ###
+N:453:Ent
+G:@:w
+I:97:8:8
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:TUNNEL | HURT_FIRE
 
-### 454 - Unused ###
+N:454:Druadan
+G:@:w
+I:97:9:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:TELEPATHY |
+F:MAN |
 
-### 455 - Unused ###
+N:455:Man of Erech
+G:@:w
+I:97:10:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_COLD |
+F:IM_POIS | UNDEAD | MAN |
 
-### 456 - Unused ###
+N:456:Man of Dale
+G:@:w
+I:97:11:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:MAN |
 
-### 457 - Unused ###
+N:457:Man of Rohan
+G:@:w
+I:97:12:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:MAN |
 
-### 458 - Unused ###
+N:458:Man of Gondor
+G:@:w
+I:97:13:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:MAN |
 
-### 459 - Unused ###
+N:459:Man of Harad
+G:@:w
+I:97:14:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_FEAR |
+F:MAN |
 
-### 460 - Unused ###
+N:460:Forge Giant
+G:@:w
+I:97:15:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:IM_ELEC |
+F:GIANT |
 
-### 461 - Unused ###
+N:461:Fire Giant
+G:@:w
+I:97:16:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:IM_FIRE |
+F:GIANT |
 
-### 462 - Unused ###
+N:462:Frost Giant
+G:@:w
+I:97:17:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:IM_COLD |
+F:GIANT |
 
-### 463 - Unused ###
+N:463:Beorning
+G:@:w
+I:97:18:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:ACTIVATE |
+F:ANIMAL | MAN |
 
-### 464 - Unused ###
+N:464:Werewolf
+G:@:w
+I:97:19:2
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:ACTIVATE |
+F:ANIMAL | MAN | REGEN_HP
 
-### 465 - Unused ###
+N:465:Vampire
+G:@:w
+I:97:20:3
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:REGEN_HP | ACTIVATE |
+F:HURT_LITE | UNDEAD |
 
-### 466 - Unused ###
+N:466:Goblin
+G:@:w
+I:97:21:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_POIS |
+F:HURT_LITE | ORC | DWARF |
 
-### 467 - Unused ###
+N:467:Goblin-Man
+G:@:w
+I:97:22:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_POIS |
+F:ORC | MAN | DWARF |
 
-### 468 - Unused ###
+N:468:Orc
+G:@:w
+I:97:23:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_DARK |
+F:HURT_LITE | ORC |
 
-### 469 - Unused ###
+N:469:Half-Orc
+G:@:w
+I:97:24:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:RES_DARK |
+F:ORC | MAN |
 
-### 470 - Unused ###
+N:470:Stone Troll
+G:@:w
+I:97:25:0
+W:0:0:0:0
+P:50:1d1:10:0:0
+F:SUST_STR |
+F:REGEN_HP |
+F:HURT_LITE | TROLL |
 
 ### 471 - Unused ###
 
@@ -3809,97 +3952,56 @@ P:0:1d1:0:0:0
 
 ### 473 - Unused ###
 
-### 474 - Unused ###
+N:474:Goat
+G:@:w
+I:97:29:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:SLOW_DIGEST | ACTIVATE |
+F:ANIMAL |
 
-### 475 - Unused ###
+N:475:Bear
+G:@:w
+I:97:30:0
+W:0:0:0:0
+P:0:1d1:10:0:0
+F:ACTIVATE |
+F:ANIMAL |
 
-### 476 - Unused ###
+N:476:Mouse
+G:@:w
+I:97:31:10
+W:0:0:0:0
+P:0:1d1:0:-25:-5
+F:ACTIVATE | STEALTH
+F:ANIMAL |
 
-### 477 - Unused ###
+N:477:Hound
+G:@:w
+I:97:32:0
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:TELEPATHY | ACTIVATE | SEARCH
+F:ANIMAL |
 
-### 478 - Unused ###
+N:478:Cheetah
+G:@:w
+I:97:33:6
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:ACTIVATE | SPEED
+F:ANIMAL |
 
-### 479 - Unused ###
+N:479:Lion
+G:@:w
+I:97:34:0
+W:0:0:0:0
+P:0:1d1:20:0:0
+F:RES_FEAR |
+F:ACTIVATE |
+F:ANIMAL |
 
-#$# 440 - Unused ###
-
-#$# 441 - Unused ###
-
-#$# 442 - Unused ###
-
-#$# 443 - Unused ###
-
-#$# 444 - Unused ###
-
-#$# 445 - Unused ###
-
-#$# 446 - Unused ###
-
-#$# 447 - Unused ###
-
-#$# 448 - Unused ###
-
-#$# 449 - Unused ###
-
-#$# 450 - Unused ###
-
-#$# 451 - Unused ###
-
-#$# 452 - Unused ###
-
-#$# 453 - Unused ###
-
-#$# 454 - Unused ###
-
-#$# 455 - Unused ###
-
-#$# 456 - Unused ###
-
-#$# 457 - Unused ###
-
-#$# 458 - Unused ###
-
-#$# 459 - Unused ###
-
-#$# 460 - Unused ###
-
-#$# 461 - Unused ###
-
-#$# 462 - Unused ###
-
-#$# 463 - Unused ###
-
-#$# 464 - Unused ###
-
-#$# 465 - Unused ###
-
-#$# 466 - Unused ###
-
-#$# 467 - Unused ###
-
-#$# 468 - Unused ###
-
-#$# 469 - Unused ###
-
-#$# 470 - Unused ###
-
-#$# 471 - Unused ###
-
-#$# 472 - Unused ###
-
-#$# 473 - Unused ###
-
-#$# 474 - Unused ###
-
-#$# 475 - Unused ###
-
-#$# 476 - Unused ###
-
-#$# 477 - Unused ###
-
-#$# 478 - Unused ###
-
-#$# 479 - Unused ###
+##### And here starts the gold/gems #####
 
 N:480:tin
 G:$:D
@@ -4190,25 +4292,52 @@ W:35:0:3:25000
 P:0:0d0:0:0:0
 F:INSTA_ART |
 
-### 515 - Unused ###
+##### More Racial Objects #####
 
-### 516 - Unused ###
+N:515:Dragon
+G:@:w
+I:97:35:0
+W:0:0:0:0
+P:30:1d1:20:20:0
+F:RES_ACID | RES_ELEC | RES_FIRE | RES_COLD | RES_POIS |
+F:SEE_INVIS |
+F:ACTIVATE |
+F:DRAGON |
 
-### 517 - Unused ###
+N:516:Wolf
+G:@:w
+I:97:36:5
+W:0:0:0:0
+P:10:1d1:10:0:0
+F:ACTIVATE | SPEED | SEARCH
+F:ANIMAL |
 
-### 518 - Unused ###
+N:517:Bat
+G:@:w
+I:97:37:5
+W:0:0:0:0
+P:0:1d1:-15:-15:0
+F:RES_BLIND | SPEED
+F:FEATHER | ACTIVATE |
+F:ANIMAL |
 
-### 519 - Unused ###
+N:518:Serpent
+G:@:w
+I:97:38:5
+W:0:0:0:0
+P:0:1d1:0:0:0
+F:ACTIVATE |
+F:ANIMAL | RES_POIS | RES_WATER
 
-#$# 515 - Unused ###
+N:519:Cat
+G:@:w
+I:97:39:0
+W:0:0:0:0
+P:0:1d1:5:0:0
+F:FEATHER | ACTIVATE
+F:ANIMAL |
 
-#$# 516 - Unused ###
-
-#$# 517 - Unused ###
-
-#$# 518 - Unused ###
-
-#$# 519 - Unused ###
+### Magic Books ###
 
 N:520:of Enchantments
 G:?:r

@@ -1349,17 +1349,7 @@ struct player_race
 	s16b r_adj[A_MAX];      /* Racial stat bonuses */
 
 	s16b r_skill[SKILL_MAX];	/* Racial skill bonus */
-#if 0
-	s16b r_dis;     /* disarming */
-	s16b r_dev;     /* magic devices */
-	s16b r_sav;     /* saving throw */
-	s16b r_stl;     /* stealth */
-	s16b r_srh;     /* search ability */
-	s16b r_dig;     /* digging ability */
-	s16b r_tht;     /* combat (throwing) */
-	s16b r_thn;     /* combat (normal) */
-	s16b r_thb;     /* combat (shooting) */
-#endif
+
 	s16b r_idx;	/* Monster index */
 
 	byte r_exp;     /* Race experience factor */
@@ -1385,14 +1375,10 @@ struct player_race
 
 	s16b hist;      /* Starting history index */
 
-	u32b flags1;    /* Racial Flags, set 1 */
-	u32b flags2;    /* Racial Flags, set 2 */
-	u32b flags3;    /* Racial Flags, set 3 */
-	u32b flags4;    /* Racial Flags, set 4 */
-
-#if 0
-	s16b slots[END_EQUIPMENT - INVEN_WIELD + 1];	/* Slot occupied by a shape 'object' */
-#endif
+	u32b cancel_flags1;    /* Race can never have these flags, set 1 */
+	u32b cancel_flags2;    /* Race can never have these flags, set 2 */
+	u32b cancel_flags3;    /* Race can never have these flags, set 3 */
+	u32b cancel_flags4;    /* Race can never have these flags, set 4 */
 };
 
 

@@ -323,13 +323,15 @@ void update_smart_racial(int m_idx)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 
-	player_race *shape_ptr = &p_info[p_ptr->pshape];
+	u32b f1 = 0;
+	u32b f2 = 0;
+	u32b f3 = 0;
+	u32b f4 = 0;
+
+	object_flags(&inventory[INVEN_SELF], &f1, &f2, &f3, &f4);
 
 	/* Get race flags */
-	m_ptr->smart |= player_smart_flags(rp_ptr->flags1, rp_ptr->flags2, rp_ptr->flags3, rp_ptr->flags4);
-
-	/* Get shape flags */
-	m_ptr->smart |= player_smart_flags(shape_ptr->flags1, shape_ptr->flags2, shape_ptr->flags3, shape_ptr->flags4);
+	m_ptr->smart |= player_smart_flags(f1, f2, f3, f4);
 
 	return;
 }

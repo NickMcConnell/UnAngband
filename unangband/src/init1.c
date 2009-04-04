@@ -3463,13 +3463,13 @@ errr parse_f_info(char *buf, header *head)
 		{
 			n2 = 0;
 		}
-		
+
 		/* Analyze the effect */
 		else for (n2 = 0; n2 < z_info->effect_max; n2++)
 		{
 			if (streq(s, effect_name + effect_info[n2].name)) break;
 		}
-		
+
 		/* Invalid region */
 		if (n2 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
@@ -4992,13 +4992,13 @@ errr parse_r_info(char *buf, header *head)
 		{
 			n2 = 0;
 		}
-		
+
 		/* Analyze the effect */
 		else for (n2 = 0; n2 < z_info->effect_max; n2++)
 		{
 			if (streq(s, effect_name + effect_info[n2].name)) break;
 		}
-		
+
 		/* Invalid effect */
 		if (n2 == z_info->effect_max) return (PARSE_ERROR_GENERIC);
 
@@ -5148,22 +5148,22 @@ errr parse_r_info(char *buf, header *head)
 /*
  * Grab one flag in a player_race from a textual string
  */
-static errr grab_one_racial_flag(player_race *pr_ptr, cptr what)
+static errr grab_one_race_cancel_flag(player_race *pr_ptr, cptr what)
 {
-	if (grab_one_flag(&pr_ptr->flags1, k_info_flags1, what) == 0)
+	if (grab_one_flag(&pr_ptr->cancel_flags1, k_info_flags1, what) == 0)
 		return (0);
 
-	if (grab_one_flag(&pr_ptr->flags2, k_info_flags2, what) == 0)
+	if (grab_one_flag(&pr_ptr->cancel_flags2, k_info_flags2, what) == 0)
 		return (0);
 
-	if (grab_one_flag(&pr_ptr->flags3, k_info_flags3, what) == 0)
+	if (grab_one_flag(&pr_ptr->cancel_flags3, k_info_flags3, what) == 0)
 		return (0);
 
-	if (grab_one_flag(&pr_ptr->flags4, k_info_flags4, what) == 0)
+	if (grab_one_flag(&pr_ptr->cancel_flags4, k_info_flags4, what) == 0)
 		return (0);
 
 	/* Oops */
-	msg_format("Unknown player flag '%s'.", what);
+	msg_format("Unknown race cancel flag '%s'.", what);
 
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
@@ -5213,6 +5213,9 @@ errr parse_p_info(char *buf, header *head)
 
 		/* Point at the "info" */
 		pr_ptr = (player_race*)head->info_ptr + i;
+
+		/* Efficiency - get innate object */
+		pr_ptr->innate = lookup_kind(TV_RACE, i);
 
 		/* Store the name */
 		if (!(pr_ptr->name = add_name(head, s)))
@@ -5293,20 +5296,19 @@ errr parse_p_info(char *buf, header *head)
 	/* Process 'X' for "Extra Info" (one line only) */
 	else if (buf[0] == 'X')
 	{
-		int exp, infra, r_idx, innate;
+		int exp, infra, r_idx;
 
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
-			    &exp, &infra, &r_idx, &innate)) return (PARSE_ERROR_GENERIC);
+		if (3 != sscanf(buf+2, "%d:%d:%d",
+			    &exp, &infra, &r_idx)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		pr_ptr->r_exp = exp;
 		pr_ptr->infra = infra;
 		pr_ptr->r_idx = r_idx;
-		pr_ptr->innate = innate;
 	}
 
 	/* Hack -- Process 'I' for "info" and such */
@@ -5361,8 +5363,8 @@ errr parse_p_info(char *buf, header *head)
 		pr_ptr->f_b_wt = f_b_wt;
 	}
 
-	/* Hack -- Process 'F' for flags */
-	else if (buf[0] == 'F')
+	/* Hack -- Process 'G' for race cancel flags */
+	else if (buf[0] == 'G')
 	{
 		/* There better be a current pr_ptr */
 		if (!pr_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -5381,7 +5383,7 @@ errr parse_p_info(char *buf, header *head)
 			}
 
 			/* Parse this entry */
-			if (0 != grab_one_racial_flag(pr_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+			if (0 != grab_one_race_cancel_flag(pr_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
 
 			/* Start the next entry */
 			s = t;
@@ -10258,9 +10260,9 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "\n");
 
 	/* Output 'X' for "Extra Info" (one line only) */
-	if (pr_ptr->r_exp || pr_ptr->infra || pr_ptr->r_idx || pr_ptr->innate)
+	if (pr_ptr->r_exp || pr_ptr->infra || pr_ptr->r_idx)
 	{
-		fprintf(fp, "X:%d:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx, pr_ptr->innate);
+		fprintf(fp, "X:%d:%d:%d\n", pr_ptr->r_exp, pr_ptr->infra, pr_ptr->r_idx);
 	}
 
 	/* Output 'I' for "Info" (one line only) */
@@ -10282,10 +10284,10 @@ errr emit_p_info_index(FILE *fp, header *head, int i)
 	}
 
 	/* Output 'F' for "Flags" */
-	emit_flags_32(fp, "F:", pr_ptr->flags1, k_info_flags1);
-	emit_flags_32(fp, "F:", pr_ptr->flags2, k_info_flags2);
-	emit_flags_32(fp, "F:", pr_ptr->flags3, k_info_flags3);
-	emit_flags_32(fp, "F:", pr_ptr->flags4, k_info_flags4);
+	emit_flags_32(fp, "G:", pr_ptr->cancel_flags1, k_info_flags1);
+	emit_flags_32(fp, "G:", pr_ptr->cancel_flags2, k_info_flags2);
+	emit_flags_32(fp, "G:", pr_ptr->cancel_flags3, k_info_flags3);
+	emit_flags_32(fp, "G:", pr_ptr->cancel_flags4, k_info_flags4);
 
 	/* Only output classes for starting races */
 	if (i< z_info->g_max)

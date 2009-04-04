@@ -517,7 +517,7 @@ static void player_outfit(void)
 			s16b k_idx = lookup_kind(e_ptr->tval, e_ptr->sval);
 
 			/* MegaHack -- undead start with 'foods' */
-			if (rp_ptr->flags4 & (TR4_UNDEAD)) switch (e_ptr->tval)
+			if (k_info[rp_ptr->innate].flags4 & (TR4_UNDEAD)) switch (e_ptr->tval)
 			{
 				case TV_FOOD:
 				{

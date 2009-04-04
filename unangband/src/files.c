@@ -2144,22 +2144,11 @@ void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 {
 	int i;
 
-	player_race *shape_ptr = &p_info[p_ptr->pshape];
-
 	/* Clear */
 	(*f1) = (*f2) = (*f3) = (*f4) = 0L;
 
-	/* Add racial flags */
-	(*f1) |= rp_ptr->flags1;
-	(*f2) |= rp_ptr->flags2;
-	(*f3) |= rp_ptr->flags3;
-	(*f4) |= rp_ptr->flags4;
-
-	/* Add shape flags */
-	(*f1) |= shape_ptr->flags1;
-	(*f2) |= shape_ptr->flags2;
-	(*f3) |= shape_ptr->flags3;
-	(*f4) |= shape_ptr->flags4;
+	/*** Handle racial object */
+	object_flags(&inventory[INVEN_SELF], f1, f2, f3, f4);
 
 	/*** Handle styles ***/
 	for (i = 0;i< z_info->w_max;i++)
