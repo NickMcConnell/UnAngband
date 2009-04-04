@@ -4056,6 +4056,12 @@ static void calc_bonuses(void)
 
 	}
 
+	/*** Handle racial prohibitions ***/
+	p_ptr->cur_flags1 &= ~(rp_ptr->cancel_flags1);
+	p_ptr->cur_flags2 &= ~(rp_ptr->cancel_flags2);
+	p_ptr->cur_flags3 &= ~(rp_ptr->cancel_flags3);
+	p_ptr->cur_flags4 &= ~(rp_ptr->cancel_flags4);
+
 
 	/*** Notice changes ***/
 
