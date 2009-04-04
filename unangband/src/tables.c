@@ -3194,7 +3194,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			item_tester_hook_assembly, 0, (USE_INVEN | USE_FLOOR), 0L, 0L, 0, NULL},
 
 	{ player_activate, 'A', "Activate which item? ", "You have no items you know how to activate.",
-			item_tester_hook_activate, 0, (USE_EQUIP), 0L, 0L, 0, NULL},
+			item_tester_hook_activate, 0, (USE_EQUIP | USE_SELF), 0L, 0L, 0, NULL},
 
 	{ player_apply_rune_or_coating, 'y', "Apply which runestone, mushroom, flask or potion? ", "You have no runestones, mushrooms, flasks or potions.",
 			item_tester_hook_apply, 0, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_BAGC), 0L, 0L, 0, cmd_tester_rune_or_coating},

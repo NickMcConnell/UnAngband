@@ -2695,6 +2695,13 @@ static void calc_mana(void)
 		}
 	}
 
+	/* Shapeshifters lose some mana */
+	if (p_ptr->prace != p_ptr->pshape)
+	{
+		/* Reduce mana */
+		msp = (2 * msp) / 3;
+	}
+
 	/* Assume player is not encumbered by gloves */
 	p_ptr->cumber_glove = FALSE;
 
@@ -3179,7 +3186,7 @@ static void calc_bonuses(void)
 		object_prep(&inventory[INVEN_SELF], p_info[p_ptr->pshape].innate);
 
 		/* Fully know abilities */
-		inventory[INVEN_SELF].ident |= (IDENT_MENTAL);
+		inventory[INVEN_SELF].ident |= (IDENT_MENTAL | IDENT_KNOWN);
 	}
 
 	/*** Analyze player ***/
