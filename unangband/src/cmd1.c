@@ -2217,6 +2217,9 @@ bool discharge_trap(int y, int x, int ty, int tx)
 								/* Trap description */
 								if (player) msg_format("%^s hits you.",o_name);
 
+								/* Seen */
+								obvious = TRUE;
+
 								/* Apply damage directly */
 								if (player)
 									project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, ny, nx, k, GF_HURT);
@@ -2526,9 +2529,8 @@ bool discharge_trap(int y, int x, int ty, int tx)
 					damage = d_plus;
 				}
 
-				(void)project_p(SOURCE_PLAYER_TRAP,o_ptr->k_idx,y,x,damage, effect);
-				(void)project_f(SOURCE_PLAYER_TRAP,o_ptr->k_idx,y,x,damage, effect);
-				(void)project_t(SOURCE_PLAYER_TRAP,o_ptr->k_idx,y,x,damage, effect);
+				/* Apply the blow */
+				obvious |= project_method(SOURCE_FEATURE, feat, method, effect, damage, p_ptr->depth, y, x, ty, tx, 0, method_info[method].flags1);
 			}
 		}
 	}
@@ -2562,16 +2564,17 @@ bool discharge_trap(int y, int x, int ty, int tx)
 		/* Apply spell effect */
 		else if (f_ptr->spell)
 		{
-      		make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,y,x);
+      		obvious |= make_attack_ranged(SOURCE_FEATURE,feat,ty,tx);
 		}
 		/* Apply blow effect */
 		else if (f_ptr->blow.method)
 		{
-			dam = damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice);
+			feature_blow *blow_ptr = &f_ptr->blow;
+
+			dam = damroll(blow_ptr->d_side,blow_ptr->d_dice);
 
 			/* Apply the blow */
-			project_p(SOURCE_FEATURE, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
-			project_t(SOURCE_FEATURE, feat, p_ptr->py, p_ptr->px, dam, f_ptr->blow.effect);
+			obvious |= project_method(SOURCE_FEATURE, feat, blow_ptr->method, blow_ptr->effect, dam, p_ptr->depth, y, x, ty, tx, 0, method_info[blow_ptr->method].flags1);
 		}
 
 		/* Hit the trap */

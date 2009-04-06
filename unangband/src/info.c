@@ -8373,11 +8373,11 @@ void describe_region_basic(region_type *r_ptr)
 	{
 		text_out(format("in %d.%d turns", r_ptr->delay / 10, r_ptr->delay % 10));
 
-		if (r_ptr->delay_reset) text_out(" and then ");
+		if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset)) text_out(" and then ");
 	}
 
 	/* Time to take effect */
-	if (r_ptr->delay_reset)
+	if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset))
 	{
 		text_out(format("every %d.%d turns", r_ptr->delay_reset / 10, r_ptr->delay_reset % 10));
 	}

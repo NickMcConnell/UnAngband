@@ -8886,7 +8886,7 @@ s16b region_random_piece(s16b region)
  * a method, or spawning a region, not if we affect every
  * grid in the region.
  */
-void region_effect(s16b region, int y, int x)
+bool region_effect(s16b region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
 	region_info_type *ri_ptr = &region_info[r_ptr->type];
@@ -8899,7 +8899,7 @@ void region_effect(s16b region, int y, int x)
 	int x1 = x ? x : r_ptr->x1;
 
 	/* Paranoia */
-	if (!r_ptr->type) return;
+	if (!r_ptr->type) return (FALSE);
 
 	/* Attacks come from multiple source features in the region */
 	if (r_ptr->flags1 & (RE1_SOURCE_FEATURE))
@@ -8977,9 +8977,6 @@ void region_effect(s16b region, int y, int x)
 		clear_temp_array();
 	}
 
-	/* Noticed region? */
-	if (notice) r_ptr->flags1 |= (RE1_NOTICE);
-
 	/* Region chains */
 	if (r_ptr->flags1 & (RE1_CHAIN))
 	{
@@ -8990,6 +8987,20 @@ void region_effect(s16b region, int y, int x)
 
 		region_update(region);
 	}
+
+	/* Noticed region? */
+	if (notice)
+	{
+		bool refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
+
+		/* Mark region noticed */
+		r_ptr->flags1 |= (RE1_NOTICE | RE1_DISPLAY);
+
+		/* Refresh required */
+		if (refresh) region_refresh(region);
+	}
+
+	return (notice);
 }
 
 
@@ -9005,12 +9016,13 @@ void region_effect(s16b region, int y, int x)
 void trigger_region(int y, int x, bool move)
 {
 	int this_region_piece, next_region_piece = 0;
-
 	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
 	{
 		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
 		region_type *r_ptr = &region_list[rp_ptr->region];
 		method_type *method_ptr = &method_info[r_ptr->method];
+
+		bool notice = FALSE;
 
 		/* Get the next object */
 		next_region_piece = rp_ptr->next_in_grid;
@@ -9041,7 +9053,6 @@ void trigger_region(int y, int x, bool move)
 			if (r_ptr->child_region)
 			{
 				int child_region = 0;
-				bool obvious = FALSE;
 
 				/* Get a newly initialized region */
 				child_region = init_region(r_ptr->who, r_ptr->what, r_ptr->child_region, r_ptr->damage, r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->y0, r_ptr->x0, y, x);
@@ -9050,14 +9061,14 @@ void trigger_region(int y, int x, bool move)
 				if (child_region)
 				{
 					/* Projection method */
-					obvious |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
+					notice |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
 
 					/* Hack -- lifespan */
 					region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
 
 					/* Display newly created regions. Allow features to be seen underneath. */
 					if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
-					if (obvious) region_list[child_region].flags1 |= (RE1_NOTICE);
+					if (notice) region_list[child_region].flags1 |= (RE1_NOTICE);
 				}
 			}
 
@@ -9065,12 +9076,12 @@ void trigger_region(int y, int x, bool move)
 			else if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
 			{
 				/* Discharge the trap */
-				discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
+				notice |= discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
 			}
 			else
 			{
 				/* Fire the attack */
-				region_effect(rp_ptr->region, y, x);
+				notice |= region_effect(rp_ptr->region, y, x);
 			}
 
 			/* Mark region as triggered */
@@ -9082,7 +9093,6 @@ void trigger_region(int y, int x, bool move)
 				((r_ptr->age) || ((r_ptr->flags1 & (RE1_TRIGGERED)) != 0)))
 		{
 			int dam = 0;
-			bool notice = FALSE;
 
 			/* Get the damage from the region piece */
 			if (r_ptr->flags1 & (RE1_SCALAR_DAMAGE))
@@ -9111,9 +9121,18 @@ void trigger_region(int y, int x, bool move)
 				/* Damage objects directly if dropping an object. */
 				notice |= project_o(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect);
 			}
+		}
 
-			/* Noticed region? */
-			if (notice) r_ptr->flags1 |= (RE1_NOTICE);
+		/* Noticed region? */
+		if (notice)
+		{
+			bool refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
+
+			/* Mark region noticed */
+			r_ptr->flags1 |= (RE1_NOTICE | RE1_DISPLAY);
+
+			/* Refresh required */
+			if (refresh) region_refresh(rp_ptr->region);
 		}
 	}
 }
