@@ -4737,6 +4737,12 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 							((r_ptr->flags1 & (RE1_DISPLAY)) != 0))
 			{
 				bool recall = FALSE;
+				
+				/* Skip because there is an underlying trap */
+				if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[y][x]].flags1 & (FF1_TRAP)))
+				{
+					continue;
+				}
 
 				/* Not boring */
 				boring = FALSE;

@@ -190,7 +190,7 @@ F:PROJECTION | AUTOMATIC
 
 N:26:mark of a white hand
 G:x:z
-F:PROJECTION
+F:PROJECTION | HIT_TRAP | TRIGGER_MOVE
 
 #Fixed source and destination.
 

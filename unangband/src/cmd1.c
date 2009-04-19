@@ -2547,15 +2547,19 @@ bool discharge_trap(int y, int x, int ty, int tx)
 		if ((y == p_ptr->py) && (x == p_ptr->px))
 		{
 			/* Player floats on terrain */
-			if (player_ignore_terrain(feat)) return (FALSE);
+			if (player_ignore_terrain(feat)) return (FALSE);			
 		}
-
-		/* Blocked message */
-		if (blocked) msg_print("You knock aside the arrow.");
-
-		/* Message */
-		else if (strlen(text)) msg_format("%s",text);
-
+		
+		/* Player on destination */
+		if ((ty == p_ptr->py) && (tx == p_ptr->px))
+		{
+			/* Blocked message */
+			if (blocked) msg_print("You knock aside the arrow.");
+			
+			/* Notice otherwise */
+			else obvious = TRUE;	
+		}
+		
 		/* Blocked the attack - no effect */
 		if (blocked)
 		{
@@ -2588,6 +2592,9 @@ bool discharge_trap(int y, int x, int ty, int tx)
 			/* Discover */
 			cave_alter_source_feat(y,x,FS_SECRET);
 		}
+		
+		/* Message */
+		if ((obvious) && (strlen(text))) msg_format("%s",text);
 	}
 
 	return (obvious);

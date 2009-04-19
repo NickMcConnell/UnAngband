@@ -13938,15 +13938,23 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 			/* Requesting a vector */
 			else if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
 			{
-				int a = degrees_of_arc ? degrees_of_arc : 180;
-				int v = get_angle_to_target(y0, y, x0, x, 0);
+				int deg_vary = degrees_of_arc ? degrees_of_arc / 2 : 45;
 
 				/* Randomize the scalar */
 				for (i = 0; i < target_path_n; i++)
 				{
-					int d = (rand_int(a) + v) % 180;
+					int yi = GRID_Y(target_path_g[i]);
+					int xi = GRID_X(target_path_g[i]);
+					int deg_dest = get_angle_to_target(y0, yi, x0, xi, 0);
+					
+					int degree = (deg_dest + rand_int(deg_vary)) % 180;
+					int dist = target_path_d[i];
 
-					target_path_d[i] = GRID(d, damage / target_path_d[i]);
+					/* Insert angle and speed into grid damage */
+					target_path_d[i] = GRID(degree, (damage + dist) / (dist + 1));
+					
+					/* Hack -- All pieces of a vector start at the origin */
+					target_path_g[i] = GRID(y0, x0);
 				}
 			}
 			else

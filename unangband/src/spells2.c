@@ -9918,6 +9918,7 @@ s16b init_region(int who, int what, int type, int dam, int method, int effect, i
 
 	s16b region = region_pop();
 	int radius = scale_method(method_ptr->radius, level);
+	int range = scale_method(method_ptr->max_range, level);
 
 	region_type *r_ptr = &region_list[region];
 
@@ -9927,7 +9928,27 @@ s16b init_region(int who, int what, int type, int dam, int method, int effect, i
 	/* Pick a target */
 	if ((!y1) && (!x1))
 	{
-		 scatter(&y1, &x1, y0, x0, radius, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+		/* Target self */
+		if (method_ptr->flags1 & (PROJECT_SELF))
+		{
+			/* Target self */
+			y1 = y0;
+			x1 = x0;
+		}
+		else
+		{
+			/* Pick a target */
+			scatter(&y1, &x1, y0, x0, radius ? radius : range, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+			 
+			/* Parania - always have a target */
+			if ((y1 == y0) && (x1 == x0))
+			{
+				int d = rand_int(8);
+				 
+				y1 = y0 + ddy_ddd[d];
+				x1 = x0 + ddx_ddd[d];
+			}
+		}
 	}
 
 	/* Initialise region values from parameters passed to this routine */

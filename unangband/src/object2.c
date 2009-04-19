@@ -7596,6 +7596,9 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 			flg |= (PROJECT_STOP);
 		}
 	}
+	
+	/* Hack -- we try to force traps to have a useful region */
+	if ((flg & (PROJECT_4WAY | PROJECT_4WAX | PROJECT_BOOM)) == 0) flg |= (PROJECT_BEAM | PROJECT_THRU);
 
 	/* Get the region */
 	region = init_region(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, f_ptr->d_attr, damage, method, effect,
@@ -7613,7 +7616,7 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 		}
 
 		/* Shape the region */
-		project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, 0,
+		project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, damage,
 			player ? p_ptr->lev : p_ptr->depth, y, x, r_ptr->y1, r_ptr->x1, region, flg);
 	}
 }
@@ -7828,8 +7831,13 @@ void pick_trap(int y, int x, bool player)
 	/* Activate the trap */
 	cave_set_feat(y, x, feat);
 
+	/* Get feature */
+	f_ptr = &f_info[feat];
+
+#if 0
 	/* Create trap region */
-	create_trap_region(y, x, feat, power, player);
+	if (power || (f_ptr->blow.method) || (f_ptr->spell)) create_trap_region(y, x, feat, power, player);
+#endif
 }
 
 
