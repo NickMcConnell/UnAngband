@@ -23,7 +23,7 @@
  */
 bool set_timed(int idx, int v, bool notify)
 {
-	timed_effect *effect;
+	const timed_effect *effect;
 
 	/* Hack -- Force good values */
 	v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;

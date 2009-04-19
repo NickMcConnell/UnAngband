@@ -22,6 +22,7 @@
 #define OBJECT_FLAGS_FULL   1 /* Full info */
 #define OBJECT_FLAGS_KNOWN  2 /* Only flags known to the player */
 #define OBJECT_FLAGS_RANDOM 3 /* Only known random flags */
+#define OBJECT_FLAGS_TRAP	4 /* Only effects of object in trap */
 
 
 /*
@@ -63,7 +64,16 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b *f1, u32b 
 		/* Clear */
 		(*f1) = (*f2) = (*f3) = (*f4) = 0L;
 
-		if (mode != OBJECT_FLAGS_RANDOM)
+		if (mode >= OBJECT_FLAGS_TRAP)
+		{
+			*f1 |= o_ptr->can_flags1 & (TR1_WEAPON_FLAGS);
+			*f2 |= o_ptr->can_flags2 & (TR2_WEAPON_FLAGS);
+			*f3 |= o_ptr->can_flags3 & (TR3_WEAPON_FLAGS);
+			*f4 |= o_ptr->can_flags4 & (TR4_WEAPON_FLAGS);
+
+			return;
+		}
+		else if (mode != OBJECT_FLAGS_RANDOM)
 		{
 			/* Add flags object is known to have */
 			*f1 |= o_ptr->can_flags1;
@@ -1380,17 +1390,361 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char *
 }
 
 
+/*
+ * Helper function for describe_blow.
+ *
+ * See attack_desc for a similar, but sufficiently different, function...
+ */
+static void text_out_blow(const char *s, int person, bool infinitive, int num)
+{
+	int state = 0;
+	int match = (infinitive) != 0 ? 1 : 2;
 
+	const char *u;
+	char *t;
+
+	char buf[128];
+	int buf_size = 128;
+
+	/* Initialise buffer */
+	buf[0] = '\0';
+
+	/* Reference buffer */
+	t = buf;
+
+	/* Copy the string */
+	for (; (*s); s++)
+	{
+		/* Handle tense changes */
+		if (*s == '|')
+		{
+			state++;
+			if (state == 3) state = 0;
+		}
+
+		/* Handle input suppression */
+		if ((state) && (state != match))
+		{
+			continue;
+		}
+
+		/* Handle tense changes */
+		if (*s == '|')
+		{
+			continue;
+		}
+
+		/* Handle a number */
+		if (*s == '@')
+		{
+			const char *v = s+1;
+
+			switch (num)
+			{
+				case 1:
+				{
+					/* Skip white space */
+					for ( ; (*v) && (*v == ' '); v++) ;
+
+					/* Is a vowel */
+					if (is_a_vowel(*v))
+					{
+						u = "an";
+					}
+					else
+					{
+						u = "a";
+					}
+					break;
+				}
+				case 0: u = "no"; break;
+				case 2: u = "two"; break;
+				case 3: u = "three"; break;
+				case 4: u = "four"; break;
+				case 5: u = "five"; break;
+				default: u = ""; break;
+			}
+
+			while ((*u) && ((t - buf) < buf_size))
+			{
+				*t++ = *u++;
+			}
+
+			if (num > 4)
+			{
+				my_strcat(t, format("%d", num), buf_size);
+				t += num / 10;
+				t++;
+			}
+		}
+
+		/* Handle the target*/
+		else if (*s == '&')
+		{
+			switch(person)
+			{
+				case 2: u = "you"; break;
+				case 3: u = "him"; break;
+				case 4: u = "her"; break;
+				default: u = "it"; break;
+			}
+
+			while ((*u) && ((t - buf) < buf_size))
+			{
+				*t++ = *u++;
+			}
+		}
+
+		/* Handle possessive */
+		else if (*s == '$')
+		{
+			switch(person)
+			{
+				case 2: u = "your"; break;
+				case 3: u = "his"; break;
+				case 4: u = "her"; break;
+				default: u = "its"; break;
+			}
+
+			while ((*u) && ((t - buf) < buf_size))
+			{
+				*t++ = *u++;
+			}
+		}
+
+		/* Handle reflexive */
+		else if (*s == '%')
+		{
+			switch(person)
+			{
+				case 2: u = "yourself"; break;
+				case 3: u = "himself"; break;
+				case 4: u = "herself"; break;
+				default: u = "itself"; break;
+			}
+
+			while ((*u) && ((t - buf) < buf_size))
+			{
+				*t++ = *u++;
+			}
+		}
+
+		/* Tensor */
+		else if (*s == '~')
+		{
+			/* Add an 's' */
+			if (!infinitive) *t++ = 's';
+		}
+
+		/* Plural */
+		else if (*s == '#')
+		{
+			/* Add an 's' */
+			if (num != 1)
+			{
+				if ((t > buf) && (*(t-1) == 's')) *t++ = 'e';
+				*t++ = 's';
+			}
+		}
+
+		/* Normal */
+		else
+		{
+			/* Copy */
+			*t++ = *s;
+		}
+	}
+
+	/* Terminate */
+	if ((t - buf) <  buf_size) *t = '\0';
+
+	/* Truncate the string to buf_size chars */
+	buf[buf_size - 1] = '\0';
+
+	/* Output text */
+	text_out(buf);
+}
 
 
 /*
  * Hack -- Get spell description for effects on target based on blow.
  */
-static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int level, bool detail, int target, bool introduced)
+static void describe_blow(int method, int effect, int level, int feat, const char *intro, const char *damage, bool detail, bool skip_method, bool skip_method_more, int num)
 {
-	int i, m,n,r;
+	int i;
 
-	cptr p[7];
+	char *p[7];
+
+	feature_type *f_ptr;
+
+	/* Get method details */
+	method_type *method_ptr = &method_info[method];
+	effect_type *effect_ptr = &effect_info[effect];
+
+	int rad = scale_method(method_ptr->radius, level);
+	int arc = method_ptr->arc;
+	int rng = scale_method(method_ptr->max_range, level);
+
+	/* Initialise the output string */
+	for (i = 0; i < 5; i++)
+	{
+		p[i] = NULL;
+	}
+
+	/* Initialise more output string */
+	p[5] = "for";
+	p[6] = "damage";
+
+	/* Get method info text */
+	p[0] = method_text + method_ptr->info[0];
+	p[3] = method_text + method_ptr->info[1];
+
+	/* Hack -- nothing */
+	if (!strlen(p[0])) p[0] = NULL;
+	if (!strlen(p[3])) p[3] = NULL;
+
+	/* Get effect info text */
+	for (i = 0; i < 6; i++)
+	{
+		/* Something to write */
+		if (strlen(effect_text + effect_ptr->info[i]))
+		{
+			/* Hack -- allow effect text to blank out method text */
+			if ((effect_text + effect_ptr->info[i])[0] == '/')
+			{
+				p[i+1] = NULL;
+			}
+			else
+			{
+				p[i+1] = effect_text + effect_ptr->info[i];
+			}
+		}
+	}
+
+	/* Hack -- handle features */
+	if (effect == GF_FEATURE)
+	{
+		char buf[80];
+		const char *name;
+
+		f_ptr = &f_info[f_info[feat].mimic];
+
+		name = f_name + f_ptr->name;
+
+		p[2] = buf;
+		sprintf(buf,"%ss %s",name,f_ptr->flags1 & (FF1_MOVE) ? "under" : "around" );
+	}
+
+	/* Introduce the attack description */
+	if (intro && strlen(intro))
+	{
+		/* Intro */
+		text_out(intro);
+	}
+
+	/* Describe the method */
+	if ((p[0]) && (!skip_method_more))
+	{
+		/* Display all method details */
+		if (!skip_method)
+		{
+			text_out_blow(p[0], 2, FALSE, num);
+			if (rng || arc || rad) text_out(" of ");
+			if (rng) text_out (format( "range %d",rng));
+			if (rng && arc) text_out(" and ");
+			if (arc) text_out (format( "%d degrees",arc));
+			if ((rng || arc) && rad) text_out(" and ");
+			if (rad) text_out (format( "%s %d",(method_ptr->flags1 & (PROJECT_BEAM)) ? "width" : "radius", rad));
+
+			text_out(" ");
+		}
+
+		text_out("to");
+
+		if (p[1])
+		{
+			text_out(" ");
+			text_out_blow(p[1], 2, TRUE, num);
+		}
+		if (p[2])
+		{
+			text_out(" ");
+			text_out_blow(p[2], 2, TRUE, num);
+		}
+		if (p[3])
+		{
+			text_out(" ");
+			text_out_blow(p[3], 2, TRUE, num);
+		}
+
+		if (p[4]) text_out(" ");
+	}
+	else if (!skip_method_more)
+	{
+		if (p[1])
+		{
+			text_out_blow(p[1], 2, FALSE, num);
+		}
+		else text_out("affects");
+
+		if (p[2])
+		{
+			text_out(" ");
+			text_out_blow(p[2], 2, FALSE, num);
+		}
+		if (p[3])
+		{
+			text_out(" ");
+			text_out_blow(p[3], 2, FALSE, num);
+		}
+		if (rng) text_out (format( " of range %d",rng));
+
+		if (rad) text_out (format( " %s radius %d",rng ? "and" : "of", rad));
+
+		if (p[4]) text_out(" ");
+	}
+
+	if (p[4])
+	{
+		text_out(p[4]);
+	}
+
+	/* Display the damage */
+	/* Roll out the damage */
+	if (detail)
+	{
+		/* Hack -- feature */
+		if (effect == GF_FEATURE)
+		{
+			f_ptr = &f_info[f_info[feat].mimic];
+
+			if (!(f_ptr->flags1 & (FF1_MOVE)))
+			{
+				text_out(format(" %s 4d8 %s", p[5], p[6]));
+			}
+		}
+		/* Get the description */
+		else if (damage && strlen(damage))
+		{
+			text_out(format(" %s %s %s", p[5], damage, p[6]));
+		}
+	}
+}
+
+
+/*
+ * Hack -- Get spell description for effects on target based on blow.
+ */
+static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int level, bool detail, int target, bool introduced)
+{
+	int m,n,r;
+
+	bool anything = FALSE;
+
+	int last_method = 0;
+	int last_effect = 0;
+
+	int last_num = 0;
 
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
@@ -1405,17 +1759,18 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 	/* Examine (and count) the actual attacks */
 	for (r = 0, m = 0; m < 4; m++)
 	{
-		int method, effect, rad, arc, rng;
-
-		method_type *method_ptr;
-		effect_type *effect_ptr;
-
 		const spell_blow *blow_ptr = &s_ptr->blow[m];
 
-		feature_type *f_ptr;
+		int num = 0;
 
-		method  = blow_ptr->method;
-		effect  = blow_ptr->effect;
+		int method  = blow_ptr->method;
+		int effect  = blow_ptr->effect;
+
+		char buf[40];
+
+		const char *current_intro;
+
+		bool skip_method_more = FALSE;
 
 		/* Skip non-attacks */
 		if (!method) continue;
@@ -1440,172 +1795,86 @@ static bool spell_desc_blows(const spell_type *s_ptr, const cptr intro, int leve
 				break;
 		}
 
-		/* Get method details */
-		method_ptr = &method_info[method];
-		effect_ptr = &effect_info[effect];
+		/* Get number of attacks */
+		num = scale_method(method_info[method].number, level);
 
-		rad = scale_method(method_ptr->radius, level);
-		arc = method_ptr->arc;
-		rng = scale_method(method_ptr->max_range, level);
+		/* Hack -- fix number */
+		if (!num) num = 1;
 
-		/* Initilise the output string */
-		for (i = 0; i < 5; i++)
+		/* Hack -- we assume identical method and effect is enough to display identical blows */
+		if ((m < 4) && (s_ptr->blow[m+1].method == blow_ptr->method) && (s_ptr->blow[m+1].effect == blow_ptr->effect))
 		{
-			p[i] = NULL;
+			last_num += num;
+			continue;
 		}
-
-		/* Initialise more output string */
-		p[5] = "for";
-		p[6] = "damage";
-
-		/* Get method info text */
-		p[0] = method_text + method_ptr->info[0];
-		p[3] = method_text + method_ptr->info[1];
-
-		/* Hack -- nothing */
-		if (!strlen(p[0])) p[0] = NULL;
-		if (!strlen(p[3])) p[3] = NULL;
-
-		/* Get effect info text */
-		for (i = 0; i < 6; i++)
+		/* Reset number */
+		else
 		{
-			/* Something to write */
-			if (strlen(effect_text + effect_ptr->info[i]))
-			{
-				/* Hack -- allow effect text to blank out method text */
-				if ((effect_text + effect_ptr->info[i])[0] == '/')
-				{
-					p[i+1] = NULL;
-				}
-				else
-				{
-					p[i+1] = effect_text + effect_ptr->info[i];
-				}
-			}
-		}
-
-		/* Hack -- handle features */
-		if (effect == GF_FEATURE)
-		{
-			char buf[80];
-			cptr name;
-
-			f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
-
-			name = f_name + f_ptr->name;
-
-			p[2] = buf;
-			sprintf(buf,"%ss %s",name,f_ptr->flags1 & (FF1_MOVE) ? "under" : "around" );
+			num += last_num;
+			last_num = 0;
 		}
 
 		/* Introduce the attack description */
 		if (!introduced)
 		{
 			/* Intro */
-			text_out(intro);
+			current_intro = intro;
 
 			introduced = TRUE;
 		}
 		else if (!r)
 		{
-			text_out(" and ");
+			current_intro = " and ";
 		}
 		else if (r < n-1)
 		{
-			text_out(", ");
+			current_intro = ", ";
 		}
 		else
 		{
-			text_out(" and ");
+			current_intro = " and ";
 		}
 
-		/* Describe the method */
-		if (p[0])
+		/* Prepare damage string */
+		spell_desc_damage(blow_ptr, target, level, buf, 40);
+
+		/* Hack -- determine if we can skip lots of text */
+		if (method == last_method)
 		{
-			text_out(p[0]);
-			if (rng || arc || rad) text_out(" of ");
-			if (rng) text_out (format( "range %d",rng));
-			if (rng && (arc || rad)) text_out(" and ");
-			if (arc) text_out (format( "%d degrees",arc));
-			if ((rng || arc) && rad) text_out(" and ");
-			if (rad) text_out (format( "radius %d",rad));
+			effect_type *effect1_ptr = &effect_info[effect];
+			effect_type *effect2_ptr = &effect_info[last_effect];
 
-			text_out(" to");
-			if (p[1])
+			int i;
+
+			/* Assume we are the same */
+			skip_method_more = TRUE;
+
+			/* Check string comparison */
+			for (i = 0; i < 3; i++)
 			{
-				text_out(" ");
-				text_out(p[1]);
-			}
-			if (p[2])
-			{
-				text_out(" ");
-				text_out(p[2]);
-			}
-			if (p[3])
-			{
-				text_out(" ");
-				text_out(p[3]);
+				if (strcmp(effect_text + effect1_ptr->info[i], effect_text + effect2_ptr->info[i])) skip_method_more = FALSE;
 			}
 		}
-		else
-		{
-			if (p[1])
-			{
-				text_out(p[1]);
-				text_out("s");
-			}
-			else text_out("affects");
 
-			if (p[2])
-			{
-				text_out(" ");
-				text_out(p[2]);
-			}
-			if (p[3])
-			{
-				text_out(" ");
-				text_out(p[3]);
-			}
-			if (rng) text_out (format( " of range %d",rng));
+		/* Describe blow */
+		describe_blow(method, effect, level, blow_ptr->d_plus, current_intro, buf, detail, method == last_method, skip_method_more, num);
 
-			if (rad) text_out (format( " %s radius %d",rng ? "and" : "of", rad));
-		}
-
-		if (p[4])
-		{
-			text_out(" ");
-			text_out(p[4]);
-		}
-
-		/* Display the damage */
-		/* Roll out the damage */
-		if (detail)
-		{
-			char buf[40];
-
-			/* Hack -- feature */
-			if (effect == GF_FEATURE)
-			{
-				f_ptr = &f_info[f_info[blow_ptr->d_plus].mimic];
-
-				if (!(f_ptr->flags1 & (FF1_MOVE)))
-				{
-					text_out(format(" %s 4d8 %s", p[5], p[6]));
-				}
-			}
-			/* Get the description */
-			else if (spell_desc_damage(blow_ptr, target, level, buf, 40))
-			{
-				text_out(format(" %s %s %s", p[5], buf, p[6]));
-			}
-
-		}
+		/* Count blows */
 		r++;
+
+		/* Something shown */
+		anything = TRUE;
+
+		/* Record last method */
+		last_method = method;
+
+		/* Record last effect */
+		last_effect = effect;
 	}
 
-	return (introduced);
-
+	return (anything);
 }
+
 
 
 /*
@@ -3077,6 +3346,10 @@ void list_object(const object_type *o_ptr, int mode)
 
 	bool random = (mode == OBJECT_FLAGS_RANDOM) ? TRUE : FALSE;
 	bool spoil = (mode == OBJECT_FLAGS_FULL) ? TRUE : FALSE;
+	bool trap = (mode >= OBJECT_FLAGS_TRAP) ? TRUE : FALSE;
+
+	/* Hack for traps */
+	if (trap) random = TRUE;
 
 	/* Basic stats */
 	if ((!random) && (o_ptr->tval < TV_SERVICE)) for (i = 0; object_group[i].tval; i++)
@@ -3239,33 +3512,6 @@ void list_object(const object_type *o_ptr, int mode)
 	f5 = k_info[o_ptr->k_idx].flags5;
 	f6 = k_info[o_ptr->k_idx].flags6;
 
-	/* Display the flags */
-	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN | IDENT_STORE)) ? o_ptr->pval : 0, LIST_FLAGS_CAN);
-
-	/*
-	 * Handle cursed objects here to avoid redundancies such as noting
-	 * that a permanently cursed object is heavily cursed as well as
-	 * being "lightly cursed".
-	 */
-	if (!random && cursed_p(o_ptr))
-	{
-		if (f3 & (TR3_PERMA_CURSE))
-		{
-			text_out_c(TERM_RED, "It is permanently cursed.  ");
-			anything = TRUE;
-		}
-		else if (f3 & (TR3_HEAVY_CURSE))
-		{
-			text_out_c(TERM_RED, "It is heavily cursed.  ");
-			anything = TRUE;
-		}
-		else if (object_known_p(o_ptr) || (o_ptr->feeling == INSCRIP_CURSED))
-		{
-			text_out_c(TERM_RED, "It is cursed.  ");
-			anything = TRUE;
-		}
-	}
-
 	/* Basic abilities -- damage/ damage multiplier */
 	if (!random && o_ptr->dd && o_ptr->ds)
 	{
@@ -3374,7 +3620,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Extra powers */
-	if (!random && ((object_aware_p(o_ptr)) || (spoil) || (o_ptr->ident & (IDENT_STORE)))
+	if (((!random) || (trap)) && ((object_aware_p(o_ptr)) || (spoil) || (o_ptr->ident & (IDENT_STORE)))
 		&& (o_ptr->tval !=TV_MAGIC_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)
 		&& (o_ptr->tval !=TV_SONG_BOOK) && (o_ptr->tval != TV_STUDY))
 	{
@@ -3395,11 +3641,11 @@ void list_object(const object_type *o_ptr, int mode)
 
 		vn = 0;
 
-		/* Detailled explaination */
+		/* Detailed explanation */
 		detail = (k_info[o_ptr->k_idx].ever_used > 4 * k_info[o_ptr->k_idx].level * num) || (spoil) || (o_ptr->ident & (IDENT_MENTAL));
 
 		/* Activates */
-		if (f3 & TR3_ACTIVATE)
+		if (f3 & (TR3_ACTIVATE))
 		{
 			vp[vn] = vp_activate; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
 			charge = (k_info[o_ptr->k_idx].ever_used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
@@ -3529,6 +3775,13 @@ void list_object(const object_type *o_ptr, int mode)
 			randtime = a_ptr->randtime;
 		}
 
+		/* Hack -- for trap information */
+		if (trap)
+		{
+			vn = 0;
+			vp[vn] = "It "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+		}
+
 		if (vn)
 		{
 			/* Scan */
@@ -3565,8 +3818,13 @@ void list_object(const object_type *o_ptr, int mode)
 								break;
 
 							case TV_SHOT:
-								text_out(" times the sling multiplier");
+								text_out(" times the sling or firearm multiplier");
 								break;
+						}
+
+						if (trap)
+						{
+							text_out(" of the trap it is loaded in");
 						}
 					}
 					else
@@ -3674,6 +3932,36 @@ void list_object(const object_type *o_ptr, int mode)
 			anything = TRUE;
 		}
 	}
+
+	/* Display the flags */
+	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN | IDENT_STORE)) ? o_ptr->pval : 0, LIST_FLAGS_CAN);
+
+	/*
+	 * Handle cursed objects here to avoid redundancies such as noting
+	 * that a permanently cursed object is heavily cursed as well as
+	 * being "lightly cursed".
+	 */
+	if (!random && cursed_p(o_ptr))
+	{
+		if (f3 & (TR3_PERMA_CURSE))
+		{
+			text_out_c(TERM_RED, "It is permanently cursed.  ");
+			anything = TRUE;
+		}
+		else if (f3 & (TR3_HEAVY_CURSE))
+		{
+			text_out_c(TERM_RED, "It is heavily cursed.  ");
+			anything = TRUE;
+		}
+		else if (object_known_p(o_ptr) || (o_ptr->feeling == INSCRIP_CURSED))
+		{
+			text_out_c(TERM_RED, "It is cursed.  ");
+			anything = TRUE;
+		}
+	}
+
+	/* If trap, we are done */
+	if (trap) return;
 
 	/* Have sensed something about this item */
 	if ((o_ptr->feeling) || (object_known_p(o_ptr)))
@@ -6227,7 +6515,7 @@ s32b object_power(const object_type *o_ptr)
 		case TV_SHOT:
 		case TV_BOLT:
 		{
-			/* Not this is 'uncorrected' */
+			/* Note this is 'uncorrected' */
 			p += o_ptr->dd * (o_ptr->ds + 1);
 
 			/* Apply the correct ego slay multiplier */
@@ -7232,10 +7520,7 @@ static void describe_feature_player_moves(int f_idx)
 	/* Collect innate attacks */
 	vn = 0;
 	intro = FALSE;
-
-
 }
-
 
 
 /*
@@ -7337,6 +7622,108 @@ static void describe_feature_monster_moves(int f_idx)
 	/* End sentence */
 	if (intro) text_out(".  ");
 }
+
+
+/*
+ * Writes the feature damage dice string into a buffer.
+ *
+ * Note the reckless use of a global for breath weapons.
+ *
+ */
+bool feat_desc_damage(const feature_blow *blow_ptr, int target, int level, char *buf, int buf_size)
+{
+	int method = blow_ptr->method;
+	method_type *method_ptr = &method_info[method];
+	int d1 = blow_ptr->d_dice;
+	int d2 = blow_ptr->d_side;
+	int d3 = 0;
+
+	/* Target & level unused in this implementation */
+	(void)target;
+	(void)level;
+
+	/* Initialise the buffer */
+	buf[0] = '\0';
+
+	/* Use player hit points */
+	if (method_ptr->flags2 & (PR2_BREATH))
+	{
+		/* Damage uses current hit points */
+		d3 = p_ptr->depth * 6;
+		d1 = 0;
+		d2 = 0;
+	}
+
+	/* Consolidation */
+	if (d2 == 1)
+	{
+		d3 += d1;
+		d1 = 0;
+		d2 = 0;
+	}
+
+	/* Display the damage dice */
+	if ((d1) && (d2))
+	{
+		/* End */
+		my_strcpy(buf,format("%dd%d",d1,d2), buf_size);
+	}
+	else if (d3)
+	{
+		/* End */
+		my_strcpy(buf,format("%d",d3), buf_size);
+
+		/* We are done */
+		return (TRUE);
+	}
+
+	/* Anything output? */
+	if (d1 || d2) return (TRUE);
+
+	return (FALSE);
+}
+
+
+/*
+ * Describe the feature blow
+ */
+static void describe_feature_blow(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	const feature_blow *blow_ptr = &f_ptr->blow;
+
+	int method = blow_ptr->method;
+	int effect = blow_ptr->effect;
+
+	int level = f_ptr->level;
+
+	char buf[40];
+
+	/* Paranoia */
+	if (!blow_ptr->method) return;
+
+	/* Prepare damage string */
+	feat_desc_damage(blow_ptr, 0, level, buf, 40);
+
+	/* Describe the blow */
+	describe_blow(method, effect, level, 0, "", buf, TRUE, FALSE, FALSE, 1);
+}
+
+
+/*
+ * Describe feature spell
+ */
+static void describe_feature_spell(int f_idx)
+{
+	const feature_type *f_ptr = &f_info[f_idx];
+
+	/* Paranoia */
+	if (!f_ptr->spell) return;
+}
+
+
+
 
 
 /*
@@ -8095,17 +8482,6 @@ void describe_region_basic(region_type *r_ptr)
 	int n, vn;
 	cptr vp[128];
 
-	int i;
-
-	int rad, arc, rng;
-
-	cptr p[7];
-
-	method_type *method_ptr;
-	effect_type *effect_ptr;
-
-	feature_type *f_ptr;
-
 	text_out("This is a");
 
 	/* Collect sight and movement */
@@ -8205,120 +8581,32 @@ void describe_region_basic(region_type *r_ptr)
 
 	if (r_ptr->flags1 & (RE1_AUTOMATIC)) text_out("automatically ");
 
-	/* Get method details */
-	method_ptr = &method_info[r_ptr->method];
-	effect_ptr = &effect_info[r_ptr->effect];
-
-	rad = scale_method(method_ptr->radius, r_ptr->level);
-	arc = method_ptr->arc;
-	rng = scale_method(method_ptr->max_range, r_ptr->level);
-
-	/* Initilise the output string */
-	for (i = 0; i < 5; i++)
+	/* Hitting a trap */
+	if (r_ptr->flags1 & (RE1_HIT_TRAP))
 	{
-		p[i] = NULL;
-	}
+		int feat = cave_feat[r_ptr->y0][r_ptr->x0];
 
-	/* Initialise more output string */
-	p[5] = "for";
-	p[6] = "damage";
-
-	/* Get method info text */
-	p[0] = method_text + method_ptr->info[0];
-	p[3] = method_text + method_ptr->info[1];
-
-	/* Hack -- nothing */
-	if (!strlen(p[0])) p[0] = NULL;
-	if (!strlen(p[3])) p[3] = NULL;
-
-	/* Get effect info text */
-	for (i = 0; i < 6; i++)
-	{
-		/* Something to write */
-		if (strlen(effect_text + effect_ptr->info[i]))
+		/* Describe the object */
+		if (cave_o_idx[r_ptr->y0][r_ptr->x0])
 		{
-			/* Hack -- allow effect text to blank out method text */
-			if ((effect_text + effect_ptr->info[i])[0] == '/')
-			{
-				p[i+1] = NULL;
-			}
-			else
-			{
-				p[i+1] = effect_text + effect_ptr->info[i];
-			}
+
 		}
-	}
-
-	/* Hack -- handle features */
-	if (r_ptr->effect == GF_FEATURE)
-	{
-		char buf[80];
-		cptr name;
-
-		f_ptr = &f_info[f_info[r_ptr->damage].mimic];
-
-		name = f_name + f_ptr->name;
-
-		p[2] = buf;
-		sprintf(buf,"%ss %s",name,f_ptr->flags1 & (FF1_MOVE) ? "under" : "around" );
-	}
-
-	/* Describe the method */
-	if (p[0])
-	{
-		text_out(p[0]);
-		if (rng || arc || rad) text_out(" of ");
-		if (rng) text_out (format( "range %d",rng));
-		if (rng && (arc || rad)) text_out(" and ");
-		if (arc) text_out (format( "%d degrees",arc));
-		if ((rng || arc) && rad) text_out(" and ");
-		if (rad) text_out (format( "radius %d",rad));
-
-		text_out(" to");
-		if (p[1])
+		/* Describe the feature blow */
+		else if (f_info[feat].blow.method)
 		{
-			text_out(" ");
-			text_out(p[1]);
+			/* Describe feature blow */
+			describe_feature_blow(feat);
 		}
-		if (p[2])
+		else if (f_info[feat].spell)
 		{
-			text_out(" ");
-			text_out(p[2]);
-		}
-		if (p[3])
-		{
-			text_out(" ");
-			text_out(p[3]);
+			/* Describe feature spell */
+			describe_feature_spell(feat);
 		}
 	}
 	else
 	{
-		if (p[1])
-		{
-			text_out(p[1]);
-			text_out("s");
-		}
-		else text_out("affects");
-
-		if (p[2])
-		{
-			text_out(" ");
-			text_out(p[2]);
-		}
-		if (p[3])
-		{
-			text_out(" ");
-			text_out(p[3]);
-		}
-		if (rng) text_out (format( " of range %d",rng));
-
-		if (rad) text_out (format( " %s radius %d",rng ? "and" : "of", rad));
-	}
-
-	if (p[4])
-	{
-		text_out(" ");
-		text_out(p[4]);
+		/* Describe the blow */
+		describe_blow(r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->damage, "", format("%d", r_ptr->damage), TRUE, FALSE, FALSE, 1);
 	}
 
 	if (r_ptr->flags1 & (RE1_TRIGGER_MOVE)) vp[vn++] = "movement";

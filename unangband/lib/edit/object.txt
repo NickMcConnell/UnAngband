@@ -7304,28 +7304,28 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD
 # These are to give low level players an option to aim for high ac
 # but sacrifice significant carrying capacity.
 
-N:907:Tabard~
+N:907:& Tabard~
 G:(:r
 I:35:3:0
 W:3:0:75:35
 A:5/1
 P:3:1d1:0:0:0
 
-N:908:Leather Coat~
+N:908:& Leather Coat~
 G:(:U
 I:35:5:0
 W:10:0:100:150
 A:10/1
 P:5:1d1:-1:0:0
 
-N:909:Riveted Leather Coat~
+N:909:& Riveted Leather Coat~
 G:(:U
 I:35:8:0
 W:15:0:150:200
 A:15/1
 P:8:1d2:-2:0:0
 
-N:910:Chain Mail Coat~
+N:910:& Chain Mail Coat~
 G:(:s
 I:35:13:0
 W:25:0:220:750

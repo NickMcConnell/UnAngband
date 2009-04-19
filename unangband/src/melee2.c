@@ -5317,7 +5317,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					}
 
 					/* Debugging - display attacks */
-					attack_desc(atk_desc, cave_m_idx[ny][nx], method, effect, damage, flg);
+					attack_desc(atk_desc, cave_m_idx[ny][nx], method, effect, damage, flg, 80);
 
 					/* Hack -- use cut or stun for resistance only */
 					if (do_cut && do_stun)

@@ -692,15 +692,12 @@ static bool check_hit(int power, int level, int who, bool ranged)
  * descriptions are applied for the same description type, it returns
  * the description 'band' chosen from.
  */
-int attack_desc(char *buf, int target, int method, int effect, int damage, byte flg)
+int attack_desc(char *buf, int target, int method, int effect, int damage, byte flg, int buf_size)
 {
 	char t_name[80];
 
-	char tmp_buf[128];
-
+	const char *s;
 	char *t;
-
-	cptr s;
 
 	method_type *method_ptr = &method_info[method];
 
@@ -781,13 +778,13 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	if (c < 0) return (c);
 
 	/* Start dumping the result */
-	t = tmp_buf;
+	t = buf;
 
 	/* Begin */
 	s = method_text + method_ptr->desc[c].text;
 
 	/* Copy the string */
-	for (; *s; s++)
+	for (; (*s) && ((t - buf) < buf_size); s++)
 	{
 		/* Handle tense changes */
 		if (*s == '|')
@@ -815,13 +812,19 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			uppercase = TRUE;
 		}
 
+		/* String doesn't end in punctuation */
+		else
+		{
+			punctuate = TRUE;
+		}
+
 		/* Handle the target*/
 		if (*s == '&')
 		{
 			/* Append the name */
 			cptr u = t_name;
 
-			while (*u)
+			while ((*u) && ((t - buf) < buf_size))
 			{
 				*t++ = *u++;
 				if (uppercase)
@@ -838,7 +841,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			/* Append the name */
 			cptr u = target < 0 ? "are" : "is";
 
-			while (*u)
+			while ((*u) && ((t - buf) < buf_size))
 			{
 				*t++ = *u++;
 				if (uppercase)
@@ -855,7 +858,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			/* Append the name */
 			cptr u = effect_text + effect_info[effect].desc[0];
 
-			while (*u)
+			while ((*u) && ((t - buf) < buf_size))
 			{
 				*t++ = *u++;
 				if (uppercase)
@@ -887,7 +890,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 			}
 
 			/* Copy */
-			while (*u)
+			while ((*u) && ((t - buf) < buf_size))
 			{
 				*t++ = *u++;
 				if (uppercase)
@@ -920,7 +923,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	}
 
 	/* Terminate the string with '.' or '!' */
-	if (punctuate)
+	if ((punctuate) && ((t - buf) <  buf_size))
 	{
 		if (flg & (ATK_DESC_EXCLAIM))
 		{
@@ -933,13 +936,10 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	}
 
 	/* Terminate */
-	*t = '\0';
+	if ((t - buf) <  buf_size) *t = '\0';
 
-	/* Truncate the string to 80 chars */
-	tmp_buf[79] = '\0';
-
-	/* Copy the string over */
-	my_strcpy(buf, tmp_buf, sizeof(tmp_buf));
+	/* Truncate the string to buf_size chars */
+	buf[buf_size - 1] = '\0';
 
 	/* Return choice */
 	return (c / div);
@@ -1218,7 +1218,7 @@ bool make_attack_normal(int m_idx)
 			}
 
 			/* Get the attack string */
-			result = attack_desc(atk_desc, -1, method, effect, damage, flg);
+			result = attack_desc(atk_desc, -1, method, effect, damage, flg, 80);
 
 			/* Describe the attack */
 			if (result >= 0) msg_format("%^s %s", m_name, atk_desc);
@@ -2364,7 +2364,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	}
 
 	/* Get the attack description */
-	result = attack_desc(atk_desc, target, method, effect, dam_desc, atk_flg);
+	result = attack_desc(atk_desc, target, method, effect, dam_desc, atk_flg, 80);
 
 	/* Weaken powerful lightning */
 	if (method_ptr->flags2 & (PR2_LIGHTNING_STRIKE))
