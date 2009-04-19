@@ -998,6 +998,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 	int floor_num = 0;
 
 	bool under = FALSE;
+	bool trap = FALSE;
+
 
 	/* Use the simple RNG to preserve seed from before save */
 	Rand_quick = TRUE;
@@ -1188,6 +1190,9 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				/* Modify lighting */
 				(*modify_grid_interesting_hook)(&a, &c, y, x, cinfo, pinfo);
 			}
+
+			/* Note if a trap */
+			if (f_ptr->flags1 & (FF1_TRAP)) trap = TRUE;
 		}
 
 		/* Handle surface grids */
@@ -1328,14 +1333,20 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 					((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) &&
 							((r_ptr->flags1 & (RE1_DISPLAY)) != 0))
 			{
+				/* Skip because there is an underlying trap */
+				if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (trap))
+				{
+					/* Don't display */
+				}
 				/* Display the effect */
-				if (r_ptr->flags1 & (RE1_ATTR_EFFECT))
+				else if (r_ptr->flags1 & (RE1_ATTR_EFFECT))
 				{
 					u16b pict = bolt_pict(y, x, y, x, r_ptr->effect);
 
 					a = PICT_A(pict);
 					c = PICT_C(pict);
 				}
+				/* Display the region graphic */
 				else
 				{
 					a = region_info[r_ptr->type].x_attr;
