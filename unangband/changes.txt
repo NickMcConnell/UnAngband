@@ -2,6 +2,8 @@ Unangband 0.6.3 "Death to the Case Statement" aka "The Projected Release"
 
 ### Game Play ###
 
+- Compress dungeon levels from 0 - 100 to 0 - 60 to speed up the end game.
+
 - Allow player to assemble friendly monsters and carry eggs to hatch friendly monsters.
 
 - Prohibit certain races from acquiring particular equipment flags.
