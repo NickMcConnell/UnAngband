@@ -1,3 +1,123 @@
+Unangband 0.6.3 "Death to the Case Statement" aka "The Projected Release"
+
+### Game Play ###
+
+- Allow player to assemble friendly monsters and carry eggs to hatch friendly monsters.
+
+- Prohibit certain races from acquiring particular equipment flags.
+ 
+- Penalize shape shifter mana.
+ 
+- Add ability to tattoo and woad yourself.
+
+- Change earthquakes and destruction to use projection code.
+
+- Add wilderness paths (from FAAngband).
+
+- Try harder to prevent escape from Moria.
+
+- Add firearms.
+
+- Updated druidic spells to use new region code.
+
+- Add in new sorceror spells that allow them to create traps from objects and other spells.
+
+- Make body armours appear earlier in the dungeon. This is to try to make them a more viable option...
+
+- Tweak weapon values as per blog. Note there are some additional tweaks here not mentioned in the blog entry.
+
+- Add additional trap types.
+
+- Add poisonous levels.
+
+- Change how traps themes work.
+
+- Sneaky monsters can now disarm traps.
+
+- Implement sticks to snakes and familiars. Somewhat hackish.
+
+- Tweak spell lists for mages based on 'Designing a Magic System - Part 14'
+
+- Add some useful low level rings so that first rings !cursed. Now the first cursed rings occur at level 15, and are actually mixed cursed and beneficial.
+
+- Altered amulets so there is no duplication in ring and amulet abilities. Amulets now occur deeper and are almost always useful.
+
+- Make freeze have an ice effect. 
+
+- Increase power of torch and chill spells. 
+
+- Added slow poison potions and spells back. Slow poison now delays the onset of poison effect.
+
+- Added slow digestion temporary effect.
+
+- Added spells and mushrooms of slow metabolism.
+
+- Improve Sauron end game. Morgoth end game still to be done.
+
+
+### User Interface ###
+
+- Reenable tunnelling using the alter key.
+
+- Added Dubtrain Angband Sound Pack v3.1.0
+
+- Remove original Angband sounds.
+
+- Added cheat_wall option to pseudo-colour walls for debugging
+purposes.
+
+- Make permanent rock distinguishable from normal rock.
+
+- If an item/spell is known, display the area of effect when targetting to better allow the player to use the ability.
+
+- Change druid starting light spell.
+
+- Windy rooms and items give the player good defense against archery.
+
+- Tweak names of throwing items.
+
+### Bug fixes ###
+
+- Many, many bugfixes, particularly due to code rewrites in a number of areas.
+
+I would like to thank the numerous Unangband contributors, especially darke, for the work put in here.
+
+Undoubtedly, I've introduced plenty of new bugs.
+
+
+### Build / Platform ###
+
+- Rowan Beentje (Lebannen): Significant updates to the Mac OS/X platform as well as some general platform updates.
+
+- Significant rewrites of the projection and blows code.
+
+- Remove another set of case statements: this time for describing item effects.
+
+- A number of improvements to dungeon generation to allow map designers to improve specific dungeon designs. You can now create 'special' levels of various types, and use level and special room flags as a part of the dungeon zone set up. This allows a lot more granular control of dungeon architecture and special scenarios.
+
+- In addition, added ability to have Mario style hidden access to dungeons. Note Gandalf taking one such route in his fight with the Balrog.
+
+- Update class and race code to use new skills array.
+
+- Make mushrooms tval 79. This simplifies code all over the place.
+
+- Implement ability to regenerate the last dungeon level as per Bug #15115. Because this uses the simple random number generator, you have to switch this capability on explicitly.
+
+Wizard command S specifies a dungeon seed. If dungeon seed is not zero, we generate levels using the simple random number generator and store the last seed used.
+
+Wizard command L will then regenerate the last level using the last level dungeon seed.
+
+Let me know if you need the ability to see what the seed and last seed currently are, or modify the last seed in any way.
+
+- Switch over to using 'modern' Angband timed effects on the character.
+
+- Player spell and ranged attacks now use the new do_cmd_item interface.
+
+- Darke: Dumps out html files of various lib/edit/ text files; needs to be run from the 'root' unangband directory
+
+
+
+
 Unangband 0.6.2 Gold "As Is" aka "The Unwarranted Release"
 
 ### Game Play ###
