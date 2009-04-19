@@ -9,7 +9,7 @@
 #Name of the executable file
 EXE=unangband
 NAME=Unangband
-COPYRIGHT=2001-2008 Andrew Doull et al
+COPYRIGHT=2001-2009 Andrew Doull
 
 TOOLDIR = /Developer/Tools
 SETFILE = $(TOOLDIR)/SetFile
