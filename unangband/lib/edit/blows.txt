@@ -566,7 +566,6 @@ D::@ adjacent target#
 N:66:BOLT_MINOR
 T:0-9999:shoot~ a minor bolt of * at &
 W:3:0:0
-R:6
 M:6
 F:GRID | KILL | PLAY | MAGIC | STOP |
 D:create~ @ bolt#:$ enemies

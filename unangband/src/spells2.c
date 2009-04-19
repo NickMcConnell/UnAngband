@@ -9049,6 +9049,15 @@ void trigger_region(int y, int x, bool move)
 				}
 			}
 
+			/* Randomize grid hit */
+			if (r_ptr->flags1 & (RE1_RANDOM))
+			{
+				int r = region_random_piece(rp_ptr->region);
+
+				y = region_piece_list[r].y;
+				x = region_piece_list[r].x;
+			}
+
 			/* Create a child region */
 			if (r_ptr->child_region)
 			{

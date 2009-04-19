@@ -7544,6 +7544,82 @@ static bool vault_trap_attr(int f_idx)
 
 
 /*
+ * Create trap region
+ */
+void create_trap_region(int y, int x, int feat, int power, bool player)
+{
+	/* Create region associated with trap */
+	feature_type *f_ptr = &f_info[feat];
+
+	int ty = 0;
+	int tx = 0;
+	int dir = 0;
+	int region;
+
+	region_info_type *ri_ptr = &region_info[f_ptr->d_attr];
+
+	int method = ri_ptr->method ? ri_ptr->method : (f_ptr->blow.method ? f_ptr->blow.method : f_ptr->spell);
+	int effect = power ? s_info[power].blow[0].effect : (f_ptr->blow.effect ? f_ptr->blow.effect : method_info[f_ptr->spell].d_res);
+
+	int damage = power ? 0 : (f_ptr->blow.d_dice ? damroll(f_ptr->blow.d_dice, f_ptr->blow.d_side) : 0);
+
+	method_type *method_ptr = &method_info[method];
+	u32b flg = method_ptr->flags1;
+
+	int radius = scale_method(method_ptr->radius, player ? p_ptr->lev : p_ptr->depth);
+
+	/* Paranoia */
+	if (effect == GF_FEATURE) effect = 0;
+
+	/* Player is setting a trap */
+	if (player)
+	{
+		if (((flg & (PROJECT_SELF)) == 0) &&
+				(!get_aim_dir(&dir, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
+						return;
+
+		msg_format("%d", dir);
+
+		/* Use the given direction */
+		ty = y + 99 * ddy[dir];
+		tx = x + 99 * ddx[dir];
+
+		/* Hack -- Use an actual "target" */
+		if ((dir == 5) && target_okay())
+		{
+			ty = p_ptr->target_row;
+			tx = p_ptr->target_col;
+		}
+		/* Stop at first target if we're firing in a direction */
+		else if (method_ptr->flags2 & (PR2_DIR_STOP))
+		{
+			flg |= (PROJECT_STOP);
+		}
+	}
+
+	/* Get the region */
+	region = init_region(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, f_ptr->d_attr, damage, method, effect,
+					player ? p_ptr->lev : p_ptr->depth, y, x, ty, tx);
+
+	/* Add to it */
+	if (region)
+	{
+		region_type *r_ptr = &region_list[region];
+
+		/* Display if player */
+		if (player || player_can_see_bold(y,x))
+		{
+			r_ptr->flags1 |= (RE1_DISPLAY  | RE1_NOTICE);
+		}
+
+		/* Shape the region */
+		project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, 0,
+			player ? p_ptr->lev : p_ptr->depth, y, x, r_ptr->y1, r_ptr->x1, region, flg);
+	}
+}
+
+
+/*
  * Hack -- instantiate a trap
  *
  * Have modified this routine to use the modified feature selection
@@ -7556,7 +7632,6 @@ void pick_trap(int y, int x, bool player)
 	feature_type *f_ptr = &f_info[feat];
 
 	int power = 0;
-	bool need_power = TRUE;
 
 	/* Paranoia */
 	if (!(f_ptr->flags1 & (FF1_TRAP))) return;
@@ -7580,6 +7655,8 @@ void pick_trap(int y, int x, bool player)
 		else if (cave_o_idx[y][x])
 		{
 			object_type *o_ptr = &o_list[cave_o_idx[y][x]];
+
+			bool need_power = TRUE;
 
 			switch (o_ptr->tval)
 			{
@@ -7701,14 +7778,11 @@ void pick_trap(int y, int x, bool player)
 			get_feat_num_hook = vault_trap_attr;
 
 			/* Get item effect */
-			get_spell(&power, "use", o_ptr, FALSE);
+			if (need_power) get_spell(&power, "use", o_ptr, FALSE);
 		}
 		/* Picking a floor trap */
 		else
 		{
-			/* Don't need power */
-			need_power = FALSE;
-
 			get_feat_num_hook = vault_trap_floor;
 		}
 	}
@@ -7719,9 +7793,6 @@ void pick_trap(int y, int x, bool player)
 
 		/* Set hook*/
 		get_feat_num_hook = vault_trap_attr;
-
-		/* Don't need power */
-		need_power = FALSE;
 	}
 
 	/* Room has specific trap type associated with it. Use it if possible. */
@@ -7757,73 +7828,8 @@ void pick_trap(int y, int x, bool player)
 	/* Activate the trap */
 	cave_set_feat(y, x, feat);
 
-	/* Create region associated with trap */
-	if ((power) || !(need_power))
-	{
-		feature_type *f_ptr2 = &f_info[feat];
-
-		int ty = 0;
-		int tx = 0;
-		int dir = 0;
-		int region;
-
-		int method = f_ptr2->blow.method ? f_ptr2->blow.method : f_ptr2->spell;
-		int effect = power ? s_info[power].blow[0].effect : (f_ptr2->blow.method ? f_ptr2->blow.method : method_info[f_ptr2->spell].d_res);
-
-		method_type *method_ptr = &method_info[method];
-		u32b flg = method_ptr->flags1;
-
-		int radius = scale_method(method_ptr->radius, player ? p_ptr->lev : p_ptr->depth);
-
-		/* Paranoia */
-		if (effect == GF_FEATURE) effect = 0;
-
-		/* Player is setting a trap */
-		if (player)
-		{
-			if (((flg & (PROJECT_SELF)) == 0) &&
-					(!get_aim_dir(&dir, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
-							return;
-
-			msg_format("%d", dir);
-
-			/* Use the given direction */
-			ty = y + 99 * ddy[dir];
-			tx = x + 99 * ddx[dir];
-
-			/* Hack -- Use an actual "target" */
-			if ((dir == 5) && target_okay())
-			{
-				ty = p_ptr->target_row;
-				tx = p_ptr->target_col;
-			}
-			/* Stop at first target if we're firing in a direction */
-			else if (method_ptr->flags2 & (PR2_DIR_STOP))
-			{
-				flg |= (PROJECT_STOP);
-			}
-		}
-
-		/* Get the region */
-		region = init_region(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, f_ptr2->d_attr, 0, method, effect,
-						player ? p_ptr->lev : p_ptr->depth, y, x, ty, tx);
-
-		/* Add to it */
-		if (region)
-		{
-			region_type *r_ptr = &region_list[region];
-
-			/* Display if player */
-			if (player || player_can_see_bold(y,x))
-			{
-				r_ptr->flags1 |= (RE1_DISPLAY  | RE1_NOTICE);
-			}
-
-			/* Shape the region */
-			project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, 0,
-				player ? p_ptr->lev : p_ptr->depth, y, x, r_ptr->y1, r_ptr->x1, region, flg);
-		}
-	}
+	/* Create trap region */
+	create_trap_region(y, x, feat, power, player);
 }
 
 
