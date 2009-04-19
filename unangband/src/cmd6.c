@@ -1626,6 +1626,9 @@ bool player_assembly(int item2)
 		else i_ptr->weight += k_ptr->weight;
 		if (k_info[i_ptr->k_idx].charges) i_ptr->timeout = (s16b)randint(k_info[i_ptr->k_idx].charges) + k_info[i_ptr->k_idx].charges;
 
+		/* Hack - mark as made by the player */
+		i_ptr->ident |= (IDENT_FORGED);
+
 		/* Adjust the weight and carry */
 		if (item2 >= 0)
 		{

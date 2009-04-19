@@ -5288,7 +5288,7 @@ bool animate_object(int item)
 	if (o_ptr->name3 <= 0) return (FALSE);
 
 	/* Summon the specific race */
-	result = summon_specific_one(y1, x1, o_ptr->name3, FALSE, 0L);
+	result = summon_specific_one(y1, x1, o_ptr->name3, FALSE, (o_ptr->ident & (IDENT_FORGED)) != 0 ? (MFLAG_ALLY) : 0L);
 
 	/* Hack -- no result */
 	if (!result)
