@@ -677,7 +677,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		else if (k_ptr->flags6 & (TR6_MOD_NAME)) modstr = basenm;
 
 		/* Add the name if required */
-		if (aware && (k_ptr->flags6 & (TR6_ADD_NAME))) append_name = TRUE;
+		if ((aware || !flavor) && (k_ptr->flags6 & (TR6_ADD_NAME))) append_name = TRUE;
 
 		/* Prepend or append the base name */
 		if (k_ptr->flags6 & (TR6_NO_TVAL))

@@ -3809,6 +3809,11 @@ errr parse_k_info(char *buf, header *head)
 
 				break;
 
+			case TV_BAG:
+
+				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				break;
+
 			case TV_PRAYER_BOOK:
 			case TV_MAGIC_BOOK:
 			case TV_SONG_BOOK:
