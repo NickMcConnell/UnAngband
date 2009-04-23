@@ -3500,7 +3500,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		k = lookup_kind(TV_SKIN, j);
 
 		/* Set up bare skin */
-		for (i = INVEN_LEFT; i <= INVEN_FEET; i++)
+		for (i = INVEN_NECK; i <= INVEN_FEET; i++)
 		{
 			object_type *o_ptr = &inventory[i];
 
@@ -4269,8 +4269,8 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	/* Remove skin */
 	if (use_skin)
 	{
-		/* Set up bare skin */
-		for (i = INVEN_NECK; i <= INVEN_FEET; i++)
+		/* Find bare skin */
+		for (i = INVEN_LEFT; i <= INVEN_FEET; i++)
 		{
 			object_type *o_ptr = &inventory[i];
 

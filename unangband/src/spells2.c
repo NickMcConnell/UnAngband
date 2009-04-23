@@ -6201,14 +6201,14 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (inc_timed(TMD_OPP_ELEC, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (inc_timed(TMD_OPP_POIS, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (inc_timed(TMD_OPP_POIS, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_STR)) && (inc_timed(TMD_INC_STR, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_STR)) && (inc_timed(TMD_INC_SIZ, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_INT)) && (inc_timed(TMD_INC_INT, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_WIS)) && (inc_timed(TMD_INC_WIS, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_DEX, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_AGI, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_CON)) && (inc_timed(TMD_INC_CON, lasts, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF3_INC_CHR)) && (inc_timed(TMD_INC_CHR, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_STR)) && (inc_timed(TMD_INC_STR, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_STR)) && (inc_timed(TMD_INC_SIZ, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_INT)) && (inc_timed(TMD_INC_INT, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_WIS)) && (inc_timed(TMD_INC_WIS, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_DEX, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_AGI, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_CON)) && (inc_timed(TMD_INC_CON, lasts, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_INC_CHR)) && (inc_timed(TMD_INC_CHR, lasts, TRUE))) obvious = TRUE;
 
 	/* SF3 - free action only */
 	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (inc_timed(TMD_FREE_ACT, lasts, TRUE))) obvious = TRUE;
@@ -9939,12 +9939,12 @@ s16b init_region(int who, int what, int type, int dam, int method, int effect, i
 		{
 			/* Pick a target */
 			scatter(&y1, &x1, y0, x0, radius ? radius : range, method_ptr->flags1 & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
-			 
+
 			/* Parania - always have a target */
 			if ((y1 == y0) && (x1 == x0))
 			{
 				int d = rand_int(8);
-				 
+
 				y1 = y0 + ddy_ddd[d];
 				x1 = x0 + ddx_ddd[d];
 			}
