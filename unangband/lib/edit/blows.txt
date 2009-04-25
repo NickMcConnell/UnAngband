@@ -474,14 +474,14 @@ D:create~ @ crossbow bolt#:@ target#
 
 N:55:DART
 T:0-9999:throw~ a dart at &
-W:0:23:4
+W:0:22:1
 M:6
 F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
 D:create~ @ dart#:@ target#
 
 N:56:DAGGER
 T:0-9999:throw~ a dagger at &
-W:0:22:1
+W:0:23:4
 M:6
 F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
 D:create~ @ dagger:@ target#
