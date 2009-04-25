@@ -6444,7 +6444,9 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			}
 
 			/* Try to avoid monsters/players between the endpoints */
-			if ((cave_m_idx[y][x] != 0) && (blockage[i] < 2))
+			if ((cave_m_idx[y][x] != 0) && (blockage[i] < 2)
+					/* Skip hidden monsters */
+					&& ((cave_m_idx[y][x] < 0) || ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) == 0)))
 			{
 				if      (flg & (PROJECT_MISS)) flg &= ~(PROJECT_MISS);
 				else if (flg & (PROJECT_STOP)) blockage[i] = 2;
