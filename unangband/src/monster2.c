@@ -3455,6 +3455,9 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Create some ammo for the monster */
 		if (!ammo_kind) ammo_kind = lookup_kind(ammo_tval, ammo_sval);
 
+		/* Paranoia */
+		if (!ammo_kind) return (-1);
+
 		/* Get the object body */
 		o_ptr = &object_type_body;
 
