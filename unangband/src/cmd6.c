@@ -350,6 +350,8 @@ bool player_eat_food(int item)
 	{
 		/* Normal food */
 		case TV_FOOD:
+		/* Mushroms */
+		case TV_MUSHROOM:
 		{
 			/* Get food effect */
 			get_spell(&power, "use", o_ptr, FALSE);
