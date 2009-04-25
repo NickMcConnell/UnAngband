@@ -593,7 +593,7 @@ static void player_outfit(void)
 					{
 					case WS_RING:
 						  {
-						    k_idx = lookup_kind(TV_RING, rand_int(1) ? SV_RING_AGGRAVATION : rand_int(5) ? SV_RING_TELEPORTATION : SV_RING_WOE);
+						    k_idx = lookup_kind(TV_RING, rand_int(2) ? SV_RING_AGGRAVATION : SV_RING_TELEPORTATION);
 						    break;
 						  }
 						case WS_TWO_WEAPON:
@@ -603,7 +603,7 @@ static void player_outfit(void)
 						  }
 						case WS_THROWN:
 						  {
-						    if (rp_ptr->r_skill[SKILL_TO_HIT_THROW] > rp_ptr->r_skill[SKILL_TO_HIT_THROW])
+						    if (rp_ptr->r_skill[SKILL_TO_HIT_THROW] > rp_ptr->r_skill[SKILL_TO_HIT_BOW])
 							{
 							  k_idx = lookup_kind(TV_SHOT, SV_AMMO_LIGHT);
 							}
@@ -713,6 +713,8 @@ static void player_outfit(void)
 			if (i_ptr->tval == TV_RING)
 			  {
 			    apply_magic(i_ptr, 50, FALSE, TRUE, TRUE);
+			    i_ptr->ident |= (IDENT_CURSED);
+			    i_ptr->can_flags3 |= (TR3_LIGHT_CURSE);
 			  }
 			else
 			  {

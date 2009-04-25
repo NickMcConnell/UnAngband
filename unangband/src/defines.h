@@ -732,9 +732,9 @@ enum
 	SKILL_STEALTH,			/* Skill: Stealth factor */
 	SKILL_DIGGING,			/* Skill: Searching ability */
 	SKILL_SEARCH,	/* Skill: Searching frequency */
-	SKILL_TO_HIT_MELEE,		/* Skill: To hit (normal) */
-	SKILL_TO_HIT_BOW,		/* Skill: To hit (shooting) */
-	SKILL_TO_HIT_THROW,		/* Skill: To hit (throwing) */
+	SKILL_TO_HIT_THROW,		/* Skill: To hit (throw) */
+	SKILL_TO_HIT_MELEE,		/* Skill: To hit (melee) */
+	SKILL_TO_HIT_BOW,		/* Skill: To hit (bow) */
 
 	SKILL_MAX
 };
