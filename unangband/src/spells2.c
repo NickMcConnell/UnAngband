@@ -7445,11 +7445,10 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 
 		case SPELL_SUMMON_RACE:
 		{
-			/* You can choose a familiar ahead of time by examining the find familiar spell */
-			if (interact)
+			/* Check if summoning */
+			if (forreal)
 			{
-				/* Choose familiar if summoning it for the first time */
-				if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
+				/* Choose familiar if summoning it for the first time */				if ((s_ptr->param == FAMILIAR_IDX) && (!p_ptr->familiar))
 				{
 					p_ptr->familiar = (byte)randint(19);
 					msg_format("You have found %s %s as a familiar.", is_a_vowel(familiar_race[p_ptr->familiar].name[0]) ? "an" : "a",
