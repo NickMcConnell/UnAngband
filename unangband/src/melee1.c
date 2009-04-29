@@ -1898,7 +1898,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 	int method = attack;
 	int effect = method_ptr->d_res;
-	bool hit = TRUE;
 
 	monster_type *m_ptr, *n_ptr;
 	monster_race *r_ptr, *s_ptr;
@@ -1944,6 +1943,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 	int fy = y;
 	int fx = x;
+
+	int range = 0;
+
+	u32b flg;
 
 	/* Some summons override cave ecology */
 	bool old_cave_ecology = cave_ecology.ready;
@@ -2190,18 +2193,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			dam_desc = dam;
 		}
 
-		/* Player has chance of being missed by various ranged attacks */
-		if (method_ptr->flags1 & (PROJECT_MISS))
-		{
-			if (target < 0)
-			{
-				hit = check_hit(attack_power(effect), rlev - m_ptr->cdis, who, TRUE);
-			}
-			else if (target > 0)
-			{
-				hit = mon_check_hit(target, attack_power(effect), rlev - m_ptr->cdis, who, TRUE);
-			}
-		}
+		/* Get range to target */
+		range = m_ptr->cdis;
 
 		/* Attack needs mana to cast */
 		if (method_ptr->mana_cost)
@@ -2311,6 +2304,31 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		}
 	}
 
+	/* Get the method flag */
+	flg = method_info[method].flags1;
+
+	/* Player has chance of being missed by various ranged attacks */
+	if (flg & (PROJECT_MISS))
+	{
+		/* See if we hit the player player */
+		if ((target < 0) && check_hit(attack_power(effect), rlev - range, who, TRUE))
+		{
+			/* Hit the player */
+			flg &= (PROJECT_MISS);
+		}
+		else if ((target > 0) && mon_check_hit(target, attack_power(effect), rlev - range, who, TRUE))
+		{
+			/* Hit the monster */
+			flg &= (PROJECT_MISS);
+		}
+		else
+		{
+			/* Go through the target and hit something behind */
+			flg |= (PROJECT_THRU | PROJECT_STOP);
+		}
+	}
+
+
 	/* Centre on caster */
 	if (method_ptr->flags1 & (PROJECT_SELF))
 	{
@@ -2376,6 +2394,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	/* Any effect? */
 	if (result >= 0)
 	{
+		/* Describe the attack */
+		msg_format("%^s %s", m_name, atk_desc);
+
 		/* Blow projects something? */
 		if ((method_ptr->flags1 & (PR1_PROJECT)) ||
 				(method_ptr->flags2 & (PR2_PROJECT)))
@@ -2386,8 +2407,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			int degrees_of_arc = method_ptr->arc;
 			int diameter_of_source = method_ptr->diameter_of_source;
-
-			u32b flg = method_info[method].flags1;
 
 			/* Hack -- scale radius up more */
 			if (method_ptr->flags2 & (PR2_SCALE_RADIUS))

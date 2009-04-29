@@ -6046,6 +6046,13 @@ void cave_alter_feat(const int y, const int x, int action)
 
 }
 
+/* Check to see whether a monster or player blocks a path */
+/* Player always blocks, monster blocks if not hidden */
+#define monster_block(Y, X) \
+	((cave_m_idx[(Y)][(X)] < 0) || \
+	((cave_m_idx[(Y)][(X)] > 0) && \
+	 ((m_list[cave_m_idx[(Y)][(X)]].mflag & (MFLAG_HIDE)) == 0)))
+
 
 /*
  * Determine the path taken by a projection.  -BEN-, -LM-
@@ -6444,11 +6451,9 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			}
 
 			/* Try to avoid monsters/players between the endpoints */
-			if ((cave_m_idx[y][x] != 0) && (blockage[i] < 2)
-					/* Skip hidden monsters */
-					&& ((cave_m_idx[y][x] < 0) || ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE)) == 0)))
+			if ((monster_block(y,x)) && (blockage[i] < 2))
 			{
-				if      (flg & (PROJECT_MISS)) flg &= ~(PROJECT_MISS);
+				if		(flg & (PROJECT_MISS)) flg &= ~(PROJECT_MISS);
 				else if (flg & (PROJECT_STOP)) blockage[i] = 2;
 				else if (flg & (PROJECT_CHCK)) blockage[i] = 1;
 			}
@@ -6541,12 +6546,12 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 				}
 
 				/* Try to avoid non-initial monsters/players */
-				if (cave_m_idx[y_c][x_c] != 0)
+				if (monster_block(y_c,x_c))
 				{
 					if      (flg & (PROJECT_STOP)) blockage[0] = 2;
 					else if (flg & (PROJECT_CHCK)) blockage[0] = 1;
 				}
-				if (cave_m_idx[y_d][x_d] != 0)
+				if (monster_block(y_d, x_d))
 				{
 					if      (flg & (PROJECT_STOP)) blockage[1] = 2;
 					else if (flg & (PROJECT_CHCK)) blockage[1] = 1;

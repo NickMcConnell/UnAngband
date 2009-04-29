@@ -2092,6 +2092,13 @@ bool discharge_trap(int y, int x, int ty, int tx)
 	/* Get feature */
 	feature_type *f_ptr = &f_info[feat];
 
+	/* Use covered if necessary */
+	if (f_ptr->flags2 & (FF2_COVERED))
+	{
+		feat = f_ptr->mimic;
+		f_ptr = &f_info[feat];
+	}
+
 	/* Object here is used in trap */
 	if ((cave_o_idx[y][x]) && (f_ptr->flags1 & (FF1_HIT_TRAP)))
 	{
@@ -2115,9 +2122,6 @@ bool discharge_trap(int y, int x, int ty, int tx)
 				u32b f1, f2, f3, f4;
 
 				int i, j, shots = 1;
-
-				/* Use this routine instead of a power */
-				power = 0;
 
 				/* Get bow */
 				j_ptr = o_ptr;
@@ -2487,51 +2491,17 @@ bool discharge_trap(int y, int x, int ty, int tx)
 		}
 
 		/* Has a power */
-		/* TODO: join with other spell attack routines */
 		if (power > 0)
 		{
-			spell_type *s_ptr = &s_info[power];
-
-			int ap_cnt;
+			bool dummy;
 
 			/* Object is used */
 			if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
 			if (k_info[o_ptr->k_idx].ever_used < MAX_SHORT) k_info[o_ptr->k_idx].ever_used++;
 
-			/* Scan through all four blows */
-			for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
-			{
-				int damage = 0;
-
-				/* Extract the attack infomation */
-				int effect = s_ptr->blow[ap_cnt].effect;
-				int method = s_ptr->blow[ap_cnt].method;
-				int d_dice = s_ptr->blow[ap_cnt].d_dice;
-				int d_side = s_ptr->blow[ap_cnt].d_side;
-				int d_plus = s_ptr->blow[ap_cnt].d_plus;
-
-				/* Hack -- no more attacks */
-				if (!method) break;
-
-				/* Mega hack -- dispel evil/undead objects */
-				if (!d_side)
-				{
-					d_plus += 25 * d_dice;
-				}
-
-				/* Roll out the damage */
-				if ((d_dice) && (d_side))
-				{
-					damage = damroll(d_dice, d_side) + d_plus;
-				}
-				else
-				{
-					damage = d_plus;
-				}
-
-				/* Apply the blow */
-				obvious |= project_method(SOURCE_FEATURE, feat, method, effect, damage, p_ptr->depth, y, x, ty, tx, 0, method_info[method].flags1);
-			}
+			/* Cast the spell */
+			process_spell_target(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, ty, tx, power, p_ptr->depth,
+					1, FALSE, TRUE, FALSE, &dummy, NULL);
 		}
 	}
 
@@ -2547,19 +2517,19 @@ bool discharge_trap(int y, int x, int ty, int tx)
 		if ((y == p_ptr->py) && (x == p_ptr->px))
 		{
 			/* Player floats on terrain */
-			if (player_ignore_terrain(feat)) return (FALSE);			
+			if (player_ignore_terrain(feat)) return (FALSE);
 		}
-		
+
 		/* Player on destination */
 		if ((ty == p_ptr->py) && (tx == p_ptr->px))
 		{
 			/* Blocked message */
 			if (blocked) msg_print("You knock aside the arrow.");
-			
+
 			/* Notice otherwise */
-			else obvious = TRUE;	
+			else if (strlen(text)) msg_format("%s",text);
 		}
-		
+
 		/* Blocked the attack - no effect */
 		if (blocked)
 		{
@@ -2581,6 +2551,9 @@ bool discharge_trap(int y, int x, int ty, int tx)
 			obvious |= project_method(SOURCE_FEATURE, feat, blow_ptr->method, blow_ptr->effect, dam, p_ptr->depth, y, x, ty, tx, 0, method_info[blow_ptr->method].flags1);
 		}
 
+		/* Reget original feature */
+		f_ptr = &f_info[cave_feat[y][x]];
+
 		/* Hit the trap */
 		if (f_ptr->flags1 & (FF1_HIT_TRAP))
 		{
@@ -2592,9 +2565,6 @@ bool discharge_trap(int y, int x, int ty, int tx)
 			/* Discover */
 			cave_alter_source_feat(y,x,FS_SECRET);
 		}
-		
-		/* Message */
-		if ((obvious) && (strlen(text))) msg_format("%s",text);
 	}
 
 	return (obvious);

@@ -7266,8 +7266,8 @@ s16b get_feat_num(int level)
 			level = 1 + (level * MAX_DEPTH / randint(MAX_DEPTH));
 #endif
 
-			/* 10-20 levels boost */
-			level += (10 + rand_int(11));
+			/* 4-7 levels boost */
+			level += (4 + rand_int(4));
 		}
 	}
 
@@ -7596,7 +7596,7 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 			flg |= (PROJECT_STOP);
 		}
 	}
-	
+
 	/* Hack -- we try to force traps to have a useful region */
 	if ((flg & (PROJECT_4WAY | PROJECT_4WAX | PROJECT_BOOM)) == 0) flg |= (PROJECT_BEAM | PROJECT_THRU);
 

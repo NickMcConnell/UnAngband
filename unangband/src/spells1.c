@@ -2806,6 +2806,12 @@ bool player_ignore_terrain(int f_idx)
 
 	bool ignore = FALSE;
 
+	/* Use covered if necessary */
+	if (f_ptr->flags2 & (FF2_COVERED))
+	{
+		f_ptr = &f_info[f_ptr->mimic];
+	}
+
 	/* Get boot flags -- hack: only if terrain not filled */
 	if ((i_ptr->k_idx) && !(f_ptr->flags2 & (FF2_FILLED))) object_flags(i_ptr, &f1, &f2, &f3, &f4);
 
@@ -13875,21 +13881,23 @@ bool project_one(int who, int what, int y, int x, int dam, int typ, u32b flg)
 
 /*
  * Project an attack method.
+ *
+ * Note the number of attacks should be handled by the calling function to determine things
+ * like what additional attacks do if the original target is killed.
  */
 bool project_method(int who, int what, int method, int effect, int damage, int level, int y0, int x0, int y1, int x1, int region, u32b flg)
 {
 	method_type *method_ptr = &method_info[method];
 	int range = scale_method(method_ptr->max_range, level);
 	int radius = scale_method(method_ptr->radius, level);
-	int num = scale_method(method_ptr->number, level);
 
 	int degrees_of_arc = method_ptr->arc;
 	int diameter_of_source = method_ptr->diameter_of_source;
 
 	bool obvious = FALSE;
 
-	/* Hack -- fix number */
-	if (num < 1) num = 1;
+	int y = y1;
+	int x = x1;
 
 	/* Hack -- fix diameter of source */
 	if (!diameter_of_source) diameter_of_source = 10;
@@ -13897,78 +13905,68 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 	/* Hack -- regions get applied later */
 	if (region) flg |= (PROJECT_CHCK);
 
-	/* Get method flags */
-	flg |= method_ptr->flags1;
+	/* Pick a 'nearby' location */
+	if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, radius, flg & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
 
-	/* Create one or more projections */
-	while (num--)
+	/* Affect distant monsters */
+	if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
 	{
-		int y = y1;
-		int x = x1;
+		if (project_dist(who, what, y, x, damage, effect, flg, method_ptr->flags2)) obvious = TRUE;
+	}
 
-		/* Pick a 'nearby' location */
-		if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, radius, flg & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+	/* Analyze the "dir" and the "target". */
+	else if (project(who, what, radius, range, y0, x0, y, x, damage, effect, flg, degrees_of_arc,
+			(byte)diameter_of_source)) obvious = TRUE;
 
-		/* Affect distant monsters */
-		else if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))
+	/* Adding projection to a region */
+	if (region)
+	{
+		region_type *r_ptr = &region_list[region];
+		int i;
+
+		/* Overwriting features */
+		if (r_ptr->effect == GF_FEATURE)
 		{
-			if (project_dist(who, what, y, x, damage, effect, flg, method_ptr->flags2)) obvious = TRUE;
+			/* Clear the scalar */
+			for (i = 0; i < target_path_n; i++) target_path_d[i] = 0;
+
+			/* And set */
+			r_ptr->flags1 |= (RE1_SCALAR_FEATURE);
+			r_ptr->flags1 &= ~(RE1_SCALAR_DISTANCE | RE1_SCALAR_VECTOR | RE1_SCALAR_DAMAGE);
+		}
+		/* Requesting a vector */
+		else if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
+		{
+			int deg_vary = degrees_of_arc ? degrees_of_arc / 2 : 45;
+
+			/* Randomize the scalar */
+			for (i = 0; i < target_path_n; i++)
+			{
+				int yi = GRID_Y(target_path_g[i]);
+				int xi = GRID_X(target_path_g[i]);
+				int deg_dest = get_angle_to_target(y0, yi, x0, xi, 0);
+
+				int degree = (deg_dest + rand_int(deg_vary)) % 180;
+				int dist = target_path_d[i];
+
+				/* Insert angle and speed into grid damage */
+				target_path_d[i] = GRID(degree, (damage + dist) / (dist + 1));
+
+				/* Hack -- All pieces of a vector start at the origin */
+				target_path_g[i] = GRID(y0, x0);
+			}
+		}
+		else
+		{
+			/* We currently have the computed distance in the region */
+			r_ptr->flags1 |= (RE1_SCALAR_DISTANCE);
 		}
 
-		/* Analyze the "dir" and the "target". */
-		else if (project(who, what, radius, range, y0, x0, y, x, damage, effect, flg, degrees_of_arc,
-				(byte)diameter_of_source)) obvious = TRUE;
+		/* Take the grids and insert them in the region */
+		region_insert(target_path_g, target_path_n, target_path_d, region);
 
-		/* Adding projection to a region */
-		if (region)
-		{
-			region_type *r_ptr = &region_list[region];
-			int i;
-
-			/* Overwriting features */
-			if (r_ptr->effect == GF_FEATURE)
-			{
-				/* Clear the scalar */
-				for (i = 0; i < target_path_n; i++) target_path_d[i] = 0;
-
-				/* And set */
-				r_ptr->flags1 |= (RE1_SCALAR_FEATURE);
-				r_ptr->flags1 &= ~(RE1_SCALAR_DISTANCE | RE1_SCALAR_VECTOR | RE1_SCALAR_DAMAGE);
-			}
-			/* Requesting a vector */
-			else if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
-			{
-				int deg_vary = degrees_of_arc ? degrees_of_arc / 2 : 45;
-
-				/* Randomize the scalar */
-				for (i = 0; i < target_path_n; i++)
-				{
-					int yi = GRID_Y(target_path_g[i]);
-					int xi = GRID_X(target_path_g[i]);
-					int deg_dest = get_angle_to_target(y0, yi, x0, xi, 0);
-					
-					int degree = (deg_dest + rand_int(deg_vary)) % 180;
-					int dist = target_path_d[i];
-
-					/* Insert angle and speed into grid damage */
-					target_path_d[i] = GRID(degree, (damage + dist) / (dist + 1));
-					
-					/* Hack -- All pieces of a vector start at the origin */
-					target_path_g[i] = GRID(y0, x0);
-				}
-			}
-			else
-			{
-				/* We currently have the computed distance in the region */
-				r_ptr->flags1 |= (RE1_SCALAR_DISTANCE);
-			}
-
-			/* Take the grids and insert them in the region */
-			region_insert(target_path_g, target_path_n, target_path_d, region);
-
-			/* Initialize the facing */
-			r_ptr->facing = get_angle_to_target(y0, x0, y, x, 0);
-		}
+		/* Initialize the facing */
+		r_ptr->facing = get_angle_to_target(y0, x0, y, x, 0);
 	}
 
 	return (obvious);

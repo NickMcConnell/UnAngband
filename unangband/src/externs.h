@@ -985,6 +985,9 @@ extern bool concentrate_light_hook(const int y, const int x, const bool modify);
 extern int concentrate_power(int y0, int x0, int radius, bool for_real, bool use_los,
 		bool concentrate_hook(const int y, const int x, const bool modify));
 extern bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, bool *known);
+extern int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int spell, int level,
+		int damage_div, bool one_grid, bool forreal, bool player, bool *cancel,
+		bool retarget(int *ty, int *tx, u32b *flg, int method, int level, bool full, bool *one_grid));
 extern bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
 extern bool item_tester_hook_magic_trap(const object_type *o_ptr);
 extern bool player_set_magic_trap(int item);
