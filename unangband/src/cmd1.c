@@ -2122,6 +2122,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 				u32b f1, f2, f3, f4;
 
 				int i, j, shots = 1;
+				int tdis = 6;
 
 				/* Get bow */
 				j_ptr = o_ptr;
@@ -2129,8 +2130,15 @@ bool discharge_trap(int y, int x, int ty, int tx)
 				/* Get bow flags */
 				object_flags(o_ptr,&f1,&f2,&f3,&f4);
 
-				/* Apply extra shots. Note extra shots for other weapons helps for putting weapons in traps only. */
+				/* Apply extra shots and hurls. Note extra shots for weapons other than bows helps for putting weapons in traps only. */
 				if (f1 & (TR1_SHOTS)) shots += j_ptr->pval;
+				if (f3 & (TR3_HURL_NUM)) shots += j_ptr->pval;
+
+				/* Increase range */
+				if (j_ptr->tval == TV_BOW) tdis += bow_multiplier(j_ptr->sval) * 3;
+
+				/* Apply extra might -- note extra might increases range of melee weapons */
+				if (f1 & (TR1_MIGHT)) tdis += j_ptr->pval * 3;
 
 				/* Test for hit */
 				for (i = 0; i < shots; i++)
@@ -2139,7 +2147,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 					int nx = x;
 
 					/* Calculate the path */
-					path_n = project_path(path_g, MAX_RANGE, y, x, &ty, &tx, (PROJECT_THRU));
+					path_n = fire_or_throw_path(path_g, tdis, y, x, &ty, &tx, f_ptr->level < 50 ? 5 - (f_ptr->level / 10): 0);
 
 					/* Do we need ammo */
 					if ((j_ptr->next_o_idx) || (o_ptr->tval != TV_BOW))
@@ -3454,8 +3462,10 @@ void move_player(int dir)
 		return;
 	}
 
-	/* Hack -- attack monsters --- except hidden ones or allies */
-	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)) &&
+	/* Hack -- attack monsters --- except hidden ones, allies or townsfolk */
+	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY | MFLAG_TOWN)) &&
+	 /* Note hack to also ignore monsters on town level who don't do damage. */
+		(((level_flag & (LF1_TOWN)) == 0) || (r_info[m_list[cave_m_idx[y][x]].r_idx].blow[0].d_dice != 0)) &&
 		 /* Allow the player to run over most monsters -- except those that can't move */
 		 (!(p_ptr->running) || (r_info[m_list[cave_m_idx[y][x]].r_idx].flags1 & (RF1_NEVER_MOVE))))
 	{

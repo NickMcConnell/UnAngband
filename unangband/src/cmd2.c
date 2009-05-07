@@ -3259,6 +3259,103 @@ static bool item_tester_hook_rope(const object_type *o_ptr)
 
 
 /*
+ * Calculate the projection path for fired or thrown objects.  -LM-
+ *
+ * From Sangband.
+ *
+ * Apply variable inaccuracy, using angular comparison.
+ *
+ * If inaccuracy is non-zero, we reduce corridor problems by reducing
+ * range instead of immediately running the projectile into the wall.
+ * This favour is not extended to projection sources out in the open,
+ * which makes it much better to be aiming from a firing slit than into
+ * one.
+ */
+int fire_or_throw_path(u16b *gp, int range, int y0, int x0, int *ty, int *tx, int inaccuracy)
+{
+	int reduce, expected_distance;
+	int dy, dx, delta, angle;
+	int mult = 1;
+
+	/* No inaccuracy or no distance -- calculate path and return */
+	if ((inaccuracy <= 0) || ((*ty == y0) && (*tx == x0)))
+	{
+		/* Calculate the path */
+		return(project_path(gp, range, y0, x0, ty, tx, PROJECT_THRU));
+	}
+
+	/* Inaccuracy penalizes range */
+	reduce = rand_int(1 + inaccuracy / 2);
+	if (reduce > range / 3) reduce = range / 3;
+	range -= reduce;
+
+
+	/* Get distance to target */
+	dy = *ty - y0;
+	dx = *tx - x0;
+	delta = MAX(ABS(dy), ABS(dx));
+
+
+	/* Extend target away from source, if necessary */
+	if ((delta > 0) && (delta <= 7))
+	{
+		if      (delta == 1) mult = 10;
+		else if (delta == 2) mult = 5;
+		else if (delta == 3) mult = 4;
+		else if (delta == 4) mult = 3;
+		else                 mult = 2;
+
+		*ty = y0 + (dy * mult);
+		*tx = x0 + (dx * mult);
+	}
+
+	/* Note whether we expect the projectile to travel anywhere */
+	expected_distance = project_path(gp, range, y0, x0, ty, tx, PROJECT_THRU);
+
+	/* Path enters no grids except the origin -- return */
+	if (expected_distance < 2) return (expected_distance);
+
+
+	/* Continue until satisfied */
+	while (TRUE)
+	{
+		int ty2 = *ty;
+		int tx2 = *tx;
+
+		/* Get angle to this target */
+		angle = get_angle_to_target(y0, x0, ty2, tx2, 0);
+
+		/* Inaccuracy changes the angle of projection */
+		angle = Rand_normal(angle, inaccuracy);
+
+		/* Handle the 0-240 angle discontinuity */
+		if (angle < 0) angle = 240 + angle;
+
+		/* Get a grid using the adjusted angle, target it */
+		get_grid_using_angle(angle, y0, x0, &ty2, &tx2);
+
+		/* Calculate the path, accept if it enters at least two grids */
+		if (project_path(gp, range, y0, x0, &ty2, &tx2, PROJECT_THRU) > 1)
+		{
+			break;
+		}
+
+		/* Otherwise, reduce range and expected distance */
+		else
+		{
+			range -= rand_int(div_round(range, 4));
+			if (expected_distance > range) expected_distance = range;
+		}
+	}
+
+	return(range);
+}
+
+
+
+
+
+/*
  * Fire or throw an already chosen object.
  *
  * You may only fire items that "match" your missile launcher
@@ -3290,6 +3387,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 	int bow_to_d = 0;
 	int ranged_skill;
 	int catch_chance = 0;
+	int inaccuracy = 5;
 
 	int style_hit, style_dam, style_crit;
 
@@ -3439,8 +3537,20 @@ void player_fire_or_throw_selected(int item, bool fire)
 	y = p_ptr->py;
 	x = p_ptr->px;
 
-	/* Test for fumble - coated weapons are riskier thrown/shot than wielded */
-	if (((p_ptr->heavy_wield) || (cursed_p(o_ptr)) || (coated_p(o_ptr))) && (!rand_int(ranged_skill)))
+	/* Increase inaccuracy */
+	if (p_ptr->heavy_wield) inaccuracy += 5;
+	if (coated_p(o_ptr)) inaccuracy += 2;
+	if (cursed_p(o_ptr)) inaccuracy += 10;
+	if (fire && (cursed_p(&inventory[INVEN_BOW]))) inaccuracy += 5;
+
+	/* Decrease inaccuracy */
+	inaccuracy -= ranged_skill / 40;
+
+	/* Minimum inaccuracy */
+	if (inaccuracy < 0) inaccuracy = 0;
+
+	/* Test for fumble */
+	if ((inaccuracy > 5) && (rand_int(ranged_skill) < inaccuracy))
 	{
 		int dir;
 
@@ -3458,6 +3568,8 @@ void player_fire_or_throw_selected(int item, bool fire)
 		int dir = 0;
 		int old_y, old_x; /* Previous weapon location */
 		int ty, tx; /* Current target coordinates */
+
+		bool report_miss = TRUE;	/* Report first monster we miss */
 
 		/* If trick throw failure, stop trick throws */
 		if (trick_failure) break;
@@ -3526,7 +3638,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 		if (tx == p_ptr->px && ty == p_ptr->py) tdis = 256;
 
 		/* Calculate the path */
-		path_n = project_path(path_g, tdis, y, x, &ty, &tx, PROJECT_THRU);
+		path_n = fire_or_throw_path(path_g, tdis, y, x, &ty, &tx, inaccuracy);
 
 		/* Hack -- Handle stuff */
 		handle_stuff();
@@ -3828,10 +3940,17 @@ void player_fire_or_throw_selected(int item, bool fire)
 							/* Missile was stopped */
 							if (r_ptr->flags2 & (RF2_ARMOR)
 								|| m_ptr->shield)
-							msg_format("%^s blocks the %s with a %sshield.",
+							{
+								msg_format("%^s blocks the %s with a %sshield.",
 										 m_name,
 										 o_name,
 										 m_ptr->shield ? "mystic " : "");
+							}
+							/* Miss the monster */
+							else if (report_miss && visible)
+							{
+								msg_format("You miss %s.", m_name);
+							}
 
 							/* No normal damage */
 							tdam = 0;
@@ -3905,6 +4024,18 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 					/* Stop looking */
 					break;
+				}
+				/* Tell the player they missed */
+				else if (report_miss && visible)
+				{
+					char m_name[80];
+
+					/* Get the monster name (or "it") */
+					monster_desc(m_name, sizeof(m_name), cave_m_idx[y][x], 0);
+
+					msg_format("You miss %s.", m_name);
+
+					report_miss = FALSE;
 				}
 			}
 			/* Handle reaching targetted grid */

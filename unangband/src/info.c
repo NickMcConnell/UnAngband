@@ -3567,55 +3567,67 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Bows */
-	if (!random && (o_ptr->tval == TV_BOW))
+	if (!random)
 	{
-		int mult = bow_multiplier (o_ptr->sval);
+		int mult = 0;
 
-		text_out("When shooting or set in a trap, it multiplies the base damage of ");
+		/* Bows get innate might */
+		if (o_ptr->tval == TV_BOW) mult += bow_multiplier (o_ptr->sval);
 
 		/* Affect Might */
 		if (f1 & (TR1_MIGHT)) mult += o_ptr->pval;
 
-		/* Analyze the launcher */
-		switch (o_ptr->sval / 10)
+		/* Any benefit? */
+		if (mult)
 		{
-			/* Short Bow and Arrow */
-			case 1:
-			{
-				text_out("arrows");
-				break;
-			}
+			text_out(format("When %sset in a trap, it multiplies the base damage %s",
+					o_ptr->tval == TV_BOW ? "shooting or " : "",
+							o_ptr->tval == TV_BOW ? "of " : ""));
 
-			/* Light Crossbow and Bolt */
-			case 2:
+			/* Analyze the launcher */
+			if (o_ptr->tval == TV_BOW)
 			{
-				text_out("bolts");
-				break;
+				switch (o_ptr->sval / 10)
+				{
+					/* Short Bow and Arrow */
+					case 1:
+					{
+						text_out("arrows");
+						break;
+					}
+
+					/* Light Crossbow and Bolt */
+					case 2:
+					{
+						text_out("bolts");
+						break;
+					}
+
+					/* Firearms */
+					case 3:
+					{
+						text_out("shots");
+						break;
+					}
+
+					/* Sling and ammo */
+					default:
+					{
+						/* Hack -- slings now act like 'throwers' */
+						text_out("shots or thrown items");
+						break;
+					}
+				}
 			}
+			text_out(format(" by %d and has a range of %d grids%s.  ", mult, 6 + mult * 3));
 
 			/* Firearms */
-			case 3:
+			if ((o_ptr->tval == TV_BOW) && (o_ptr->sval / 10 == 3))
 			{
-				text_out("shots");
-				break;
+				int max_charge = k_info[o_ptr->k_idx].charges;
+
+				text_out(format("It requires gunpowder to reload and can fit %d charge%s.  ",max_charge, max_charge > 1 ? "s" : ""));
 			}
-
-			/* Sling and ammo */
-			default:
-			{
-				/* Hack -- slings now act like 'throwers' */
-				text_out("shots or thrown items");
-				break;
-			}
-
-		}
-		text_out(format(" by %d.  ", mult));
-
-		if (o_ptr->sval / 10 == 3)
-		{
-			int max_charge = k_info[o_ptr->k_idx].charges;
-
-			text_out(format("It requires gunpowder to reload and can fit %d charge%s.  ",max_charge, max_charge > 1 ? "s" : ""));
 		}
 	}
 
@@ -6436,6 +6448,7 @@ s32b object_power(const object_type *o_ptr)
 				}
 			}
 
+			/* Not as good as blows because we throw the weapon away */
 			if (f3 & TR3_HURL_NUM)
 			{
 				if (o_ptr->pval > 3 || o_ptr->pval < 0)
@@ -6444,13 +6457,14 @@ s32b object_power(const object_type *o_ptr)
 				}
 				else if (o_ptr->pval > 0)
 				{
-					p = sign(p) * ((ABS(p) * (5 + o_ptr->pval)) / 5);
-					/* Add an extra +5 per blow to account for damage rings */
-					/* (The +5 figure is a compromise here - could be adjusted) */
-					p += 5 * o_ptr->pval;
+					p = sign(p) * ((ABS(p) * (10 + o_ptr->pval)) / 10);
+					/* Add an extra +2 per blow to account for damage rings */
+					/* (The +2 figure is a compromise here - could be adjusted) */
+					p += 2 * o_ptr->pval;
 				}
 			}
 
+			/* Not as good as blows because we throw the weapon away */
 			if (f3 & TR3_HURL_DAM)
 			{
 				if (o_ptr->pval > 3 || o_ptr->pval < 0)
@@ -6459,10 +6473,20 @@ s32b object_power(const object_type *o_ptr)
 				}
 				else if (o_ptr->pval > 0)
 				{
-					p = sign(p) * ((ABS(p) * (5 + o_ptr->pval)) / 5);
-					/* Add an extra +5 per blow to account for damage rings */
-					/* (The +5 figure is a compromise here - could be adjusted) */
-					p += 5 * o_ptr->pval;
+					p = sign(p) * ((ABS(p) * (10 + o_ptr->pval)) / 10);
+				}
+			}
+
+			/* Might helps with traps but not terribly well */
+			if (f1 & TR1_MIGHT)
+			{
+				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+				}
+				else if (o_ptr->pval > 0)
+				{
+					p = sign(p) * ((ABS(p) * (15 + o_ptr->pval)) / 15);
 				}
 			}
 
