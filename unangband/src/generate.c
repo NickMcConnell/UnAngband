@@ -3011,7 +3011,7 @@ static bool find_space(int *y, int *x, int height, int width)
 		if (dun->cent_n <= cave_ecology.num_ecologies)
 		{
 			/* Pick which ecology */
-			room_info[dun->cent_n].ecology = (1L << dun->cent_n);
+			room_info[dun->cent_n].ecology = (1L << dun->cent_n) | (1L << (dun->cent_n + MAX_ECOLOGIES));
 
 			/* Pick which deepest monster */
 			room_info[dun->cent_n].deepest_race = cave_ecology.deepest_race[dun->cent_n];
@@ -3037,7 +3037,7 @@ static bool find_space(int *y, int *x, int height, int width)
 			}
 
 			/* Pick which ecology */
-			room_info[dun->cent_n].ecology = room_info[pick].ecology;
+			room_info[dun->cent_n].ecology = room_info[pick].ecology & ((1L << (MAX_ECOLOGIES)) - 1);
 
 			/* Pick which deepest monster */
 			room_info[dun->cent_n].deepest_race = room_info[pick].deepest_race;
@@ -5990,15 +5990,14 @@ static bool build_chambers(int y1, int x1, int y2, int x2, int monsters_left, bo
 		if (!cave_naked_bold(y, x)) continue;
 
 		/* Enforce monster selection */
-		cave_ecology.use_ecology = room_idx(y, x);
-		cave_ecology.single_ecology = TRUE;
+		cave_ecology.use_ecology = room_info[room_idx(y, x)].ecology;
 
 		/* Place a single monster.  Sleeping 2/3rds of the time. */
 		place_monster_aux(y, x, get_mon_num(monster_level),
 			(bool)(rand_int(3)), FALSE, 0L);
 
 		/* End enforcement of monster selection */
-		cave_ecology.single_ecology = FALSE;
+		cave_ecology.use_ecology = (0L);
 
 		/* One less monster to place. */
 		monsters_left--;
@@ -6037,6 +6036,7 @@ static bool vault_monster_okay(int r_idx)
 	return (TRUE);
 }
 
+int vault_deepest_monster;
 
 /*
  * Place a monster in a vault and get the details. Add these to the ecology.
@@ -6101,6 +6101,9 @@ static void vault_monster(int y, int x, char symbol, int level)
 	{
 		get_monster_ecology(r_idx);
 	}
+
+	/* Track deepest monster level */
+	if (vault_deepest_monster < r_info[r_idx].level) vault_deepest_monster = r_info[r_idx].level;
 }
 
 
@@ -6134,6 +6137,12 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 
 	/* Add the vault ecology */
 	room_info[room].ecology |= (1L << (cave_ecology.num_ecologies - 1));
+
+	/* Use this ecology for monster placement during vault generation */
+	cave_ecology.use_ecology = room_info[room].ecology;
+
+	/* Track the deepest monster to ramp up difficulty near the vault */
+	vault_deepest_monster = 0;
 
 	/* Place dungeon features and objects */
 	for (t = data, i = 0; i < ymax; i++)
@@ -6592,6 +6601,23 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 			}
 		}
 	}
+
+	/* Shallower vault monsters are found outside the core room */
+	/* We use this to ramp up the difficulty near the vault to warn
+	 * the player and make it harder to exploit.
+	 */
+	for (j = 0; j < cave_ecology.num_races; j++)
+	{
+		/* Deepest monster */
+		if (r_info[cave_ecology.race[j]].level < (p_ptr->depth + vault_deepest_monster) / 2)
+		{
+			/* Appears in rooms near the vault */
+			cave_ecology.race_ecologies[j] |= room_info[room].ecology;
+		}
+	}
+
+	/* Don't use this ecology */
+	cave_ecology.use_ecology = 0L;
 
 	/* Success. */
 	return (TRUE);
@@ -10452,6 +10478,9 @@ static void init_ecology(int r_idx)
 	/* Start with two ecologies - one for the dungeon, and one for rooms in the dungeon */
 	cave_ecology.num_ecologies = 2;
 
+	/* Dungeon uses first ecology */
+	room_info[0].ecology = (1L);
+
 	/* Initialise ecology based on seed race */
 	if (r_idx)
 	{
@@ -10538,6 +10567,26 @@ static void init_ecology(int r_idx)
 		else
 		{
 			break;
+		}
+	}
+
+	/* Deepest monster in each ecology does not wander outside of core room */
+	for (i = 0; i < cave_ecology.num_ecologies; i++)
+	{
+		for (j = 0; j < cave_ecology.num_races; j++)
+		{
+			/* Deepest monster */
+			if (cave_ecology.deepest_race[i] == cave_ecology.race[j])
+			{
+				/* Does not wander through dungeon */
+				cave_ecology.race_ecologies[j] &= ~(1L);
+
+				/* Does not appear outside core */
+				cave_ecology.race_ecologies[j] &= ~(1L << i);
+
+				/* Does appear in core */
+				cave_ecology.race_ecologies[j] |= (1L << (i + MAX_ECOLOGIES));
+			}
 		}
 	}
 

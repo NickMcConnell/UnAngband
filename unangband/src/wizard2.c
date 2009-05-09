@@ -1520,6 +1520,14 @@ void do_cmd_wiz_ecology(void)
 				prt(format("%d", i), row, col += 1);
 			}
 		}
+
+		for (i = 0; i <= cave_ecology.num_ecologies; i++)
+		{
+			if (cave_ecology.race_ecologies[num] & (1L << (i + MAX_ECOLOGIES)))
+			{
+				prt(format("c%d", i), row, col += 2);
+			}
+		}
 	}
 
 	/* Total monsters */
