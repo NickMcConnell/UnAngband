@@ -1183,7 +1183,7 @@ static bool draw_maze(int y1, int x1, int y2, int x2, s16b feat_wall,
 	}
 
 	/* Now build the maze */
-	while ((grids) && (++count < 10000))
+	while ((++count < 10000) && (grids))
 	{
 		/* Only use maze grids */
 		if ((cave_feat[YPOS(y, y1)][XPOS(x, x1)] == feat_path) || ((width_path > 1) &&
@@ -6046,13 +6046,6 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 
 	cptr t;
 
-	bool old_ecology = cave_ecology.ready;
-	const int old_num_ecologies = cave_ecology.num_ecologies;
-	int new_num_ecologies = old_num_ecologies;
-
-	/* Allow any monster */
-	cave_ecology.ready = FALSE;
-
 	/* Place dungeon features and objects */
 	for (t = data, dy = 0; dy < ymax; dy++)
 	{
@@ -6202,26 +6195,8 @@ static void build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 					break;
 				}
 			}
-
-			/* Ensure vault has a single ecology */
-			if (cave_ecology.num_ecologies > old_num_ecologies)
-			{
-				cave_ecology.num_ecologies = old_num_ecologies;
-				assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
-				new_num_ecologies = old_num_ecologies + 1;
-			}
 		}
 	}
-
-	/* Vault supports this room */
-	room_info[room].ecology = (1L << ++cave_ecology.num_ecologies);
-	assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
-	room_info[room].deepest_race = cave_ecology.deepest_race[cave_ecology.num_ecologies];
-
-	/* Ecology */
-	cave_ecology.ready = old_ecology;
-	cave_ecology.num_ecologies = new_num_ecologies;
-	assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
 }
 
 
@@ -10073,11 +10048,14 @@ static void init_ecology(int r_idx)
 	(void)WIPE(&cave_ecology, ecology_type);
 	assert (cave_ecology.ready == FALSE);
 	assert (cave_ecology.valid_hook == FALSE);
-	assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
+	assert (cave_ecology.num_ecologies < MAX_ECOLOGIES);
 
 	/* Count of different non-unique monsters in ecology */
-	k = (MIN_ECOLOGY_RACES / 2) + rand_int((MIN_ECOLOGY_RACES + 1) / 2);
+	k = MIN_ECOLOGY_RACES + rand_int(MIN_ECOLOGY_RACES);
 
+	/* Start with two ecologies - one for the dungeon, and one for rooms in the dungeon */
+	cave_ecology.num_ecologies = 2;
+	
 	/* Initialise ecology based on seed race */
 	if (r_idx)
 	{
@@ -10129,7 +10107,7 @@ static void init_ecology(int r_idx)
 		l = cave_ecology.num_races;
 
 		/* Not enough different monsters */
-		if ((k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES) && (count++ < 100))
+		if ((count++ < 100) && (k >= 0) && (cave_ecology.num_races < MAX_ECOLOGY_RACES))
 		{
 			/* XXX Sometimes we have to cancel out due to not being able to
 			 * find a dun_level_mon match for the level we are on.
@@ -10143,6 +10121,12 @@ static void init_ecology(int r_idx)
 				get_mon_num_prep();
 			}
 
+			/* Increase ecologies by one. */
+			if ((cave_ecology.num_ecologies < MAX_ECOLOGIES)
+					/* Sometimes merge them instead */
+					&& (rand_int(100) < 80))
+				cave_ecology.num_ecologies++;
+			
 			/* Get seed monster for ecology */
 			get_monster_ecology(0);
 
@@ -11160,7 +11144,7 @@ static bool place_contents()
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_FEATURE, 1);
 
 		/* If deepest monster is powerful, place lots of bodies around */
-		if (r_info[cave_ecology.deepest_race[0]].level > p_ptr->depth * 5 / 4)
+		if ((p_ptr->depth > 10) && (r_info[cave_ecology.deepest_race[0]].level > p_ptr->depth * 5 / 4))
 		{
 			/* Place some bodies in the dungeon */
 			alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_BODY, randint(k * (((level_flag & (LF1_STRONGHOLD | LF1_WILD)) != 0) ? 3 : 1)));

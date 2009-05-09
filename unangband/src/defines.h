@@ -959,6 +959,8 @@ enum
 #define SUMMON_ALL_BUT_PREFIX   37
 #define SUMMON_INFIX_WYRM_OF   38
 #define SUMMON_DRAGON_BREATH   39
+#define SUMMON_ALIGN	40
+#define SUMMON_LIVING	41
 
 
 /*

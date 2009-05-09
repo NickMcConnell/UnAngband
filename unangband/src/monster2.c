@@ -4302,6 +4302,29 @@ static bool summon_specific_okay(int r_idx)
 			break;
 		}
 
+		/* Match on flag3 */
+		case SUMMON_ALIGN:
+		case SUMMON_LIVING:
+		{
+			if (summon_flag_type)
+			{
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
+
+					/* Match any */
+					((r_ptr->flags3 & (summon_flag_type)) == summon_flag_type));
+			}
+			else if (summon_specific_type == SUMMON_ALIGN)
+			{
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			else
+			{
+				okay = (!(r_ptr->flags3 & (RF3_NONLIVING)) &&
+					!(r_ptr->flags1 & (RF1_UNIQUE)));
+			}
+			break;
+		}
+
 		case SUMMON_COLOUR:
 		{
 			if ((summon_attr_type) || (summon_flag_type))
@@ -5021,6 +5044,24 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 			}
 			break;
 		}
+		
+		case SUMMON_ALIGN:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_ptr->flags3 & (RF3_EVIL);
+			}
+			break;
+		}
+
+		case SUMMON_LIVING:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type |= r_ptr->flags3 & (RF3_NONLIVING);
+			}
+			break;
+		}
 
 		case SUMMON_GROUP:
 		case ANIMATE_ELEMENT:
@@ -5604,7 +5645,7 @@ static void deepest_in_ecology(int r_idx)
 	int r;
 
 	/* Check the overall depth, and the room depth */
-	for (r = 0; r <= cave_ecology.num_ecologies; r += cave_ecology.num_ecologies)
+	for (r = 0; r < cave_ecology.num_ecologies; r += cave_ecology.num_ecologies - 1)
 	{
 		/* Is the current monster deeper */
 		if (r_info[cave_ecology.deepest_race[r]].level < r_info[r_idx].level)
@@ -5625,27 +5666,75 @@ static void deepest_in_ecology(int r_idx)
 
 /*
  * Auxiliary helper function for get_monster_ecology.
+ * 
+ * This adds a number of races to the ecology, which match the hook,
+ * without adding their related races. The first half of this function
+ * is concerned with ensuring that the ecology doesn't overflow when it
+ * starts to fill up - by checking whether existing monsters in the
+ * ecology match the hook we're looking for. If so, we can use an
+ * existing monster as an ally instead.
  */
 static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int number)
 {
-	int i, count;
+	int i, k = 0;
+	int count = 0;
 	int races = cave_ecology.num_races + number;
 
 	/* No more races */
-	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return (FALSE);
+	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES - 1) return (FALSE);
 
-	/* Reduce races required by existing races in ecology */
-	if (cave_ecology.num_races > MIN_ECOLOGY_RACES)
+	/* Reduce races required by allowing existing races in ecology */
+	if (cave_ecology.num_races > 2 * MIN_ECOLOGY_RACES)
+	{
+		bool out_of_space = cave_ecology.num_races < 3 * MIN_ECOLOGY_RACES;
+		bool pick_one = FALSE;
+		
+		/* Check to see if an existing race matches the criteria */
 		for (i = 0; i < cave_ecology.num_races; i++)
 		{
+			/* The summoner shouldn't just summon themselves */
 			if (cave_ecology.race[i] == summoner) continue;
-			if (tmp_mon_num_hook(cave_ecology.race[i])) races--;
-			if (cave_ecology.num_races < 2 * MIN_ECOLOGY_RACES) break;
+			
+			/* We shouldn't summon the 'seed' from another ecology unless we're
+			 * really running out of space */
+			if ((cave_ecology.num_races < MAX_ECOLOGY_RACES / 2) &&
+					((cave_ecology.race_ecologies[i] & (1L)) == 0)) continue;
+			
+			/* We've found a match. Pick_one is used to pick a random monster
+			 * to overlap between ecologies if we have plenty of space left in
+			 * the ecology. */
+			if (tmp_mon_num_hook(cave_ecology.race[i]))
+			{
+				/* We need to add less races */
+				if (!pick_one) races--;
+				
+				/* Add monster to this room - always if we're running out of space */
+				if (out_of_space)
+				{
+					cave_ecology.race_ecologies[i] |= (1L << (cave_ecology.num_ecologies - 1));
+				}
+				/* Pick a random monster to overlap */
+				else
+				{
+					k = rand_int(++count);
+					pick_one = TRUE;
+				}
+			}
 		}
+		
+		/* We've picked one monster */
+		if (pick_one)
+		{
+			cave_ecology.race_ecologies[k] |= (1L << (cave_ecology.num_ecologies - 1));
+		}
+	}
 
 	/* Limit races */
-	if (races >= MAX_ECOLOGY_RACES) races = MAX_ECOLOGY_RACES;
+	if (races >= MAX_ECOLOGY_RACES) races = MAX_ECOLOGY_RACES - 1;
 
+	/* Ensure races */
+	if (races <= cave_ecology.num_races) return (FALSE);
+	
 	/* Use supplied hook */
 	get_mon_num_hook = tmp_mon_num_hook;
 
@@ -5656,7 +5745,7 @@ static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int num
 	count = 0;
 
 	/* Pick */
-	while ((count < 1000) && (cave_ecology.num_races < races))
+	while ((count < 1000) && (cave_ecology.num_races <= races))
 	{
 		/* Make a resident */
 		int r_idx = get_mon_num(monster_level);
@@ -5669,7 +5758,7 @@ static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int num
 			cave_ecology.race[cave_ecology.num_races] = r_idx;
 
 			/* Add monster to room and dungeon */
-			cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L) | (1L << cave_ecology.num_ecologies);
+			cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L) | (1L << (cave_ecology.num_ecologies - 1));
 
 			/* Is the current monster deeper */
 			deepest_in_ecology(r_idx);
@@ -5692,13 +5781,38 @@ static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int num
 
 /*
  * Get a monster, and add it and its allies to the ecology for the level.
+ * 
+ * Allies are defined as any monster that can be summoned or escort the
+ * monster passed to this routine. However, for small ecologies, we add
+ * allies using by picking a hack_ecology number from 1 to 10:
+ * 
+ * 10 -- Match on dragon breath type (dragons only)
+ * 9 -- Match the prefix, unless a wyrm 'of' where match the suffix
+ * 8 -- Match living/non-living
+ * 7 -- Match the same colour for metallic monsters
+ * 6 -- Match on evil-ness and intelligence
+ * 5 -- Match on group (faerie, fire elemental etc) if group defined
+ * 4 -- Match on race (orc, giant, dragon, insect etc) if has a race flag
+ * 3 -- Match on class (warrior, mage etc) if has a class flag
+ * 2 -- Match on animal (animal, either feathered, furry or foul)
+ * 1 -- Match on kin
+ * 
+ * Note that this routine is now not responsible for creating new
+ * ecologies. To do so, increase cave_ecology.num_ecologies by one before
+ * calling this routine.
+ * 
+ * All monsters are added to the ecology cave_ecology.num_ecologies.
  */
 void get_monster_ecology(int r_idx)
 {
 	int i = cave_ecology.num_races;
+	int j;
 
 	/* Hack -- hack the ecology */
 	int hack_ecology = 0;
+	
+	/* Hack -- used to reduce duplicate seed monster entries */
+	bool already_exists = TRUE;
 
 	/* Store old hook */
 	bool (*get_mon_num_hook_temp)(int r_idx) = get_mon_num_hook;
@@ -5708,66 +5822,85 @@ void get_monster_ecology(int r_idx)
 
 	int old_monster_level = monster_level;
 
-	/* Paranoia */
-	if (cave_ecology.num_races >= MAX_ECOLOGY_RACES) return;
-
-	/* For first few monsters on a level, we force some related monsters to appear */
-	if (cave_ecology.num_races <= 7) hack_ecology = randint(7);
+	/* Ensure we're pointing at a valid ecology number */
+	assert(cave_ecology.num_ecologies < MAX_ECOLOGIES);
 
 	/* Pick a monster if one not specified */
 	if (!r_idx)
 	{
 		r_idx = get_mon_num(monster_level);
+		
+		/* Still not got one */
+		if (!r_idx) return;
 	}
 
-	/* Add the monster */
-	if (r_idx)
+	/* Is the current monster deeper */
+	deepest_in_ecology(r_idx);
+	
+	/* Find monster in ecology if it exists already */
+	for (j = 0; j < cave_ecology.num_races; j++)
 	{
-		if (cheat_hear) msg_format("Adding base race to ecology (%s)", r_name + r_info[r_idx].name);
-
+		if  (cave_ecology.race[j] == r_idx) break;
+	}
+	
+	/* Make space for monster if it does not exist already*/
+	if (j == cave_ecology.num_races)
+	{
+		/* Paranoia */
+		if (cave_ecology.num_races >= MAX_ECOLOGY_RACES - 1) return;
+		
 		/* Add monster to ecology */
 		cave_ecology.get_mon[cave_ecology.num_races] = TRUE;
 		cave_ecology.race[cave_ecology.num_races] = r_idx;
-
-		/* Add monster to room (base races don't wander around dungeon) */
-		cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L << (++cave_ecology.num_ecologies));
-		assert (cave_ecology.num_ecologies <= MAX_ECOLOGIES);
-		/* Is the current monster deeper */
-		deepest_in_ecology(r_idx);
-
+		
 		/* Increase total race count */
 		cave_ecology.num_races++;
+		
+		/* Monster had to be added */
+		already_exists = FALSE;
+		
+		if (cheat_hear) msg_format("Adding base race to ecology (%s)", r_name + r_info[r_idx].name);
+	}
+	
+	/* Add monster to room (base races don't wander around dungeon) */
+	cave_ecology.race_ecologies[j] |= (1L << (cave_ecology.num_ecologies - 1));
 
-		/* Try to ensure we have a hack */
-		switch(hack_ecology)
-		{
-			case 7:
-				/* Hack -- dragons, except wyrms 'of' match on breath */
-				if (strchr("adD", r_info[r_idx].d_char) &&
-						(!strstr(r_name +  + r_info[r_idx].name, " of ")))
-							{ hack_ecology++; break; }
-				if (!strchr(r_name + r_info[r_idx].name, ' ')) hack_ecology--;
-				else break;
-			case 6:
-				if ((r_info[r_idx].flags9 & (RF9_ATTR_METAL)) == 0) hack_ecology--;
-				else break;
-			case 5:
-				if (!r_info[r_idx].grp_idx) hack_ecology--;
-				else break;
-			case 4:
-				if (((r_info[r_idx].flags3 & (RF3_RACE_MASK)) == 0) &&
-						((r_info[r_idx].flags9 & (RF9_RACE_MASK)) == 0)) hack_ecology--;
-				else break;
-			case 3:
-				if ((r_info[r_idx].flags2 & (RF2_CLASS_MASK)) != 0) break;
+	/* For the seed monster, we force some related monsters to appear */
+	hack_ecology = randint(10);
 
-			case 2:
-			case 1:
-				/* Battle-fields and two thirds of failures match on d_char - the rest use animals */
-				if ((level_flag & (LF1_BATTLE)) || (rand_int(100) < 66)) hack_ecology = 1;
-				else hack_ecology = 2;
-				break;
-		}
+	/* Try to ensure we have a hack. */
+	switch(hack_ecology)
+	{
+		case 10:
+			/* Hack -- dragons, except wyrms 'of' match on breath */
+			if (!strchr("adD", r_info[r_idx].d_char) ||
+					(strstr(r_name +  + r_info[r_idx].name, " of "))) hack_ecology--;
+			else break;
+		case 9:
+			if (!strchr(r_name + r_info[r_idx].name, ' ')) hack_ecology--;
+			else break;
+		case 8:
+			break;
+		case 7:
+			if ((r_info[r_idx].flags9 & (RF9_ATTR_METAL)) == 0) hack_ecology--;
+			else break;
+		case 6:
+			break;
+		case 5:
+			if (!r_info[r_idx].grp_idx) hack_ecology--;
+			else break;
+		case 4:
+			if (((r_info[r_idx].flags3 & (RF3_RACE_MASK)) == 0) &&
+					((r_info[r_idx].flags9 & (RF9_RACE_MASK)) == 0)) hack_ecology--;
+			else break;
+		case 3:
+			if ((r_info[r_idx].flags2 & (RF2_CLASS_MASK)) != 0) break;
+		case 2:
+		case 1:
+			/* Battle-fields and two thirds of failures match on d_char - the rest use animals */
+			if ((level_flag & (LF1_BATTLE)) || (rand_int(100) < 66)) hack_ecology = 1;
+			else hack_ecology = 2;
+			break;
 	}
 
 	/* Display hack index */
@@ -5775,18 +5908,26 @@ void get_monster_ecology(int r_idx)
 		msg_format("Hacking ecology (%d)", hack_ecology);
 
 	/* Have a good race */
-	for ( ; i < cave_ecology.num_races; i++)
+	for ( ; (i < cave_ecology.num_races) || (already_exists); i++)
 	{
 		/* Monster race pointer */
 		monster_race *r_ptr;
 
-		/* How many monsters to generate per summons */
-		int k = cave_ecology.num_races > 2 * MIN_ECOLOGY_RACES ? 1 :
-			cave_ecology.num_races > MIN_ECOLOGY_RACES ? 2 : 3;
-
+		int k;
+		
 		/* Get the monster */
-		r_idx = cave_ecology.race[i];
+		r_idx = cave_ecology.race[already_exists ? j : i];
 		r_ptr = &r_info[r_idx];
+				
+		/* How many monsters to generate per summons */
+		k = cave_ecology.num_races > 2 * MIN_ECOLOGY_RACES ? 1 :
+					cave_ecology.num_races > MIN_ECOLOGY_RACES ? 2 : 3;
+			
+		/* Hack -- summoners get less of each race */
+		if ((k > 1) && (r_ptr->flags7 & (RF7_SUMMON_MASK))) k--;
+
+		/* We've used the already existing monster */
+		already_exists = FALSE;
 
 		/* Try slightly lower monster level */
 		monster_level = MAX(1, MIN(monster_level - 3,
@@ -5917,9 +6058,24 @@ void get_monster_ecology(int r_idx)
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
+		
+		/* Add summon races -- summon alignment. Note this is only done via ecology hacks. */
+		if (hack_ecology == 6)
+		{
+			summon_specific_type = SUMMON_ALIGN;
+
+			/* Clear existing restrictions */
+			summon_flag_type = 0L;
+
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_ALIGN);
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
 
 		/* Add summon races -- summon colour. Note this is only done via ecology hacks. */
-		if (hack_ecology == 6)
+		if (hack_ecology == 7)
 		{
 			summon_specific_type = SUMMON_COLOUR;
 
@@ -5934,8 +6090,23 @@ void get_monster_ecology(int r_idx)
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
 
+		/* Add summon races -- summon living/nonliving. Note this is only done via ecology hacks. */
+		if (hack_ecology == 8)
+		{
+			summon_specific_type = SUMMON_LIVING;
+
+			/* Clear existing restrictions */
+			summon_flag_type = 0L;
+
+			/* Set the restrictions */
+			summon_specific_params(r_idx, SUMMON_LIVING);
+
+			/* Get additional monsters */
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+		}
+
 		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 7)
+		if (hack_ecology == 9)
 		{
 			summon_specific_type = SUMMON_INFIX_WYRM_OF;
 
@@ -5949,8 +6120,8 @@ void get_monster_ecology(int r_idx)
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
 
-		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
-		if (hack_ecology == 8)
+		/* Add summon races -- summon dragon breath. Note this is only done via ecology hacks. */
+		if (hack_ecology == 10)
 		{
 			summon_specific_type = SUMMON_DRAGON_BREATH;
 
@@ -5963,6 +6134,7 @@ void get_monster_ecology(int r_idx)
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
 		}
+		
 
 		/* Add summon races -- summon orc */
 		if (r_ptr->flags7 & (RF7_S_ORC))
