@@ -1792,6 +1792,26 @@ static bool get_player_roller(void)
 }
 
 
+/*
+ * Structure used for a beginner quickstart.
+ *
+ * Race is Maia, class is Istari, no speciality.
+ *
+ * All stats start at 15.
+ */
+quickstart_type beginner_quickstart =
+{
+	SEX_MALE,
+	RACE_MAIA,
+	CLASS_ISTARI,
+	0, 		/* No style */
+	0,		/* No substyle */
+	0,		/* No school */
+	{15, 15, 15, 15, 15, 15, 15, 15},
+	100L
+};
+
+
 
 /*
  * Player sex
@@ -1815,6 +1835,9 @@ static bool get_player_sex(void)
 
 	p_ptr->psex = get_player_choice(genders, 2, SEX_COL, 10,
 				 "birth.txt",   NULL);
+
+	/* Hack -- overwrite beginner quick start as well */
+	beginner_quickstart.psex = p_ptr->psex;
 
 	/* No selection? */
 	if (p_ptr->psex == INVALID_CHOICE)
@@ -1969,26 +1992,6 @@ static bool get_player_quickstart(void)
 
 
 /*
- * Structure used for a beginner quickstart.
- *
- * Race is Maia, class is Istari, no speciality.
- *
- * All stats start at 15.
- */
-quickstart_type beginner_quickstart =
-{
-	SEX_MALE,
-	RACE_MAIA,
-	CLASS_ISTARI,
-	0, 		/* No style */
-	0,		/* No substyle */
-	0,		/* No school */
-	{15, 15, 15, 15, 15, 15, 15, 15},
-	100L
-};
-
-
-/*
  * Quick start a character. Takes a quick start structure and fills in the
  * required values.
  */
@@ -1997,10 +2000,7 @@ static void player_birth_quickstart(quickstart_type *q_ptr)
 	int i;
 
 	/* Copy across the quickstart structure */
-	/* HACK: assuming sp_ptr has been set, user has selected a gender in get_player_sex.
-	 * otherwise: overwrite */
-	if(sp_ptr==0)
-		p_ptr->psex = q_ptr->psex;
+	p_ptr->psex = q_ptr->psex;
 
 	p_ptr->pshape = p_ptr->prace = q_ptr->prace;
 	p_ptr->pclass = q_ptr->pclass;
