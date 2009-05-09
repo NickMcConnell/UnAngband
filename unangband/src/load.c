@@ -2173,7 +2173,7 @@ static errr rd_dungeon(void)
 	rd_byte(&cave_ecology.num_ecologies);
 
 	/* Hack -- verify */
-	if (limit >= MAX_ECOLOGY_RACES)
+	if (limit > MAX_ECOLOGY_RACES)
 	{
 		note(format("Too many (%d) ecology entries!", limit));
 		return (-1);
