@@ -5713,8 +5713,23 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		}
 		default:
 		{
+			/* Throwing weapons come in stacks unless ego items */
 			if ((k_info[j_ptr->k_idx].flags5 & (TR5_THROWING))
-				&& (object_level > k_info[j_ptr->k_idx].level + 4)) j_ptr->number = damroll(3, 4);
+				&& (!ego_item_p(j_ptr))
+				&& (object_level > k_info[j_ptr->k_idx].level + 4))
+				{
+					/* Magic items are permitted stacks only for a few different types */
+					if (((j_ptr->xtra1 == 16) && (j_ptr->xtra2 < 14)) ||
+							((j_ptr->xtra1 == 17) && ((j_ptr->xtra2 < 6) || (j_ptr->xtra2 > 11))) ||
+							((j_ptr->xtra1 == 18) && (j_ptr->xtra2 < 27)) ||
+							((j_ptr->xtra1 == 19) && (((j_ptr->xtra2 > 1) && (j_ptr->xtra2 < 8)) || (j_ptr->xtra2 > 11))))
+					{
+						break;
+					}
+
+					/* Stack of throwing weapons */
+					j_ptr->number = damroll(3, 4);
+				}
 			break;
 		}
 	}
