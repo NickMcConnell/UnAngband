@@ -497,8 +497,8 @@ static HMENU main_menu;
 #endif /* USE_SAVER */
 
 static char arg_lastsavefile[1024];
-static int yOldPos = 0;
-static int xOldPos = 0;
+static bool highSensitivity = FALSE;
+static DWORD highTime;
 static bool term_initialised = FALSE;
 static bool term_readytoload = FALSE;
 
@@ -4807,22 +4807,39 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 #endif /* USE_SAVER */
 			if ((term_initialised) && (td->tile_wid) && (td->tile_hgt) && (use_trackmouse || !character_generated))
 			{
+				dx = LOWORD(lParam) - xMouse;
+				dy = HIWORD(lParam) - yMouse;
+
+				if (dx < 0) dx = -dx;
+				if (dy < 0) dy = -dy;
+
 				/* Get the text grid */
 				xPos = GET_X_LPARAM(lParam);
 				yPos = GET_Y_LPARAM(lParam);
 				xPos /= td->tile_wid;
 				yPos /= td->tile_hgt;
 
-				/* Have we changed grid? */
-				if ((xPos != xOldPos) ||
-					(xPos != yOldPos))
+				/* We've lost sensitivity */
+				if (highSensitivity)
+				{
+					if (highTime < GetTickCount() - 100)
+					{
+						highSensitivity = FALSE;
+					}
+				}
+
+				/* Have we gone sensitive */
+				if ((dx > MOUSE_SENS) || (dy > MOUSE_SENS))
+				{
+					highSensitivity = TRUE;
+					highTime = GetTickCount();
+				}
+
+				/* We're sensitive */
+				if (highSensitivity)
 				{
 					Term_mousepress(xPos,yPos,0);
 				}
-
-				/* Save last location */
-				xOldPos = xPos;
-				yOldPos = yPos;
 			}
 		}
 
