@@ -12563,8 +12563,12 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 	/* Hack -- paranoia for checking */
 	if (flg & (PROJECT_CHCK))
 	{
+		/* Hide projection and don't affect anything */
 		flg &= ~(PROJECT_LITE);
 		flg |= (PROJECT_HIDE);
+
+		/* XXX Can't use these projections as they modify temp grids */
+		flg &= ~(PROJECT_STAR | PROJECT_FLOW);
 	}
 
 	/* Hack -- Jump to target, but require a valid target */
@@ -12767,16 +12771,17 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 	/* Handle explosions */
 	else if (flg & (PROJECT_BOOM))
 	{
-
 		/* Pre-calculate some things for starbursts. */
 		if (flg & (PROJECT_STAR))
 		{
 			calc_starburst(1 + rad * 2, 1 + rad * 2, arc_first, arc_dist,
 				&arc_num);
 
+			/* Clear the "temp" array  XXX */
+			clear_temp_array();
+
 			/* Mark the area nearby -- limit range, ignore rooms */
 			spread_cave_temp(y0, x0, rad, FALSE);
-
 		}
 
 		/* Pre-calculate some things for arcs. */
@@ -12959,10 +12964,14 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 				}
 			}
 		}
-	}
 
-	/* Clear the "temp" array  XXX */
-	clear_temp_array();
+		/* Clean up starburst. */
+		if (flg & (PROJECT_STAR))
+		{
+			/* Clear the "temp" array  XXX */
+			clear_temp_array();
+		}
+	}
 
 	/* Flood out from existing grids up to radius.
 	 * Reduce flood from any existing square by radius.
@@ -12998,6 +13007,9 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 			grid[*grids] = GRID(y2, x2);
 			gd[(*grids)++] = 0;
 		}
+
+		/* Clear the "temp" array  XXX */
+		clear_temp_array();
 
 		for (i = 0; i < *grids; i++)
 		{
@@ -13099,6 +13111,8 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 			play_info[GRID_Y(grid[i])][GRID_X(grid[i])] &= ~(PLAY_TEMP);
 		}
 
+		/* Clear the "temp" array  XXX */
+		clear_temp_array();
 	}
 
 	/*
