@@ -8672,8 +8672,11 @@ void region_mark_temp(s16b region)
 void region_update(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
+	method_type *method_ptr = &method_info[r_ptr->method];
 
 	int type = r_ptr->type;
+
+	u32b flg = method_ptr->flags1;
 
 	/* Fake clearing the old grids */
 	r_ptr->type = 0;
@@ -8687,8 +8690,11 @@ void region_update(s16b region)
 	/* Hack - remove previous list of grids */
 	region_delete(region);
 
+	/* Hack -- we try to force regions to have a useful effect */
+	if ((flg & (PROJECT_4WAY | PROJECT_4WAX | PROJECT_BOOM)) == 0) flg |= (PROJECT_BEAM | PROJECT_THRU);
+
 	/* Hack - add regions */
-	project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, region, (PROJECT_HIDE));
+	project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, region, flg);
 
 	/* Redraw grids */
 	region_refresh(region);
@@ -8891,6 +8897,8 @@ void region_terminate(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 
+	msg_format("region %d terminated", region);
+
 	/* Effect is "dead" - mark for later */
 	r_ptr->type = 0;
 
@@ -8976,121 +8984,155 @@ s16b region_random_piece(s16b region)
  * a method, or spawning a region, not if we affect every
  * grid in the region.
  */
-bool region_effect(s16b region, int y, int x)
+bool region_effect(int region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
-	region_info_type *ri_ptr = &region_info[r_ptr->type];
+	method_type *method_ptr = &method_info[r_ptr->method];
 
 	bool notice = FALSE;
-
-	int y0 = r_ptr->y0;
-	int x0 = r_ptr->x0;
-	int y1 = y ? y : r_ptr->y1;
-	int x1 = x ? x : r_ptr->x1;
 
 	/* Paranoia */
 	if (!r_ptr->type) return (FALSE);
 
-	/* Attacks come from multiple source features in the region */
-	if (r_ptr->flags1 & (RE1_SOURCE_FEATURE))
+	/* Create a child region */
+	if (r_ptr->child_region)
 	{
-		s16b this_region_piece, next_region_piece = 0;
+		int child_region = 0;
 
-		for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
+		/* Get a newly initialized region */
+		child_region = init_region(r_ptr->who, r_ptr->what, r_ptr->child_region, r_ptr->damage, r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->y0, r_ptr->x0, y, x);
+
+		/* Paranoia */
+		if (child_region)
 		{
-			/* Get the region piece */
-			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+			/* Projection method */
+			notice |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
 
-			/* Get the next object */
-			next_region_piece = rp_ptr->next_in_region;
+			/* Hack -- lifespan */
+			region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
 
-			/* Skip if it doesn't match source feature */
-			if ((r_ptr->who != SOURCE_FEATURE) && (r_ptr->who != SOURCE_PLAYER_TRAP)) continue;
-			if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
-
-			/* Hack -- restore original terrain if going backwards */
-			if ((r_ptr->flags1 & (RE1_BACKWARDS)) && (r_ptr->flags1 & (RE1_SCALAR_FEATURE)))
-			{
-				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, FALSE, region_restore_hook);
-			}
-			else
-			{
-				/* Apply projection effects to the grids */
-				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_project_hook);
-
-				/* Apply temporary effects to grids */
-				notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_project_t_hook);
-
-				/* Clear temporary array */
-				clear_temp_array();
-			}
+			/* Display newly created regions. Allow features to be seen underneath. */
+			if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
+			if (notice) region_list[child_region].flags1 |= (RE1_NOTICE);
 		}
 	}
 
-	/* Method is defined */
-	else if (ri_ptr->method)
+	/* A real trap */
+	else if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
 	{
-		/* Pick a random grid if required */
-		if (r_ptr->flags1 & (RE1_RANDOM))
-		{
-			int r = region_random_piece(region);
-
-			y1 = region_piece_list[r].y;
-			x1 = region_piece_list[r].x;
-		}
-
-		/* Reverse destination and source */
-		if (r_ptr->flags1 & (RE1_INVERSE))
-		{
-			y = y0;
-			x = x0;
-			y0 = x1;
-			x0 = x1;
-			y1 = y;
-			x1 = x;
-		}
-
-		/* Attack the target */
-		project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0L);
+		/* Discharge the trap */
+		notice |= discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
 	}
-
-	/* Method is not defined. Apply effect to all grids */
 	else
 	{
-		/* Apply projection effects to the grids */
-		notice |= region_iterate(region, region_project_hook);
+		int y0 = r_ptr->y0;
+		int x0 = r_ptr->x0;
+		int y1 = y ? y : r_ptr->y1;
+		int x1 = x ? x : r_ptr->x1;
 
-		/* Apply temporary effects to grids */
-		notice |= region_iterate(region, region_project_t_hook);
+		region_info_type *ri_ptr = &region_info[r_ptr->type];
 
-		/* Clear temporary array */
-		clear_temp_array();
+		/* Attacks come from multiple source features in the region */
+		if (r_ptr->flags1 & (RE1_SOURCE_FEATURE))
+		{
+			s16b this_region_piece, next_region_piece = 0;
+
+			for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
+			{
+				/* Get the region piece */
+				region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+				/* Get the next object */
+				next_region_piece = rp_ptr->next_in_region;
+
+				/* Skip if it doesn't match source feature */
+				if ((r_ptr->who != SOURCE_FEATURE) && (r_ptr->who != SOURCE_PLAYER_TRAP)) continue;
+				if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
+
+				/* Hack -- restore original terrain if going backwards */
+				if ((r_ptr->flags1 & (RE1_BACKWARDS)) && (r_ptr->flags1 & (RE1_SCALAR_FEATURE)))
+				{
+					notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, FALSE, region_restore_hook);
+				}
+				else
+				{
+					/* Apply projection effects to the grids */
+					notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_project_hook);
+
+					/* Apply temporary effects to grids */
+					notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_project_t_hook);
+
+					/* Clear temporary array */
+					clear_temp_array();
+				}
+			}
+		}
+
+		/* Method is defined */
+		else if (ri_ptr->method)
+		{
+			/* Pick a random grid if required */
+			if (r_ptr->flags1 & (RE1_RANDOM))
+			{
+				int r = region_random_piece(region);
+
+				y1 = region_piece_list[r].y;
+				x1 = region_piece_list[r].x;
+			}
+
+			/* Reverse destination and source */
+			if (r_ptr->flags1 & (RE1_INVERSE))
+			{
+				y = y0;
+				x = x0;
+				y0 = x1;
+				x0 = x1;
+				y1 = y;
+				x1 = x;
+			}
+
+			/* Attack the target */
+			project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0L);
+		}
+
+		/* Method is not defined. Apply effect to all grids */
+		else
+		{
+			/* Apply projection effects to the grids */
+			notice |= region_iterate(region, region_project_hook);
+
+			/* Apply temporary effects to grids */
+			notice |= region_iterate(region, region_project_t_hook);
+
+			/* Clear temporary array */
+			clear_temp_array();
+		}
+
+		/* Region chains */
+		if (r_ptr->flags1 & (RE1_CHAIN))
+		{
+			r_ptr->y0 = y0;
+			r_ptr->x0 = x0;
+			r_ptr->y1 = y1;
+			r_ptr->x1 = x1;
+
+			region_update(region);
+		}
+
+		/* Noticed region? */
+		if (notice)
+		{
+			bool refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
+
+			/* Mark region noticed */
+			r_ptr->flags1 |= (RE1_NOTICE | RE1_DISPLAY);
+
+			/* Refresh required */
+			if (refresh) region_refresh(region);
+		}
 	}
 
-	/* Region chains */
-	if (r_ptr->flags1 & (RE1_CHAIN))
-	{
-		r_ptr->y0 = y0;
-		r_ptr->x0 = x0;
-		r_ptr->y1 = y1;
-		r_ptr->x1 = x1;
-
-		region_update(region);
-	}
-
-	/* Noticed region? */
-	if (notice)
-	{
-		bool refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
-
-		/* Mark region noticed */
-		r_ptr->flags1 |= (RE1_NOTICE | RE1_DISPLAY);
-
-		/* Refresh required */
-		if (refresh) region_refresh(region);
-	}
-
-	return (notice);
+	return(notice);
 }
 
 
@@ -9148,40 +9190,8 @@ void trigger_region(int y, int x, bool move)
 				x = region_piece_list[r].x;
 			}
 
-			/* Create a child region */
-			if (r_ptr->child_region)
-			{
-				int child_region = 0;
-
-				/* Get a newly initialized region */
-				child_region = init_region(r_ptr->who, r_ptr->what, r_ptr->child_region, r_ptr->damage, r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->y0, r_ptr->x0, y, x);
-
-				/* Paranoia */
-				if (child_region)
-				{
-					/* Projection method */
-					notice |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
-
-					/* Hack -- lifespan */
-					region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
-
-					/* Display newly created regions. Allow features to be seen underneath. */
-					if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
-					if (notice) region_list[child_region].flags1 |= (RE1_NOTICE);
-				}
-			}
-
-			/* A real trap */
-			else if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
-			{
-				/* Discharge the trap */
-				notice |= discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
-			}
-			else
-			{
-				/* Fire the attack */
-				notice |= region_effect(rp_ptr->region, y, x);
-			}
+			/* Actually discharge the region */
+			notice |= region_effect(rp_ptr->region, y, x);
 
 			/* Mark region as triggered */
 			r_ptr->flags1 |= (RE1_TRIGGERED);
@@ -9931,8 +9941,17 @@ void process_region(s16b region)
 	/* Apply effect every turn, unless already applied earlier in the turn */
 	if ((r_ptr->flags1 & (RE1_AUTOMATIC)) && !(r_ptr->flags1 & (RE1_TRIGGERED)))
 	{
-		/* Apply the effect */
-		region_effect(region, 0, 0);
+		/* Discharge the region */
+		if (region_effect(region, r_ptr->y1, r_ptr->y0))
+		{
+			bool refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
+
+			/* Mark region noticed */
+			r_ptr->flags1 |= (RE1_NOTICE | RE1_DISPLAY);
+
+			/* Refresh required */
+			if (refresh) region_refresh(region);
+		}
 	}
 
 	/* Age the region */

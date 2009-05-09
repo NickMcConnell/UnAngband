@@ -7573,7 +7573,7 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 
 	region_info_type *ri_ptr = &region_info[f_ptr->d_attr];
 
-	int method = ri_ptr->method ? ri_ptr->method : (f_ptr->blow.method ? f_ptr->blow.method : f_ptr->spell);
+	int method = ri_ptr->method;
 	int effect = power ? s_info[power].blow[0].effect : (f_ptr->blow.effect ? f_ptr->blow.effect : method_info[f_ptr->spell].d_res);
 
 	int damage = power ? 0 : (f_ptr->blow.d_dice ? damroll(f_ptr->blow.d_dice, f_ptr->blow.d_side) : 0);
@@ -7582,6 +7582,9 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 	u32b flg = method_ptr->flags1;
 
 	int radius = scale_method(method_ptr->radius, player ? p_ptr->lev : p_ptr->depth);
+
+	/* Paranoia */
+	if (!method) return;
 
 	/* Paranoia */
 	if (effect == GF_FEATURE) effect = 0;
@@ -7611,9 +7614,6 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 			flg |= (PROJECT_STOP);
 		}
 	}
-
-	/* Hack -- we try to force traps to have a useful region */
-	if ((flg & (PROJECT_4WAY | PROJECT_4WAX | PROJECT_BOOM)) == 0) flg |= (PROJECT_BEAM | PROJECT_THRU);
 
 	/* Get the region */
 	region = init_region(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, f_ptr->d_attr, damage, method, effect,
@@ -7849,10 +7849,8 @@ void pick_trap(int y, int x, bool player)
 	/* Get feature */
 	f_ptr = &f_info[feat];
 
-#if 0
 	/* Create trap region */
 	if (power || (f_ptr->blow.method) || (f_ptr->spell)) create_trap_region(y, x, feat, power, player);
-#endif
 }
 
 

@@ -759,7 +759,6 @@ U:56
 #$ granite wall
 O:0
 W:6:1:20:0
-T:MIST
 S:S_MONSTERS
 K:DEFAULT:1:6
 #$ open floor
@@ -783,7 +782,6 @@ U:56
 #$ granite wall
 O:0
 W:2:1:20:0
-T:SCATTER_PASS
 S:TELE_AWAY
 K:DEFAULT:1:5
 #$ open floor
@@ -853,7 +851,7 @@ U:56
 #$ granite wall
 O:434
 W:1:1:20:0
-T:BOLT_MINOR:SLOW:1d4
+T:DART:SLOW:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -878,7 +876,7 @@ U:56
 #$ granite wall
 O:434
 W:2:1:20:0
-T:BOLT_MINOR:LOSE_STR:1d4
+T:DART:LOSE_STR:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -903,7 +901,7 @@ U:56
 #$ granite wall
 O:434
 W:3:1:20:0
-T:BOLT_MINOR:LOSE_DEX:1d4
+T:DART:LOSE_DEX:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -928,7 +926,7 @@ U:56
 #$ granite wall
 O:434
 W:4:1:20:0
-T:BOLT_MINOR:LOSE_CON:1d4
+T:DART:LOSE_CON:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -1922,7 +1920,6 @@ U:56
 #$ granite wall
 O:0
 W:12:2:20:0
-T:MIST
 S:S_UNDEAD
 K:DEFAULT:1:12
 #$ open floor
@@ -1946,7 +1943,6 @@ U:56
 #$ granite wall
 O:0
 W:18:2:20:0
-T:MIST
 S:S_DRAGON
 K:DEFAULT:1:18
 #$ open floor
@@ -1970,7 +1966,6 @@ U:56
 #$ granite wall
 O:0
 W:24:2:20:0
-T:MIST
 S:S_DEMON
 K:DEFAULT:1:24
 #$ open floor
@@ -2155,7 +2150,7 @@ U:56
 #$ granite wall
 O:0
 W:2:2:20:0
-T:HANDS
+T:SHRIEK
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -2169,8 +2164,6 @@ F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:An alarm goes off in the distance!
-
-#S:SHRIEK
 
 N:78:tripwire
 G:^:y
@@ -2378,7 +2371,6 @@ U:56
 #$ granite wall
 O:0
 W:2:3:20:0
-T:LINE_LOS
 S:DARKNESS
 K:DEFAULT:1:5
 #$ open floor
@@ -2402,7 +2394,6 @@ U:56
 #$ granite wall
 O:0
 W:4:3:20:0
-T:ADJACENT
 S:FORGET
 K:DEFAULT:1:5
 #$ open floor
@@ -2426,7 +2417,6 @@ U:56
 #$ granite wall
 O:0
 W:8:3:20:0
-T:ARC_40_SHORT
 S:DRAIN_MANA
 K:DEFAULT:1:8
 #$ open floor
@@ -2450,7 +2440,6 @@ U:56
 #$ granite wall
 O:0
 W:16:3:20:0
-T:ADJACENT
 S:MIND_BLAST
 K:DEFAULT:1:16
 #$ open floor
@@ -2474,7 +2463,7 @@ U:56
 #$ granite wall
 O:78
 W:2:1:20:0
-T:BEAM:HURT:1d6
+T:ARROW:HURT:1d6
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -2497,7 +2486,7 @@ U:56
 #$ granite wall
 O:80
 W:5:1:20:0
-T:BEAM:HURT:3d6
+T:ARROW:HURT:3d6
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -2520,7 +2509,7 @@ U:56
 #$ granite wall
 O:79
 W:8:1:20:0
-T:BEAM:HURT:5d6
+T:ARROW:HURT:5d6
 K:DEFAULT:1:8
 #$ open floor
 K:CHASM:141:8
@@ -2543,7 +2532,7 @@ U:56
 #$ granite wall
 O:81
 W:11:1:20:0
-T:BEAM:HURT:7d6
+T:ARROW:HURT:7d6
 K:DEFAULT:1:11
 #$ open floor
 K:CHASM:141:11
@@ -6273,7 +6262,6 @@ U:56
 #$ granite wall
 O:0
 W:45:2:20:0
-T:ADJACENT
 S:BALL_NETHR
 K:DEFAULT:1:60
 #$ open floor
@@ -6292,7 +6280,6 @@ U:56
 #$ granite wall
 O:0
 W:55:2:20:0
-T:ARC_40_SHORT
 S:BALL_MANA
 K:DEFAULT:1:80
 #$ open floor
@@ -6330,7 +6317,6 @@ U:56
 #$ granite wall
 O:0
 W:6:3:20:0
-T:ARC_40
 S:WOUND
 K:DEFAULT:1:6
 #$ open floor
@@ -6351,7 +6337,6 @@ U:56
 #$ granite wall
 O:0
 W:12:3:20:0
-T:ARC_40
 S:A_DEAD
 K:DEFAULT:1:12
 #$ open floor
@@ -6372,7 +6357,6 @@ U:56
 #$ granite wall
 O:0
 W:18:3:20:0
-T:ARC_40
 S:A_OBJECT
 K:DEFAULT:1:18
 #$ open floor
@@ -6393,7 +6377,6 @@ U:56
 #$ granite wall
 O:0
 W:24:3:20:0
-T:ARC_40
 S:A_ELEMENT
 K:DEFAULT:1:24
 #$ open floor
@@ -6412,7 +6395,6 @@ U:56
 #$ granite wall
 O:0
 W:10:1:20:0
-T:ARC_40_SHORT
 S:S_ORC
 K:DEFAULT:1:10
 #$ open floor
@@ -6431,7 +6413,6 @@ U:56
 #$ granite wall
 O:0
 W:55:2:20:0
-T:MIST
 S:S_HI_DEMON
 K:DEFAULT:1:80
 #$ open floor
@@ -6451,7 +6432,6 @@ U:56
 #$ granite wall
 O:0
 W:6:2:20:0
-T:MIST
 S:S_SPIDER
 K:DEFAULT:1:6
 #$ open floor
@@ -6471,7 +6451,6 @@ U:56
 #$ granite wall
 O:0
 W:45:2:20:0
-T:MIST
 S:S_HI_DRAGON
 K:DEFAULT:1:60
 #$ open floor
@@ -6491,7 +6470,6 @@ U:56
 #$ granite wall
 O:0
 W:50:2:20:0
-T:MIST
 S:S_HI_UNDEAD
 K:DEFAULT:1:70
 #$ open floor
@@ -6511,7 +6489,6 @@ U:56
 #$ granite wall
 O:0
 W:18:1:20:0
-T:8WAY_III
 K:DEFAULT:1:8
 #$ open floor
 K:HIT_TRAP:313:8
@@ -6532,7 +6509,6 @@ U:56
 #$ granite wall
 O:0
 W:31:1:20:0
-T:8WAY_III
 K:DEFAULT:1:32
 #$ open floor
 K:HIT_TRAP:314:32
@@ -6643,7 +6619,7 @@ U:56
 #$ granite wall
 O:0
 W:2:3:20:0
-T:SCATTER:PLASMA:8d6
+T:BALL:PLASMA:8d6
 K:DEFAULT:1:5
 #$ open floor
 K:HIT_TRAP:295:5
@@ -6663,7 +6639,7 @@ U:56
 #$ granite wall
 O:0
 W:33:3:20:0
-T:SCATTER:GRAVITY:8d6
+T:BALL:GRAVITY:8d6
 K:DEFAULT:1:36
 #$ open floor
 K:HIT_TRAP:296:5
@@ -6683,7 +6659,7 @@ U:56
 #$ granite wall
 O:0
 W:31:3:20:0
-T:SCATTER:INERTIA:8d6
+T:BALL:INERTIA:8d6
 K:DEFAULT:1:33
 #$ open floor
 K:HIT_TRAP:297:5
@@ -6703,7 +6679,7 @@ U:56
 #$ granite wall
 O:0
 W:30:3:20:0
-T:SCATTER:FORCE:8d6
+T:BALL:FORCE:8d6
 K:DEFAULT:1:30
 #$ open floor
 K:HIT_TRAP:298:5
@@ -6743,7 +6719,7 @@ U:56
 #$ granite wall
 O:0
 W:12:3:20:0
-T:SCATTER:SOUND:8d6
+T:BALL:SOUND:8d6
 K:DEFAULT:1:12
 #$ open floor
 K:HIT_TRAP:300:5
@@ -6763,7 +6739,7 @@ U:56
 #$ granite wall
 O:0
 W:18:3:20:0
-T:SCATTER:SHARD:8d6
+T:BALL:SHARD:8d6
 K:DEFAULT:1:18
 #$ open floor
 K:HIT_TRAP:301:5
@@ -6783,7 +6759,7 @@ U:56
 #$ granite wall
 O:0
 W:15:3:20:0
-T:SCATTER:NEXUS:8d6
+T:BALL:NEXUS:8d6
 K:DEFAULT:1:15
 #$ open floor
 K:HIT_TRAP:302:5
@@ -6801,7 +6777,7 @@ U:56
 #$ granite wall
 O:0
 W:24:3:20:0
-T:SCATTER:CHAOS:8d6
+T:BALL:CHAOS:8d6
 K:DEFAULT:1:24
 #$ open floor
 K:HIT_TRAP:303:5
@@ -19379,7 +19355,6 @@ U:56
 #$ granite wall
 O:0
 W:20:2:20:0
-T:LINE_LOS
 S:BALL_LITE
 K:DEFAULT:1:70
 #$ open floor
@@ -19396,7 +19371,6 @@ U:56
 #$ granite wall
 O:0
 W:5:2:20:0
-T:AREA
 K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:958:5
@@ -19517,7 +19491,7 @@ U:56
 #$ granite wall
 O:0
 W:1:2:20:0
-T:ARC_30
+T:ARC_30:HURT
 K:DEFAULT:1:70
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -19625,7 +19599,7 @@ U:56
 #$ granite wall
 O:0
 W:50:2:20:0
-T:BEAM_MINOR:FIRE:4d6
+T:BEAM:FIRE:4d6
 K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:971:5

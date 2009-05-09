@@ -80,64 +80,74 @@ F:SOURCE_FEATURE | TRIGGER_OPEN | TRIGGER_CLOSE
 
 N:3:strange rune
 G:x:o
+B:8WAY
 F:TRIGGER_MOVE | HIT_TRAP
 
 N:4:spring-loaded trap
 G:x:r
-F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+B:ARC_40_SHORT
+F:PROJECTION | TRIGGER_MOVE | HIT_TRAP | RANDOM
 
 N:5:gas trap
 G:x:g
+B:AREA
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:6:explosive trap
 G:x:b
+B:BALL
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:7:discolored spot
 G:x:u
-B:FLASK
+B:AREA
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:8:silent watcher
 G:x:D
-B:GAZE
+B:STARE
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:9:stone visage
 G:x:W
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
-B:ARC_20
+B:ARC_40
 
 N:10:loose rock
 G:x:P
-F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+B:SCATTER
+F:TRIGGER_MOVE | HIT_TRAP
 
 N:11:tripwire
 G:x:y
-F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+B:HANDS
+F:TRIGGER_MOVE | HIT_TRAP
 
 N:12:murder hole
 G:x:R
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
-B:BOLT
+B:BEAM_MINOR
 
 N:13:ancient hex
 G:x:G
+B:ADJACENT
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:14:magic symbol
 G:x:B
 C:30
 I:5
+B:ARC_40_SHORT
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:15:fine net
 G:x:U
+B:8WAY
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:16:surreal painting
 G:x:p
+B:ARC_40_SHORT
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 #Terrain glows.
@@ -146,15 +156,18 @@ N:17:ever burning eye
 G:x:v
 F:CLOCKWISE | COUNTER_CLOCKWISE | SHINING
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+B:BEAM
 
 N:18:upwards draft
 G:x:t
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+B:SCATTER
 
 N:19:deadfall
 G:x:m
 C:28
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
+B:ARC_30
 
 #Terrain doesn't glow - this allows trap to be avoided in darkness
 #also makes room filled with these more dangerous if completely lit.
@@ -162,17 +175,20 @@ F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 N:20:shaft of light
 G:x:Y
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP | SHINING
+B:HANDS
 
 #Terrain glows
 
 N:21:glowing glyph
 G:x:M
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP | SHINING
+B:LINE_WIDE
 
 N:22:demonic sign
 G:x:T
 C:38
 I:15
+B:ARC_20
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
 N:23:Radagast's snare
@@ -181,22 +197,24 @@ F:TRIGGER_MOVE | HIT_TRAP
 
 N:24:siege engine
 G:x:I
-F:PROJECTION | TRIGGER_AIM
+F:PROJECTION | TRIGGER_AIM | HIT_TRAP
 
 N:25:clockwork mechanism
 G:x:i
 I:30
-F:PROJECTION | AUTOMATIC
+B:BEAM
+F:PROJECTION | HIT_TRAP
 
 N:26:mark of a white hand
 G:x:z
+B:HANDS
 F:PROJECTION | HIT_TRAP | TRIGGER_MOVE
 
 #Fixed source and destination.
 
 N:27:shimmering portal
 G:x:Z
-F:PROJECTION | AUTOMATIC | SHINING
+F:PROJECTION | SHINING | HIT_TRAP
 
 # Boulders are released by a deadfall and act as slow
 # moving projections towards the target.
