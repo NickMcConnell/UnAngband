@@ -2588,7 +2588,7 @@ G:::w
 M:49
 #$ pile of rubble
 O:82
-W:1:9:13:0
+W:20:9:13:0
 K:DEFAULT:1:10
 #$ open floor
 K:SECRET:97:10
@@ -2611,7 +2611,7 @@ D:You have found something!
 N:97:a pile of rubble containing something
 G:&:w
 O:82
-W:1:9:13:0
+W:20:9:13:0
 K:DEFAULT:1:10
 #$ open floor
 K:CHASM:141:10

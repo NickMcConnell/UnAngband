@@ -578,11 +578,7 @@ static s16b pick_room_feat(s16b feat)
  * Note that the order we generate the dungeon is terrain features, then
  * rooms, then corridors, then streamers. This is important, because
  * (currently) we ensure that deep or hostile terrain is bridged by safe
- * terrain, and rooms (and vaults) alway have their respective walls intact.
- *
- * Note that rooms can be generated inside 'big' lakes, but not on regular
- * lakes. We take a risk here that 'big' lakes are less likely to have
- * areas rendered inaccessible by having a room block them.
+ * terrain, and rooms (and vaults) always have their respective walls intact.
  *
  * XXX XXX XXX Currently both types of lakes can have areas that are completely
  * blocked because of the 20% chance of filling a lake centre location with
