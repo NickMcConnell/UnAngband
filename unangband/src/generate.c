@@ -10992,6 +10992,15 @@ static bool place_tunnels()
 		{
 			if (cheat_room) message_add(format("Unable to connect rooms in %d attempted tunnels.", DUN_ROOMS * DUN_ROOMS), MSG_GENERIC);
 
+			/* Hack -- Clear play safe grids */
+			for (y = 0; y < DUNGEON_HGT; y++)
+			{
+				for (x = 0; x < DUNGEON_WID; x++)
+				{
+					play_info[y][x] = 0;
+				}
+			}
+
 			/* Megahack -- we have connectivity on surface anyway */
 			if (level_flag & (LF1_SURFACE)) return (TRUE);
 
