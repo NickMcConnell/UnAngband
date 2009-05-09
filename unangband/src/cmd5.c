@@ -450,13 +450,16 @@ bool player_browse_object(object_type *o_ptr)
 
 	int spell=-1;
 
-	int i;
+	int i, ii;
 
 	int tval;
+	int level;
 
 	char choice = 0;
 
 	char out_val[160];
+
+	bool study_item = FALSE;
 
 	spell_type *s_ptr;
 
@@ -522,6 +525,9 @@ bool player_browse_object(object_type *o_ptr)
 			o_ptr->tval = k_info[selection].tval;
 			o_ptr->sval = k_info[selection].sval;
 			o_ptr->xtra1 = 0;
+
+			/* Study item */
+			study_item = TRUE;
 		}
 		/* Did not choose something */
 		else
@@ -661,6 +667,116 @@ bool player_browse_object(object_type *o_ptr)
 
 				/* Terminate if required */
 				if (intro) text_out_c(TERM_VIOLET, format(" before studying this %s.\n",p));
+
+				/* Spell not legible */
+				if (!spell_legible(spell))
+				{
+					text_out_c(TERM_SLATE, "You lack the ability to learn this spell.\n");
+				}
+				else
+				{
+					/* Get level */
+					level = spell_level(spell);
+
+					/* Get the spell knowledge*/
+					for (ii=0;ii<PY_MAX_SPELLS;ii++)
+					{
+						if (p_ptr->spell_order[ii] == spell) break;
+					}
+
+					/* Analyze the spell */
+					if (ii==PY_MAX_SPELLS)
+					{
+						if (level <= p_ptr->lev)
+						{
+							if (spell_okay(spell, FALSE))
+							{
+								/* Describe how the player learns spells */
+								if (o_ptr->tval == TV_PRAYER_BOOK)
+								{
+									text_out_c(TERM_BLUE_SLATE, "The luck of the gods decides whether you learn this spell.\n");
+								}
+								else if (o_ptr->tval == TV_SONG_BOOK)
+								{
+									int iii;
+
+									/* Do the hard work */
+									for(iii=0;iii<num;iii++)
+									{
+										if (spell_okay(book[iii],FALSE) && (i == iii))
+										{
+											text_out_c(TERM_L_BLUE, "You will learn this spell next if you study this book.  ");
+										}
+									}
+									text_out_c(TERM_BLUE_SLATE, "You must learn these spells in the listed order.\n");
+								}
+								else
+								{
+									text_out_c(TERM_BLUE_SLATE, "You may choose to learn this spell.\n");
+								}
+							}
+							else
+							{
+								/* Already highlighted pre-requisites */
+							}
+						}
+						else
+						{
+							text_out_c(TERM_L_RED, "You are not at high enough a level to learn this spell.\n");
+						}
+					}
+					else if ((ii < 32) ? (p_ptr->spell_forgotten1 & (1L << ii)) :
+						  ((ii < 64) ? (p_ptr->spell_forgotten2 & (1L << (ii - 32))) :
+						  ((ii < 96) ? (p_ptr->spell_forgotten3 & (1L << (ii - 64))) :
+						  (p_ptr->spell_forgotten4 & (1L << (ii - 96))))))
+					{
+						/* Describe how the player learns spells */
+						text_out_c(TERM_L_YELLOW, "You have forgotten how to cast this spell.\n");
+					}
+					else if (!((ii < 32) ? (p_ptr->spell_learned1 & (1L << ii)) :
+						  ((ii < 64) ? (p_ptr->spell_learned2 & (1L << (ii - 32))) :
+						  ((ii < 96) ? (p_ptr->spell_learned3 & (1L << (ii - 64))) :
+						  (p_ptr->spell_learned4 & (1L << (ii - 96)))))))
+					{
+						if (level <= p_ptr->lev)
+						{
+							/* Describe how the player learns spells */
+							if (o_ptr->tval == TV_PRAYER_BOOK)
+							{
+								text_out_c(TERM_BLUE_SLATE, "The luck of the gods decides whether you learn this spell.\n");
+							}
+							else if (o_ptr->tval == TV_SONG_BOOK)
+							{
+								int iii;
+
+								/* Do the hard work */
+								for(iii=0;iii<num;iii++)
+								{
+									if (spell_okay(book[iii],FALSE) && (i == iii))
+									{
+										text_out_c(TERM_L_BLUE, "You will learn this spell next if you study this book.  ");
+									}
+								}
+								text_out_c(TERM_BLUE_SLATE, "You must learn these spells in the listed order.\n");
+							}
+							else
+							{
+								text_out_c(TERM_BLUE_SLATE, "You may choose to learn this spell.\n");
+							}
+						}
+						else
+						{
+							text_out_c(TERM_L_RED, "You are not at high enough a level to learn this spell.\n");
+						}
+					}
+					else if (!((ii < 32) ? (p_ptr->spell_worked1 & (1L << ii)) :
+						  ((ii < 64) ? (p_ptr->spell_worked2 & (1L << (ii - 32))) :
+						  ((ii < 96) ? (p_ptr->spell_worked3 & (1L << (ii - 64))) :
+						  (p_ptr->spell_worked4 & (1L << (ii - 96)))))))
+					{
+						text_out_c(TERM_L_GREEN, "You have yet to cast this spell.\n");
+					}
+				}
 
 				/* Build a prompt (accept all spells) */
 				strnfmt(out_val, 78, "The %s of %s. (%c-%c, ESC) Browse which %s:",
@@ -854,6 +970,9 @@ bool player_study(int item)
 			o_ptr->tval = k_info[selection].tval;
 			o_ptr->sval = k_info[selection].sval;
 			o_ptr->xtra1 = 0;
+
+			/* Study it further */
+			study_item = TRUE;
 		}
 		/* Did not choose something */
 		else
@@ -949,7 +1068,7 @@ bool player_study(int item)
 		spell = graft;
 	}
 
-	/* Magic book -- Learn a selected spell */
+/* Magic book -- Learn a selected spell */
 	else if (o_ptr->tval == TV_MAGIC_BOOK)
 	{
 		/* Ask for a spell, allow cancel */
