@@ -16645,7 +16645,7 @@ F:ATTR_LITE |
 N:818:shrine
 G:0:g
 O:0
-W:30:1:20:0
+W:5:1:20:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0
@@ -16662,7 +16662,7 @@ G:0:g
 M:818
 #$ shrine
 O:0
-W:30:1:20:0
+W:5:1:20:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0
@@ -16675,7 +16675,7 @@ D:You find something.
 N:820:empty shrine
 G:0:D
 O:0
-W:30:1:20:0
+W:5:1:20:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0

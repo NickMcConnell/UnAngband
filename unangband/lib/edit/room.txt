@@ -753,7 +753,7 @@ R:MAGE
 N:104:119:0:0:35:2:5:128
 A:
 B:shrine
-F:668:0:736:0:0
+F:818:0:736:0:0
 D:A shrine 
 S:SEEN
 R:PRIEST
