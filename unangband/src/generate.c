@@ -3049,7 +3049,7 @@ static bool find_space(int *y, int *x, int height, int width)
 		}
 
 		/* Put the guardian in a room, unless they're in the tower */
-		if (!rand_int(dun->cent_n) && ((level_flag & (LF1_TOWER)) == 0))
+		if ((dun->cent_n == 1) && ((level_flag & (LF1_TOWER)) == 0))
 		{
 			/* Set the coordinates */
 			dun->guard_y0 = *y - height / 2;

@@ -6287,37 +6287,24 @@ bool place_guardian(int y0, int x0, int y1, int x1)
 			y = y0 + rand_int(y1);
 			x = x0 + rand_int(x1);
 
-			/* XXX This is a duplicate of the place_monster_one checks */
+			/* Place the questor */
+			if (place_monster_aux(y, x, guard, FALSE, TRUE, 0L)) break;
 
-			/* Paranoia */
-			if (!in_bounds(y, x)) continue;
-
-			/* Require empty space */
-			if (!cave_empty_bold(y, x)) continue;
-
-			/* Require monster can pass and survive on terrain */
-			if (place_monster_here(y, x, guard) <= MM_FAIL) continue;
-
-			/* Hack -- no creation on glyph of warding */
-			if (f_info[cave_feat[y][x]].flags1 & (FF1_GLYPH)) continue;
-
-			break;
-		}
-
-		if (count < MAX_RANGE)
-		{
-			/* Paranoia - ensure some horizontal space to choose from */
-			if (x1 - x0 < count)
+			if (count < MAX_RANGE)
 			{
-				x0 = (x1 + x0) / 2 - count;
-				x1 = (x1 + x0) / 2 + count;
-			}
+				/* Paranoia - ensure some horizontal space to choose from */
+				if (x1 - x0 < count)
+				{
+					x0 = (x1 + x0) / 2 - count;
+					x1 = (x1 + x0) / 2 + count;
+				}
 
-			/* Paranoia - ensure some vertical space to choose from */
-			if (y1 - y0 < count)
-			{
-				y0 = (y1 + y0) / 2 - count;
-				y1 = (y1 + y0)/ 2 + count;
+				/* Paranoia - ensure some vertical space to choose from */
+				if (y1 - y0 < count)
+				{
+					y0 = (y1 + y0) / 2 - count;
+					y1 = (y1 + y0)/ 2 + count;
+				}
 			}
 		}
 
@@ -6328,8 +6315,7 @@ bool place_guardian(int y0, int x0, int y1, int x1)
 			return (FALSE);
 		}
 
-		/* Place the questor */
-		place_monster_aux(y, x, guard, FALSE, TRUE, 0L);
+
 	}
 
 	return (TRUE);
