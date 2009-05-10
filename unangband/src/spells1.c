@@ -8683,7 +8683,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Apply stun */
-			m_ptr->stunned = MIN(tmp, 200);
+			m_ptr->stunned = tmp > 200 ? 200 : (byte)tmp;
 		}
 
 		/* Handle "blindness" */
@@ -8697,7 +8697,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if (do_blind > 1) if (!note) note =  " is blinded.";
 
 				/* Apply blindness */
-				m_ptr->blind = MIN(do_blind, 200);
+				m_ptr->blind = do_blind > 200 ? 200 : (byte)do_blind;
 			}
 		}
 
@@ -8720,7 +8720,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Apply stun */
-			m_ptr->berserk = MIN(tmp, 200);
+			m_ptr->berserk = tmp > 200 ? 200 : (byte)tmp;
 
 			if (r_ptr->flags1 & (RF1_QUESTOR))
 			{
@@ -8762,7 +8762,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Apply stun */
-			m_ptr->tim_invis = MIN(tmp, 200);
+			m_ptr->tim_invis = tmp > 200 ? 200 : (byte)tmp;
 
 			/* Target the player */
 			if (who <= SOURCE_PLAYER_START)
@@ -8800,7 +8800,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			tmp = do_cuts / (r_ptr->level / 10 + 1);
 
 			/* Apply cuts if player only */
-			if (who > SOURCE_MONSTER_START) m_ptr->cut = MIN(255, m_ptr->cut + tmp);
+			if (who > SOURCE_MONSTER_START) m_ptr->cut = tmp > 200 ? 200 : (byte)tmp;
 		}
 
 		/* Handle poison from player only */
@@ -8824,7 +8824,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			tmp = do_pois / (r_ptr->level / 10 + 1);
 
 			/* Only apply poison caused by player*/
-			m_ptr->poisoned = MIN(255, m_ptr->poisoned + tmp);
+			m_ptr->poisoned = tmp > 200 ? 200 : (byte)tmp;
 		}
 
 		/* Handle confusion */
@@ -8849,7 +8849,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Apply confusion */
-			m_ptr->confused = (tmp < 200) ? tmp : 200;
+			m_ptr->confused = tmp > 200 ? 200 : (byte)tmp;
 		}
 
 		/* Fear */
@@ -8891,7 +8891,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Apply confusion */
-			m_ptr->petrify = (tmp < 200) ? tmp : 200;
+			m_ptr->petrify = tmp > 200 ? 200 : (byte)tmp;
 
 			/* As we can't move, need to find new range */
 			find_range(cave_m_idx[y][x]);

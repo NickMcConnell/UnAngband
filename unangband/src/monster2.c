@@ -3278,8 +3278,8 @@ void set_monster_haste(s16b m_idx, s16b counter, bool message)
 		}
 	}
 
-	/*update the counter*/
-	m_ptr->hasted = counter;
+	/* Update the counter */
+	m_ptr->hasted = counter > 255 ? 255 : (byte)counter;
 
 	/*re-calculate speed if necessary*/
 	if (recalc) m_ptr->mspeed = calc_monster_speed(m_idx);
@@ -3324,8 +3324,8 @@ void set_monster_slow(s16b m_idx, s16b counter, bool message)
 		}
 	}
 
-	/*update the counter*/
-	m_ptr->slowed = counter;
+	/* Update the counter */
+	m_ptr->slowed = counter > 255 ? 255 : (byte)counter;
 
 	/*re-calculate speed if necessary*/
 	if (recalc) m_ptr->mspeed = calc_monster_speed(m_idx);
@@ -5422,7 +5422,7 @@ void set_monster_fear(monster_type *m_ptr, int v, bool panic)
 	if (r_ptr->flags3 & (RF3_NO_FEAR)) v = 0;
 
 	/* Set monfear */
-	m_ptr->monfear = v;
+	m_ptr->monfear = v > 255 ? 255 : (byte)v;
 
 	/* Monster is panicking */
 	if ((m_ptr->monfear) && (panic)) m_ptr->min_range = PANIC_RANGE;

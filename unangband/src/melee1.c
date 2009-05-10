@@ -2974,8 +2974,11 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target > 0)
 			{
+				/* Paranoia: Prevent overflow */
+				int tmp = n_ptr->tim_invis + rlev + rand_int(rlev);
+
 				/* Add to the monster invisibility counter */
-				n_ptr->tim_invis += n_ptr->tim_invis + rlev + rand_int(rlev);
+				n_ptr->tim_invis += tmp > 255 ? 255 : (byte)tmp;
 
 				/* Notify player */
 				if (n_ptr->ml)
@@ -3157,14 +3160,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target > 0)
 			{
+				/* Paranoia: Prevent overflow */
+				int tmp = n_ptr->tim_passw + rlev + rand_int(rlev);
+
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->tim_passw))
 				{
 					msg_format("%^s becomes more insubstantial!", t_nref);
 				}
 
-				/* Add to the monster haste counter */
-				n_ptr->tim_passw += n_ptr->tim_passw + rlev + rand_int(rlev);
+				/* Add to the monster passwall counter */
+				n_ptr->tim_passw += tmp > 255 ? 255 : (byte)tmp;
 			}
 			else if (target < 0)
 			{
@@ -3630,6 +3636,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target > 0)
 			{
+				/* Paranoia: Prevent overflow */
+				int tmp = n_ptr->bless + rlev + rand_int(rlev);
+
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->bless))
 				{
@@ -3637,7 +3646,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Add to the monster bless counter */
-				n_ptr->bless += n_ptr->bless + rlev + rand_int(rlev);
+				n_ptr->bless += tmp > 255 ? 255 : (byte)tmp;
 			}
 			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
@@ -3663,14 +3672,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target > 0)
 			{
+				/* Paranoia: Prevent overflow */
+				int tmp = n_ptr->berserk + rlev + rand_int(rlev);
+
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->berserk))
 				{
 					msg_format("%^s goes berserk!", t_nref);
 				}
 
-				/* Add to the monster haste counter */
-				n_ptr->berserk += n_ptr->berserk + rlev + rand_int(rlev);
+				/* Add to the monster berserk counter */
+				n_ptr->berserk += tmp > 255 ? 255 : (byte)tmp;
 			}
 			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
@@ -3696,6 +3708,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target > 0)
 			{
+				/* Paranoia: Prevent overflow */
+				int tmp = n_ptr->shield + rlev + rand_int(rlev);
+
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->shield))
 				{
@@ -3703,7 +3718,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				}
 
 				/* Add to the monster shield counter */
-				n_ptr->shield += n_ptr->shield + rlev + rand_int(rlev);
+				n_ptr->shield += tmp > 255 ? 255 : (byte)tmp;
 			}
 			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
@@ -3729,14 +3744,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (target > 0)
 			{
+				/* Paranoia: Prevent overflow */
+				int tmp = n_ptr->oppose_elem + rlev + rand_int(rlev);
+
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->oppose_elem))
 				{
 					msg_format("%^s becomes temporarily resistant to the elements.", t_nref);
 				}
 
-				/* Add to the monster haste counter */
-				n_ptr->oppose_elem += n_ptr->oppose_elem + rlev + rand_int(rlev);
+				/* Add to the monster elements counter */
+				n_ptr->oppose_elem += tmp > 255 ? 255 : (byte)tmp;
 			}
 			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
