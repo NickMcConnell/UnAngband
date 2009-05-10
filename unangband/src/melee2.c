@@ -1994,6 +1994,13 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 			return (100);
 		}
 
+		/* Guardians can always push through other monsters, except other guardians */
+		else if ((r_ptr->flags1 & (RF1_GUARDIAN)) && ((nr_ptr->flags1 & (RF1_GUARDIAN)) == 0))
+		{
+			/* Can always push at full speed. */
+			return (100);
+		}
+
 		/* Pushed already */
 		else if ((m_ptr->mflag & (MFLAG_PUSH)) || (n_ptr->mflag & (MFLAG_PUSH)))
 		{

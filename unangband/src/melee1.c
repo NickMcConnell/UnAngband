@@ -2155,6 +2155,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Extract the summoning level.  Must be at least 1. */
 		summon_lev = MAX(1, (r_ptr->level + p_ptr->depth) / 2 - 1);
 
+		/* Hack -- guardians can summon any monster */
+		if (r_ptr->flags1 & (RF1_GUARDIAN)) cave_ecology.ready = FALSE;
+
 		/* Extract the source location */
 		fy = m_ptr->fy;
 		fx = m_ptr->fx;
