@@ -211,7 +211,7 @@ D:Someone with a silver-tongue and guile-full words has brought fair
 D: Hobbiton to its knees in a whir of devilish industry and foul pollution.
 
 N:3:Hobbiton rebuilt
-X:70:0:0:0
+X:69:70:0:0
 G:h
 S:264:515:265:266:772:773:774:0
 L:0:56:0:407:153:0:0:0:SURFACE | DAYLIGHT | TOWN:
