@@ -13785,10 +13785,10 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			/* Affect marked grid */
 			if (project_t(who, what, y, x, gd[i], typ)) notice = TRUE;
 		}
-	}
 
-	/* Clear the "temp" array  (paranoia is good) */
-	clear_temp_array();
+		/* Clear the "temp" array  (paranoia is good) */
+		clear_temp_array();
+	}
 
 	/* Finally break items on floor.  This has to be done here and carefully to avoid infinite recursion. */
 	for (i = 0; i < z_info->o_max; i++)
