@@ -5038,7 +5038,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		{
 			if (!summon_flag_type)
 			{
-				summon_flag_type |= r_ptr->flags3 & (RF3_EVIL);
+				summon_flag_type |= r_ptr->flags3 & (RF3_EVIL | RF3_NONLIVING);
 			}
 			break;
 		}
