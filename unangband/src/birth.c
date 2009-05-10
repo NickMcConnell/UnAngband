@@ -1146,9 +1146,10 @@ static void race_aux_hook(birth_menu r_str)
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
-		sprintf(s, "%s%+d ", stat_names_reduced[i],
-		rp_ptr->r_adj[i]);
-		Term_putstr(RACE_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
+		put_str(stat_names_reduced[i], TABLE_ROW + i, RACE_AUX_COL);
+		sprintf(s, "%+d ", rp_ptr->r_adj[i]);
+		Term_putstr(RACE_AUX_COL + 5, TABLE_ROW + i, -1, rp_ptr->r_adj[i] < -4 ? TERM_RED :
+			( rp_ptr->r_adj[i] < 0? TERM_YELLOW : ( rp_ptr->r_adj[i] ? TERM_L_GREEN : TERM_WHITE)), s);
 	}
 
 	/* Process stats */
@@ -1183,7 +1184,7 @@ static void race_aux_hook(birth_menu r_str)
 	for (i = 0; skill_table[i].skill >= 0; i++)
 	{
 		put_str(skill_table[i].name, TABLE_ROW + i, CLASS_AUX2_COL);
-		desc = likert(p_ptr->skills[skill_table[i].skill] * 2 + 2 * skill_table[i].div, skill_table[i].div, &likert_attr);
+		desc = likert(rp_ptr->r_skill[skill_table[i].skill] * 2 + 2 * skill_table[i].div, skill_table[i].div, &likert_attr);
 		c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + i, CLASS_AUX2_COL+11);
 	}
 }
@@ -1264,9 +1265,11 @@ static void class_aux_hook(birth_menu c_str)
 	/* Display relevant details. */
 	for (i = 0; i < A_MAX; i++)
 	{
-		sprintf(s, "%s%+d ", stat_names_reduced[i],
-		cp_ptr->c_adj[i] + rp_ptr->r_adj[i]);
-		Term_putstr(CLASS_AUX_COL, TABLE_ROW + i, -1, TERM_WHITE, s);
+		put_str(stat_names_reduced[i], TABLE_ROW + i, CLASS_AUX_COL);
+		sprintf(s, "%+d ", cp_ptr->c_adj[i] + rp_ptr->r_adj[i]);
+		Term_putstr(CLASS_AUX_COL + 5, TABLE_ROW + i, -1, cp_ptr->c_adj[i] + rp_ptr->r_adj[i] < -4 ? TERM_RED :
+			( cp_ptr->c_adj[i] + rp_ptr->r_adj[i] < 0? TERM_YELLOW :
+				( cp_ptr->c_adj[i] + rp_ptr->r_adj[i] ? TERM_L_GREEN : TERM_WHITE)), s);
 	}
 
 	/* Process stats */
@@ -1300,7 +1303,7 @@ static void class_aux_hook(birth_menu c_str)
 	for (i = 0; skill_table[i].skill >= 0; i++)
 	{
 		put_str(skill_table[i].name, TABLE_ROW + i, CLASS_AUX2_COL);
-		desc = likert(p_ptr->skills[skill_table[i].skill], skill_table[i].div, &likert_attr);
+		desc = likert(cp_ptr->c_skill_base[skill_table[i].skill] + rp_ptr->r_skill[skill_table[i].skill], skill_table[i].div, &likert_attr);
 		c_put_str(likert_attr, format("%9s", desc), TABLE_ROW + i, CLASS_AUX2_COL+11);
 	}
 }
