@@ -3004,7 +3004,7 @@ static bool find_space(int *y, int *x, int height, int width)
 		}
 
 		/* Get matching ecology */
-		if (dun->cent_n <= cave_ecology.num_ecologies)
+		if (dun->cent_n < cave_ecology.num_ecologies)
 		{
 			/* Pick which ecology */
 			room_info[dun->cent_n].ecology = (1L << dun->cent_n) | (1L << (dun->cent_n + MAX_ECOLOGIES));
