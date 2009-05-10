@@ -2050,11 +2050,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		s_ptr = &r_info[0];
 		k_ptr = &l_list[0];
 
-		my_strcpy(t_name,f_name + f_info[cave_feat[y][x]].name, sizeof(t_name));
-		my_strcpy(t_nref,f_name + f_info[cave_feat[y][x]].name, sizeof(t_nref));
-		my_strcpy(t_poss,"the ", sizeof(t_poss));
-		my_strcat(t_poss,f_name + f_info[cave_feat[y][x]].name, sizeof(t_poss));
-		my_strcat(t_poss,"'s",sizeof(t_poss));
+		my_strcpy(t_name,format("the %s",f_name + f_info[cave_feat[y][x]].name), sizeof(t_name));
+		my_strcpy(t_nref,format("the %s",f_name + f_info[cave_feat[y][x]].name), sizeof(t_nref));
+		my_strcpy(t_poss,format("the %s's",f_name + f_info[cave_feat[y][x]].name), sizeof(t_poss));
 	}
 
 	/* Describe caster - player traps and features only */
@@ -5580,28 +5578,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 
 	/* Avoid trap */
 	if ((f_ptr->flags1 & (FF1_TRAP)) && (mon_avoid_trap(m_ptr, y, x))) return;
-
-	/* Hack --- trapped doors */
-	/* XXX XXX Dangerous */
-	while (!(f_ptr->spell) && !(f_ptr->blow.method) && (f_ptr->flags1 & (FF1_TRAP)))
-	{
-		pick_trap(y,x, FALSE);
-
-		/* Error */
-		if (cave_feat[y][x] == feat) break;
-
-		feat = cave_feat[y][x];
-
-		/* Get feature */
-		f_ptr = &f_info[feat];
-
-	}
-
-	/* Use covered if necessary */
-	if (f_ptr->flags2 & (FF2_COVERED))
-	{
-		f_ptr = &f_info[f_ptr->mimic];
-	}
 
 	/* Hack -- monster falls onto trap */
 	if ((m_ptr->fy!=y)|| (m_ptr->fx !=x))

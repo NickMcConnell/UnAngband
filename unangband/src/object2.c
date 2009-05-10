@@ -7574,9 +7574,9 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 	region_info_type *ri_ptr = &region_info[f_ptr->d_attr];
 
 	int method = ri_ptr->method;
-	int effect = power ? s_info[power].blow[0].effect : (f_ptr->blow.effect ? f_ptr->blow.effect : method_info[f_ptr->spell].d_res);
+	int effect = 0; /* Not needed - we use discharge_trap code */
 
-	int damage = power ? 0 : (f_ptr->blow.d_dice ? damroll(f_ptr->blow.d_dice, f_ptr->blow.d_side) : 0);
+	int damage = 0; /* Not needed - we use discharge_trap code */
 
 	method_type *method_ptr = &method_info[method];
 	u32b flg = method_ptr->flags1;
@@ -7588,6 +7588,9 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 
 	/* Paranoia */
 	if (effect == GF_FEATURE) effect = 0;
+
+	/* Not needed at the moment */
+	(void)power;
 
 	/* Player is setting a trap */
 	if (player)
@@ -7648,14 +7651,50 @@ void pick_trap(int y, int x, bool player)
 	int feat= cave_feat[y][x];
 	int room = room_idx(y, x);
 	feature_type *f_ptr = &f_info[feat];
+	int region = 0;
 
 	int power = 0;
+	int i;
 
 	/* Paranoia */
 	if (!(f_ptr->flags1 & (FF1_TRAP))) return;
 
+	/* 'Pre-trap' region already exists */
+	/* XXX We can't just check the grid, because it's highly likely that the source trap
+	 * for a region won't affect the grid it's in.
+	 */
+	for (i = 0; i < region_max; i++)
+	{
+		/* Get this effect */
+		region_type *r_ptr = &region_list[i];
+
+		/* Skip empty effects */
+		if (!r_ptr->type) continue;
+
+		/* Skip regions with differing sources */
+		if ((r_ptr->y0 != y) || (r_ptr->x0 != x)) continue;
+
+		/* Skip non-trap regions */
+		if ((r_ptr->flags1 & (RE1_HIT_TRAP)) == 0) continue;
+
+		/* We have a region */
+		region = i;
+
+		break;
+	}
+
+	/* Region found */
+	if (region)
+	{
+		/* Use this to pick the trap later */
+		pick_attr = f_info[cave_feat[y][x]].d_attr;
+
+		/* Set hook*/
+		get_feat_num_hook = vault_trap_attr;
+	}
+
 	/* Floor trap */
-	if (f_ptr->flags3 & (FF3_ALLOC))
+	else if (f_ptr->flags3 & (FF3_ALLOC))
 	{
 		/* Set hook */
 		if (f_ptr->flags3 & (FF3_CHEST))
@@ -7850,7 +7889,7 @@ void pick_trap(int y, int x, bool player)
 	f_ptr = &f_info[feat];
 
 	/* Create trap region */
-	if (power || (f_ptr->blow.method) || (f_ptr->spell)) create_trap_region(y, x, feat, power, player);
+	if ((!region) && (power || (f_ptr->blow.method) || (f_ptr->spell))) create_trap_region(y, x, feat, power, player);
 }
 
 

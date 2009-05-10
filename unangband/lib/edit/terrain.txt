@@ -5880,7 +5880,7 @@ M:1
 U:56
 #$ granite wall
 O:0
-W:1:1:5:0
+W:10:1:5:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0
@@ -6618,7 +6618,7 @@ G:^:M
 U:56
 #$ granite wall
 O:0
-W:2:3:20:0
+W:32:3:20:0
 T:BALL:PLASMA:8d6
 K:DEFAULT:1:5
 #$ open floor
@@ -6738,7 +6738,7 @@ M:295
 U:56
 #$ granite wall
 O:0
-W:18:3:20:0
+W:28:3:20:0
 T:BALL:SHARD:8d6
 K:DEFAULT:1:18
 #$ open floor
@@ -19598,7 +19598,7 @@ G:^:i
 U:56
 #$ granite wall
 O:0
-W:50:2:20:0
+W:10:2:20:0
 T:BEAM:FIRE:4d6
 K:DEFAULT:1:70
 #$ open floor
@@ -19663,7 +19663,7 @@ M:1
 U:56
 #$ granite wall
 O:0
-W:1:1:5:0
+W:12:1:5:0
 K:DEFAULT:1:0
 #$ open floor
 K:CHASM:141:0

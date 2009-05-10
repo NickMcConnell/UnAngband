@@ -8897,8 +8897,6 @@ void region_terminate(s16b region)
 {
 	region_type *r_ptr = &region_list[region];
 
-	msg_format("region %d terminated", region);
-
 	/* Effect is "dead" - mark for later */
 	r_ptr->type = 0;
 

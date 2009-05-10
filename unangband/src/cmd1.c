@@ -1861,7 +1861,7 @@ bool avoid_trap(int y, int x)
 		/* Discoloured spot */
 		case TERM_UMBER:
 		{
-			/* Avoid by XXXX */
+			/* Avoid by dropping stuff to trigger it */
 			break;
 		}
 		/* Silent watcher */
@@ -1932,8 +1932,18 @@ bool avoid_trap(int y, int x)
 		/* Surreal painting */
 		case TERM_PURPLE:
 		{
-			/* Avoid by being able to see the painting */
-			if (play_info[y][x] & (PLAY_SEEN)) return (TRUE);
+			/* Most surreal paintings... */
+			if ((y + x) % 3)
+			{
+				/* Avoid by being blind */
+				if (p_ptr->timed[TMD_BLIND]) return (TRUE);
+			}
+			/* But some surreal paintings... */
+			else
+			{
+				/* Avoid by being able to see the painting */
+				if (play_info[y][x] & (PLAY_SEEN)) return (TRUE);
+			}
 			break;
 		}
 		/* Ever burning eye */
@@ -1968,10 +1978,9 @@ bool avoid_trap(int y, int x)
 			break;
 		}
 		/* Glowing glyph */
-		case TERM_MAGENTA:
+		case TERM_MUSTARD:
 		{
-			/* Avoid by being blind or unable to read */
-			if (p_ptr->timed[TMD_BLIND]) return (TRUE);
+			/* Avoid by dropping stuff to trigger it */
 			break;
 		}
 		/* Demonic sign */
@@ -1991,7 +2000,7 @@ bool avoid_trap(int y, int x)
 		/* Siege engine */
 		case TERM_L_PINK:
 		/* Clockwork mechanism */
-		case TERM_MUSTARD:
+		case TERM_MAGENTA:
 		{
 			/* Always avoid */
 			return (TRUE);
@@ -2091,6 +2100,21 @@ bool discharge_trap(int y, int x, int ty, int tx)
 
 	/* Get feature */
 	feature_type *f_ptr = &f_info[feat];
+
+	/* Hack --- discover the trap */
+	/* XXX XXX Dangerous */
+	while (f_ptr->flags3 & (FF3_PICK_TRAP))
+	{
+		pick_trap(y,x, FALSE);
+
+		/* Error */
+		if (cave_feat[y][x] == feat) break;
+
+		feat = cave_feat[y][x];
+
+		/* Get feature */
+		f_ptr = &f_info[feat];
+	}
 
 	/* Use covered if necessary */
 	if (f_ptr->flags2 & (FF2_COVERED))
@@ -2546,7 +2570,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 		/* Apply spell effect */
 		else if (f_ptr->spell)
 		{
-      		obvious |= make_attack_ranged(SOURCE_FEATURE,feat,ty,tx);
+      		obvious |= make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,ty,tx);
 		}
 		/* Apply blow effect */
 		else if (f_ptr->blow.method)
@@ -2559,7 +2583,7 @@ bool discharge_trap(int y, int x, int ty, int tx)
 			obvious |= project_method(SOURCE_FEATURE, feat, blow_ptr->method, blow_ptr->effect, dam, p_ptr->depth, y, x, ty, tx, 0, method_info[blow_ptr->method].flags1);
 		}
 
-		/* Reget original feature */
+		/* Re-get original feature */
 		f_ptr = &f_info[cave_feat[y][x]];
 
 		/* Hit the trap */
@@ -2593,28 +2617,6 @@ void hit_trap(int y, int x)
 
 	/* Avoid trap */
 	if ((f_ptr->flags1 & (FF1_TRAP)) && (avoid_trap(y, x))) return;
-
-	/* Hack --- trapped doors/chests */
-	while (f_ptr->flags3 & (FF3_PICK_TRAP))
-	{
-		/* Get the trap */
-		pick_trap(y,x, FALSE);
-
-		/* Error */
-		if (cave_feat[y][x] == feat) break;
-
-		/* Set the trap */
-		feat = cave_feat[y][x];
-
-		/* Get feature */
-		f_ptr = &f_info[feat];
-	}
-
-	/* Use covered if necessary */
-	if (f_ptr->flags2 & (FF2_COVERED))
-	{
-		f_ptr = &f_info[f_ptr->mimic];
-	}
 
 	/* Hack -- fall onto trap if we can move */
 	if ((f_ptr->flags1 & (FF1_MOVE)) && ((p_ptr->py != y) || (p_ptr->px !=x)))
