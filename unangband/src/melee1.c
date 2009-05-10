@@ -125,6 +125,9 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 	if (n_ptr->flags9 & (RF9_LEVEL_POWER)) flag[n++] = RF9_LEVEL_POWER;
 	if (n_ptr->flags9 & (RF9_LEVEL_SIZE)) flag[n++] = RF9_LEVEL_SIZE;
 
+	/* Paranoia */
+	if (n == 0) return (FALSE);
+
 	/* Clear all but one flag */
 	if (n > 1)
 	{
@@ -481,7 +484,8 @@ bool monster_scale(monster_race *n_ptr, int m_idx, int depth)
 		n_ptr->ac += boost;
 
 		/* Reduce scale by actual scaled improvement in armour class */
-		scale = scale * r_ptr->ac / n_ptr->ac;
+		/* XXX Correction to avoid divide by zero issues */
+		scale = scale * (r_ptr->ac + 1) / (n_ptr->ac + 1);
 
 		/* Boost speed next */
 		boost = scale / 200;
