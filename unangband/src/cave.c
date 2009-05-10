@@ -5056,21 +5056,8 @@ void town_illuminate(bool daytime)
 	/* Megahack --- darkness brings out the bad guys */
 	if ((character_loaded) && (!daytime) && actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)].cur_num <= 0))
 	{
-		int y = 0;
-		int x = 0;
-		int count = 0;
-
-		/* Pick a location */
-		while (++count < 1000)
-		{
-			y = rand_int(dungeon_hgt);
-			x = rand_int(dungeon_wid);
-
-			if (cave_naked_bold(y, x)) break;
-		}
-
-		/* Place the questor */
-		place_monster_aux(y, x, actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone), TRUE, TRUE, 0L);
+		/* Place the guardian */
+		place_guardian(1, 1, dungeon_hgt- 1, dungeon_wid -1);
 	}
 
 	/* Fully update the visuals */

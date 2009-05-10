@@ -25,6 +25,10 @@ bool is_quest_race(int r_idx)
 {
 	int i;
 
+	/* Unique quest targets are never placed randomly */
+	if (r_info[r_idx].flags1 & (RF1_UNIQUE)) return (TRUE);
+
+	/* Other quest monsters may be found outside of the quest location */
 	for (i = 0; i < MAX_Q_IDX; i++)
 	{
 		quest_type *q_ptr = &(q_list[i]);
@@ -499,6 +503,14 @@ void wipe_m_list(void)
 		(void)WIPE(m_ptr, monster_type);
 	}
 
+	/* No longer a monster on the level */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		monster_race *r_ptr = &r_info[i];
+
+		r_ptr->cur_num = 0;
+	}
+
 	/* Reset "m_max" */
 	m_max = 1;
 
@@ -767,6 +779,25 @@ s16b get_mon_num(int level)
 			    (r_ptr->cur_num >= r_ptr->max_num))
 			{
 				continue;
+			}
+
+			/* MegaHack -- Sauron shapes */
+			if ((cave_ecology.race[i] == SAURON_TRUE) ||
+					((cave_ecology.race[i] >= SAURON_FORM) &&
+							(cave_ecology.race[i] < SAURON_FORM + MAX_SAURON_FORMS)))
+			{
+				int j;
+				bool present = FALSE;
+
+				/* Check all shapes */
+				if (r_info[SAURON_TRUE].cur_num) continue;
+
+				for (j = SAURON_FORM; j < SAURON_FORM + MAX_SAURON_FORMS; j++)
+				{
+					if (r_info[SAURON_TRUE].cur_num) present = TRUE;
+				}
+
+				if (present) continue;
 			}
 
 			/* Hack -- Never place quest monsters randomly. */
@@ -4630,6 +4661,8 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg)
 	if (r_idx == SAURON_TRUE)
 	{
 		r_idx = sauron_shape(0);
+
+		if (!r_idx) return (FALSE);
 	}
 
 	/* Place one monster, or fail */
@@ -6222,3 +6255,83 @@ void get_monster_ecology(int r_idx)
 	/* Get old monster level */
 	monster_level = old_monster_level;
 }
+
+
+/*
+ * Places the guardian on the level.
+ */
+bool place_guardian(int y0, int x0, int y1, int x1)
+{
+	int y = 0;
+	int x = 0;
+	int guard;
+	int count = 0;
+
+	dungeon_zone *zone=&t_info[0].zone[0];
+
+	/* Get the zone */
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+	/* Get the guardian */
+	guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
+
+	/* Paranoia */
+	if ((guard) && (r_info[guard].cur_num < r_info[guard].max_num))
+	{
+		/* Generating */
+		if (cheat_room) message_add(format("Placing guardian (%s).", r_name + r_info[guard].name), MSG_GENERIC);
+
+		/* Pick a location */
+		while (count++ < 1000)
+		{
+			y = y0 + rand_int(y1);
+			x = x0 + rand_int(x1);
+
+			/* XXX This is a duplicate of the place_monster_one checks */
+
+			/* Paranoia */
+			if (!in_bounds(y, x)) continue;
+
+			/* Require empty space */
+			if (!cave_empty_bold(y, x)) continue;
+
+			/* Require monster can pass and survive on terrain */
+			if (place_monster_here(y, x, guard) <= MM_FAIL) continue;
+
+			/* Hack -- no creation on glyph of warding */
+			if (f_info[cave_feat[y][x]].flags1 & (FF1_GLYPH)) continue;
+
+			break;
+		}
+
+		if (count < MAX_RANGE)
+		{
+			/* Paranoia - ensure some horizontal space to choose from */
+			if (x1 - x0 < count)
+			{
+				x0 = (x1 + x0) / 2 - count;
+				x1 = (x1 + x0) / 2 + count;
+			}
+
+			/* Paranoia - ensure some vertical space to choose from */
+			if (y1 - y0 < count)
+			{
+				y0 = (y1 + y0) / 2 - count;
+				y1 = (y1 + y0)/ 2 + count;
+			}
+		}
+
+		if (count >= 1000)
+		{
+			if (cheat_room) message_add(format("Could not place guardian (%s).", r_name + r_info[guard].name), MSG_GENERIC);
+
+			return (FALSE);
+		}
+
+		/* Place the questor */
+		place_monster_aux(y, x, guard, FALSE, TRUE, 0L);
+	}
+
+	return (TRUE);
+}
+

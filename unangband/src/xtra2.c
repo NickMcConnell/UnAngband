@@ -2772,8 +2772,14 @@ bool monster_death(int m_idx)
 		/* Killing this form means there is a chance of the true form being revealed */
 		p_ptr->sauron_forms |= (1 << (m_ptr->r_idx - SAURON_FORM));
 
+		/* XXX We have to manually mark it dead here */
+		r_info[m_ptr->r_idx].max_num = 0;
+
 		/* Sauron changes form */
 		m_ptr->r_idx = sauron_shape(m_ptr->r_idx);
+
+		/* Paranoia */
+		if (!m_ptr->r_idx) m_ptr->r_idx = SAURON_TRUE;
 
 		/* And gets back his hitpoints / mana */
 		m_ptr->hp = m_ptr->maxhp;

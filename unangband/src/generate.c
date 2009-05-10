@@ -313,6 +313,12 @@ struct dun_data
 
 	/* Array of which blocks are used */
 	bool room_map[MAX_ROOMS_ROW][MAX_ROOMS_COL];
+
+	/* Good location for guardian */
+	byte guard_x0;
+	byte guard_y0;
+	byte guard_x1;
+	byte guard_y1;
 };
 
 
@@ -3040,6 +3046,16 @@ static bool find_space(int *y, int *x, int height, int width)
 
 			/* Pick which deepest monster */
 			room_info[dun->cent_n].deepest_race = room_info[pick].deepest_race;
+		}
+
+		/* Put the guardian in a room, unless they're in the tower */
+		if (!rand_int(dun->cent_n) && ((level_flag & (LF1_TOWER)) == 0))
+		{
+			/* Set the coordinates */
+			dun->guard_y0 = *y - height / 2;
+			dun->guard_x0 = *x - width / 2;
+			dun->guard_y1 = *y + height / 2;
+			dun->guard_x1 = *x + width / 2;
 		}
 
 		/* Success. */
@@ -6635,6 +6651,12 @@ static void build_tower(int y0, int x0, int ymax, int xmax, cptr data)
 	cptr t;
 
 	int monsters_left = 30;
+
+	/* Put the guardian in the tower */
+	dun->guard_y0 = y0 - ymax / 2;
+	dun->guard_x0 = x0 - xmax / 2;
+	dun->guard_y1 = y0 + ymax / 2;
+	dun->guard_x1 = x0 + xmax / 2;
 
 	/* Place dungeon features and objects */
 	for (t = data, dy = 0; dy < ymax; dy++)
@@ -11660,6 +11682,12 @@ static bool cave_gen(void)
 	dun = &dun_body;
 	WIPE(dun, dun_data);
 
+	/* Set allowed guardian locations */
+	dun->guard_x0 = 1;
+	dun->guard_y0 = 1;
+	dun->guard_x1 = DUNGEON_WID - 1;
+	dun->guard_y1 = DUNGEON_HGT - 1;
+
 	/* Get the zone */
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
@@ -12009,44 +12037,18 @@ static bool cave_gen(void)
 	/* Build streamers and entrance markings in caves */
 	place_decorations();
 
+	/* Ensure guardian monsters */
+	if ((level_flag & (LF1_GUARDIAN)) != 0)
+	{
+		/* Place the guardian in the dungeon */
+		if (!place_guardian(dun->guard_y0, dun->guard_x0, dun->guard_y1, dun->guard_x1)) return (FALSE);
+	}
+
 	/* Build traps, treasure, rubble etc and place the player */
 	if (!place_contents()) return (FALSE);
 
 	/* Apply illumination */
 	if ((level_flag & (LF1_SURFACE)) != 0) town_illuminate((level_flag & (LF1_DAYLIGHT)) != 0);
-
-	/* Ensure guardian monsters */
-	if ((level_flag & (LF1_GUARDIAN)) != 0)
-	{
-		int y = 0;
-		int x = 0;
-		int guard;
-		int count = 0;
-
-		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
-
-		/* Generating */
-		if (cheat_room) message_add(format("Placing guardian (%s).", r_name + r_info[guard].name), MSG_GENERIC);
-
-		/* Pick a location */
-		while (count++ < 1000)
-		{
-			y = rand_int(DUNGEON_HGT);
-			x = rand_int(DUNGEON_WID);
-
-			if (place_monster_here(y, x, guard) > MM_FAIL) break;
-		}
-
-		if (count >= 1000)
-		{
-			if (cheat_room) message_add(format("Could not place guardian (%s).", r_name + r_info[guard].name), MSG_GENERIC);
-
-			return (FALSE);
-		}
-
-		/* Place the questor */
-		place_monster_aux(y, x, guard, FALSE, TRUE, 0L);
-	}
 
 	/* Generating */
 	if (cheat_room) message_add("Finished generating dungeon.", MSG_GENERIC);
@@ -12428,24 +12430,8 @@ static bool town_gen(void)
 	/* Ensure guardian monsters */
 	if (((level_flag & (LF1_GUARDIAN)) != 0) && ((level_flag & (LF1_DAYLIGHT)) == 0))
 	{
-		int y, x, guard;
-
-		guard = actual_guardian(zone->guard, p_ptr->dungeon, zone - t_info[p_ptr->dungeon].zone);
-
-		/* Generating */
-		if (cheat_room) message_add(format("Placing guardian (%s).", r_name + r_info[guard].name), MSG_GENERIC);
-
-		/* Pick a location */
-		while (1)
-		{
-			y = rand_range(3, TOWN_HGT - 4);
-			x = rand_range(3, TOWN_WID - 4);
-
-			if (place_monster_here(y, x, guard) > MM_FAIL) break;
-		}
-
-		/* Place the questor */
-		place_monster_aux(y, x, guard, FALSE, TRUE, 0L);
+		/* Place the guardian in the town */
+		place_guardian(3, 3, TOWN_HGT - 4, TOWN_WID -4);
 	}
 	else
 	{
@@ -12515,10 +12501,11 @@ void generate_cave(void)
 	/* Initialise level flags */
 	init_level_flags();
 
-	/* Reset 'quest' status of monsters */
+	/* Reset 'quest' status of monsters and count of current number on level */
 	for (i = 0; i < z_info->r_max; i++)
 	{
 		r_info[i].flags1 &= ~(RF1_QUESTOR);
+		r_info[i].cur_num = 0;
 	}
 
 	/* Hack -- ensure quest monsters not randomly generated */

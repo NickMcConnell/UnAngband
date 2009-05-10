@@ -1851,6 +1851,19 @@ int sauron_shape(int old_form)
 
 	int r_idx = SAURON_TRUE;
 
+	/* Player has killed the true Sauron */
+	if (r_info[SAURON_TRUE].cur_num >= r_info[SAURON_TRUE].max_num) return (0);
+
+	/* Oops - we have a true Sauron */
+	if ((r_info[SAURON_TRUE].cur_num) && (old_form != SAURON_TRUE)) return (0);
+
+	/* Check that another form is not on this level */
+	for (i = SAURON_FORM; i < SAURON_FORM + MAX_SAURON_FORMS; i++)
+	{
+		if ((r_info[i].cur_num) && (old_form != i)) return (0);
+	}
+
+	/* Choose a form */
 	for (i = SAURON_FORM; i < SAURON_FORM + MAX_SAURON_FORMS; i++)
 	{
 		/* Never pick old shape */
@@ -2626,6 +2639,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 				/* Get the new Sauron Shape */
 				m_ptr->r_idx = sauron_shape(m_ptr->r_idx);
+
+				/* We have a problem */
+				if (!m_ptr->r_idx) m_ptr->r_idx = SAURON_TRUE;
 			}
 			/* Druids/shamans sometimes add health from trees/plants */
 			if ((who > 0) && (target == who) && ((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (rand_int(100) < 50))
