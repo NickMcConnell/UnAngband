@@ -180,7 +180,7 @@
  * Bounds on some arrays used in the "dun_data" structure.
  * These bounds are checked, though usually this is a formality.
  */
-#define CENT_MAX	50	/* Consider DUN_ROOMS */
+#define CENT_MAX	DUN_ROOMS
 #define DOOR_MAX	100
 #define NEXT_MAX	200
 #define WALL_MAX	80
@@ -2876,6 +2876,9 @@ static bool find_space(int *y, int *x, int height, int width)
 	int blocks_high = 1 + ((height - 1) / BLOCK_HGT);
 	int blocks_wide = 1 + ((width - 1) / BLOCK_WID);
 
+	/* Out of space in the room array */
+	if (dun->cent_n >= CENT_MAX - 1) return (FALSE);
+
 	/* Sometimes, little rooms like to have more space. */
 	if (blocks_wide == 2)
 	{
@@ -2986,7 +2989,7 @@ static bool find_space(int *y, int *x, int height, int width)
 		(*x) = ((bx1 + bx2) * BLOCK_WID) / 2;
 
 		/* Save the room location */
-		if (dun->cent_n < CENT_MAX)
+		if (dun->cent_n < CENT_MAX - 1)
 		{
 			dun->cent[dun->cent_n].y = *y;
 			dun->cent[dun->cent_n].x = *x;
@@ -10630,7 +10633,7 @@ static void place_tower()
 	build_tower(y, x, v_ptr->hgt, v_ptr->wid, v_text + v_ptr->text);
 
 	/* Paranoia */
-	if (dun->cent_n < CENT_MAX)
+	if (dun->cent_n < CENT_MAX - 1)
 	{
 		/* Set corridor here */
 		dun->cent[dun->cent_n].y = y;
