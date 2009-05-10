@@ -991,6 +991,9 @@ void self_knowledge_aux(bool spoil, bool random)
 		t2 &= ~(f2);
 		t3 &= ~(f3);
 		t4 &= ~(f4);
+
+		/* Clear the flags */
+		f1 = f2 = f3 = f4 = 0L;
 	}
 
 	/* Hack -- class effects */
