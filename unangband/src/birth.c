@@ -971,16 +971,10 @@ static int get_player_choice(birth_menu *choices, int num, int col, int wid,
 			/* Mega Hack - go back. */
 			return (INVALID_CHOICE);
 		}
-		if (ke.key == '*')
+		if ((ke.key == '*') || (ke.key == '@'))
 		{
-			int count = 0;
-
 			/* Select a legal choice at random */
-			while (count++ < 100)
-			{
-				cur = rand_int(num);
-				if (!choices[cur].ghost) break;
-			}
+			cur = rand_int(num);
 
 			/* Move it onto the screen */
 			if ((cur < top) || (cur > top + hgt))
