@@ -1849,13 +1849,13 @@ bool avoid_trap(int y, int x)
 		/* Gas trap */
 		case TERM_GREEN:
 		{
-			/* Avoid by holding breath */
+			/* Avoid by dropping stuff to trigger it */
 			break;
 		}
 		/* Explosive trap */
 		case TERM_BLUE:
 		{
-			/* Avoid by XXXX */
+			/* Avoid by dropping stuff to trigger it */
 			break;
 		}
 		/* Discoloured spot */
@@ -3465,9 +3465,9 @@ void move_player(int dir)
 	}
 
 	/* Hack -- attack monsters --- except hidden ones, allies or townsfolk */
-	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY | MFLAG_TOWN)) &&
+	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)) &&
 	 /* Note hack to also ignore monsters on town level who don't do damage. */
-		(((level_flag & (LF1_TOWN)) == 0) || (r_info[m_list[cave_m_idx[y][x]].r_idx].blow[0].d_dice != 0)) &&
+		(((level_flag & (LF1_TOWN)) == 0) || (r_info[m_list[cave_m_idx[y][x]].r_idx].blow[0].effect != GF_NOTHING)) &&
 		 /* Allow the player to run over most monsters -- except those that can't move */
 		 (!(p_ptr->running) || (r_info[m_list[cave_m_idx[y][x]].r_idx].flags1 & (RF1_NEVER_MOVE))))
 	{

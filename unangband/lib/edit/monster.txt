@@ -109,7 +109,7 @@ G:h:W
 #$ Multihued available
 #$ Metallics available:dwsrgbuDWPRGBpvtmYiTVIMzZ
 #$ Colors available:dgtz
-I:110:343:40:10:3
+I:110:120:40:10:3
 W:0:7:0:0
 C:6:7:0:9:57
 M:20:0:1:0
