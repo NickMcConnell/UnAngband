@@ -5912,14 +5912,14 @@ int deeper_monster(int r_idx, int r)
 	if (!r_idx) return (r);
 
 	/* Is the current monster deeper */
-	if (r_info[cave_ecology.deepest_race[r]].level < r_info[r_idx].level)
+	if (r_info[r].level < r_info[r_idx].level)
 	{
 		/* Monster race */
 		return(r_idx);
 	}
 
 	/* Is the current monster deeper */
-	else if ((r_info[cave_ecology.deepest_race[r]].level == r_info[r_idx].level) && (r_info[cave_ecology.deepest_race[r]].mexp < r_info[r_idx].mexp))
+	else if ((r_info[r].level == r_info[r_idx].level) && (r_info[r].mexp < r_info[r_idx].mexp))
 	{
 		/* Monster race */
 		return(r_idx);
