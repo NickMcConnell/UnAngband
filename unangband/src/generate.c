@@ -10035,6 +10035,7 @@ static bool build_type20(int room, int type)
 
 	/* Save ecology start */
 	int ecology_start = cave_ecology.num_races;
+	bool old_ecology_ready = FALSE;
 
 	/* Unused yet */
 	(void)type;
@@ -10068,17 +10069,36 @@ static bool build_type20(int room, int type)
 	if (cave_ecology.num_ecologies < MAX_ECOLOGIES) cave_ecology.num_ecologies++;
 
 	/* Use ecology of room */
-	cave_ecology.use_ecology = room_info[room].ecology;
+	cave_ecology.ready = FALSE;
 
 	/* Get the ecology */
 	get_monster_ecology(0, NUM_PIT_RACES);
 
 	/* Clear ecology use */
-	cave_ecology.use_ecology = FALSE;
+	cave_ecology.ready = old_ecology_ready;
 
-	/* Paranoia */
-	if (ecology_start == cave_ecology.num_races)
+	/* Remove duplicate races from pit */
+	for (i = ecology_start; i < cave_ecology.num_races; i++)
 	{
+		for (j = i + 1; j < cave_ecology.num_races; j++)
+		{
+			/* Duplicate detected */
+			if (cave_ecology.race[i] == cave_ecology.race[j])
+			{
+				cave_ecology.race[j] = cave_ecology.race[cave_ecology.num_races - 1];
+				cave_ecology.num_races--;
+				
+				/* Need to recheck swapped in race */
+				j--;
+			}
+		}
+	}
+		
+	/* Need at least 3 different races in pit */
+	if (ecology_start + 2 >= cave_ecology.num_races)
+	{
+		cave_ecology.num_races = ecology_start;
+		
 		return(FALSE);
 	}
 

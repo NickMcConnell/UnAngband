@@ -6038,7 +6038,7 @@ static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int num
 			cave_ecology.race[cave_ecology.num_races] = r_idx;
 
 			/* Add monster to ecology */
-			cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L << (cave_ecology.num_ecologies - 1));
+			cave_ecology.race_ecologies[cave_ecology.num_races] = (1L << (cave_ecology.num_ecologies - 1));
 
 			/* Shallow monsters wander outside ecology */
 			if (r_info[r_idx].level < p_ptr->depth - 5) cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L);
