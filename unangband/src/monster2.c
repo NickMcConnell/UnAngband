@@ -4105,7 +4105,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 			(strstr(r_name + r_ptr->name, "Swamp")))
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_WATER);
+			if (!rand_int(++k)) temp_flag2 = (LF1_WATER);
 		}
 	}
 
@@ -4127,7 +4127,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 			(strst(r_name + r_ptr->name, "Magma")) */)
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_LAVA);
+			if (!rand_int(++k)) temp_flag2 = (LF1_LAVA);
 		}
 	}
 
@@ -4147,7 +4147,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 			(strst(r_name + r_ptr->name, "Magma")) */)
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_ICE);
+			if (!rand_int(++k)) temp_flag2 = (LF1_ICE);
 		}
 	}
 
@@ -4162,7 +4162,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 			(r_ptr->flags4 & (RF4_BRTH_ACID)))
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_ACID);
+			if (!rand_int(++k)) temp_flag2 = (LF1_ACID);
 		}
 	}
 
@@ -4186,7 +4186,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 			(strstr(r_name + r_ptr->name, "Crystal")))
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_ACID);
+			if (!rand_int(++k)) temp_flag2 = (LF1_ACID);
 		}
 	}
 
@@ -4201,7 +4201,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 		if ((strchr("g|\\/~", r_ptr->d_char)))
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_OIL);
+			if (!rand_int(++k)) temp_flag2 = (LF1_OIL);
 		}
 	}
 
@@ -4219,7 +4219,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 			(strstr(r_name + r_ptr->name, "Sky")))
 		{
 			okay |= (TRUE);
-			if (rand_int(++k)) temp_flag2 = (LF1_CHASM);
+			if (!rand_int(++k)) temp_flag2 = (LF1_CHASM);
 		}
 
 	}
@@ -4236,14 +4236,14 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 				{
 					okay |= (TRUE);
 					/* 'Modern' ecology - feathered and furred allowed */
-					if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_ANIMAL);
+					if (!rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_ANIMAL);
 				}
 			}
 			else
 			{
 				okay |= (TRUE);
 				/* 'Prehistoric' ecology - scaley, skinned, plants and insects only */
-				if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
+				if (!rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
 			}
 		}
 
@@ -4252,7 +4252,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 		{
 			okay |= (TRUE);
 			/* 'Prehistoric' ecology - scaley, skinned, plants and insects only */
-			if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
+			if (!rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
 		}
 
 		/* Most plants are prehistoric or later -- flowering plants require insects */
@@ -4260,7 +4260,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 		{
 			okay |= (TRUE);
 			/* 'Prehistoric' ecology - scaley, skinned, plants and insects only */
-			if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
+			if (!rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
 		}
 
 		/* Slime ecology? - Ugh. Not pleasant for the player... */
@@ -4268,7 +4268,7 @@ static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
 		{
 			okay |= (TRUE);
 			/* Slime ecology */
-			if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_PLANT);
+			if (!rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_PLANT);
 		}
 	}
 
