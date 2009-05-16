@@ -5907,6 +5907,10 @@ void message_pain(int m_idx, int dam)
  */
 int deeper_monster(int r_idx, int r)
 {
+	/* Paranoia */
+	if (!r) return (r_idx);
+	if (!r_idx) return (r);
+
 	/* Is the current monster deeper */
 	if (r_info[cave_ecology.deepest_race[r]].level < r_info[r_idx].level)
 	{
@@ -6131,8 +6135,11 @@ void get_monster_ecology(int r_idx, int hack_pit)
 		if (cave_ecology.race[j] == r_idx) break;
 	}
 
-	/* Make space for monster if it does not exist already. Force this for pits. */
-	if ((hack_pit) || (j == cave_ecology.num_races))
+	/* Force space for pits */
+	if (hack_pit) j = cave_ecology.num_races;
+
+	/* Make space for monster if it does not exist already. */
+	if (j == cave_ecology.num_races)
 	{
 		/* Paranoia */
 		if (cave_ecology.num_races >= MAX_ECOLOGY_RACES - 1) return;

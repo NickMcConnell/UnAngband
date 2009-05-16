@@ -6190,11 +6190,19 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 	/* Make space for the ecology of the vault */
 	if (cave_ecology.num_ecologies < MAX_ECOLOGIES) cave_ecology.num_ecologies++;
 
-	/* Add the vault ecology */
-	room_info[room].ecology |= (1L << (cave_ecology.num_ecologies - 1));
+	/* Sweep up existing ecology for use in vault */
+	for (i = 0; i < cave_ecology.num_races; i++)
+	{
+		/* Monster in this room's base ecology */
+		if ((cave_ecology.race_ecologies[i] & (room_info[room].ecology)) != 0)
+		{
+			/* Add monster to vault ecology */
+			cave_ecology.race_ecologies[i] |= (1L << (cave_ecology.num_ecologies - 1));
+		}
+	}
 
 	/* Use this ecology for monster placement during vault generation */
-	cave_ecology.use_ecology = room_info[room].ecology;
+	cave_ecology.use_ecology = (1L << (cave_ecology.num_ecologies - 1));
 
 	/* Track the deepest monster to ramp up difficulty near the vault */
 	vault_deepest_monster = 0;
@@ -6670,6 +6678,9 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 			cave_ecology.race_ecologies[j] |= room_info[room].ecology;
 		}
 	}
+
+	/* Deepest race */
+	room_info[room].deepest_race = deeper_monster(room_info[room].deepest_race, cave_ecology.deepest_race[cave_ecology.num_ecologies - 1]);
 
 	/* Don't use this ecology */
 	cave_ecology.use_ecology = 0L;
@@ -10025,8 +10036,6 @@ static bool build_type20(int room, int type)
 	/* Save ecology start */
 	int ecology_start = cave_ecology.num_races;
 
-	bool old_ecology_ready = cave_ecology.ready;
-
 	/* Unused yet */
 	(void)type;
 
@@ -10058,14 +10067,14 @@ static bool build_type20(int room, int type)
 	/* Make space for the ecology of the pit */
 	if (cave_ecology.num_ecologies < MAX_ECOLOGIES) cave_ecology.num_ecologies++;
 
-	/* Stop ecology */
-	cave_ecology.ready = FALSE;
+	/* Use ecology of room */
+	cave_ecology.use_ecology = room_info[room].ecology;
 
 	/* Get the ecology */
 	get_monster_ecology(0, NUM_PIT_RACES);
 
-	/* Start ecology */
-	cave_ecology.ready = old_ecology_ready;
+	/* Clear ecology use */
+	cave_ecology.use_ecology = FALSE;
 
 	/* Paranoia */
 	if (ecology_start == cave_ecology.num_races)
@@ -10073,8 +10082,8 @@ static bool build_type20(int room, int type)
 		return(FALSE);
 	}
 
-	/* Add to room ecology */
-	room_info[room].ecology |= (1L << (cave_ecology.num_ecologies - 1));
+	/* Deepest race */
+	room_info[room].deepest_race = deeper_monster(room_info[room].deepest_race, cave_ecology.deepest_race[cave_ecology.num_ecologies - 1]);
 
 	/* Shallower pit monsters are found outside the pit
 	   We use this to ramp up the difficulty near the pit to warn
@@ -10083,7 +10092,7 @@ static bool build_type20(int room, int type)
 	for (j = ecology_start; j < cave_ecology.num_races; j++)
 	{
 		/* Deepest monster */
-		if (r_info[cave_ecology.race[j]].level < (p_ptr->depth + vault_deepest_monster) / 2)
+		if (r_info[cave_ecology.race[j]].level < (p_ptr->depth + r_info[room_info[room].deepest_race].level) / 2)
 		{
 			/* Appears in rooms near the vault */
 			cave_ecology.race_ecologies[j] |= room_info[room].ecology;
