@@ -209,7 +209,7 @@
 /*
  * Maximal number of room types
  */
-#define ROOM_MAX	23
+#define ROOM_MAX	24
 #define ROOM_MIN	2
 
 
@@ -371,6 +371,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 41,DUN_ROOMS/3,		1, 0, LF1_THEME & ~(LF1_DESTROYED)},
    /* Lrg maze */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 41,	3,		2, 0, LF1_LABYRINTH | LF1_STRONGHOLD | LF1_CAVE | LF1_CRYPT | LF1_SEWER | LF1_WILD},
    /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 41,	1,		3, 0, LF1_LABYRINTH | LF1_WILD},
+   /* Monst.pit */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 41,	1,		2, 0, LF1_DUNGEON},
    /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		2, 0, LF1_WILD},
    /* Huge lake */{{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		3, 0, LF1_WILD},
    /* Tower */    {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 41,	1,		3, 0, LF1_TOWER}
@@ -380,7 +381,7 @@ static room_data_type room_data[ROOM_MAX] =
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
 static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_HUGE_MAZE, ROOM_CHAMBERS,
-						ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LARGE_MAZE, ROOM_LARGE_FRACTAL,
+						ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_MONSTER_PIT, ROOM_LARGE_MAZE, ROOM_LARGE_FRACTAL,
 						ROOM_LESSER_VAULT, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_MAZE, ROOM_FRACTAL, ROOM_LARGE_CENTRE,
 						ROOM_LARGE_WALLS, ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0, 0, 0, 0};
 
@@ -986,6 +987,44 @@ static void generate_rect(int y1, int x1, int y2, int x2, int feat)
 	{
 		cave_set_feat(y1, x, feat);
 		cave_set_feat(y2, x, feat);
+	}
+}
+
+
+/*
+ * Generate helper -- open one side of a rectangle with a feature
+ */
+static void generate_hole(int y1, int x1, int y2, int x2, int feat)
+{
+	int y0, x0;
+
+	/* Center */
+	y0 = (y1 + y2) / 2;
+	x0 = (x1 + x2) / 2;
+
+	/* Open random side */
+	switch (rand_int(4))
+	{
+		case 0:
+		{
+			cave_set_feat(y1, x0, feat);
+			break;
+		}
+		case 1:
+		{
+			cave_set_feat(y0, x1, feat);
+			break;
+		}
+		case 2:
+		{
+			cave_set_feat(y2, x0, feat);
+			break;
+		}
+		case 3:
+		{
+			cave_set_feat(y0, x2, feat);
+			break;
+		}
 	}
 }
 
@@ -6114,7 +6153,7 @@ static void vault_monster(int y, int x, char symbol, int level)
 	/* Get monster ecology */
 	if (needed)
 	{
-		get_monster_ecology(r_idx);
+		get_monster_ecology(r_idx, 0);
 	}
 
 	/* Track deepest monster level */
@@ -6137,12 +6176,13 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 	bool flip_vert = (bool)rand_int(2);
 	bool flip_hori = (bool)rand_int(2);
 
+	int ecology_start = cave_ecology.num_races;
+
 	/* Calculate the borders of the vault. */
 	y1 = y0 - (ymax / 2);
 	x1 = x0 - (xmax / 2);
 	y2 = y1 + ymax - 1;
 	x2 = x1 + xmax - 1;
-
 
 	/* Make certain that the vault does not cross the dungeon edge. */
 	if ((!in_bounds(y1, x1)) || (!in_bounds(y2, x2))) return (FALSE);
@@ -6621,7 +6661,7 @@ static bool build_vault(int room, int y0, int x0, int ymax, int xmax, cptr data)
 	/* We use this to ramp up the difficulty near the vault to warn
 	 * the player and make it harder to exploit.
 	 */
-	for (j = 0; j < cave_ecology.num_races; j++)
+	for (j = ecology_start; j < cave_ecology.num_races; j++)
 	{
 		/* Deepest monster */
 		if (r_info[cave_ecology.race[j]].level < (p_ptr->depth + vault_deepest_monster) / 2)
@@ -9948,6 +9988,314 @@ static bool build_type171819(int room, int type)
 }
 
 
+/* The number of different races used for the pit ecology */
+/* XXX We assume this is at least 16 */
+#define NUM_PIT_RACES	16
+
+/*
+ * Monster pits
+ *
+ * A monster pit is a large room, with an inner room filled with monsters.
+ *
+ * The type of monsters is determined by inputting the current dungeon
+ * level into "mon_symbol_at_depth", and accepting the character returned.
+ * After translating this into a set of selection criteria, monsters are
+ * chosen and arranged in the inner room.
+ *
+ * Monster pits will never contain unique monsters.
+ *
+ * Note:
+ * Monster pits are fun, but they are among the chief monster (and thus
+ * object) inflators going.  We have therefore reduced their size in many
+ * cases.
+ */
+static bool build_type20(int room, int type)
+{
+	int y, x, y0, x0, y1, x1, y2, x2;
+	int i, j;
+
+	int width;
+
+	bool ordered = FALSE;
+	int light = FALSE;
+
+	/* Save level rating */
+	int old_rating = rating;
+
+	/* Save ecology start */
+	int ecology_start = cave_ecology.num_races;
+
+	bool old_ecology_ready = cave_ecology.ready;
+
+	/* Unused yet */
+	(void)type;
+
+	/* Ensure we have empty space in the ecology for the monster races */
+	if (cave_ecology.num_races + NUM_PIT_RACES >= MAX_ECOLOGY_RACES) return (FALSE);
+
+	/* Pick a room size (less border walls) */
+	y = 9;
+	x = (one_in_(3) ? 23 : 13);
+
+	/* Save the width */
+	width = (x-5) / 2;
+
+	/* Find and reserve some space in the dungeon.  Get center of room. */
+	if (!find_space(&y0, &x0, y+2, x+2)) return (FALSE);
+
+	/* Locate the room */
+	y1 = y0 - y / 2;
+	x1 = x0 - x / 2;
+	y2 =  y1 + y - 1;
+	x2 =  x1 + x - 1;
+
+	/* Check bounds */
+	if (!(in_bounds_fully(y1, x1)) || !(in_bounds_fully(y2, x2))) return (FALSE);
+
+	/* Allow tougher monsters */
+	monster_level = p_ptr->depth + 3 + div_round(p_ptr->depth, 12);
+
+	/* Make space for the ecology of the pit */
+	if (cave_ecology.num_ecologies < MAX_ECOLOGIES) cave_ecology.num_ecologies++;
+
+	/* Stop ecology */
+	cave_ecology.ready = FALSE;
+
+	/* Get the ecology */
+	get_monster_ecology(0, NUM_PIT_RACES);
+
+	/* Start ecology */
+	cave_ecology.ready = old_ecology_ready;
+
+	/* Paranoia */
+	if (ecology_start == cave_ecology.num_races)
+	{
+		return(FALSE);
+	}
+
+	/* Add to room ecology */
+	room_info[room].ecology |= (1L << (cave_ecology.num_ecologies - 1));
+
+	/* Shallower pit monsters are found outside the pit
+	   We use this to ramp up the difficulty near the pit to warn
+	 * the player and make it harder to exploit.
+	 */
+	for (j = ecology_start; j < cave_ecology.num_races; j++)
+	{
+		/* Deepest monster */
+		if (r_info[cave_ecology.race[j]].level < (p_ptr->depth + vault_deepest_monster) / 2)
+		{
+			/* Appears in rooms near the vault */
+			cave_ecology.race_ecologies[j] |= room_info[room].ecology;
+		}
+	}
+
+	/* Generate new room.  Quit immediately if out of bounds. */
+	generate_room(y1-1, x1-1, y2+1, x2+1, light);
+
+	/* Generate outer walls */
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+
+	/* Generate inner floors */
+	generate_fill(y1, x1, y2, x2, FEAT_FLOOR);
+
+	/* Advance to the center room */
+	y1 = y1 + 2;
+	y2 = y2 - 2;
+	x1 = x1 + 2;
+	x2 = x2 - 2;
+
+	/* Generate inner walls */
+	generate_rect(y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+
+	/* Open the inner room with a secret door */
+	generate_hole(y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+
+	/* Order on the basis of intelligence of the deepest race */
+	ordered = ((r_info[cave_ecology.deepest_race[room]].flags2 & (RF2_SMART)) != 0);
+
+	/* Arrange the monsters in the room randomly. */
+	if (!ordered)
+	{
+		int r_idx = 0;
+
+		/* Place some monsters */
+		for (y = y0 - 2; y <= y0 + 2; y++)
+		{
+			for (x = x0 - width; x <= x0 + width; x++)
+			{
+				int r = ecology_start + rand_int(cave_ecology.num_races - ecology_start);
+
+				/* Get a monster index */
+				r_idx = cave_ecology.race[r];
+
+				/* Place a single monster */
+				(void)place_monster_aux(y, x, r_idx, FALSE, FALSE, 0L);
+
+				/* If a unique, fill in the gap */
+				if (r_info[r_idx].flags1 & (RF1_UNIQUE))
+				{
+					cave_ecology.race[r] = cave_ecology.race[cave_ecology.num_races - 1];
+					if (cave_ecology.num_races > ecology_start + 1) cave_ecology.num_races--;
+				}
+			}
+		}
+	}
+
+	/* Arrange the monsters in the room in an orderly fashion. */
+	else
+	{
+		s16b what[NUM_PIT_RACES];
+
+		/* Pick some monster types */
+		for (i = 0; i < NUM_PIT_RACES; i++)
+		{
+			/* Get a monster index. */
+			/* Paranoia in case we were unable to get NUM_PIT_RACES */
+			what[i] = cave_ecology.race[ecology_start + (i * (cave_ecology.num_races - ecology_start)) / NUM_PIT_RACES];
+		}
+
+		/* Sort the monsters */
+		for (i = 0; i < NUM_PIT_RACES - 1; i++)
+		{
+			for (j = 0; j < NUM_PIT_RACES - 1; j++)
+			{
+				int i1 = j;
+				int i2 = j + 1;
+
+				int p1 = r_info[what[i1]].level;
+				int p2 = r_info[what[i2]].level;
+
+				/* Bubble sort */
+				if ((p1 > p2) || (r_info[what[i1]].flags1 & (RF1_UNIQUE)))
+				{
+					int tmp = what[i1];
+					what[i1] = what[i2];
+					what[i2] = tmp;
+				}
+			}
+		}
+
+		/* Handle both widths */
+		if (width == 9)
+		{
+			/* Top and bottom rows (outer) */
+			for (x = x0 - 9; x <= x0 - 4; x++)
+			{
+				place_monster_aux(y0 - 2, x, what[2], FALSE, FALSE, 0L);
+				place_monster_aux(y0 + 2, x, what[2], FALSE, FALSE, 0L);
+			}
+			for (x = x0 + 4; x <= x0 + 9; x++)
+			{
+				place_monster_aux(y0 - 2, x, what[2], FALSE, FALSE, 0L);
+				place_monster_aux(y0 + 2, x, what[2], FALSE, FALSE, 0L);
+			}
+
+			/* Top and bottom rows (inner) */
+			for (x = x0 - 3; x <= x0 + 3; x++)
+			{
+				place_monster_aux(y0 - 2, x, what[3], FALSE, FALSE, 0L);
+				place_monster_aux(y0 + 2, x, what[3], FALSE, FALSE, 0L);
+			}
+
+			/* Outer and middle columns */
+			for (y = y0 - 1; y <= y0 + 1; y++)
+			{
+				place_monster_aux(y, x0 - 9, what[2], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 9, what[2], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 8, what[4], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 8, what[4], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 7, what[5], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 7, what[5], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 6, what[6], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 6, what[6], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 5, what[7], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 5, what[7], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 4, what[8], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 4, what[8], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 3, what[9], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 3, what[9], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 2, what[11], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 2, what[11], FALSE, FALSE, 0L);
+			}
+		}
+		else if (width == 4)
+		{
+			/* Top and bottom rows (outer) */
+			for (x = x0 - 4; x <= x0 - 3; x++)
+			{
+				place_monster_aux(y0 - 2, x, what[2], FALSE, FALSE, 0L);
+				place_monster_aux(y0 + 2, x, what[2], FALSE, FALSE, 0L);
+			}
+			for (x = x0 + 3; x <= x0 + 4; x++)
+			{
+				place_monster_aux(y0 - 2, x, what[2], FALSE, FALSE, 0L);
+				place_monster_aux(y0 + 2, x, what[2], FALSE, FALSE, 0L);
+			}
+
+			/* Top and bottom rows (inner) */
+			for (x = x0 - 2; x <= x0 + 2; x++)
+			{
+				place_monster_aux(y0 - 2, x, what[3], FALSE, FALSE, 0L);
+				place_monster_aux(y0 + 2, x, what[3], FALSE, FALSE, 0L);
+			}
+
+			/* Outer and middle columns */
+			for (y = y0 - 1; y <= y0 + 1; y++)
+			{
+				place_monster_aux(y, x0 - 4, what[2], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 4, what[2], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 3, what[6], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 3, what[6], FALSE, FALSE, 0L);
+
+				place_monster_aux(y, x0 - 2, what[9], FALSE, FALSE, 0L);
+				place_monster_aux(y, x0 + 2, what[9], FALSE, FALSE, 0L);
+			}
+		}
+
+		/* Above/Below the center monster */
+		for (x = x0 - 1; x <= x0 + 1; x++)
+		{
+			place_monster_aux(y0 + 1, x, what[12], FALSE, FALSE, 0L);
+			place_monster_aux(y0 - 1, x, what[12], FALSE, FALSE, 0L);
+		}
+
+		/* Next to the center monster */
+		place_monster_aux(y0, x0 + 1, what[14], FALSE, FALSE, 0L);
+		place_monster_aux(y0, x0 - 1, what[14], FALSE, FALSE, 0L);
+
+		/* Center monster */
+		place_monster_aux(y0, x0, what[15], FALSE, FALSE, 0L);
+	}
+
+	/* Describe */
+	if (cheat_room) msg_print("Monster pit");
+
+	/*
+	 * Because OOD monsters in monster pits are generally less dangerous than
+	 * they are when wandering around, apply only one-half the difference in
+	 * level rating, and then add something for the sheer quantity of monsters.
+	 */
+	i = rating - old_rating;
+	rating = old_rating + (i / 2) + (width <= 4 ? 5 : 10);
+
+	/* Set the vault / interesting room flags */
+	set_room_flags(room, type, FALSE);
+
+	/* Success */
+	return (TRUE);
+}
+
+
+
 /*
  * Attempt to build a room of the given type.
  */
@@ -9973,6 +10321,7 @@ static bool room_build(int room, int type)
 	switch (type)
 	{
 		/* Build an appropriate room */
+		case ROOM_MONSTER_PIT: if (build_type20(room, type)) return (TRUE); break;
 		case ROOM_HUGE_MAZE: if (build_type171819(room,type)) return(TRUE); break;
 		case ROOM_LARGE_MAZE: if (build_type171819(room,type)) return(TRUE); break;
 		case ROOM_MAZE: if (build_type171819(room,type)) return(TRUE); break;
@@ -10506,7 +10855,7 @@ static void init_ecology(int r_idx)
 	if (r_idx)
 	{
 		/* Get seed monster for ecology */
-		get_monster_ecology(r_idx);
+		get_monster_ecology(r_idx, 0);
 	}
 
 	/* Get a seed monster for the ecology */
@@ -10519,7 +10868,7 @@ static void init_ecology(int r_idx)
 		get_mon_num_prep();
 
 		/* Get seed monster for ecology */
-		get_monster_ecology(0);
+		get_monster_ecology(0, 0);
 
 		/* Clear monster hook */
 		get_mon_num_hook = NULL;
@@ -10574,7 +10923,7 @@ static void init_ecology(int r_idx)
 				cave_ecology.num_ecologies++;
 
 			/* Get seed monster for ecology */
-			get_monster_ecology(0);
+			get_monster_ecology(0, 0);
 
 			if (get_mon_num_hook)
 			{

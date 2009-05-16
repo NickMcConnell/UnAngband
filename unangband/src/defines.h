@@ -409,9 +409,10 @@
 #define ROOM_MAZE				17
 #define ROOM_LARGE_MAZE			18
 #define ROOM_HUGE_MAZE			19
-#define ROOM_LAKE				20
-#define ROOM_HUGE_LAKE			21
-#define ROOM_TOWER       		22
+#define ROOM_MONSTER_PIT		20
+#define ROOM_LAKE				21
+#define ROOM_HUGE_LAKE			22
+#define ROOM_TOWER       		23
 
 
 /*
@@ -959,8 +960,8 @@ enum
 #define SUMMON_ALL_BUT_PREFIX   37
 #define SUMMON_INFIX_WYRM_OF   38
 #define SUMMON_DRAGON_BREATH   39
-#define SUMMON_ALIGN	40
-#define SUMMON_LIVING	41
+#define SUMMON_ALIGN	40		/* Summon monsters which match living & evil flags */
+#define SUMMON_LEVEL	41		/* Summon monsters specific to LF1_TERRAIN flags */
 
 
 /*
@@ -3266,6 +3267,9 @@ enum
 	(LF1_DESTROYED | LF1_VAULT | LF1_DUNGEON | LF1_STRONGHOLD | \
 	LF1_CRYPT | LF1_LAIR | LF1_MINE | LF1_CAVE | LF1_WILD | \
 	LF1_SEWER | LF1_LABYRINTH)
+
+#define LF1_TERRAIN \
+	(LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_CHASM | LF1_LIVING)
 
 /* Room generation flags */
 #define RG1_NORTH	0x00000001L	/* Place in north */

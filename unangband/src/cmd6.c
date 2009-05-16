@@ -54,6 +54,12 @@
  * item causes the inducer of that action to "move", causing "o_ptr" to
  * no longer point at the correct item, with horrifying results.
  *
+ * We avoid the above horrifying results by flagging the item with
+ * the IDENT_BREAK flag before applying the "effect", then locate the
+ * item so flagged in the inventory afterwards and consuming it. Be
+ * careful to allow scenarios such as a scroll of fire destroying
+ * itself.
+ *
  * Note that food/potions/scrolls no longer use bit-flags for effects,
  * but instead use the "sval" (which is also used to sort the objects).
  */

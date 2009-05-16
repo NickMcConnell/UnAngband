@@ -4073,6 +4073,213 @@ static int summon_specific_type = 0;
 
 
 /*
+ * Helper function summon a monster based on what level flags exist.
+ *
+ * XXX This function relies on a whole lot of horrible coincidences
+ * such as no overlapping values for the LF1_ flags and relevant RF3_
+ * flags, and (even worse) LF1_NATURAL matching RF3_ANIMAL.
+ */
+static bool summon_specific_level_match(int r_idx, u32b *summon_flag)
+{
+	/* Be careful not to actually set summon_flag_type here */
+	u32b temp_flag = *summon_flag;
+	u32b temp_flag2 = 0L;
+	int k = 0;
+	bool okay = FALSE;
+
+	/* Get the monster */
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Watery monsters - not on lava, ice levels */
+	if ((!temp_flag) || ((temp_flag & (LF1_WATER | LF1_LAVA | LF1_ICE)) == (LF1_WATER)))
+	{
+		/*
+		 * Water elementals, frogs and fish, monsters names
+		 * starting with water, swamp, river or sea.
+		 */
+		if ((r_ptr->grp_idx == 12) ||
+			(strchr("F", r_ptr->d_char)) ||
+			(strstr(r_name + r_ptr->name, "Water")) ||
+			(strstr(r_name + r_ptr->name, "Sea")) ||
+			(strstr(r_name + r_ptr->name, "River")) ||
+			(strstr(r_name + r_ptr->name, "Swamp")))
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_WATER);
+		}
+	}
+
+	/* Lava monsters */
+	if ((!temp_flag) || (temp_flag & (LF1_LAVA)))
+	{
+		/*
+		 * Fire / mama elementals, fire breathers, first
+		 * attack is fire or lava, monsters names
+		 * starting with fire, hell (magma not needed).
+		 */
+		if ((r_ptr->grp_idx == 14) ||
+			(r_ptr->grp_idx == 19) ||
+			(r_ptr->flags4 & (RF4_BRTH_FIRE)) ||
+			(r_ptr->blow[0].effect == (GF_FIRE)) ||
+			(r_ptr->blow[0].effect == (GF_LAVA)) ||
+			(strstr(r_name + r_ptr->name, "Fire")) ||
+			(strstr(r_name + r_ptr->name, "Hell")) /* ||
+			(strst(r_name + r_ptr->name, "Magma")) */)
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_LAVA);
+		}
+	}
+
+	/* Ice monsters */
+	if ((!temp_flag) || (temp_flag & (LF1_ICE)))
+	{
+		/*
+		 * Ice elementals, frost breathers, first attack is
+		 * cold or ice, monsters names starting with cold, ice.
+		 */
+		if ((r_ptr->grp_idx == 18) ||
+			(r_ptr->flags4 & (RF4_BRTH_COLD)) ||
+			(r_ptr->blow[0].effect == (GF_COLD)) ||
+			(r_ptr->blow[0].effect == (GF_ICE)) ||
+			(strstr(r_name + r_ptr->name, "Cold")) ||
+			(strstr(r_name + r_ptr->name, "Ice")) /* ||
+			(strst(r_name + r_ptr->name, "Magma")) */)
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_ICE);
+		}
+	}
+
+	/* Acid monsters - not on lava levels */
+	if ((!temp_flag) || ((temp_flag & (LF1_ACID | LF1_LAVA)) == (LF1_ACID)))
+	{
+		/*
+		 * Ooze, acid breathers. Anything else would
+		 * be too annoying.
+		 */
+		if ((r_ptr->grp_idx == 16) ||
+			(r_ptr->flags4 & (RF4_BRTH_ACID)))
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_ACID);
+		}
+	}
+
+	/* Earth monsters -- oops. We really need an earth level flag
+	 * to indicate levels which are filled with sand, dirt, rubble.
+	 * This would also be used in get_mon_prep to indicate levels
+	 * we should favour CAN_DIG monsters on.
+	 * We also add these to acid levels to ensure sufficient
+	 * variety of monsters on acid levels.
+	 */
+	if ((!temp_flag) || ((temp_flag & (LF1_ACID | LF1_LAVA)) == (LF1_ACID)))
+	{
+		/*
+		 * Ooze, earth elementals, acid, shard breathers, monsters
+		 * names starting with earth, rock, crystal.
+		 */
+		if ((r_ptr->grp_idx == 13) ||
+			(r_ptr->flags4 & (RF4_BRTH_SHARD)) ||
+			(strstr(r_name + r_ptr->name, "Earth")) ||
+			(strstr(r_name + r_ptr->name, "Rock")) ||
+			(strstr(r_name + r_ptr->name, "Crystal")))
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_ACID);
+		}
+	}
+
+	/* XXX To do: Electricity monsters */
+
+	/* XXX To do: Fire monsters for burning oil levels */
+
+	/* Oil monsters e.g. machines */
+	if ((!temp_flag) || ((temp_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL)) == (LF1_OIL)))
+	{
+		/* Golems, animated weapons */
+		if ((strchr("g|\\/~", r_ptr->d_char)))
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_OIL);
+		}
+	}
+
+	/* Air monsters on chasm only levels */
+	if ((!temp_flag) || ((temp_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_CHASM)) == (LF1_CHASM)))
+	{
+		/*
+		 * Air elementals, flyers, tornadoes, monsters
+		 * names starting with air, wind, sky.
+		 */
+		if ((r_ptr->grp_idx == 11) ||
+			(strchr("~", r_ptr->d_char)) ||
+			(strstr(r_name + r_ptr->name, "Air")) ||
+			(strstr(r_name + r_ptr->name, "Wind")) ||
+			(strstr(r_name + r_ptr->name, "Sky")))
+		{
+			okay |= (TRUE);
+			if (rand_int(++k)) temp_flag2 = (LF1_CHASM);
+		}
+
+	}
+
+	/* Plants, insects or animals on living levels */
+	if ((!temp_flag) || ((temp_flag & (LF1_WATER | LF1_LAVA | LF1_ICE | LF1_ACID | LF1_OIL | LF1_LIVING)) == (LF1_LIVING)))
+	{
+		/* Hack -- we create different ecology types */
+		if ((r_ptr->flags3 & (RF3_ANIMAL)) && ((temp_flag & (RF3_PLANT)) == 0))
+		{
+			if (r_ptr->flags8 & (RF8_HAS_FUR | RF8_HAS_FEATHER))
+			{
+				if ((temp_flag & (RF3_INSECT)) == 0)
+				{
+					okay |= (TRUE);
+					/* 'Modern' ecology - feathered and furred allowed */
+					if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_ANIMAL);
+				}
+			}
+			else
+			{
+				okay |= (TRUE);
+				/* 'Prehistoric' ecology - scaley, skinned, plants and insects only */
+				if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
+			}
+		}
+
+		/* Insects are always prehistoric or later */
+		if ((r_ptr->flags3 & (RF3_INSECT)) && ((temp_flag & (RF3_PLANT)) == 0))
+		{
+			okay |= (TRUE);
+			/* 'Prehistoric' ecology - scaley, skinned, plants and insects only */
+			if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
+		}
+
+		/* Most plants are prehistoric or later -- flowering plants require insects */
+		if ((r_ptr->flags3 & (RF3_PLANT)) && ((temp_flag & (RF3_PLANT)) == 0))
+		{
+			okay |= (TRUE);
+			/* 'Prehistoric' ecology - scaley, skinned, plants and insects only */
+			if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_INSECT);
+		}
+
+		/* Slime ecology? - Ugh. Not pleasant for the player... */
+		if ((strchr("ijm,", r_ptr->d_char)) && ((temp_flag & (RF3_ANIMAL | RF3_INSECT)) == 0))
+		{
+			okay |= (TRUE);
+			/* Slime ecology */
+			if (rand_int(++k)) temp_flag2 = (LF1_LIVING | RF3_PLANT);
+		}
+	}
+
+	/* Return revised flag */
+	if (okay) *summon_flag = temp_flag2;
+
+	return (okay);
+}
+
+
+/*
  * Hack -- help decide if a monster race is "okay" to summon
  *
  * XXX We pass through a number of parameters as global
@@ -4112,6 +4319,19 @@ static bool summon_specific_okay(int r_idx)
 			{
 				okay = ((r_ptr->d_char == summon_char_type) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)));
+
+				/* Hack - some dissimilar chars are actually similar */
+				if (summon_specific_type == SUMMON_KIN)
+				{
+					/* Animated weapons */
+					if (strchr ("\\/|~", summon_char_type)) okay |= (strchr ("\\/|~", summon_char_type)) != 0;
+
+					/* Mimics */
+					if (strchr ("!&=_?\"", summon_char_type)) okay |= (strchr ("\\/|~", summon_char_type)) != 0;
+
+					/* Trees and plants  */
+					if (strchr (":;", summon_char_type)) okay |= (strchr ("\\/|~", summon_char_type)) != 0;
+				}
 			}
 			else
 			{
@@ -4239,6 +4459,9 @@ static bool summon_specific_okay(int r_idx)
 				okay = ((r_ptr->flags3 & (RF3_ANIMAL)) &&
 					!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
+					/* Hack -- exclude undead */
+					!(r_ptr->flags3 & (RF3_UNDEAD)) &&
+
 					/* Hack -- exclude hounds */
 					(r_ptr->d_char != 'C') && (r_ptr->d_char != 'Z') &&
 
@@ -4277,18 +4500,25 @@ static bool summon_specific_okay(int r_idx)
 			warrior priests hang out with warriors and priests */
 		case SUMMON_CLASS:
 		{
+
 			if (summon_flag_type)
 			{
+				u32b summon_flag2_type = summon_flag_type & (RF2_CLASS_MASK);
+				u32b summon_flag3_type = summon_flag_type & (RF3_EVIL);
+
 				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
+					/* Match evil or not evil */
+					((r_ptr->flags3 & (RF3_EVIL)) == summon_flag3_type) &&
+
 					/* Check 'class' is mage or priest and we want a mage and/or priest */
-					((r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) && (summon_flag_type & (RF2_MAGE | RF2_PRIEST)) ?
+					((r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) && (summon_flag2_type & (RF2_MAGE | RF2_PRIEST)) ?
 
 					/* Exact match on mage / priest component */
-					((r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) == (summon_flag_type & (RF2_MAGE | RF2_PRIEST)) ? TRUE : FALSE) :
+					((r_ptr->flags2 & (RF2_MAGE | RF2_PRIEST)) == (summon_flag2_type & (RF2_MAGE | RF2_PRIEST)) ? TRUE : FALSE) :
 
 					/* Match any other */
-					((r_ptr->flags2 & (summon_flag_type)) ? TRUE : FALSE) ));
+					((r_ptr->flags2 & (summon_flag2_type)) ? TRUE : FALSE) ));
 			}
 			else
 			{
@@ -4303,16 +4533,16 @@ static bool summon_specific_okay(int r_idx)
 		{
 			if (summon_flag_type)
 			{
-				u32b summon_flag3_type = summon_flag_type & (0x0000FFFFL);
-				u32b summon_flag9_type = summon_flag_type & (0xFFFF0000L);
+				u32b summon_flag3_type = summon_flag_type & (RF3_RACE_MASK);
+				u32b summon_flag9_type = summon_flag_type & (RF9_RACE_MASK);
 
 				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
 					/* Match any */
-					((r_ptr->flags3 & (summon_flag3_type)) ||
+					((r_ptr->flags3 & (RF3_RACE_MASK)) == summon_flag3_type) &&
 
 					/* Match any */
-					(r_ptr->flags9 & (summon_flag9_type)) ));
+					((r_ptr->flags9 & (RF9_RACE_MASK)) == summon_flag9_type));
 			}
 			else
 			{
@@ -4322,25 +4552,37 @@ static bool summon_specific_okay(int r_idx)
 			break;
 		}
 
+		/* Match on monsters specific to the type of level
+		 * e.g. lava monsters on lava level etc. If no flags,
+		 * we just match on the NONLIVING flag.
+		 */
+		case SUMMON_LEVEL:
+		{
+			/* Not used here */
+			u32b dummy_flag = summon_flag_type;
+
+			/* Use the helper function */
+			okay = summon_specific_level_match(r_idx, &dummy_flag);
+
+			/* We have a match */
+			if (okay) break;
+
+			/* Fall through */
+		}
+
 		/* Match on flag3 */
 		case SUMMON_ALIGN:
-		case SUMMON_LIVING:
 		{
 			if (summon_flag_type)
 			{
 				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
 
 					/* Match any */
-					((r_ptr->flags3 & (summon_flag_type)) == summon_flag_type));
-			}
-			else if (summon_specific_type == SUMMON_ALIGN)
-			{
-				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)));
+					((r_ptr->flags3 & (RF3_EVIL | RF3_NONLIVING)) == summon_flag_type));
 			}
 			else
 			{
-				okay = (!(r_ptr->flags3 & (RF3_NONLIVING)) &&
-					!(r_ptr->flags1 & (RF1_UNIQUE)));
+				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)));
 			}
 			break;
 		}
@@ -4361,7 +4603,7 @@ static bool summon_specific_okay(int r_idx)
 					(((r_ptr->d_attr == summon_attr_type) &&
 
 					/* Match 'metallic-ness' */
-					((r_ptr->flags9 & (RF9_ATTR_METAL)) == summon_flag9_type) &&
+					((r_ptr->flags9 & (RF9_ATTR_METAL | RF9_DROP_MINERAL)) == summon_flag9_type) &&
 
 					/* Reject clear or multi-hued */
 					((r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI)) == 0)) ||
@@ -4456,9 +4698,6 @@ static bool summon_specific_okay(int r_idx)
 			if (summon_group_type)
 			{
 				okay = (!(r_ptr->flags1 & (RF1_UNIQUE)) &&
-
-					/* Has a group */
-					(r_ptr->grp_idx) &&
 
 					/* Match group index */
 					(r_ptr->grp_idx == summon_group_type));
@@ -4914,12 +5153,14 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 		}
 
 		/* Hack -- mage priests only hang out with mage priests, but
-			warrior priests hang out with warriors and priests */
+			warrior priests hang out with warriors and priests. Evil and non-evil
+			prefer each other. */
 		case SUMMON_CLASS:
 		{
 			if (!summon_flag_type)
 			{
-				summon_flag_type = r_ptr->flags2 & (RF2_CLASS_MASK);
+				summon_flag_type |= r_ptr->flags2 & (RF2_CLASS_MASK);
+				summon_flag_type |= r_ptr->flags3 & (RF3_EVIL);
 			}
 			break;
 		}
@@ -4929,7 +5170,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 			if (!summon_flag_type)
 			{
 				summon_flag_type |= r_ptr->flags1 & (RF1_ATTR_CLEAR | RF1_ATTR_MULTI);
-				summon_flag_type |= r_ptr->flags9 & (RF9_ATTR_METAL);
+				summon_flag_type |= r_ptr->flags9 & (RF9_ATTR_METAL | RF9_DROP_MINERAL);
 			}
 			if (!summon_attr_type)
 			{
@@ -5067,20 +5308,25 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 			break;
 		}
 
+		case SUMMON_LEVEL:
+		{
+			if (!summon_flag_type)
+			{
+				summon_flag_type = level_flag & (LF1_TERRAIN);
+
+				if (summon_specific_level_match(r_idx, &summon_flag_type)) break;
+
+				summon_flag_type = 0L;
+			}
+
+			/* Fall through */
+		}
+
 		case SUMMON_ALIGN:
 		{
 			if (!summon_flag_type)
 			{
 				summon_flag_type |= r_ptr->flags3 & (RF3_EVIL | RF3_NONLIVING);
-			}
-			break;
-		}
-
-		case SUMMON_LIVING:
-		{
-			if (!summon_flag_type)
-			{
-				summon_flag_type |= r_ptr->flags3 & (RF3_NONLIVING);
 			}
 			break;
 		}
@@ -5656,31 +5902,41 @@ void message_pain(int m_idx, int dam)
 	}
 }
 
+/*
+ * Returns which of two monsters are deeper
+ */
+int deeper_monster(int r_idx, int r)
+{
+	/* Is the current monster deeper */
+	if (r_info[cave_ecology.deepest_race[r]].level < r_info[r_idx].level)
+	{
+		/* Monster race */
+		return(r_idx);
+	}
+
+	/* Is the current monster deeper */
+	else if ((r_info[cave_ecology.deepest_race[r]].level == r_info[r_idx].level) && (r_info[cave_ecology.deepest_race[r]].mexp < r_info[r_idx].mexp))
+	{
+		/* Monster race */
+		return(r_idx);
+	}
+
+	return(r);
+}
+
 
 /*
  * Update monster ecology deepest monster for the room
  */
 static void deepest_in_ecology(int r_idx)
 {
-	int r;
+	int r = cave_ecology.num_ecologies - 1;
 
-	/* Check the overall depth, and the room depth */
-	for (r = 0; r < cave_ecology.num_ecologies; r += cave_ecology.num_ecologies - 1)
-	{
-		/* Is the current monster deeper */
-		if (r_info[cave_ecology.deepest_race[r]].level < r_info[r_idx].level)
-		{
-			/* Monster race */
-			cave_ecology.deepest_race[r] = r_idx;
-		}
+	/* Check overall depth */
+	cave_ecology.deepest_race[0] = deeper_monster(r_idx, cave_ecology.deepest_race[0]);
 
-		/* Is the current monster deeper */
-		else if ((r_info[cave_ecology.deepest_race[r]].level == r_info[r_idx].level) && (r_info[cave_ecology.deepest_race[r]].mexp < r_info[r_idx].mexp))
-		{
-			/* Monster race */
-			cave_ecology.deepest_race[r] = r_idx;
-		}
-	}
+	/* Check room depth */
+	cave_ecology.deepest_race[r] = deeper_monster(r_idx, cave_ecology.deepest_race[r]);
 }
 
 
@@ -5824,9 +6080,13 @@ static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int num
  * ecologies. To do so, increase cave_ecology.num_ecologies by one before
  * calling this routine.
  *
+ * Hack_pit is used to force a minimum number of monsters of a certain
+ * 'type' in order for monster pits (and possibly other room types) to
+ * have enough variety.
+ *
  * All monsters are added to the ecology cave_ecology.num_ecologies.
  */
-void get_monster_ecology(int r_idx)
+void get_monster_ecology(int r_idx, int hack_pit)
 {
 	int i = cave_ecology.num_races;
 	int j;
@@ -5845,6 +6105,8 @@ void get_monster_ecology(int r_idx)
 
 	int old_monster_level = monster_level;
 
+	monster_race *r_ptr;
+
 	/* Ensure we're pointing at a valid ecology number */
 	assert(cave_ecology.num_ecologies < MAX_ECOLOGIES);
 
@@ -5857,17 +6119,20 @@ void get_monster_ecology(int r_idx)
 		if (!r_idx) return;
 	}
 
+	/* Get the race */
+	r_ptr = &r_info[r_idx];
+
 	/* Is the current monster deeper */
 	deepest_in_ecology(r_idx);
 
 	/* Find monster in ecology if it exists already */
 	for (j = 0; j < cave_ecology.num_races; j++)
 	{
-		if  (cave_ecology.race[j] == r_idx) break;
+		if (cave_ecology.race[j] == r_idx) break;
 	}
 
-	/* Make space for monster if it does not exist already*/
-	if (j == cave_ecology.num_races)
+	/* Make space for monster if it does not exist already. Force this for pits. */
+	if ((hack_pit) || (j == cave_ecology.num_races))
 	{
 		/* Paranoia */
 		if (cave_ecology.num_races >= MAX_ECOLOGY_RACES - 1) return;
@@ -5882,7 +6147,7 @@ void get_monster_ecology(int r_idx)
 		/* Monster had to be added */
 		already_exists = FALSE;
 
-		if (cheat_hear) msg_format("Adding base race to ecology (%s)", r_name + r_info[r_idx].name);
+		if (cheat_hear) msg_format("Adding base race to ecology (%s)", r_name + r_ptr->name);
 	}
 
 	/* Add monster to room (base races don't wander around dungeon) */
@@ -5896,28 +6161,38 @@ void get_monster_ecology(int r_idx)
 	{
 		case 10:
 			/* Hack -- dragons, except wyrms 'of' match on breath */
-			if (!strchr("adD", r_info[r_idx].d_char) ||
-					(strstr(r_name +  + r_info[r_idx].name, " of "))) hack_ecology--;
+			if (!strchr("adD", r_ptr->d_char) ||
+					(strstr(r_name +  + r_ptr->name, " of "))) hack_ecology--;
 			else break;
 		case 9:
-			if (!strchr(r_name + r_info[r_idx].name, ' ')) hack_ecology--;
+			if (!strchr(r_name + r_ptr->name, ' ')) hack_ecology--;
+			/* Paranoia to minimise empty pits */
+			else if (r_ptr->flags1 & (RF1_UNIQUE)) hack_ecology--;
 			else break;
 		case 8:
-			break;
+		{
+			u32b dummy_flag = 0L;
+
+			/* We only populate a pit if the monster matches a level flag match */
+			if ((hack_pit) && (!summon_specific_level_match(r_idx, &dummy_flag))) hack_ecology--;
+			else break;
+		}
 		case 7:
-			if ((r_info[r_idx].flags9 & (RF9_ATTR_METAL)) == 0) hack_ecology--;
+			if ((r_ptr->flags9 & (RF9_DROP_MINERAL)) == 0) hack_ecology--;
 			else break;
 		case 6:
-			break;
+			/* Summon align is too generic for pits */
+			if (hack_pit) hack_ecology--;
+			else break;
 		case 5:
-			if (!r_info[r_idx].grp_idx) hack_ecology--;
+			if (!(r_ptr->grp_idx)) hack_ecology--;
 			else break;
 		case 4:
-			if (((r_info[r_idx].flags3 & (RF3_RACE_MASK)) == 0) &&
-					((r_info[r_idx].flags9 & (RF9_RACE_MASK)) == 0)) hack_ecology--;
+			if (((r_ptr->flags3 & (RF3_RACE_MASK)) == 0) &&
+					((r_ptr->flags9 & (RF9_RACE_MASK)) == 0)) hack_ecology--;
 			else break;
 		case 3:
-			if ((r_info[r_idx].flags2 & (RF2_CLASS_MASK)) != 0) break;
+			if ((r_ptr->flags2 & (RF2_CLASS_MASK)) != 0) break;
 		case 2:
 		case 1:
 			/* Battle-fields and two thirds of failures match on d_char - the rest use animals */
@@ -5933,9 +6208,6 @@ void get_monster_ecology(int r_idx)
 	/* Have a good race */
 	for ( ; (i < cave_ecology.num_races) || (already_exists); i++)
 	{
-		/* Monster race pointer */
-		monster_race *r_ptr;
-
 		int k;
 
 		/* Get the monster */
@@ -5963,7 +6235,7 @@ void get_monster_ecology(int r_idx)
 		summon_strict = TRUE;
 
 		/* Add escort races */
-		if (r_ptr->flags1 & (RF1_ESCORT | RF1_ESCORTS))
+		if ((!hack_pit) && (r_ptr->flags1 & (RF1_ESCORT | RF1_ESCORTS)))
 		{
 			place_monster_idx = r_idx;
 
@@ -5972,7 +6244,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon kin */
-		if ((r_ptr->flags7 & (RF7_S_KIN)) || (hack_ecology == 1))
+		if (((!hack_pit) && (r_ptr->flags7 & (RF7_S_KIN))) || (hack_ecology == 1))
 		{
 			summon_specific_type = SUMMON_KIN;
 
@@ -5983,11 +6255,15 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_KIN);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay,
+					(hack_ecology == 1) && hack_pit ? hack_pit : (1 + randint(k) + (r_ptr->flags1 & (RF1_UNIQUE) ? rand_int(3) : 0)));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Kin pit.");
 		}
 
 		/* Add summon races -- summon plant */
-		if (r_ptr->flags7 & (RF7_S_PLANT))
+		if ((!hack_pit) && (r_ptr->flags7 & (RF7_S_PLANT)))
 		{
 			summon_specific_type = SUMMON_PLANT;
 
@@ -5996,7 +6272,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon insect */
-		if (r_ptr->flags7 & (RF7_S_INSECT))
+		if ((!hack_pit) && (r_ptr->flags7 & (RF7_S_INSECT)))
 		{
 			summon_specific_type = SUMMON_INSECT;
 
@@ -6005,7 +6281,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon animal */
-		if ((r_ptr->flags7 & (RF7_S_ANIMAL)) || (hack_ecology == 2))
+		if (((!hack_pit) && (r_ptr->flags7 & (RF7_S_ANIMAL))) || (hack_ecology == 2))
 		{
 			summon_specific_type = SUMMON_ANIMAL;
 
@@ -6016,11 +6292,14 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_ANIMAL);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 2) && hack_pit ? hack_pit : randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Zoo.");
 		}
 
 		/* Add summon races -- summon hound */
-		if (r_ptr->flags7 & (RF7_S_HOUND))
+		if ((!hack_pit) && (r_ptr->flags7 & (RF7_S_HOUND)))
 		{
 			summon_specific_type = SUMMON_HOUND;
 
@@ -6029,7 +6308,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon spider */
-		if (r_ptr->flags7 & (RF7_S_SPIDER))
+		if ((!hack_pit) && (r_ptr->flags7 & (RF7_S_SPIDER)))
 		{
 			summon_specific_type = SUMMON_SPIDER;
 
@@ -6038,7 +6317,7 @@ void get_monster_ecology(int r_idx)
 		}
 
 		/* Add summon races -- summon class */
-		if ((r_ptr->flags7 & (RF7_S_CLASS)) || (hack_ecology == 3))
+		if (((!hack_pit) && (r_ptr->flags7 & (RF7_S_CLASS))) || (hack_ecology == 3))
 		{
 			summon_specific_type = SUMMON_CLASS;
 
@@ -6049,11 +6328,14 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_CLASS);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 3) && hack_pit ? hack_pit :  1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Class pit.");
 		}
 
 		/* Add summon races -- summon race */
-		if ((r_ptr->flags7 & (RF7_S_RACE)) || (hack_ecology == 4))
+		if (((!hack_pit) && (r_ptr->flags7 & (RF7_S_RACE))) || (hack_ecology == 4))
 		{
 			summon_specific_type = SUMMON_RACE;
 
@@ -6064,11 +6346,14 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_RACE);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 4) && hack_pit ? hack_pit :  1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Race pit.");
 		}
 
 		/* Add summon races -- summon group */
-		if ((r_ptr->flags7 & (RF7_S_GROUP)) || (hack_ecology == 5))
+		if (((!hack_pit) && (r_ptr->flags7 & (RF7_S_GROUP))) || (hack_ecology == 5))
 		{
 			summon_specific_type = SUMMON_GROUP;
 
@@ -6079,10 +6364,13 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_GROUP);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 5) && hack_pit ? hack_pit : 1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Group pit.");
 		}
 
-		/* Add summon races -- summon alignment. Note this is only done via ecology hacks. */
+		/* Add summon races -- summon alignment (match evilness, livingness). Note this is only done via ecology hacks. */
 		if (hack_ecology == 6)
 		{
 			summon_specific_type = SUMMON_ALIGN;
@@ -6094,7 +6382,10 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_ALIGN);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Aligned pit.");
 		}
 
 		/* Add summon races -- summon colour. Note this is only done via ecology hacks. */
@@ -6110,22 +6401,28 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_COLOUR);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Colour pit.");
 		}
 
-		/* Add summon races -- summon living/nonliving. Note this is only done via ecology hacks. */
+		/* Add summon races -- summon a good match for the level. Note this is only done via ecology hacks. */
 		if (hack_ecology == 8)
 		{
-			summon_specific_type = SUMMON_LIVING;
+			summon_specific_type = SUMMON_LEVEL;
 
 			/* Clear existing restrictions */
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_LIVING);
+			summon_specific_params(r_idx, SUMMON_LEVEL);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Level pit.");
 		}
 
 		/* Add summon races -- summon infix. Note this is only done via ecology hacks. */
@@ -6140,7 +6437,10 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_INFIX_WYRM_OF);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_format("%s pit.", summon_word_type);
 		}
 
 		/* Add summon races -- summon dragon breath. Note this is only done via ecology hacks. */
@@ -6155,8 +6455,15 @@ void get_monster_ecology(int r_idx)
 			summon_specific_params(r_idx, SUMMON_DRAGON_BREATH);
 
 			/* Get additional monsters */
-			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, 1 + randint(k));
+			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
+
+			/* What type of pit */
+			if (cheat_room && hack_pit) msg_print("Dragon pit.");
 		}
+
+
+		/* Break if generating a pit */
+		if (hack_pit) break;
 
 
 		/* Add summon races -- summon orc */

@@ -210,9 +210,16 @@ B:labyrinth
 
 # Huge maze.
 
-N:19:113:0:0:1:1:0:128
+N:19:117:0:0:1:1:0:128
 A:
 B:labyrinth
+
+# Monster pit.
+
+N:20:117:0:0:1:1:0:128
+A:
+B:pit
+
 
 
 # An inner room of some description

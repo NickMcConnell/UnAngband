@@ -768,7 +768,7 @@ extern bool animate_object(int item);
 extern void set_monster_fear(monster_type *m_ptr, int v, bool panic);
 extern bool multiply_monster(int m_idx);
 extern void message_pain(int m_idx, int dam);
-extern void get_monster_ecology(int r_idx);
+extern void get_monster_ecology(int r_idx, int hack_pit);
 extern bool place_guardian(int y0, int x0, int y1, int x1);
 
 
