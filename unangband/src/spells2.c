@@ -8984,6 +8984,12 @@ s16b region_random_piece(s16b region)
  * Note the concept of target only applies if we are using
  * a method, or spawning a region, not if we affect every
  * grid in the region.
+ *
+ * XXX It is important to realise that discharge_trap
+ * called from here can result in an invalidated region.
+ * Therefore the caller needs to check r_ptr->type > 0,
+ * before attempting to refer to the region after calling
+ * this routine.
  */
 bool region_effect(int region, int y, int x)
 {
@@ -9193,6 +9199,9 @@ void trigger_region(int y, int x, bool move)
 
 			/* Actually discharge the region */
 			notice |= region_effect(rp_ptr->region, y, x);
+
+			/* Paranoia - region has been removed */
+			if (!r_ptr->type) return;
 
 			/* Mark region as triggered */
 			r_ptr->flags1 |= (RE1_TRIGGERED);
@@ -9945,7 +9954,12 @@ void process_region(s16b region)
 		/* Discharge the region */
 		if (region_effect(region, r_ptr->y1, r_ptr->y0))
 		{
-			bool refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
+			bool refresh;
+
+			/* Paranoia: Could end up with an invalid region */
+			if (!r_ptr->type) return;
+
+			refresh = (r_ptr->flags1 & (RE1_NOTICE)) == 0;
 
 			/* Mark region noticed */
 			r_ptr->flags1 |= (RE1_NOTICE | RE1_DISPLAY);
