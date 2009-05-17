@@ -7002,6 +7002,7 @@ errr parse_u_info(char *buf, header *head)
 				u_ptr->tvals_will_buy[3] = TV_HAFTED;
 				u_ptr->tvals_will_buy[4] = TV_STATUE;
 				u_ptr->tvals_will_buy[5] = TV_SHOT;
+				u_ptr->tvals_will_buy[6] = TV_STATUE;
 				/*u_ptr->tvals_will_buy[6] = TV_POLEARM; Was blessed only */
 				/*u_ptr->tvals_will_buy[7] = TV_SWORD; Was blessed only */
 				break;
@@ -7029,6 +7030,7 @@ errr parse_u_info(char *buf, header *head)
 				u_ptr->tvals_will_buy[6] = TV_SCROLL;
 				u_ptr->tvals_will_buy[7] = TV_POTION;
 				u_ptr->tvals_will_buy[8] = TV_RUNESTONE;
+				u_ptr->tvals_will_buy[9] = TV_STATUE;
 				break;
 			}
 		}
