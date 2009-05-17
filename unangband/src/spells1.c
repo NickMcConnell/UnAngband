@@ -3397,6 +3397,9 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 	/* Set feature name */
 	f = (f_name + f_ptr->name);
 
+	/* Hack - don't affect permanent grids */
+	if (f_ptr->flags1 & (FF1_PERMANENT)) return (FALSE);
+
 	/* Track changes */
 	feat = cave_feat[y][x];
 
@@ -4383,15 +4386,6 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 	/* Prevent warning */
 	(void)who;
-
-	/* Hack - some effects delete the whole stack */
-	if ((typ == GF_DESTROY) || (typ == GF_QUAKE))
-	{
-		delete_object(y, x);
-
-		/* Notice elsewhere */
-		return (FALSE);
-	}
 
 	/* Scan all objects in the grid */
 	for (this_o_idx = cave_o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
@@ -11882,6 +11876,12 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 
 	/* Only process marked grids. */
 	if (!(play_info[y][x] & (PLAY_TEMP))) return (FALSE);
+
+	/* Hack - some effects delete the whole stack */
+	if ((cave_o_idx[y][x]) && ((typ == GF_DESTROY) || (typ == GF_QUAKE)))
+	{
+		delete_object(y, x);
+	}
 
 	/* Hack -- pre-stage teleportation hooks for efficiency */
 	switch(typ)
