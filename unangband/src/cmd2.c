@@ -3923,7 +3923,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 						msg_format("The %s finds a mark.", o_name);
 
 						/* Near miss? */
-						if (!genuine_hit) tdam = 0;
+						if (!genuine_hit) break;
 					}
 
 					/* Handle visible monster */
@@ -3952,8 +3952,8 @@ void player_fire_or_throw_selected(int item, bool fire)
 								msg_format("You miss %s.", m_name);
 							}
 
-							/* No normal damage */
-							tdam = 0;
+							/* No further effect */
+							break;
 						}
 						/* Successful hit */
 						else
