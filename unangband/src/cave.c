@@ -1310,10 +1310,12 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 	/*
 	 * Display regions when:
-	 *  1.  when the player can see the region (either because it is PLAY_SEEN or in PLAY_VIEW and the region is self-lit)
+	 *  1.  when the player can see the region (either because it is PLAY_SEEN or in PLAY_VIEW and the region is self-lit
 	 *  2.  when explicitly told to
+	 *
+	 *  as long as the feature underneath is projectable.
 	 */
-	if (pinfo & (PLAY_REGN | PLAY_VIEW))
+	if ((pinfo & (PLAY_REGN | PLAY_VIEW)) && (f_info[cave_feat[y][x]].flags1 & (FF1_PROJECT)))
 	{
 		s16b this_region_piece, next_region_piece = 0;
 
@@ -1330,7 +1332,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 
 			/* Displaying region */
 			if (((cheat_hear) || ((r_ptr->flags1 & (RE1_NOTICE)) != 0)) &&
-					((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) &&
+					(((pinfo & (PLAY_REGN | PLAY_SEEN)) != 0) ||
+						(((pinfo & (PLAY_VIEW)) != 0) && ((r_ptr->flags1 & (RE1_SHINING)) != 0))) &&
 							((r_ptr->flags1 & (RE1_DISPLAY)) != 0))
 			{
 				/* Skip because there is an underlying trap */
@@ -1338,6 +1341,7 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 				{
 					/* Don't display */
 				}
+
 				/* Display the effect */
 				else if (r_ptr->flags1 & (RE1_ATTR_EFFECT))
 				{
