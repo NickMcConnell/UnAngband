@@ -364,78 +364,6 @@ bool inven_book_okay(const object_type *o_ptr)
 
 
 /*
- * Print a list of fields (for research).
- */
-void print_fields(const s16b *sn, int num, int y, int x)
-{
-	int i;
-
-	char out_val[160];
-#if 0
-	/* Title the list */
-	prt("", y, x);
-#endif
-	/* Dump the fields */
-	for (i = 0; i < num; i++)
-	{
-		/* Dump the spell -- skip 'of ' if required */
-		sprintf(out_val, "  %c) %-75s ",
-			I2A(i), k_name + k_info[sn[i]].name);
-		c_prt(TERM_WHITE, out_val, y + i, x);
-	}
-
-	/* Clear the bottom line */
-	prt("", y + i, x);
-}
-
-/*
- * Other research field functions.
- */
-bool field_commands(char choice, const s16b *sn, int i, bool *redraw)
-{
-	(void)redraw;
-
-	switch (choice)
-	{
-		case 'B':
-		{
-			/* Fake the o_ptr */
-			object_type object_type_body;
-			object_type *o_ptr = &object_type_body;
-
-			/* Set object details required */
-			o_ptr->k_idx = sn[i];
-			o_ptr->tval = k_info[sn[i]].tval;
-			o_ptr->sval = k_info[sn[i]].sval;
-			o_ptr->xtra1 = 0;
-
-			/* Load screen */
-			if (*redraw) screen_load();
-
-			/* Browse the object */
-			player_browse_object(o_ptr);
-
-			/* Save screen */
-			if (*redraw) screen_save();
-
-			break;
-		}
-
-		default:
-		{
-			return (FALSE);
-		}
-	}
-
-
-
-	return (TRUE);
-}
-
-
-
-
-/*
  * Peruse the spells/prayers in a Book.
  *
  * Takes an object as a parameter
@@ -446,7 +374,7 @@ bool player_browse_object(object_type *o_ptr)
 
 	s16b book[26];
 
-	cptr p, r;
+	cptr p;
 
 	int spell=-1;
 
@@ -459,12 +387,6 @@ bool player_browse_object(object_type *o_ptr)
 
 	char out_val[160];
 
-	bool study_item = FALSE;
-
-	spell_type *s_ptr;
-
-	object_type object_type_body;
-
 	/* Get fake tval */
 	if (o_ptr->tval == TV_STUDY) tval = o_ptr->sval;
 	else tval = o_ptr->tval;
@@ -474,66 +396,19 @@ bool player_browse_object(object_type *o_ptr)
 	{
 		case TV_PRAYER_BOOK:
 			p="prayer";
-			r="Pray for which blessing";
 			break;
 
 		case TV_SONG_BOOK:
 			p="song";
-			r="Improvise which melody";
 			break;
 
 		case TV_MAGIC_BOOK:
 			p="spell";
-			r="Research which field";
 			break;
 
 		default:
 			p="power";
-			r = "";
 			break;
-	}
-
-	/* Study materials -- Browse spells in a book related to the current spell for magic books only */
-	if ((o_ptr->tval == TV_STUDY) && ((o_ptr->sval == TV_MAGIC_BOOK)))
-	{
-		s16b field[MAX_SPELL_APPEARS];
-
-		int num = 0;
-
-		int selection = 0;
-
-		/* Get the spell */
-		s_ptr = &s_info[o_ptr->pval];
-
-		/* Pick a new spell item */
-		for (i = 0; i < MAX_SPELL_APPEARS; i++)
-		{
-			if (s_ptr->appears[i].tval == tval) field[num++] = lookup_kind(tval, s_ptr->appears[i].sval);
-		}
-
-		/* Paranoia */
-		if (!num) return (FALSE);
-
-		/* Display the list and get a selection */
-		if (get_list(print_fields, field, num, format("%^ss",p), r, ",B=browse", 1, 20, field_commands, &selection))
-		{
-			/* Fake the o_ptr */
-			o_ptr = &object_type_body;
-
-			/* Set object details required */
-			o_ptr->k_idx = selection;
-			o_ptr->tval = k_info[selection].tval;
-			o_ptr->sval = k_info[selection].sval;
-			o_ptr->xtra1 = 0;
-
-			/* Study item */
-			study_item = TRUE;
-		}
-		/* Did not choose something */
-		else
-		{
-			return (FALSE);
-		}
 	}
 
 	/* Fill book with spells */
@@ -938,49 +813,6 @@ bool player_study(int item)
 			break;
 	}
 
-	/* Study materials -- Choose spells in a book related to the current spell */
-	if (o_ptr->tval == TV_STUDY)
-	{
-		s16b field[MAX_SPELL_APPEARS];
-
-		int num = 0;
-
-		int selection = 0;
-
-		/* Get the spell */
-		s_ptr = &s_info[o_ptr->pval];
-
-		/* Pick a new spell item */
-		for (i = 0; i < MAX_SPELL_APPEARS; i++)
-		{
-			if (s_ptr->appears[i].tval == tval) field[num++] = lookup_kind(tval, s_ptr->appears[i].sval);
-		}
-
-		/* Paranoia */
-		if (!num) return (FALSE);
-
-		/* Display the list and get a selection */
-		if (get_list(print_fields, field, num, format("%^ss",p), r, "", 1, 20, field_commands, &selection))
-		{
-			/* Fake the o_ptr */
-			o_ptr = &object_type_body;
-
-			/* Set object details required */
-			o_ptr->k_idx = selection;
-			o_ptr->tval = k_info[selection].tval;
-			o_ptr->sval = k_info[selection].sval;
-			o_ptr->xtra1 = 0;
-
-			/* Study it further */
-			study_item = TRUE;
-		}
-		/* Did not choose something */
-		else
-		{
-			return (FALSE);
-		}
-	}
-
 	/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
 	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD))
 	{
@@ -1068,11 +900,17 @@ bool player_study(int item)
 		spell = graft;
 	}
 
-/* Magic book -- Learn a selected spell */
+	/* Magic book -- Learn a selected spell */
 	else if (o_ptr->tval == TV_MAGIC_BOOK)
 	{
 		/* Ask for a spell, allow cancel */
 		if (!get_spell(&spell, "study", o_ptr, FALSE) && (spell == -1)) return (FALSE);
+	}
+
+	/* Study -- only one spell available */
+	else if (o_ptr->tval == TV_STUDY)
+	{
+		if (spell_okay(o_ptr->pval,FALSE)) spell = o_ptr->pval;
 	}
 
 	/* Nothing to study */
