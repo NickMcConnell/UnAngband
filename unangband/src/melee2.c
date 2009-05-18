@@ -1998,7 +1998,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		else if ((r_ptr->flags1 & (RF1_GUARDIAN)) && ((nr_ptr->flags1 & (RF1_GUARDIAN)) == 0))
 		{
 			/* Can always push at full speed. */
-			return (100);
+			move_chance = 100;
 		}
 
 		/* Pushed already */
@@ -2094,7 +2094,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		}
 
 		/* We cannot natively climb, but are negotiating a tree or rubble */
-		else if (mmove == MM_CLIMB && !(r_ptr->flags2 & RF2_CAN_CLIMB))
+		else if (mmove == MM_CLIMB && !(r_ptr->flags2 & (RF2_CAN_CLIMB)))
 		{
 			move_chance /= 2;
 		}
@@ -3438,7 +3438,7 @@ static bool get_route_to_target(monster_type *m_ptr, int *ty, int *tx)
 			y = m_ptr->fy + ddy_ddd[i];
 			x = m_ptr->fx + ddx_ddd[i];
 
-       			/* Check Bounds (fully) */
+       		/* Check Bounds (fully) */
 			if (!in_bounds_fully(y, x)) continue;
 
 			/* Grid is not passable */
@@ -4351,7 +4351,6 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 		}
 	}
 
-
 	/*
 	 * Now that we have an initial direction, we must determine which
 	 * grid to actually move into.
@@ -4374,10 +4373,8 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 		 * looks like it will get the monster to the character - or away
 		 * from him - most effectively.
 		 */
-		for (i = 0; i <= 8; i++)
+		for (i = 0; i < 8; i++)
 		{
-			if (i == 8) break;
-
 			/* Get the actual direction */
 			dir = side_dirs[dir0][i];
 
@@ -4506,7 +4503,7 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 			}
 
 			/* XXX XXX -- Sometimes attempt to break glyphs. */
-			if ((f_info[cave_feat[ny][nx]].flags1 & FF1_GLYPH) && (!fear) &&
+			if ((f_info[cave_feat[ny][nx]].flags1 & (FF1_GLYPH)) && (!fear) &&
 			    (rand_int(5) == 0))
 			{
 				break;
@@ -4632,7 +4629,6 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 		}
 	}
 
-
 	/* Monster is frightened, and is obliged to fight. */
 	if ((fear) && (cave_m_idx[*ty][*tx] < 0))
 	{
@@ -4660,7 +4656,6 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 			msg_format("%^s turns on you!", m_name);
 		}
 	}
-
 
 	/* We can move. */
 	return (TRUE);

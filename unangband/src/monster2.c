@@ -2832,7 +2832,7 @@ int place_monster_here(int y, int x, int r_idx)
 	/* Monster resists terrain damage? */
 	resist = mon_resist_feat(cave_feat[y][x],r_idx);
 
-	/* Monster can't move through terrain */
+	/* Monster can't move through traps easily */
 	if (f_ptr->flags1 & (FF1_HIT_TRAP))
 	{
 		/* Monster can't avoid trap */
@@ -2854,6 +2854,17 @@ int place_monster_here(int y, int x, int r_idx)
 			}
 		}
 	}
+
+	/* Regions can also trap the monster */
+	if (cave_region_piece[y][x])
+	{
+		/* XXX Iterate through the traps and see if the monster will be
+		 * affected by any of them.
+		 */
+
+		trap |= TRUE;
+	}
+
 
 	/* Check for pass wall */
 	if (resist &&
@@ -2917,7 +2928,8 @@ int place_monster_here(int y, int x, int r_idx)
 
 	/* Check for climbing - adjacent to CAN_CLIMB terrain.
 	 * Note the use of the CAVE_CLIM flag to optimise this. */
-	if ((cave_info[y][x] & (CAVE_CLIM)) &&
+	if (((r_ptr->flags2 & (RF2_CAN_CLIMB)) != 0) &&
+		(cave_info[y][x] & (CAVE_CLIM)) &&
 		((f_ptr->flags2 & (FF2_CAN_FLY)) != 0))
 	{
 		return(trap ? MM_TRAP : MM_CLIMB);

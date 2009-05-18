@@ -5609,8 +5609,6 @@ void mon_hit_trap(int m_idx, int y, int x)
 	feature_type *f_ptr;
 	monster_type *m_ptr = &m_list[m_idx];
 
-	int feat = cave_feat[y][x];
-
 	/* Hack --- don't activate unknown invisible traps */
 	if (cave_feat[y][x] == FEAT_INVIS) return;
 
