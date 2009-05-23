@@ -2315,7 +2315,22 @@ S:BOLT_MANA |
 S:CURE | BLINK | WOUND | BLESS |
 D:A goblin dressed in skins who gestures wildly.
 
-### 126 - Unused ###
+N:126:Spikey mushroom patch
+G:,:Z
+#$ Multihued available
+#$ Metallics available:dsorPRGBUvtmYTVMzZ
+#$ Colors available:dGUvYTVIZ
+I:120:20:2:30:0
+W:3:1:0:5
+M:16:0:1:0
+B:HIT:HURT:1d3
+B:SPIKE:HURT:1d6
+F:NEVER_MOVE | ONLY_ITEM
+F:STUPID | EMPTY_MIND |
+F:PLANT | IM_POIS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP |
+F:RES_BLIND | NO_CUTS | LEVEL_SIZE |
+S:BLOW_2 | ADD_AMMO |
+#D:Hmmm... it looks quite painful to eat.
 
 N:127:Baby blue dragon
 G:d:B
@@ -6959,7 +6974,22 @@ F:NO_SLEEP |
 F:NEVER_MISS | LEVEL_SPEED | LEVEL_POWER |
 D:It is impossible to define its form but its violence is legendary.
 
-#$# 353 - Unused ###
+N:353:Stone jelly
+G:j:W
+#$ Metallics available:dsoPvtmYTVZ
+#$ Colors available:dWRmYVZ
+I:120:48:2:1:99
+W:5:2:0:6
+M:15:0:1:0
+B:CRUSH:HURT:1d5
+B:SHOT:HURT:1d5
+F:NEVER_MOVE |
+F:STUPID | EMPTY_MIND |
+F:NONVOCAL | HURT_LITE | IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP |
+F:HAS_CORPSE | HAS_SLIME |
+F:RES_BLIND | LEVEL_SIZE |
+S:BLOW_2 | ADD_AMMO
+#D:Its a large pile of stone-coloured flesh.
 
 N:354:Thief
 G:t:v
@@ -24331,7 +24361,7 @@ G:J:Y
 #$ Clear available
 #$ Metallics available:dwsrgbWyRGBUvtmYiTVIMzZ
 #$ Colors available:doUvmiVIZ
-I:110:21:6:15:30
+I:110:21:6:35:30
 W:5:1:0:5
 M:0:0:1:0
 B:CRUSH:HURT:1d8
