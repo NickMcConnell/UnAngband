@@ -4366,7 +4366,7 @@ bool recharge(int num)
 			o_ptr->ident &= ~(IDENT_SENSE);
 
 			/* Hack -- the item is no longer empty */
-			if (o_ptr->feeling == INSCRIP_EMPTY) o_ptr->feeling = 0;
+			o_ptr->feeling = 0;
 
 			/* Hack -- round up */
 			o_ptr->stackc = 0;

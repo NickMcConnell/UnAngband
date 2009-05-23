@@ -926,6 +926,37 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		object_desc_str_macro(t, ") ");
 	}
 
+	/* Hack -- display debug value in cheat_peek mode */
+	if (cheat_peek)
+	{
+		object_desc_str_macro(t, "(worth ");
+		object_desc_num_macro(t,object_value(o_ptr));
+		object_desc_str_macro(t, ") ");
+	}
+
+	/* Hack -- display id details */
+	if (cheat_peek)
+	{
+		object_desc_str_macro(t, "(");
+		if (o_ptr->ident & (IDENT_SENSE)) object_desc_chr_macro(t,'s');
+		if (o_ptr->ident & (IDENT_FIXED)) object_desc_chr_macro(t,'x');
+		if (o_ptr->ident & (IDENT_BONUS)) object_desc_chr_macro(t,'b');
+		if (o_ptr->ident & (IDENT_KNOWN)) object_desc_chr_macro(t,'k');
+		if (o_ptr->ident & (IDENT_STORE)) object_desc_chr_macro(t,'u');
+		if (o_ptr->ident & (IDENT_MENTAL)) object_desc_chr_macro(t,'f');
+		if (o_ptr->ident & (IDENT_CURSED)) object_desc_chr_macro(t,'c');
+		if (o_ptr->ident & (IDENT_BROKEN)) object_desc_chr_macro(t,'w');
+		if (o_ptr->ident & (IDENT_BREAKS)) object_desc_chr_macro(t,'k');
+		if (o_ptr->ident & (IDENT_CHARGES)) object_desc_chr_macro(t,'s');
+		if (o_ptr->ident & (IDENT_VALUE)) object_desc_chr_macro(t,'v');
+		if (o_ptr->ident & (IDENT_RUNES)) object_desc_chr_macro(t,'r');
+		if (o_ptr->ident & (IDENT_NAME)) object_desc_chr_macro(t,'n');
+		if (o_ptr->ident & (IDENT_PVAL)) object_desc_chr_macro(t,'p');
+		if (o_ptr->ident & (IDENT_MARKED)) object_desc_chr_macro(t,'m');
+		if (o_ptr->ident & (IDENT_FORGED)) object_desc_chr_macro(t,'g');
+		object_desc_str_macro(t, ") ");
+	}
+
 	/* Hack -- display debug xtra info in cheat_peek mode */
 	if ((cheat_peek) && (o_ptr->xtra1))
 	{

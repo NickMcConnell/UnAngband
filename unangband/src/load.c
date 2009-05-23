@@ -1525,6 +1525,9 @@ static errr rd_inventory(void)
 			/* Copy object */
 			object_copy(&inventory[n], i_ptr);
 
+			/* Hack -- clear the marked flag */
+			inventory[n].ident &= ~(IDENT_MARKED);
+
 			/* Add the weight */
 			p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
 

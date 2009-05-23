@@ -1070,7 +1070,7 @@ bool player_observe(int item)
 	/* Hack - obviously interested enough in item */
 	if (o_ptr->ident & (IDENT_STORE))
 	{
-		o_ptr->ident |= (IDENT_MARKED);
+		if (item < 0) o_ptr->ident |= (IDENT_MARKED);
 
 		/* No longer 'stored' */
 		o_ptr->ident &= ~(IDENT_STORE);
