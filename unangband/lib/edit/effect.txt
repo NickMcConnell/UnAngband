@@ -748,15 +748,15 @@ D:drain~:mana from::::spell points:mana
 
 N:146:LOSE_MANA_PERC
 I:0:0:0
-T:gaining mana
+T:losing mana
 D:drain~:mana from::::percent of spell points:mana %
 
 N:147:DESTROY
 I:0:0:0
-T:gaining mana
+T:destroying
 D:destroy~::::::
 
 N:148:QUAKE
 I:0:0:0
-T:gaining mana
+T:quaking
 D:shake~::the foundations::::
