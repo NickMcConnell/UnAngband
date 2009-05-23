@@ -6053,7 +6053,7 @@ static bool get_monster_ecology_aux(bool (*tmp_mon_num_hook)(int r_idx), int num
 			cave_ecology.race_ecologies[cave_ecology.num_races] = (1L << (cave_ecology.num_ecologies - 1));
 
 			/* Shallow monsters wander outside ecology */
-			if (r_info[r_idx].level < p_ptr->depth - 5) cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L);
+			if (r_info[r_idx].level < MAX(p_ptr->depth - 5, p_ptr->depth / 2 + 3)) cave_ecology.race_ecologies[cave_ecology.num_races] |= (1L);
 
 			/* Is the current monster deeper */
 			deepest_in_ecology(r_idx);

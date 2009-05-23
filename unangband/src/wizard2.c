@@ -1531,7 +1531,8 @@ void do_cmd_wiz_ecology(void)
 	}
 
 	/* Total monsters */
-	msg_format("Ecology has %d races and %d sub-ecologies.", cave_ecology.num_races, cave_ecology.num_ecologies);
+	msg_format("Ecology has %d races and %d sub-ecologies. The ecology is %sready.", cave_ecology.num_races, cave_ecology.num_ecologies,
+			cave_ecology.ready ? "" : " not");
 
 	anykey();
 
