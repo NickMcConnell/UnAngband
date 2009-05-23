@@ -7893,8 +7893,8 @@ G:g:Y
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
 #$ Colors available:dwbPpvtmTVIMzZ
-I:110:12:12:30:10
-W:4:1:20:3
+I:110:18:12:30:10
+W:5:1:20:4
 M:0:0:2:0
 B:HIT:HURT:1d3
 B:TOUCH:TERRIFY
