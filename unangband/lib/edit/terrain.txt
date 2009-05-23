@@ -7088,7 +7088,7 @@ F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D3 | ATTR_LITE |
 
 N:319:small wooden chest (open)
-G:&:d
+G:&:D
 U:56
 #$ granite wall
 O:0
@@ -7334,7 +7334,7 @@ F:HURT_FIRE | HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D2 | DROP_1D3 | ATTR_LITE |
 
 N:330:large wooden chest (open)
-G:&:d
+G:&:D
 U:56
 #$ granite wall
 O:0
@@ -7538,7 +7538,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D3 | DROP_GOOD | ATTR_LITE |
 
 N:339:small iron chest (open)
-G:&:d
+G:&:D
 U:56
 #$ granite wall
 O:0
@@ -7743,7 +7743,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D2 | DROP_1D3 | DROP_GOOD | ATTR_LITE |
 
 N:348:large iron chest (open)
-G:&:d
+G:&:D
 U:56
 #$ granite wall
 O:0
@@ -7946,7 +7946,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
 N:357:small steel chest (open)
-G:&:d
+G:&:D
 U:56
 #$ granite wall
 O:0
@@ -8151,7 +8151,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:CHEST | DROP_1D2 | DROP_1D3 | DROP_GREAT | ATTR_LITE |
 
 N:366:large steel chest (open)
-G:&:d
+G:&:D
 U:56
 #$ granite wall
 O:0
