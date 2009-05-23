@@ -1528,6 +1528,9 @@ static errr rd_inventory(void)
 			/* Hack -- clear the marked flag */
 			inventory[n].ident &= ~(IDENT_MARKED);
 
+			/* Hack -- in inventory, player must be aware it exists */
+			if (!k_info[i_ptr->k_idx].flavor) k_info[i_ptr->k_idx].aware |= (AWARE_EXISTS);
+
 			/* Add the weight */
 			p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
 

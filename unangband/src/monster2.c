@@ -3514,6 +3514,9 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		/* Sense magic */
 		o_ptr->feeling = sense_magic(o_ptr,cp_ptr->sense_type,TRUE, TRUE);
 
+		/* Sensed the item */
+		if (o_ptr->feeling) o_ptr->ident |= (IDENT_SENSE);
+
 		/* Auto-inscribe if necessary */
 		if ((cheat_auto) || (object_aware_p(o_ptr))) o_ptr->note = k_info[ammo_kind].note;
 

@@ -1889,6 +1889,7 @@ bool player_activate(int item)
 		if (flush_failure) flush();
 		msg_print("It whines, glows and fades...");
 		o_ptr->feeling = INSCRIP_BROKEN;
+		o_ptr->ident |= (IDENT_SENSE);
 		return (TRUE);
 	}
 

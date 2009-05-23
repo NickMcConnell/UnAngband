@@ -1372,7 +1372,7 @@ static void py_destroy_aux(int o_idx)
 			&& !(o_ptr->ident & (IDENT_SENSE))
 			 && !(object_named_p(o_ptr)))
 		{
-			o_ptr->discount = INSCRIP_UNBREAKABLE;
+			o_ptr->feeling = INSCRIP_UNBREAKABLE;
 
 			/* The object has been "sensed" */
 			o_ptr->ident |= (IDENT_SENSE);

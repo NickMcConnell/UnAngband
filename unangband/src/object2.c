@@ -895,7 +895,7 @@ void object_aware_tips(object_type *o_ptr, bool seen)
 	}
 
 	/* We didn't note the object */
-	if (!(k_ptr->aware & (AWARE_EXISTS)) && (object_aware_p(o_ptr)))
+	if (!(k_ptr->aware & (AWARE_EXISTS)) && (!(k_ptr->flavor) || (object_aware_p(o_ptr))))
 	{
 		/* Noted object */
 		k_ptr->aware |= (AWARE_EXISTS);
@@ -1376,6 +1376,10 @@ s32b object_value(const object_type *o_ptr)
 
 		/* Base value (see above) */
 		else value = object_value_base(o_ptr);
+
+		return (value  + 1000L);
+
+
 
 		/* Hack -- assess known pval */
 		if (object_pval_p(o_ptr))

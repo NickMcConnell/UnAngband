@@ -439,7 +439,7 @@ bool player_wield(int item)
 		{
 
 			/* Sense the object */
-			o_ptr->discount = INSCRIP_UNGETTABLE;
+			o_ptr->feeling = INSCRIP_UNGETTABLE;
 
 			/* The object has been "sensed" */
 			o_ptr->ident |= (IDENT_SENSE);
