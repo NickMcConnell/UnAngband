@@ -5565,6 +5565,8 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 {
 	int prob, base;
 
+	bool clear_temp = FALSE;
+
 	/* Chance of "special object" */
 	prob = (good ? 10 : 1000);
 
@@ -5635,6 +5637,58 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 			/* Prepare allocation table */
 			get_obj_num_prep();
 		}
+		/* MegaHack - for the moment. Ensure that each tval is dropped approximately with the same
+		 * frequency
+		 */
+		else
+		{
+			/* Pick a random tval. Consumables twice as frequent. */
+			switch (rand_int(23 + 5 * (object_level / 3)) - 5)
+			{
+				case 0: case 1:	tval_drop_idx = TV_FOOD; break;
+				case 2:	case 3: tval_drop_idx = TV_MUSHROOM; break;
+				case 4: case 5:	tval_drop_idx = TV_POTION; break;
+				case 6: case 7:	tval_drop_idx = TV_SCROLL; break;
+				case 8: tval_drop_idx = TV_FLASK; break;
+				case 9: case 10:	tval_drop_idx = TV_ARROW; break;
+				case 11: case 12:	tval_drop_idx = TV_BOLT; break;
+				case 13: case 14: tval_drop_idx = TV_SHOT; break;
+				case 15:	tval_drop_idx = TV_GLOVES; break;
+				case 16:	tval_drop_idx = TV_BOOTS; break;
+				case 17:	tval_drop_idx = TV_CLOAK; break;
+				case 18:	tval_drop_idx = TV_RING; break;
+				case 19: tval_drop_idx = TV_SHIELD; break;
+				case 20: tval_drop_idx = TV_HELM; break;
+				case 21: tval_drop_idx = TV_WAND; break;
+				case 22:	tval_drop_idx = TV_SOFT_ARMOR; break;
+				case 23:	tval_drop_idx = TV_LITE; break;
+				case 24: tval_drop_idx = TV_SWORD; break;
+				case 25: tval_drop_idx = TV_POLEARM; break;
+				case 26: tval_drop_idx = TV_HAFTED; break;
+				case 27: tval_drop_idx = TV_BOW; break;
+				case 28: tval_drop_idx = TV_STAFF; break;
+				case 29:	tval_drop_idx = TV_HARD_ARMOR; break;
+				case 30:	tval_drop_idx = TV_AMULET; break;
+				case 32: tval_drop_idx = TV_ROD; break;
+				case 33: tval_drop_idx = TV_MAGIC_BOOK; break;
+				case 34:	tval_drop_idx = TV_PRAYER_BOOK; break;
+				case 35:	tval_drop_idx = TV_SONG_BOOK; break;
+				case 36:	tval_drop_idx = TV_INSTRUMENT; break;
+				case 37:	tval_drop_idx = TV_RUNESTONE; break;
+				case 38:	tval_drop_idx = TV_BAG; break;
+			}
+
+			if (tval_drop_idx)
+			{
+				/* Activate tval restriction */
+				get_obj_num_hook = kind_is_tval;
+
+				/* Prepare allocation table */
+				get_obj_num_prep();
+
+				clear_temp = TRUE;
+			}
+		}
 
 		/* Pick a random object */
 		k_idx = get_obj_num(base);
@@ -5647,6 +5701,8 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 
 			/* Prepare allocation table */
 			get_obj_num_prep();
+
+			if (clear_temp) tval_drop_idx = FALSE;
 		}
 
 		/* Handle failure */

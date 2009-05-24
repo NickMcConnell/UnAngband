@@ -160,7 +160,7 @@ sint critical_norm(int weight, int plus, int dam)
  *
  * Acid damage is only (x2) against armoured opponents.
  */
-sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool floor)
+sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, bool floor)
 {
 	int mult = 1;
 
@@ -318,10 +318,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			{
 				if (m_ptr->ml)
 				{
-					if (rand_int(100)<tdam)
-					{
-						if (p_ptr->branded_blows != 25) object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L, floor);
-					}
+					if (p_ptr->branded_blows != 25) object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L, floor);
 					l_ptr->flags3 |= (RF3_DRAGON);
 				}
 
@@ -329,7 +326,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			}
 			else if ((l_ptr->flags3 & (RF3_DRAGON)) && (m_ptr->ml))
 			{
-				if (rand_int(100)<tdam*3) object_not_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L, floor);
+				object_not_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L, floor);
 			}
 
 			/* Execute demon */
@@ -338,10 +335,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			{
 				if (m_ptr->ml)
 				{
-					if (rand_int(100)<tdam)
-					{
-						if (p_ptr->branded_blows != 26) object_can_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L, floor);
-					}
+					if (p_ptr->branded_blows != 26) object_can_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L, floor);
 					l_ptr->flags3 |= (RF3_DEMON);
 				}
 
@@ -349,7 +343,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			}
 			else if ((l_ptr->flags3 & (RF3_DEMON)) && (m_ptr->ml))
 			{
-				if (rand_int(100)<tdam*3) object_not_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L, floor);
+				object_not_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L, floor);
 			}
 
 			/* Execute undead */
@@ -358,10 +352,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			{
 				if (m_ptr->ml)
 				{
-					if (rand_int(100)<tdam)
-					{
-						if (p_ptr->branded_blows != 27) object_can_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L, floor);
-					}
+					if (p_ptr->branded_blows != 27) object_can_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L, floor);
 					l_ptr->flags3 |= (RF3_UNDEAD);
 				}
 
@@ -369,7 +360,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 			}
 			else if ((l_ptr->flags3 & (RF3_UNDEAD)) && (m_ptr->ml))
 			{
-				if (rand_int(100)<tdam*3) object_not_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L, floor);
+				object_not_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L, floor);
 			}
 
 			/* Brand (Acid) */
@@ -388,7 +379,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 				/* Otherwise, take the damage */
 				else
 				{
-					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) if (p_ptr->branded_blows != 29) object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
+					if ((m_ptr->ml) && (p_ptr->branded_blows != 29)) object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
 
 					/* Armour partially protects the monster */
 					if (r_ptr->flags2 & (RF2_ARMOR))
@@ -413,7 +404,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 					else if (mult < 3) mult = 3;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_ACID)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_ACID)))
 			{
 				object_not_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
 			}
@@ -434,7 +425,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 				/* Otherwise, take the damage */
 				else
 				{
-					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) if (p_ptr->branded_blows != 30) object_can_flags(o_ptr,TR1_BRAND_ELEC,0x0L,0x0L,0x0L, floor);
+					if ((m_ptr->ml) && (p_ptr->branded_blows != 30)) object_can_flags(o_ptr,TR1_BRAND_ELEC,0x0L,0x0L,0x0L, floor);
 
 					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
@@ -446,7 +437,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 					else if (mult < 3) mult = 3;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_ELEC)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_ELEC)))
 			{
 				object_not_flags(o_ptr,TR1_BRAND_ELEC,0x0L,0x0L,0x0L, floor);
 			}
@@ -467,7 +458,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 				/* Otherwise, take the damage */
 				else
 				{
-					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) if (p_ptr->branded_blows != 31) object_can_flags(o_ptr,TR1_BRAND_FIRE,0x0L,0x0L,0x0L, floor);
+					if ((m_ptr->ml) && (p_ptr->branded_blows != 31)) object_can_flags(o_ptr,TR1_BRAND_FIRE,0x0L,0x0L,0x0L, floor);
 
 					/* Water decreases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
@@ -479,7 +470,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 					else if (mult < 3) mult = 3;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_FIRE)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_FIRE)))
 			{
 				object_not_flags(o_ptr,TR1_BRAND_FIRE,0x0L,0x0L,0x0L, floor);
 			}
@@ -500,7 +491,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 				/* Otherwise, take the damage */
 				else
 				{
-					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) if (p_ptr->branded_blows != 32) object_can_flags(o_ptr,TR1_BRAND_COLD,0x0L,0x0L,0x0L, floor);
+					if ((m_ptr->ml) && (p_ptr->branded_blows != 32)) object_can_flags(o_ptr,TR1_BRAND_COLD,0x0L,0x0L,0x0L, floor);
 
 					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
@@ -512,7 +503,7 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 					else if (mult < 3) mult = 3;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_COLD)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_COLD)))
 			{
 				object_not_flags(o_ptr,TR1_BRAND_COLD,0x0L,0x0L,0x0L, floor);
 			}
@@ -533,12 +524,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 				/* Otherwise, take the damage */
 				else
 				{
-					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) if (p_ptr->branded_blows != 28) object_can_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L, floor);
+					if (m_ptr->ml) if (p_ptr->branded_blows != 28) object_can_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L, floor);
 
 					if (mult < 3) mult = 3;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags3 & (RF3_IM_POIS)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_POIS)))
 			{
 				object_not_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L, floor);
 			}
@@ -593,12 +584,12 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 				/* Otherwise, take the damage */
 				else
 				{
-					if ((rand_int(100)<tdam*3) && (m_ptr->ml)) if (p_ptr->branded_blows != 97) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK, floor);
+					if ((m_ptr->ml) && (p_ptr->branded_blows != 97)) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK, floor);
 
 					if (mult < 3) mult = 3;
 				}
 			}
-			else if ((m_ptr->ml) && ((l_ptr->flags9 & (RF9_RES_DARK)) || (rand_int(100)<tdam*3)))
+			else if ((m_ptr->ml) && (l_ptr->flags9 & (RF9_RES_DARK)))
 			{
 				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK, floor);
 			}
@@ -659,6 +650,15 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 		}
 	}
 
+	return (mult);
+}
+
+
+/*
+ * The above computation for legacy purposes.
+ */
+sint tot_dam_mult(int tdam, int mult)
+{
 	/* Hack -- if dice roll less than three, treat as three for adding multiplier only */
 	if (tdam < 3)
 	{
@@ -668,6 +668,8 @@ sint tot_dam_aux(object_type *o_ptr, int tdam, const monster_type *m_ptr, bool f
 	/* Return the total damage */
 	return (tdam * mult);
 }
+
+
 
 
 /*
@@ -2241,9 +2243,20 @@ bool discharge_trap(int y, int x, int ty, int tx)
 								/* Apply extra might. Note might helps for other weapons to be put in traps only. */
 								if (f1 & (TR1_MIGHT)) mult += j_ptr->pval;
 
+								/* Add bow multiplier */
 								k = damroll(o_ptr->dd, o_ptr->ds);
 								k *= mult;
 
+								/* Add slay multipliers. TODO: Apply equivalent multipliers for trap affecting player */
+								if (!player)
+								{
+									mult = object_damage_multiplier(o_ptr, &m_list[cave_m_idx[y][x]], TRUE);
+									mult = MAX(mult, object_damage_multiplier(j_ptr, &m_list[cave_m_idx[y][x]], TRUE) - 1);
+
+									k = tot_dam_mult(k, mult);
+								}
+
+								/* Add other damage multipliers */
 								k += critical_shot(o_ptr->weight, o_ptr->to_h + j_ptr->to_h, k);
 								k += o_ptr->to_d + j_ptr->to_d;
 
@@ -2743,10 +2756,16 @@ static int weapon_slot(u32b melee_style, int blows, bool charging)
 		if (charging && blows == 1) slot = INVEN_FEET;
 
 		/* Alternate hands and feet */
-		else if (!(blows % 2)) slot = INVEN_FEET;
+		else if (!(blows % 3)) slot = INVEN_FEET;
 
 		/* Use hands */
-		else slot = INVEN_HANDS;
+		else if (inventory[INVEN_HANDS].k_idx) slot = INVEN_HANDS;
+
+		/* Use rings */
+		else if (blows % 3 == 1) slot = INVEN_RIGHT;
+
+		/* Use rings */
+		else slot = INVEN_LEFT;
 	}
 
 	return(slot);
@@ -3040,26 +3059,32 @@ void py_attack(int dir)
 			{
 				k = damroll(o_ptr->dd, o_ptr->ds);
 
-				/* Hack -- get brands/slays from artifact/ego item/magic item type */
-				if ((o_ptr->name1) || (o_ptr->name2) || (o_ptr->xtra1) || (o_ptr->ident & (IDENT_FORGED)))
+				int mult = object_damage_multiplier(o_ptr, m_ptr, FALSE);
+
+				/* Allow other items on hands to assist with melee blow multipliers */
+				if (slot != INVEN_FEET)
 				{
-					k = tot_dam_aux(o_ptr, k, m_ptr, FALSE);
+					/* Use gauntlet brand. Gauntlets use 1 less multiplier */
+					if (inventory[INVEN_HANDS].k_idx)
+					{
+						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE) - 1);
+					}
+
+					/* Use ring brands on right hand for main weapon. Rings use 1 less multiplier. */
+					if ((inventory[INVEN_RIGHT].k_idx) && ((slot == INVEN_WIELD) || (melee_style & (1L << WS_TWO_HANDED))))
+					{
+						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE) - 1);
+					}
+
+					/* Use ring brands on left hand for off-hand weapon. Rings use 1 less multiplier. */
+					if ((inventory[INVEN_LEFT].k_idx) && ((slot == INVEN_ARM) || (melee_style & (1L << WS_TWO_HANDED))))
+					{
+						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE) - 1);
+					}
 				}
-				/* Hack -- use gauntlet brand if wielding a normal weapon */
-				else if (inventory[INVEN_HANDS].k_idx)
-				{
-					k = tot_dam_aux(&inventory[INVEN_HANDS], k, m_ptr, FALSE);
-				}
-				/* Hack -- use ring brands if not wielding gloves */
-				else if ((inventory[INVEN_RIGHT].k_idx) && (slot == INVEN_WIELD))
-				{
-					k = tot_dam_aux(&inventory[INVEN_RIGHT], k, m_ptr, FALSE);
-				}
-				/* Hack -- use ring brands if not wielding gloves */
-				else if ((inventory[INVEN_LEFT].k_idx) && (slot == INVEN_ARM))
-				{
-					k = tot_dam_aux(&inventory[INVEN_LEFT], k, m_ptr, FALSE);
-				}
+
+				/* Get the total damage from the multiplier */
+				k = tot_dam_mult(k, mult);
 
 				/* Haven't got an critical type yet */
 				c = 0;

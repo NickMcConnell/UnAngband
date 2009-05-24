@@ -3856,6 +3856,26 @@ void player_fire_or_throw_selected(int item, bool fire)
 					/* Assume a default death */
 					cptr note_dies = " dies.";
 
+					int mult = object_damage_multiplier(o_ptr, m_ptr, item < 0);
+
+					/* Apply bow brands */
+					if (fire) mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_BOW], m_ptr, item < 0) - 1);
+
+					/* Use left-hand ring brand when shooting. Rings contribute 1 less multiplier. */
+					if ((fire) && (inventory[INVEN_LEFT].k_idx))
+					{
+						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_LEFT], m_ptr, item < 0) - 1);
+					}
+
+					/* Use right-hand ring brand when shooting. Rings contribute 1 less multiplier. */
+					if ((!fire) && (inventory[INVEN_LEFT].k_idx))
+					{
+						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_RIGHT], m_ptr, item < 0) - 1);
+					}
+
+					/* Get total damage */
+					tdam = tot_dam_mult(tdam, mult);
+
 					/* Note the collision */
 					ammo_can_break = TRUE;
 
@@ -3875,19 +3895,6 @@ void player_fire_or_throw_selected(int item, bool fire)
 						/* Special note at death */
 						note_dies = " is destroyed.";
 					}
-
-					/* Apply special damage XXX XXX XXX */
-					/* Hack -- get brands/slays from artifact/ego item/magic item type */
-					if ((i_ptr->name1) || (i_ptr->name2) || (i_ptr->xtra1) || (i_ptr->ident & (IDENT_FORGED)))
-					{
-						tdam = tot_dam_aux(i_ptr, tdam, m_ptr, item < 0);
-					}
-					/* Hack -- use left-hand ring brand */
-					else if (inventory[INVEN_LEFT].k_idx)
-					{
-						tdam = tot_dam_aux(&inventory[INVEN_LEFT], tdam, m_ptr, item < 0);
-					}
-
 
 					/* The third piece of fire/throw dependent code */
 					if (fire)

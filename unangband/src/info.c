@@ -3948,6 +3948,34 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Display the flags */
 	anything |= list_object_flags(f1, f2, f3, f4, spoil || (o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN | IDENT_STORE)) ? o_ptr->pval : 0, LIST_FLAGS_CAN);
 
+	/* Hack -- Caveat some flags */
+	if (!random)
+	{
+		switch (o_ptr->tval)
+		{
+			case TV_BOOTS:
+			case TV_GLOVES:
+				text_out(format("Slays and brands are %s effective on %s when you attack using unarmed combat.  ",
+						o_ptr->tval == TV_BOOTS ? "only" : "most",
+								o_ptr->tval == TV_BOOTS ? "boots" : "gloves"));
+
+				if (o_ptr->tval == TV_BOOTS) break;
+				text_out("Slays and brands are x1 multiplier less effective on gloves when wielding a weapon.  ");
+				break;
+
+			case TV_RING:
+				text_out("Slays and brands are x1 multiplier less effective on rings and only apply to the hand the ring is worn on.  ");
+				text_out("Wear it on the right hand to affect thrown weapons and the main weapon you are wielding.  ");
+				text_out("Wear it on the left hand to affect missile weapons and off-hand weapons.  ");
+				text_out("Two handed weapons are affected by rings on both hands.  ");
+				break;
+
+			case TV_BOW:
+				text_out("Slays and brands are x1 multiplier less effective on missile weapons then their ammunition.  ");
+				break;
+		}
+	}
+
 	/*
 	 * Handle cursed objects here to avoid redundancies such as noting
 	 * that a permanently cursed object is heavily cursed as well as
@@ -6282,6 +6310,25 @@ s32b object_power(const object_type *o_ptr)
 			}
 			p *= mult;
 
+			/* Apply the correct ego slay multiplier */
+			if (o_ptr->name2)
+			{
+				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+			}
+
+			/* Hack -- For efficiency, compute for first slay or brand flag only */
+			else
+			{
+				int i;
+				u32b j, s_index;
+
+				s_index = slay_index(f1, f2, f3, f4);
+
+				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
+
+				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+			}
+
 			/* Increase power for to-dam */
 			if (o_ptr->to_d > 9)
 			{
@@ -6787,6 +6834,25 @@ s32b object_power(const object_type *o_ptr)
 			/* Hack -- only if it has other flags though */
 			if (((f2 & (TR2_IGNORE_ELEC)) != 0) && ((kf2 & (TR2_IGNORE_ELEC)) == 0)
 				&& ( (f1 & ~(kf1)) || (f2 & ~(TR2_IGNORE_MASK) & ~(kf2)) || (f3 & ~(kf3)) || (f4 & ~(kf4)) ) ) p++;
+
+			/* Apply the correct ego slay multiplier */
+			if (o_ptr->name2)
+			{
+				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+			}
+
+			/* Hack -- For efficiency, compute for first slay or brand flag only */
+			else
+			{
+				int i;
+				u32b j, s_index;
+
+				s_index = slay_index(f1, f2, f3, f4);
+
+				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
+
+				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
+			}
 
 			/* Fall through */
 		}
