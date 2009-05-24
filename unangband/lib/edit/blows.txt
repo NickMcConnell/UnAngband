@@ -1738,11 +1738,11 @@ F:HEARD |
 D::
 
 N:157:BEAM_NETHR
-T:50-9999:unleash||es| a ray of death at & 
+T:50-9999:unleash||es| a ray of death at &
 T:50-9999:intones with deadly menace
 T:25-49:hurl~ a * lance at 
 T:25-49:murmur~ a deadly word
-T:0-24:cast~ a beam of * at & 
+T:0-24:cast~ a beam of * at &
 T:0-24:whisper~ nastily
 I:0:6:0
 W:7:0:0
