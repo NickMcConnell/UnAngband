@@ -1907,9 +1907,12 @@ P:0:1d1:0:0:0
 Y:24:1
 F:THROWING |
 
-### 236 - Unused ###
-
-#$# 236 - Unused ###
+N:236:Restore Dexterity and Agility
+G:,:w
+I:79:24:0
+W:10:500:1:50
+A:20/1
+P:0:0d0:0:0:0
 
 N:237:Cure Light Wounds
 G:!:w
@@ -6387,7 +6390,7 @@ P:0:0d0:0:0:0
 N:792:Phlogiston
 G:?:v
 I:99:43:0
-W:40:0:0:200
+W:40:0:0:5
 P:0:0d0:0:0:0
 
 ### Three new types of ammo ###

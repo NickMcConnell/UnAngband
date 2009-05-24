@@ -3855,6 +3855,7 @@ S:CURE_DISEASE:26
 
 N:306:Restore Dexterity and Agility
 A:90:4:11
+A:79:24:1
 C:1:12:22:95:160
 C:3:16:28:95:100
 C:4:16:28:95:100
