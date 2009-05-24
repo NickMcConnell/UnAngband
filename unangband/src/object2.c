@@ -815,12 +815,42 @@ void object_known(object_type *o_ptr)
 
 
 /*
+ * Sense the bonus of an object
+ *
+ * Note under some circumstances, we fully know the object (When
+ * its bonuses are all there is to know about it).
+ */
+void object_bonus(object_type *o_ptr, bool floor)
+{
+	/* Identify the bonuses */
+	o_ptr->ident |= (IDENT_BONUS);
+
+	/* Sense the item (if appropriate) */
+	if (!object_known_p(o_ptr))
+	{
+		int feel = sense_magic(o_ptr, 1, TRUE, floor);
+
+		if (feel) o_ptr->feeling = feel;
+	}
+
+	/* For armour/weapons - is this all we need to know? */
+	if ((o_ptr->feeling == INSCRIP_AVERAGE) ||
+			(o_ptr->feeling == INSCRIP_GOOD) ||
+			(o_ptr->feeling == INSCRIP_VERY_GOOD) ||
+			(o_ptr->feeling == INSCRIP_GREAT))
+	{
+		object_known(o_ptr);
+	}
+}
+
+
+/*
  * Sense the bonus/charges of an object
  *
  * Note under some circumstances, we fully know the object (When
  * its bonuses/charges are all there is to know about it).
  */
-void object_bonus(object_type *o_ptr, bool floor)
+void object_gauge(object_type *o_ptr, bool floor)
 {
 	/* Identify the bonuses */
 	o_ptr->ident |= (IDENT_BONUS | IDENT_CHARGES | IDENT_PVAL);
@@ -840,9 +870,21 @@ void object_bonus(object_type *o_ptr, bool floor)
 	/* Sense the item (if appropriate) */
 	if (!object_known_p(o_ptr))
 	{
-		sense_magic(o_ptr, 1, TRUE, floor);
+		int feel = sense_magic(o_ptr, 1, TRUE, floor);
+
+		if (feel) o_ptr->feeling = feel;
+	}
+
+	/* For armour/weapons - is this all we need to know? */
+	if ((o_ptr->feeling == INSCRIP_AVERAGE) ||
+			(o_ptr->feeling == INSCRIP_GOOD) ||
+			(o_ptr->feeling == INSCRIP_VERY_GOOD) ||
+			(o_ptr->feeling == INSCRIP_GREAT))
+	{
+		object_known(o_ptr);
 	}
 }
+
 
 
 /*

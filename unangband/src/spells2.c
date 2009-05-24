@@ -2591,7 +2591,7 @@ static bool item_tester_unknown_tval(const object_type *o_ptr)
 }
 
 
-static bool item_tester_unknown_bonus(const object_type *o_ptr)
+static bool item_tester_unknown_gauge(const object_type *o_ptr)
 {
 	if (object_known_p(o_ptr))
 		return FALSE;
@@ -3308,7 +3308,7 @@ bool ident_spell_name(void)
  * This routine does *not* automatically combine objects.
  * Returns TRUE if something was identified, else FALSE.
  */
-bool ident_spell_bonus(void)
+bool ident_spell_gauge(void)
 {
 	int item;
 
@@ -3320,7 +3320,7 @@ bool ident_spell_bonus(void)
 
 
 	/* Only un-id'ed items */
-	item_tester_hook = item_tester_unknown_bonus;
+	item_tester_hook = item_tester_unknown_gauge;
 
 	/* Get an item */
 	q = "Gauge which item? ";
@@ -3350,7 +3350,7 @@ bool ident_spell_bonus(void)
 	}
 
 	/* Identify it's bonuses */
-	object_bonus(o_ptr, item < 0);
+	object_gauge(o_ptr, item < 0);
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -6079,9 +6079,9 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	}
 
 	/* Process the flags that apply to equipment */
-	if (s_ptr->flags1 & (SF1_IDENT_BONUS))
+	if (s_ptr->flags1 & (SF1_IDENT_GAUGE))
 	{
-		if (!ident_spell_bonus() && (*cancel)) return (TRUE);
+		if (!ident_spell_gauge() && (*cancel)) return (TRUE);
 		*cancel = FALSE;
 		obvious = TRUE;
 	}

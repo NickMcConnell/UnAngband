@@ -565,8 +565,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (id_flags & (SF1_DETECT_CURSE)) vp[vn++]="curses";
 	if (id_flags & (SF1_IDENT_SENSE)) vp[vn++]="the general power level";
 	if (id_flags & (SF1_IDENT_MAGIC)) vp[vn++]="a magical attribute";
-	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="the bonuses to hit, damage and armour class";
-	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="the number of charges";
+	if (id_flags & (SF1_IDENT_GAUGE)) vp[vn++]="the bonuses to hit, damage and armour class";
+	if (id_flags & (SF1_IDENT_GAUGE)) vp[vn++]="the number of charges";
 	if (id_flags & (SF1_IDENT_VALUE)) vp[vn++]="the value";
 	if (id_flags & (SF1_IDENT_RUNES)) vp[vn++]="the types of runes";
 	if ((id_flags & (SF1_IDENT)) || (s_ptr->type == SPELL_IDENT_TVAL) || (s_ptr->type == SPELL_IDENT_NAME)) vp[vn++]="the kind, ego-item and artifact names";
@@ -617,10 +617,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Collect identifies */
 	vn = 0;
 
-	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="weapon";
-	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="wearable item";
-	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="wand";
-	if (id_flags & (SF1_IDENT_BONUS)) vp[vn++]="staff";
+	if (id_flags & (SF1_IDENT_GAUGE)) vp[vn++]="weapon";
+	if (id_flags & (SF1_IDENT_GAUGE)) vp[vn++]="wearable item";
+	if (id_flags & (SF1_IDENT_GAUGE)) vp[vn++]="wand";
+	if (id_flags & (SF1_IDENT_GAUGE)) vp[vn++]="staff";
 	if (id_flags & (SF1_IDENT | SF1_IDENT_SENSE | SF1_IDENT_MAGIC)) vp[vn++]="unknown item";
 	if (id_flags & (SF1_IDENT_RUMOR | SF1_IDENT_FULLY | SF1_FORGET | SF1_IDENT_MAGIC)) vp[vn++]="known item";
 	if (id_flags & (SF1_DETECT_CURSE)) vp[vn++]="cursed item";
@@ -5718,6 +5718,10 @@ void object_usage(int slot)
 
 	char o_name[80];
 
+	bool sense = FALSE;
+	bool bonus = FALSE;
+	bool heavy = FALSE;
+
 	if (slot >=0) o_ptr =&inventory[slot];
 	else o_ptr=&o_list[0-slot];
 
@@ -5731,9 +5735,6 @@ void object_usage(int slot)
 
 	if ((o_ptr->usage)<MAX_SHORT) o_ptr->usage++;
 
-	/* Describe the object */
-	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
-
 	/* Don't identify if fully known */
 	if (o_ptr->ident & (IDENT_MENTAL)) return;
 
@@ -5743,8 +5744,57 @@ void object_usage(int slot)
 	/* Describe the object */
 	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
-	/* Calculate object bonus */
-	if (!object_bonus_p(o_ptr) && (o_ptr->usage > 30) && (o_ptr->usage % 30 == 0) && (rand_int(100) < 30))
+	/* Valid "tval" codes */
+	switch (o_ptr->tval)
+	{
+		case TV_SHOT:
+		case TV_ARROW:
+		case TV_BOLT:
+		case TV_BOW:
+		case TV_DIGGING:
+		case TV_STAFF:
+		case TV_HAFTED:
+		case TV_POLEARM:
+		case TV_SWORD:
+		{
+			/* Suggested calculation for weapons is 1 + (dd * ds ^ 1.5) / 4 from
+			 * http://angband.oook.cz/forum/showthread.php?t=1135&highlight=weapon+calculation&page=2 */
+			if (!object_bonus_p(o_ptr) && (o_ptr->usage >= (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4))) bonus = TRUE;
+
+			/* Heavy sense if half-way there */
+			else if (o_ptr->usage > (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4) / 2) heavy = TRUE;
+
+			/* Sense if one third of way there */
+			else if (o_ptr->usage == (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4) / 3) sense = TRUE;
+
+			break;
+		}
+
+		case TV_BOOTS:
+		case TV_GLOVES:
+		case TV_HELM:
+		case TV_CROWN:
+		case TV_SHIELD:
+		case TV_CLOAK:
+		case TV_SOFT_ARMOR:
+		case TV_HARD_ARMOR:
+		case TV_DRAG_ARMOR:
+		{
+			/* Calculation is based on the fact that base armour outweighs bonus */
+			if (!object_bonus_p(o_ptr) && (o_ptr->usage >= o_ptr->ac /2)) bonus = TRUE;
+
+			/* Heavy sense if half-way there */
+			else if (o_ptr->usage > o_ptr->ac / 4) heavy = TRUE;
+
+			/* Sense if one-third of way there */
+			else if (o_ptr->usage == 1 + o_ptr->ac / 6) sense = TRUE;
+
+			break;
+		}
+	}
+
+	/* Fully sense bonus */
+	if (bonus)
 	{
 		/* Describe what we know */
 		msg_format("You feel you know more about the %s you are %s.",o_name,describe_use(slot));
@@ -5760,57 +5810,27 @@ void object_usage(int slot)
 
 		/* Window stuff */
 		p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
-
 	}
-	else if ((!o_ptr->feeling) && (!(o_ptr->ident & (IDENT_SENSE))) && (o_ptr->usage > 5) && (o_ptr->usage % 5 == 0)
-		&& (rand_int(100) < 30))
+
+	/* Sense the item if we don't get an exact match */
+	if (((sense) || (heavy)) && !(o_ptr->ident & (IDENT_SENSE)))
 	{
-		/* Valid "tval" codes */
-		switch (o_ptr->tval)
+		/* Check for a feeling */
+		int feel = sense_magic(o_ptr, 1, heavy, slot < 0);
+
+		if (feel)
 		{
-			case TV_SHOT:
-			case TV_ARROW:
-			case TV_BOLT:
-			case TV_BOW:
-			case TV_DIGGING:
-			case TV_HAFTED:
-			case TV_POLEARM:
-			case TV_SWORD:
-			case TV_BOOTS:
-			case TV_GLOVES:
-			case TV_HELM:
-			case TV_CROWN:
-			case TV_SHIELD:
-			case TV_CLOAK:
-			case TV_SOFT_ARMOR:
-			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
-			case TV_INSTRUMENT:
-			case TV_STAFF:
-			{
-				/* Check for a feeling */
-				int feel = value_check_aux1(o_ptr);
+			/* Describe what we know */
+			msg_format("You feel you know more about the %s you are %s.",o_name,describe_use(slot));
 
-				if (feel)
-				{
-					/* Describe what we know */
-					msg_format("You feel you know more about the %s you are %s.",o_name,describe_use(slot));
+			/* Change feeling */
+			o_ptr->feeling = feel;
 
-					/* Sense the object */
-					o_ptr->feeling = feel;
+			/* Combine / Reorder the pack (later) */
+			p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
-					/* The object has been "sensed" */
-					o_ptr->ident |= (IDENT_SENSE);
-
-					/* Combine / Reorder the pack (later) */
-					p_ptr->notice |= (PN_COMBINE | PN_REORDER);
-
-					/* Window stuff */
-					p_ptr->window |= (PW_INVEN | PW_EQUIP);
-
-				}
-				break;
-			}
+			/* Window stuff */
+			p_ptr->window |= (PW_INVEN | PW_EQUIP);
 		}
 	}
 }

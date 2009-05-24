@@ -1568,7 +1568,7 @@ enum
 #define SF1_IDENT 		0x00040000
 #define SF1_IDENT_MAGIC   	0x00080000
 #define SF1_IDENT_SENSE  	0x00100000
-#define SF1_IDENT_BONUS  	0x00200000
+#define SF1_IDENT_GAUGE  	0x00200000
 #define SF1_IDENT_RUNES  	0x00400000
 #define SF1_IDENT_VALUE  	0x00800000
 #define SF1_IDENT_RUMOR  	0x01000000
@@ -4778,7 +4778,7 @@ enum
  * Test Two -- Check for "Easy Know" + "Aware"
  */
 #define object_charges_p(T) \
-	((T)->ident & (IDENT_KNOWN | IDENT_CHARGES))
+	(((T)->ident & (IDENT_KNOWN | IDENT_CHARGES)) != 0)
 
 
 /*
@@ -4786,7 +4786,7 @@ enum
  * Test One -- Check for special "known" or "named" tags
  */
 #define object_pval_p(T) \
-	((T)->ident & (IDENT_KNOWN | IDENT_PVAL))
+	(((T)->ident & (IDENT_KNOWN | IDENT_PVAL)) != 0)
 
 
 /*
@@ -4794,7 +4794,7 @@ enum
  * Test One -- Check for special "known" or "bonus" tags
  */
 #define object_bonus_p(T) \
-	((T)->ident & (IDENT_KNOWN | IDENT_BONUS))
+	(((T)->ident & (IDENT_KNOWN | IDENT_BONUS)) != 0)
 
 
 /*

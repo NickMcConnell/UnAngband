@@ -1129,7 +1129,7 @@ static cptr s_info_flags1[] =
 	"IDENT",
 	"IDENT_MAGIC",
 	"IDENT_SENSE",
-	"IDENT_BONUS",
+	"IDENT_GAUGE",
 	"IDENT_RUNES",
 	"IDENT_VALUE",
 	"IDENT_RUMOR",

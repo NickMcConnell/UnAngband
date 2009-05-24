@@ -564,7 +564,7 @@ bool player_wield(int item)
 	p_ptr->total_weight += i_ptr->weight * amt;
 
 	/* Important - clear this flag */
-	j_ptr->ident &= ~(IDENT_STORE);
+	j_ptr->ident &= ~(IDENT_STORE | IDENT_MARKED);
 
 	/* Hack - prevent dragon armour swap abuse */
 	if (j_ptr->tval == TV_DRAG_ARMOR)
