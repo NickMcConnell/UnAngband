@@ -5750,7 +5750,6 @@ void object_usage(int slot)
 		case TV_SHOT:
 		case TV_ARROW:
 		case TV_BOLT:
-		case TV_BOW:
 		case TV_DIGGING:
 		case TV_STAFF:
 		case TV_HAFTED:
@@ -5766,6 +5765,20 @@ void object_usage(int slot)
 
 			/* Sense if one third of way there */
 			else if (o_ptr->usage == (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4) / 3) sense = TRUE;
+
+			break;
+		}
+
+		case TV_BOW:
+		{
+			/* Calculation is based on the fact that base armour outweighs bonus */
+			if (!object_bonus_p(o_ptr) && (o_ptr->usage > 6)) bonus = TRUE;
+
+			/* Heavy sense if half-way there */
+			else if (o_ptr->usage > 3) heavy = TRUE;
+
+			/* Sense if one-third of way there */
+			else if (o_ptr->usage == 2) sense = TRUE;
 
 			break;
 		}
