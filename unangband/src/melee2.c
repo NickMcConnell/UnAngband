@@ -2087,7 +2087,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		if (mmove == MM_DROWN && !m_ptr->confused)
 		{
 			/* Try to get out of existing trouble */
-            if (place_monster_here(m_ptr->fy, m_ptr->fx, m_ptr->r_idx) <= MM_FAIL) move_chance /= 4;
+            if (place_monster_here(m_ptr->fy, m_ptr->fx, m_ptr->r_idx) <= MM_DROWN) move_chance /= 2;
 
 			/* Don't walk into trouble */
 			else move_chance = 0;
@@ -2102,18 +2102,21 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		/* Check for traps */
 		else if (mmove == MM_TRAP)
 		{
-			/* Stupid monsters ignore traps, as do those which can avoid or resist them */
-			if ((r_ptr->flags2 & (RF2_STUPID)) || (mon_avoid_trap(m_ptr, y, x))
-					|| (mon_resist_feat(cave_feat[y][x], m_ptr->r_idx)))
+			/* Stupid monsters ignore traps */
+			if ((r_ptr->flags2 & (RF2_STUPID)) || (m_ptr->mflag & (MFLAG_STUPID)))
 			{
 				/* No modification */
 			}
 
-			/* Smart and sneaky monsters will disarm traps.
-			 * Monsters in line of fire to the player will consider moving
+			/* Smart and sneaky monsters will disarm traps. */
+			else if ((r_ptr->flags2 & (RF2_SMART | RF2_SNEAKY)) && (f_ptr->flags1 & (FF1_DISARM)))
+			{
+				move_chance /= 2;
+			}
+
+			/* Monsters in line of fire to the player will consider moving
 			 * through traps, as will those monsters aggravated by the player. */
-			else if ((r_ptr->flags2 & (RF2_SMART | RF2_SNEAKY)) ||
-					(play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) ||
+			else if	((play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) ||
 					(m_ptr->mflag & (MFLAG_AGGR)))
 			{
 				move_chance /= 4;

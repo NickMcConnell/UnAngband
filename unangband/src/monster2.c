@@ -2572,6 +2572,148 @@ void monster_swap(int y1, int x1, int y2, int x2)
 }
 
 
+/*
+ * Monster resists a particular effect type.
+ *
+ * Note that this should only be used for navigation purposes
+ * to determine whether a monster can enter a particular grid because
+ * of either the feature in the grid, or a region in the grid.
+ *
+ * Returns -1 if the monster resists naturally, 0 if the monster
+ * does not resist, and 1 if the monster resists if they are
+ * able to correctly navigate the terrain.
+ */
+static int mon_resist_effect(int effect, int r_idx)
+{
+	monster_race *r_ptr;
+
+	/* Paranoia */
+	if (!r_idx) return (FALSE);
+
+	/* Race */
+	r_ptr = &r_info[r_idx];
+
+	/* Monster resists effect */
+	switch (effect)
+	{
+		case GF_ICE:
+		case GF_HURT:
+		case GF_UN_BONUS:
+		case GF_UN_POWER:
+		case GF_EAT_GOLD:
+		case GF_EAT_ITEM:
+		case GF_EAT_FOOD:
+		case GF_EAT_LITE:
+		return (-1);
+		break;
+
+		case GF_DELAY_POISON:
+		case GF_POIS:
+		if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (0);
+		break;
+
+		case GF_ACID:
+		case GF_VAPOUR:
+		if (!(r_ptr->flags3 & (RF3_IM_ACID))) return (0);
+		break;
+
+		case GF_ELEC:
+		if (!(r_ptr->flags3 & (RF3_IM_ELEC))) return (0);
+		break;
+
+		case GF_FIRE:
+		case GF_SMOKE:
+		if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (0);
+		break;
+
+		case GF_LAVA:
+		if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (0);
+		break;
+
+		case GF_POISON_WATER:
+		if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (0);
+		/* Fall through */
+
+		case GF_WATER_WEAK:
+		case GF_WATER:
+		if (r_ptr->flags3 & (RF3_NONLIVING))  return (-1);
+		return (1);
+
+		case GF_BWATER:
+		case GF_STEAM:
+		if ((r_ptr->flags3 & (RF3_NONLIVING)) && (r_ptr->flags3 & (RF3_IM_FIRE))) return (-1);
+		if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (0);
+		return (1);
+
+		case GF_BMUD:
+		if ((r_ptr->flags3 & (RF3_NONLIVING))&& (r_ptr->flags3 & (RF3_IM_FIRE))) return (TRUE);
+		if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (0);
+		return(1);
+
+		case GF_COLD:
+		if (!(r_ptr->flags3 & (RF3_IM_COLD))) return (0);
+		break;
+
+		case GF_BLIND:
+		case GF_BLIND_WEAK:
+		if (!(r_ptr->flags9 & (RF9_RES_BLIND))) return (0);
+		break;
+
+		case GF_CONFUSION:
+		case GF_CONF_WEAK:
+		if (!(r_ptr->flags3 & (RF3_NO_CONF))) return (0);
+		break;
+
+		case GF_TERRIFY:
+		case GF_FEAR_WEAK:
+		if (!(r_ptr->flags3 & (RF3_NO_FEAR))) return (0);
+		break;
+
+		case GF_SLEEP:
+		case GF_PARALYZE:
+		if (!(r_ptr->flags3 & (RF3_NO_SLEEP))) return (0);
+		break;
+
+		case GF_LOSE_STR:
+		case GF_LOSE_INT:
+		case GF_LOSE_WIS:
+		case GF_LOSE_DEX:
+		case GF_LOSE_CON:
+		case GF_LOSE_CHR:
+		case GF_LOSE_ALL:
+		case GF_EXP_10:
+		case GF_EXP_20:
+		case GF_EXP_40:
+		case GF_EXP_80:
+		if (!(r_ptr->flags3 & (RF3_UNDEAD))) return (0);
+		break;
+
+		case GF_SHATTER:
+		return (0);
+		break;
+
+		case GF_NOTHING:
+		break;
+
+		case GF_FALL_MORE:
+		if (!(r_ptr->flags2 & (RF2_CAN_FLY))) return (0);
+		break;
+
+		case GF_FALL:
+		case GF_FALL_SPIKE:
+		case GF_FALL_POIS:
+		if (!(r_ptr->flags1 & (RF1_NEVER_MOVE))) return (0);
+		break;
+
+		default:
+		return (0);
+		break;
+	}
+
+	return (TRUE);
+}
+
+
 
 
 /* XXX XXX Checking by blow method is broken currently, because we
@@ -2627,7 +2769,6 @@ void monster_swap(int y1, int x1, int y2, int x2)
  * We then stop monsters flowing that can't flow through all non-wall terrain
  * on the level. This is currently unimplemented.
  */
-
 bool mon_resist_feat(int feat, int r_idx)
 {
 	monster_race *r_ptr;
@@ -2657,144 +2798,17 @@ bool mon_resist_feat(int feat, int r_idx)
 	/* Check trap/feature attack */
 	if (f_ptr->blow.method)
 	{
-		switch (f_ptr->blow.effect)
+		switch(mon_resist_effect(f_ptr->blow.effect, r_idx))
 		{
-
-			case GF_ICE:
-			case GF_HURT:
-			case GF_UN_BONUS:
-			case GF_UN_POWER:
-			case GF_EAT_GOLD:
-			case GF_EAT_ITEM:
-			case GF_EAT_FOOD:
-			case GF_EAT_LITE:
-			return ((f_ptr->blow.d_dice * f_ptr->blow.d_side)==0);
-			break;
-
-			case GF_DELAY_POISON:
-			case GF_POIS:
-			if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (FALSE);
-			break;
-
-			case GF_ACID:
-			case GF_VAPOUR:
-			if (!(r_ptr->flags3 & (RF3_IM_ACID))) return (FALSE);
-			break;
-
-			case GF_ELEC:
-			if (!(r_ptr->flags3 & (RF3_IM_ELEC))) return (FALSE);
-			break;
-
-			case GF_FIRE:
-			case GF_SMOKE:
-			if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (FALSE);
-			break;
-
-			case GF_LAVA:
-			if (!(r_ptr->flags3 & (RF3_RES_LAVA))) return (FALSE);
-			break;
-
-			case GF_POISON_WATER:
-			if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (FALSE);
-			/* Fall through */
-
-			case GF_WATER_WEAK:
-			case GF_WATER:
-			if (r_ptr->flags3 & (RF3_NONLIVING))  return (TRUE);
-			if ((r_ptr->flags2 & (RF2_CAN_SWIM)) && (f_ptr->flags2 & (FF2_CAN_SWIM)))
-			{
+			case -1:
 				return (TRUE);
-			}
-			else if ((r_ptr->flags2 & (RF2_CAN_DIG)) && (f_ptr->flags2 & (FF2_CAN_DIG)))
-			{
-				return (TRUE);
-			}
-			else
-			{
+			case 0:
 				return (FALSE);
-			}
-
-			break;
-
-			case GF_BWATER:
-			case GF_STEAM:
-			if ((r_ptr->flags3 & (RF3_NONLIVING)) && (r_ptr->flags3 & (RF3_IM_FIRE))) return (TRUE);
-			if ((r_ptr->flags2 & (RF2_CAN_SWIM)) && (f_ptr->flags2 & (FF2_CAN_SWIM)))
-			{
-				if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (FALSE);
-			}
-			else
-			{
-				return(FALSE);
-			}
-			break;
-
-			case GF_BMUD:
-			if ((r_ptr->flags3 & (RF3_NONLIVING))&& (r_ptr->flags3 & (RF3_IM_FIRE))) return (TRUE);
-			if ((r_ptr->flags2 & (RF2_CAN_DIG)) && (f_ptr->flags2 & (FF2_CAN_DIG)))
-			{
-				if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (FALSE);
-			}
-			else
-			{
-				return(FALSE);
-			}
-			break;
-
-			case GF_COLD:
-			if (!(r_ptr->flags3 & (RF3_IM_COLD))) return (FALSE);
-			break;
-
-			case GF_BLIND:
-			case GF_CONFUSION:
-			if (!(r_ptr->flags3 & (RF3_NO_CONF))) return (FALSE);
-			break;
-
-			case GF_TERRIFY:
-			if (!(r_ptr->flags3 & (RF3_NO_FEAR))) return (FALSE);
-			break;
-
-			case GF_PARALYZE:
-			if (!(r_ptr->flags3 & (RF3_NO_SLEEP))) return (FALSE);
-			break;
-
-			case GF_LOSE_STR:
-			case GF_LOSE_INT:
-			case GF_LOSE_WIS:
-			case GF_LOSE_DEX:
-			case GF_LOSE_CON:
-			case GF_LOSE_CHR:
-			case GF_LOSE_ALL:
-			case GF_EXP_10:
-			case GF_EXP_20:
-			case GF_EXP_40:
-			case GF_EXP_80:
-			if (!(r_ptr->flags3 & (RF3_UNDEAD))) return (FALSE);
-			break;
-
-			case GF_SHATTER:
-			return (FALSE);
-			break;
-
-			case GF_NOTHING:
-			break;
-
-			case GF_FALL_MORE:
-			if (!(r_ptr->flags2 & (RF2_CAN_FLY))) return (FALSE);
-			break;
-
-			case GF_FALL:
-			case GF_FALL_SPIKE:
-			case GF_FALL_POIS:
-			if (!(r_ptr->flags1 & (RF1_NEVER_MOVE))) return (FALSE);
-			break;
-
-
-			default:
-			return (FALSE);
-			break;
+			case 1:
+				if ((r_ptr->flags2 & (RF2_CAN_SWIM)) && (f_ptr->flags2 & (FF2_CAN_SWIM))) return (TRUE);
+				if ((r_ptr->flags2 & (RF2_CAN_DIG)) && (f_ptr->flags2 & (FF2_CAN_DIG))) return (TRUE);
+				return (FALSE);
 		}
-
 	}
 
 
@@ -2861,6 +2875,31 @@ int place_monster_here(int y, int x, int r_idx)
 		/* XXX Iterate through the traps and see if the monster will be
 		 * affected by any of them.
 		 */
+		s16b this_region_piece, next_region_piece = 0;
+
+		for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+		{
+			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+			region_type *re_ptr = &region_list[rp_ptr->region];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_grid;
+
+			/* Skip dead regions */
+			if (!re_ptr->type) continue;
+
+			/* Trapped regions */
+			if (re_ptr->flags1 & (RE1_HIT_TRAP))
+			{
+				if (race_avoid_trap(re_ptr->y0, re_ptr->y1, r_idx)) trap |= !mon_resist_feat(cave_feat[re_ptr->y0][re_ptr->x0], r_idx);
+			}
+
+			/* Non-trapped regions */
+			else if (!(mon_resist_effect(re_ptr->effect, r_idx)))
+			{
+				trap = TRUE;
+			}
+		}
 
 		trap |= TRUE;
 	}

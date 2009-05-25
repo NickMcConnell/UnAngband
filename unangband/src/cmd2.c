@@ -4299,6 +4299,10 @@ void player_fire_or_throw_selected(int item, bool fire)
 					/* Hack -- drop into chasm */
 					cave_alter_feat(y, x, FS_TIMED);
 				}
+				else
+				{
+					break;
+				}
 			}
 		}
 	}

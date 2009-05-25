@@ -9171,10 +9171,10 @@ void trigger_region(int y, int x, bool move)
 
 		/* Shoot grid with effect */
 		if ((move ? ((r_ptr->flags1 & (RE1_TRIGGER_MOVE)) != 0) : ((r_ptr->flags1 & (RE1_TRIGGER_DROP)) != 0)) &&
-				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0) && (!r_ptr->delay))
+				((r_ptr->flags1 & (RE1_TRIGGERED)) == 0))
 		{
 			/* Handle avoidable traps */
-			if (r_ptr->flags1 & (RE1_HIT_TRAP))
+			if ((move) && (r_ptr->flags1 & (RE1_HIT_TRAP)))
 			{
 				/* Some traps are avoidable by monsters */
 				if ((cave_m_idx[y][x] > 0) && (mon_avoid_trap(&m_list[cave_m_idx[y][x]], y,x)))
@@ -9187,6 +9187,9 @@ void trigger_region(int y, int x, bool move)
 					return;
 				}
 			}
+
+			/* Reset the delay */
+			r_ptr->delay = r_ptr->delay_reset;
 
 			/* Randomize grid hit */
 			if (r_ptr->flags1 & (RE1_RANDOM))
@@ -9670,11 +9673,20 @@ void process_region(s16b region)
 	int path_n = 0;
 	u16b path_g[99];
 
+	bool update = FALSE;
+
 	/* Paranoia */
 	if (!r_ptr->type) return;
 
-	/* Count down to next turn, return if not yet ready */
-	if (--r_ptr->delay > 0) return;
+	/* Count down to next turn */
+	if (r_ptr->delay)
+	{
+		/* Reduce timer */
+		if (--r_ptr->delay > 0) return;
+	}
+
+	/* Ensure we have a timer interval */
+	r_ptr->delay = r_ptr->delay_reset;
 
 	/* Accelerating */
 	if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (r_ptr->age < r_ptr->lifespan / 2)))
@@ -9689,9 +9701,6 @@ void process_region(s16b region)
 		r_ptr->delay_reset += r_ptr->delay_reset / 3;
 		if (r_ptr->delay_reset < 3) r_ptr->delay_reset += 1;
 	}
-
-	/* Reset count */
-	r_ptr->delay = r_ptr->delay_reset;
 
 	/* Effects eventually "die" */
 	if (r_ptr->age >= r_ptr->lifespan)
@@ -9745,6 +9754,8 @@ void process_region(s16b region)
 
 		r_ptr->y1 = y;
 		r_ptr->x1 = x;
+
+		update = TRUE;
 	}
 
 	/* Rotate the region */
@@ -9778,12 +9789,8 @@ void process_region(s16b region)
 
 		r_ptr->y1 = y;
 		r_ptr->x1 = x;
-	}
 
-	/* Updating a projection */
-	if (r_ptr->flags1 & (RE1_PROJECTION))
-	{
-		region_update(region);
+		update = TRUE;
 	}
 
 	/* Moving a wall */
@@ -9934,18 +9941,30 @@ void process_region(s16b region)
 	if (r_ptr->flags1 & (RE1_SEEKER))
 	{
 		region_iterate_movement(region, region_move_seeker_hook);
+
+		update = TRUE;
 	}
 
 	/* Apply scalar vector effect */
 	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
 	{
 		region_iterate_movement(region, region_move_vector_hook);
+
+		update = TRUE;
 	}
 
 	/* Apply spreading effect */
 	if (r_ptr->flags1 & (RE1_SPREAD))
 	{
 		region_iterate_movement(region, region_move_spread_hook);
+
+		update = TRUE;
+	}
+
+	/* Update the region if required */
+	if ((update) && (r_ptr->flags1& (RE1_PROJECTION)))
+	{
+		region_update(region);
 	}
 
 	/* Apply effect every turn, unless already applied earlier in the turn */

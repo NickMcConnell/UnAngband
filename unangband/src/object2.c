@@ -6924,7 +6924,6 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 	      return;
 	  }
 
-
 	/* Score */
 	bs = -1;
 
@@ -7093,7 +7092,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 		j_ptr->ident &= ~(IDENT_MARKED);
 
 		/* Skip message on auto-ignored items */
-		if (!auto_pickup_ignore(j_ptr))
+		if ((character_dungeon) && (!auto_pickup_ignore(j_ptr)))
 		{
 			/* Message */
 			msg_format("The %s disappear%s from view.",
@@ -7124,7 +7123,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x)
 		}
 	}
 
-	/* Trigger regions */
+	/* Trigger regions. Note that this is the original location dropped, not where the object ends up. */
 	trigger_region(y, x, FALSE);
 }
 

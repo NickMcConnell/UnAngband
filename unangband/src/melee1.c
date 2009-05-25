@@ -5641,6 +5641,9 @@ void mon_hit_trap(int m_idx, int y, int x)
 	else
 	{
 		discharge_trap(y, x, y, x);
+
+		/* XXX Monster is no longer stupid */
+		m_ptr->mflag &= ~(MFLAG_STUPID);
 	}
 }
 
