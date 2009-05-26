@@ -3254,7 +3254,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			item_tester_hook_magic_trap, 0, (USE_INVEN | USE_FLOOR), 0L, 0L, 0, NULL},
 
 	{ player_throw, 't', "Throw which item? ", "You have nothing to throw.",
-			item_tester_hook_throwable, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG),
+			item_tester_hook_throwable, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGC),
 			(CONDITION_NO_WIND | CONDITION_SKILL_THROW), TMD_CONDITION(TMD_BERSERK), 0, NULL},
 
 	{ player_fire, 'f', "Sling which item? ", "You have nothing to sling around.",
