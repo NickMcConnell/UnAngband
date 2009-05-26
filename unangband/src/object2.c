@@ -4285,12 +4285,14 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	/* Valid "tval" codes */
 	switch (o_ptr->tval)
 	{
-		case TV_RING:
-		case TV_AMULET:
 		case TV_LITE:
 		{
-			heavy = FALSE;
+			/* Torches don't pseudo id */
+			if (o_ptr->sval == SV_LITE_TORCH) break;
 		}
+
+		case TV_RING:
+		case TV_AMULET:
 		case TV_SHOT:
 		case TV_ARROW:
 		case TV_BOLT:
@@ -4364,10 +4366,13 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 			break;
 	}
 
+	/* Rings and amulets: Only sense curses/artifacts. Note almost all feelings except unusual will correctly distinguish this. */
+	if (((o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET)) && (feel == INSCRIP_UNUSUAL)) return(0);
+
 	if (feel == old_feel) return(0);
 
 	/* Mark as sensed */
-	if ((sense_type) && ((heavy) || (o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET))) o_ptr->ident |= (IDENT_SENSE);
+	if ((sense_type) && (heavy)) o_ptr->ident |= (IDENT_SENSE);
 
 	return (feel);
 }
