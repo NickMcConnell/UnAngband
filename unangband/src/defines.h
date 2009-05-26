@@ -2733,8 +2733,8 @@ enum
 #define RBM_EXPLODE	52
 #define RBM_ARROW	53
 #define RBM_XBOLT	54		/* Crossbow bolt */
-#define RBM_DAGGER	55
-#define RBM_DART	56
+#define RBM_DART	55
+#define RBM_DAGGER	56
 #define RBM_SHOT 	57
 #define RBM_ARC_20	58
 #define RBM_ARC_30	59

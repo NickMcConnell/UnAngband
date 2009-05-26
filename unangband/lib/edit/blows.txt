@@ -573,7 +573,7 @@ D:create~ @ arc#:
 N:63:FLASK
 T:20-9999:throw~ a primed grenade at &
 T:0-19:throw~ a fizzing flask at &
-W:0:2:2
+W:0:77:0
 R:1
 M:6
 F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
