@@ -4059,23 +4059,43 @@ void player_fire_or_throw_selected(int item, bool fire)
 		/* Apply effects of activation/coating */
 		if (activate)
 		{
+			/* Check usage */
+			object_usage(item);
+
+			/* Copy learned values to the thrown/fired weapon.
+			 * We do this to help allow weapons to stack. */
+			i_ptr->ident = o_ptr->ident;
+			i_ptr->usage = o_ptr->usage;
+			i_ptr->feeling = o_ptr->feeling;
+			i_ptr->guess1 = o_ptr->guess1;
+			i_ptr->guess2 = o_ptr->guess2;
+			i_ptr->can_flags1 = o_ptr->can_flags1;
+			i_ptr->can_flags2 = o_ptr->can_flags2;
+			i_ptr->can_flags3 = o_ptr->can_flags3;
+			i_ptr->can_flags4 = o_ptr->can_flags4;
+			i_ptr->may_flags1 = o_ptr->may_flags1;
+			i_ptr->may_flags2 = o_ptr->may_flags2;
+			i_ptr->may_flags3 = o_ptr->may_flags3;
+			i_ptr->may_flags4 = o_ptr->may_flags4;
+			i_ptr->not_flags1 = o_ptr->not_flags1;
+			i_ptr->not_flags2 = o_ptr->not_flags2;
+			i_ptr->not_flags3 = o_ptr->not_flags3;
+			i_ptr->not_flags4 = o_ptr->not_flags4;
+
 			/* Apply additional effect from activation */
 			if (auto_activate(o_ptr))
 			{
 				/* Make item strike */
 				process_item_blow(o_ptr->name1 ? SOURCE_PLAYER_ACT_ARTIFACT : (o_ptr->name2 ? SOURCE_PLAYER_ACT_EGO_ITEM : SOURCE_PLAYER_ACTIVATE),
-						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), o_ptr, y, x,  TRUE, (play_info[y][x] & (PLAY_FIRE)) == 0);
+						o_ptr->name1 ? o_ptr->name1 : (o_ptr->name2 ? o_ptr->name2 : o_ptr->k_idx), i_ptr, y, x,  TRUE, (play_info[y][x] & (PLAY_FIRE)) == 0);
 			}
 
 			/* Apply additional effect from coating*/
 			else if (coated_p(o_ptr))
 			{
 				/* Make item strike */
-				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), o_ptr, y, x, TRUE, TRUE);
+				process_item_blow(SOURCE_PLAYER_COATING, lookup_kind(o_ptr->xtra1, o_ptr->xtra2), i_ptr, y, x, TRUE, TRUE);
 			}
-
-			/* Check usage */
-			object_usage(item);
 
 			/* Chance of breakage */
 			ammo_can_break = TRUE;

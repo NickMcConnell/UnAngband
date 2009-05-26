@@ -568,6 +568,7 @@ extern bool inven_cast_okay(const object_type *o_ptr);
 extern bool player_cast(int item);
 
 /* cmd6.c */
+extern int find_item_to_reduce(int item);
 extern bool do_cmd_item(int item);
 extern bool item_tester_hook_food_edible(const object_type *o_ptr);
 extern bool item_tester_hook_rod_charged(const object_type *o_ptr);

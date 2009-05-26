@@ -2144,6 +2144,7 @@ struct timed_effect
   const char *on_increase;
   const char *on_decrease;
   const char *on_condition;
+  const char *self_knowledge;
   u32b flag_redraw, flag_update;
   int msg;
 };

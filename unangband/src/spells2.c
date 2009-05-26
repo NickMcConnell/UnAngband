@@ -677,63 +677,18 @@ void self_knowledge_aux(bool spoil, bool random)
 	int vn;
 
 	bool healthy = TRUE;
-#if 0
-	if (p_ptr->timed[TMD_BLIND])
+
+	for (i = 0; i < TMD_MAX; i++)
 	{
-		text_out("You cannot see.  ");
-		healthy = FALSE;
+		if (p_ptr->timed[i])
+		{
+			text_out(format("%s  ", timed_effects[i].self_knowledge));
+
+			/* Hack - treat everything as bad */
+			healthy = FALSE;
+		}
 	}
-	if (p_ptr->timed[TMD_CONFUSED])
-	{
-		text_out("You are confused.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->timed[TMD_AFRAID])
-	{
-		text_out("You are terrified.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->cut)
-	{
-		text_out("You are bleeding.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->timed[TMD_STUN])
-	{
-		text_out("You are stunned.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->timed[TMD_POISONED])
-	{
-		text_out("You are poisoned.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->timed[TMD_IMAGE])
-	{
-		text_out("You are hallucinating.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->amnesia)
-	{
-		text_out("You are suffering from amnesia.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->timed[TMD_CURSED])
-	{
-		text_out("You are cursed.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->msleep)
-	{
-		text_out("You are magically drowsy, and liable to fall asleep.  ");
-		healthy = FALSE;
-	}
-	if (p_ptr->petrify)
-	{
-		text_out("You are petrified.  ");
-		healthy = FALSE;
-	}
-#endif
+
 	if (p_ptr->disease)
 	{
 		char output[1024];
@@ -823,47 +778,7 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("You suffer from no afflictions.  ");
 	}
-#if 0
-	if (p_ptr->timed[TMD_BLESSED])
-	{
-		text_out("You feel rightous.  ");
-	}
-	if (p_ptr->timed[TMD_HERO])
-	{
-		text_out("You feel heroic.  ");
-	}
-	if (p_ptr->timed[TMD_BERSERK])
-	{
-		text_out("You are in a battle rage.  ");
-	}
-	if ((p_ptr->protevil) || (p_ptr->shield) || (p_ptr->timed[TMD_HERO]) || (p_ptr->timed[TMD_BERSERK]))
-	{
 
-		text_out("You are protected ");
-
-		/* Collect protections */
-		vn = 0;
-
-		if (p_ptr->protevil) vp[vn++]="from evil";
-		if ((p_ptr->timed[TMD_HERO]) || (p_ptr->timed[TMD_BERSERK])) vp[vn++]="from fear";
-		if (p_ptr->shield) vp[vn++]="by a mystic sheild";
-
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) { }
-			else if (n < vn-1) text_out(", ");
-			else text_out(" and ");
-
-			/* Dump */
-			text_out(vp[n]);
-		}
-
-		if (n) text_out(".  ");
-
-	}
-#endif
 	if (p_ptr->climbing)
 	{
 		text_out("You are climbing over an obstacle.  ");
@@ -886,82 +801,6 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("You will soon be returned to a nearby location.  ");
 	}
-#if 0
-	/* Hack -- timed abilities that may also be from equipment */
-	if (p_ptr->tim_infra)
-	{
-		text_out("Your eyes are temporarily sensitive to infrared light.  ");
-	}
-
-	if (p_ptr->tim_invis)
-	{
-		text_out("You can temporarily see invisible monsters.  ");
-
-	}
-
-	/* Collect temporary effects */
-	vn = 0;
-
-	if (p_ptr->invis) vp[vn++] = "invisible";
-	if (p_ptr->timed[TMD_FREE_ACT]) vp[vn++] = "protected from paralysis and magical slowing";
-
-	for (n = 0; n < A_CHR; n++)
-	{
-		if (p_ptr->stat_inc_tim[n]) vp[vn++] = desc_stat_imp[n];
-	}
-	for (n = 0; n < A_CHR; n++)
-	{
-		if (p_ptr->stat_dec_tim[n]) vp[vn++] = desc_stat_dec[n];
-	}
-
-	if ((p_ptr->oppose_acid) || (p_ptr->oppose_elec) || (p_ptr->oppose_fire) || (p_ptr->oppose_cold)) vp[vn++]= "resistant to ";
-
-	/* Introduce */
-	if (vn) text_out("You are temporarily ");
-
-	/* Scan */
-	for (n = 0; n < vn; n++)
-	{
-		/* Intro */
-		if (n == 0) { }
-		else if (n < vn-1) text_out(", ");
-		else text_out(" and ");
-
-		/* Dump */
-		text_out(vp[n]);
-	}
-
-	if ((p_ptr->oppose_acid) || (p_ptr->oppose_elec) || (p_ptr->oppose_fire) || (p_ptr->oppose_cold))
-	{
-		/* Collect temporary resistances */
-		vn = 0;
-
-		if (p_ptr->oppose_acid) vp[vn++]= "acid";
-		if (p_ptr->oppose_elec) vp[vn++]= "electricity";
-		if (p_ptr->oppose_fire) vp[vn++]= "fire";
-		if (p_ptr->oppose_cold) vp[vn++]= "cold";
-
-		/* Scan */
-		for (n = 0; n < vn; n++)
-		{
-			/* Intro */
-			if (n == 0) { }
-			else if (n < vn-1) text_out(", ");
-			else text_out(" and ");
-
-			/* Dump */
-			text_out(vp[n]);
-		}
-
-		text_out(".  ");
-
-	}
-	else if (vn)
-	{
-		text_out(".  ");
-	}
-#endif
-	text_out("\n");
 
 	/* Get player flags */
 	player_flags(&t1,&t2,&t3,&t4);
@@ -7756,6 +7595,9 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
  * Otherwise we only affect the targetted grid.
  *
  * XXX We assume that there is only 1 item in the stack at present.
+ *
+ * XXX We should never call this routine on an item in inventory (as opposed
+ * to equipment or on the floor).
  */
 int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal, bool one_grid)
 {
@@ -7803,6 +7645,9 @@ int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool 
 
 		/* We've calculated damage? */
 		if (!forreal) return (damage);
+
+		/* We no longer have a valid object? */
+		if (!o_ptr->k_idx) return (damage);
 
 		/* Object is used */
 		if ((k_info[o_ptr->k_idx].used < MAX_SHORT)) k_info[o_ptr->k_idx].used++;
