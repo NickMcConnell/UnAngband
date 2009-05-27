@@ -2332,12 +2332,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		if ((target < 0) && check_hit(attack_power(effect), rlev - range, who, TRUE))
 		{
 			/* Hit the player */
-			flg &= (PROJECT_MISS);
+			flg &= ~(PROJECT_MISS);
 		}
 		else if ((target > 0) && mon_check_hit(target, attack_power(effect), rlev - range, who, TRUE))
 		{
 			/* Hit the monster */
-			flg &= (PROJECT_MISS);
+			flg &= ~(PROJECT_MISS);
 		}
 		else
 		{

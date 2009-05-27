@@ -5537,6 +5537,13 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 	/* Restrict race as appropriate */
 	summoner = restrict_race;
 
+	/* Cave ecology enforced; however allow non-core monsters from other ecologies */
+	if (cave_ecology.ready)
+	{
+		cave_ecology.use_ecology = room_info[dun_room[y/BLOCK_HGT][x/BLOCK_WID]].ecology;
+		cave_ecology.use_ecology |= 0x0000FFFFL;
+	}
+
 	/* Require "okay" monsters */
 	get_mon_num_hook = summon_specific_okay;
 
@@ -5545,6 +5552,12 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 
 	/* Pick a monster, using the level calculation */
 	r_idx = get_mon_num(lev);
+
+	/* Cave ecology enforced */
+	if (cave_ecology.ready)
+	{
+		cave_ecology.use_ecology = 0L;
+	}
 
 	/* Remove restriction */
 	get_mon_num_hook = NULL;

@@ -878,8 +878,8 @@ T:18-21:grows more bolts.
 T:17-17:grows more arrows.
 T:16-16:grows more shots.
 T:9-15:grows more spores.
-T:3-8:grows more rocks.
 T:5-8:grows more spikes.
+T:3-4:grows more rocks.
 I:0:20:0
 C:60:0:0:5:0:0:100
 F:ADD_AMMO |

@@ -13755,7 +13755,6 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			/* Player is in this grid */
 			if (cave_m_idx[y][x] < 0)
 			{
-
 				/* Affect the player */
 				if (project_p(who, what, y, x, gd[i], typ))
 				{
