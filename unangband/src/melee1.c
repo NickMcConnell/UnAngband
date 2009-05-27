@@ -951,62 +951,6 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 
 
 /*
- * Get attack power based on effect.
- */
-static int attack_power(int effect)
-{
-	int power = 0;
-
-	/* Extract the attack "power". Elemental attacks upgraded. */
-	switch (effect)
-	{
-		case GF_HURT: power = 60; break;
-		case GF_WOUND: power = 60; break;
-		case GF_BATTER: power = 60; break;
-		case GF_SHATTER: power = 60; break;
-
-		case GF_UN_BONUS:	power = 20; break;
-		case GF_UN_POWER:	power = 15; break;
-		case GF_LOSE_MANA: power = 45; break;
-		case GF_EAT_GOLD:	power =  5; break;
-		case GF_EAT_ITEM:	power =  5; break;
-		case GF_EAT_FOOD:	power =  45; break;
-		case GF_EAT_LITE:	power =  45; break;
-		case GF_HUNGER: power = 45; break;
-
-		case GF_POIS:	power =  25; break;
-		case GF_ACID:		power = 50; break;
-		case GF_ELEC:		power = 50; break;
-		case GF_FIRE:		power = 50; break;
-		case GF_COLD:		power = 50; break;
-
-		case GF_BLIND:	power =  5; break;
-		case GF_CONFUSION:	power = 10; break;
-		case GF_TERRIFY:	power = 10; break;
-		case GF_PARALYZE:	power =  5; break;
-		case GF_HALLU:     power = 10; break;
-		case GF_DISEASE:	power = 10; break;
-
-		case GF_LOSE_STR:	power =  0; break;
-		case GF_LOSE_DEX:	power =  0; break;
-		case GF_LOSE_CON:	power =  0; break;
-		case GF_LOSE_INT:	power =  0; break;
-		case GF_LOSE_WIS:	power =  0; break;
-		case GF_LOSE_CHR:	power =  0; break;
-		case GF_LOSE_ALL:	power =  2; break;
-
-		case GF_EXP_10:	power =  5; break;
-		case GF_EXP_20:	power =  5; break;
-		case GF_EXP_40:	power =  5; break;
-		case GF_EXP_80:	power =  5; break;
-
-		/* Need to add extra flavours in here */
-	}
-	return power;
-}
-
-
-/*
  * Determine if a monster attack against another monster succeeds.
  * Always miss 5% of the time, Always hit 5% of the time.
  * Otherwise, match monster power against monster armor.
@@ -1142,6 +1086,7 @@ bool make_attack_normal(int m_idx)
 		int d_side = r_ptr->blow[ap_cnt].d_side;
 
 		method_type *method_ptr = &method_info[method];
+		effect_type *effect_ptr = &effect_info[effect];
 
 		/* Get whether attack cuts, stuns, touches */
 		do_cut = (method_ptr->flags2 & (PR2_CUTS)) != 0;
@@ -1181,7 +1126,7 @@ bool make_attack_normal(int m_idx)
 		damage = damroll(d_dice, d_side);
 
 		/* Monster hits player */
-		if (!effect || check_hit(attack_power(effect), rlev, m_idx, FALSE))
+		if (!effect || check_hit(effect_ptr->power, rlev, m_idx, FALSE))
 		{
 			/* Always disturbing */
 			disturb(1, 1);
@@ -1529,164 +1474,31 @@ static int get_dam(byte power, int attack)
 
 
 /*
- * Using an input value for average damage, and another that controls
- * variability, return the actual base damage of a monster's attack
- * spell.  The larger the value for "control", the less likely the damage
- * will vary greatly.
+ * Determines the amount of damage caused by monster breaths.
+ *
+ * Monster breathers are amongst the highest damage sources in the game so
+ * we need to be careful to limit the maximum damage inflicted in order to
+ * allow the player a fighting chance.
  */
-int get_breath_dam(s16b hit_points, int gf_type, bool powerful)
+extern int get_breath_dam(s16b hp, int method, bool powerful)
 {
-	int dam, max_dam;
+	method_type *method_ptr = &method_info[method];
 
-	switch (gf_type)
+	int dam_div = powerful ? method_ptr->dam_div_powerful : method_ptr->dam_div;
+	int dam_max = powerful ? method_ptr->dam_max_powerful : method_ptr->dam_max;
+
+	/* Damage reduction */
+	if (dam_div) hp /= dam_div;
+
+	/* Limit maximum damage for breath weapons */
+	if (dam_max && (hp > dam_max))
 	{
-		case GF_ACID:
-		case GF_ELEC:
-		case GF_FIRE:
-		case GF_COLD:
-		{
-			dam = hit_points / 3;
-			max_dam = 1600;
-			break;
-		}
-		case GF_POIS:
-		{
-			dam = hit_points / 3;
-			max_dam = 800;
-			break;
-		}
-		case GF_PLASMA:
-		{
-			if (powerful)
-			{
-				dam = hit_points / 3;
-				max_dam = 400;
-			}
-			else
-			{
-				dam = hit_points / 6;
-				max_dam = 150;
-			}
-			break;
-		}
-		case GF_LITE:
-		case GF_DARK:
-		case GF_CONFUSION:
-		case GF_TERRIFY:
-		{
-			dam = hit_points / 6;
-			max_dam = 400;
-			break;
-		}
-		case GF_WIND:
-		case GF_SOUND:
-		{
-			if (powerful)
-			{
-				dam = hit_points / 4;
-				max_dam = 500;
-			}
-			else
-			{
-				dam = hit_points / 9;
-				max_dam = 150;
-			}
-			break;
-		}
-		case GF_SHARD:
-		{
-			dam = hit_points / 6;
-			max_dam = 500;
-			break;
-		}
-		case GF_INERTIA:
-		{
-			if (powerful)
-			{
-				dam = hit_points / 4;
-				max_dam = 400;
-			}
-			else
-			{
-				dam = hit_points / 8;
-				max_dam = 150;
-			}
-			break;
-		}
-		case GF_GRAVITY:
-		{
-			if (powerful)
-			{
-				dam = hit_points / 4;
-				max_dam = 300;
-			}
-			else
-			{
-				dam = hit_points / 8;
-				max_dam = 150;
-			}
-			break;
-		}
-		case GF_FORCE:
-		{
-			if (powerful)
-			{
-				dam = hit_points / 3;
-				max_dam = 400;
-			}
-			else
-			{
-				dam = hit_points / 6;
-				max_dam = 150;
-			}
-			break;
-		}
-		case GF_NEXUS:
-		{
-			dam = hit_points / 6;
-			max_dam = 450;
-			break;
-		}
-		case GF_HOLY_ORB:
-		case GF_NETHER:
-		{
-			dam = hit_points / 6;
-			max_dam = 550;
-			break;
-		}
-		case GF_CHAOS:
-		case GF_DISENCHANT:
-		{
-			dam = hit_points / 6;
-			max_dam = 500;
-			break;
-		}
-		case GF_DISEASE:
-		case GF_TIME:
-		{
-			dam = hit_points / 3;
-			if (powerful) max_dam = 400;
-			else max_dam = 150;
-			break;
-		}
-		case GF_MANA:
-		{
-			dam = hit_points / 3;
-			if (powerful) max_dam = 400;
-			else max_dam = 250;
-			break;
-		}
-
-		/*Whoops!*/
-		default: return (FALSE);
+		hp = dam_max;
 	}
 
-	/* Don't exceed max damage */
-	if (dam > max_dam) dam = max_dam;
-
-	/* Return breath damage */
-	return (dam);
+	return (hp);
 }
+
 
 
 #define FLG_MON_BEAM (PROJECT_BEAM | PROJECT_GRID | PROJECT_ITEM | PROJECT_KILL | \
@@ -1916,6 +1728,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	int method = attack;
 	int effect = method_ptr->d_res;
 
+	effect_type *effect_ptr = &effect_info[effect];
+
 	monster_type *m_ptr, *n_ptr;
 	monster_race *r_ptr, *s_ptr;
 	monster_lore *l_ptr, *k_ptr;
@@ -2125,7 +1939,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Get damage for breath weapons */
 		if (method_ptr->flags2 & (PR2_BREATH))
 		{
-			dam = get_breath_dam(p_ptr->depth * 10, effect, powerful);
+			/* Get the damage */
+			dam = get_breath_dam(p_ptr->depth * 10, method, powerful);
 			dam_desc = dam;
 		}
 		/* Get the damage */
@@ -2206,7 +2021,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Get damage for breath weapons */
 		if (method_ptr->flags2 & (PR2_BREATH))
 		{
-			dam = get_breath_dam(m_ptr->hp, effect, powerful);
+			dam = get_breath_dam(m_ptr->hp, method, powerful);
 
 			dam_desc = dam;
 		}
@@ -2329,12 +2144,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	if (flg & (PROJECT_MISS))
 	{
 		/* See if we hit the player player */
-		if ((target < 0) && check_hit(attack_power(effect), rlev - range, who, TRUE))
+		if ((target < 0) && check_hit(effect_ptr->power, rlev - range, who, TRUE))
 		{
 			/* Hit the player */
 			flg &= ~(PROJECT_MISS);
 		}
-		else if ((target > 0) && mon_check_hit(target, attack_power(effect), rlev - range, who, TRUE))
+		else if ((target > 0) && mon_check_hit(target, effect_ptr->power, rlev - range, who, TRUE))
 		{
 			/* Hit the monster */
 			flg &= ~(PROJECT_MISS);

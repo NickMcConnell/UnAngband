@@ -322,6 +322,10 @@ struct method_type
 	byte dam_mult;
 	byte dam_div;
 	byte dam_var;
+	byte dam_div_powerful;
+
+	s16b dam_max;
+	s16b dam_max_powerful;
 
 	/* Monster spell desirability */
 	byte d_base;
@@ -351,9 +355,6 @@ struct effect_type
 	u32b desc[2];     /* Description (offset) */
 
 	u32b flags1;	/* Projection flags */
-
-	s16b dam_max;
-	s16b dam_max_powerful;
 
 	byte power;		/* Attack power */
 	byte unused;

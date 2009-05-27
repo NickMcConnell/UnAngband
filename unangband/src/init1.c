@@ -2228,7 +2228,7 @@ errr parse_method_info(char *buf, header *head)
 	/* Process 'X' for "Damage" */
 	else if (buf[0] == 'X')
 	{
-		int mult, div, var;
+		int mult, div, var, max, div_pow, max_pow;
 		int n, n1;
 		char *s;
 
@@ -2237,7 +2237,7 @@ errr parse_method_info(char *buf, header *head)
 
 		/* TODO: This is bound to cause memory problems. Should have effect listed first */
 		/* Scan for 4th colon */
-		for (s = buf, n = 0; *s && (n < 4);)
+		for (s = buf, n = 0; *s && (n < 7);)
 		{
 			s++;
 			if (*s == ':') n++;
@@ -2259,13 +2259,16 @@ errr parse_method_info(char *buf, header *head)
 		method_ptr->d_res = n1;
 
 		/* Scan for the values */
-		if (3 != sscanf(buf, "X:%d:%d:%d",
-			    &mult, &div, &var)) return (PARSE_ERROR_GENERIC);
+		if (6 != sscanf(buf, "X:%d:%d:%d:%d:%d:%d",
+			    &mult, &div, &var, &max, &div_pow, &max_pow)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		method_ptr->dam_mult = mult;
 		method_ptr->dam_div = div;
 		method_ptr->dam_var = var;
+		method_ptr->dam_max = max;
+		method_ptr->dam_div_powerful = div_pow;
+		method_ptr->dam_max_powerful = max_pow;
 	}
 
 	/* Process 'C' for "Choice" */
@@ -2421,13 +2424,11 @@ errr parse_effect_info(char *buf, header *head)
 		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
 
 		/* Scan for the values */
-		if (3 != sscanf(buf, "I:%d:%d:%d",
-				&power, &max, &max_power)) return (PARSE_ERROR_GENERIC);
+		if (1 != sscanf(buf, "I:%d",
+				&power)) return (PARSE_ERROR_GENERIC);
 
 		/* Save the values */
 		effect_ptr->power = power;
-		effect_ptr->dam_max = max;
-		effect_ptr->dam_max_powerful = max_power;
 	}
 
 	/* Process 'D' for "Description" */
@@ -8017,7 +8018,7 @@ static long eval_max_dam(monster_race *r_ptr)
 
 					if (which_gf)
 					{
-						this_dam = get_breath_dam(hp, which_gf,
+						this_dam = get_breath_dam(hp,  x * 32 + i,
 									(r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE));
 
 						/* handle elemental breaths*/
@@ -9478,9 +9479,11 @@ errr emit_method_info_index(FILE *fp, header *head, int i)
 	}
 
 	/* Output 'X' for "Extra damage" */
-	if (method_ptr->dam_mult || method_ptr->dam_div || method_ptr->dam_var || method_ptr->d_res)
+	if (method_ptr->dam_mult || method_ptr->dam_div || method_ptr->dam_var || method_ptr->dam_max
+			|| method_ptr->dam_div_powerful || method_ptr->dam_max_powerful || method_ptr->d_res)
 	{
-		fprintf(fp, "X:%d:%d:%d:%s\n",method_ptr->dam_mult, method_ptr->dam_div, method_ptr->dam_var,
+		fprintf(fp, "X:%d:%d:%d:%d:%d:%d:%s\n",method_ptr->dam_mult, method_ptr->dam_div, method_ptr->dam_var,
+				method_ptr->dam_max, method_ptr->dam_div_powerful, method_ptr->dam_max_powerful,
 			effect_name + effect_info[method_ptr->d_res].name);
 	}
 
@@ -10734,7 +10737,7 @@ errr emit_effect_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + effect_ptr->name);
 
 	/* Output 'I' for "Info" (one line only) */
-	fprintf(fp,"I:%d:%d:%d\n",effect_ptr->power, effect_ptr->dam_max, effect_ptr->dam_max_powerful);
+	fprintf(fp,"I:%d\n",effect_ptr->power);
 
 	/* Output 'D' for Description */
 	fprintf(fp, "D");

@@ -692,7 +692,7 @@ extern bool load_player(void);
 
 /* melee1.c */
 extern bool monster_scale(monster_race *n_ptr, int m_idx, int depth);
-extern int get_breath_dam(s16b hit_points, int gf_type, bool powerful);
+extern int get_breath_dam(s16b hp, int method, bool powerful);
 extern bool mon_check_hit(int m_idx, int power, int level, int who, bool ranged);
 extern int attack_desc(char *buf, int target, int method, int effect, int damage, byte flg, int buf_size);
 extern bool make_attack_normal(int m_idx);
