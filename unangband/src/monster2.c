@@ -5156,10 +5156,26 @@ bool place_monster(int y, int x, bool slp, bool grp)
 
 /*
  * Set additional summon_specific parameters based on monster race and summon specific type
+ *
+ * Hack_ecology is used to distinguish between when we are populating an ecology, against
+ * summoning monsters.
  */
-static void summon_specific_params(int r_idx, int summon_specific_type)
+void summon_specific_params(int r_idx, int summon_specific_type, bool hack_ecology)
 {
 	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Handle no summoner or restrictions */
+	if ((!r_idx) || (!summon_specific_type))
+	{
+		summon_char_type = '\0';
+		summon_flag_type = 0L;
+		summon_attr_type = 0;
+		summon_group_type = 0;
+		summon_race_type = 0;
+		my_strcpy(summon_word_type, "", sizeof(summon_word_type));
+
+		return;
+	}
 
 	/* Hack -- Set specific summoning parameters if not currently set */
 	switch (summon_specific_type)
@@ -5187,7 +5203,7 @@ static void summon_specific_params(int r_idx, int summon_specific_type)
 			if (!summon_flag_type)
 			{
 				/* Undead animals */
-				if (r_ptr->flags3 & (RF3_UNDEAD)) summon_flag_type |= (RF8_HAS_SKELETON);
+				if ((hack_ecology) && (r_ptr->flags3 & (RF3_UNDEAD))) summon_flag_type |= (RF8_HAS_SKELETON);
 				else summon_flag_type |= r_ptr->flags8 & (RF8_SKIN_MASK);
 
 				if (!summon_flag_type)
@@ -5578,7 +5594,7 @@ bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool 
 	if (!place_monster_aux(y, x, r_idx, FALSE, grp, flg)) return (FALSE);
 
 	/* Set additional paramaters if we haven't yet set a restriction */
-	if (summon_specific_type) summon_specific_params(r_idx, summon_specific_type);
+	if (summon_specific_type) summon_specific_params(r_idx, summon_specific_type, FALSE);
 
 	/* Success */
 	return (TRUE);
@@ -6326,7 +6342,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_char_type = 0;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_KIN);
+			summon_specific_params(r_idx, SUMMON_KIN, (hack_ecology == 1));
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay,
@@ -6363,7 +6379,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_ANIMAL);
+			summon_specific_params(r_idx, SUMMON_ANIMAL, (hack_ecology == 2));
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 2) && hack_pit ? hack_pit : randint(k));
@@ -6399,7 +6415,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_CLASS);
+			summon_specific_params(r_idx, SUMMON_CLASS, (hack_ecology == 3));
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 3) && hack_pit ? hack_pit :  1 + randint(k));
@@ -6417,7 +6433,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_RACE);
+			summon_specific_params(r_idx, SUMMON_RACE, (hack_ecology == 4));
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 4) && hack_pit ? hack_pit :  1 + randint(k));
@@ -6435,7 +6451,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_group_type = 0;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_GROUP);
+			summon_specific_params(r_idx, SUMMON_GROUP, (hack_ecology == 5));
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, (hack_ecology == 5) && hack_pit ? hack_pit : 1 + randint(k));
@@ -6453,7 +6469,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_ALIGN);
+			summon_specific_params(r_idx, SUMMON_ALIGN, (hack_ecology == 6));
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
@@ -6472,7 +6488,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_COLOUR);
+			summon_specific_params(r_idx, SUMMON_COLOUR, TRUE);
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
@@ -6490,7 +6506,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_LEVEL);
+			summon_specific_params(r_idx, SUMMON_LEVEL, TRUE);
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
@@ -6508,7 +6524,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_word_type[0] = '\0';
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_INFIX_WYRM_OF);
+			summon_specific_params(r_idx, SUMMON_INFIX_WYRM_OF, TRUE);
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));
@@ -6526,7 +6542,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 			summon_flag_type = 0L;
 
 			/* Set the restrictions */
-			summon_specific_params(r_idx, SUMMON_DRAGON_BREATH);
+			summon_specific_params(r_idx, SUMMON_DRAGON_BREATH, TRUE);
 
 			/* Get additional monsters */
 			used_new_hook |= get_monster_ecology_aux(summon_specific_okay, hack_pit ? hack_pit : 1 + randint(k));

@@ -2877,11 +2877,13 @@ enum
 #define PR2_FAIL				0x01000000
 #define PR2_EYESIGHT			0x02000000
 #define PR2_SCALE_AMMO			0x04000000
-#define PR2_SPECIAL_CASE		0x08000000	/* Special case in the code */
 
-/* Summoning flags to set */
-#define PR2_SUMMON_CHAR			0x10000000
-#define PR2_SCATTER				0x20000000
+/* Irregular attacks */
+#define PR2_SPECIAL_CASE		0x08000000	/* Special case in the code */
+#define PR2_SCATTER				0x10000000
+#define PR2_AUTOMATIC			0x20000000
+#define PR2_SUMMON				0x40000000
+#define PR2_NO_ECOLOGY			0x80000000	/* Switch off monster ecology */
 
 
 /* Flags for regions */

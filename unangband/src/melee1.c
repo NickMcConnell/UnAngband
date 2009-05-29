@@ -1088,6 +1088,20 @@ bool make_attack_normal(int m_idx)
 		method_type *method_ptr = &method_info[method];
 		effect_type *effect_ptr = &effect_info[effect];
 
+		/* Hack -- no more attacks */
+		if (!method) break;
+
+		/* Handle "leaving" */
+		if (p_ptr->leaving) break;
+
+		/* Handle "automatic" attacks */
+		if (method_ptr->flags2 & (PR2_AUTOMATIC))
+		{
+			make_attack_ranged(m_idx, 96 + ap_cnt, p_ptr->py, p_ptr->px);
+
+			continue;
+		}
+
 		/* Get whether attack cuts, stuns, touches */
 		do_cut = (method_ptr->flags2 & (PR2_CUTS)) != 0;
 		do_stun = (method_ptr->flags2 & (PR2_STUN)) != 0;
@@ -1095,12 +1109,6 @@ bool make_attack_normal(int m_idx)
 		touched |= (method_ptr->flags2 & (PR2_TOUCH)) != 0;
 
 		if (cheat_xtra) msg_format("base dice in this blow: dice %d, sides %d", d_dice, d_side);
-
-		/* Hack -- no more attacks */
-		if (!method) break;
-
-		/* Handle "leaving" */
-		if (p_ptr->leaving) break;
 
 		/* Extract visibility (before blink) */
 		if (m_ptr->ml) visible = TRUE;
@@ -1898,10 +1906,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Feature is seen */
 		if (play_info[y][x] & (PLAY_SEEN))
 		{
-			my_strcpy(m_name,f_name + f_info[what].name, sizeof(m_name));
-			my_strcpy(m_poss,"the ", sizeof(m_poss));
-			my_strcpy(m_poss,f_name + f_info[what].name, sizeof(m_poss));
-			my_strcat(m_poss,"'s",sizeof(t_poss));
+			my_strcpy(m_poss,format("the %s", f_name + f_info[what].name), sizeof(m_name));
+			my_strcpy(m_poss,format("the %s's", f_name + f_info[what].name), sizeof(m_poss));
 		}
 		else
 		{
@@ -2229,6 +2235,55 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	{
 		/* Describe the attack */
 		msg_format("%^s %s", m_name, atk_desc);
+
+		/* Some summons/projections override ecology */
+		if (method_ptr->flags2 & (PR2_NO_ECOLOGY)) cave_ecology.ready = FALSE;
+
+		/* Blow summons something */
+		if (method_ptr->flags2 & (PR2_SUMMON))
+		{
+			int num = scale_method(method_ptr->number, rlev);
+
+			int summon_type = method_ptr->summon_type;
+
+			/* Hack -- we have to handle summon friends slightly differently */
+			bool friend = (summon_type == SUMMON_FRIEND);
+
+			/* Uniques have special friends */
+			if ((r_ptr->flags1 & (RF1_UNIQUE)) && (friend))
+			{
+				summon_type = SUMMON_UNIQUE_FRIEND;
+			}
+
+			/* Boost power of raising uniques if high level */
+			if ((summon_type == RAISE_UNIQUE) && (r_ptr->flags7 & (RF7_S_HI_UNIQUE)))
+			{
+				summon_type = RAISE_HI_UNIQUE;
+			}
+
+			/* XXX Always disturb the player */
+			disturb(1, 0);
+
+			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
+			{
+				/* Hack -- prevent summoning for a short while */
+				m_ptr->summoned = 20;
+
+				/* Set the parameters based on the summoner */
+				summon_specific_params(who > SOURCE_MONSTER_START ? who : what, summon_type, FALSE);
+			}
+			else
+			{
+				/* Set the parameters later */
+				summon_specific_params(0, summon_type, FALSE);
+			}
+
+			/* Count them for later */
+			for (k = 0; k < num; k++)
+			{
+				count += summon_specific(y, x, summoner, summon_lev - (friend ? 0 : 1), summon_type, TRUE, allies);
+			}
+		}
 
 		/* Blow projects something? */
 		if ((method_ptr->flags1 & (PR1_PROJECT)) ||
@@ -4004,827 +4059,6 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				/* Hack --- Use GF_SLEEP */
 				project_t(who, what, y, x, rlev, GF_SLEEP);
 			}
-			break;
-		}
-
-		/* RF7_S_KIN */
-		case 192 + 0:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s cries out for help.", m_name);
-				else if (known) msg_format("%^s magically summons %s %s.", m_name, m_poss,
-						((r_ptr->flags1) & RF1_UNIQUE ?
-						 "minions" : "kin"));
-				else msg_print("You hear distant cries for help.");
-
-				/* Hack -- Set the letter of the monsters to summon */
-				summon_char_type = r_ptr->d_char;
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			else
-			{
-				/* MegaHack -- Determine letter later */
-				summon_char_type = '\0';
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_KIN, TRUE, allies);
-			}
-
-			break;
-		}
-
-		/* RF7_R_KIN */
-		case 192 + 1:
-		{
-			/* Override cave ecology */
-			cave_ecology.ready = FALSE;
-			disturb(1, 0);
-#if 0
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if (((blind) && (known)) && (target < 0)) result = format("%^s whispers.", m_name);
-				else if (known) result = format("%^s magically reanimates %s %s from %s.", m_name, m_poss,
-						((r_ptr->flags1) & RF1_UNIQUE ? "minions" : "kin"),
-						((r_ptr->flags3) & RF3_NONLIVING ? "spare parts" : "death"));
-				else result = "You hear distant whispering.";
-
-				/* Hack -- Set the letter of the monsters to summon */
-				summon_char_type = r_ptr->d_char;
-			}
-			else
-			{
-				/* MegaHack -- Determine letter later */
-				summon_char_type = '\0';
-			}
-			/* Raise the dead */
-			mon_ball(who, what, y, x, GF_RAISE_DEAD, 0, 3, TRUE);
-			break;
-#endif
-		}
-
-
-		/* RF7_A_DEAD */
-		case 192 + 2:
-		{
-			/* Override cave ecology */
-			cave_ecology.ready = FALSE;
-			disturb(1, 0);
-#if 0
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if (((blind) && (known)) && (target < 0)) result = format("%^s whispers.", m_name);
-				else if (known) result = format("%^s animates dead bodies near %s.", m_name, t_name);
-				else result = "You hear distant whispering.";
-			}
-
-			/* Animate dead */
-			mon_ball(who, what, y, x, GF_ANIM_DEAD, 0, 3, TRUE);
-#endif
-			break;
-		}
-
-
-		/* RF7_S_MONSTER */
-		case 192 + 3:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically summons help!", m_name);
-				else msg_print("You hear distant chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, 0, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_MONSTERS */
-		case 192 + 4:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically summons monsters.", m_name);
-				else msg_print("You hear distant chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, 0, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_R_MONSTER */
-		case 192 + 5:
-		{
-			/* Override cave ecology */
-			cave_ecology.ready = FALSE;
-			disturb(1, 0);
-#if 0
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) result = format("%^s chants.", m_name);
-				else if (known) result = format("%^s magically reanimates a monster!", m_name);
-				else result = "You hear distant chanting.";
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Raise the dead */
-			mon_ball(who, what, y, x, GF_RAISE_DEAD, 0, 3, TRUE);
-#endif
-			break;
-		}
-
-		/* RF7_R_MONSTERS */
-		case 192 + 6:
-		{
-			/* Override cave ecology */
-			cave_ecology.ready = FALSE;
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically reanimates monsters.", m_name);
-				else msg_print("You hear distant chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* All in line of sight */
-
-			break;
-		}
-
-		/* RF7_S_PLANT */
-		case 192 + 7:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a rustling tongue.", m_name);
-				else if (known) msg_format("%^s magically summons plants.", m_name);
-				else msg_print("You hear distant rustling.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_PLANT, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_INSECT */
-		case 192 + 8:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a chittering tongue.", m_name);
-				else if (known) msg_format("%^s magically summons insects.", m_name);
-				else msg_print("You hear distant chittering.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_INSECT, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_ANIMALS */
-		case 192 + 9:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically summons animals.", m_name);
-				else msg_print("You hear distant chanting.");
-
-				/* Hack -- This lets vampires summon animals while not letting undead live with non-undead animals in general */
-				if ((r_ptr->flags3 & (RF3_UNDEAD)) && ((r_ptr->flags7 & (RF7_S_ANIMAL)) == 0)) summon_flag_type = (RF8_HAS_SKELETON);
-
-				/* Hack -- Set the skin flags to summon */
-				else summon_flag_type = (r_ptr->flags8 & (RF8_SKIN_MASK));
-
-				/* Mega Hack -- Other racial preferences for animals */
-				if (!summon_flag_type)
-				{
-					/* Everyone likes lions, tigers, wolves */
-					summon_flag_type |= RF8_HAS_FUR;
-
-					/* Surface dwellers like birds */
-					if ((r_ptr->flags9 & (RF9_RACE_MASK)) && ! (r_ptr->flags3 & (RF3_RACE_MASK)))
-						summon_flag_type |= RF8_HAS_FEATHER;
-
-					/* Dungeon dwellers like reptiles, fish and worse */
-					else summon_flag_type |= RF8_HAS_SCALE;
-				}
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			else
-			{
-				/* MegaHack -- Determine letter later */
-				summon_flag_type = 0L;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_ANIMAL, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_HOUND */
-		case 192 + 10:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s howls.", m_name);
-				else if (known) msg_format("%^s magically summons hounds.", m_name);
-				else msg_print("You hear distant howling.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 2; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_HOUND, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_SPIDER */
-		case 192 + 11:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a chittering tongue.", m_name);
-				else if (known) msg_format("%^s magically summons spiders.", m_name);
-				else msg_print("You hear distant chittering.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_SPIDER, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_CLASS */
-		case 192 + 12:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically summons allies.", m_name);
-				else msg_print("You hear distant chanting.");
-
-				/* Hack -- Set the class flags to summon */
-				summon_flag_type = (r_ptr->flags2 & (RF2_CLASS_MASK));
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			else
-			{
-				/* MegaHack -- Determine letter later */
-				summon_flag_type = 0L;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_CLASS, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_RACE */
-		case 192 + 13:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically summons allies.", m_name);
-				else msg_print("You hear distant chanting.");
-
-				/* Hack -- Set the class flags to summon */
-				summon_flag_type = (r_ptr->flags3 & (RF3_RACE_MASK));
-
-				/* Mega Hack -- Combine two flags XXX */
-				summon_flag_type |= (r_ptr->flags9 & (RF9_RACE_MASK));
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			else
-			{
-				/* MegaHack -- Determine letter later */
-				summon_flag_type = 0L;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_RACE, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_GROUP */
-		case 192 + 14:
-		{
-			disturb(1, 0);
-			summon_group_type = 0;
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants.", m_name);
-				else if (known) msg_format("%^s magically summons allies.", m_name);
-				else msg_print("You hear distant chanting.");
-
-				summon_group_type = r_ptr->grp_idx;
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_GROUP, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_FRIEND */
-		case 192 + 15:
-		{
-			int summon_type = SUMMON_FRIEND;
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s calls out for help.", m_name);
-				else if (known) msg_format("%^s magically summons a friend.", m_name);
-				else msg_print("You hear distant cries for help.");
-
-				/* Mega Hack -- uniques summon other uniques with the same d_char and d_attr */
-				if (r_ptr->flags1 & (RF1_UNIQUE))
-				{
-					summon_char_type = r_ptr->d_char;
-					summon_attr_type = r_ptr->d_attr;
-					summon_type = SUMMON_UNIQUE_FRIEND;
-				}
-				else
-				{
-					summon_race_type = m_ptr->r_idx;
-				}
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			else
-			{
-				/* MegaHack -- Determine race later */
-				summon_race_type = 0;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev, summon_type, TRUE, allies);
-			}
-
-			break;
-		}
-
-		/* RF7_S_FRIENDS */
-		case 192 + 16:
-		{
-			int summon_type = SUMMON_FRIEND;
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s calls out for help.", m_name);
-				else if (known) msg_format("%^s magically summons friends.", m_name);
-				else msg_print("You hear distant cries for help.");
-
-				/* Mega Hack -- uniques summon other uniques with the same d_char and d_attr */
-				if (r_ptr->flags1 & (RF1_UNIQUE))
-				{
-					summon_char_type = r_ptr->d_char;
-					summon_attr_type = r_ptr->d_attr;
-					summon_type = SUMMON_UNIQUE_FRIEND;
-				}
-				else
-				{
-					summon_race_type = m_ptr->r_idx;
-				}
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-			else
-			{
-				/* MegaHack -- Determine race later */
-				summon_race_type = 0;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev, summon_type, TRUE, allies);
-			}
-
-			break;
-		}
-
-		/* RF7_S_ORC */
-		case 192 + 17:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s beats on a drum.", m_name);
-				else if (known) msg_format("%^s magically summons orcs.", m_name);
-				else msg_print("You hear distant drums.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_ORC, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_TROLL */
-		case 192 + 18:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s beats on a drum.", m_name);
-				else if (known) msg_format("%^s magically summons trolls.", m_name);
-				else msg_print("You hear distant drums.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_TROLL, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_GIANT */
-		case 192 + 19:
-		{
-			disturb(1, 0);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a thundering voice.", m_name);
-				else if (known) msg_format("%^s magically summons giants.", m_name);
-				else msg_print("You hear distant thunder.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			/* Count them for later */
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_GIANT, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_DRAGON */
-		case 192 + 20:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_DRAGON);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a roaring voice.", m_name);
-				else if (known) msg_format("%^s magically summons a dragon.", m_name);
-				else msg_print("You hear distant roars.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(m_ptr->fy, m_ptr->fx, summoner,
-					summon_lev - 1, SUMMON_DRAGON, TRUE, allies);
-			}
-
-			break;
-		}
-
-		/* RF7_S_HI_DRAGON */
-		case 192 + 21:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_HI_DRAGON);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a cacophonous voice.", m_name);
-				else if (known) msg_format("%^s magically summons ancient dragons!", m_name);
-				else msg_print("You hear cacophonous roars.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_HI_DRAGON, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_A_ELEMENT */
-		case 192 + 22:
-		{
-			/* Override cave ecology */
-			cave_ecology.ready = FALSE;
-			disturb(1, 0);
-
-#if 0
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) result = format("%^s chants in a rumbling voice.", m_name);
-				else if (known) result = format("%^s magically animates the elements around %s.", m_name, t_name);
-				else result = "You hear distant rumbles.";
-			}
-
-			/* Animate elements */
-			mon_ball(who, what, y, x, GF_ANIM_ELEMENT, 0, 3, TRUE);
-#endif
-			break;
-		}
-
-		/* RF7_A_OBJECT */
-		case 192 + 23:
-		{
-			/* Override cave ecology */
-			cave_ecology.ready = FALSE;
-			disturb(1, 0);
-#if 0
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) result = format("%^s chants in a clanking.", m_name);
-				else if (known) result = format("%^s magically animates the objects around %s.", m_name, t_name);
-				else result = "You hear distant clanking.";
-			}
-
-			/* Animate objects */
-			mon_ball(who, what, y, x, GF_ANIM_OBJECT, 0, 3, TRUE);
-#endif
-			break;
-		}
-
-		/* RF7_S_DEMON */
-		case 192 + 24:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_DEMON);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in an infernal voice.", m_name);
-				else if (known) msg_format("%^s magically summons a hellish adversary!", m_name);
-				else msg_print("You hear infernal chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_DEMON, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_HI_DEMON */
-		case 192 + 25:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_HI_DEMON);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in an infernal voice.", m_name);
-				else if (known) msg_format("%^s magically summons greater demons!", m_name);
-				else msg_print("You hear an infernal chorus.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_HI_DEMON, TRUE, allies);
-			}
-			break;
-		}
-
-		/* Summon a dead unique */
-		/* RF7_R_UNIQUE */
-		case 192 + 26:
-		{
-			int summon_type = RAISE_UNIQUE;
-
-			disturb(1, 0);
-			sound(MSG_SUM_UNIQUE);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a powerful voice.", m_name);
-				else if (known) msg_format("%^s magically raises one of your former opponents!", m_name);
-				else msg_print("You hear powerful, invocative chanting.");
-
-				if (r_ptr->flags7 & (RF7_S_HI_UNIQUE)) summon_type = RAISE_HI_UNIQUE;
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, summon_type, TRUE, allies);
-			}
-			break;
-		}
-
-		/* Summon Uniques */
-		/* RF7_S_UNIQUE */
-		case 192 + 27:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_UNIQUE);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a powerful voice.", m_name);
-				else if (known) msg_format("%^s magically summons special opponents!", m_name);
-				else msg_print("You hear powerful, invocative chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_UNIQUE, TRUE, allies);
-			}
-			break;
-		}
-
-		/* Summon Uniques */
-		/* RF7_S_HI_UNIQUE */
-		case 192 + 28:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_UNIQUE);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s chants in a powerful voice.", m_name);
-				else if (known) msg_format("%^s magically summons legendary opponents!", m_name);
-				else msg_print("You hear powerful, invocative chanting.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 3; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_HI_UNIQUE, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_UNDEAD */
-		case 192 + 29:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_UNDEAD);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
-				else if (known) msg_format("%^s magically summons an undead adversary!", m_name);
-				else msg_print("You hear distant whispering.");
-			}
-
-			for (k = 0; k < 1; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_UNDEAD, TRUE, allies);
-			}
-			break;
-		}
-
-		/* RF7_S_HI_UNDEAD */
-		case 192 + 30:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_HI_UNDEAD);
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				summoner = m_list[who > SOURCE_MONSTER_START ? who : what].r_idx;
-
-				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
-				else if (known) msg_format("%^s magically summons greater undead!", m_name);
-				else msg_print("You hear loud and imperious whispering.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 4; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_HI_UNDEAD, TRUE, allies);
-			}
-
-			break;
-		}
-
-		/* Summon the Ringwraiths */
-		/* RF7_S_WRAITH */
-		case 192 + 31:
-		{
-			disturb(1, 0);
-			sound(MSG_SUM_WRAITH);
-
-			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY) || (who == SOURCE_SELF))
-			{
-				if ((blind) && (known)) msg_format("%^s whispers.", m_name);
-				else if (known) msg_format("%^s magically summons mighty undead opponents!", m_name);
-				else msg_print("You hear thunderous, echoing whispers.");
-
-				/* Hack -- prevent summoning for a short while */
-				m_ptr->summoned = 20;
-			}
-
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_WRAITH, TRUE, allies);
-			}
-
-			for (k = 0; k < 6; k++)
-			{
-				count += summon_specific(y, x, summoner, summon_lev - 1, SUMMON_HI_UNDEAD, TRUE, allies);
-			}
-
 			break;
 		}
 

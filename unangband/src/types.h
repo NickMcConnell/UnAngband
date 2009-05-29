@@ -316,7 +316,7 @@ struct method_type
 
 	/* Monter summoning */
 	byte summon_type;
-	char summon_char;
+	byte unused;
 
 	/* Monster spell/breath damage  */
 	byte dam_mult;

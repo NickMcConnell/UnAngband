@@ -764,6 +764,7 @@ extern int place_monster_here(int y, int x, int r_idx);
 extern bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg);
 extern bool place_monster(int y, int x, bool slp, bool grp);
 extern bool alloc_monster(int dis, bool slp);
+extern void summon_specific_params(int r_idx, int summon_specific_type, bool hack_ecology);
 extern bool summon_specific(int y1, int x1, int restrict_race, int lev, int type, bool grp, u32b flg);
 extern bool summon_specific_one(int y1, int x1, int r_idx, bool slp, u32b flg);
 extern bool animate_object(int item);

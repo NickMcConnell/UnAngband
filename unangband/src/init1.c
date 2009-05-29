@@ -246,10 +246,61 @@ static cptr method_info_flags2[] =
 	"EYESIGHT",
 	"SCALE_AMMO",
 	"SPECIAL_CASE",
-	"SUMMON_CHAR",
 	"SCATTER",
-	"",
-	""
+	"AUTOMATIC",
+	"SUMMON",
+	"NO_ECOLOGY"
+};
+
+
+/*
+ * Summoning types
+ */
+static cptr summon_types[] =
+{
+		"SUMMON_MONSTER",
+		"SUMMON_KIN",
+		"RAISE_DEAD",
+		"ANIMATE_DEAD",
+		"SUMMON_XXX1",
+		"SUMMON_XXX2",
+		"RAISE_MONSTER",
+		"ANIMATE_TREE",
+		"SUMMON_PLANT",
+		"SUMMON_INSECT",
+		"SUMMON_ANIMAL",
+		"SUMMON_HOUND",
+		"SUMMON_SPIDER",
+		"SUMMON_CLASS",
+		"SUMMON_RACE",
+		"SUMMON_GROUP",
+		"SUMMON_FRIEND",
+		"SUMMON_UNIQUE_FRIEND",
+		"SUMMON_ORC",
+		"SUMMON_TROLL",
+		"SUMMON_GIANT",
+		"SUMMON_DRAGON",
+		"SUMMON_HI_DRAGON",
+		"ANIMATE_ELEMENT",
+		"ANIMATE_OBJECT",
+		"SUMMON_DEMON",
+		"SUMMON_HI_DEMON",
+		"RAISE_UNIQUE",
+		"SUMMON_UNIQUE",
+		"SUMMON_HI_UNIQUE",
+		"SUMMON_UNDEAD",
+		"SUMMON_HI_UNDEAD",
+		"SUMMON_WRAITH",
+		"RAISE_HI_UNIQUE",
+		"SUMMON_COLOUR",
+		"SUMMON_PREFIX",
+		"SUMMON_SUFFIX",
+		"SUMMON_ALL_BUT_PREFIX",
+		"SUMMON_INFIX_WYRM_OF",
+		"SUMMON_DRAGON_BREATH",
+		"SUMMON_ALIGN",
+		"SUMMON_LEVEL",
+		""
 };
 
 
@@ -2029,6 +2080,34 @@ static errr grab_one_level_scalar(method_level_scalar_type *scalar, char *what)
 
 
 /*
+ * Grab one summon type from a textual string
+ */
+static errr grab_one_summoning(byte *summon_type, cptr what)
+{
+	int i = 0;
+
+	/* Check styles */
+	while (strlen(summon_types[i]))
+	{
+		if (streq(what, summon_types[i]))
+		{
+			*summon_type = i;
+			return (0);
+		}
+
+		i++;
+	}
+
+	/* Oops */
+	msg_format("Unknown summoning type '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+
+
+/*
  * Initialize the "method_info" array, by parsing an ascii "template" file
  */
 errr parse_method_info(char *buf, header *head)
@@ -2340,6 +2419,17 @@ errr parse_method_info(char *buf, header *head)
 		if (grab_one_level_scalar(&method_ptr->number, buf + 2)) return (PARSE_ERROR_GENERIC);
 	}
 
+	/* Process 'S' for "Summon type" */
+	else if (buf[0] == 'S')
+	{
+		/* There better be a current method_ptr */
+		if (!method_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Get the radius information */
+		if (grab_one_summoning(&method_ptr->summon_type, buf + 2)) return (PARSE_ERROR_GENERIC);
+
+	}
+
 	else
 	{
 		/* Oops */
@@ -2418,7 +2508,7 @@ errr parse_effect_info(char *buf, header *head)
 	/* Process 'I' for "Info" */
 	else if (buf[0] == 'I')
 	{
-		int power, max, max_power;
+		int power;
 
 		/* There better be a current method_ptr */
 		if (!effect_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -9498,7 +9588,7 @@ errr emit_method_info_index(FILE *fp, header *head, int i)
 	/* Output 'S' for "Summoning choices" */
 	if (method_ptr->summon_type)
 	{
-		fprintf(fp, "S:%d\n",method_ptr->summon_type);
+		fprintf(fp, "S:%s\n",summon_types[method_ptr->summon_type]);
 	}
 
 	/* Output 'A' for "Arc information" */

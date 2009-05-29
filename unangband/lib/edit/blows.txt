@@ -464,7 +464,7 @@ N:52:EXPLODE
 T:0-9999:explodes!
 R:2
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | EXPAND |
-F:RANGED |
+F:RANGED | AUTOMATIC | MELEE
 D::& and all enemies adjacent to &
 
 N:53:ARROW
@@ -1970,14 +1970,15 @@ F:SPECIAL_CASE |
 D::
 
 N:192:S_KIN
-T:0-9999:magically summon~ $ kin
+T:0-9999:magically summon~ $ allies
 T:0-9999:cr|y|ies| out for help
 T:0-9999:You hear distant cries for help.
 W:12:0:0
 C:0:15:0:0:0:0:100
+S:SUMMON_KIN
 U:6
 F:SELF |
-F:HEARD | INDIRECT | SPECIAL_CASE | SUMMON_CHAR |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:193:R_KIN
@@ -1989,7 +1990,7 @@ X:0:0:0:0:0:0:RAISE_DEAD
 C:0:15:0:0:0:0:100
 R:3
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
-F:HEARD | INDIRECT | SPECIAL_CASE | SUMMON_CHAR |
+F:HEARD | INDIRECT | SUMMON | NO_ECOLOGY |
 D::
 
 N:194:A_DEAD
@@ -2001,19 +2002,29 @@ X:0:0:0:0:0:0:ANIM_DEAD
 C:0:15:0:0:0:0:100
 R:3
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
-F:HEARD | INDIRECT | SPECIAL_CASE |
+F:HEARD | INDIRECT | NO_ECOLOGY |
 D::
 
 N:195:S_MONSTER
+T:0-9999:magically summons help
+T:0-9999:chant~
+T:0-9999:You hear distant chanting.
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:1
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:196:S_MONSTERS
+T:0-9999:magically summons monsters
+T:-9999:chant~
+T:0-9999:You hear distant chanting.
+U:4
 W:15:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:197:R_MONSTER
@@ -2025,7 +2036,7 @@ X:0:0:0:0:0:0:RAISE_DEAD
 C:0:15:0:0:0:0:100
 R:3
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
-F:HEARD | INDIRECT | SPECIAL_CASE |
+F:HEARD | INDIRECT | NO_ECOLOGY |
 D::
 
 N:198:R_MONSTERS
@@ -2037,97 +2048,185 @@ X:0:0:0:0:0:0:RAISE_DEAD
 C:0:15:0:0:0:0:100
 R:10
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
-F:HEARD | INDIRECT | SPECIAL_CASE |
+F:HEARD | INDIRECT | NO_ECOLOGY |
 D::
 
 N:199:S_PLANT
+T:0-9999:magically summons plants
+T:0-9999:chant~ in a rustling tongue
+T:0-9999:You hear distant rustling.
 W:8:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
+U:4
+S:SUMMON_PLANT
 D::
 
 N:200:S_INSECT
+T:0-9999:magically summons insects
+T:0-9999:chant~ in a chittering voice
+T:0-9999:You hear distant chittering.
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:201:S_ANIMAL
+T:0-9999:magically summons animals
+T:0-9999:whistle~
+T:0-9999:You hear distant whistling.
 W:12:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:3
+S:SUMMON_ANIMAL
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:202:S_HOUND
+T:0-9999:magically summons hounds
+T:0-9999:howl~
+T:0-9999:You hear distant howling.
 W:14:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:2
+S:SUMMON_HOUND
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:203:S_SPIDER
+T:0-9999:magically summons spiders
+T:0-9999:chant~ in a chittering voice
+T:0-9999:You hear distant chittering.
 W:15:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:4
+S:SUMMON_SPIDER
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:204:S_CLASS
+T:0-9999:magically summons allies
+T:0-9999:chant~ in a foreign cant
+T:0-9999:You hear distant chanting.
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:3
+S:SUMMON_CLASS
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:205:S_RACE
+T:0-9999:magically summons allies
+T:0-9999:chant~ in a foreign cant
+T:0-9999:You hear distant chanting.
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:3
+S:SUMMON_RACE
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:206:S_GROUP
+T:0-9999:magically summons allies
+T:0-9999:chant~ in a foreign cant
+T:0-9999:You hear distant chanting.
 W:15:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:3
+S:SUMMON_GROUP
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:207:S_FRIEND
+T:0-9999:magically summons a friend
+T:0-9999:call~ out for help
+T:0-9999:You hear distant cries for help.
 W:5:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:1
+S:SUMMON_FRIEND
+F:SELF |
+F:HEARD | INDIRECT | SUMMON
 D::
 
 N:208:S_FRIENDS
+T:0-9999:magically summons friends
+T:0-9999:call~ out for help
+T:0-9999:You hear distant cries for help.
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:1
+S:SUMMON_FRIEND
+F:SELF |
+F:HEARD | INDIRECT | SUMMON
 D::
 
 N:209:S_ORC
+T:0-9999:magically summons orcs
+T:0-9999:beat~ on a drum
+T:0-9999:You hear distant drums.
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:4
+S:SUMMON_ORC
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:210:S_TROLL
+T:0-9999:magically summons trolls
+T:0-9999:beat~ on a drum
+T:0-9999:You hear distant drums.
 W:10:0:0
+U:4
+S:SUMMON_TROLL
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:211:S_GIANT
+T:0-9999:magically summons giants
+T:0-9999:chant~ in a thundering voice
+T:0-9999:You hear distant thunder.
+U:4
+S:SUMMON_GIANT
 W:10:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:212:S_DRAGON
+T:0-9999:magically summons a dragon
+T:0-9999:chant~ in a roaring voice
+T:0-9999:You hear distant roars.
+U:1
+S:SUMMON_DRAGON
 W:14:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:213:S_HI_DRAGON
+T:0-9999:magically summons ancient dragons
+T:0-9999:chant~ in a cacophonous voice
+T:0-9999:You hear cacophonous roars.
 W:20:0:0
 C:0:17:0:0:0:0:100
-F:SPECIAL_CASE |
+U:4
+S:SUMMON_HI_DRAGON
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:214:A_ELEMENT
@@ -2139,7 +2238,7 @@ X:0:0:0:0:0:0:ANIM_ELEMENT
 C:0:15:0:0:0:0:100
 R:10
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
-F:HEARD | INDIRECT | SPECIAL_CASE |
+F:HEARD | INDIRECT | NO_ECOLOGY |
 D::
 
 N:215:A_OBJECT
@@ -2148,54 +2247,104 @@ T:0-9999:chant~ in a clanking voice
 T:0-9999:You hear distant clanking.
 W:6:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+R:3
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC |
+F:HEARD | INDIRECT | NO_ECOLOGY |
 D::
 
 N:216:S_DEMON
+T:0-9999:magically summons a hellish adversary
+T:0-9999:chant~ in an infernal voice
+T:0-9999:You hear infernal chanting.
 W:14:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:1
+S:SUMMON_DEMON
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:217:S_HI_DEMON
+T:0-9999:magically summons greater demons
+T:0-9999:chant~ in an infernal voice
+T:0-9999:You hear infernal chorus.
 W:20:0:0
 C:0:17:0:0:0:0:100
-F:SPECIAL_CASE |
+U:4
+S:SUMMON_HI_DEMON
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:218:R_UNIQUE
+T:0-9999:magically raises one of your former opponents
+T:0-9999:chant~ in a powerful voice
+T:0-9999:You hear powerful, invocative chanting.
 W:25:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:1
+S:RAISE_UNIQUE
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:219:S_UNIQUE
+T:0-9999:magically summons special opponents
+T:0-9999:chant~ in a powerful voice
+T:0-9999:You hear powerful, invocative chanting.
 W:15:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:3
+S:SUMMON_UNIQUE
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:220:S_HI_UNIQUE
+T:0-9999:magically summons legendary opponents
+T:0-9999:chant~ in a powerful voice
+T:0-9999:You hear powerful, invocative chanting.
 W:20:0:0
 C:0:18:0:0:0:0:100
-F:SPECIAL_CASE |
+U:3
+S:SUMMON_HI_UNIQUE
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:221:S_UNDEAD
+T:0-9999:magically summons an undead adversary
+T:0-9999:whisper~
+T:0-9999:You hear distant whispering.
 W:12:0:0
 C:0:15:0:0:0:0:100
-F:SPECIAL_CASE |
+U:1
+S:SUMMON_UNDEAD
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:222:S_HI_UNDEAD
+T:0-9999:magically summons greater undead
+T:0-9999:whisper~
+T:0-9999:You hear loud and imperious whispering.
 W:20:0:0
 C:0:17:0:0:0:0:100
-F:SPECIAL_CASE |
+U:4
+S:SUMMON_HI_UNDEAD
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
 N:223:S_WRAITH
+T:0-9999:magically summons mighty undead opponents
+T:0-9999:whisper~
+T:0-9999:You hear thunderous, echoing whispers.
 W:20:0:0
 C:0:18:0:0:0:0:100
-F:SPECIAL_CASE |
+U:6
+S:SUMMON_WRAITH
+F:SELF |
+F:HEARD | INDIRECT | SUMMON |
 D::
 
