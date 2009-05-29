@@ -3057,9 +3057,9 @@ void py_attack(int dir)
 			/* Handle normal weapon/gauntlets/boots */
 			if (o_ptr->k_idx)
 			{
-				k = damroll(o_ptr->dd, o_ptr->ds);
-
 				int mult = object_damage_multiplier(o_ptr, m_ptr, FALSE);
+
+				k = damroll(o_ptr->dd, o_ptr->ds);
 
 				/* Allow other items on hands to assist with melee blow multipliers */
 				if (slot != INVEN_FEET)
