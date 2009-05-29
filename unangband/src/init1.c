@@ -10837,6 +10837,14 @@ errr emit_effect_info_index(FILE *fp, header *head, int i)
 	}
 	fprintf(fp,"\n");
 
+	/* Output 'T' for Text */
+	fprintf(fp, "T");
+	for (j = 0; j < 1; j++)
+	{
+		fprintf(fp,":%s",head->text_ptr + effect_ptr->desc[j]);
+	}
+	fprintf(fp,"\n");
+
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", effect_ptr->flags1, method_info_flags1);
 
