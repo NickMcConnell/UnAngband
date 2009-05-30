@@ -1038,22 +1038,43 @@ s16b get_mon_num(int level)
 }
 
 
+
+static const char *sort_by_name[]=
+{
+		"distance",
+		"depth",
+		"vengeance"
+};
+
 /*
  * Display visible monsters in a window
+ *
+ * Sort by values:
+ *
+ * 0	- distance
+ * 1	- depth
+ * 2	- number of times your ancestor has been killed
  */
-void display_monlist(void)
+void display_monlist(int sort_by)
 {
-	int idx, n, max;
-	int line = 1;
-	int total_count = 0, disp_count = 0;
+	int idx, max;
+	int line;
+	int total_count, disp_count, status_count;
+	int forreal;
 
 	char *m_name;
 	char buf[80];
-
 	monster_type *m_ptr;
 	monster_race *r_ptr;
 
 	u16b *race_counts;
+
+	int i, j;
+
+	int max_sort;
+	unsigned int n = 0, width = 0;
+
+	bool intro;
 
 	/* Clear the term if in a subwindow, set x otherwise */
 	if (Term != angband_term[0])
@@ -1073,158 +1094,286 @@ void display_monlist(void)
 		return;
 	}
 
-	/* Allocate the array */
-	race_counts = C_ZNEW(z_info->r_max, u16b);
-
-	/* Iterate over mon_list */
-	for (idx = 1; idx < z_info->m_max; idx++)
+	/*
+	 * Iterate through once to compute width, then second time to display
+	 */
+	for (forreal = 0; forreal < 2; forreal++)
 	{
-		m_ptr = &m_list[idx];
+		/* Allocate the array again */
+		race_counts = C_ZNEW(z_info->r_max, u16b);
 
-		/* Only visible monsters */
-		if (!m_ptr->ml) continue;
+		/* Reset some values */
+		total_count = 0;
+		disp_count = 0;
+		line = 0;
+		intro = TRUE;
 
-		/* Bump the count for this race */
-		race_counts[m_ptr->r_idx]++;
-		total_count++;
-	}
-
-	/* Note no visible monsters */
-	if (!total_count)
-	{
-		/* Clear display and print note */
-		c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
-
-		/* Display a message */
-		if (Term == angband_term[0])
-		    Term_addstr(-1, TERM_WHITE, "  (Press any key to continue.)");
-
-		/* Free up memory */
-		FREE(race_counts);
-
-		/* Done */
-		return;
-	}
-
-	/* Message */
-	prt(format("You can see %d monster%s:",
-		total_count, (total_count > 1 ? "s" : "")), 0, 0);
-
-	/* Iterate over mon_list ( again :-/ ) */
-	for (idx = 1; idx < z_info->m_max && (line < max); idx++)
-	{
-		m_ptr = &m_list[idx];
-
-		/* Only visible monsters */
-		if (!m_ptr->ml) continue;
-
-		/* Do each race only once */
-		if (!race_counts[m_ptr->r_idx]) continue;
-
-		/* Get monster race */
-		r_ptr = &r_info[m_ptr->r_idx];
-
-		/* Get the monster name */
-		m_name = r_name + r_ptr->name;
-
-		/* Obtain the length of the description */
-		n = strlen(m_name);
-
-		/* Display multiple monsters */
-		if (race_counts[m_ptr->r_idx] > 1)
+		/*
+		 * Iterate multiple times. We put monsters we can project to in the first list, then monsters we can see,
+		 * then monsters we are aware of through other means.
+		 */
+		for (i = 0; i < 3; i++)
 		{
-			/* Add race count */
-			sprintf(buf, "%d", race_counts[m_ptr->r_idx]);
-			Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
-			Term_addstr(-1, TERM_WHITE, " ");
+			/* Reset status count */
+			status_count = 0;
+			max_sort = 0;
 
-			/* Display the entry itself */
-			Term_addstr(-1, TERM_WHITE, m_name);
-
-			/* XXX Need to pluralise this properly */
-			Term_addstr(-1, TERM_WHITE, "s");
-
-			n+= strlen(buf) + 2;
-		}
-		/* Display single monsters */
-		else
-		{
-			/* Display the entry itself */
-			Term_putstr(0, line, n, TERM_WHITE, m_name);
-		}
-
-
-		/* Append the "standard" attr/char info */
-		Term_addstr(-1, TERM_WHITE, " ('");
-		Term_addch(r_ptr->d_attr, r_ptr->d_char);
-		Term_addstr(-1, TERM_WHITE, "')");
-		n += 6;
-
-		/* Monster graphic on one line */
-		if (!(use_dbltile) && !(use_trptile))
-		{
-			/* Append the "optional" attr/char info */
-			Term_addstr(-1, TERM_WHITE, "/('");
-
-			Term_addch(r_ptr->x_attr, r_ptr->x_char);
-
-			if (use_bigtile)
+			/* Iterate over mon_list */
+			for (idx = 1; idx < z_info->m_max; idx++)
 			{
-				if (r_ptr->x_attr & 0x80)
-					Term_addch(255, -1);
-				else
-					Term_addch(0, ' ');
+				m_ptr = &m_list[idx];
 
-				n++;
+				/* Only visible monsters */
+				if (!m_ptr->ml) continue;
+
+				/* Check which type we're collecting */
+				if (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE))
+				{
+					if (i != 0) continue;
+				}
+				else if (play_info[m_ptr->fy][m_ptr->fx] & (PLAY_SEEN))
+				{
+					if (i != 1) continue;
+				}
+				else if (i != 2) continue;
+
+				/* Bump the count for this race */
+				race_counts[m_ptr->r_idx]++;
+				total_count++;
+				status_count++;
+
+				/* Get maximum sort by */
+				if (!sort_by) max_sort = MAX(max_sort, m_ptr->cdis);
+				else if ((sort_by == 1) || (!l_list[m_ptr->r_idx].deaths))
+				{
+					max_sort = MAX(max_sort,r_info[m_ptr->r_idx].level);
+				}
+				else
+				{
+					max_sort = MAX(max_sort, l_list[m_ptr->r_idx].deaths + 60);
+				}
 			}
 
-			Term_addstr(-1, TERM_WHITE, "')");
-			n += 6;
+			/* Note no visible monsters */
+			if ((i == 3) && (!total_count))
+			{
+				/* Clear display and print note */
+				c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
+
+				/* Free up memory */
+				FREE(race_counts);
+
+				/* Done */
+				return;
+			}
+
+			/* Message */
+			if (status_count)
+			{
+				sprintf(buf, "You %s%s %d monster%s:%s",
+					(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
+					status_count, (status_count > 1 ? "s" : ""),
+					intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+
+				if (forreal)
+				{
+					Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
+					Term_erase(strlen(buf), line, width + 1 - strlen(buf));
+				}
+				else width = MAX(width, strlen(buf));
+
+				/* Increase line number */
+				line++;
+			}
+
+			/* Iterate through sort */
+			for (j = sort_by ? max_sort : 0; sort_by ? j >= 0 : j <= max_sort; sort_by ? j-- : j++)
+			{
+				/* Iterate over mon_list ( again :-/ ) */
+				for (idx = 1; idx < z_info->m_max; idx++)
+				{
+					m_ptr = &m_list[idx];
+
+					/* Only visible monsters */
+					if (!m_ptr->ml) continue;
+
+					/* Do each race only once */
+					if (!race_counts[m_ptr->r_idx]) continue;
+
+					/* Skip races at the sort distance */
+					if (!sort_by && (m_ptr->cdis != j)) continue;
+					else if ((sort_by == 2) && (l_list[m_ptr->r_idx].deaths && (l_list[m_ptr->r_idx].deaths != j - 60))) continue;
+					else if ((sort_by) && (r_info[m_ptr->r_idx].level != j)) continue;
+
+					/* Get monster race */
+					r_ptr = &r_info[m_ptr->r_idx];
+
+					/* Get the monster name */
+					m_name = r_name + r_ptr->name;
+
+					/* Obtain the length of the description */
+					n = strlen(m_name);
+
+					/* Display multiple monsters */
+					if (race_counts[m_ptr->r_idx] > 1)
+					{
+						/* Add race count */
+						sprintf(buf, "%d", race_counts[m_ptr->r_idx]);
+
+						if (forreal)
+						{
+							Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
+							Term_addstr(-1, TERM_WHITE, " ");
+
+							/* Display the entry itself */
+							Term_addstr(-1, TERM_WHITE, m_name);
+
+							/* XXX Need to pluralise this properly */
+							Term_addstr(-1, TERM_WHITE, "s");
+						}
+
+						n+= strlen(buf) + 2;
+					}
+					/* Display single monsters */
+					else
+					{
+						/* Display the entry itself */
+						Term_putstr(0, line, n, TERM_WHITE, m_name);
+					}
+
+
+					/* Append the "standard" attr/char info */
+					if (forreal)
+					{
+						Term_addstr(-1, TERM_WHITE, " ('");
+						Term_addch(r_ptr->d_attr, r_ptr->d_char);
+						Term_addstr(-1, TERM_WHITE, "')");
+					}
+
+					n += 6;
+
+					/* Monster graphic on one line */
+					if (!(use_dbltile) && !(use_trptile))
+					{
+						if (forreal)
+						{
+							/* Append the "optional" attr/char info */
+							Term_addstr(-1, TERM_WHITE, "/('");
+
+							Term_addch(r_ptr->x_attr, r_ptr->x_char);
+						}
+
+						if (use_bigtile)
+						{
+							if (forreal)
+							{
+								if (r_ptr->x_attr & 0x80)
+									Term_addch(255, -1);
+								else
+									Term_addch(0, ' ');
+							}
+
+							n++;
+						}
+
+						if (forreal) Term_addstr(-1, TERM_WHITE, "')");
+						n += 6;
+					}
+
+					/* Erase the rest of the line */
+					if (forreal) Term_erase(n, line, width + 1 - n);
+
+					/* Add to monster counter */
+					disp_count += race_counts[m_ptr->r_idx];
+
+					/* Don't display again */
+					race_counts[m_ptr->r_idx] = 0;
+
+					/* Increase required width */
+					width = MAX(width, n);
+
+					/* Bump line counter */
+					line++;
+
+					/* Page wrap */
+					if (Term == angband_term[0] && (line == max) && disp_count != total_count && forreal)
+					{
+						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
+						anykey();
+
+						/* Clear the screen */
+						Term_erase(0, line, width + 1);
+
+						/* Reprint Message */
+						if (forreal)
+						{
+							sprintf(buf, "You %s%s %d monster%s:%s",
+								(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
+								status_count, (status_count > 1 ? "s" : ""),
+								intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+
+							if (forreal)
+							{
+								Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
+								Term_erase(strlen(buf), line, width + 1 - strlen(buf));
+							}
+							else width = MAX(width, strlen(buf));
+						}
+
+						/* Reset */
+						line = 1;
+					}
+				}
+			}
+
+			/* Get status count */
+			if (status_count && forreal)
+			{
+				/* Print "and others" message if we're out of space */
+				if (disp_count != total_count)
+				{
+					sprintf(buf, format("  ...and %d others.", total_count - disp_count));
+					Term_putstr(0, line, width+1, TERM_WHITE, buf);
+					Term_erase(strlen(buf), line, width + 1 - strlen(buf));
+
+					/* We've displayed the others */
+					disp_count = total_count;
+				}
+
+				/* Put a shadow */
+				else
+					Term_erase(0, line, width + 1);
+
+				/* Increase line number */
+				line++;
+			}
+
+			/* Hack -- no ancestor deaths - demote to difficulty */
+			if ((sort_by == 2) && (max_sort <= 60)) sort_by = 1;
+
+			/* If displaying on the terminal, recenter on the player,
+			 * taking away the used up width on the left hand side */
+			if (!forreal && (Term == angband_term[0]) && ((signed)width < SCREEN_WID))
+			{
+				/* Dangerous hack */
+				screen_load();
+
+				/* Use "modify_panel" */
+				modify_panel(p_ptr->py - (SCREEN_HGT) / 2, p_ptr->px - (SCREEN_WID + width) / 2);
+
+				/* Force redraw */
+				redraw_stuff();
+
+				screen_save();
+			}
+
+			/* Introduced? */
+			if (status_count) intro = FALSE;
 		}
 
-		/* Erase the rest of the line */
-		Term_erase(n, line, 255);
-
-		/* Add to monster counter */
-		disp_count += race_counts[m_ptr->r_idx];
-
-		/* Don't display again */
-		race_counts[m_ptr->r_idx] = 0;
-
-		/* Bump line counter */
-		line++;
-
-		/* Page wrap */
-		if (Term == angband_term[0] && (line == max) && disp_count != total_count)
-		{
-			prt("-- more --", line, 0);
-			anykey();
-
-			/* Clear the screen */
-			clear_from(0);
-
-			/* Reprint Message */
-			prt(format("You can see %d monster%s:",
-				total_count, (total_count > 1 ? "s" : "")), 0, 0);
-
-			/* Reset */
-			line = 1;
-		}
+		/* Free the race counters */
+		FREE(race_counts);
 	}
-
-	/* Print "and others" message if we're out of space */
-	if (disp_count != total_count)
-		prt(format("  ...and %d others.", total_count - disp_count), line, 0);
-
-	/* Put a shadow */
-	else
-		prt("", line, 0);
-
-	if (Term == angband_term[0])
-	prt("(Press any key to continue.)", line, 0);
-
-	/* Free the race counters */
-	FREE(race_counts);
 }
 
 
@@ -2933,7 +3082,7 @@ int place_monster_here(int y, int x, int r_idx)
 	if (resist &&
 		((r_ptr->flags3 & (RF3_NONLIVING)) != 0) &&
 		((f_ptr->flags1 & (FF1_MOVE)) != 0) &&
-                ((f_ptr->flags2 & (FF2_DEEP | FF2_FILLED)) != 0))
+		((f_ptr->flags2 & (FF2_DEEP | FF2_FILLED)) != 0))
 	{
 		return (MM_UNDER);
 	}
@@ -3090,7 +3239,7 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 	else if ((f_ptr->flags3 & (FF3_EASY_HIDE)) != 0)
 	{
 		/* Covered/bridged features are special */
-                if ((f_ptr->flags2 & (FF2_COVERED)) != 0)
+		if ((f_ptr->flags2 & (FF2_COVERED)) != 0)
 		{
 			/* Nothing */
 		}
@@ -4539,14 +4688,14 @@ static bool summon_specific_okay(int r_idx)
 		case SUMMON_HOUND:
 		{
 			okay = (((r_ptr->d_char == 'C') || (r_ptr->d_char == 'Z')) &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
 		case SUMMON_SPIDER:
 		{
 			okay = ((r_ptr->d_char == 'S') &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
@@ -4797,7 +4946,7 @@ static bool summon_specific_okay(int r_idx)
 		case ANIMATE_TREE:
 		{
 			okay = ((r_ptr->d_char == ':') &&
-			        !(r_ptr->flags1 & (RF1_UNIQUE)));
+				!(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
@@ -4892,22 +5041,22 @@ static bool summon_specific_okay(int r_idx)
 		case SUMMON_HI_UNDEAD:
 		{
 			okay = ((r_ptr->d_char == 'L') ||
-			        (r_ptr->d_char == 'V') ||
-			        (r_ptr->d_char == 'W'));
+				(r_ptr->d_char == 'V') ||
+				(r_ptr->d_char == 'W'));
 			break;
 		}
 
 		case SUMMON_HI_DRAGON:
 		{
 			okay = ((r_ptr->d_char == 'D') ||
-			        (r_ptr->d_char == 'A'));
+				(r_ptr->d_char == 'A'));
 			break;
 		}
 
 		case SUMMON_WRAITH:
 		{
 			okay = ((r_ptr->d_char == 'W') &&
-			        (r_ptr->flags1 & (RF1_UNIQUE)));
+				(r_ptr->flags1 & (RF1_UNIQUE)));
 			break;
 		}
 
@@ -5707,7 +5856,7 @@ bool animate_object(int item)
 			p = "come back from the dead!";
 			break;
 
-	        case TV_HOLD:
+		case TV_HOLD:
 			p = "broken open!";
 			break;
 

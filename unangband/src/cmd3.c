@@ -2474,7 +2474,7 @@ void do_cmd_monlist(void)
 {
 	/* Save the screen and display the list */
 	screen_save();
-	display_monlist();
+	display_monlist(2);
 
 	/* Wait */
 	anykey();
