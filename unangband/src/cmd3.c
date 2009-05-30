@@ -2474,7 +2474,11 @@ void do_cmd_monlist(void)
 {
 	/* Save the screen and display the list */
 	screen_save();
-	display_monlist(2);
+
+	if (!display_monlist(0, 3, 2))
+	{
+		prt("You see nothing interesting.", 0, 0);
+	}
 
 	/* Wait */
 	anykey();

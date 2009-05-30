@@ -4767,11 +4767,14 @@ enum
  * Determine if a given inventory item is "named"
  * Test One -- Check for special "known" or "named" tags
  * Test Two -- Check for "Flavor" + "Aware"
+ * Test Three --
  */
 #define object_named_p(T) \
 	(((T)->ident & (IDENT_KNOWN | IDENT_NAME)) || \
-	 (k_info[(T)->k_idx].flavor && \
-	  k_info[(T)->k_idx].aware & (AWARE_FLAVOR)))
+	 (k_info[(T)->k_idx].flavor  ? \
+	  ((k_info[(T)->k_idx].aware & (AWARE_FLAVOR)) != 0) : \
+		((k_info[(T)->k_idx].flags6 & (TR6_MOD_NAME | \
+				TR6_FORCE_MOD | TR6_SIMPLE)) != 0)))
 
 
 /*
@@ -4846,6 +4849,15 @@ enum
  */
 #define cursed_p(T) \
 	((T)->ident & (IDENT_CURSED))
+
+/*
+ * Uninteresting items.
+ */
+#define uninteresting_p(T) \
+	(((T)->feeling == INSCRIP_AVERAGE) || \
+			 ((T)->feeling == INSCRIP_CURSED) || \
+			 ((T)->feeling == INSCRIP_NONMAGICAL) || \
+			 ((T)->feeling == INSCRIP_UNRUNED))
 
 /*
  * Uncontrolled items.

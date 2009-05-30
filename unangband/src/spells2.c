@@ -1237,7 +1237,10 @@ bool detect_objects_tval(int tval)
 		if (o_ptr->tval == tval)
 		{
 			/* Hack -- memorize it */
-			o_ptr->ident |= (IDENT_MARKED);
+			if (!auto_pickup_ignore(o_ptr)) o_ptr->ident |= (IDENT_MARKED);
+
+			/* Get awareness */
+			object_aware_tips(o_ptr, TRUE);
 
 			/* Redraw */
 			lite_spot(y, x);

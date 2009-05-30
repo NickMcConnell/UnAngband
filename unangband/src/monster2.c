@@ -1046,19 +1046,28 @@ static const char *sort_by_name[]=
 		"vengeance"
 };
 
+
 /*
- * Display visible monsters in a window
+ * Display visible monsters and/or objects in a window
+ *
+ * Types defines whether we see monsters, objects or both:
+ *
+ * 1 	- monsters
+ * 2	- objects
+ * 3	- both
  *
  * Sort by values:
  *
  * 0	- distance
  * 1	- depth
  * 2	- number of times your ancestor has been killed
+ *
+ * Returns the width of the monster and/or object lists, or 0 if no monsters/objects are seen.
  */
-void display_monlist(int sort_by)
+int display_monlist(int row, int types, int sort_by)
 {
 	int idx, max;
-	int line;
+	int line = row;
 	int total_count, disp_count, status_count;
 	int forreal;
 
@@ -1066,9 +1075,13 @@ void display_monlist(int sort_by)
 	char buf[80];
 	monster_type *m_ptr;
 	monster_race *r_ptr;
+	object_type *o_ptr;
 
 	u16b *race_counts;
 	u16b *sleep_counts;
+	u16b *kind_counts;
+	u16b *artifact_counts;
+	u16b *unknown_counts;
 
 	int i, j;
 
@@ -1091,8 +1104,8 @@ void display_monlist(int sort_by)
 	/* If hallucinating, we can't see any monsters */
 	if (p_ptr->timed[TMD_IMAGE])
 	{
-		c_prt(TERM_SLATE, "You're too confused to see straight!", 0, 0);
-		return;
+		/*Term_putstr(0, line, 36, TERM_ORANGE, "You're too confused to see straight! ");*/
+		return (0);
 	}
 
 	/*
@@ -1103,6 +1116,9 @@ void display_monlist(int sort_by)
 		/* Allocate the array */
 		race_counts = C_ZNEW(z_info->r_max, u16b);
 		sleep_counts = C_ZNEW(z_info->r_max, u16b);
+		kind_counts = C_ZNEW(z_info->k_max, u16b);
+		unknown_counts = C_ZNEW(z_info->k_max, u16b);
+		artifact_counts = C_ZNEW(z_info->a_max, u16b);
 
 		/* Reset some values */
 		total_count = 0;
@@ -1114,7 +1130,7 @@ void display_monlist(int sort_by)
 		 * Iterate multiple times. We put monsters we can project to in the first list, then monsters we can see,
 		 * then monsters we are aware of through other means.
 		 */
-		for (i = 0; i < 3; i++)
+		if (types % 2) for (i = 0; i < 3; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1157,38 +1173,27 @@ void display_monlist(int sort_by)
 				}
 			}
 
-			/* Note no visible monsters */
-			if ((i == 3) && (!total_count) && (forreal))
-			{
-				/* Clear display and print note */
-				c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
+			/* Hack -- no ancestor deaths - demote to difficulty */
+			if ((sort_by == 2) && (max_sort <= 60)) sort_by = 1;
 
-				/* Free up memory */
-				FREE(race_counts);
-				FREE(sleep_counts);
-
-				/* Done */
-				return;
-			}
+			/* No visible monsters */
+			if (!status_count) continue;
 
 			/* Message */
-			if (status_count)
+			sprintf(buf, "You %s%s %d monster%s:%s",
+				(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
+				status_count, (status_count > 1 ? "s" : ""),
+				intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+
+			if (forreal)
 			{
-				sprintf(buf, "You %s%s %d monster%s:%s",
-					(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
-					status_count, (status_count > 1 ? "s" : ""),
-					intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
-
-				if (forreal)
-				{
-					Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
-					Term_erase(strlen(buf), line, width + 1 - strlen(buf));
-				}
-				else width = MAX(width, strlen(buf));
-
-				/* Increase line number */
-				line++;
+				Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
+				Term_erase(strlen(buf), line, width + 1 - strlen(buf));
 			}
+			else width = MAX(width, strlen(buf));
+
+			/* Increase line number */
+			line++;
 
 			/* Iterate through sort */
 			for (j = sort_by ? max_sort : 0; sort_by ? j >= 0 : j <= max_sort; sort_by ? j-- : j++)
@@ -1318,7 +1323,7 @@ void display_monlist(int sort_by)
 					line++;
 
 					/* Page wrap */
-					if (Term == angband_term[0] && (line == max) && disp_count != total_count && forreal)
+					if ((Term == angband_term[0]) && (line == max) && (disp_count != total_count) && forreal)
 					{
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
 						anykey();
@@ -1327,29 +1332,24 @@ void display_monlist(int sort_by)
 						Term_erase(0, line, width + 1);
 
 						/* Reprint Message */
-						if (forreal)
-						{
-							sprintf(buf, "You %s%s %d monster%s:%s",
-								(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
-								status_count, (status_count > 1 ? "s" : ""),
-								intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+						sprintf(buf, "You %s%s %d monster%s:%s",
+							(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
+							status_count, (status_count > 1 ? "s" : ""),
+							intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
 
-							if (forreal)
-							{
-								Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
-								Term_erase(strlen(buf), line, width + 1 - strlen(buf));
-							}
-							else width = MAX(width, strlen(buf));
-						}
+						Term_putstr(0, row, strlen(buf), TERM_WHITE, buf);
+						Term_erase(strlen(buf), row, width + 1 - strlen(buf));
+
+						width = MAX(width, strlen(buf));
 
 						/* Reset */
-						line = 1;
+						line = row + 1;
 					}
 				}
 			}
 
-			/* Get status count */
-			if (status_count && forreal)
+			/* Others to be displayed */
+			if (forreal)
 			{
 				/* Print "and others" message if we're out of space */
 				if (disp_count != total_count)
@@ -1370,33 +1370,301 @@ void display_monlist(int sort_by)
 				line++;
 			}
 
-			/* Hack -- no ancestor deaths - demote to difficulty */
-			if ((sort_by == 2) && (max_sort <= 60)) sort_by = 1;
+			/* Introduced? */
+			intro = FALSE;
+		}
 
-			/* If displaying on the terminal, recenter on the player,
-			 * taking away the used up width on the left hand side */
-			if (!forreal && (Term == angband_term[0]) && ((signed)width < SCREEN_WID))
+		/* Display items */
+		if (types / 2) for (i = 0; i < 2; i++)
+		{
+			/* Reset status count */
+			status_count = 0;
+			max_sort = 0;
+
+			/* Iterate over item list */
+			for (idx = 1; idx < z_info->o_max; idx++)
 			{
-				/* Dangerous hack */
-				screen_load();
+				o_ptr = &o_list[idx];
 
-				/* Use "modify_panel" */
-				modify_panel(p_ptr->py - (SCREEN_HGT) / 2, p_ptr->px - (SCREEN_WID + width) / 2);
+				/* Only visible objects */
+				if ((o_ptr->ident & (IDENT_MARKED)) == 0) continue;
 
-				/* Force redraw */
-				redraw_stuff();
+				/* Only objects on the floor */
+				if (o_ptr->held_m_idx) continue;
 
-				screen_save();
+				/* Check which type we're collecting */
+				if (play_info[o_ptr->iy][o_ptr->ix] & (PLAY_SEEN))
+				{
+					if (i != 0) continue;
+				}
+				else if (i != 1) continue;
+
+				/* Bump the count for this artifact or kind */
+				if ((object_named_p(o_ptr)) && (o_ptr->name1))
+				{
+					total_count++;
+					status_count++;
+					artifact_counts[o_ptr->name1]++;
+				}
+				else
+				{
+					kind_counts[o_ptr->k_idx] += o_ptr->number;
+					total_count += o_ptr->number;
+					status_count += o_ptr->number;
+					if (!object_named_p(o_ptr) && !uninteresting_p(o_ptr)) unknown_counts[o_ptr->k_idx] += o_ptr->number;
+				}
+
+				/* Get maximum sort by */
+				if (!sort_by) max_sort = MAX(max_sort, distance(p_ptr->py, p_ptr->px, o_ptr->iy, o_ptr->ix));
+				else
+				{
+					max_sort = MAX(max_sort, !(object_named_p(o_ptr)) ? 60 + o_ptr->tval : k_info[o_ptr->k_idx].level);
+				}
+			}
+
+			/* Nothing */
+			if (!status_count) continue;
+
+			/* Message */
+			sprintf(buf, "You %s %d object%s:%s",
+				i ? "are aware of" : "can see",
+				status_count, (status_count > 1 ? "s" : ""),
+				intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+
+			if (forreal)
+			{
+				Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
+				Term_erase(strlen(buf), line, width + 1 - strlen(buf));
+			}
+			else width = MAX(width, strlen(buf));
+
+			/* Increase line number */
+			line++;
+
+			/* Iterate through sort */
+			for (j = sort_by ? max_sort : 0; sort_by ? j >= 0 : j <= max_sort; sort_by ? j-- : j++)
+			{
+				/* Iterate over object_list ( again :-/ ) */
+				for (idx = 1; idx < z_info->o_max; idx++)
+				{
+					int attr;
+					object_type object_type_body;
+
+					o_ptr = &o_list[idx];
+
+					/* Colour text based on knowledge */
+					attr = unknown_counts[o_ptr->k_idx] == kind_counts[o_ptr->k_idx] ? TERM_WHITE :
+											(unknown_counts[o_ptr->k_idx] ? TERM_L_WHITE : TERM_SLATE);
+
+					/* Only visible objects */
+					if ((o_ptr->ident & (IDENT_MARKED)) == 0) continue;
+
+					/* Only objects on the floor */
+					if (o_ptr->held_m_idx) continue;
+
+					/* Have we seen the artifact */
+					if (object_named_p(o_ptr) && o_ptr->name1 && !artifact_counts[o_ptr->name1]) continue;
+
+					/* Do each race only once */
+					else if (!kind_counts[o_ptr->k_idx]) continue;
+
+					/* Check whether we group object */
+					if (!sort_by)
+					{
+						if (j != distance(p_ptr->py, p_ptr->px, o_ptr->iy, o_ptr->ix)) continue;
+					}
+					else if ((sort_by) && !(object_named_p(o_ptr)))
+					{
+						if (j != 60 + o_ptr->tval) continue;
+					}
+					else if (sort_by)
+					{
+						if (j != k_info[o_ptr->k_idx].level) continue;
+					}
+
+					/* Prepare a fake object */
+					object_prep(&object_type_body, o_ptr->k_idx);
+
+					/* Fake the artifact */
+					if (object_named_p(o_ptr) && o_ptr->name1)
+					{
+						object_type_body.name1 = o_ptr->name1;
+						attr = TERM_YELLOW;
+					}
+
+					/* Fake the number */
+					else
+					{
+						if (kind_counts[o_ptr->k_idx] > 99) object_type_body.number = 99;
+						else object_type_body.number = kind_counts[o_ptr->k_idx];
+					}
+
+					/* Describe the object */
+					object_desc(buf, sizeof(buf), &object_type_body, TRUE, 0);
+
+					if (forreal)
+					{
+						Term_putstr(0, line, strlen(buf), attr, buf);
+					}
+
+					n= strlen(buf);
+
+					/* Show unknown number of kinds */
+					if ((!object_named_p(o_ptr) || !o_ptr->name1) &&
+							(unknown_counts[o_ptr->k_idx]) && (unknown_counts[o_ptr->k_idx] < kind_counts[o_ptr->k_idx]))
+					{
+						/* Add race count */
+						sprintf(buf, format(" (%d unknown)", unknown_counts[o_ptr->k_idx]));
+
+						/* Display the entry itself */
+						if (forreal) Term_addstr(-1, attr, buf);
+
+						n += strlen(buf);
+					}
+
+					/* Append the "standard" attr/char info */
+					if (forreal)
+					{
+						Term_addstr(-1, attr, " ('");
+						Term_addch(k_info[o_ptr->k_idx].flavor ? TERM_WHITE : k_info[o_ptr->k_idx].d_attr, k_info[o_ptr->k_idx].d_char);
+						Term_addstr(-1, attr, "')");
+					}
+
+					n += 6;
+
+					/* Monster graphic on one line */
+					if (!(use_dbltile) && !(use_trptile))
+					{
+						if (forreal)
+						{
+							/* Append the "optional" attr/char info */
+							Term_addstr(-1, attr, "/('");
+
+							Term_addch(object_attr(o_ptr), object_char(o_ptr));
+						}
+
+						if (use_bigtile)
+						{
+							if (forreal)
+							{
+								if (object_attr(o_ptr) & 0x80)
+									Term_addch(255, -1);
+								else
+									Term_addch(0, ' ');
+							}
+
+							n++;
+						}
+
+						if (forreal) Term_addstr(-1, attr, "')");
+						n += 6;
+					}
+
+					/* Erase the rest of the line */
+					if (forreal) Term_erase(n, line, width + 1 - n);
+
+					/* Visible artifact */
+					if (object_named_p(o_ptr) && o_ptr->name1)
+					{
+						disp_count++;
+						artifact_counts[o_ptr->name1] = 0;
+					}
+					else
+					{
+						/* Add to monster counter */
+						disp_count += kind_counts[o_ptr->k_idx];
+
+						/* Don't display again */
+						kind_counts[o_ptr->k_idx] = 0;
+						unknown_counts[o_ptr->k_idx] = 0;
+					}
+
+					/* Increase required width */
+					width = MAX(width, n);
+
+					/* Bump line counter */
+					line++;
+
+					/* Page wrap */
+					if ((Term == angband_term[0]) && (line == max) && (disp_count != total_count) && forreal)
+					{
+						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
+						anykey();
+
+						/* Clear the screen */
+						Term_erase(0, line, width + 1);
+
+						/* Reprint Message */
+						sprintf(buf, "You %s %d object%s:%s",
+							i ? "are aware of" : "can see",
+							status_count, (status_count > 1 ? "s" : ""),
+							intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+
+						Term_putstr(0, row, strlen(buf), TERM_WHITE, buf);
+						Term_erase(strlen(buf), row, width + 1 - strlen(buf));
+
+						width = MAX(width, strlen(buf));
+
+						/* Reset */
+						line = row + 1;
+					}
+				}
+			}
+
+			/* Others to be displayed */
+			if (forreal)
+			{
+				/* Print "and others" message if we're out of space */
+				if (disp_count != total_count)
+				{
+					sprintf(buf, format("  ...and %d others.", total_count - disp_count));
+					Term_putstr(0, line, width+1, TERM_WHITE, buf);
+					Term_erase(strlen(buf), line, width + 1 - strlen(buf));
+
+					/* We've displayed the others */
+					disp_count = total_count;
+				}
+
+				/* Put a shadow */
+				else
+					Term_erase(0, line, width + 1);
+
+				/* Increase line number */
+				line++;
 			}
 
 			/* Introduced? */
-			if (status_count) intro = FALSE;
+			intro = FALSE;
+		}
+
+		/* If displaying on the terminal, recenter on the player,
+		 * taking away the used up width on the left hand side */
+		if (!forreal && (Term == angband_term[0]) && ((signed)width < SCREEN_WID) &&
+				(!center_player || (p_ptr->wx - p_ptr->px < (signed)width)))
+		{
+			/* Dangerous hack */
+			screen_load();
+
+			/* Use "modify_panel" */
+			modify_panel(p_ptr->py - (SCREEN_HGT) / 2, p_ptr->px - (SCREEN_WID + width) / 2);
+
+			/* Force redraw */
+			redraw_stuff();
+
+			screen_save();
 		}
 
 		/* Free the race counters */
 		FREE(race_counts);
 		FREE(sleep_counts);
+
+		/* Free the object counters */
+		FREE(kind_counts);
+		FREE(unknown_counts);
+		FREE(artifact_counts);
 	}
+
+	return (width);
 }
 
 
