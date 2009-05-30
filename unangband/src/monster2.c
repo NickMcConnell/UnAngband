@@ -1155,7 +1155,7 @@ void display_monlist(int sort_by)
 			}
 
 			/* Note no visible monsters */
-			if ((i == 3) && (!total_count))
+			if ((i == 3) && (!total_count) && (forreal))
 			{
 				/* Clear display and print note */
 				c_prt(TERM_SLATE, "You see no monsters.", 0, 0);
