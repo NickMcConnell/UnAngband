@@ -699,6 +699,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 int attack_desc(char *buf, int target, int method, int effect, int damage, byte flg, int buf_size)
 {
 	char t_name[80];
+	char t_poss[80];
 
 	const char *s;
 	char *t;
@@ -721,19 +722,27 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 	{
 		/* Get the monster reflexive ("himself"/"herself"/"itself") */
 		monster_desc(t_name, sizeof(t_name), target, 0x23);
+
+		/* Get the monster possessive ("his"/"her"/"its") */
+		monster_desc(t_poss, sizeof(t_poss), target, 0x22);
 	}
 	else if (target > 0)
 	{
 		/* Get the monster name (or "it") */
 		monster_desc(t_name, sizeof(t_name), target, 0x00);
+
+		/* Get the monster possessive ("the goblin's") */
+		monster_desc(t_poss, sizeof(t_poss), target, 0x02);
 	}
 	else if (target < 0)
 	{
 		my_strcpy(t_name,"you", sizeof(t_name));
+		my_strcpy(t_poss,"your", sizeof(t_poss));
 	}
 	else
 	{
 		my_strcpy(t_name,"it", sizeof(t_name));
+		my_strcpy(t_poss,"its", sizeof(t_poss));
 	}
 
 	/* Check for blows which are of alternate type - the attack is stunning as opposed to cutting */
@@ -827,6 +836,23 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, byte 
 		{
 			/* Append the name */
 			cptr u = t_name;
+
+			while ((*u) && ((t - buf) < buf_size))
+			{
+				*t++ = *u++;
+				if (uppercase)
+				{
+					if ((*t >= 'a') && (*t <= 'z')) *t -= 32;
+					uppercase = FALSE;
+				}
+			}
+		}
+
+		/* Handle the target*/
+		else if (*s == '%')
+		{
+			/* Append the name */
+			cptr u = t_poss;
 
 			while ((*u) && ((t - buf) < buf_size))
 			{
@@ -1847,10 +1873,10 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		monster_desc(t_nref, sizeof(t_name), target, 0x00);
 
 		/* Get the monster reflexive ("himself"/"herself"/"itself") */
-		monster_desc(t_name, sizeof(t_nref), who, 0x23);
+		monster_desc(t_name, sizeof(t_nref), target, 0x23);
 
 		/* Get the monster possessive ("his"/"her"/"its") */
-		monster_desc(t_poss, sizeof(t_poss), who, 0x22);
+		monster_desc(t_poss, sizeof(t_poss), target, 0x22);
 
 		/* Targetting self */
 		atk_flg |= (ATK_DESC_SELF);
