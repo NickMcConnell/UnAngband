@@ -1339,7 +1339,7 @@ int display_monlist(int row, int types, bool command, bool force)
 
 							if ((ke.key == '\xff') && !(ke.mousebutton))
 							{
-								int y = ke.mousey;
+								int y = ke.mousey-1; /* ??? */
 								int x = ke.mousex;
 								int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
@@ -1628,7 +1628,7 @@ int display_monlist(int row, int types, bool command, bool force)
 
 							if ((ke.key == '\xff') && !(ke.mousebutton))
 							{
-								int y = ke.mousey;
+								int y = ke.mousey-1; /* ??? */
 								int x = ke.mousex;
 								int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
@@ -1739,7 +1739,7 @@ int display_monlist(int row, int types, bool command, bool force)
 
 			if ((ke.key == '\xff') && !(ke.mousebutton))
 			{
-				int y = ke.mousey;
+				int y = ke.mousey -1; /* ??? */
 				int x = ke.mousex;
 				int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 

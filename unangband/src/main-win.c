@@ -4745,8 +4745,8 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 			if ((term_initialised) && (td->tile_wid) && (td->tile_hgt) && (use_mouse || !character_generated))
 			{
 				/* Get the text grid */
-				xPos = GET_X_LPARAM(lParam);
-				yPos = GET_Y_LPARAM(lParam);
+				xPos = GET_X_LPARAM(lParam) - td->size_ow1;
+				yPos = GET_Y_LPARAM(lParam) - td->size_oh1;
 				xPos /= td->tile_wid;
 				yPos /= td->tile_hgt;
 
@@ -4814,8 +4814,8 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				if (dy < 0) dy = -dy;
 
 				/* Get the text grid */
-				xPos = GET_X_LPARAM(lParam);
-				yPos = GET_Y_LPARAM(lParam);
+				xPos = GET_X_LPARAM(lParam) - td->size_ow1;
+				yPos = GET_Y_LPARAM(lParam) - td->size_oh1;
 				xPos /= td->tile_wid;
 				yPos /= td->tile_hgt;
 
@@ -4833,6 +4833,11 @@ static LRESULT FAR PASCAL AngbandWndProc(HWND hWnd, UINT uMsg,
 				{
 					highSensitivity = TRUE;
 					highTime = GetTickCount();
+
+					/* Save last location */
+					iMouse = 1;
+					xMouse = LOWORD(lParam);
+					yMouse = HIWORD(lParam);
 				}
 
 				/* We're sensitive */
