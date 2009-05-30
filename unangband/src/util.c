@@ -2588,8 +2588,8 @@ void messages_easy(bool command)
 
 				if ((ke.key == '\xff') && !(ke.mousebutton))
 				{
-					int y = KEY_GRID_Y(p_ptr->command_cmd_ex);
-					int x = KEY_GRID_X(p_ptr->command_cmd_ex);
+					int y = ke.mousey;
+					int x = ke.mousex;
 					int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
 					if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));

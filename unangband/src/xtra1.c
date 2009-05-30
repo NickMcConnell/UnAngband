@@ -2177,7 +2177,7 @@ static void fix_monlist(void)
 		Term_activate(angband_term[j]);
 
 		/* Display visible monsters */
-		display_monlist(0, 1, 0);
+		display_monlist(0, 1, FALSE, TRUE);
 
 		/* Fresh */
 		Term_fresh();

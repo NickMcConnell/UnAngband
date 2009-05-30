@@ -2208,7 +2208,6 @@ static void process_command(void)
 	{
 		/* Ignore */
 		case ESCAPE:
-		case ' ':
 		{
 			break;
 		}
@@ -2794,6 +2793,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Save "toggle monster list on or off" */
+		case ' ':
+		{
+			easy_monlist = !easy_monlist;
+			break;
+		}
+
 		/* Mouse interaction */
 		case '\xff':
 		{
@@ -3223,6 +3229,9 @@ static void process_player(void)
 		{
 			/* Check monster recall */
 			process_player_aux();
+
+			/* Display the monlist */
+			if (easy_monlist) display_monlist(1, 3, TRUE, FALSE);
 
 			/* Place the cursor on the player */
 			move_cursor_relative(p_ptr->py, p_ptr->px);

@@ -2472,18 +2472,23 @@ void do_cmd_query_symbol(void)
  */
 void do_cmd_monlist(void)
 {
-	/* Save the screen and display the list */
-	screen_save();
+	/* Hack -- cycling monster list sorting */
+	if (easy_monlist)
+	{
+		if (!op_ptr->monlist_sort_by) op_ptr->monlist_sort_by = 2;
+		else op_ptr->monlist_sort_by--;
+	}
 
-	if (!display_monlist(0, 3, 2))
+	if (!display_monlist(0, 3, TRUE, TRUE))
 	{
 		prt("You see nothing interesting.", 0, 0);
 	}
 
-	/* Wait */
-	anykey();
-
-	/* Return */
-	screen_load();
+	/* Hack -- cycling monster list sorting */
+	if ((!easy_monlist) && (p_ptr->command_new.key == '['))
+	{
+		if (!op_ptr->monlist_sort_by) op_ptr->monlist_sort_by = 2;
+		else op_ptr->monlist_sort_by--;
+	}
 }
 

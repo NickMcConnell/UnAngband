@@ -1064,10 +1064,10 @@ static const char *sort_by_name[]=
  *
  * Returns the width of the monster and/or object lists, or 0 if no monsters/objects are seen.
  */
-int display_monlist(int row, int types, int sort_by)
+int display_monlist(int row, int types, bool command, bool force)
 {
 	int idx, max;
-	int line = row;
+	int line;
 	int total_count, disp_count, status_count;
 	int forreal;
 
@@ -1089,6 +1089,9 @@ int display_monlist(int row, int types, int sort_by)
 	unsigned int n = 0, width = 0;
 
 	bool intro;
+	bool done = FALSE;
+
+	key_event ke;
 
 	/* Clear the term if in a subwindow, set x otherwise */
 	if (Term != angband_term[0])
@@ -1099,6 +1102,8 @@ int display_monlist(int row, int types, int sort_by)
 	else
 	{
 		max = Term->hgt - 2;
+
+		screen_save();
 	}
 
 	/* If hallucinating, we can't see any monsters */
@@ -1123,14 +1128,14 @@ int display_monlist(int row, int types, int sort_by)
 		/* Reset some values */
 		total_count = 0;
 		disp_count = 0;
-		line = 0;
+		line = row;
 		intro = TRUE;
 
 		/*
 		 * Iterate multiple times. We put monsters we can project to in the first list, then monsters we can see,
 		 * then monsters we are aware of through other means.
 		 */
-		if (types % 2) for (i = 0; i < 3; i++)
+		if (types % 2) for (i = 0; !done && i < 3; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1162,8 +1167,8 @@ int display_monlist(int row, int types, int sort_by)
 				status_count++;
 
 				/* Get maximum sort by */
-				if (!sort_by) max_sort = MAX(max_sort, m_ptr->cdis);
-				else if ((sort_by == 1) || (!l_list[m_ptr->r_idx].deaths))
+				if (!op_ptr->monlist_sort_by) max_sort = MAX(max_sort, m_ptr->cdis);
+				else if ((op_ptr->monlist_sort_by == 1) || (!l_list[m_ptr->r_idx].deaths))
 				{
 					max_sort = MAX(max_sort,r_info[m_ptr->r_idx].level);
 				}
@@ -1174,7 +1179,7 @@ int display_monlist(int row, int types, int sort_by)
 			}
 
 			/* Hack -- no ancestor deaths - demote to difficulty */
-			if ((sort_by == 2) && (max_sort <= 60)) sort_by = 1;
+			if ((op_ptr->monlist_sort_by == 2) && (max_sort <= 60)) op_ptr->monlist_sort_by = 1;
 
 			/* No visible monsters */
 			if (!status_count) continue;
@@ -1183,7 +1188,7 @@ int display_monlist(int row, int types, int sort_by)
 			sprintf(buf, "You %s%s %d monster%s:%s",
 				(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
 				status_count, (status_count > 1 ? "s" : ""),
-				intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+				intro ? format(" (by %s)", sort_by_name[op_ptr->monlist_sort_by]) : "");
 
 			if (forreal)
 			{
@@ -1196,10 +1201,10 @@ int display_monlist(int row, int types, int sort_by)
 			line++;
 
 			/* Iterate through sort */
-			for (j = sort_by ? max_sort : 0; sort_by ? j >= 0 : j <= max_sort; sort_by ? j-- : j++)
+			for (j = op_ptr->monlist_sort_by ? max_sort : 0; !done && (op_ptr->monlist_sort_by ? j >= 0 : j <= max_sort); op_ptr->monlist_sort_by ? j-- : j++)
 			{
 				/* Iterate over mon_list ( again :-/ ) */
-				for (idx = 1; idx < z_info->m_max; idx++)
+				for (idx = 1; !done && idx < z_info->m_max && (line < max); idx++)
 				{
 					int attr;
 
@@ -1216,9 +1221,9 @@ int display_monlist(int row, int types, int sort_by)
 					if (!race_counts[m_ptr->r_idx]) continue;
 
 					/* Skip races at the sort distance */
-					if (!sort_by && (m_ptr->cdis != j)) continue;
-					else if ((sort_by == 2) && (l_list[m_ptr->r_idx].deaths && (l_list[m_ptr->r_idx].deaths != j - 60))) continue;
-					else if ((sort_by) && (r_info[m_ptr->r_idx].level != j)) continue;
+					if (!op_ptr->monlist_sort_by && (m_ptr->cdis != j)) continue;
+					else if ((op_ptr->monlist_sort_by == 2) && (l_list[m_ptr->r_idx].deaths && (l_list[m_ptr->r_idx].deaths != j - 60))) continue;
+					else if ((op_ptr->monlist_sort_by) && (r_info[m_ptr->r_idx].level != j)) continue;
 
 					/* Get monster race */
 					r_ptr = &r_info[m_ptr->r_idx];
@@ -1326,16 +1331,42 @@ int display_monlist(int row, int types, int sort_by)
 					if ((Term == angband_term[0]) && (line == max) && (disp_count != total_count) && forreal)
 					{
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
-						anykey();
 
-						/* Clear the screen */
-						Term_erase(0, line, width + 1);
+						/* Get an acceptable keypress. */
+						while (1)
+						{
+							ke = inkey_ex();
+
+							if ((ke.key == '\xff') && !(ke.mousebutton))
+							{
+								int y = ke.mousey;
+								int x = ke.mousex;
+								int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
+
+								if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+
+								continue;
+							}
+
+							break;
+						}
+
+						screen_load();
+
+						/* Tried a command - avoid rest of list */
+						if (ke.key != ' ')
+						{
+							done = TRUE;
+							break;
+						}
+
+						screen_save();
 
 						/* Reprint Message */
 						sprintf(buf, "You %s%s %d monster%s:%s",
 							(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
 							status_count, (status_count > 1 ? "s" : ""),
-							intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+							intro ? format(" (by %s)", sort_by_name[op_ptr->monlist_sort_by]) : "");
 
 						Term_putstr(0, row, strlen(buf), TERM_WHITE, buf);
 						Term_erase(strlen(buf), row, width + 1 - strlen(buf));
@@ -1375,7 +1406,7 @@ int display_monlist(int row, int types, int sort_by)
 		}
 
 		/* Display items */
-		if (types / 2) for (i = 0; i < 2; i++)
+		if (types / 2) for (i = 0; !done && i < 2; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1415,7 +1446,7 @@ int display_monlist(int row, int types, int sort_by)
 				}
 
 				/* Get maximum sort by */
-				if (!sort_by) max_sort = MAX(max_sort, distance(p_ptr->py, p_ptr->px, o_ptr->iy, o_ptr->ix));
+				if (!op_ptr->monlist_sort_by) max_sort = MAX(max_sort, distance(p_ptr->py, p_ptr->px, o_ptr->iy, o_ptr->ix));
 				else
 				{
 					max_sort = MAX(max_sort, !(object_named_p(o_ptr)) ? 60 + o_ptr->tval : k_info[o_ptr->k_idx].level);
@@ -1429,7 +1460,7 @@ int display_monlist(int row, int types, int sort_by)
 			sprintf(buf, "You %s %d object%s:%s",
 				i ? "are aware of" : "can see",
 				status_count, (status_count > 1 ? "s" : ""),
-				intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+				intro ? format(" (by %s)", sort_by_name[op_ptr->monlist_sort_by]) : "");
 
 			if (forreal)
 			{
@@ -1442,10 +1473,10 @@ int display_monlist(int row, int types, int sort_by)
 			line++;
 
 			/* Iterate through sort */
-			for (j = sort_by ? max_sort : 0; sort_by ? j >= 0 : j <= max_sort; sort_by ? j-- : j++)
+			for (j = op_ptr->monlist_sort_by ? max_sort : 0; !done && (op_ptr->monlist_sort_by ? j >= 0 : j <= max_sort); op_ptr->monlist_sort_by ? j-- : j++)
 			{
 				/* Iterate over object_list ( again :-/ ) */
-				for (idx = 1; idx < z_info->o_max; idx++)
+				for (idx = 1; !done && (idx < z_info->o_max) && (line < max); idx++)
 				{
 					int attr;
 					object_type object_type_body;
@@ -1469,15 +1500,15 @@ int display_monlist(int row, int types, int sort_by)
 					else if (!kind_counts[o_ptr->k_idx]) continue;
 
 					/* Check whether we group object */
-					if (!sort_by)
+					if (!op_ptr->monlist_sort_by)
 					{
 						if (j != distance(p_ptr->py, p_ptr->px, o_ptr->iy, o_ptr->ix)) continue;
 					}
-					else if ((sort_by) && !(object_named_p(o_ptr)))
+					else if ((op_ptr->monlist_sort_by) && !(object_named_p(o_ptr)))
 					{
 						if (j != 60 + o_ptr->tval) continue;
 					}
-					else if (sort_by)
+					else if (op_ptr->monlist_sort_by)
 					{
 						if (j != k_info[o_ptr->k_idx].level) continue;
 					}
@@ -1589,16 +1620,42 @@ int display_monlist(int row, int types, int sort_by)
 					if ((Term == angband_term[0]) && (line == max) && (disp_count != total_count) && forreal)
 					{
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
-						anykey();
 
-						/* Clear the screen */
-						Term_erase(0, line, width + 1);
+						/* Get an acceptable keypress. */
+						while (1)
+						{
+							ke = inkey_ex();
+
+							if ((ke.key == '\xff') && !(ke.mousebutton))
+							{
+								int y = ke.mousey;
+								int x = ke.mousex;
+								int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
+
+								if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+
+								continue;
+							}
+
+							break;
+						}
+
+						screen_load();
+
+						/* Tried a command - avoid rest of list */
+						if (ke.key != ' ')
+						{
+							done = TRUE;
+							break;
+						}
+
+						screen_save();
 
 						/* Reprint Message */
 						sprintf(buf, "You %s %d object%s:%s",
 							i ? "are aware of" : "can see",
 							status_count, (status_count > 1 ? "s" : ""),
-							intro ? format(" (by %s)", sort_by_name[sort_by]) : "");
+							intro ? format(" (by %s)", sort_by_name[op_ptr->monlist_sort_by]) : "");
 
 						Term_putstr(0, row, strlen(buf), TERM_WHITE, buf);
 						Term_erase(strlen(buf), row, width + 1 - strlen(buf));
@@ -1609,10 +1666,12 @@ int display_monlist(int row, int types, int sort_by)
 						line = row + 1;
 					}
 				}
+
 			}
 
+
 			/* Others to be displayed */
-			if (forreal)
+			if (!done && forreal)
 			{
 				/* Print "and others" message if we're out of space */
 				if (disp_count != total_count)
@@ -1637,12 +1696,13 @@ int display_monlist(int row, int types, int sort_by)
 			intro = FALSE;
 		}
 
-		/* If displaying on the terminal, recenter on the player,
-		 * taking away the used up width on the left hand side */
+		/* If displaying on the terminal using the '[' command, recenter on the player,
+		 * taking away the used up width on the left hand side. Otherwise, recenter when
+		 * the player walks next to the display box. */
 		if (!forreal && (Term == angband_term[0]) && ((signed)width < SCREEN_WID) &&
-				(!center_player || (p_ptr->wx - p_ptr->px < (signed)width)))
+				(((force) && !(center_player)) ||
+				((p_ptr->px - p_ptr->wx <= (signed)width + 1) && (p_ptr->py - p_ptr->wy <= (signed)line + 1))))
 		{
-			/* Dangerous hack */
 			screen_load();
 
 			/* Use "modify_panel" */
@@ -1650,6 +1710,11 @@ int display_monlist(int row, int types, int sort_by)
 
 			/* Force redraw */
 			redraw_stuff();
+
+			/* Unable to place the player */
+			if ((!force) && (p_ptr->px - p_ptr->wx <= (signed)width + 1) && (p_ptr->py - p_ptr->wy <= (signed)7)) return (0);
+
+			if ((!force) && (p_ptr->py - p_ptr->wy <= (signed)line + 1)) max = p_ptr->py - p_ptr->wy - 1;
 
 			screen_save();
 		}
@@ -1662,6 +1727,50 @@ int display_monlist(int row, int types, int sort_by)
 		FREE(kind_counts);
 		FREE(unknown_counts);
 		FREE(artifact_counts);
+	}
+
+	/* Reload the screen if we got to end of the list */
+	if (!done)
+	{
+		/* Get an acceptable keypress. */
+		while (1)
+		{
+			ke = inkey_ex();
+
+			if ((ke.key == '\xff') && !(ke.mousebutton))
+			{
+				int y = ke.mousey;
+				int x = ke.mousex;
+				int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
+
+				if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+
+				continue;
+			}
+
+			break;
+		}
+
+		screen_load();
+	}
+
+	/* Display command prompt */
+	if (command)
+	{
+		Term_putstr(0, 0, -1, TERM_WHITE, "Command:");
+
+		/* Requeue command just pressed */
+		p_ptr->command_new = ke;
+
+		/* Hack -- Process "Escape"/"Spacebar"/"Return" */
+		if ((p_ptr->command_new.key == ESCAPE) ||
+			/*(p_ptr->command_new.key == ' ') ||*/
+			(p_ptr->command_new.key == '\r') ||
+			(p_ptr->command_new.key == '\n'))
+		{
+			/* Reset stuff */
+			p_ptr->command_new.key = 0;
+		}
 	}
 
 	return (width);

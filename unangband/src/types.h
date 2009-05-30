@@ -1589,8 +1589,9 @@ struct player_other
 	u32b window_flag[ANGBAND_TERM_MAX];    /* Window flags */
 
 	byte hitpoint_warn;     /* Hitpoint warning (0 to 9) */
-
 	byte delay_factor;      /* Delay factor (0 to 9) */
+	byte monlist_sort_by;	/* Monster list sorted by (0 to 3) */
+	byte unused;
 };
 
 
