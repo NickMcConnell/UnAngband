@@ -1068,6 +1068,7 @@ void display_monlist(int sort_by)
 	monster_race *r_ptr;
 
 	u16b *race_counts;
+	u16b *sleep_counts;
 
 	int i, j;
 
@@ -1099,8 +1100,9 @@ void display_monlist(int sort_by)
 	 */
 	for (forreal = 0; forreal < 2; forreal++)
 	{
-		/* Allocate the array again */
+		/* Allocate the array */
 		race_counts = C_ZNEW(z_info->r_max, u16b);
+		sleep_counts = C_ZNEW(z_info->r_max, u16b);
 
 		/* Reset some values */
 		total_count = 0;
@@ -1139,6 +1141,7 @@ void display_monlist(int sort_by)
 
 				/* Bump the count for this race */
 				race_counts[m_ptr->r_idx]++;
+				if (m_ptr->csleep) sleep_counts[m_ptr->r_idx]++;
 				total_count++;
 				status_count++;
 
@@ -1162,6 +1165,7 @@ void display_monlist(int sort_by)
 
 				/* Free up memory */
 				FREE(race_counts);
+				FREE(sleep_counts);
 
 				/* Done */
 				return;
@@ -1192,7 +1196,13 @@ void display_monlist(int sort_by)
 				/* Iterate over mon_list ( again :-/ ) */
 				for (idx = 1; idx < z_info->m_max; idx++)
 				{
+					int attr;
+
 					m_ptr = &m_list[idx];
+
+					/* Colour text based on wakefulness */
+					attr = sleep_counts[m_ptr->r_idx] == race_counts[m_ptr->r_idx] ? TERM_SLATE :
+											(sleep_counts[m_ptr->r_idx] ? TERM_L_WHITE : TERM_WHITE);
 
 					/* Only visible monsters */
 					if (!m_ptr->ml) continue;
@@ -1222,32 +1232,43 @@ void display_monlist(int sort_by)
 
 						if (forreal)
 						{
-							Term_putstr(0, line, strlen(buf), TERM_WHITE, buf);
-							Term_addstr(-1, TERM_WHITE, " ");
+							Term_putstr(0, line, strlen(buf), attr, buf);
+							Term_addstr(-1, attr, " ");
 
 							/* Display the entry itself */
-							Term_addstr(-1, TERM_WHITE, m_name);
+							Term_addstr(-1, attr, m_name);
 
 							/* XXX Need to pluralise this properly */
-							Term_addstr(-1, TERM_WHITE, "s");
+							Term_addstr(-1, attr, "s");
 						}
 
 						n+= strlen(buf) + 2;
+
+						if ((sleep_counts[m_ptr->r_idx]) && (sleep_counts[m_ptr->r_idx] < race_counts[m_ptr->r_idx]))
+						{
+							/* Add race count */
+							sprintf(buf, format(" (%d awake)", race_counts[m_ptr->r_idx] - sleep_counts[m_ptr->r_idx]));
+
+							/* Display the entry itself */
+							if (forreal) Term_addstr(-1, attr, buf);
+
+							n += strlen(buf);
+						}
 					}
 					/* Display single monsters */
-					else
+					else if (forreal)
 					{
 						/* Display the entry itself */
-						Term_putstr(0, line, n, TERM_WHITE, m_name);
+						Term_putstr(0, line, n, attr, m_name);
 					}
 
 
 					/* Append the "standard" attr/char info */
 					if (forreal)
 					{
-						Term_addstr(-1, TERM_WHITE, " ('");
+						Term_addstr(-1, attr, " ('");
 						Term_addch(r_ptr->d_attr, r_ptr->d_char);
-						Term_addstr(-1, TERM_WHITE, "')");
+						Term_addstr(-1, attr, "')");
 					}
 
 					n += 6;
@@ -1258,7 +1279,7 @@ void display_monlist(int sort_by)
 						if (forreal)
 						{
 							/* Append the "optional" attr/char info */
-							Term_addstr(-1, TERM_WHITE, "/('");
+							Term_addstr(-1, attr, "/('");
 
 							Term_addch(r_ptr->x_attr, r_ptr->x_char);
 						}
@@ -1276,7 +1297,7 @@ void display_monlist(int sort_by)
 							n++;
 						}
 
-						if (forreal) Term_addstr(-1, TERM_WHITE, "')");
+						if (forreal) Term_addstr(-1, attr, "')");
 						n += 6;
 					}
 
@@ -1288,6 +1309,7 @@ void display_monlist(int sort_by)
 
 					/* Don't display again */
 					race_counts[m_ptr->r_idx] = 0;
+					sleep_counts[m_ptr->r_idx] = 0;
 
 					/* Increase required width */
 					width = MAX(width, n);
@@ -1373,6 +1395,7 @@ void display_monlist(int sort_by)
 
 		/* Free the race counters */
 		FREE(race_counts);
+		FREE(sleep_counts);
 	}
 }
 
