@@ -1333,7 +1333,7 @@ int display_monlist(int row, int types, bool command, bool force)
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
 
 						/* Get an acceptable keypress. */
-						ke = inkey_ex();
+						ke = force ? anykey() : inkey_ex();
 
 						while ((ke.key == '\xff') && !(ke.mousebutton))
 						{
@@ -1615,7 +1615,7 @@ int display_monlist(int row, int types, bool command, bool force)
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
 
 						/* Get an acceptable keypress. */
-						ke = inkey_ex();
+						ke = force ? anykey() : inkey_ex();
 
 						while ((ke.key == '\xff') && !(ke.mousebutton))
 						{
@@ -1719,7 +1719,7 @@ int display_monlist(int row, int types, bool command, bool force)
 	if (!done)
 	{
 		/* Get an acceptable keypress. */
-		ke = inkey_ex();
+		ke = force ? anykey() : inkey_ex();
 
 		while ((ke.key == '\xff') && !(ke.mousebutton))
 		{
