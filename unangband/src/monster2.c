@@ -1373,7 +1373,7 @@ int display_monlist(int row, int types, bool command, bool force)
 			}
 
 			/* Others to be displayed */
-			if (forreal)
+			if (!done && forreal)
 			{
 				/* Print "and others" message if we're out of space */
 				if (disp_count != total_count)
