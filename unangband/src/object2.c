@@ -5722,7 +5722,6 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 				case 35:	tval_drop_idx = TV_SONG_BOOK; break;
 				case 36:	tval_drop_idx = TV_INSTRUMENT; break;
 				case 37:	tval_drop_idx = TV_RUNESTONE; break;
-				case 38:	tval_drop_idx = TV_BAG; break;
 			}
 
 			if (tval_drop_idx)
