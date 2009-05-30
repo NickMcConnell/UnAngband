@@ -5693,35 +5693,35 @@ P:0:1d1:0:0:0
 
 # Maps. Used to travel to locations in t_info.txt (By sval).
 
-N:692:& map~ to the mountain Caradhras
+N:692:to the mountain Caradhras
 G:?:U
 I:72:47:0
 W:20:0:5:250
 A:20/2
 P:0:0d0:0:0:0
 
-N:693:& map~ to the Paths of the Dead
+N:693:to the Paths of the Dead
 G:?:U
 I:72:50:0
 W:30:0:5:250
 A:30/2
 P:0:0d0:0:0:0
 
-N:694:& map~ to the citadel of Isengard
+N:694:to the citadel of Isengard
 G:?:U
 I:72:31:0
 W:20:0:5:250
 A:20/2
 P:0:0d0:0:0:0
 
-N:695:& map~ to Shelob's Lair
+N:695:to Shelob's Lair
 G:?:U
 I:72:56:0
 W:40:0:5:1250
 A:40/2
 P:0:0d0:0:0:0
 
-N:696:& map~ to Mount Doom
+N:696:to Mount Doom
 G:?:U
 I:72:62:0
 W:55:0:5:1500
@@ -5732,35 +5732,35 @@ P:0:0d0:0:0:0
 
 #$# 697 - Unused ###
 
-N:698:& map~ titled 'There and Back Again'
+N:698:titled 'There and Back Again'
 G:?:U
 I:72:25:0
 W:20:0:5:500
 A:20/2
 P:0:0d0:0:0:0
 
-N:699:& map~ to the ruins of Angmar
+N:699:to the ruins of Angmar
 G:?:U
 I:72:68:0
 W:20:0:5:500
 A:20/4
 P:0:0d0:0:0:0
 
-N:700:& map~ to the sunken city of Numenor
+N:700:to the sunken city of Numenor
 G:?:U
 I:72:64:0
 W:20:0:5:500
 A:20/2
 P:0:0d0:0:0:0
 
-N:701:& map~ to the temple of Elemental Evil
+N:701:to the temple of Elemental Evil
 G:?:U
 I:72:65:0
 W:20:0:5:500
 A:20/2
 P:0:0d0:0:0:0
 
-N:702:& map~ to the Crystal Castle
+N:702:to the Crystal Castle
 G:?:U
 I:72:66:0
 W:20:0:5:500
@@ -7164,7 +7164,7 @@ I:99:51:0
 W:40:0:0:500
 P:0:0d0:0:0:0
 
-N:893:& map~ to the door to Moria
+N:893:to the door to Moria
 G:?:U
 I:72:41:0
 W:20:0:5:250

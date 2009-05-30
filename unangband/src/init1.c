@@ -3908,6 +3908,7 @@ errr parse_k_info(char *buf, header *head)
 			case TV_PRAYER_BOOK:
 			case TV_MAGIC_BOOK:
 			case TV_SONG_BOOK:
+			case TV_MAP:
 
 				k_ptr->flags6 |= (TR6_MOD_NAME | TR6_FORCE_MOD);
 				break;
