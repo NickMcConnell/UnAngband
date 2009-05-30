@@ -1591,7 +1591,7 @@ struct player_other
 	byte hitpoint_warn;     /* Hitpoint warning (0 to 9) */
 	byte delay_factor;      /* Delay factor (0 to 9) */
 	byte monlist_sort_by;	/* Monster list sorted by (0 to 3) */
-	byte unused;
+	byte monlist_display;	/* Monster list displays what (1 to 3) */
 };
 
 

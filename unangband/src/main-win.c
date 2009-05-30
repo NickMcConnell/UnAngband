@@ -2338,7 +2338,7 @@ static int Term_xtra_win_grids(int v)
 
 	td->grid_display = v;
 
-	if (arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO)
+	if (use_graphics == GRAPHICS_DAVID_GERVAIS_ISO)
 	{
 		Term->always_draw = TRUE;
 	}
@@ -2702,7 +2702,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
          * Hack -- isometric location.
 	 * Note check on grid_display
          */
-	if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
+	if ((use_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display))
 	{
 		x = (x - COL_MAP);
 		y = (y - ROW_MAP);
@@ -2737,7 +2737,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	hdcSrc = CreateCompatibleDC(hdc);
 	hbmSrcOld = SelectObject(hdcSrc, infGraph.hBitmap);
 
-	if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (arg_graphics == GRAPHICS_DAVID_GERVAIS) || (arg_graphics == GRAPHICS_ADAM_BOLT))
+	if ((use_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (use_graphics == GRAPHICS_DAVID_GERVAIS) || (use_graphics == GRAPHICS_ADAM_BOLT))
 	{
 		hdcMask = CreateCompatibleDC(hdc);
 		SelectObject(hdcMask, infMask.hBitmap);
@@ -2767,7 +2767,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 		x1 = col * w1;
 		y1 = row * h1;
 
-		if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (arg_graphics == GRAPHICS_DAVID_GERVAIS) || (arg_graphics == GRAPHICS_ADAM_BOLT))
+		if ((use_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (use_graphics == GRAPHICS_DAVID_GERVAIS) || (use_graphics == GRAPHICS_ADAM_BOLT))
 		{
 			x3 = (tcp[i] & 0x7F) * w1;
 			y3 = (tap[i] & 0x7F) * h1;
@@ -2775,7 +2775,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 			/* Perfect size */
 			if ((w1 == tw2) && (h1 == th2))
 			{
-				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
+				if ((use_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
 				{
 					if (!(x))
 					{
@@ -2831,7 +2831,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 				/* Set the correct mode for stretching the tiles */
 				SetStretchBltMode(hdc, COLORONCOLOR);
 
-				if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
+				if ((use_graphics == GRAPHICS_DAVID_GERVAIS_ISO) && (td->grid_display) && ((x) || (y)))
 				{
 					if (!(x))
 					{
@@ -2906,7 +2906,7 @@ static errr Term_pict_win(int x, int y, int n, const byte *ap, const char *cp, c
 	SelectObject(hdcSrc, hbmSrcOld);
 	DeleteDC(hdcSrc);
 
-	if ((arg_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (arg_graphics == GRAPHICS_DAVID_GERVAIS) || (arg_graphics == GRAPHICS_ADAM_BOLT))
+	if ((use_graphics == GRAPHICS_DAVID_GERVAIS_ISO) || (use_graphics == GRAPHICS_DAVID_GERVAIS) || (use_graphics == GRAPHICS_ADAM_BOLT))
 	{
 		/* Release */
 		SelectObject(hdcMask, hbmSrcOld);
@@ -3016,8 +3016,13 @@ static void windows_map(void)
 	windows_map_aux();
 
 	/* Wait for a keypress, flush key buffer */
-	Term_inkey(&ke, TRUE, TRUE);
-	Term_flush();
+	while (1)
+	{
+		Term_inkey(&ke, TRUE, TRUE);
+		Term_flush();
+
+		if ((ke.key != '\xff') || (ke.mousebutton)) break;
+	}
 
 	/* Switch off the map display */
 	td->grid_display = old_display;

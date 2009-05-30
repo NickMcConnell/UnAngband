@@ -2475,19 +2475,27 @@ void do_cmd_monlist(void)
 	/* Hack -- cycling monster list sorting */
 	if (easy_monlist)
 	{
-		if (!op_ptr->monlist_sort_by) op_ptr->monlist_sort_by = 2;
+		if (!op_ptr->monlist_sort_by)
+		{
+			op_ptr->monlist_sort_by = 2;
+			if (op_ptr->monlist_display == 3) op_ptr->monlist_display = 1;
+			else op_ptr->monlist_display = 3;
+		}
 		else op_ptr->monlist_sort_by--;
 	}
 
-	if (!display_monlist(0, 3, TRUE, TRUE))
-	{
-		prt("You see nothing interesting.", 0, 0);
-	}
+	/* Display the monster list */
+	display_monlist(0, TRUE, TRUE);
 
 	/* Hack -- cycling monster list sorting */
 	if ((!easy_monlist) && (p_ptr->command_new.key == '['))
 	{
-		if (!op_ptr->monlist_sort_by) op_ptr->monlist_sort_by = 2;
+		if (!op_ptr->monlist_sort_by)
+		{
+			op_ptr->monlist_sort_by = 2;
+			if (op_ptr->monlist_display == 3) op_ptr->monlist_display = 1;
+			else op_ptr->monlist_display = 3;
+		}
 		else op_ptr->monlist_sort_by--;
 	}
 }

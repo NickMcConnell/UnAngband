@@ -1064,7 +1064,7 @@ static const char *sort_by_name[]=
  *
  * Returns the width of the monster and/or object lists, or 0 if no monsters/objects are seen.
  */
-int display_monlist(int row, int types, bool command, bool force)
+void display_monlist(int row, bool command, bool force)
 {
 	int idx, max;
 	int line;
@@ -1093,6 +1093,13 @@ int display_monlist(int row, int types, bool command, bool force)
 
 	key_event ke;
 
+	/* Hack -- initialise for the first time */
+	if (!op_ptr->monlist_display)
+	{
+		op_ptr->monlist_display = 3;
+		op_ptr->monlist_sort_by = 2;
+	}
+
 	/* Clear the term if in a subwindow, set x otherwise */
 	if (Term != angband_term[0])
 	{
@@ -1109,8 +1116,8 @@ int display_monlist(int row, int types, bool command, bool force)
 	/* If hallucinating, we can't see any monsters */
 	if (p_ptr->timed[TMD_IMAGE])
 	{
-		/*Term_putstr(0, line, 36, TERM_ORANGE, "You're too confused to see straight! ");*/
-		return (0);
+		Term_putstr(0, 0, 36, TERM_ORANGE, "You're too confused to see straight! ");
+		return;
 	}
 
 	/*
@@ -1135,7 +1142,7 @@ int display_monlist(int row, int types, bool command, bool force)
 		 * Iterate multiple times. We put monsters we can project to in the first list, then monsters we can see,
 		 * then monsters we are aware of through other means.
 		 */
-		if (types % 2) for (i = 0; !done && i < 3; i++)
+		if (op_ptr->monlist_display % 2) for (i = 0; !done && i < 3; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1312,7 +1319,7 @@ int display_monlist(int row, int types, bool command, bool force)
 					}
 
 					/* Erase the rest of the line */
-					if (forreal) Term_erase(n, line, width + 1 - n);
+					if (forreal) Term_erase(n + 1, line, width - n);
 
 					/* Add to monster counter */
 					disp_count += race_counts[m_ptr->r_idx];
@@ -1337,11 +1344,12 @@ int display_monlist(int row, int types, bool command, bool force)
 
 						while ((ke.key == '\xff') && !(ke.mousebutton))
 						{
-							int y = ke.mousey -1; /* ??? */
-							int x = ke.mousex;
+							int y = KEY_GRID_Y(ke);
+							int x = KEY_GRID_X(ke);
+
 							int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-							if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+							ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 						}
 
 						screen_load();
@@ -1399,7 +1407,7 @@ int display_monlist(int row, int types, bool command, bool force)
 		}
 
 		/* Display items */
-		if (types / 2) for (i = 0; !done && i < 2; i++)
+		if (op_ptr->monlist_display / 2) for (i = 0; !done && i < 2; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1585,7 +1593,7 @@ int display_monlist(int row, int types, bool command, bool force)
 					}
 
 					/* Erase the rest of the line */
-					if (forreal) Term_erase(n, line, width + 1 - n);
+					if (forreal) Term_erase(n + 1, line, width - n);
 
 					/* Visible artifact */
 					if (object_named_p(o_ptr) && o_ptr->name1)
@@ -1619,11 +1627,12 @@ int display_monlist(int row, int types, bool command, bool force)
 
 						while ((ke.key == '\xff') && !(ke.mousebutton))
 						{
-							int y = ke.mousey -1; /* ??? */
-							int x = ke.mousex;
+							int y = KEY_GRID_Y(ke);
+							int x = KEY_GRID_X(ke);
+
 							int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-							if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+							ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 						}
 
 						screen_load();
@@ -1692,13 +1701,14 @@ int display_monlist(int row, int types, bool command, bool force)
 			screen_load();
 
 			/* Use "modify_panel" */
-			modify_panel(p_ptr->py - (SCREEN_HGT) / 2, p_ptr->px - (SCREEN_WID + width) / 2);
-
-			/* Force redraw */
-			redraw_stuff();
+			if (modify_panel(p_ptr->py - (SCREEN_HGT) / 2, p_ptr->px - (SCREEN_WID + width) / 2))
+			{
+				/* Force redraw */
+				redraw_stuff();
+			}
 
 			/* Unable to place the player */
-			if ((!force) && (p_ptr->px - p_ptr->wx <= (signed)width + 1) && (p_ptr->py - p_ptr->wy <= (signed)7)) return (0);
+			if ((!force) && (p_ptr->px - p_ptr->wx <= (signed)width + 1) && (p_ptr->py - p_ptr->wy <= (signed)7)) return;
 
 			if ((!force) && (p_ptr->py - p_ptr->wy <= (signed)line + 1)) max = p_ptr->py - p_ptr->wy - 1;
 
@@ -1718,16 +1728,26 @@ int display_monlist(int row, int types, bool command, bool force)
 	/* Reload the screen if we got to end of the list */
 	if (!done)
 	{
+		if (!width && force)
+		{
+			prt(format("You see no %s%s%s. (by %s)",
+					op_ptr->monlist_display % 2 ? "monsters" : "",
+					op_ptr->monlist_display == 3 ? " or " : "",
+					op_ptr->monlist_display / 2 ? "objects" : "",
+					sort_by_name[op_ptr->monlist_sort_by]), 0, 0);
+		}
+
 		/* Get an acceptable keypress. */
 		ke = force ? anykey() : inkey_ex();
 
 		while ((ke.key == '\xff') && !(ke.mousebutton))
 		{
-			int y = ke.mousey -1; /* ??? */
-			int x = ke.mousex;
+			int y = KEY_GRID_Y(ke);
+			int x = KEY_GRID_X(ke);
+
 			int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-			if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+			ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 		}
 
 		screen_load();
@@ -1736,7 +1756,7 @@ int display_monlist(int row, int types, bool command, bool force)
 	/* Display command prompt */
 	if (command)
 	{
-		Term_putstr(0, 0, -1, TERM_WHITE, "Command:");
+		/*Term_putstr(0, 0, -1, TERM_WHITE, "Command:");*/
 
 		/* Requeue command just pressed */
 		p_ptr->command_new = ke;
@@ -1751,8 +1771,6 @@ int display_monlist(int row, int types, bool command, bool force)
 			p_ptr->command_new.key = 0;
 		}
 	}
-
-	return (width);
 }
 
 

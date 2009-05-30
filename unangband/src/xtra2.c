@@ -4519,10 +4519,10 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 			sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, name, info);
 			prt(out_val, 0, 0);
 			move_cursor_relative(y, x);
-			query = anykey();
+			query = inkey_ex();
 
 			/* Stop on everything but "return" */
-			if ((query.key != '\n') && (query.key != '\r')) break;
+			if ((query.key != '\n') && (query.key != '\r')) return (query);
 
 			/* Repeat forever */
 			continue;
@@ -4548,10 +4548,10 @@ key_event target_set_interactive_aux(int y, int x, int *room, int mode, cptr inf
 			sprintf(out_val, "%s%s%s%s [%s]", s1, s2, s3, name, info);
 			prt(out_val, 0, 0);
 			move_cursor_relative(y, x);
-			query = anykey();
+			query = inkey_ex();
 
 			/* Stop on everything but "return" */
-			if ((query.key != '\n') && (query.key != '\r')) break;
+			if ((query.key != '\n') && (query.key != '\r')) return (query);
 
 			/* Repeat forever */
 			continue;

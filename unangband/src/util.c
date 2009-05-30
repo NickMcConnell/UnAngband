@@ -1615,7 +1615,7 @@ key_event inkey_ex(void)
 
 
 	/* Show the cursor if waiting, except sometimes in "command" mode */
-	if (!inkey_scan && (!inkey_flag || hilite_player || character_icky))
+	if (!inkey_scan && (!inkey_flag || hilite_player /*|| character_icky*/))
 	{
 		/* Scan windows */
 		for (j = 0; j < ANGBAND_TERM_MAX; j++)
@@ -1794,7 +1794,7 @@ key_event inkey_ex(void)
 
 
 	/* Hide the cursor again */
-	if (!inkey_scan && (!inkey_flag || hilite_player || character_icky))
+	if (!inkey_scan && (!inkey_flag || hilite_player/* || character_icky*/))
 	{
 		/* Scan windows */
 		for (j = 0; j < ANGBAND_TERM_MAX; j++)
@@ -2589,11 +2589,12 @@ void messages_easy(bool command)
 			{
 				while ((ke.key == '\xff') && !(ke.mousebutton))
 				{
-					int y = ke.mousey;
-					int x = ke.mousex;
+					int yi = KEY_GRID_Y(ke);
+					int xi = KEY_GRID_X(ke);
+
 					int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-					if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+					ke = target_set_interactive_aux(yi, xi, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 				}
 		#if 0
 				if ((p_ptr->chp < warning) && (ke.key != 'c')) { bell("Press c to continue."); continue; }
