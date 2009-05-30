@@ -1333,22 +1333,15 @@ int display_monlist(int row, int types, bool command, bool force)
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
 
 						/* Get an acceptable keypress. */
-						while (1)
+						ke = inkey_ex();
+
+						while ((ke.key == '\xff') && !(ke.mousebutton))
 						{
-							ke = inkey_ex();
+							int y = ke.mousey -1; /* ??? */
+							int x = ke.mousex;
+							int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-							if ((ke.key == '\xff') && !(ke.mousebutton))
-							{
-								int y = ke.mousey-1; /* ??? */
-								int x = ke.mousex;
-								int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
-
-								if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
-
-								continue;
-							}
-
-							break;
+							if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 						}
 
 						screen_load();
@@ -1622,22 +1615,15 @@ int display_monlist(int row, int types, bool command, bool force)
 						Term_putstr(0, line, width+1, TERM_WHITE, "-- more --");
 
 						/* Get an acceptable keypress. */
-						while (1)
+						ke = inkey_ex();
+
+						while ((ke.key == '\xff') && !(ke.mousebutton))
 						{
-							ke = inkey_ex();
+							int y = ke.mousey -1; /* ??? */
+							int x = ke.mousex;
+							int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-							if ((ke.key == '\xff') && !(ke.mousebutton))
-							{
-								int y = ke.mousey-1; /* ??? */
-								int x = ke.mousex;
-								int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
-
-								if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
-
-								continue;
-							}
-
-							break;
+							if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 						}
 
 						screen_load();
@@ -1733,22 +1719,15 @@ int display_monlist(int row, int types, bool command, bool force)
 	if (!done)
 	{
 		/* Get an acceptable keypress. */
-		while (1)
+		ke = inkey_ex();
+
+		while ((ke.key == '\xff') && !(ke.mousebutton))
 		{
-			ke = inkey_ex();
+			int y = ke.mousey -1; /* ??? */
+			int x = ke.mousex;
+			int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
 
-			if ((ke.key == '\xff') && !(ke.mousebutton))
-			{
-				int y = ke.mousey -1; /* ??? */
-				int x = ke.mousex;
-				int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
-
-				if (in_bounds_fully(y, x)) target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
-
-				continue;
-			}
-
-			break;
+			if (in_bounds_fully(y, x)) ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 		}
 
 		screen_load();

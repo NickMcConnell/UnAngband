@@ -2833,7 +2833,7 @@ static void process_command(void)
 			}
 			else if (use_trackmouse && (easy_more || (auto_more && !easy_more)))
 			{
-				target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+				p_ptr->command_new = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 			}
 			break;
 		}
