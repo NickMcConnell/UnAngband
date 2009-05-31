@@ -3230,11 +3230,11 @@ static void process_player(void)
 			/* Check monster recall */
 			process_player_aux();
 
-			/* Place the cursor on the player */
-			move_cursor_relative(p_ptr->py, p_ptr->px);
-
 			/* Display the monlist */
 			if (easy_monlist) display_monlist(1, TRUE, FALSE);
+
+			/* Place the cursor on the player */
+			move_cursor_relative(p_ptr->py, p_ptr->px);
 
 			/* Get a command (normal) */
 			request_command(FALSE);
