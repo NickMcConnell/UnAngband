@@ -446,7 +446,7 @@ monlist_type *monlist_copy_object_to_screen(int idx, u16b *index_counts, u16b *i
 /*
  * Creates a list of sorted indexes
  */
-monlist_type *monlist_sort_index(int sort_by, int max, int idx_max, monlist_type *monlist, bool *intro,
+void *monlist_sort_index(int sort_by, int max, int idx_max, monlist_type **monlist_groups, bool *intro,
 		const char* index_name, int header_offset, int monlist_get_index(int idx), int monlist_get_count(int idx),
 		bool monlist_check_grouping(int idx, int group_by), bool monlist_check_secondary(int idx),
 		int monlist_get_order(int idx, int sort_by),
@@ -464,12 +464,8 @@ monlist_type *monlist_sort_index(int sort_by, int max, int idx_max, monlist_type
 	u16b *index_counts;
 	u16b *index2_counts;
 
-	monlist_type *first_monlist;
 	monlist_type *last_monlist;
-
-	/* Start of list */
-	first_monlist = monlist;
-	last_monlist = monlist;
+	monlist_type *monlist;
 
 	/* Allocate the counter arrays */
 	index_counts = C_ZNEW(idx_max, u16b);
@@ -478,6 +474,9 @@ monlist_type *monlist_sort_index(int sort_by, int max, int idx_max, monlist_type
 	/* Go through the groupings for the monster list */
 	for (i = 0; i < MONLIST_GROUP_BY_MAX; i++)
 	{
+		/* Start of list */
+		last_monlist = monlist_groups[header_offset * MONLIST_GROUP_BY_MAX + i];
+
 		/* Reset status count */
 		status_count = 0;
 		max_order = 0;
@@ -522,9 +521,9 @@ monlist_type *monlist_sort_index(int sort_by, int max, int idx_max, monlist_type
 		monlist->attr = TERM_WHITE;
 
 		/* Head of list? */
-		if (!first_monlist)
+		if (!last_monlist)
 		{
-			first_monlist = monlist;
+			last_monlist = monlist;
 		}
 		/* Add as child */
 		else
@@ -581,12 +580,9 @@ monlist_type *monlist_sort_index(int sort_by, int max, int idx_max, monlist_type
 	/* Free the counters */
 	FREE(index_counts);
 	FREE(index2_counts);
-
-	return (first_monlist);
 }
 
 
-#if 0
 /* Display the list */
 bool display_monlist_rows(monlist_type *monlist, int row, int line, int width, bool force)
 {
@@ -609,7 +605,7 @@ bool display_monlist_rows(monlist_type *monlist, int row, int line, int width, b
 		}
 
 		/* Unable to place the player */
-		if ((!force) && (p_ptr->px - p_ptr->wx <= (signed)width + 1) && (p_ptr->py - p_ptr->wy <= (signed)line + 1)) return (FALSE);
+		if ((!force) && (p_ptr->px - p_ptr->wx <= (signed)width + 1) && (p_ptr->py - p_ptr->wy <= (signed)line + 1)) return (TRUE);
 
 		screen_save();
 	}
@@ -624,7 +620,7 @@ bool display_monlist_rows(monlist_type *monlist, int row, int line, int width, b
 		monlist = monlist->next;
 	}
 
-	return (TRUE);
+	return (FALSE);
 }
 
 
@@ -655,202 +651,6 @@ key_event display_monlist_interact(monlist_type *monlist, int row, int line, int
 
 
 /*
- * Displays a list of sorted indexes
- */
-key_event monlist_display_indexes(int sort_by, int max, int idx_max, int *total_count, int row, int *line, int *width,
-		const char* index_name, int header_offset, bool *intro, bool *done, bool force, monlist_type *monlist_screen,
-		int monlist_get_index(int idx), int monlist_get_count(int idx), bool monlist_check_grouping(int idx, int group_by),
-		bool monlist_check_secondary(int idx), int monlist_get_order(int idx, int sort_by),
-		int monlist_copy_to_screen(int idx, int line, monlist_type *monlist_screen, u16b *index_counts, u16b *index2_counts)
-)
-{
-	int idx;
-
-	int i, j, k;
-	int status_count;
-	int max_order;
-
-	int disp_count = 0;
-
-	char buf[80];
-
-	u16b *index_counts;
-	u16b *index2_counts;
-
-	key_event ke;
-
-	/* Allocate the counter arrays */
-	index_counts = C_ZNEW(idx_max, u16b);
-	index2_counts = C_ZNEW(idx_max, u16b);
-
-	/* Go through the groupings for the monster list */
-	for (i = 0; !*done && (i < MONLIST_GROUP_BY_MAX); i++)
-	{
-		/* Reset status count */
-		status_count = 0;
-		max_order = 0;
-
-		/* Iterate over index list */
-		for (idx = 1; idx < max; idx++)
-		{
-			/* Not in this grouping */
-			if (!monlist_check_grouping(idx, i)) continue;
-
-			/* Bump the count for this index */
-			index_counts[monlist_get_index(idx)] += monlist_get_count(idx);
-
-			/* Bump the secondary count if qualifies */
-			if (monlist_check_secondary(idx)) index2_counts[monlist_get_index(idx)] += monlist_get_count(idx);
-
-			/* Increase the counters */
-			*total_count += monlist_get_count(idx);
-
-			/* We have an index */
-			status_count++;
-
-			/* Efficiency - Get maximum sort by */
-			max_order = MAX(max_order, monlist_get_order(idx, sort_by));
-		}
-
-		/* No visible monsters */
-		if (!status_count) continue;
-
-		/* Set up the buffer */
-		my_strcpy(buf, format("You %s%s %d %s%s:%s",
-			(i < 2) ? "can see" : "are aware of", (i == 1) ? " but not shoot" : "",
-			status_count, index_name, (status_count > 1 ? "s" : ""),
-			*intro ? format(" (by %s)", sort_by_name[sort_by]) : ""), sizeof(buf));
-
-		/* Copy the buffer */
-		*width = MAX(*width, monlist_copy_buffer_to_screen(buf, monlist_screen, *line));
-
-		/* Set up the screen line */
-		monlist_screen[*line].row_type = MONLIST_HEADER_SEEN_MONSTER + header_offset * MONLIST_GROUP_BY_MAX + i;
-		monlist_screen[*line].number = status_count;
-		monlist_screen[*line].attr = TERM_WHITE;
-
-		/* Increase line number */
-		line++;
-
-		/* Iterate through sort */
-		for (j = sort_by ? max_order : 0; !*done && (sort_by ? j >= 0 : j <= max_order); sort_by ? j-- : j++)
-		{
-			/* Iterate over mon_list ( again :-/ ) */
-			for (idx = 1; !*done && idx < max && (*line < max); idx++)
-			{
-				/* Do each race only once */
-				if (!index_counts[monlist_get_index(idx)]) continue;
-
-				/* Check the monster is valid */
-				if (!monlist_check_grouping(idx, j)) continue;
-
-				/* Copy to the screen */
-				monlist_copy_to_screen(idx, *line, monlist_screen, index_counts, index2_counts);
-
-				/* Increase line number */
-				*line++;
-
-				/* Add to monster counter */
-				disp_count += index_counts[monlist_get_index(idx)];
-
-				/* Don't display again */
-				index_counts[monlist_get_index(idx)] = 0;
-				index2_counts[monlist_get_index(idx)] = 0;
-
-				/* Page wrap */
-				if ((*line == max) && (disp_count != *total_count))
-				{
-					/* Format the others */
-					my_strcpy(buf, "-- more --", sizeof(buf));
-
-					/* Copy the buffer */
-					*width = MAX(*width, monlist_copy_buffer_to_screen(buf, monlist_screen, *line));
-
-					/* Set up the screen line */
-					monlist_screen[*line].row_type = MONLIST_MORE;
-					monlist_screen[*line].attr = TERM_WHITE;
-
-					/* Increase line number */
-					*line++;
-
-					/* Display the list */
-					if (display_monlist_rows(monlist_screen, row, *line, *width, force))
-					{
-						*done = TRUE;
-					}
-
-					/* Interact with the list */
-					if (Term == angband_term[0])
-					{
-						ke = display_monlist_interact(monlist_screen, row, *line, *width, done, force);
-					}
-
-					/* Free strings - except header */
-					for (k = row + *done ? 0 : 1; k < *line; k++)
-					{
-						FREE(monlist_screen[*line].text);
-					}
-
-					/* Reset */
-					*line = row + 1;
-					width = 0;
-
-					/* Finished - reload the screen */
-					if (*done)
-					{
-						screen_load();
-						break;
-					}
-				}
-			}
-		}
-
-		/* Others to be displayed */
-		if (!*done)
-		{
-			/* Print "and others" message if we're out of space */
-			if (disp_count != *total_count)
-			{
-				/* Format the others */
-				my_strcpy(buf, format("  ...and %d others.", total_count - disp_count), sizeof(buf));
-
-				/* Copy the buffer */
-				*width = MAX(*width, monlist_copy_buffer_to_screen(buf, monlist_screen, *line));
-
-				/* Set up the screen line */
-				monlist_screen[*line].row_type = MONLIST_OTHER_SEEN_MONSTER + header_offset * MONLIST_GROUP_BY_MAX + i;
-				monlist_screen[*line].number = *total_count - disp_count;
-				monlist_screen[*line].attr = TERM_WHITE;
-
-				/* We've displayed the others */
-				disp_count = *total_count;
-			}
-
-			/* Put a shadow */
-			else
-			{
-				monlist_screen[*line].row_type = MONLIST_BLANK;
-			}
-
-			/* Increase line number */
-			line++;
-		}
-
-		/* Introduced? */
-		*intro = FALSE;
-	}
-
-	/* Free the counters */
-	FREE(index_counts);
-	FREE(index2_counts);
-
-	return (ke);
-}
-#endif
-
-
-
-/*
  * Display visible monsters and/or objects in a window
  *
  * Row is the row to start displaying the list from.
@@ -876,15 +676,25 @@ key_event monlist_display_indexes(int sort_by, int max, int idx_max, int *total_
 void display_monlist(int row, bool command, bool force)
 {
 	int line = row, max_row;
-
-	monlist_type *monlist = NULL;
+	int top = 0;
+	int group = 0;
 
 	int sort_by = op_ptr->monlist_sort_by;
 
 	bool intro = TRUE;
 	bool done = FALSE;
+	int disp_count, total_count;
+	int width;
 
 	key_event ke;
+
+	monlist_type *monlist_groups[MONLIST_GROUP_BY_MAX * 3];
+	monlist_type *monlist_screen;
+	monlist_type *monlist;
+
+	int i, j;
+
+	char buf[80];
 
 	/* Hack -- initialise for the first time */
 	if (!op_ptr->monlist_display)
@@ -920,7 +730,7 @@ void display_monlist(int row, bool command, bool force)
 	if (op_ptr->monlist_display % MONLIST_DISPLAY_MONSTER)
 	{
 		/* Add to the list */
-		monlist = monlist_sort_index(sort_by, z_info->m_max, z_info->r_max, monlist, &intro, "monster", 0,
+		monlist_sort_index(sort_by, z_info->m_max, z_info->r_max, monlist_groups, &intro, "monster", 0,
 				monlist_get_monster_index, monlist_get_monster_count, monlist_check_monster_grouping,
 				monlist_check_monster_secondary, monlist_get_monster_order, monlist_copy_monster_to_screen);
 
@@ -940,7 +750,7 @@ void display_monlist(int row, bool command, bool force)
 	if ((!done) && (op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT)))
 	{
 		/* Add to the list */
-		monlist = monlist_sort_index(sort_by, z_info->o_max, z_info->k_max, monlist, &intro, "object", 0,
+		monlist_sort_index(sort_by, z_info->o_max, z_info->k_max, monlist_groups, &intro, "object", 0,
 				monlist_get_object_index, monlist_get_object_count, monlist_check_object_grouping,
 				monlist_check_object_secondary, monlist_get_object_order, monlist_copy_object_to_screen);
 	}
@@ -948,84 +758,149 @@ void display_monlist(int row, bool command, bool force)
 	/* Display features */
 	if ((!done) && (op_ptr->monlist_display & (MONLIST_DISPLAY_FEATURE)))
 	{
-		/* Display the objects */
-		monlist = monlist_sort_index(sort_by, z_info->o_max, z_info->k_max, monlist, &intro, "object", 0,
-				monlist_get_object_index, monlist_get_object_count, monlist_check_object_grouping,
-				monlist_check_object_secondary, monlist_get_object_order, monlist_copy_object_to_screen);
+		/* Add to the list */
+		monlist_sort_index(sort_by, MAX_RANGE * MAX_RANGE * 4, z_info->f_max, monlist_groups, &intro, "notable feature", 0,
+				monlist_get_feature_index, monlist_get_feature_count, monlist_check_feature_grouping,
+				monlist_check_feature_secondary, monlist_get_feature_order, monlist_copy_feature_to_screen);
 	}
 #endif
 
-#if 0
-	/* Display the list */
-	if (!done && display_monlist_rows(monlist_screen, row, line, width, force))
-	{
-		done = FALSE;
-	}
 
-	/* Interact with the list */
-	if (!done && Term == angband_term[0])
-	{
-		ke = display_monlist_interact(monlist_screen, row, line, width, &done, force);
+	/* Allocate space for the screen display */
+	monlist_screen = C_ZNEW(max_row - row, monlist_type);
 
-		/* Finished - reload the screen */
-		if (done)
+	/* Loop */
+	while (!done)
+	{
+		/* Restart from top */
+		total_count = 0;
+		disp_count = 0;
+		group = 0;
+		j = 0;
+		width = 0;
+
+		/* Copy monster list to screen */
+		for (i = 0, group = 0; group < MONLIST_GROUP_BY_MAX * 3; )
 		{
-			screen_load();
+			/* Get first in the group */
+			monlist = monlist_groups[group++];
+
+			/* Get monster list */
+			while ((monlist) && (i < max_row - row))
+			{
+				/* Add to the screen */
+				if (j >= top)
+				{
+					COPY(monlist_screen, monlist, monlist_type);
+					disp_count += monlist->number;
+					width = MAX(width, monlist->len);
+				}
+
+				/* Increase total count */
+				total_count += monlist->number;
+
+				/* Get the next monster */
+				monlist = monlist->next;
+				i++; j++;
+			}
+
+			/* Get remaining undisplayed */
+			while (monlist)
+			{
+				total_count += monlist->number;
+				monlist = monlist->next;
+			}
 		}
-	}
-#endif
-	/* Notice nothing */
-	if (!monlist)
-	{
-		prt(format("You see no %s%s%s%s%s. (by %s)",
-				op_ptr->monlist_display & (MONLIST_DISPLAY_MONSTER) ? "monsters" : "",
-				(op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_MONSTER)) ==
-					(MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_MONSTER) ?" or " : "",
-				op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT) ? "objects" : "",
-				(op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_FEATURE)) ==
-					(MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_FEATURE) ?" or " : "",
-				op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT) ? "notable features" : "",
-				sort_by_name[sort_by]), row, 0);
-	}
 
-	if (Term == angband_term[0])
-	{
-		/* Get an acceptable keypress. */
-		ke = force ? anykey() : inkey_ex();
-
-		while ((ke.key == '\xff') && !(ke.mousebutton))
+		/* Print "--- more ---" prompt if required */
+		if ((Term == angband_term[0]) && (disp_count != total_count))
 		{
-			int y = KEY_GRID_Y(ke);
-			int x = KEY_GRID_X(ke);
+			/* Format the others */
+			my_strcpy(buf, "-- more --", sizeof(buf));
 
-			int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
+			/* Copy the buffer */
+			monlist_copy_buffer_to_screen(buf, &monlist_screen[i]);
 
-			ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+			/* Set up the screen line */
+			monlist_screen[i].row_type = MONLIST_MORE;
+			monlist_screen[i].attr = TERM_WHITE;
+
+			/* Fake backing up. This allows us to print the 'others' prompt below. */
+			i--;
+		}
+		/* Put a shadow */
+		else
+		{
+			monlist_screen[i].row_type = MONLIST_BLANK;
+			i++;
 		}
 
-		/* Reload the screen */
-		screen_load();
+		/* Print "and others" message if we're out of space */
+		if (disp_count != total_count)
+		{
+			/* XXX Back up one */
+			i--;
+			disp_count -= monlist_screen[i].number;
+
+			/* Format the others */
+			my_strcpy(buf, format("  ...and %d others.", total_count - disp_count), sizeof(buf));
+
+			/* Copy the buffer */
+			monlist_copy_buffer_to_screen(buf, &monlist_screen[i]);
+
+			/* Set up the screen line */
+			monlist_screen[i].row_type = monlist_screen[i-1].row_type + MONLIST_GROUP_BY_MAX * 3;
+			monlist_screen[i].number = total_count - disp_count;
+			monlist_screen[i].attr = TERM_WHITE;
+
+			/* We've displayed the others */
+			disp_count = total_count;
+
+			/* Increase line */
+			i++;
+		}
+
+		/* Notice nothing */
+		if (!total_count)
+		{
+			prt(format("You see no %s%s%s%s%s. (by %s)",
+					op_ptr->monlist_display & (MONLIST_DISPLAY_MONSTER) ? "monsters" : "",
+					(op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_MONSTER)) ==
+						(MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_MONSTER) ?" or " : "",
+					op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT) ? "objects" : "",
+					(op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_FEATURE)) ==
+						(MONLIST_DISPLAY_OBJECT | MONLIST_DISPLAY_FEATURE) ?" or " : "",
+					op_ptr->monlist_display & (MONLIST_DISPLAY_OBJECT) ? "notable features" : "",
+					sort_by_name[sort_by]), row, 0);
+
+			done = TRUE;
+		}
+		else
+		{
+			/* Display the list */
+			done = display_monlist_rows(monlist_screen, row, row + i, width, force);
+		}
+
+		/* Interact further with the list */
+		if (Term == angband_term[0])
+		{
+			ke = display_monlist_interact(monlist_screen, row, line, width, &done,force);
+		}
+		else
+			done = TRUE;
 	}
 
-	/* Display command prompt */
-	if (command)
+	/* Note we don't free the text here */
+	FREE(monlist_screen);
+
+	/* Release monster groups */
+	for (i = 0; i < MONLIST_GROUP_BY_MAX * 3; i++)
 	{
-		/*Term_putstr(0, 0, -1, TERM_WHITE, "Command:");*/
-
-		/* Requeue command just pressed */
-		p_ptr->command_new = ke;
-
-		/* Hack -- Process "Escape"/"Spacebar"/"Return" */
-		if ((p_ptr->command_new.key == ESCAPE) ||
-			/*(p_ptr->command_new.key == ' ') ||*/
-			(p_ptr->command_new.key == '\r') ||
-			(p_ptr->command_new.key == '\n'))
-		{
-			/* Reset stuff */
-			p_ptr->command_new.key = 0;
-		}
+		free_monlist(monlist_groups[i]);
 	}
 }
+
+
 
 
 
