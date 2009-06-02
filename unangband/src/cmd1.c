@@ -3122,7 +3122,11 @@ void py_attack(int dir)
 					}
 					case TR5_DO_TRIP:
 					{
-						do_trip = i;
+						if (i) do_trip = 60 / num_blows;
+
+						/* XXX 1 energy is equivalent to one damage. */
+						if (do_trip > i) do_trip = i;
+						else k += i - do_trip;
 						break;
 					}
 					default:
@@ -3261,6 +3265,28 @@ void py_attack(int dir)
 					m_ptr->cut = 255;
 				}
 				else m_ptr->cut += do_cuts / (r_ptr->level / 10 + 1);
+			}
+
+			/* Trip - rob monster of energy */
+			if (do_trip)
+			{
+				if (fumble)
+				{
+					/* Fumble trip - finish attacking immediately */
+					blows = num_blows;
+				}
+				else
+				{
+					/* Adjust energy */
+					int energy = m_ptr->energy - do_trip;
+
+					/* Set bounds */
+					/*if (energy > 250) energy = 250;*/
+					if (energy <   0) energy =   0;
+
+					/* Apply to monster */
+					m_ptr->energy = (byte)energy;
+				}
 			}
 
 			/* Fumble - damage self */

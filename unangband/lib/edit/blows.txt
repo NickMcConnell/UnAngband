@@ -676,7 +676,7 @@ T:0-9999:create~ * around &
 W:3:0:0
 R:1+1/10
 M:1
-F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC | SAFE |
+F:BOOM | WALL | AREA | GRID | ITEM | KILL | PLAY | MAGIC |
 F:RANGED |
 D:affect~ @ area#:
 

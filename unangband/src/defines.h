@@ -2996,6 +2996,7 @@ enum
 
 #define SOURCE_PREFIX			-11	/* Less than here or equal to here, we suffix the string, otherwise we prefix it */
 #define SOURCE_PLAYER_START		-13	/* Less than here or equal to here, player is the source, and gets experience */
+#define SOURCE_PLAYER_SAFE		-28	/* Less than here or equal to here, player cannot hurt themselves with safe attacks */
 #define SOURCE_PLAYER_NO_TARGET	-30	/* Less than here or equal to here, no target is specified and some messages are suppressed.
 									 * Note that all items less than here that could specify a target always have a 'known' effect. */
 

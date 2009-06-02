@@ -5680,9 +5680,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* No monster here */
 	if (!(cave_m_idx[y][x] > 0)) return (FALSE);
 
-	/* Never affect projector */
-	if (cave_m_idx[y][x] == who) return (FALSE);
-
 	/* Obtain monster info */
 	m_ptr = &m_list[cave_m_idx[y][x]];
 
@@ -13701,6 +13698,14 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			{
 			 	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
 
+				/* Safe projections */
+				if (flg & (PROJECT_SAFE))
+				{
+					/* Skip the monster */
+					if (cave_m_idx[y][x] == who) continue;
+					if ((who == SOURCE_MONSTER_START) && (cave_m_idx[y][x] == what)) continue;
+				}
+
 				/* Hack -- handle resist magic. Deeper monsters are more resistant to spells.
 				 * All monsters are more resistant to devices and spells from each other. */
 				if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
@@ -13755,6 +13760,13 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			/* Player is in this grid */
 			if (cave_m_idx[y][x] < 0)
 			{
+				/* Safe projections */
+				if (flg & (PROJECT_SAFE))
+				{
+					/* Skip the player - note: allies still affect the player with 'safe' effects */
+					if (who <= SOURCE_PLAYER_SAFE) continue;
+				}
+
 				/* Affect the player */
 				if (project_p(who, what, y, x, gd[i], typ))
 				{

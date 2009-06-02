@@ -83,7 +83,7 @@ M:Q:8
 M:i:44
 
 # Maximum number of region pieces
-M:p:1024
+M:p:2048
 
 # Maximum number of regions
 M:r:64

@@ -7971,6 +7971,15 @@ void compact_region_pieces(int size)
 
 
 /*
+ * This gets set when we max out region pieces.
+ * As the player reduces regions by disarming them,
+ * we then attempt to regenerate some regions that
+ * may previously not had any contents.
+ */
+bool region_piece_limit;
+
+
+/*
  * Get an available region piece
  */
 s16b region_piece_pop(void)
@@ -8014,7 +8023,15 @@ s16b region_piece_pop(void)
 
 
 	/* Warn the player */
-	msg_print("Too many region pieces!");
+	if (cheat_xtra)
+	{
+		msg_print("Too many region pieces!");
+
+		/* We use a global to track when it might be possible
+		 * to regenerate some regions.
+		 */
+		region_piece_limit = TRUE;
+	}
 
 	/* Oops */
 	return (0);
@@ -9812,6 +9829,15 @@ void process_region(s16b region)
 		update = TRUE;
 	}
 
+	/* We've freed up some regions. Allow regions to regenerate
+	 * if required.
+	 */
+	if ((region_piece_limit) && (region_piece_max * 5 / 4 < z_info->region_piece_max)
+			&& !(r_ptr->first_piece))
+	{
+		update = TRUE;
+	}
+
 	/* Update the region if required */
 	if ((update) && (r_ptr->flags1& (RE1_PROJECTION)))
 	{
@@ -9881,6 +9907,16 @@ void process_regions(void)
 		process_region(i);
 	}
 
+	/*
+	 * We've finished freeing up enough regions.
+	 */
+	if ((region_piece_limit) && (region_piece_max * 5 / 4 < z_info->region_piece_max))
+	{
+		region_piece_limit = FALSE;
+	}
+
+/* We've fixed the code that this check was used for */
+#if 0
 	/* Warn if we get orphaned pieces */
 	for (i = 0; i < z_info->region_piece_max; i++)
 	{
@@ -9893,6 +9929,7 @@ void process_regions(void)
 		/* Skip empty effects */
 		if (!r_ptr->type) msg_format("Piece %d is orphaned from %d.", i, region);
 	}
+#endif
 }
 
 

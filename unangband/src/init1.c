@@ -3776,12 +3776,19 @@ errr parse_k_info(char *buf, header *head)
 			case TV_ARROW:
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
+				k_ptr->flags5 |= (TR5_DO_CRIT);
 				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_ROPE);
 				break;
 			case TV_SHOT:
+				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+				k_ptr->flags5 |= (TR5_SHOW_DD);
+				k_ptr->flags5 |= (TR5_DO_STUN);
+				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_CHAIN);
+			break;
 			case TV_BOLT:
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
+				k_ptr->flags5 |= (TR5_DO_CRIT);
 				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_CHAIN);
 			break;
 
@@ -3801,13 +3808,22 @@ errr parse_k_info(char *buf, header *head)
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_DO_CUTS);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
+				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 				break;
 
 			case TV_HAFTED:
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
-				k_ptr->flags5 |= (TR5_DO_STUN);
+				if (!(strstr(k_name + k_ptr->name, "taff")))
+				{
+					k_ptr->flags5 |= (TR5_DO_STUN);
+				}
+				else
+				{
+					k_ptr->flags5 |= (TR5_DO_TRIP);
+				}
 				k_ptr->flags6 |= (TR6_BAD_THROW);
+				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 				break;
 
 			case TV_POLEARM:
@@ -3815,22 +3831,19 @@ errr parse_k_info(char *buf, header *head)
 
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
-				k_ptr->flags5 |= (TR5_DO_CUTS);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
-				break;
-#if 0
+				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
+
 				/* Hack -- spears do damaging criticals, axes stun or cut */
-				if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Axe"))
-					&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Halberd"))
-					&& !(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe")))
-					k += critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
-				else if (!(strstr(k_name + k_info[o_ptr->k_idx].name, "Scythe"))
-					&& (rand_int(100) < 50))
-					do_stun = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+				if (!(strstr(k_name + k_ptr->name, "xe"))
+					&& !(strstr(k_name + k_ptr->name, "alberd"))
+					&& !(strstr(k_name + k_ptr->name, "cythe")))
+					k_ptr->flags5 |= (TR5_DO_CRIT);
+				else if (!(strstr(k_name + k_ptr->name, "cythe")))
+					k_ptr->flags5 |= (TR5_DO_CUTS | TR5_DO_STUN);
 				else
-					do_cuts = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+					k_ptr->flags5 |= (TR5_DO_CUTS);
 				break;
-#endif
 
 			case TV_FOOD:
 				/* Ordinary food is "boring". */
@@ -3931,7 +3944,7 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_GLOVES:
-				k_ptr->flags5 |= (TR5_SHOW_DD);
+				if ((k_ptr->ds) && (k_ptr->dd)) k_ptr->flags5 |= (TR5_SHOW_DD);
 
 				/* Fall through */
 
