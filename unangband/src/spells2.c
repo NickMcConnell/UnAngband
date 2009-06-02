@@ -458,6 +458,9 @@ void uncurse_object(object_type *o_ptr)
 	/* Uncurse it */
 	o_ptr->ident &= ~(IDENT_CURSED);
 
+	/* Break it */
+	o_ptr->ident |= (IDENT_BROKEN);
+
 	/* Take note */
 	o_ptr->feeling = INSCRIP_UNCURSED;
 
@@ -1533,19 +1536,19 @@ int value_check_aux5(const object_type *o_ptr)
 	{
 		if (o_ptr->feeling == INSCRIP_NONMAGICAL) return (INSCRIP_CURSED);
 
-		return (INSCRIP_UNUSUAL);
+		return (INSCRIP_MAGIC_ITEM);
 	}
 
 	/* Good "armor" bonus */
 	if (o_ptr->to_a > 0)
 	{
-		return (INSCRIP_UNUSUAL);
+		return (INSCRIP_MAGIC_ITEM);
 	}
 
 	/* Good "weapon" bonus */
 	if (o_ptr->to_h + o_ptr->to_d > 0)
 	{
-		return (INSCRIP_UNUSUAL);
+		return (INSCRIP_MAGIC_ITEM);
 	}
 
 	/* Default to nothing */

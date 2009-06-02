@@ -625,7 +625,7 @@ F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | HIDE | SAFE |
 D:surround~ & with @ aura#:$ enemies
 
 N:71:8WAY
-T:0-9999:throw~ a ragged ball of * at & 
+T:0-9999:throw~ a ragged ball of * at &
 W:4:0:0
 R:2
 M:20
@@ -1467,11 +1467,11 @@ F:HEARD | SCALE_RADIUS | LARGE_RADIUS |
 D::
 
 N:140:BALL_NETHR
-T:40-9999:call~ up a storm of * magics around & 
+T:40-9999:call~ up a storm of * magics around &
 T:40-9999:intones with deadly menace
 T:10-39:cast~ @ * ball at &
 T:10-39:murmur~ a deadly word
-T:0-9:cast~ an orb of * at & 
+T:0-9:cast~ an orb of * at &
 T:0-9:whisper~ nastily
 I:0:6:0
 W:6:0:0
@@ -1484,11 +1484,11 @@ F:HEARD |
 D::
 
 N:141:BALL_CHAOS
-T:40-9999:call~ up a storm of * around & 
+T:40-9999:call~ up a storm of * around &
 T:40-9999:chant~ powerfully
 T:13-39:cast~ casts an exlosion of raw * at &
 T:13-39:murmur~ deeply
-T:0-12:cast~ an orb of * at & 
+T:0-12:cast~ an orb of * at &
 T:0-12:mumble~
 I:0:4:0
 W:7:0:0
@@ -1501,11 +1501,11 @@ F:HEARD |
 D::
 
 N:142:BALL_MANA
-T:50-9999:call~ up a storm of * around & 
+T:50-9999:call~ up a storm of * around &
 T:50-9999:chant~ powerfully
 T:25-49:cast~ @ * ball at &
 T:25-49:murmur~ deeply
-T:0-24:cast~ @ * burst at & 
+T:0-24:cast~ @ * burst at &
 T:0-24:mumble~
 I:0:8:0
 W:7:0:0
@@ -1518,13 +1518,13 @@ F:HEARD |
 D::
 
 N:143:BALL_WATER
-T:120-9999:invoke~ a storm of * around & 
+T:120-9999:invoke~ a storm of * around &
 T:120-9999:chant~ powerfully
-T:40-119:invoke~ a storm of * around & 
+T:40-119:invoke~ a storm of * around &
 T:40-119:chant~ powerfully
 T:15-39:cast~ @ * ball at &
 T:15-39:murmur~ deeply
-T:0-14:cast~ a small * ball at & 
+T:0-14:cast~ a small * ball at &
 T:0-14:mumble~
 I:0:6:0
 W:7:0:0
@@ -1539,7 +1539,7 @@ D::
 N:144:BOLT_ACID
 T:50-9999:cast~ @ bolt of * at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:4:0:0
@@ -1553,7 +1553,7 @@ D::
 N:145:BOLT_ELEC
 T:50-9999:cast~ @ bolt of * at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ bolt of electricity at & 
+T:0-49:cast~ @ bolt of electricity at &
 T:0-49:mumble~
 I:0:6:0
 W:4:0:0
@@ -1567,7 +1567,7 @@ D::
 N:146:BOLT_FIRE
 T:50-9999:cast~ @ fiery sphere at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:4:0:0
@@ -1581,7 +1581,7 @@ D::
 N:147:BOLT_COLD
 T:50-9999:cast~ @ * bolt at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:4:0:0
@@ -1595,7 +1595,7 @@ D::
 N:148:BOLT_POIS
 T:50-9999:cast~ @ bolt of venom at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:4:0:0
@@ -1609,7 +1609,7 @@ D::
 N:149:BOLT_PLAS
 T:50-9999:cast~ @ bolt of * at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:5:0:0
@@ -1623,7 +1623,7 @@ D::
 N:150:BOLT_ICE
 T:50-9999:cast~ @ bolt of * at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ a * bolt at & 
+T:0-49:cast~ a * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:5:0:0
@@ -1637,7 +1637,7 @@ D::
 N:151:BOLT_WATER
 T:50-9999:cast~ @ * bolt at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:mumble~
 I:0:6:0
 W:5:0:0
@@ -1649,9 +1649,9 @@ F:HEARD |
 D::
 
 N:152:BOLT_NETHR
-T:50-9999:hurls a black bolt of * at & 
+T:50-9999:hurls a black bolt of * at &
 T:50-9999:murmur~ a deadly word
-T:0-49:cast~ @ * bolt at & 
+T:0-49:cast~ @ * bolt at &
 T:0-49:whisper~ nastily
 I:0:6:0
 W:5:0:0
@@ -1663,7 +1663,7 @@ F:HEARD |
 D::
 
 N:153:BOLT_MANA
-T:50-9999:cast~ @ * bolt at & 
+T:50-9999:cast~ @ * bolt at &
 T:50-9999:murmur~ deeply
 T:0-49:cast~ @ magic missile at &
 T:0-49:mumble~
@@ -1681,7 +1681,7 @@ T:40-9999:cast~ a large orb of holy might at &
 T:40-9999:chant~ powerfully
 T:15-39:cast~ a powerful orb of draining at &
 T:15-39:murmur~ deeply
-T:0-14:cast~ an orb of draining at & 
+T:0-14:cast~ an orb of draining at &
 T:0-14:mumble~
 I:0:8:0
 W:5:0:0
@@ -1707,7 +1707,7 @@ D::
 N:156:BEAM_ICE
 T:50-9999:cast~ an icy lance at &
 T:50-9999:murmur~ deeply
-T:0-49:cast~ an icy lance at & 
+T:0-49:cast~ an icy lance at &
 T:0-49:mumble~
 I:0:6:0
 W:6:0:0

@@ -1932,7 +1932,7 @@ int get_food_type(const monster_race *r_ptr)
 		if (strstr(name, "Green ")) return (SV_FOOD_NAIVETY+1);
 		if (strstr(name, "Rotting ")) return (SV_FOOD_UNHEALTH+1);
 		if (strstr(name, "Brown ")) return (SV_FOOD_DISEASE+1);
-		if (strstr(name, "Shrieker ")) return (SV_FOOD_CURE_PARANOIA+1);
+		if (strstr(name, "Shrieker ")) return ((rand_int(100)<30?SV_FOOD_HASTE+1:SV_FOOD_CURE_PARANOIA+1));
 		if (strstr(name, "Noxious ")) return (SV_FOOD_DISEASE+1);
 		if (strstr(name, "Magic ")) return ((rand_int(100)<30?SV_FOOD_MANA+1:SV_FOOD_HALLUCINATION+1));
 

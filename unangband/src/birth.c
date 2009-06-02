@@ -716,10 +716,12 @@ static void player_outfit(void)
 			    i_ptr->ident |= (IDENT_CURSED);
 			    i_ptr->can_flags3 |= (TR3_LIGHT_CURSE);
 			  }
+			/* Other items are fully known */
 			else
 			  {
 			    object_aware(i_ptr, FALSE);
 			    object_known(i_ptr);
+			    object_mental(i_ptr, FALSE);
 			  }
 
 			/* Check the slot */

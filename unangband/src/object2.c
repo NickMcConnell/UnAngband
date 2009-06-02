@@ -1376,6 +1376,8 @@ s32b object_value(const object_type *o_ptr)
 
 		/* Real value (see above) */
 		value = object_value_real(o_ptr);
+
+		return (value);
 	}
 
 	/* Unknown items -- acquire a base value */
@@ -1418,10 +1420,6 @@ s32b object_value(const object_type *o_ptr)
 
 		/* Base value (see above) */
 		else value = object_value_base(o_ptr);
-
-		return (value  + 1000L);
-
-
 
 		/* Hack -- assess known pval */
 		if (object_pval_p(o_ptr))
@@ -2275,7 +2273,9 @@ void object_prep(object_type *o_ptr, int k_idx)
 			o_ptr->ident |= (IDENT_CURSED);
 		}
 #endif
-		else if (rand_int(100) < 30) o_ptr->ident |= (IDENT_CURSED);
+		/* Generate cursed items deeper in the dungeon */
+		else if (rand_int(75) < p_ptr->depth) o_ptr->ident |= (IDENT_CURSED);
+		/* Otherwise item is easily removable */
 		else o_ptr->ident |= (IDENT_BROKEN);
 	}
 	else if (k_ptr->flags3 & (TR3_UNCONTROLLED))
@@ -4332,7 +4332,7 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	switch (sense_type)
 	{
 		case 1:
-			feel = heavy ? value_check_aux1(o_ptr) : value_check_aux2(o_ptr);
+			feel = heavy ? value_check_aux1(o_ptr) : value_check_aux11(o_ptr);
 			break;
 		case 2:
 			feel = heavy ? value_check_aux2(o_ptr) : value_check_aux11(o_ptr);
@@ -4366,8 +4366,10 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 			break;
 	}
 
-	/* Rings and amulets: Only sense curses/artifacts. Note almost all feelings except unusual will correctly distinguish this. */
-	if (((o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET)) && (feel == INSCRIP_UNUSUAL)) return(0);
+	/* Rings and amulets: Only sense curses/artifacts. */
+	if (((o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET)) &&
+		/* Rings and amulets only distinguish cursed vs not cursed */
+			((feel == INSCRIP_UNUSUAL) || (feel == INSCRIP_MAGIC_ITEM) || (feel == INSCRIP_AVERAGE))) return(0);
 
 	if (feel == old_feel) return(0);
 
@@ -5690,16 +5692,16 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		else
 		{
 			/* Pick a random tval. Consumables twice as frequent. */
-			switch (rand_int(23 + 5 * (object_level / 3)) - 5)
+			switch (rand_int(18 + 5 * (object_level / 3)))
 			{
-				case 0: case 1:	tval_drop_idx = TV_FOOD; break;
-				case 2:	case 3: tval_drop_idx = TV_MUSHROOM; break;
-				case 4: case 5:	tval_drop_idx = TV_POTION; break;
-				case 6: case 7:	tval_drop_idx = TV_SCROLL; break;
-				case 8: tval_drop_idx = TV_FLASK; break;
-				case 9: case 10:	tval_drop_idx = TV_ARROW; break;
-				case 11: case 12:	tval_drop_idx = TV_BOLT; break;
-				case 13: case 14: tval_drop_idx = TV_SHOT; break;
+				case 5: case 6:	tval_drop_idx = TV_FOOD; break;
+				case 7:	case 8: tval_drop_idx = TV_MUSHROOM; break;
+				case 9: tval_drop_idx = TV_POTION; break;
+				case 10: tval_drop_idx = TV_SCROLL; break;
+				case 11: tval_drop_idx = TV_FLASK; break;
+				case 12:	tval_drop_idx = TV_SHOT; break;
+				case 13:	tval_drop_idx = TV_ARROW; break;
+				case 14: tval_drop_idx = TV_BOLT; break;
 				case 15:	tval_drop_idx = TV_GLOVES; break;
 				case 16:	tval_drop_idx = TV_BOOTS; break;
 				case 17:	tval_drop_idx = TV_CLOAK; break;
@@ -5791,9 +5793,10 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		{
 			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = damroll(3, 4);
 			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = damroll(2, 3);
+			else j_ptr->number = (byte)randint(3);
 
 			/* Hack -- reduce stack sizes of deep items */
-			j_ptr->number /= (k_info[j_ptr->k_idx].level / 25) + 1;
+			j_ptr->number /= (k_info[j_ptr->k_idx].level / 15) + 1;
 
 			if (j_ptr->number < 1) j_ptr->number = 1;
 			break;
@@ -5813,8 +5816,6 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		{
 			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = (byte)randint(5);
 			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = (byte)randint(3);
-
-			if (j_ptr->number < 1) j_ptr->number = 1;
 			break;
 		}
 		default:

@@ -10087,18 +10087,18 @@ static bool build_type20(int room, int type)
 			{
 				cave_ecology.race[j] = cave_ecology.race[cave_ecology.num_races - 1];
 				cave_ecology.num_races--;
-				
+
 				/* Need to recheck swapped in race */
 				j--;
 			}
 		}
 	}
-		
+
 	/* Need at least 3 different races in pit */
 	if (ecology_start + 2 >= cave_ecology.num_races)
 	{
 		cave_ecology.num_races = ecology_start;
-		
+
 		return(FALSE);
 	}
 
@@ -12032,8 +12032,8 @@ static bool place_contents()
 		alloc_object(ALLOC_SET_ROOM, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ROOM * (((level_flag & (LF1_STRONGHOLD)) != 0) ? 2 : 1), 3));
 
 		/* Put some objects/gold in the dungeon */
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * (((level_flag & (LF1_CRYPT)) != 0) ? 4 : 1), 3));
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* (((level_flag & (LF1_MINE)) != 0) ? 4 : 1), 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * (((level_flag & (LF1_CRYPT)) != 0) ? 2 : 1), 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* (((level_flag & (LF1_MINE)) != 0) ? 2 : 1), 3));
 	}
 
 	/* Successfully placed some stuff */

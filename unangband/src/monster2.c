@@ -1319,7 +1319,7 @@ void display_monlist(int row, bool command, bool force)
 					}
 
 					/* Erase the rest of the line */
-					if (forreal) Term_erase(n + 1, line, width - n);
+					if (forreal) Term_erase(n, line, width - n + 1);
 
 					/* Add to monster counter */
 					disp_count += race_counts[m_ptr->r_idx];
@@ -1593,7 +1593,7 @@ void display_monlist(int row, bool command, bool force)
 					}
 
 					/* Erase the rest of the line */
-					if (forreal) Term_erase(n + 1, line, width - n);
+					if (forreal) Term_erase(n, line, width - n + 1);
 
 					/* Visible artifact */
 					if (object_named_p(o_ptr) && o_ptr->name1)

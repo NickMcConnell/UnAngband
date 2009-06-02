@@ -3574,9 +3574,6 @@ static void calc_bonuses(void)
 	if (k > 10) p_ptr->tiring = k - 10;
 	else p_ptr->tiring = 0;
 
-	/* Hack -- temporary speed tires the player out quickly */
-	if (p_ptr->timed[TMD_FAST]) p_ptr->tiring += PY_REST_RATE;
-
 	/* Apply "encumbrance" from weight */
 	if (j > i/2) p_ptr->pspeed -= ((j - (i/2)) / (i / 10));
 

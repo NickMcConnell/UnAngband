@@ -1934,7 +1934,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"good",
 	"excellent",
 	"special",
-	"uncursed",
+	"not cursed",
 	"very good",
 	"great",
 	"superb",
@@ -1942,7 +1942,7 @@ const cptr inscrip_text[MAX_INSCRIP] =
 	"ungettable",
 	"nonmagical",
 	"magical",
-	"powerful",
+	"magic item",
 	"ego item",
 	"high ego item",
 	"artifact",
@@ -2860,10 +2860,10 @@ const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2] =
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
 	/* Bag of Antidotes - holds low powered curing potions */
-	{ {75, 26}, {75, 27}, {75, 28}, {75, 31},
-	  {75, 30}, {75, 34}, {75, 35}, {75, 41},
-	  {75, 47}, {75, 60}, {75, 61}, {75, 62},
-	  {75, 64}, {75, 68}, {75, 71}, {75, 83},
+	{ {75, 26}, {75, 27}, {75, 31}, {75, 30},
+	  {75, 34}, {75, 35}, {75, 41}, {75, 47},
+	  {75, 60}, {75, 61}, {75, 62}, {75, 64},
+	  {75, 68}, {75, 71}, {75, 83}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
 	/* Bag of Philtres - holds medium power potions */
@@ -2883,8 +2883,8 @@ const s16b bag_holds[SV_BAG_MAX_BAGS][INVEN_BAG_TOTAL][2] =
 	/* Bag of Helpful Mushrooms - holds helpful mushrooms */
 	{ {79, 12}, {79, 13}, {79, 14}, {79, 15},
 	  {79, 16}, {79, 17}, {79, 18}, {79, 19},
-	  {79, 20}, {79, 21}, {79, 22}, {0, 0},
-	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
+	  {79, 20}, {79, 21}, {79, 22}, {79, 23},
+	  {79, 24}, {79, 25}, {79, 26}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0}, {0, 0},
 	  {0, 0}, {0, 0}, {0, 0} },
 	/* Bag of Scrying - holds identify / detect scrolls */
