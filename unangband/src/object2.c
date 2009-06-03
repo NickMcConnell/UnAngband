@@ -1396,9 +1396,43 @@ s32b object_value(const object_type *o_ptr)
 			object_copy(j_ptr, o_ptr);
 
 			/* Remove unknown information */
-			if (!object_bonus_p(o_ptr)) { j_ptr->to_h = 0; j_ptr->to_d = 0; j_ptr->to_a = 0; }
+			if (!object_bonus_p(o_ptr))
+			{
+				if (o_ptr->name1)
+				{
+					j_ptr->to_h = a_info[o_ptr->name1].to_h;
+					j_ptr->to_d = a_info[o_ptr->name2].to_d;
+					j_ptr->to_a = a_info[o_ptr->name3].to_a;
+				}
+				else if (o_ptr->name2)
+				{
+					j_ptr->to_h = e_info[o_ptr->name2].max_to_h / 2;
+					j_ptr->to_d = e_info[o_ptr->name2].max_to_d / 2;
+					j_ptr->to_a = e_info[o_ptr->name2].max_to_a / 2;
+				}
+				else
+				{
+					j_ptr->to_h = k_info[o_ptr->to_h].to_h;
+					j_ptr->to_d = k_info[o_ptr->to_d].to_d;
+					j_ptr->to_a = k_info[o_ptr->to_a].to_a;
+				}
+			}
 			if (!object_charges_p(o_ptr)) j_ptr->charges = 0;
-			if (!object_pval_p(o_ptr)) j_ptr->pval = 0;
+			if (!object_pval_p(o_ptr))
+			{
+				if (o_ptr->name1)
+				{
+					j_ptr->pval = a_info[o_ptr->name1].pval;
+				}
+				else if (o_ptr->name2)
+				{
+					j_ptr->pval = e_info[o_ptr->name2].max_pval / 2;
+				}
+				else
+				{
+					j_ptr->pval = k_info[o_ptr->to_h].pval;
+				}
+			}
 			j_ptr->ident &= ~(IDENT_CURSED | IDENT_BROKEN);
 
 			/* Hack -- get 'real' value */
