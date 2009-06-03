@@ -179,7 +179,8 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 		/* Display a list of spells */
 		if (cast) print_spells(book, num, 1, 20);
-		else print_powers(book, num, 1, 20);
+		else print_powers(book, num, 1, 20, o_ptr->name1 ? a_info[o_ptr->name1].level :
+		(o_ptr->name2 ? e_info[o_ptr->name2].level : k_info[o_ptr->k_idx].level));
 	}
 
 	/* Build a prompt (accept all spells) */
@@ -225,7 +226,8 @@ int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known)
 
 				/* Display a list of spells */
 				if (cast) print_spells(book, num, 1, 20);
-				else print_powers(book, num, 1, 20);
+				else print_powers(book, num, 1, 20, o_ptr->name1 ? a_info[o_ptr->name1].level :
+				(o_ptr->name2 ? e_info[o_ptr->name2].level : k_info[o_ptr->k_idx].level));
 			}
 
 			/* Ask again */

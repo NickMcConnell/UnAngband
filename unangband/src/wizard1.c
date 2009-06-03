@@ -163,7 +163,7 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 	object_prep(i_ptr, k);
 
 	/* Obtain the "kind" info */
-	k_ptr = &k_info[i_ptr->k_idx];
+	k_ptr = &k_info[k];
 
 	/* It is known */
 	i_ptr->ident |= (IDENT_KNOWN);
@@ -269,7 +269,7 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 	/* Power */
 	else if (book[0])
 	{
-		spell_info(pow,pow_s, book[0],0);
+		spell_info(pow,pow_s, book[0],k_info[k].level);
 	}
 
 }

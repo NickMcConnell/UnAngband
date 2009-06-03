@@ -1901,15 +1901,11 @@ bool spell_desc(spell_type *s_ptr, const cptr intro, int level, bool detail, int
  *
  * Note they do not take account of modifiers to player level.
  */
-void spell_info(char *p, int p_s, int spell, bool use_level)
+void spell_info(char *p, int p_s, int spell, int level)
 {
 	spell_type *s_ptr = &s_info[spell];
 
 	int m;
-
-	int level = spell_power(spell);
-
-	if (!use_level) level = 0;
 
 	/* Default */
 	my_strcpy(p, "", p_s);
@@ -3873,7 +3869,9 @@ void list_object(const object_type *o_ptr, int mode)
 						bool tmp;
 
 						/* List powers */
-						tmp = spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",0,detail, vt[n]);
+						tmp = spell_desc(&s_info[book[i]],(i==0) ? (vd[n] ? " and ": vp[n]) : " or ",
+								o_ptr->name1 ? a_info[o_ptr->name1].level : (o_ptr->name2 ?
+									e_info[o_ptr->name2].level : k_info[o_ptr->k_idx].level),detail, vt[n]);
 
 						/* Any output */
 						powers |= tmp;
@@ -4282,7 +4280,7 @@ void list_object(const object_type *o_ptr, int mode)
 /*
  * Print a list of powers (for selection).
  */
-void print_powers(const s16b *book, int num, int y, int x)
+void print_powers(const s16b *book, int num, int y, int x, int level)
 {
 	int i, spell;
 
@@ -4315,7 +4313,7 @@ void print_powers(const s16b *book, int num, int y, int x)
 		process_spell_prepare(spell, 25, &dummy, FALSE, FALSE);
 
 		/* Get extra info */
-		spell_info(info, sizeof(info), spell, FALSE);
+		spell_info(info, sizeof(info), spell, level);
 
 		/* Use that info */
 		comment = info;
@@ -4396,7 +4394,7 @@ void print_spells(const s16b *sn, int num, int y, int x)
 		process_spell_prepare(spell, spell_power(spell), &dummy, FALSE, FALSE);
 
 		/* Get extra info */
-		spell_info(info, sizeof(info), spell, TRUE);
+		spell_info(info, sizeof(info), spell, spell_power(spell));
 
 		/* Get level */
 		level = spell_level(spell);

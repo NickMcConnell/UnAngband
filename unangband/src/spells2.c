@@ -5505,15 +5505,7 @@ static int spell_damage(spell_blow *blow_ptr, int level, u32b flg, bool player, 
 		/* Add level dependent damage */
 		if (blow_ptr->l_plus)
 		{
-			/* Mega-hack - dispel evil/undead etc. */
-			if (!level)
-			{
-				damage += blow_ptr->l_plus * 25 / blow_ptr->levels;
-			}
-			else
-			{
-				damage += blow_ptr->l_plus * level / blow_ptr->levels;
-			}
+			damage += blow_ptr->l_plus * level / blow_ptr->levels;
 		}
 
 		/* Add boosted damage */
@@ -5857,7 +5849,7 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
  *
  *      We should allow useful spells to be cast on adjacent monsters. XXX
  *
- *      We should make summoned monsters friendly if plev is > 0. XXX
+ *      We should make summoned monsters friendly. XXX
  *
  */
 bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten)
@@ -5880,7 +5872,7 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 	retarget_blows_eaten = eaten;
 
 	/* Cast the spell */
-	return (process_spell_target(who, what, py, px, py, px, spell, level, 1, one_grid, TRUE, TRUE, cancel, retarget_blows) != 0);
+	return (process_spell_target(who, what, py, px, py, px, spell, level, 1, one_grid, TRUE, who == (SOURCE_PLAYER_CAST), cancel, retarget_blows) != 0);
 }
 
 

@@ -4668,7 +4668,7 @@ C:5:9:8:40:3
 C:8:9:8:40:3
 C:11:5:4:30:4
 P:490:0
-B:AIM:HOLY_ORB:3d6
+B:AIM:HOLY_ORB:3d6+1d6/9
 
 N:399:Ring of Power (Bad)
 A:45:37:1
