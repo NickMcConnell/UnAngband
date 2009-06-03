@@ -1433,7 +1433,25 @@ s32b object_value(const object_type *o_ptr)
 					j_ptr->pval = k_info[o_ptr->to_h].pval;
 				}
 			}
-			j_ptr->ident &= ~(IDENT_CURSED | IDENT_BROKEN);
+
+			/* Try curse analysis */
+			if (o_ptr->name1)
+			{
+				if (a_info[o_ptr->name1].flags3 & (TR3_LIGHT_CURSE | TR3_HEAVY_CURSE | TR3_PERMA_CURSE | TR3_UNCONTROLLED))
+					j_ptr->ident |= (IDENT_CURSED);
+			}
+			else if (o_ptr->name2)
+			{
+				if (e_info[o_ptr->name2].flags3 & (TR3_LIGHT_CURSE | TR3_HEAVY_CURSE | TR3_PERMA_CURSE | TR3_UNCONTROLLED))
+					j_ptr->ident |= (IDENT_CURSED);
+			}
+			else
+			{
+				if (k_info[o_ptr->k_idx].flags3 & (TR3_LIGHT_CURSE | TR3_HEAVY_CURSE | TR3_PERMA_CURSE | TR3_UNCONTROLLED))
+					j_ptr->ident |= (IDENT_CURSED);
+				else
+					j_ptr->ident &= ~(IDENT_CURSED | IDENT_BROKEN);
+			}
 
 			/* Hack -- get 'real' value */
 			value = object_value_real(j_ptr);
