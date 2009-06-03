@@ -1380,11 +1380,10 @@ s32b object_value(const object_type *o_ptr)
 	else
 	{
 		/* Hack -- Felt broken items */
-		if (o_ptr->ident & (IDENT_SENSE)
-			 && (o_ptr->feeling == INSCRIP_TERRIBLE
+		if (o_ptr->feeling == INSCRIP_TERRIBLE
 				  || o_ptr->feeling == INSCRIP_WORTHLESS
 				  || o_ptr->feeling == INSCRIP_CURSED
-				  || o_ptr->feeling == INSCRIP_BROKEN))
+				  || o_ptr->feeling == INSCRIP_BROKEN)
 			return (0L);
 
 		/* Named value (use 'real' value and attempt to hack) */
@@ -1400,6 +1399,7 @@ s32b object_value(const object_type *o_ptr)
 			if (!object_bonus_p(o_ptr)) { j_ptr->to_h = 0; j_ptr->to_d = 0; j_ptr->to_a = 0; }
 			if (!object_charges_p(o_ptr)) j_ptr->charges = 0;
 			if (!object_pval_p(o_ptr)) j_ptr->pval = 0;
+			j_ptr->ident &= ~(IDENT_CURSED | IDENT_BROKEN);
 
 			/* Hack -- get 'real' value */
 			value = object_value_real(j_ptr);
