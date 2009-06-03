@@ -1639,8 +1639,6 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 	/* Scan all objects */
 	for (i = 1; i < o_max; i++)
 	{
-		int feel = 0;
-
 		object_type *o_ptr = &o_list[i];
 
 		/* Skip dead objects */
@@ -1684,17 +1682,12 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 		/* Sense if necessary */
 		if (sense_type)
 		{
-			/* Get the inscription */
-			feel = sense_magic(o_ptr, sense_type, TRUE, TRUE);
-
 			/* Sense something */
-			if (!feel) continue;
-
-			/* Sense the object */
-			o_ptr->feeling = feel;
-
-			/* The object has been "sensed" */
-			o_ptr->ident |= (IDENT_SENSE);
+			if (sense_magic(o_ptr, sense_type, TRUE, TRUE))
+			{
+				/* Auto-id average items */
+				if (o_ptr->feeling == INSCRIP_AVERAGE) object_bonus(o_ptr, TRUE);
+			}
 		}
 	}
 
@@ -1706,28 +1699,20 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 		object_type *o_ptr = &inventory[i];
 
 		/* Get the inscription */
-		feel = sense_magic(o_ptr, sense_type, TRUE, TRUE);
+		if (sense_magic(o_ptr, sense_type, TRUE, TRUE))
+		{
+			/* Detect */
+			if (o_ptr->feeling != ignore_feeling) detect = TRUE;
 
-		/* Sense something */
-		if (!feel) continue;
+			/* Auto-id average items */
+			if (feel == INSCRIP_AVERAGE) object_bonus(o_ptr, TRUE);
 
-		/* Any different */
-		if (o_ptr->feeling == feel) continue;
+			/* Combine / Reorder the pack (later) */
+			p_ptr->notice |= (PN_COMBINE | PN_REORDER);
 
-		/* Detect */
-		if (feel != ignore_feeling) detect = TRUE;
-
-		/* Sense the object */
-		o_ptr->feeling = feel;
-
-		/* The object has been "sensed" */
-		o_ptr->ident |= (IDENT_SENSE);
-
-		/* Combine / Reorder the pack (later) */
-		p_ptr->notice |= (PN_COMBINE | PN_REORDER);
-
-		/* Window stuff */
-		p_ptr->window |= (PW_INVEN | PW_EQUIP);
+			/* Window stuff */
+			p_ptr->window |= (PW_INVEN | PW_EQUIP);
+		}
 	}
 
 	/* Return result */
@@ -2362,6 +2347,18 @@ static bool item_tester_hook_weapon_strict(const object_type *o_ptr)
 
 
 /*
+ * Hook to specify "ac"
+ */
+static bool item_tester_hook_ac(const object_type *o_ptr)
+{
+	if (k_info[o_ptr->k_idx].flags5 & (TR5_SHOW_AC)) return (TRUE);
+
+	return (FALSE);
+}
+
+
+
+/*
  * Hook to specify "armour"
  */
 static bool item_tester_hook_armour(const object_type *o_ptr)
@@ -2384,6 +2381,7 @@ static bool item_tester_hook_armour(const object_type *o_ptr)
 
 	return (FALSE);
 }
+
 
 /*
  * Hook to specify "bolts"
@@ -2733,7 +2731,7 @@ bool enchant_spell(int num_hit, int num_dam, int num_ac)
 	item_tester_hook = item_tester_hook_weapon;
 
 	/* Enchant armor if requested */
-	if (num_ac) item_tester_hook = item_tester_hook_armour;
+	if (num_ac) item_tester_hook = item_tester_hook_ac;
 
 	/* Get an item */
 	q = "Enchant which item? ";
@@ -3237,7 +3235,7 @@ bool ident_spell_gauge(void)
  */
 bool ident_spell_sense(void)
 {
-  int item, feel;
+  int item;
 
 	object_type *o_ptr;
 
@@ -3276,11 +3274,13 @@ bool ident_spell_sense(void)
 		o_ptr = &inventory[item];
 	}
 
-	/* Identify it's bonuses */
-	feel = sense_magic(o_ptr, cp_ptr->sense_type, TRUE, item < 0);
-
 	/* Sense non-wearable items */
-	if (!feel)
+	if (sense_magic(o_ptr, cp_ptr->sense_type, TRUE, item < 0))
+	{
+		if (o_ptr->feeling == INSCRIP_AVERAGE) object_bonus(o_ptr, item < 0);
+	}
+	/* Hack -- describe the item as if sensed */
+	else
 	{
 		int i, j, k;
 
@@ -3294,7 +3294,6 @@ bool ident_spell_sense(void)
 				&& (bag_holds[i][j][1] == o_ptr->sval))
 			  {
 			    o_ptr->feeling = MAX_INSCRIP + i;
-			    feel = 1;
 
 			    if (object_aware_p(o_ptr)) k_info[o_ptr->k_idx].aware |= (AWARE_SENSE);
 			    else if (k_info[o_ptr->k_idx].flavor) k_info[o_ptr->k_idx].aware |= (AWARE_SENSEX);
@@ -3320,15 +3319,10 @@ bool ident_spell_sense(void)
 
 			  }
 		}
+
+		/* Nothing found */
+		if (o_ptr->feeling < MAX_INSCRIP) return (FALSE);
 	}
-	else
-	  o_ptr->feeling = feel;
-
-	/* Nothing sensed */
-	if (!feel) return (FALSE);
-
-	/* Item is sensed */
-	o_ptr->ident |= (IDENT_SENSE);
 
 	/* Description */
 	object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);

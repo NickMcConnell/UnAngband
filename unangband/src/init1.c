@@ -3814,14 +3814,16 @@ errr parse_k_info(char *buf, header *head)
 			case TV_HAFTED:
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
+
+				/*
 				if (!(strstr(k_name + k_ptr->name, "taff")))
-				{
-					k_ptr->flags5 |= (TR5_DO_STUN);
+				{*/
+					k_ptr->flags5 |= (TR5_DO_STUN);/*
 				}
 				else
 				{
 					k_ptr->flags5 |= (TR5_DO_TRIP);
-				}
+				}*/
 				k_ptr->flags6 |= (TR6_BAD_THROW);
 				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 				break;
@@ -3835,13 +3837,13 @@ errr parse_k_info(char *buf, header *head)
 				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 
 				/* Hack -- spears do damaging criticals, axes stun or cut */
-				if (!(strstr(k_name + k_ptr->name, "xe"))
+				/*if (!(strstr(k_name + k_ptr->name, "xe"))
 					&& !(strstr(k_name + k_ptr->name, "alberd"))
 					&& !(strstr(k_name + k_ptr->name, "cythe")))
 					k_ptr->flags5 |= (TR5_DO_CRIT);
 				else if (!(strstr(k_name + k_ptr->name, "cythe")))
 					k_ptr->flags5 |= (TR5_DO_CUTS | TR5_DO_STUN);
-				else
+				else*/
 					k_ptr->flags5 |= (TR5_DO_CUTS);
 				break;
 
@@ -4082,6 +4084,15 @@ errr parse_k_info(char *buf, header *head)
 		k_ptr->to_h = th;
 		k_ptr->to_d = td;
 		k_ptr->to_a =  ta;
+
+		switch(k_ptr->tval)
+		{
+			case TV_SWORD:
+			case TV_HAFTED:
+			case TV_POLEARM:
+				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
+				break;
+		}
 	}
 
 	/* Process 'Y' for "Rune" (one line only) */

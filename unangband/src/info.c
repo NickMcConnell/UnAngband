@@ -3287,41 +3287,6 @@ void list_ego_item_runes(int ego, bool spoil)
 }
 
 
-
-
-const cptr inscrip_info[] =
-{
-		NULL,
-		"It is a cursed artifact of some kind, that you may be able to enchant back to full strength.  ",
-		"It is a cursed ego item of some kind.  ",
-		"It is cursed, with negative effects if you attempt to use it.  ",
-		"It is broken, having been blasted by powerful magic.  ",
-		"It needs recharging.  ",
-		"It is of good quality, but with no additional powers.  ",
-		"It is a useful ego item.  ",
-		"It is a useful artifact.  ",
-		"It is of average quality or better, and not cursed.  It may be an ego item or artifact.  ",
-		"It is of very good quality, but with no additional powers.  ",
-		"It is of great quality, but with no additonal powers.  ",
-		"It is a useful ego item, with a random hidden ability.  ",
-		"It is an artifact that has resisted your destruction.  ",
-		"It is an ego item or artifact that resisted being picked up or used.  ",
-		"It is of average quality or worse, and may be cursed.  It may be an cursed ego item or artifact.  ",
-		"It is better than average quality, and not cursed.  It may be an ego item or artifact.  ",
-		"It is an ego item or artifact.  ",
-		"It is an ego item, but may or may not be cursed.  ",
-		"It is an ego item, with a random hidden ability, but may or may not be cursed.  ",
-		"It is an artifact, but may or may not be cursed.  ",
-		"There are no runes on it.  ",
-		"There are runes on it.  It may be an ego item or artifact.  ",
-		"It is of average quality, but may be damaged by wear and tear.  ",
-		"It is valuable, but may or may not be cursed.  ",
-		"It is better than average quality, but may or may not be cursed.  It may be an ego item or artifact.  ",
-		"It is coated with a substance.  ",
-		"It has a magically applied enchantment.  "
-};
-
-
 /*
  * Create a spoiler file entry for an artifact
  */
@@ -5731,7 +5696,7 @@ void object_usage(int slot)
 	if (p_ptr->timed[TMD_CONFUSED]) return;
 
 	/* No sensing when hallucinating */
-	if (p_ptr->timed[TMD_CONFUSED]) return;
+	if (p_ptr->timed[TMD_IMAGE]) return;
 
 	if ((o_ptr->usage)<MAX_SHORT) o_ptr->usage++;
 
@@ -5829,15 +5794,16 @@ void object_usage(int slot)
 	if (((sense) || (heavy)) && !(o_ptr->ident & (IDENT_SENSE)))
 	{
 		/* Check for a feeling */
-		int feel = sense_magic(o_ptr, 1, heavy, slot < 0);
-
-		if (feel)
+		if (sense_magic(o_ptr, 1, heavy, slot < 0))
 		{
 			/* Describe what we know */
 			msg_format("You feel you know more about the %s you are %s.",o_name,describe_use(slot));
 
-			/* Change feeling */
-			o_ptr->feeling = feel;
+			/* Describe the feeling */
+			msg_format("%s", inscrip_info[o_ptr->feeling]);
+
+			/* Auto-id average items */
+			if (o_ptr->feeling == INSCRIP_AVERAGE) object_bonus(o_ptr, slot < 0);
 
 			/* Combine / Reorder the pack (later) */
 			p_ptr->notice |= (PN_COMBINE | PN_REORDER);

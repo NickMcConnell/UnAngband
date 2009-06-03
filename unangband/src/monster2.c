@@ -4097,10 +4097,10 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		if ((ammo_tval == TV_JUNK) || (ammo_tval == TV_FLASK) || (ammo_tval == TV_POTION)) o_ptr->number = (o_ptr->number + 1) / 2;
 
 		/* Sense magic */
-		o_ptr->feeling = sense_magic(o_ptr,cp_ptr->sense_type,TRUE, TRUE);
+		sense_magic(o_ptr,cp_ptr->sense_type,TRUE, TRUE);
 
-		/* Sensed the item */
-		if (o_ptr->feeling) o_ptr->ident |= (IDENT_SENSE);
+		/* Auto-id average items */
+		if (o_ptr->feeling == INSCRIP_AVERAGE) object_bonus(o_ptr, TRUE);
 
 		/* Auto-inscribe if necessary */
 		if ((cheat_auto) || (object_aware_p(o_ptr))) o_ptr->note = k_info[ammo_kind].note;

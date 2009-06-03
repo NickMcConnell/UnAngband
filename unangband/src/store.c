@@ -754,6 +754,16 @@ static bool store_will_buy(const object_type *o_ptr)
 		if (st_ptr->tvals_will_buy[i] == o_ptr->tval) return (TRUE);
 	}
 
+	/* Hack -- temples buy blessed items */
+	if (st_ptr->base == STORE_TEMPLE)
+	{
+		u32b f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
+
+		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+
+		if (f3 & (TR3_BLESSED)) return (TRUE);
+	}
+
 	/* Assume not okay */
 	return (FALSE);
 }

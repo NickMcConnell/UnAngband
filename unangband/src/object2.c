@@ -828,9 +828,7 @@ void object_bonus(object_type *o_ptr, bool floor)
 	/* Sense the item (if appropriate) */
 	if (!object_known_p(o_ptr))
 	{
-		int feel = sense_magic(o_ptr, 1, TRUE, floor);
-
-		if (feel) o_ptr->feeling = feel;
+		sense_magic(o_ptr, 1, TRUE, floor);
 	}
 
 	/* For armour/weapons - is this all we need to know? */
@@ -870,9 +868,7 @@ void object_gauge(object_type *o_ptr, bool floor)
 	/* Sense the item (if appropriate) */
 	if (!object_known_p(o_ptr))
 	{
-		int feel = sense_magic(o_ptr, 1, TRUE, floor);
-
-		if (feel) o_ptr->feeling = feel;
+		sense_magic(o_ptr, 1, TRUE, floor);
 	}
 
 	/* For armour/weapons - is this all we need to know? */
@@ -4252,7 +4248,7 @@ int value_check_aux13(object_type *o_ptr)
  * Level 8 is equivalent to identify name only.
  * Level 9 is equivalent to full identify on restricted objects only.
  */
-int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
+bool sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 {
 	int feel = 0;
 
@@ -4319,10 +4315,10 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	}
 
 	/* Skip objects */
-	if (!okay) return (0);
+	if (!okay) return (FALSE);
 
 	/* It is fully known, no information needed */
-	if (object_known_p(o_ptr)) return (0);
+	if (object_known_p(o_ptr)) return (FALSE);
 
 	/* Always update racial information */
 	(void)value_check_aux0(o_ptr, floor);
@@ -4369,14 +4365,17 @@ int sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	/* Rings and amulets: Only sense curses/artifacts. */
 	if (((o_ptr->tval == TV_RING) || (o_ptr->tval == TV_AMULET)) &&
 		/* Rings and amulets only distinguish cursed vs not cursed */
-			((feel == INSCRIP_UNUSUAL) || (feel == INSCRIP_MAGIC_ITEM) || (feel == INSCRIP_AVERAGE))) return(0);
+			((feel == INSCRIP_UNUSUAL) || (feel == INSCRIP_MAGIC_ITEM) || (feel == INSCRIP_AVERAGE))) return(FALSE);
 
-	if (feel == old_feel) return(0);
+	if (feel == old_feel) return(FALSE);
+
+	/* Mark with feeling */
+	o_ptr->feeling = feel;
 
 	/* Mark as sensed */
 	if ((sense_type) && (heavy)) o_ptr->ident |= (IDENT_SENSE);
 
-	return (feel);
+	return (TRUE);
 }
 
 
@@ -4531,6 +4530,9 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 			if (power)
 			{
 				a_m_aux_1(o_ptr, lev, power);
+
+				/* Allow defensive weapons to be enchanted */
+				if (k_info[o_ptr->k_idx].flags5 & (TR5_SHOW_AC)) a_m_aux_2(o_ptr, lev, power);
 
 				if (((power > 1) || (o_ptr->xtra1) ? TRUE : FALSE) || ((power < -1) || (o_ptr->xtra1) ? TRUE : FALSE))
 					(void)make_ego_item(o_ptr, (bool)((power < 0) ? TRUE : FALSE),great);
@@ -5850,7 +5852,10 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 	}
 
 	/* Sense some magic on object at creation time */
-	j_ptr->feeling = sense_magic(j_ptr, cp_ptr->sense_type, (p_ptr->lev >= 40) || rand_int(100) < 20 + p_ptr->lev * 2, TRUE);
+	sense_magic(j_ptr, cp_ptr->sense_type, (p_ptr->lev >= 40) || rand_int(100) < 20 + p_ptr->lev * 2, TRUE);
+
+	/* Auto-id average items */
+	if (j_ptr->feeling == INSCRIP_AVERAGE) object_bonus(j_ptr, TRUE);
 
 	/* Hack -- theme chests */
 	if (opening_chest) tval_drop_idx = j_ptr->tval;

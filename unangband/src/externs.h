@@ -107,7 +107,7 @@ extern const familiar_type familiar_race[MAX_FAMILIARS];
 extern const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES];
 extern const timed_effect timed_effects[TMD_MAX];
 extern const skill_table_entry skill_table[];
-
+extern const char *inscrip_info[];
 
 /* variable.c */
 extern cptr copyright;
@@ -827,7 +827,7 @@ extern s16b lookup_kind(int tval, int sval);
 extern void object_wipe(object_type *o_ptr);
 extern void object_copy(object_type *o_ptr, const object_type *j_ptr);
 extern void object_prep(object_type *o_ptr, int k_idx);
-extern int sense_magic(object_type *o_ptr, int sense_level, bool heavy, bool floor);
+extern bool sense_magic(object_type *o_ptr, int sense_level, bool heavy, bool floor);
 extern void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great);
 extern bool make_object(object_type *j_ptr, bool good, bool great);
 extern bool make_chest(int *feat);

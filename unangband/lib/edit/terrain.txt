@@ -9862,7 +9862,6 @@ F:ATTR_LITE |
 
 N:456:vines
 G:':g
-O:846
 W:10:1:20:0
 K:DEFAULT:407:0
 #$ earth
@@ -9874,7 +9873,7 @@ K:HURT_WATER:629:0
 #$ a wave breaking over open ground
 F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | OPEN |
 F:LAKE | HURT_FIRE | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
-F:HURT_WATER | GET_FEAT | OUTSIDE | LIVING | ATTR_LITE |
+F:HURT_WATER | OUTSIDE | LIVING | ATTR_LITE |
 
 N:457:shallow pit
 G:^:U
@@ -15145,7 +15144,6 @@ N:742:vine-covered granite wall
 G:*:G
 U:56
 #$ granite wall
-O:846
 W:10:1:10:0
 K:DEFAULT:58:40
 #$ granite wall
@@ -15165,7 +15163,7 @@ K:SECRET:920:40
 #$ vine-covered granite wall
 F:SECRET | REMEMBER | TUNNEL | STREAMER | WALL | OUTER |
 F:LAKE | FILLED | HURT_ROCK | HURT_FIRE | CAN_CLIMB | CAN_PASS |
-F:GET_FEAT | LIVING | ATTR_LITE |
+F:LIVING | ATTR_LITE |
 D:You find nothing interesting.
 
 N:743:vine-covered granite wall
@@ -15174,7 +15172,6 @@ M:742
 #$ vine-covered granite wall
 U:56
 #$ granite wall
-O:846
 W:1:0:10:0
 K:DEFAULT:1:1
 #$ open floor
@@ -15186,7 +15183,7 @@ K:TUNNEL:456:1
 #$ vines
 F:SECRET | REMEMBER | TUNNEL | WALL |
 F:FILLED | HURT_ROCK | HURT_FIRE | CAN_CLIMB | CAN_PASS |
-F:GET_FEAT | LIVING | ATTR_LITE |
+F:LIVING | ATTR_LITE |
 D:You find a tunnel hidden behind the vines.
 
 N:744:basin
@@ -16291,7 +16288,6 @@ F:OUTSIDE | ATTR_LITE | INSTANT | ADJACENT |
 
 N:799:vine bridge
 G:x:G
-O:846
 W:48:1:8:0
 K:DEFAULT:800:0
 #$ vine hanging over a chasm
@@ -16304,11 +16300,10 @@ K:TREE:799:0
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY | KILL_HUGE |
-F:GET_FEAT | OUTSIDE | EASY_CLIMB | LIVING | ATTR_LITE |
+F:OUTSIDE | EASY_CLIMB | LIVING | ATTR_LITE |
 
 N:800:vine hanging over a chasm
 G:>:G
-O:846
 W:48:1:8:0
 K:DEFAULT:801:0
 #$ falling vine
@@ -16329,7 +16324,7 @@ K:TREE:800:0
 F:LOS | PROJECT | PLACE | REMEMBER | STAIRS | MORE | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY | KILL_HUGE | KILL_MOVE |
-F:GET_FEAT | OUTSIDE | EASY_CLIMB | MUST_CLIMB | LIVING | ATTR_LITE | TIMED |
+F:OUTSIDE | EASY_CLIMB | MUST_CLIMB | LIVING | ATTR_LITE | TIMED |
 
 N:801:falling vine
 G:>:G
@@ -16388,7 +16383,6 @@ F:GET_FEAT | OUTSIDE | ATTR_LITE | INSTANT |
 
 N:804:vine swinging over a chasm
 G:x:G
-O:846
 W:48:1:8:0
 K:DEFAULT:801:0
 #$ falling vine
@@ -16405,7 +16399,7 @@ K:MORE:456:0
 F:LOS | PROJECT | MOVE | PLACE | REMEMBER | STAIRS | MORE | RUN |
 F:PATH | LAKE | COVERED | HURT_FIRE | HURT_ACID | CHASM | CAN_CLIMB |
 F:CAN_FLY |
-F:GET_FEAT | OUTSIDE | LIVING | ATTR_LITE | INSTANT |
+F:OUTSIDE | LIVING | ATTR_LITE | INSTANT |
 
 N:805:tomb of Balin
 G:+:U
@@ -16706,7 +16700,6 @@ M:742
 #$ vine-covered granite wall
 U:56
 #$ granite wall
-O:846
 W:1:0:10:0
 K:DEFAULT:1:40
 #$ open floor
@@ -16720,7 +16713,7 @@ K:SECRET:920:40
 #$ vine-covered granite wall
 F:SECRET | NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
 F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
-F:GET_FEAT | LIVING | ATTR_LITE |
+F:LIVING | ATTR_LITE |
 
 N:825:writing on a granite wall
 G:*:W
@@ -18674,7 +18667,6 @@ N:920:vine-covered granite wall
 G:%:o
 U:56
 #$ granite wall
-O:846
 W:10:1:10:0
 K:DEFAULT:58:40
 #$ granite wall
@@ -18692,7 +18684,7 @@ K:STREAMER:56:40
 #$ granite wall
 F:REMEMBER | TUNNEL | STREAMER | WALL | OUTER |
 F:LAKE | FILLED | HURT_ROCK | HURT_FIRE | CAN_CLIMB | CAN_PASS |
-F:GET_FEAT | LIVING | ATTR_LITE |
+F:LIVING | ATTR_LITE |
 
 N:921:metal framework
 G:0:s
