@@ -2690,11 +2690,12 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 	/* Failure */
 	if (!res) return (FALSE);
 
-	/* Hack --- unsense the item */
-	o_ptr->ident &= ~(IDENT_SENSE);
-
-	/* Remove special inscription, if any */
-	o_ptr->feeling = 0;
+	/* Remove some inscriptions */
+	if (!object_bonus_p(o_ptr) && ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)))
+	{
+		/* Hack --- unsense the item */
+		o_ptr->ident &= ~(IDENT_SENSE);
+	}
 
 	/* Recalculate bonuses */
 	p_ptr->update |= (PU_BONUS);
@@ -4201,11 +4202,8 @@ bool recharge(int num)
 			/* Hack -- we no longer "know" the item */
 			o_ptr->ident &= ~(IDENT_KNOWN);
 
-			/* Hack -- we no longer "sense" the item */
-			o_ptr->ident &= ~(IDENT_SENSE);
-
 			/* Hack -- the item is no longer empty */
-			o_ptr->feeling = 0;
+			if (o_ptr->feeling == INSCRIP_EMPTY) o_ptr->feeling = 0;
 
 			/* Hack -- round up */
 			o_ptr->stackc = 0;
