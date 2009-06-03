@@ -2434,6 +2434,10 @@ bool player_apply_rune_or_coating2(int item2)
 		/* Clear feeling */
 		if (o_ptr->feeling == INSCRIP_COATED) o_ptr->feeling = 0;
 
+		/* Clear coating */
+		o_ptr->xtra1 = 0;
+		o_ptr->xtra2 = 0;
+
 		/* Clear charges */
 		o_ptr->charges = 0;
 		o_ptr->stackc = 0;
@@ -2720,6 +2724,13 @@ bool player_apply_rune_or_coating2(int item2)
 			}
 		}
 	}
+
+	/* Hack - water washes away */
+	else if ((tval == TV_POTION) && (sval == SV_POTION_WATER))
+	{
+		msg_print("The coating washes away.");
+	}
+
 	/* Coat weapon */
 	else
 	{
