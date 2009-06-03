@@ -2289,6 +2289,7 @@ bool item_tester_hook_coating(const object_type *o_ptr)
 		case TV_BOLT:
 		case TV_SHIELD:
 		case TV_SKIN:
+		case TV_SPELL:
 			if (o_ptr->weight < 1000) return (TRUE);
 	}
 
@@ -2731,8 +2732,8 @@ bool player_apply_rune_or_coating2(int item2)
 		if (!aware) j_ptr->feeling = INSCRIP_COATED;
 
 		/* Based on the weight, determine charges */
-		j_ptr->charges = (charges + 1000 / j_ptr->weight) / j_ptr->number;
-		j_ptr->stackc = (charges + 1000 / j_ptr->weight) % j_ptr->number;
+		j_ptr->charges = (charges + 1000 / (j_ptr->weight > cp_ptr->min_weight ? j_ptr->weight : cp_ptr->min_weight)) / j_ptr->number;
+		j_ptr->stackc = (charges + 1000 / (j_ptr->weight > cp_ptr->min_weight ? j_ptr->weight : cp_ptr->min_weight)) % j_ptr->number;
 
 		if (j_ptr->stackc) j_ptr->charges++;
 	}
