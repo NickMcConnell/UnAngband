@@ -5743,7 +5743,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		/* MegaHack - for the moment. Ensure that each tval is dropped approximately with the same
 		 * frequency
 		 */
-		else
+		else if (!get_obj_num_hook)
 		{
 			/* Pick a random tval. Consumables twice as frequent. */
 			switch (rand_int(18 + 5 * (object_level / 3)))
