@@ -4740,7 +4740,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					{
 						for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
-									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, SUMMON_KIN,
+									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), SUMMON_KIN,
 							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
 
 						if (summons)
@@ -4803,7 +4803,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					{
 						for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
-									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, ANIMATE_OBJECT,
+									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), ANIMATE_OBJECT,
 							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
 
 						if (summons)
@@ -4894,7 +4894,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 					for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
-									who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, ANIMATE_DEAD,
+									who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), ANIMATE_DEAD,
 						FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
 
 					if (summons)
@@ -4940,7 +4940,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 					for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
-									who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, RAISE_DEAD,
+									who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), RAISE_DEAD,
 						FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L));
 
 					if (summons)

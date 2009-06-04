@@ -5600,6 +5600,18 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 		/* Get the target */
 		if ((retarget) && (!retarget(&ty, &tx, &flg, method, level, TRUE, &one_grid) != 0)) return (obvious);
 
+		/* Set target coords */
+		if (flg & (PROJECT_SELF))
+		{
+			y1 = y0;
+			x1 = x0;
+		}
+		else
+		{
+			y1 = ty;
+			x1 = tx;
+		}
+		
 		/* Get initial damage */
 		damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
 
@@ -5610,7 +5622,7 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			for (i = 1; i < num; i++) damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
 
 			/* Apply once */
-			if (forreal && project_one(who, what, ty, tx, damage, effect, flg))
+			if (forreal && project_one(who, what, y1, x1, damage, effect, flg))
 			{
 				/* Noticed */
 				obvious = TRUE;
@@ -5628,7 +5640,7 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			region_type *r_ptr;
 
 			/* Get a newly initialized region */
-			region = init_region(who, what, region_id, damage, method, effect, level, y0, x0, ty, tx);
+			region = init_region(who, what, region_id, damage, method, effect, level, y0, x0, y1, x1);
 
 			/* Get the region */
 			r_ptr = &region_list[region];
@@ -5700,7 +5712,7 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			}
 
 			/* Projection method */
-			obvious |= project_method(who, what, method, effect, damage, level, y0, x0, ty, tx, region, flg);
+			obvious |= project_method(who, what, method, effect, damage, level, y0, x0, y1, x1, region, flg);
 
 			/* Revise damage */
 			if (i < num - 1) damage = spell_damage(blow_ptr, level, method_ptr->flags2, damage_div, forreal) / (damage_div);
@@ -5775,6 +5787,9 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 
 	/* Any further blows have slightly differing semantics */
 	retarget_blows_subsequent = TRUE;
+	
+	/* Never retarget for spells which affect self */
+	if (*flg & (PROJECT_SELF)) return (TRUE);
 
 	/* If we're not fully retargetting, just continue through the target */
 	if (!full)
@@ -5800,11 +5815,10 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 		if (retarget_blows_subsequent && !(target_okay())) p_ptr->command_dir = 0;
 
 		/* Allow direction to be cancelled for free */
-		if ((((*flg & (PROJECT_SELF)) == 0)) &&
-				(!get_aim_dir(&retarget_blows_dir, retarget_blows_known ? range : MAX_RANGE, retarget_blows_known ? radius : 0,
+		if (!get_aim_dir(&retarget_blows_dir, retarget_blows_known ? range : MAX_RANGE, retarget_blows_known ? radius : 0,
 						retarget_blows_known ? *flg : (PROJECT_BEAM),
 						retarget_blows_known ? method_ptr->arc : 0,
-						retarget_blows_known ? method_ptr->diameter_of_source : 0))) return (FALSE);
+						retarget_blows_known ? method_ptr->diameter_of_source : 0)) return (FALSE);
 
 		/* Use the given direction */
 		*ty = py + 99 * ddy[retarget_blows_dir];
