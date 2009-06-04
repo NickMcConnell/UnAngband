@@ -5745,11 +5745,11 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		 */
 		else if (!get_obj_num_hook)
 		{
-			/* Pick a random tval. Consumables twice as frequent. */
-			switch (rand_int(18 + 5 * (object_level / 3)))
+			/* Pick a random tval. */
+			switch (rand_int(15 + 5 * (object_level / 3)) + 3)
 			{
-				case 5: case 6:	tval_drop_idx = TV_FOOD; break;
-				case 7:	case 8: tval_drop_idx = TV_MUSHROOM; break;
+				case 7:	tval_drop_idx = TV_FOOD; break;
+				case 8: tval_drop_idx = TV_MUSHROOM; break;
 				case 9: tval_drop_idx = TV_POTION; break;
 				case 10: tval_drop_idx = TV_SCROLL; break;
 				case 11: tval_drop_idx = TV_FLASK; break;

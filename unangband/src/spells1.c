@@ -6028,7 +6028,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_POIS:
 		{
 			if (seen) obvious = TRUE;
-			do_pois = dam;
 			if (r_ptr->flags3 & (RF3_IM_POIS))
 			{
 				dam /= 9;
@@ -6037,6 +6036,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					note = " is immune to poison.";
 					l_ptr->flags3 |= (RF3_IM_POIS);
 				}
+			}
+			else
+			{
+				do_pois = dam;
 			}
 			break;
 		}
@@ -8656,7 +8659,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Handle "stun" */
 		if ((do_stun > 1) &&
-			 !(r_ptr->flags3 & (RF3_NO_STUN)))
+			 ((r_ptr->flags3 & (RF3_NO_STUN)) == 0))
 		{
 			/* Obvious */
 			if (seen) obvious = TRUE;
@@ -8679,7 +8682,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Handle "blindness" */
 		if ((do_blind > 1) &&
-			 !(r_ptr->flags9 & (RF9_RES_BLIND)))
+			 ((r_ptr->flags9 & (RF9_RES_BLIND)) == 0))
 		{
 			/* Don't blind already blinded monsters -- but allow cross-eyed to be blinded */
 			if (m_ptr->blind <= 1)
@@ -8773,7 +8776,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Handle cuts from player or allies only */
 		if ((do_cuts > 1) && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) &&
-			 !(r_ptr->flags9 & (RF9_NO_CUTS)))
+			 ((r_ptr->flags9 & (RF9_NO_CUTS)) == 0))
 		{
 			/* Obvious */
 			if (seen) obvious = TRUE;
@@ -8796,7 +8799,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Handle poison from player only */
 		if ((do_pois > 1) && ((who <= SOURCE_PLAYER_START) || ((who > 0) && (m_list[who].mflag & (MFLAG_ALLY)))) &&
-			 !(r_ptr->flags3 & (RF3_IM_POIS)))
+			 ((r_ptr->flags3 & (RF3_IM_POIS)) == 0))
 		{
 			/* Obvious */
 			if (seen) obvious = TRUE;
@@ -8820,7 +8823,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 		/* Handle confusion */
 		if ((do_conf > 1) &&
-			 !(r_ptr->flags3 & (RF3_NO_CONF)))
+			 ((r_ptr->flags3 & (RF3_NO_CONF)) == 0))
 		{
 			/* Obvious */
 			if (seen) obvious = TRUE;

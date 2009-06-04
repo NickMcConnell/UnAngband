@@ -3744,6 +3744,7 @@ errr parse_k_info(char *buf, header *head)
 		{
 			case TV_JUNK:
 				k_ptr->flags6 |= (TR6_BREAK_THROW);
+				if (k_ptr->sval == SV_JUNK_SHARD) k_ptr->flags6 |= (TR6_NAMED);
 				if (k_ptr->sval == SV_JUNK_STICK) k_ptr->flags6 |= (TR6_NAMED);
 				if (k_ptr->sval == SV_JUNK_STUMP) k_ptr->flags6 |= (TR6_NAMED);
 				if (k_ptr->sval == SV_JUNK_BRANCH) k_ptr->flags6 |= (TR6_NAMED);
