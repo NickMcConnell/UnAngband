@@ -8603,7 +8603,7 @@ F:LAKE | CAN_CLIMB | CAN_FLY |
 F:HURT_WATER | ATTR_LITE |
 
 N:391:stone well
-G:0:v
+G:0:T
 U:56
 #$ granite wall
 O:224
@@ -8880,7 +8880,7 @@ F:GLOW | CAN_CLIMB | CAN_FLY |
 F:ALLOC | HURT_WATER | USE_FEAT | EASY_CLIMB | ATTR_LITE |
 
 N:405:unlit brazier
-G:0:D
+G:0:M
 O:346
 W:1:1:15:0
 K:DEFAULT:405:0
@@ -11429,7 +11429,7 @@ F:PATH | SHALLOW | HURT_FIRE | ICE | CAN_FLY |
 F:HURT_WATER | MUST_CLIMB | LIVING | NEED_TREE | ATTR_LITE |
 
 N:547:open vent
-G:0:o
+G:0:m
 U:56
 #$ granite wall
 O:0
@@ -14551,7 +14551,7 @@ F:USE_FEAT | OUTSIDE | ATTR_LITE | ADJACENT | ERUPT |
 #Quescient phase
 
 N:715:open vent which erupts poison
-G:0:o
+G:0:m
 U:56
 #$ granite wall
 O:0
@@ -14569,7 +14569,7 @@ F:PATH | LAKE | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:716:open vent which erupts boiling water
-G:0:o
+G:0:m
 U:56
 #$ granite wall
 O:0
@@ -14587,7 +14587,7 @@ F:PATH | LAKE | LAVA | WATER | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:717:open vent which erupts fire
-G:0:o
+G:0:m
 U:56
 #$ granite wall
 O:0
@@ -14605,7 +14605,7 @@ F:PATH | LAKE | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:718:open vent which erupts acid
-G:0:o
+G:0:m
 U:56
 #$ granite wall
 O:0
@@ -14623,7 +14623,7 @@ F:PATH | LAKE | ACID | CAN_OOZE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | TIMED |
 
 N:719:open vent which erupts water
-G:0:o
+G:0:m
 U:56
 #$ granite wall
 O:0
@@ -14704,7 +14704,7 @@ F:PATH | LAKE | GLOW | LAVA | DEEP | CAN_FLY | HIDE_ITEM |
 F:OUTSIDE | MUST_CLIMB | ATTR_LITE | ADJACENT | TIMED | ERUPT |
 
 N:723:window
-G:*:B
+G:*:Z
 U:56
 #$ granite wall
 O:0
@@ -14722,7 +14722,7 @@ F:HURT_ROCK | CAN_CLIMB | CAN_PASS | KILL_HUGE |
 F:ATTR_LITE |
 
 N:724:open window
-G:':B
+G:':Z
 U:56
 #$ granite wall
 O:0
@@ -14740,7 +14740,7 @@ F:CAN_CLIMB | CAN_FLY | KILL_HUGE |
 F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:725:broken window
-G:0:o
+G:0:D
 U:56
 #$ granite wall
 O:0
@@ -15187,7 +15187,7 @@ F:LIVING | ATTR_LITE |
 D:You find a tunnel hidden behind the vines.
 
 N:744:basin
-G:*:Z
+G:*:B
 U:56
 #$ granite wall
 O:0
@@ -15210,7 +15210,7 @@ F:ATTR_LITE |
 D:You find nothing interesting.
 
 N:745:basin
-G:*:Z
+G:*:B
 M:744
 #$ basin
 U:56
@@ -16539,7 +16539,7 @@ F:ALLOC | USE_FEAT | ATTR_LITE |
 D:You find something in the fountain!
 
 N:814:water-filled well
-G:0:b
+G:0:t
 U:56
 #$ granite wall
 O:224
@@ -16554,7 +16554,7 @@ F:HIDE_SWIM |
 F:ALLOC | USE_FEAT | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
 
 N:815:stone well
-G:0:v
+G:0:T
 U:56
 #$ granite wall
 O:0
@@ -16569,7 +16569,7 @@ F:ALLOC | MUST_CLIMB | ATTR_LITE |
 D:The well is empty.
 
 N:816:empty well
-G:>:w
+G:>:T
 U:56
 #$ granite wall
 O:0
@@ -17654,7 +17654,7 @@ F:PATH | CAN_CLIMB | CAN_FLY |
 F:ATTR_LITE |
 
 N:870:opening sliding wall
-G:0:s
+G:0:Z
 U:56
 #$ granite wall
 O:0
@@ -18332,7 +18332,7 @@ F:HURT_WATER | ATTR_LITE |
 D:You have found a hidden valve.
 
 N:907:basin
-G:*:Z
+G:*:B
 M:744
 #$ basin
 U:56
@@ -18357,7 +18357,7 @@ F:ATTR_LITE |
 D:You find nothing interesting.
 
 N:908:basin
-G:*:Z
+G:*:B
 M:744
 #$ basin
 U:56
