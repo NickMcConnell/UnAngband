@@ -345,3 +345,10 @@ N:43:delayed
 G:*:w
 F:AUTOMATIC | PROJECTION | ATTR_EFFECT
 
+# Haze - used by chill
+
+N:44:haze
+G:*:Z
+I:12
+F:AUTOMATIC | ATTR_EFFECT
+F:LINGER | SEEKER
