@@ -1123,6 +1123,7 @@ byte spell_color(int type)
 		case GF_POIS:         return (pois_color());
 
 		case GF_DELAY_POISON: return (pois_color());
+		case GF_POISON_WEAK:  return (pois_color());
 
 		case GF_PLASMA:       return (plasma_color());
 		case GF_HELLFIRE:     return (hellfire_color());
@@ -2604,7 +2605,7 @@ static void cold_dam(int who, int what, int dam, bool inven)
 /*
  * Hurt the player with Poison
  */
-static void poison_dam(int who, int what, int dam, bool inven, bool delay)
+static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool weak)
 {
 	int res = p_ptr->incr_resist[INCR_RES_POIS];
 
@@ -2702,9 +2703,12 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay)
 	if (!(p_ptr->timed[TMD_OPP_POIS]) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
 	{
 		/* Set poison counter */
-		(void)set_poisoned(p_ptr->timed[TMD_POISONED] + rand_int(dam + 1) + 10);
+		(void)set_poisoned(p_ptr->timed[TMD_POISONED] + rand_int(dam + 1) + weak ? 0 : 10);
 	}
 
+	/* Weak does no immediate damage */
+	if (weak) return;
+	
 	/* Take damage */
 	take_hit(who, what, dam);
 }
@@ -3604,6 +3608,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			}
 			break;
 		}
+		case GF_POISON_WEAK:
 		case GF_DELAY_POISON:
 		case GF_POIS:
 		{
@@ -6024,6 +6029,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Poison */
+		case GF_POISON_WEAK:
 		case GF_DELAY_POISON:
 		case GF_POIS:
 		{
@@ -6040,6 +6046,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				do_pois = dam;
+				
+				if ((typ == GF_POISON_WEAK) && (who <= SOURCE_PLAYER_START)) dam = 0;
 			}
 			break;
 		}
@@ -9225,11 +9233,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Standard damage -- also poisons player */
+		case GF_POISON_WEAK:
 		case GF_DELAY_POISON:
 		case GF_POIS:
 		{
 			if (fuzzy) msg_print("You are hit by poison!");
-			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON);
+			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON, typ == GF_POISON_WEAK);
 			break;
 		}
 
@@ -11210,7 +11219,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					(void)set_cut(p_ptr->timed[TMD_CUT] + randint(dam));
 
 					/* Poison the player */
-					poison_dam(who, what, dam, TRUE, FALSE);
+					poison_dam(who, what, dam, TRUE, FALSE, FALSE);
 				}
 
 				/* Take the damage */

@@ -1281,7 +1281,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
-
 	/* Eliminate 'direct' spells when blinded or afraid (except innate spells) * */
 	else if ((m_ptr->blind) || (m_ptr->monfear))
 	{
@@ -1306,26 +1305,21 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
-	/* Eliminate all summoning spells if monster has recently summoned or been summoned */
-	if (m_ptr->summoned)
-	{
-		f4 &= (RF4_SUMMON_MASK);
-		f5 &= (RF4_SUMMON_MASK);
-		f6 &= (RF6_SUMMON_MASK);
-		f7 &= (RF7_SUMMON_MASK);
-
-		/* No spells left */
-		if (!f4 && !f5 && !f6 && !f7) return (0);
-	}
-
-	/* Allies do not summon (or teleport unless afraid) */
-	if (m_ptr->mflag & (MFLAG_ALLY))
+	/* Eliminate all summoning spells if monster has recently summoned or been summoned or an ally */
+	if ((m_ptr->summoned) || (m_ptr->mflag & (MFLAG_ALLY)))
 	{
 		f4 &= ~(RF4_SUMMON_MASK);
 		f5 &= ~(RF5_SUMMON_MASK);
 		f6 &= ~(RF6_SUMMON_MASK);
 		f7 &= ~(RF7_SUMMON_MASK);
 
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+
+	/* Allies do not teleport unless afraid or blink unless we need to reposition */
+	if ((m_ptr->mflag & (MFLAG_ALLY)) && ((!m_ptr->ml) || (m_ptr->cdis >= MAX_SIGHT)))
+	{
 		/* Prevent blinking unless target is at wrong range - note check to see if we can blink for efficiency */
 		if (((f6 & (RF6_BLINK)) != 0) && (!(m_ptr->ty) || !(m_ptr->tx) || (ABS(m_ptr->best_range - distance(m_ptr->fy, m_ptr->fx, m_ptr->ty, m_ptr->tx)) < 4)))
 		{
@@ -1503,7 +1497,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			}
 		}
 	}
-
+	
 	/* No valid target (only possible if an idle ally) */
 	if (!target_m_idx)
 	{
@@ -6261,15 +6255,15 @@ static void process_monster(int m_idx)
 		|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 	{
 		int roll;
-
+		
 		/* Monster must cast */
 		if (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH))
 		{
 			roll = 0;
 		}
 
-		/* Aggressive monsters use ranged attacks more frequently */
-		else if (m_ptr->mflag & (MFLAG_AGGR))
+		/* Aggressive/allied monsters use ranged attacks more frequently */
+		else if (m_ptr->mflag & (MFLAG_AGGR | MFLAG_ALLY | MFLAG_IGNORE))
 		{
 			roll = rand_int(200);
 			if (chance_innate) chance_innate += 100;

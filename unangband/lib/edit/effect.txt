@@ -708,12 +708,12 @@ T:rage
 
 N:138:HEAL_PERC
 I:0
-D:heal~:::::percent of hit points:heal %
+D:heal~:::::percent of hit points:% heal
 T:healing
 
 N:139:GAIN_MANA_PERC
 I:0
-D:return~:mana to::::percent of spell points:mana %
+D:return~:mana to::::percent of spell points:% mana
 T:gaining mana
 
 N:140:TANGLE
@@ -748,7 +748,7 @@ T:mana drain
 
 N:146:LOSE_MANA_PERC
 I:0
-D:drain~:mana from::::percent of spell points:mana %
+D:drain~:mana from::::percent of spell points:% mana
 T:losing mana
 
 N:147:DESTROY
@@ -760,4 +760,9 @@ N:148:QUAKE
 I:0
 D:shake~::the foundations::::
 T:quaking
+
+N:149:POISON_WEAK
+I:0
+D:poison~::::::
+T:poison
 

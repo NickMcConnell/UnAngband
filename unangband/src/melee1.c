@@ -2425,7 +2425,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -2482,7 +2482,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				spower /= 2;
 			}
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -2556,7 +2556,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					spower = MAX(spower, power);
 				}
 			}
-			else if (known)
+			else if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -2589,7 +2589,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					n_ptr->hp = n_ptr->maxhp;
 
 					/* Message */
-					if (known)
+					if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 					{
 						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks very healthy!",  t_nref);
 						else msg_format("%^s sounds very healthy!", t_nref);
@@ -2600,7 +2600,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else
 				{
 					/* Message */
-					if (known)
+					if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 					{
 						if ((!blind) && (n_ptr->ml)) msg_format("%^s looks healthier.",  t_nref);
 						else msg_format("%^s sounds healthier.", t_nref);
@@ -2647,7 +2647,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -2883,7 +2883,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -3069,7 +3069,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -3535,7 +3535,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -3581,7 +3581,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -3617,7 +3617,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 
@@ -3653,7 +3653,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		{
 			if (target == 0) break;
 
-			if (known)
+			if ((known) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				disturb(1,0);
 

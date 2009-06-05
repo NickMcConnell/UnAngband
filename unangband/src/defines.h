@@ -1116,7 +1116,7 @@ enum
 #define GF_LOSE_MANA_PERC	146
 #define GF_DESTROY	147
 #define GF_QUAKE	148
-
+#define GF_POISON_WEAK	149
 
 
 
