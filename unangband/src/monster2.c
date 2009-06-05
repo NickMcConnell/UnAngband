@@ -1750,7 +1750,7 @@ void display_monlist(int row, bool command, bool force)
 			ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
 		}
 
-		screen_load();
+		if (Term == angband_term[0]) screen_load();
 	}
 
 	/* Display command prompt */
