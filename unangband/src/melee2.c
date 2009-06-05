@@ -1318,16 +1318,17 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	}
 
 	/* Allies do not teleport unless afraid or blink unless we need to reposition */
-	if ((m_ptr->mflag & (MFLAG_ALLY)) && ((!m_ptr->ml) || (m_ptr->cdis >= MAX_SIGHT)))
+	if (m_ptr->mflag & (MFLAG_ALLY))
 	{
 		/* Prevent blinking unless target is at wrong range - note check to see if we can blink for efficiency */
-		if (((f6 & (RF6_BLINK)) != 0) && (!(m_ptr->ty) || !(m_ptr->tx) || (ABS(m_ptr->best_range - distance(m_ptr->fy, m_ptr->fx, m_ptr->ty, m_ptr->tx)) < 4)))
+		if (((f6 & (RF6_BLINK)) != 0) && (m_ptr->cdis >= MAX_SIGHT / 3) &&
+			(!(m_ptr->ty) || !(m_ptr->tx) || (ABS(m_ptr->best_range - distance(m_ptr->fy, m_ptr->fx, m_ptr->ty, m_ptr->tx)) < 4)))
 		{
 			f6 &= ~(RF6_BLINK);
 		}
 
-		/* Prevent teleporting unless afraid */
-		if (!m_ptr->monfear)
+		/* Prevent teleporting unless afraid or too far away */
+		if ((!m_ptr->monfear) || (m_ptr->cdis >= MAX_SIGHT))
 		{
 			f6 &= ~(RF6_TPORT);
 		}
