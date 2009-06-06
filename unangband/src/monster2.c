@@ -1044,11 +1044,13 @@ static const char *sort_by_name[]=
 /*
  * Display visible monsters and/or objects in a window
  *
- * Types defines whether we see monsters, objects or both:
+ * Mode defines whether we see monsters, objects, features,
+ * and whether we show or hide stuff we are only aware of.
  *
  * 1 	- monsters
  * 2	- objects
- * 3	- both
+ * 4	- features (not implemented)
+ * 8	- hide objects we're only aware of
  *
  * Sort by values:
  *
@@ -1058,7 +1060,7 @@ static const char *sort_by_name[]=
  *
  * Returns the width of the monster and/or object lists, or 0 if no monsters/objects are seen.
  */
-void display_monlist(int row, bool command, bool force)
+void display_monlist(int row, unsigned int width, int mode, bool command, bool force)
 {
 	int idx, max;
 	int line;
@@ -1080,19 +1082,12 @@ void display_monlist(int row, bool command, bool force)
 	int i, j;
 
 	int max_sort;
-	unsigned int n = 0, width = 0;
+	unsigned int n = 0;
 
 	bool intro;
 	bool done = FALSE;
 
 	key_event ke;
-
-	/* Hack -- initialise for the first time */
-	if (!op_ptr->monlist_display)
-	{
-		op_ptr->monlist_display = 3;
-		op_ptr->monlist_sort_by = 2;
-	}
 
 	/* Clear the term if in a subwindow, set x otherwise */
 	if (Term != angband_term[0])
@@ -1102,7 +1097,7 @@ void display_monlist(int row, bool command, bool force)
 	}
 	else
 	{
-		max = Term->hgt - 2;
+		max = Term->hgt - (show_sidebar ? 3 : 2);
 
 		screen_save();
 	}
@@ -1136,7 +1131,7 @@ void display_monlist(int row, bool command, bool force)
 		 * Iterate multiple times. We put monsters we can project to in the first list, then monsters we can see,
 		 * then monsters we are aware of through other means.
 		 */
-		if (op_ptr->monlist_display % 2) for (i = 0; !done && i < 3; i++)
+		if (mode & 1) for (i = 0; !done && i < 3; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1159,7 +1154,7 @@ void display_monlist(int row, bool command, bool force)
 				{
 					if (i != 1) continue;
 				}
-				else if (i != 2) continue;
+				else if ((i != 2) || (mode & 8)) continue;
 
 				/* Bump the count for this race */
 				race_counts[m_ptr->r_idx]++;
@@ -1398,7 +1393,7 @@ void display_monlist(int row, bool command, bool force)
 		}
 
 		/* Display items */
-		if (op_ptr->monlist_display / 2) for (i = 0; !done && i < 2; i++)
+		if (mode & 2) for (i = 0; !done && i < 2; i++)
 		{
 			/* Reset status count */
 			status_count = 0;
@@ -1420,7 +1415,7 @@ void display_monlist(int row, bool command, bool force)
 				{
 					if (i != 0) continue;
 				}
-				else if (i != 1) continue;
+				else if ((i != 1) || (mode & 8)) continue;
 
 				/* Bump the count for this artifact or kind */
 				if ((object_named_p(o_ptr)) && (o_ptr->name1))
@@ -1719,13 +1714,21 @@ void display_monlist(int row, bool command, bool force)
 	/* Reload the screen if we got to end of the list */
 	if (!done)
 	{
-		if (!width && force)
+		if (!total_count)
 		{
-			prt(format("You see no %s%s%s. (by %s)",
-					op_ptr->monlist_display % 2 ? "monsters" : "",
-					op_ptr->monlist_display == 3 ? " or " : "",
-					op_ptr->monlist_display / 2 ? "objects" : "",
-					sort_by_name[op_ptr->monlist_sort_by]), 0, 0);
+			if (force)
+			{
+				prt(format("You see no %s%s%s. (by %s)",
+						mode % 2 ? "monsters" : "",
+						mode == 3 ? " or " : "",
+						mode / 2 ? "objects" : "",
+						sort_by_name[op_ptr->monlist_sort_by]), 0, 0);
+			}
+			else
+			{
+				screen_load();
+				return;
+			}
 		}
 
 		if (Term == angband_term[0])

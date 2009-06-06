@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	3
-#define VERSION_EXTRA	7
+#define VERSION_EXTRA	8
 
 /*
  * Oldest version number that can still be imported
@@ -3161,7 +3161,9 @@ enum
 #define PW_ROOM_INFO	    	0x00001000L /* Display room description */
 #define PW_SNAPSHOT	 	0x00002000L /* Display snap-shot */
 #define PW_MONLIST          	0x00004000L /* Display monster list */
-#define PW_HELP			0x00008000L /* Display self-knowledge */
+#define PW_ITEMLIST		0x00008000L	/* Display item list */
+#define PW_HELP			0x00010000L	/* Display help */
+#define PW_SELF_KNOW	0x00020000L /* Display self-knowledge */
 
 #define PW_MAX_FLAGS		16
 

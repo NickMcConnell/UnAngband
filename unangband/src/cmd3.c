@@ -2482,10 +2482,14 @@ void do_cmd_monlist(void)
 			else op_ptr->monlist_display = 3;
 		}
 		else op_ptr->monlist_sort_by--;
+
+		p_ptr->window |= (PW_MONLIST | PW_ITEMLIST);
+
+		window_stuff();
 	}
 
 	/* Display the monster list */
-	display_monlist(0, TRUE, TRUE);
+	display_monlist(0, 0, op_ptr->monlist_display, TRUE, TRUE);
 
 	/* Hack -- cycling monster list sorting */
 	if ((!easy_monlist) && (p_ptr->command_new.key == '['))
@@ -2497,6 +2501,10 @@ void do_cmd_monlist(void)
 			else op_ptr->monlist_display = 3;
 		}
 		else op_ptr->monlist_sort_by--;
+
+		p_ptr->window |= (PW_MONLIST | PW_ITEMLIST);
+
+		window_stuff();
 	}
 }
 

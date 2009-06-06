@@ -950,8 +950,20 @@ static void rd_options(void)
 	op_ptr->hitpoint_warn = b;
 
 	/* Old cheating options */
-	rd_u16b(&tmp16u);
+	rd_byte(&b);
+	op_ptr->monlist_display = b;
 
+	/* Old cheating options */
+	rd_byte(&b);
+	op_ptr->monlist_sort_by = b;
+
+	/* Hack -- initialise options for the first time */
+	if (!op_ptr->monlist_display)
+	{
+		op_ptr->monlist_display = 3;
+		op_ptr->monlist_sort_by = 2;
+		op_ptr->delay_factor = 9;
+	}
 
 	/*** Normal Options ***/
 
