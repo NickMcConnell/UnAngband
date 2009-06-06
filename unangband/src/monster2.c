@@ -1731,20 +1731,23 @@ void display_monlist(int row, bool command, bool force)
 					sort_by_name[op_ptr->monlist_sort_by]), 0, 0);
 		}
 
-		/* Get an acceptable keypress. */
-		ke = force ? anykey() : inkey_ex();
-
-		while ((ke.key == '\xff') && !(ke.mousebutton))
+		if (Term == angband_term[0])
 		{
-			int y = KEY_GRID_Y(ke);
-			int x = KEY_GRID_X(ke);
+			/* Get an acceptable keypress. */
+			ke = force ? anykey() : inkey_ex();
 
-			int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
+			while ((ke.key == '\xff') && !(ke.mousebutton))
+			{
+				int y = KEY_GRID_Y(ke);
+				int x = KEY_GRID_X(ke);
 
-			ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+				int room = dun_room[p_ptr->py/BLOCK_HGT][p_ptr->px/BLOCK_WID];
+
+				ke = target_set_interactive_aux(y, x, &room, TARGET_PEEK, (use_mouse ? "*,left-click to target, right-click to go to" : "*"));
+			}
+
+			screen_load();
 		}
-
-		if (Term == angband_term[0]) screen_load();
 	}
 
 	/* Display command prompt */
