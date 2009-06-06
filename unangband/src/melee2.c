@@ -1498,7 +1498,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			}
 		}
 	}
-	
+
 	/* No valid target (only possible if an idle ally) */
 	if (!target_m_idx)
 	{
@@ -2304,6 +2304,9 @@ static void get_town_target(monster_type *m_ptr)
 				y = rand_range(1, TOWN_HGT - 2);
 				x = rand_range(1, TOWN_WID - 2);
 			}
+
+			/* Require a grid we can get to */
+			if (!mon_resist_feat(cave_feat[y][x], m_ptr->r_idx)) continue;
 
 			/* Require "empty" floor grids */
 			if (cave_empty_bold(y, x))
@@ -6256,7 +6259,7 @@ static void process_monster(int m_idx)
 		|| (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH)))
 	{
 		int roll;
-		
+
 		/* Monster must cast */
 		if (m_ptr->mflag & (MFLAG_CAST | MFLAG_SHOT | MFLAG_BREATH))
 		{
