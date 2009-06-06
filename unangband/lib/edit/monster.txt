@@ -12278,7 +12278,7 @@ D: apparently feel no pain.  |He|She| tramples weaker creatures underfoot
 D: in |his|her| eagerness to get to |his|her| real enemy, and |his|her|
 D: battle-cry strikes terror into |his|her| foes.
 
-N:584:Cyclops
+N:584:Cyclops|||es|
 G:P:u
 #$ Clear available
 #$ Multihued available
