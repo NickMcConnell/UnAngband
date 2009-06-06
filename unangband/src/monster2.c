@@ -1065,7 +1065,7 @@ void display_monlist(int row, bool command, bool force)
 	int total_count, disp_count, status_count;
 	int forreal;
 
-	char *m_name;
+	char m_name[80];
 	char buf[80];
 	monster_type *m_ptr;
 	monster_race *r_ptr;
@@ -1230,7 +1230,7 @@ void display_monlist(int row, bool command, bool force)
 					r_ptr = &r_info[m_ptr->r_idx];
 
 					/* Get the monster name */
-					m_name = r_name + r_ptr->name;
+					monster_desc(m_name, sizeof(m_name), idx, race_counts[m_ptr->r_idx] > 1 ? 0x300 : 0x208);
 
 					/* Obtain the length of the description */
 					n = strlen(m_name);
@@ -1248,12 +1248,9 @@ void display_monlist(int row, bool command, bool force)
 
 							/* Display the entry itself */
 							Term_addstr(-1, attr, m_name);
-
-							/* XXX Need to pluralise this properly */
-							Term_addstr(-1, attr, "s");
 						}
 
-						n+= strlen(buf) + 2;
+						n+= strlen(buf) + 1;
 
 						if ((sleep_counts[m_ptr->r_idx]) && (sleep_counts[m_ptr->r_idx] < race_counts[m_ptr->r_idx]))
 						{
@@ -1811,6 +1808,8 @@ void display_monlist(int row, bool command, bool force)
  *   0x20 --> Pronominalize visible monsters
  *   0x40 --> Assume the monster is hidden
  *   0x80 --> Assume the monster is visible
+ *   0x100 --> Pluralize the monster
+ *   0x200 --> No special suffixes
  *
  * Useful Modes:
  *   0x00 --> Full nominative name ("the goblin") or "it"
@@ -1835,6 +1834,8 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 	int match = 1;
 	char *s, *t;
 
+	bool append_s = TRUE;
+
 	/* Can we "see" it (forced, or not hidden + visible) */
 	seen = ((mode & (0x80)) || (!(mode & (0x40)) && m_ptr->ml));
 
@@ -1843,6 +1844,9 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 
 	/* Extract the gender if female */
 	if ((r_ptr->flags1 & (RF1_FEMALE)) && (!(r_ptr->flags1 & (RF1_MALE)) || (m_idx % 2))) match = 2;
+
+	/* Extract pluralized if requested */
+	if (mode & (0x100)) match = 3;
 
 	/* First, try using pronouns, or describing hidden monsters */
 	if (!seen || pron)
@@ -1932,8 +1936,8 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARCHER)) != 0)) suffix = "ranger";
 			else if (((r_ptr->flags2 & (RF2_MAGE)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "warrior mage";
 			else if ((r_ptr->flags2 & (RF2_MAGE)) != 0) suffix = "mage";
-			else if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "|knight|princess|";
-			else if ((r_ptr->flags2 & (RF2_PRIEST)) != 0) suffix = "priest||ess|";
+			else if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && ((r_ptr->flags2 & (RF2_ARMOR)) != 0)) suffix = "|knight|princess|knights|";
+			else if ((r_ptr->flags2 & (RF2_PRIEST)) != 0) suffix = "priest||ess|s|";
 			else if ((r_ptr->flags2 & (RF2_ARCHER)) != 0) suffix = "archer";
 			else if ((r_ptr->flags2 & (RF2_SNEAKY)) != 0) suffix = "scout";
 			else if ((r_ptr->flags2 & (RF2_ARMOR)) != 0) suffix = "warrior";
@@ -2034,27 +2038,47 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		}
 
 		/* It could be an indefinite monster */
-		else if (mode & 0x08)
+		else
 		{
 			/* XXX Check plurality for "some" */
+			if (mode & 0x100) my_strcpy(desc, "", max);
 
 			/* Indefinite monsters need an indefinite article */
-			my_strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ", max);
+			else if (mode & 0x08) my_strcpy(desc, is_a_vowel(prefix ? prefix[0] : name[0]) ? "an " : "a ", max);
+
+			/* It could be a normal, definite, monster */
+			else my_strcpy(desc, "the ", max);
+
+			/* Otherwise */
 			if (prefix) my_strcat(desc, prefix, max);
 			if (infix) { my_strcat(desc, infix, max); my_strcat(desc, " ", max); }
 			my_strcat(desc, name, max);
 			if (suffix) { my_strcat(desc, " ", max); my_strcat(desc, suffix, max); }
 		}
 
-		/* It could be a normal, definite, monster */
-		else
+		/* Remove gender sensitivity */
+		for (t = s = desc; *s; s++)
 		{
-			/* Definite monsters need a definite article */
-			my_strcpy(desc, "the ", max);
-			if (prefix) my_strcat(desc, prefix, max);
-			if (infix) { my_strcat(desc, infix, max); my_strcat(desc, " ", max); }
-			my_strcat(desc, name, max);
-			if (suffix) my_strcat(desc, suffix, max);
+			if (*s == '|')
+			{
+				state++;
+				if (state == 4) state = 0;
+				append_s = FALSE;
+			}
+			else if (!state || (state == match))
+			{
+				*t++ = *s;
+			}
+		}
+
+		/* Terminate buffer */
+		*t = '\0';
+
+		/* Pluralize */
+		if ((append_s) && ((mode & (0x100)) != 0))
+		{
+			/* Simply append "s" for plural */
+			my_strcat(desc, "s", max);
 		}
 
 		/* Handle the Possessive as a special afterthought */
@@ -2065,6 +2089,9 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 			/* Simply append "apostrophe" and "s" */
 			my_strcat(desc, "'s", max);
 		}
+
+		/* Don't affix special comments if requested */
+		if (mode & 0x200) return;
 
 		/* Mention "hidden" monsters XXX XXX */
 		/* Note we only see "hidden" monsters with detection,
@@ -2147,23 +2174,6 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 				my_strcat(desc, format(" (sp:%d)", r_ptr->mana) , max);
 			}
 		}
-
-		/* Remove gender sensitivity */
-		for (t = s = desc; *s; s++)
-		{
-			if (*s == '|')
-			{
-				state++;
-				if (state == 3) state = 0;
-			}
-			else if (!state || (state == match))
-			{
-				*t++ = *s;
-			}
-		}
-
-		/* Terminate buffer */
-		*t = '\0';
 	}
 }
 
