@@ -781,23 +781,17 @@ s16b get_mon_num(int level)
 				continue;
 			}
 
-			/* MegaHack -- Sauron shapes */
-			if ((cave_ecology.race[i] == SAURON_TRUE) ||
-					((cave_ecology.race[i] >= SAURON_FORM) &&
-							(cave_ecology.race[i] < SAURON_FORM + MAX_SAURON_FORMS)))
+			/* Sauron musn't be summoned with his forms already present */
+			/* XXX This only occurs because we generate him in the ecology. */
+			if (i == SAURON_TRUE)
 			{
-				int j;
-				bool present = FALSE;
-
-				/* Check all shapes */
-				if (r_info[SAURON_TRUE].cur_num) continue;
-
 				for (j = SAURON_FORM; j < SAURON_FORM + MAX_SAURON_FORMS; j++)
 				{
-					if (r_info[SAURON_TRUE].cur_num) present = TRUE;
+					if (r_info[j].cur_num) break;
 				}
 
-				if (present) continue;
+				/* Another form present */
+				if (j < SAURON_FORM + MAX_SAURON_FORMS) continue;
 			}
 
 			/* Hack -- Never place quest monsters randomly. */
@@ -5497,7 +5491,9 @@ bool place_monster_aux(int y, int x, int r_idx, bool slp, bool grp, u32b flg)
 	monster_race *r_ptr = &r_info[r_idx];
 
 	/* MegaHack: Handle forms of Sauron */
-	if (r_idx == SAURON_TRUE)
+	if ((r_idx == SAURON_TRUE) ||
+			((r_idx >= SAURON_FORM) &&
+			(r_idx < SAURON_FORM + MAX_SAURON_FORMS)))
 	{
 		r_idx = sauron_shape(0);
 
@@ -7257,8 +7253,6 @@ bool place_guardian(int y0, int x0, int y1, int x1)
 
 			return (FALSE);
 		}
-
-
 	}
 
 	return (TRUE);
