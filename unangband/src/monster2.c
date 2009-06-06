@@ -1089,6 +1089,9 @@ void display_monlist(int row, unsigned int width, int mode, bool command, bool f
 
 	key_event ke;
 
+	/* Paranoia */
+	if (!mode) return;
+
 	/* Clear the term if in a subwindow, set x otherwise */
 	if (Term != angband_term[0])
 	{

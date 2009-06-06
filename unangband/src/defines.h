@@ -4771,14 +4771,17 @@ enum
  * Determine if a given inventory item is "named"
  * Test One -- Check for special "known" or "named" tags
  * Test Two -- Check for "Flavor" + "Aware"
- * Test Three --
+ * Test Three -- Check for easily known items.
+ * Test Four -- Check for named items where the monster is known.
  */
 #define object_named_p(T) \
 	(((T)->ident & (IDENT_KNOWN | IDENT_NAME)) || \
 	 (k_info[(T)->k_idx].flavor  ? \
 	  ((k_info[(T)->k_idx].aware & (AWARE_FLAVOR)) != 0) : \
-		((k_info[(T)->k_idx].flags6 & (TR6_MOD_NAME | \
-				TR6_FORCE_MOD | TR6_SIMPLE)) != 0)))
+		(((k_info[(T)->k_idx].flags6 & (TR6_MOD_NAME | \
+				TR6_FORCE_MOD | TR6_SIMPLE)) != 0) || \
+		(((k_info[(T)->k_idx].flags6 & (TR6_NAMED)) != 0) && \
+				(!((T)->name3) || (l_list[(T)->name3].sights))))))
 
 
 /*
