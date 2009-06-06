@@ -4172,6 +4172,15 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	/* Hack -- no creation on glyph of warding */
 	if (f_ptr->flags1 & (FF1_GLYPH)) return (FALSE);
 
+	/* MegaHack: Handle forms of Sauron */
+	if ((r_idx == SAURON_TRUE) ||
+			((r_idx >= SAURON_FORM) &&
+			(r_idx < SAURON_FORM + MAX_SAURON_FORMS)))
+	{
+		/* XXX We've already picked a form. Just verifying that we can use it */
+		if (!sauron_shape(0)) return (FALSE);
+	}
+
 
 	if (!r_idx) msg_print("Bug: no monster!");
 
