@@ -9192,14 +9192,17 @@ void trigger_region(int y, int x, bool move)
 				x = region_piece_list[r].x;
 			}
 
+			/* Mark region as triggered */
+			/* XXX It's really important we mark region triggered before firing the effect.
+			 * This prevents a situation where a region gets retriggered by a monster drop
+			 * due to a monster dying, and recursively overrunning the stack. */
+			r_ptr->flags1 |= (RE1_TRIGGERED);
+			
 			/* Actually discharge the region */
 			notice |= region_effect(rp_ptr->region, y, x);
 
 			/* Paranoia - region has been removed */
 			if (!r_ptr->type) return;
-
-			/* Mark region as triggered */
-			r_ptr->flags1 |= (RE1_TRIGGERED);
 		}
 
 		/* Lingering effect hits player/monster moving into grid */

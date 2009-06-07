@@ -13066,7 +13066,7 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 					if (*grids >= grid_s - 1) break;
 
 					/* Stay within dungeon */
-					if (!in_bounds(yy, xx)) continue;
+					if (!in_bounds_fully(yy, xx)) continue;
 
 					/* Skip already added grids */
 					if (play_info[yy][xx] & (PLAY_TEMP)) continue;
