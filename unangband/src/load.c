@@ -926,8 +926,6 @@ static void rd_options(void)
 
 	byte b;
 
-	u16b tmp16u;
-
 	u32b flag[8];
 	u32b mask[8];
 	u32b window_flag[ANGBAND_TERM_MAX];
