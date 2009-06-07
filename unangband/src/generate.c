@@ -8073,6 +8073,14 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Get the next location */
 			tmp_row = row1 + row_dir;
 			tmp_col = col1 + col_dir;
+			
+			/* Mega-Hack -- Paranoia -- prevent infinite loops */
+			if (main_loop_count++ > 2000)
+			{
+				if (cheat_room) message_add(format("Main loop count exceeded from %d. Aborting.", part1), MSG_GENERIC);
+				abort_and_cleanup = TRUE;
+				break;
+			}
 		}
 
 		/* Avoid "solid" granite walls */
@@ -13083,6 +13091,16 @@ void generate_cave(void)
 		/* Wipe the regions */
 		wipe_region_piece_list();
 		wipe_region_list();
+		
+		/* Safety */
+		if (num > 100)
+		{
+			msg_format("A bug hidden in %s leaps out at you and takes you elsewhere.", t_name + t_info[p_ptr->dungeon].name);
+			
+			/* Banish the player to nowhere town. */
+			p_ptr->dungeon = 0;
+			p_ptr->depth = 0;
+		}
 	}
 
 
