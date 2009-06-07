@@ -1117,6 +1117,8 @@ enum
 #define GF_DESTROY	147
 #define GF_QUAKE	148
 #define GF_POISON_WEAK	149
+#define GF_POISON_HALF	150
+#define GF_HURT_POISON	151
 
 
 

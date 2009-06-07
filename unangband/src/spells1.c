@@ -1124,6 +1124,8 @@ byte spell_color(int type)
 
 		case GF_DELAY_POISON: return (pois_color());
 		case GF_POISON_WEAK:  return (pois_color());
+		case GF_POISON_HALF:  return (pois_color());
+		case GF_HURT_POISON:  return (pois_color());
 
 		case GF_PLASMA:       return (plasma_color());
 		case GF_HELLFIRE:     return (hellfire_color());
@@ -2605,11 +2607,14 @@ static void cold_dam(int who, int what, int dam, bool inven)
 /*
  * Hurt the player with Poison
  */
-static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool weak)
+static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool weak, bool half, bool hurt)
 {
 	int res = p_ptr->incr_resist[INCR_RES_POIS];
 
 	(void)inven;
+
+	/* Take damage */
+	if (hurt) take_hit(who, what, half ? (dam + 1) / 2 : dam);
 
 	/* Apply delay */
 	if ((delay) && !(p_ptr->timed[TMD_POISONED]))
@@ -2637,11 +2642,14 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 			/* Notice unless delayed */
 			if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
 
+			/* Weak does no immediate damage */
+			if (weak) return;
+
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
 
 			/* Take damage */
-			take_hit(who, what, dam);
+			if (!hurt) take_hit(who, what, half ? (dam + 1) / 2 : dam);
 
 			return;
 		}
@@ -2710,7 +2718,7 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	if (weak) return;
 
 	/* Take damage */
-	take_hit(who, what, dam);
+	if (!hurt) take_hit(who, what, half ? (dam + 1) / 2 : dam);
 }
 
 
@@ -3608,9 +3616,11 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			}
 			break;
 		}
+		case GF_POISON_HALF:
 		case GF_POISON_WEAK:
 		case GF_DELAY_POISON:
 		case GF_POIS:
+		case GF_HURT_POISON:
 		{
 			if ((f_ptr->flags3 & (FF3_HURT_POIS)) &&
 			       (dam > (f_ptr->power*10)))
@@ -6029,14 +6039,16 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Poison */
+		case GF_POISON_HALF:
 		case GF_POISON_WEAK:
 		case GF_DELAY_POISON:
 		case GF_POIS:
+		case GF_HURT_POISON:
 		{
 			if (seen) obvious = TRUE;
 			if (r_ptr->flags3 & (RF3_IM_POIS))
 			{
-				dam /= 9;
+				if (typ != GF_HURT_POISON) dam /= 9;
 				if ((seen) && !(l_ptr->flags3 & (RF3_IM_POIS)))
 				{
 					note = " is immune to poison.";
@@ -6048,6 +6060,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				do_pois = dam;
 
 				if ((typ == GF_POISON_WEAK) && (who <= SOURCE_PLAYER_START)) dam = 0;
+				if ((typ == GF_POISON_HALF) && (who <= SOURCE_PLAYER_START)) dam /= 2;
 			}
 			break;
 		}
@@ -7935,14 +7948,16 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Melee attack - lose mana */
 		case GF_MANA_DRAIN:
 		case GF_LOSE_MANA:
+		case GF_HURT_MANA:
 		{
+			/* Does no damage */
+			if (typ != GF_HURT_MANA) dam = 0;
+
 			/* Monster may have mana */
 			if (r_ptr->mana)
 			{
 				/* Drain depends on maximum mana */
 				int drain = 2 + rand_int(r_ptr->mana / 10);
-
-				dam = 0;
 
 				/* Monster still has mana */
 				if (m_ptr->mana > drain)
@@ -9233,12 +9248,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Standard damage -- also poisons player */
+		case GF_POISON_HALF:
 		case GF_POISON_WEAK:
 		case GF_DELAY_POISON:
+		case GF_HURT_POISON:
 		case GF_POIS:
 		{
 			if (fuzzy) msg_print("You are hit by poison!");
-			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON, typ == GF_POISON_WEAK);
+			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON, typ == GF_POISON_WEAK, typ == GF_POISON_HALF, typ == GF_HURT_POISON);
 			break;
 		}
 
@@ -11219,7 +11236,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					(void)set_cut(p_ptr->timed[TMD_CUT] + randint(dam));
 
 					/* Poison the player */
-					poison_dam(who, what, dam, TRUE, FALSE, FALSE);
+					poison_dam(who, what, dam, TRUE, FALSE, FALSE, FALSE, TRUE);
 				}
 
 				/* Take the damage */

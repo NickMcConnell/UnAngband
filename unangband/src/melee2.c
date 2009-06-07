@@ -475,6 +475,8 @@ static int find_resist(u32b smart, int effect)
 
 		/* Poison Spells */
 		case GF_POIS:
+		case GF_POISON_WEAK:
+		case GF_POISON_HALF:
 		{
 			if (smart & (SM_IMM_POIS)) return (100);
 			else if ((smart & (SM_OPP_POIS)) && (smart & (SM_RES_POIS))) return (80);

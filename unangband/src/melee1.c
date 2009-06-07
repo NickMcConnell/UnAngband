@@ -2256,6 +2256,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		if ((result) && (spower >= 40)) dam = dam * 3 / 4;
 	}
 
+	/* Hack -- Weaken poison ball attacks */
+	if ((effect == GF_POIS) && (result >= 4))
+	{
+		effect = result >= 6 ? GF_POISON_WEAK  : GF_POISON_HALF;
+
+		effect_ptr = &effect_info[GF_POISON_HALF];
+
+		/* Hack -- bump damage */
+		dam *= 2;
+	}
+
 	/* Any effect? */
 	if (result >= 0)
 	{

@@ -1333,7 +1333,7 @@ T:0-9:cast~ a stinking cloud at &
 T:0-9:mumble~ bitterly
 I:0:6:0
 W:4:0:0
-X:3:1:6:0:1:0:POISON
+X:3:1:6:0:1:0:POISON_WEAK
 C:50:0:0:0:0:0:100
 R:4
 M:20

@@ -3168,6 +3168,8 @@ static int mon_resist_effect(int effect, int r_idx)
 
 		case GF_DELAY_POISON:
 		case GF_POIS:
+		case GF_POISON_WEAK:
+		case GF_POISON_HALF:
 		if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (0);
 		break;
 

@@ -7786,6 +7786,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_POIS:
 		case GF_ICE:
 		case GF_SHARD:
+		case GF_HURT_POISON:
 		{
 			atk_dam *= 5;
 			atk_dam /= 4;

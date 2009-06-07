@@ -803,6 +803,8 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 			case GF_FIRE:   q = "burn"; break;
 			case GF_COLD:   q = "freeze"; break;
 			case GF_POIS: q = "poison"; break;
+			case GF_POISON_HALF: q = "poison"; break;
+			case GF_POISON_WEAK: q = "poison"; break;
 			case GF_ANIM_DEAD: q="animate dead"; break;
 			case GF_LITE: q = "blast with powerful light";break;
 			case GF_DARK: q = "blast with powerful darkness";break;

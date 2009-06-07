@@ -766,3 +766,13 @@ I:0
 D:poison~::::::
 T:poison
 
+N:150:POISON_HALF
+I:0
+D:poison~::::::
+T:poison
+
+N:151:HURT_POISON
+I:0
+D:poison~::::::
+T:poison
+
