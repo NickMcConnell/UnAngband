@@ -2308,7 +2308,7 @@ static void get_town_target(monster_type *m_ptr)
 			}
 
 			/* Require a grid we can get to */
-			if (!mon_resist_feat(cave_feat[y][x], m_ptr->r_idx)) continue;
+			if (!mon_resist_feat(f_info[cave_feat[y][x]].mimic, m_ptr->r_idx)) continue;
 
 			/* Require "empty" floor grids */
 			if (cave_empty_bold(y, x))
