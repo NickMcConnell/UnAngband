@@ -3788,10 +3788,7 @@ void move_player(int dir)
 		}
 
 		/* Handle "store doors" */
-		/* The running with pathfind check ensures we don't interrupt ourselves
-		 * if we accidentally walk on a shop due to route finding */
-		if ((f_ptr->flags1 & (FF1_ENTER))
-				&& (!(p_ptr->running_withpathfind) || (pf_result_index <= 0)))
+		if (f_ptr->flags1 & (FF1_ENTER))
 		{
 			/* Disturb */
 			disturb(0, 0);
@@ -4026,6 +4023,10 @@ static int see_wall(int dir, int y, int x)
  */
 static int see_stop(int dir, int y, int x)
 {
+	s16b this_region_piece, next_region_piece = 0;
+
+	int feat = f_info[cave_feat[y][x]].mimic;
+
 	/* Get the new location */
 	y += ddy[dir];
 	x += ddx[dir];
@@ -4036,8 +4037,33 @@ static int see_stop(int dir, int y, int x)
 	/* Unknown walls are not known obstacles */
 	if (!(play_info[y][x] & (PLAY_MARK))) return (FALSE);
 
+	/* Don't move over known regions */
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+		region_type *r_ptr = &region_list[rp_ptr->region];
+
+		/* Get the next region */
+		next_region_piece = rp_ptr->next_in_grid;
+
+		/* Skip dead regions */
+		if (!r_ptr->type) continue;
+
+		/* Displaying region */
+		if (((cheat_hear) || ((r_ptr->flags1 & (RE1_NOTICE)) != 0)) &&
+				(((play_info[y][x] & (PLAY_REGN | PLAY_SEEN)) != 0) ||
+					(((play_info[y][x] & (PLAY_VIEW)) != 0) && ((r_ptr->flags1 & (RE1_SHINING)) != 0))) &&
+						((r_ptr->flags1 & (RE1_DISPLAY)) != 0))
+		{
+			return (TRUE);
+		}
+	}
+
 	/* Run-able grids are not known obstacles */
-	if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_RUN)) return (FALSE);
+	if (f_info[feat].flags1 & (FF1_RUN)) return (FALSE);
+
+	/* The terrain the player started on is not a known obstacle */
+	if (feat == p_ptr->run_cur_feat) return (FALSE);
 
 	/* Default */
 	return (TRUE);
