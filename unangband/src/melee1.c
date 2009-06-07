@@ -1947,7 +1947,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* Feature is seen */
 		if (play_info[y][x] & (PLAY_SEEN))
 		{
-			my_strcpy(m_poss,format("the %s", f_name + f_info[what].name), sizeof(m_name));
+			my_strcpy(m_name,format("the %s", f_name + f_info[what].name), sizeof(m_name));
 			my_strcpy(m_poss,format("the %s's", f_name + f_info[what].name), sizeof(m_poss));
 		}
 		else
