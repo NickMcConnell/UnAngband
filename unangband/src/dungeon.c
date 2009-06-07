@@ -866,7 +866,7 @@ void suffer_disease(bool allow_cure)
 
 			case DISEASE_THIRST:
 			{
-				set_food(p_ptr->food - randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) + 10);
+				set_food(p_ptr->food - randint(p_ptr->disease & (DISEASE_POWER) ? 100 : 30) - 10);
 				break;
 			}
 
