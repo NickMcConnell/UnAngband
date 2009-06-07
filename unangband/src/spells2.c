@@ -5601,16 +5601,8 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 		if ((retarget) && (!retarget(&ty, &tx, &flg, method, level, TRUE, &one_grid) != 0)) return (obvious);
 
 		/* Set target coords */
-		if (flg & (PROJECT_SELF))
-		{
-			y1 = y0;
-			x1 = x0;
-		}
-		else
-		{
-			y1 = ty;
-			x1 = tx;
-		}
+		y1 = ty;
+		x1 = tx;
 
 		/* Get initial damage */
 		damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
@@ -5789,7 +5781,13 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 	retarget_blows_subsequent = TRUE;
 
 	/* Never retarget for spells which affect self */
-	if (*flg & (PROJECT_SELF)) return (TRUE);
+	if (*flg & (PROJECT_SELF))
+	{
+		*ty = py;
+		*tx = px;
+
+		return (TRUE);
+	}
 
 	/* If we're not fully retargetting, just continue through the target */
 	if (!full)
