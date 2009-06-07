@@ -844,7 +844,7 @@ extern s16b floor_carry(int y, int x, object_type *j_ptr);
 extern void race_near(int r_idx, int y1, int x1);
 extern bool break_near(object_type *j_ptr, int y1, int x1);
 extern bool check_object_lite(object_type *j_ptr);
-extern void drop_near(object_type *j_ptr, int chance, int y, int x);
+extern void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger);
 extern void feat_near(int feat, int y, int x);
 extern void acquirement(int y1, int x1, int num, bool great);
 extern void place_object(int y, int x, bool good, bool great);

@@ -5136,7 +5136,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			delete_object_idx(this_o_idx);
 
 			/* Drop it near the new location */
-			drop_near(i_ptr, -1, ny, nx);
+			drop_near(i_ptr, -1, ny, nx, FALSE);
 
 			/* Redraw */
 			lite_spot(y, x);
@@ -5164,7 +5164,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		if (make_meat < i_ptr->weight) i_ptr->weight = make_meat;
 
 		/* Drop it near the new location */
-		drop_near(i_ptr, -1, y, x);
+		drop_near(i_ptr, -1, y, x, FALSE);
 
 		/* Redraw */
 		lite_spot(y, x);
@@ -10361,7 +10361,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				else
 				{
 					/* Hack --- 20% chance of lost forever */
-					drop_near(i_ptr,20,p_ptr->py,p_ptr->px);
+					drop_near(i_ptr,20,p_ptr->py,p_ptr->px, FALSE);
 				}
 
 				/* Forget about item */

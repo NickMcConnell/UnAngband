@@ -2304,9 +2304,6 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 							/* Modify quantity */
 							i_ptr->number = 1;
 
-							/* Drop nearby - some chance of breakage */
-							drop_near(i_ptr,ny,nx,breakage_chance(i_ptr));
-
 							/* Decrease the item */
 							floor_item_increase(ammo, -1);
 
@@ -2323,6 +2320,10 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 
 							/* Alter feat if out of ammunition */
 							if (!cave_o_idx[y][x]) cave_alter_source_feat(y,x,FS_DISARM);
+							
+							/* Drop nearby - some chance of breakage */
+							/* XXX Put last for safety in case region triggered or broken */
+							drop_near(i_ptr,ny,nx,breakage_chance(i_ptr), FALSE);
 						}
 					}
 					else

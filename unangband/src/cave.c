@@ -5934,7 +5934,7 @@ void cave_set_feat(const int y, const int x, int feat)
 			i_ptr->origin_depth = p_ptr->depth;
 
 			/* Drop it in the dungeon */
-			drop_near(i_ptr, -1, y, x);
+			drop_near(i_ptr, -1, y, x, TRUE);
 		}
 
 		/* Clear drop restriction */

@@ -2960,7 +2960,7 @@ bool brand_item(int brand, cptr act)
 		{
 			/* Carry the item */
 			if (inven_carry_okay(o_ptr)) inven_carry(o_ptr);
-			else drop_near(o_ptr,0,p_ptr->py,p_ptr->px);
+			else drop_near(o_ptr,0,p_ptr->py,p_ptr->px, FALSE);
 		}
 
 		/* Recalculate bonuses */
@@ -5220,7 +5220,7 @@ static void create_gold(void)
 	i_ptr->charges = (s16b)(base + (8 * randint(base)) + randint(8));
 
 	/* Floor carries the item */
-	drop_near(i_ptr, 0, p_ptr->py, p_ptr->px);
+	drop_near(i_ptr, 0, p_ptr->py, p_ptr->px, FALSE);
 
 	/* XXX To do thesis on inflation in Angband economies. */
 }

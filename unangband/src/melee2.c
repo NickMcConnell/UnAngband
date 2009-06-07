@@ -7226,7 +7226,7 @@ static void recover_monster(int m_idx, bool regen)
 					delete_object_idx(this_o_idx);
 
 					/* Drop it */
-					drop_near(i_ptr, -1, y, x);
+					drop_near(i_ptr, -1, y, x, TRUE);
 				}
 
 				/* Forget objects */

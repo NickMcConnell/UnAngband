@@ -4299,7 +4299,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 		drop_may_flags(i_ptr);
 
 		/* Drop (or break) near that location */
-		drop_near(i_ptr, j, y, x);
+		drop_near(i_ptr, j, y, x, FALSE);
 
 		/* Rope doesn't reach other end of chasm */
 		if (chasm)
