@@ -6241,18 +6241,17 @@ static void process_monster(int m_idx)
 	if ((chance_spell) && (m_ptr->cdis > MAX_RANGE + 1)) chance_spell = 0;
 
 	/* Cannot use spell attacks when enraged or not aware. */
-	/* Hack -- when blind, monster can only cast CURE spell. */
-	if ((chance_spell) && ((m_ptr->berserk) || (!aware)
-		|| ((m_ptr->blind) && !(r_ptr->flags6 & (RF6_CURE))) )) chance_spell = 0;
+	if ((chance_spell) && ((m_ptr->berserk) || (!aware) )) chance_spell = 0;
 
 	/* Cannot use innate attacks when not aware. */
 	if ((chance_innate) && (!aware)) chance_innate = 0;
 
-	/* Stunned and confused monsters use spell attacks half as often. */
-	if ((chance_spell) && (m_ptr->stunned) && (m_ptr->confused)) chance_spell /= 2;
-
-	/* Blind, confused or stunned monsters use innate attacks half as often. */
-	if ((chance_innate) && ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))) chance_innate /= 2;
+	/* Blind, confused and stunned monsters use spell attacks half as often. */
+	if ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))
+	{
+		chance_spell /= 2;
+		chance_innate /= 2;
+	}
 
 	/* Monster can use ranged attacks */
 	/* Now use a 'save' against the players charisma to avoid this */
