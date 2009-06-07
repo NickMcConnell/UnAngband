@@ -839,10 +839,10 @@ void object_bonus(object_type *o_ptr, bool floor)
 	}
 
 	/* For armour/weapons - is this all we need to know? */
-	if ((o_ptr->feeling == INSCRIP_AVERAGE) ||
+	if ((o_ptr->tval != TV_STAFF) && ((o_ptr->feeling == INSCRIP_AVERAGE) ||
 			(o_ptr->feeling == INSCRIP_GOOD) ||
 			(o_ptr->feeling == INSCRIP_VERY_GOOD) ||
-			(o_ptr->feeling == INSCRIP_GREAT))
+			(o_ptr->feeling == INSCRIP_GREAT)))
 	{
 		object_known(o_ptr);
 	}
@@ -879,10 +879,10 @@ void object_gauge(object_type *o_ptr, bool floor)
 	}
 
 	/* For armour/weapons - is this all we need to know? */
-	if ((o_ptr->feeling == INSCRIP_AVERAGE) ||
+	if ((o_ptr->tval != TV_STAFF) && ((o_ptr->feeling == INSCRIP_AVERAGE) ||
 			(o_ptr->feeling == INSCRIP_GOOD) ||
 			(o_ptr->feeling == INSCRIP_VERY_GOOD) ||
-			(o_ptr->feeling == INSCRIP_GREAT))
+			(o_ptr->feeling == INSCRIP_GREAT)))
 	{
 		object_known(o_ptr);
 	}
