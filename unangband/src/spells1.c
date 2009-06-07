@@ -13960,7 +13960,7 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 	if (region) flg |= (PROJECT_CHCK);
 
 	/* Pick a 'nearby' location */
-	if (method_ptr->flags2 & (PR2_SCATTER)) scatter(&y, &x, y1, x1, radius, flg & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
+	if (method_ptr->flags2 & (PR2_SCATTER))	scatter(&y, &x, y1, x1, range, flg & (PROJECT_LOS) ? CAVE_XLOS : CAVE_XLOF);
 
 	/* Affect distant monsters */
 	if (method_ptr->flags2 & (PR2_ALL_IN_LOS | PR2_PANEL | PR2_LEVEL))

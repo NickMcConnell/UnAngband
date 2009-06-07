@@ -952,7 +952,9 @@ struct region_info_type
 	u32b text;      /* Text (offset) */
 
 	s16b method;	/* Instead of affecting all grids in region, use this method, if defined. */
+
 	s16b child_region;	/* Instead of affecting all grids in region, create a region with this type instead. */
+	method_level_scalar_type child_lasts;	/* How long does the child last for? */
 
 	s16b delay_reset;		/* Number of turns to reset counter to when countdown has finished */
 

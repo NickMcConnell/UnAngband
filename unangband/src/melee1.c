@@ -1428,7 +1428,7 @@ bool make_attack_normal(int m_idx)
  * spell.  The larger the value for "control", the less likely the damage
  * will vary greatly.
  */
-static int get_dam(byte power, int attack)
+int get_dam(byte power, int attack)
 {
 	int dam = 0;
 	int spread;
@@ -1972,7 +1972,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		rlev = f_info[cave_feat[y][x]].power;
 
 		/* Fake the spell power */
-		spower = 2 + p_ptr->depth / 10;
+		spower = 2 + p_ptr->depth / 2;
 
 		/* Fake the powerfulness */
 		powerful = (p_ptr->depth > 50 ? TRUE : FALSE);
@@ -4741,7 +4741,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	/* Apply the object */
 	else
 	{
-		discharge_trap(y, x, y, x);
+		discharge_trap(y, x, y, x, 0);
 
 		/* XXX Monster is no longer stupid */
 		m_ptr->mflag &= ~(MFLAG_STUPID);

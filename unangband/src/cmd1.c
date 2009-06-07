@@ -2088,10 +2088,13 @@ void cave_alter_source_feat(int y, int x, int action)
  * Handle a trap being discharged.
  *
  * Returns if the player noticed this.
+ *
+ * Child region is used to create a region instead of directly fire the trap.
  */
-bool discharge_trap(int y, int x, int ty, int tx)
+bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 {
 	int path_n;
+
 	u16b path_g[256];
 	bool obvious = FALSE;
 	bool apply_terrain = TRUE;
@@ -2582,17 +2585,77 @@ bool discharge_trap(int y, int x, int ty, int tx)
 		/* Apply spell effect */
 		else if (f_ptr->spell)
 		{
-      		obvious |= make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,ty,tx);
+			/* Hack -- force a child region.
+			 * The below damage values are culled from the hacks in make_attack_ranged */
+			if (child_region)
+			{
+				region_type *r_ptr = &region_list[child_region];
+				method_type *method_ptr = &method_info[f_ptr->spell];
+
+				int num = scale_method(method_ptr->number, p_ptr->depth);
+				int i;
+
+				/* Hack -- minimum number */
+				if (!num) num = 1;
+
+				/* Hack -- set various region parameters */
+				r_ptr->method = f_ptr->spell;
+				r_ptr->effect = method_ptr->d_res;
+
+				/* Create the region */
+				for (i = 0; i < num; i++)
+				{
+					/* Get damage for breath weapons */
+					if (method_ptr->flags2 & (PR2_BREATH))
+					{
+						dam = get_breath_dam(p_ptr->depth * 10, f_ptr->spell, p_ptr->depth > 50);
+					}
+					/* Get damage for regular spells */
+					else
+					{
+						dam = get_dam(2 + p_ptr->depth / 2, f_ptr->spell);
+					}
+
+					/* Hack -- set region damage */
+					r_ptr->damage = dam;
+
+					/* Apply the blow */
+					obvious |= project_method(SOURCE_FEATURE, feat, f_ptr->spell, method_ptr->d_res, dam, p_ptr->depth, y, x, ty, tx, child_region, method_ptr->flags1);
+				}
+			}
+			/* Regular spell attack */
+			else
+			{
+				obvious |= make_attack_ranged(SOURCE_FEATURE,f_ptr->spell,ty,tx);
+			}
 		}
 		/* Apply blow effect */
 		else if (f_ptr->blow.method)
 		{
+			region_type *r_ptr = &region_list[child_region];
 			feature_blow *blow_ptr = &f_ptr->blow;
+			int num = scale_method(method_info[blow_ptr->method].number, p_ptr->depth);
+			int i;
 
-			dam = damroll(blow_ptr->d_side,blow_ptr->d_dice);
+			/* Hack -- minimum number */
+			if (!num) num = 1;
 
-			/* Apply the blow */
-			obvious |= project_method(SOURCE_FEATURE, feat, blow_ptr->method, blow_ptr->effect, dam, p_ptr->depth, y, x, ty, tx, 0, method_info[blow_ptr->method].flags1);
+			/* Hack -- set various region parameters */
+			r_ptr->method = blow_ptr->method;
+			r_ptr->effect = blow_ptr->effect;
+
+			/* Create the region */
+			for (i = 0; i < num; i++)
+			{
+				/* Get the damage */
+				dam = damroll(blow_ptr->d_side,blow_ptr->d_dice);
+
+				/* Hack -- set region damage */
+				r_ptr->damage = dam;
+
+				/* Apply the blow */
+				obvious |= project_method(SOURCE_FEATURE, feat, blow_ptr->method, blow_ptr->effect, dam, p_ptr->depth, y, x, ty, tx, child_region, method_info[blow_ptr->method].flags1);
+			}
 		}
 
 		/* Re-get original feature */
@@ -2641,7 +2704,7 @@ void hit_trap(int y, int x)
 	disturb(0, 0);
 
 	/* Discharge the trap */
-	discharge_trap(y, x, y, x);
+	discharge_trap(y, x, y, x, 0);
 }
 
 

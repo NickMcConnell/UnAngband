@@ -8213,7 +8213,7 @@ s16b region_pop(void)
 
 
 	/* Warn the player */
-	msg_print("Too many regions!");
+	if (cheat_xtra) msg_print("Too many regions!");
 
 	/* Oops */
 	return (0);
@@ -8427,6 +8427,42 @@ void region_refresh(s16b region)
 }
 
 
+#if 0
+
+/*
+ * Hook for redrawing all grids in a region.
+ */
+bool region_debug_hook(int y, int x, int d, s16b region)
+{
+	(void)d;
+	(void)region;
+
+	/* Visual effects */
+	print_rel('*', TERM_GREEN, y, x);
+	move_cursor_relative(y, x);
+	Term_fresh();
+	Term_xtra(TERM_XTRA_DELAY, op_ptr->delay_factor * op_ptr->delay_factor);
+	lite_spot(y, x);
+	Term_fresh();
+
+
+	/* Notice elsewhere */
+	return (FALSE);
+}
+
+
+/*
+ * Redraw the region
+ */
+void region_debug(s16b region)
+{
+	region_iterate(region, region_debug_hook);
+
+	anykey();
+}
+#endif
+
+
 /*
  * Highlight the region. We do this by moving the first region pieces to the top of the stack.
  */
@@ -8562,8 +8598,64 @@ void region_update(s16b region)
 	/* Redraw grids */
 	region_refresh(region);
 
-	/* Update the facing */
-	r_ptr->facing = get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
+	/* Check region for triggers */
+	if ((r_ptr->flags1 & (RE1_TRIGGER_MOVE)) && !(r_ptr->flags1 & (RE1_TRIGGERED)))
+	{
+		s16b this_region_piece, next_region_piece = 0;
+		int y = 0;
+		int x = 0;
+		int k = 0;
+
+		for (this_region_piece = region_list[region].first_piece; this_region_piece; this_region_piece = next_region_piece)
+		{
+			/* Get the region piece */
+			region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+			/* Get the next object */
+			next_region_piece = rp_ptr->next_in_region;
+
+			/* Empty grids don't trigger anything */
+			if (cave_m_idx[rp_ptr->y][rp_ptr->x] == 0)
+			{
+				continue;
+			}
+
+			/* Some traps are avoidable */
+			else if (r_ptr->flags1 & (RE1_HIT_TRAP))
+			{
+				/* Some traps are avoidable by monsters*/
+				if ((cave_m_idx[rp_ptr->y][rp_ptr->x] > 0) && (mon_avoid_trap(&m_list[cave_m_idx[rp_ptr->y][rp_ptr->x]],r_ptr->y0,r_ptr->x0)))
+				{
+					continue;
+				}
+				/* Some traps are avoidable by the player */
+				else if ((cave_m_idx[rp_ptr->y][rp_ptr->x] < 0) && (avoid_trap(r_ptr->y0,r_ptr->x0)))
+				{
+					continue;
+				}
+			}
+
+			/* Trigger the region */
+			if (!rand_int(++k))
+			{
+				y = rp_ptr->y;
+				x = rp_ptr->x;
+			}
+		}
+
+		/* Valid target */
+		if (k)
+		{
+			trigger_region(y, x, TRUE);
+		}
+	}
+
+	/* Update the facing for various projections */
+	/* XXX Try to avoid updating clockwise/anticlockwise to avoid compounding rounding errors */
+	if (r_ptr->flags1 & (RE1_MOVE_SOURCE | RE1_SEEKER | RE1_RANDOM | RE1_SPREAD | RE1_INVERSE | RE1_CHAIN))
+	{
+		r_ptr->facing = get_angle_to_target(r_ptr->y0, r_ptr->x0, r_ptr->y1, r_ptr->x1, 0);
+	}
 }
 
 
@@ -8754,6 +8846,27 @@ bool region_project_t_hook(int y, int x, int d, s16b region)
 
 
 /*
+ * Hack - region we are copying this one to.
+ */
+s16b region_copy_to;
+
+
+/*
+ * Copy the pieces to a new region.
+ */
+bool region_copy_pieces_hook(int y, int x, int d, s16b region)
+{
+	(void)region;
+
+	/* Copy the region pieces */
+	region_piece_insert(y, x, d, region_copy_to);
+
+	return (FALSE);
+}
+
+
+
+/*
  * Kill a region.
  */
 void region_terminate(s16b region)
@@ -8854,9 +8967,11 @@ s16b region_random_piece(s16b region)
 bool region_effect(int region, int y, int x)
 {
 	region_type *r_ptr = &region_list[region];
-	method_type *method_ptr = &method_info[r_ptr->method];
+	region_info_type *ri_ptr = &region_info[r_ptr->type];
 
 	bool notice = FALSE;
+
+	int child_region = 0;
 
 	/* Paranoia */
 	if (!r_ptr->type) return (FALSE);
@@ -8864,31 +8979,15 @@ bool region_effect(int region, int y, int x)
 	/* Create a child region */
 	if (r_ptr->child_region)
 	{
-		int child_region = 0;
-
 		/* Get a newly initialized region */
 		child_region = init_region(r_ptr->who, r_ptr->what, r_ptr->child_region, r_ptr->damage, r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->y0, r_ptr->x0, y, x);
-
-		/* Paranoia */
-		if (child_region)
-		{
-			/* Projection method */
-			notice |= project_method(r_ptr->who, r_ptr->what, r_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->effect, r_ptr->y0, r_ptr->x0, y, x, child_region, method_ptr->flags1);
-
-			/* Hack -- lifespan */
-			region_list[child_region].lifespan = scale_method(method_ptr->max_range, r_ptr->level);
-
-			/* Display newly created regions. Allow features to be seen underneath. */
-			if (r_ptr->effect != GF_FEATURE) region_list[child_region].flags1 |= (RE1_DISPLAY);
-			if (notice) region_list[child_region].flags1 |= (RE1_NOTICE);
-		}
 	}
 
 	/* A real trap */
-	else if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
+	if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (f_info[cave_feat[r_ptr->y0][r_ptr->x0]].flags1 & (FF1_HIT_TRAP)))
 	{
 		/* Discharge the trap */
-		notice |= discharge_trap(r_ptr->y0, r_ptr->x0, y, x);
+		notice |= discharge_trap(r_ptr->y0, r_ptr->x0, y, x, child_region);
 	}
 	else
 	{
@@ -8916,11 +9015,19 @@ bool region_effect(int region, int y, int x)
 				if ((r_ptr->who != SOURCE_FEATURE) && (r_ptr->who != SOURCE_PLAYER_TRAP)) continue;
 				if (r_ptr->what != cave_feat[rp_ptr->y][rp_ptr->x]) continue;
 
+				/* Copy to child region */
+				if (child_region)
+				{
+					region_copy_to = child_region;
+
+					notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, TRUE, region_copy_pieces_hook);
+				}
 				/* Hack -- restore original terrain if going backwards */
-				if ((r_ptr->flags1 & (RE1_BACKWARDS)) && (r_ptr->flags1 & (RE1_SCALAR_FEATURE)))
+				else if ((r_ptr->flags1 & (RE1_BACKWARDS)) && (r_ptr->flags1 & (RE1_SCALAR_FEATURE)))
 				{
 					notice |= region_iterate_distance(region, rp_ptr->y, rp_ptr->x, r_ptr->age, FALSE, region_restore_hook);
 				}
+				/* Apply projection to region */
 				else
 				{
 					/* Apply projection effects to the grids */
@@ -8959,20 +9066,30 @@ bool region_effect(int region, int y, int x)
 			}
 
 			/* Attack the target */
-			project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, 0, 0L);
+			notice |= project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, child_region, 0L);
 		}
 
 		/* Method is not defined. Apply effect to all grids */
 		else
 		{
-			/* Apply projection effects to the grids */
-			notice |= region_iterate(region, region_project_hook);
+			/* Copy to child region */
+			if (child_region)
+			{
+				region_copy_to = child_region;
 
-			/* Apply temporary effects to grids */
-			notice |= region_iterate(region, region_project_t_hook);
+				notice |= region_iterate(region, region_copy_pieces_hook);
+			}
+			else
+			{
+				/* Apply projection effects to the grids */
+				notice |= region_iterate(region, region_project_hook);
 
-			/* Clear temporary array */
-			clear_temp_array();
+				/* Apply temporary effects to grids */
+				notice |= region_iterate(region, region_project_t_hook);
+
+				/* Clear temporary array */
+				clear_temp_array();
+			}
 		}
 
 		/* Region chains */
@@ -8997,6 +9114,21 @@ bool region_effect(int region, int y, int x)
 			/* Refresh required */
 			if (refresh) region_refresh(region);
 		}
+	}
+
+	/* Define child region */
+	if (child_region)
+	{
+		region_type *r_ptr = &region_list[child_region];
+
+		/* Hack -- lifespan */
+		r_ptr->lifespan = scale_method(ri_ptr->child_lasts, r_ptr->level);
+
+		/* Display newly created regions. Allow features to be seen underneath. */
+		if (r_ptr->effect != GF_FEATURE) r_ptr->flags1 |= (RE1_DISPLAY);
+		if (notice) r_ptr->flags1 |= (RE1_NOTICE);
+
+		region_refresh(child_region);
 	}
 
 	return(notice);
@@ -9310,8 +9442,8 @@ void region_move_seeker_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 	*ty = y;
 	*tx = x;
 
-	/* If random, we only move vortexes 20% of the time */
-	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 5)) return;
+	/* If random, we only move vortexes 50% of the time */
+	if ((r_ptr->flags1 & (RE1_RANDOM)) && (r % 2)) return;
 
 	/* Check around (and under) the vortex */
 	for (dir = 0; dir < 9; dir++)
@@ -9443,8 +9575,8 @@ void region_move_vector_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 	/* Does this fragment move at this age? */
 	if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) return;
 
-	/* If random, we only move vertexes 20% of the time */
-	if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 80)) return;
+	/* If random, we only move vertexes 50% of the time */
+	if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 50)) return;
 
 	/* Angle of travel */
 	angle = GRID_Y(d);
@@ -9587,7 +9719,7 @@ void process_region(s16b region)
 	if (r_ptr->flags1 & (RE1_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int facing = r_ptr->facing - 3;
+		int facing = r_ptr->facing - 2;
 		int dir;
 		int y, x;
 
@@ -9596,10 +9728,10 @@ void process_region(s16b region)
 		dir = get_angle_to_dir(facing);
 
 		/* Change direction if we can't project at least 1 grid after rotating */
-		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddx_ddd[old_dir], method_ptr->flags1)) &&
-				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddx_ddd[dir], method_ptr->flags1)))
+		if ((cave_passable_bold(r_ptr->y0 + ddy[old_dir], r_ptr->x0 + ddx[old_dir], method_ptr->flags1)) &&
+				!(cave_passable_bold(r_ptr->y0 + ddy[dir], r_ptr->x0 + ddx[dir], method_ptr->flags1)))
 		{
-			facing += 6;
+			facing += 4;
 			while (facing >= 180) facing -= 180;
 
 			r_ptr->flags1 &= ~(RE1_CLOCKWISE);
@@ -9622,7 +9754,7 @@ void process_region(s16b region)
 	else if (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))
 	{
 		int old_dir = get_angle_to_dir(r_ptr->facing);
-		int facing = r_ptr->facing + 3;
+		int facing = r_ptr->facing + 2;
 		int dir;
 		int y, x;
 
@@ -9631,10 +9763,10 @@ void process_region(s16b region)
 		dir = get_angle_to_dir(facing);
 
 		/* Change direction if we can't project at least 1 grid after rotating */
-		if ((cave_passable_bold(r_ptr->y0 + ddy_ddd[old_dir], r_ptr->x0 + ddx_ddd[old_dir], method_ptr->flags1)) &&
-				!(cave_passable_bold(r_ptr->y0 + ddy_ddd[dir], r_ptr->x0 + ddx_ddd[dir], method_ptr->flags1)))
+		if ((cave_passable_bold(r_ptr->y0 + ddy[old_dir], r_ptr->x0 + ddx[old_dir], method_ptr->flags1)) &&
+				!(cave_passable_bold(r_ptr->y0 + ddy[dir], r_ptr->x0 + ddx[dir], method_ptr->flags1)))
 		{
-			facing -= 6;
+			facing -= 4;
 			while (facing < 0) facing += 180;
 
 			r_ptr->flags1 &= ~(RE1_COUNTER_CLOCKWISE);
@@ -9840,7 +9972,7 @@ void process_region(s16b region)
 	if ((r_ptr->flags1 & (RE1_AUTOMATIC)) && !(r_ptr->flags1 & (RE1_TRIGGERED)))
 	{
 		/* Discharge the region */
-		if (region_effect(region, r_ptr->y1, r_ptr->y0))
+		if (region_effect(region, r_ptr->y1, r_ptr->x1))
 		{
 			bool refresh;
 
