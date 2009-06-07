@@ -5785,20 +5785,16 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 	{
 		*ty = py;
 		*tx = px;
-
-		return (TRUE);
 	}
 
 	/* If we're not fully retargetting, just continue through the target */
-	if (!full)
+	else if (!full)
 	{
 		if (!target_okay()) *flg |= (PROJECT_THRU);
-
-		return (TRUE);
 	}
 
 	/* Eaten spells use a single target */
-	if (retarget_blows_eaten && (method != RBM_SPIT) && (method != RBM_BREATH))
+	else if (retarget_blows_eaten && (method != RBM_SPIT) && (method != RBM_BREATH))
 	{
 		*one_grid = TRUE;
 		retarget_blows_dir = (method == RBM_VOMIT) ? ddd[rand_int(8)] : 5;
@@ -5821,18 +5817,18 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 		/* Use the given direction */
 		*ty = py + 99 * ddy[retarget_blows_dir];
 		*tx = px + 99 * ddx[retarget_blows_dir];
-	}
 
-	/* Hack -- Use an actual "target" */
-	if ((retarget_blows_dir == 5) && target_okay())
-	{
-		*ty = p_ptr->target_row;
-		*tx = p_ptr->target_col;
-	}
-	/* Stop at first target if we're firing in a direction */
-	else if (method_ptr->flags2 & (PR2_DIR_STOP))
-	{
-		*flg |= (PROJECT_STOP);
+		/* Hack -- Use an actual "target" */
+		if ((retarget_blows_dir == 5) && target_okay())
+		{
+			*ty = p_ptr->target_row;
+			*tx = p_ptr->target_col;
+		}
+		/* Stop at first target if we're firing in a direction */
+		else if (method_ptr->flags2 & (PR2_DIR_STOP))
+		{
+			*flg |= (PROJECT_STOP);
+		}
 	}
 
 	return (TRUE);
