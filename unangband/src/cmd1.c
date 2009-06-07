@@ -3879,6 +3879,118 @@ void move_player(int dir)
 	}
 }
 
+
+
+/*
+ * Hack -- allow quick "cycling" through the legal directions
+ */
+static const byte cycle[] =
+{ 1, 2, 3, 6, 9, 8, 7, 4, 1, 2, 3, 6, 9, 8, 7, 4, 1 };
+
+/*
+ * Hack -- map each direction into the "middle" of the "cycle[]" array
+ */
+static const byte chome[] =
+{ 0, 8, 9, 10, 7, 0, 11, 6, 5, 4 };
+
+
+
+/*
+ * We use this to ignore isolated pillars
+ *
+ * XXX Note we don't check whether the player can
+ * see the dead end. Otherwise we'd stop at every
+ * pillar the first time, which would make navigating
+ * unknown pillared rooms and corridors unnecessarily
+ * annoying.
+ */
+static bool see_dead_end(int y, int x)
+{
+	int yy, xx, i;
+	int move = 0L;
+
+	/* Count transitions from movable to non-movable and vice versa */
+	int k =  0;
+
+	/* Check for adjacent movable grids */
+	for (i = 0; i < 8; i++)
+	{
+		yy = y + ddy[cycle[i]];
+		xx = x + ddx[cycle[i]];
+
+		if (!in_bounds_fully(yy, xx)) continue;
+
+		/*if (!(play_info[yy][xx] & (PLAY_MARK))) continue;*/
+
+		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags1 & (FF1_MOVE))
+		{
+			move |= 1L << i;
+		}
+
+		/* Previous location does not match */
+		if ((i > 0) && (((move & (1L << (i - 1))) != 0) != ((move & (1L << i)) != 0))) k++;
+
+		/* Too many discontinuities */
+		if (k > 2) return (FALSE);
+	}
+
+	/* Check first and last */
+	if ((((move & (1L << 0)) != 0) != ((move & (1L << 7)) != 0)) && (k > 1)) return (FALSE);
+
+	/* Reset counter */
+	k = 0;
+
+	/* Check for more than 4 contiguous empty locations */
+	for (i = 0; i < 8 + 4; i++)
+	{
+		/* Count open areas */
+		if (move & 1L << (i % 8)) k++;
+		else k = 0;
+
+		if (k > 4) return (FALSE);
+	}
+
+	/* Checked all locations -- dead end */
+	return (TRUE);
+}
+
+
+/*
+ * We use this to ignore isolated pillars
+ *
+ * XXX Note we don't check whether the player can
+ * see the pillar. Otherwise we'd stop at every
+ * pillar the first time, which would make navigating
+ * unknown pillared rooms and corridors unnecessarily
+ * annoying.
+ */
+static bool see_pillar(int y, int x)
+{
+	int yy, xx, i;
+
+	/* Not a wall */
+	if ((f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_WALL)) == 0) return (FALSE);
+
+	/* Isolated pillars are not known walls */
+	for (i = 0; i < 8; i++)
+	{
+		yy = y + ddy_ddd[i];
+		xx = x + ddx_ddd[i];
+
+		if (!in_bounds_fully(yy, xx)) break;
+
+		/*if (!(play_info[yy][xx] & (PLAY_MARK))) break;*/
+
+		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags1 & (FF1_WALL)) break;
+	}
+
+	/* Checked all locations -- pillar is isolated */
+	if (i == 8) return (TRUE);
+
+	return (FALSE);
+}
+
+
 /*
  * Hack -- Check for a "known wall" (see below)
  */
@@ -3892,10 +4004,19 @@ static int see_wall(int dir, int y, int x)
 	if (!in_bounds(y, x)) return (FALSE);
 
 	/* Non-wall grids are not known walls */
-	if (!(f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_WALL))) return (FALSE);
+	if (!(f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_WALL)))
+	{
+		/* Except where the non-wall grid is a short known dead end */
+		if (see_dead_end(y, x)) return (TRUE);
+
+		return (FALSE);
+	}
 
 	/* Unknown walls are not known walls */
 	if (!(play_info[y][x] & (PLAY_MARK))) return (FALSE);
+
+	/* Isolated pillars are not know walls */
+	if (see_pillar(y, x)) return (FALSE);
 
 	/* Default */
 	return (TRUE);
@@ -4072,21 +4193,6 @@ static int see_stop(int dir, int y, int x)
 
 
 
-
-/*
- * Hack -- allow quick "cycling" through the legal directions
- */
-static const byte cycle[] =
-{ 1, 2, 3, 6, 9, 8, 7, 4, 1, 2, 3, 6, 9, 8, 7, 4, 1 };
-
-/*
- * Hack -- map each direction into the "middle" of the "cycle[]" array
- */
-static const byte chome[] =
-{ 0, 8, 9, 10, 7, 0, 11, 6, 5, 4 };
-
-
-
 /*
  * Initialize the running algorithm for a new direction.
  *
@@ -4114,6 +4220,9 @@ static void run_init(int dir)
 
 	/* Save the direction */
 	p_ptr->run_cur_dir = dir;
+
+	/* Save the feature */
+	p_ptr->run_cur_feat = f_info[cave_feat[py][px]].mimic;
 
 	/* Assume running straight */
 	p_ptr->run_old_dir = dir;
@@ -4219,6 +4328,8 @@ static bool run_test(void)
 
 	int feat;
 
+	bool pillar = FALSE;
+
 	/* No options yet */
 	option = 0;
 	option2 = 0;
@@ -4243,7 +4354,6 @@ static bool run_test(void)
 		/* New location */
 		row = py + ddy[new_dir];
 		col = px + ddx[new_dir];
-
 
 		/* Visible monsters abort running */
 		if (cave_m_idx[row][col] > 0)
@@ -4275,16 +4385,16 @@ static bool run_test(void)
 		/* Assume unknown */
 		inv = TRUE;
 
+		/* Get feature */
+		feat = cave_feat[row][col];
+
+		/* Set mimiced feature */
+		feat = f_info[feat].mimic;
+
 		/* Check memorized grids */
 		if (play_info[row][col] & (PLAY_MARK))
 		{
 			bool notice = TRUE;
-
-			/* Get feature */
-			feat = cave_feat[row][col];
-
-			/* Set mimiced feature */
-			feat = f_info[feat].mimic;
 
 			/* Notice feature? */
 			notice = ((f_info[feat].flags1 & (FF1_NOTICE)) !=0);
@@ -4294,6 +4404,15 @@ static bool run_test(void)
 				/* Ignore unusual floors; don't run if you want to inspect them */
 				if (f_info[feat].flags1 & (FF1_FLOOR))
 					notice = FALSE;
+
+				/* Ignore whatever we're standing on */
+				if (feat == p_ptr->run_cur_feat) notice = FALSE;
+
+				/* Ignore whatever was to our left */
+				if ((i < 0) && (feat == p_ptr->run_left_feat)) notice = FALSE;
+
+				/* Ignore whatever was to our right */
+				if ((i > 0) && (feat == p_ptr->run_right_feat)) notice = FALSE;
 			}
 
 			/* Interesting feature */
@@ -4304,7 +4423,8 @@ static bool run_test(void)
 		}
 
 		/* Analyze unknown grids and floors */
-		if (inv || cave_floor_bold(row, col))
+		if ((inv || cave_floor_bold(row, col) || (feat == p_ptr->run_cur_feat)) &&
+				!see_dead_end(row, col))
 		{
 			/* Looking for open area */
 			if (p_ptr->run_open_area)
@@ -4324,8 +4444,8 @@ static bool run_test(void)
 				return (TRUE);
 			}
 
-			/* Two non-adjacent new directions.  Stop running. */
-			else if (option != cycle[chome[prev_dir] + i - 1])
+			/* Two non-adjacent new directions.  Stop running. Ignore pillar between them. */
+			else if ((option != cycle[chome[prev_dir] + i - 1]) && !(pillar))
 			{
 				return (TRUE);
 			}
@@ -4344,23 +4464,38 @@ static bool run_test(void)
 				option2 = option;
 				option = new_dir;
 			}
+
+			pillar = FALSE;
 		}
 
 		/* Obstacle, while looking for open area */
 		else
 		{
-			if (p_ptr->run_open_area)
+			/* Check for pillars if we're looking for open areas and not breaks */
+			if (((p_ptr->run_open_area) ||
+					((i < 0) && (!p_ptr->run_break_left)) ||
+					((i > 0) && (!p_ptr->run_break_right))) &&
+					(see_pillar(row, col)))
 			{
-				if (i < 0)
-				{
-					/* Break to the right */
-					p_ptr->run_break_right = TRUE;
-				}
+				pillar = TRUE;
+			}
+			else
+			{
+				pillar = FALSE;
 
-				else if (i > 0)
+				if (p_ptr->run_open_area)
 				{
-					/* Break to the left */
-					p_ptr->run_break_left = TRUE;
+					if (i < 0)
+					{
+						/* Break to the right */
+						p_ptr->run_break_right = TRUE;
+					}
+
+					else if (i > 0)
+					{
+						/* Break to the left */
+						p_ptr->run_break_left = TRUE;
+					}
 				}
 			}
 		}
@@ -4387,7 +4522,8 @@ static bool run_test(void)
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(play_info[row][col] & (PLAY_MARK)) ||
-			    (!(f_info[feat].flags1 & (FF1_WALL))) )
+			    (!(f_info[feat].flags1 & (FF1_WALL))) ||
+			    see_pillar(row, col))
 			{
 				/* Looking to break right */
 				if (p_ptr->run_break_right)
@@ -4424,7 +4560,8 @@ static bool run_test(void)
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(play_info[row][col] & (PLAY_MARK)) ||
-			    (!(f_info[feat].flags1 & (FF1_WALL))))
+			    (!(f_info[feat].flags1 & (FF1_WALL))) ||
+			    (see_pillar(row, col)))
 			{
 				/* Looking to break left */
 				if (p_ptr->run_break_left)
