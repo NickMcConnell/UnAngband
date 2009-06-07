@@ -2191,12 +2191,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 	if (flg & (PROJECT_MISS))
 	{
 		/* See if we hit the player player */
-		if ((target < 0) && check_hit(effect_ptr->power - 3 * range, rlev, who, TRUE))
+		if ((target < 0) && check_hit(effect_ptr->power - BTH_RANGE_ADJ * range, rlev, who, TRUE))
 		{
 			/* Hit the player */
 			flg &= ~(PROJECT_MISS);
 		}
-		else if ((target > 0) && mon_check_hit(target, effect_ptr->power - 3 * range, rlev, who, TRUE))
+		else if ((target > 0) && mon_check_hit(target, effect_ptr->power - BTH_RANGE_ADJ * range, rlev, who, TRUE))
 		{
 			/* Hit the monster */
 			flg &= ~(PROJECT_MISS);

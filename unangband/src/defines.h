@@ -355,6 +355,7 @@
 
 #define BREAK_GLYPH		550		/* Rune of protection resistance */
 #define BTH_PLUS_ADJ    2       /* Adjust BTH per plus-to-hit */
+#define BTH_RANGE_ADJ	3		/* Minus to hit for each range grid */
 #define MON_MULT_ADJ	8		/* High value slows multiplication */
 #define MON_SUMMON_ADJ	2		/* Adjust level of summoned creatures */
 #define MON_DRAIN_LIFE	2		/* Percent of player exp drained per hit */
