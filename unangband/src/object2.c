@@ -169,6 +169,13 @@ void delete_object_idx(int o_idx)
 			check_attribute_lost(y, x, 2, CAVE_XLOS, require_halo, has_halo, redraw_halo_loss, remove_halo, reapply_halo);
 		}
 
+		/* Check the item was seen */
+		if (j_ptr->ident & (IDENT_MARKED))
+		{
+			/* Window flags */
+			p_ptr->window |= (PW_ITEMLIST);
+		}
+
 		/* Visual update */
 		lite_spot(y, x);
 	}
@@ -6393,6 +6400,9 @@ s16b floor_carry(int y, int x, object_type *j_ptr)
 		/* Link the floor to the object */
 		cave_o_idx[y][x] = o_idx;
 
+		/* Window flags */
+		p_ptr->window |= (PW_ITEMLIST);
+
 		/* Notice */
 		note_spot(y, x);
 
@@ -8682,7 +8692,6 @@ void floor_item_optimize(int item)
 
 	/* Delete the object */
 	delete_object_idx(item);
-
 }
 
 

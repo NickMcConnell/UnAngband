@@ -2957,7 +2957,7 @@ static void player_swap(const int y1, const int x1, const int y2, const int x2)
 	p_ptr->update |= (PU_BONUS);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MONLIST | PW_ITEMLIST);
 
 	/* Update room description (if needed) */
 	/* Line 1 -- we are entering a room */

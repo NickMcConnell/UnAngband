@@ -1400,7 +1400,6 @@ static void py_destroy_aux(int o_idx)
 
 	/* Delete the object directly */
 	delete_object_idx(o_idx);
-
 }
 
 

@@ -5244,6 +5244,9 @@ void cave_set_feat_aux(const int y, const int x, int feat)
 			else if (!use_feat)
 			{
 				o_ptr->ident &= ~IDENT_STORE;
+
+				/* Window flags */
+				p_ptr->window |= (PW_ITEMLIST);
 			}
 			continue;
 		}
