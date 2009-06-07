@@ -5611,7 +5611,7 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			y1 = ty;
 			x1 = tx;
 		}
-		
+
 		/* Get initial damage */
 		damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
 
@@ -5787,7 +5787,7 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 
 	/* Any further blows have slightly differing semantics */
 	retarget_blows_subsequent = TRUE;
-	
+
 	/* Never retarget for spells which affect self */
 	if (*flg & (PROJECT_SELF)) return (TRUE);
 
@@ -7581,7 +7581,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 	if (process_spell_prepare(spell, level, cancel, TRUE, !eaten)) obvious = TRUE;
 	if (process_spell_blows(who, what, spell, level, cancel, known, eaten)) obvious = TRUE;
 	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
-	if ((!eaten) && (process_spell_types(who, spell, level, cancel))) obvious = TRUE;
+	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
 
 	/* Paranoia - clear boost */
 	p_ptr->boost_spell_power = 0;
