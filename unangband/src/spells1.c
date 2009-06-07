@@ -2703,12 +2703,12 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	if (!(p_ptr->timed[TMD_OPP_POIS]) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
 	{
 		/* Set poison counter */
-		(void)set_poisoned(p_ptr->timed[TMD_POISONED] + rand_int(dam + 1) + weak ? 0 : 10);
+		(void)set_poisoned(p_ptr->timed[TMD_POISONED] + rand_int(dam + 1) + (weak ? 0 : 10));
 	}
 
 	/* Weak does no immediate damage */
 	if (weak) return;
-	
+
 	/* Take damage */
 	take_hit(who, what, dam);
 }
@@ -6046,7 +6046,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				do_pois = dam;
-				
+
 				if ((typ == GF_POISON_WEAK) && (who <= SOURCE_PLAYER_START)) dam = 0;
 			}
 			break;
