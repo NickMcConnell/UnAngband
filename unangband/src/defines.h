@@ -2084,6 +2084,7 @@ enum
 #define SV_ASSEMBLY_MISS_HAND_L  21
 #define SV_ASSEMBLY_LEGS	 22
 #define SV_ASSEMBLY_PART_LEG_R	 23
+#define SV_MAX_ASSEMBLY		24
 
 /* The "sval" codes for TV_ROPE */
 #define SV_ROPE_ROPE	1

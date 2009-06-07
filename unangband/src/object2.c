@@ -6014,7 +6014,16 @@ bool make_body(object_type *j_ptr, int r_idx)
 	if ((r_ptr->flags3 & (RF3_HURT_ROCK)) && !(r_ptr->flags3 & (RF3_NONLIVING))) k_idx = lookup_kind(TV_STATUE,SV_STATUE_STONE);
 
 	/* Hack -- golems leave behind assemblies */
-	else if (r_ptr->flags8 & (RF8_ASSEMBLY)) k_idx = lookup_kind(TV_ASSEMBLY, SV_ASSEMBLY_NONE);
+	else if (r_ptr->flags8 & (RF8_ASSEMBLY))
+	{
+		int sval = rand_int(SV_MAX_ASSEMBLY);
+		
+		/* Hack -- ensure larger parts */
+		if ((sval < SV_ASSEMBLY_FULL) && !(sval % 2)) sval++;
+		else if (sval == SV_ASSEMBLY_HANDS) sval--;
+		
+		k_idx = lookup_kind(TV_ASSEMBLY, sval);
+	}
 
 	/* Monsters with corpses produce corpses */
 	else if (r_ptr->flags8 & (RF8_HAS_CORPSE)) k_idx = lookup_kind(TV_BODY,SV_BODY_CORPSE);
