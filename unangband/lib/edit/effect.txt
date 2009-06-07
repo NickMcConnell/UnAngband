@@ -18,7 +18,7 @@ V:0.6.3
 
 N:0:NOTHING
 I:0
-D:do||es|:::nothing:::
+D:do||es|:::no effect:::
 T:nothing
 
 N:1:STORM
@@ -323,7 +323,7 @@ T:boiling mud
 
 N:61:HURT
 I:0
-D:attack~::::::
+D:hurt~::::::
 T:pain
 
 N:62:LAVA
@@ -333,32 +333,32 @@ T:lava
 
 N:63:UN_BONUS
 I:0
-D:disenchant~::::::
+D:disenchant~::$ armour and weapons::::
 T:disenchantment
 
 N:64:UN_POWER
 I:0
-D:drain~::charges from::::
+D:drain~:charges from:$ wands and staffs::::
 T:static
 
 N:65:EAT_GOLD
 I:0
-D:steal~::gold from::::
+D:steal~:gold from:::::
 T:stealing gold
 
 N:66:EAT_ITEM
 I:0
-D:steal~::items from::::
+D:steal~:items from:::::
 T:stealing items
 
 N:67:EAT_FOOD
 I:0
-D:eat~:::$ food:::
+D:eat~::$ food::::
 T:eating food
 
 N:68:EAT_LITE
 I:0
-D:absorb~::light from::::
+D:absorb~:light from:::::
 T:absorbing light
 
 N:69:FALL
@@ -598,7 +598,7 @@ T:slime
 
 N:116:RESIST_MAGIC
 I:0
-D:::::::
+D:resist~:magic:::::
 T:magic resistance
 
 N:117:FALL_LESS
@@ -698,7 +698,7 @@ T:mental energy
 
 N:136:SNUFF
 I:0
-D:snuff~:the life from::if they have less than a maximum:of:hit points:max hp
+D:snuff~:the life from::if & has less than a maximum:of:hit points:max hp
 T:snuffing small life
 
 N:137:RAGE
@@ -728,7 +728,7 @@ T:poisonous water
 
 N:142:INVISIBILITY
 I:0
-D:::::::
+D:turn~:::invisible:::
 T:invisibility
 
 N:143:DELAY_POISON
@@ -773,6 +773,6 @@ T:poison
 
 N:151:HURT_POISON
 I:0
-D:poison~::::::
+D:hurt~ and poison~::::::
 T:poison
 
