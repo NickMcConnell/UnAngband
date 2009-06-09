@@ -10353,6 +10353,13 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Forget about it */
 				drop_may_flags(i_ptr);
 
+				/* Forget about item */
+				if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
+				/* Steal the items */
+				inven_item_increase(i, -1);
+				inven_item_optimize(i);
+
 				/* Carry the object */
 				if (who > SOURCE_MONSTER_START)
 				{
@@ -10363,13 +10370,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					/* Hack --- 20% chance of lost forever */
 					drop_near(i_ptr,20,p_ptr->py,p_ptr->px, FALSE);
 				}
-
-				/* Forget about item */
-				if (o_ptr->number == 1) inven_drop_flags(o_ptr);
-
-				/* Steal the items */
-				inven_item_increase(i, -1);
-				inven_item_optimize(i);
 
 				/* Obvious */
 				obvious = TRUE;

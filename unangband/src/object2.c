@@ -6017,11 +6017,11 @@ bool make_body(object_type *j_ptr, int r_idx)
 	else if (r_ptr->flags8 & (RF8_ASSEMBLY))
 	{
 		int sval = rand_int(SV_MAX_ASSEMBLY);
-		
+
 		/* Hack -- ensure larger parts */
 		if ((sval < SV_ASSEMBLY_FULL) && !(sval % 2)) sval++;
 		else if (sval == SV_ASSEMBLY_HANDS) sval--;
-		
+
 		k_idx = lookup_kind(TV_ASSEMBLY, sval);
 	}
 
@@ -6974,7 +6974,7 @@ bool check_object_lite(object_type *j_ptr)
  * We check several locations to see if we can find a location at which
  * the object can combine, stack, or be placed.  Artifacts will try very
  * hard to be placed, including "teleporting" to a useful grid if needed.
- * 
+ *
  * XXX We set dont_trigger when a monster dies to avoid their drop
  * triggering a region or projection from the object breaking and
  * potentially killing the monster twice (!?!)
@@ -9218,7 +9218,7 @@ void inven_drop(int item, int amt)
 	inven_item_increase(item, -amt);
 	inven_item_describe(item);
 	inven_item_optimize(item);
-	
+
 	/* Drop it near the player */
 	/* XXX Happens last for safety reasons */
 	drop_near(i_ptr, 0, py, px, FALSE);
@@ -9238,8 +9238,17 @@ void overflow_pack(void)
 
 		object_type *o_ptr;
 
+		object_type *i_ptr;
+		object_type object_type_body;
+
 		/* Get the slot to be dropped */
 		o_ptr = &inventory[item];
+
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Obtain local object */
+		object_copy(i_ptr, o_ptr);
 
 		/* Disturbing */
 		disturb(0, 0);
@@ -9248,13 +9257,16 @@ void overflow_pack(void)
 		msg_print("Your pack overflows!");
 
 		/* Describe */
-		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+		object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
 		/* Message */
 		msg_format("You drop %s (%c).", o_name, index_to_label(item));
 
 		/* Forget about it */
 		inven_drop_flags(o_ptr);
+
+		/* Forget information on dropped object */
+		drop_may_flags(i_ptr);
 
 		/* Modify, Describe, Optimize */
 		inven_item_increase(item, -255);
@@ -9263,7 +9275,7 @@ void overflow_pack(void)
 
 		/* Drop it (carefully) near the player */
 		/* XXX Happens last for safety reasons */
-		drop_near(o_ptr, 0, p_ptr->py, p_ptr->px, FALSE);
+		drop_near(i_ptr, 0, p_ptr->py, p_ptr->px, FALSE);
 
 		/* Notice stuff (if needed) */
 		if (p_ptr->notice) notice_stuff();
