@@ -2473,7 +2473,7 @@ void do_cmd_query_symbol(void)
 void do_cmd_monlist(void)
 {
 	/* Hack -- cycling monster list sorting */
-	if (easy_monlist)
+	if (auto_monlist)
 	{
 		if (!op_ptr->monlist_sort_by)
 		{
@@ -2492,7 +2492,7 @@ void do_cmd_monlist(void)
 	display_monlist(0, 0, op_ptr->monlist_display, TRUE, TRUE);
 
 	/* Hack -- cycling monster list sorting */
-	if ((!easy_monlist) && (p_ptr->command_new.key == '['))
+	if ((!auto_monlist) && (p_ptr->command_new.key == '['))
 	{
 		if (!op_ptr->monlist_sort_by)
 		{

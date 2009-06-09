@@ -1036,6 +1036,12 @@ static void rd_options(void)
 			}
 		}
 	}
+
+	/* Hack -- for competition 70 */
+	if (older_than(0, 6, 3, 9))
+	{
+		auto_monlist = FALSE;
+	}
 }
 
 

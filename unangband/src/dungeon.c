@@ -2796,7 +2796,10 @@ static void process_command(void)
 		/* Save "toggle monster list on or off" */
 		case ' ':
 		{
-			easy_monlist = !easy_monlist;
+			if (easy_monlist)
+			{
+				auto_monlist = !auto_monlist;
+			}
 
 			break;
 		}
@@ -3232,7 +3235,7 @@ static void process_player(void)
 			process_player_aux();
 
 			/* Display the monlist */
-			if (easy_monlist) display_monlist(1, 0, 11, TRUE, FALSE);
+			if (auto_monlist) display_monlist(1, 0, 11, TRUE, FALSE);
 
 			/* Place the cursor on the player */
 			move_cursor_relative(p_ptr->py, p_ptr->px);
