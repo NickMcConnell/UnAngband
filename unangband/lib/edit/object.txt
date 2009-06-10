@@ -1266,7 +1266,7 @@ A:10/1:40/1
 P:0:1d6:0:0:0
 Y:15:2
 F:SPEED |
-F:AGGRAVATE |
+F:AGGRAVATE | LIGHT_CURSE
 
 N:159:Sustain Constitution and Charisma
 G:=:w
