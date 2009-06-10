@@ -713,7 +713,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 				if (*s == '|')
 				{
 					state++;
-					if (state == 3) state = 0;
+					if (state == 4) state = 0;
 				}
 				else if (!state || (state == 1 /* Male */))
 				{
