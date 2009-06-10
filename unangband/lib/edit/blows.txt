@@ -815,7 +815,7 @@ T:0-9999:create~ * around &
 W:3:0:0
 R:10
 F:BOOM | WALL | PASS | AREA | GRID | ITEM | KILL | PLAY | SELF | HIDE |
-F:RANGED |
+F:RANGED | SAFE
 D:surround~ & with magic:
 
 N:92:DESTROY_AREA
@@ -825,7 +825,7 @@ T:0-9999:create~ * around &
 W:3:0:0
 R:15
 F:BOOM | WALL | PASS | AREA | GRID | ITEM | KILL | PLAY | SELF | HIDE |
-F:RANGED |
+F:RANGED | SAFE
 D:surround~ & with magic:
 
 #$# 93 - Unused ###
@@ -879,6 +879,7 @@ X:0:0:0:0:0:0:QUAKE
 C:40:0:0:5:0:0:100
 R:8
 F:BOOM | WALL | PASS | AREA | GRID | ITEM | KILL | PLAY | SELF | HIDE |
+F:SAFE
 D:surround~ & with magic:
 
 N:102:EXPLODE
