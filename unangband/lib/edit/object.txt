@@ -52,14 +52,14 @@ N:2:Paranoia
 G:,:w
 I:79:2:0
 W:5:500:1:0
-A:5/1
+A:3/1
 P:0:0d0:0:0:0
 
 N:3:Confusion
 G:,:w
 I:79:3:0
 W:5:500:1:0
-A:5/1
+A:3/1
 P:0:0d0:0:0:0
 
 N:4:Hallucination
@@ -143,7 +143,7 @@ N:15:Poison
 G:,:w
 I:79:0:0
 W:5:500:1:0
-A:5/1:5/1
+A:3/1:5/1
 P:0:0d0:0:0:0
 
 N:16:Sickness
@@ -2110,8 +2110,8 @@ F:EAT_HEAL
 N:259:Haste
 G:,:w
 I:79:26:0
-W:1:0:4:10
-A:1/1
+W:3:0:4:10
+A:3/1
 P:0:1d1:0:0:0
 Y:23:1
 F:THROWING |
@@ -5816,69 +5816,79 @@ F:THROWING |
 N:708:& disassembled #~
 G:~:s
 I:12:1:0
-W:0:0:25:0
+W:10:0:25:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 
 N:709:& # Arm~ (left)
 G:~:s
 I:12:2:0
-W:0:20:10:0
+W:10:20:10:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 
 N:710:& partially assembled #~ (left arm)
 G:~:s
 I:12:3:0
-W:0:0:35:0
+W:10:0:35:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The left arm is attached.
 
 N:711:& # Arm~ (right)
 G:~:s
 I:12:4:0
-W:0:20:10:0
+W:10:20:10:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 
 N:712:& partially assembled # (arms)
 G:~:s
 I:12:5:0
-W:0:0:45:0
+W:10:0:45:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The arms are attached.
 
 N:713:& # Hand~ (left)
 G:~:s
 I:12:6:0
-W:0:20:5:0
+W:10:20:5:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 
 N:714:& partially assembled # (missing right hand)
 G:~:s
 I:12:7:0
-W:0:0:50:0
+W:10:0:50:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The arms are attached. The right hand is missing.
 
 N:715:& # Hand~ (right)
 G:~:s
 I:12:8:0
-W:0:20:5:0
+W:10:20:5:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 
 N:716:& partially assembled # (hands)
 G:~:s
 I:12:9:0
-W:0:0:55:0
+W:10:0:55:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The hands are attached.
 
 N:717:& # Leg (left)
 G:~:s
 I:12:10:0
-W:0:20:15:0
+W:10:20:15:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 D:The legs must be added after any upper limbs.
@@ -5886,29 +5896,33 @@ D:The legs must be added after any upper limbs.
 N:718:& partially assembled #~ (left leg)
 G:~:s
 I:12:11:0
-W:0:0:70:0
+W:10:0:70:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The left leg is attached.
 
 N:719:& # Leg (right)
 G:~:s
 I:12:12:0
-W:0:20:15:0
+W:10:20:15:0
 P:0:1d1:0:0:0
+A:10\6:50/3
 F:ACTIVATE |
 D:The legs must be added after any upper limbs.
 
 N:720:& partially assembled #~ (legs)
 G:~:s
 I:12:13:0
-W:0:0:85:0
+W:10:0:85:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The legs are attached.
 
 N:721:& # Head~
 G:~:s
 I:12:14:0
-W:0:20:15:0
+W:10:20:15:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 D:The head must be added last.
@@ -5916,7 +5930,8 @@ D:The head must be added last.
 N:722:& completely assembled #~
 G:~:s
 I:12:15:3
-W:0:0:100:0
+A:10\6:50/3
+W:10:0:100:0
 P:0:1d1:0:0:0
 
 # The below items are for non-standard assembly order...
@@ -5924,49 +5939,56 @@ P:0:1d1:0:0:0
 N:723:& set~ of # Arms
 G:~:s
 I:12:16:0
-W:0:20:20:0
+W:10:20:20:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 
 N:724:& set~ of # Hands
 G:~:s
 I:12:17:0
-W:0:20:100:0
+W:10:20:100:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 
 N:725:& partially assembled #~ (left hand)
 G:~:s
 I:12:18:0
-W:0:0:40:0
+W:10:0:40:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The left hand is attached.
 
 N:726:& partially assembled #~ (right arm)
 G:~:s
 I:12:19:0
-W:0:0:35:0
+W:10:0:35:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The right arm is attached.
 
 N:727:& partially assembled #~ (right hand)
 G:~:s
 I:12:20:0
-W:0:0:40:0
+W:10:0:40:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The right hand is attached.
 
 N:728:& partially assembled # (missing left hand)
 G:~:s
 I:12:21:0
-W:0:0:100:0
+W:10:0:100:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The arms are attached. The left hand is missing.
 
 N:729:& set~ of # Legs
 G:~:s
 I:12:22:0
-W:0:20:30:0
+W:10:20:30:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:ACTIVATE |
 D:The legs must be added after any upper limbs.
@@ -5974,7 +5996,8 @@ D:The legs must be added after any upper limbs.
 N:730:& partially assembled #~ (right leg)
 G:~:s
 I:12:23:0
-W:0:0:70:0
+W:10:0:70:0
+A:10\6:50/3
 P:0:1d1:0:0:0
 D:The right leg is attached.
 
@@ -5983,8 +6006,9 @@ D:The right leg is attached.
 N:731:& broken Statue~ of #
 G:9:D
 I:11:1:0
-W:15:0:1800:50
-A:15/2
+W:5:0:1800:50
+A:5/2
+A:10\6:50/3
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_FIRE | IGNORE_WATER |
 
@@ -6598,8 +6622,8 @@ F:THROWING |
 N:820:Bloating
 G:,:w
 I:79:25:0
-W:10:15000:4:5
-A:10/1
+W:3:15000:4:5
+A:3/1
 P:0:1d1:0:0:0
 F:THROWING |
 
