@@ -3413,8 +3413,11 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 	int use_old_target_backup = use_old_target;
 
+	/* Get kind flags */
+	u32b f5 = k_info[o_ptr->k_idx].flags5;
+
 	bool throwing = is_throwing_item(o_ptr);
-	bool trick_throw = !fire && item == INVEN_WIELD && throwing;
+	bool trick_throw = !fire && ((item == INVEN_WIELD) || (f5 & (TR5_TRICK_THROW))) && throwing;
 	int num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
 
 	/* Get kind flags */
@@ -3778,8 +3781,16 @@ void player_fire_or_throw_selected(int item, bool fire)
 				/* If the weapon returns, ignore monsters */
 				if (tdis == 256) continue;
 
-				/* Base damage from the object */
-				tdam = damroll(i_ptr->dd, i_ptr->ds);
+				/* Badly balanced weapons do minimum damage
+			 	Various junk (non-weapons) do not use damage for anything else
+			 	so don't penalize a second time. */
+				if (!fire && !throwing
+					&& (f6 & (TR6_BAD_THROW)))
+					/* Minimum damage from the object */
+					tdam = i_ptr->dd;
+				else
+					/* Base damage from the object */
+					tdam = damroll(i_ptr->dd, i_ptr->ds);
 
 				/* The second fire/throw dependent code piece */
 				if (fire)
@@ -3917,8 +3928,16 @@ void player_fire_or_throw_selected(int item, bool fire)
 						tdam += 0;
 					}
 
-					/* Apply launcher, missile and style bonus */
-					tdam += i_ptr->to_d + bow_to_d + style_dam;
+					/* Badly balanced weapons have less effective damage bonus
+				 	Various junk (non-weapons) do not use damage for anything else
+				 	so don't penalize a second time. */
+					if (!fire && !throwing
+						&& (f6 & (TR6_BAD_THROW)) && (i_ptr->to_d > 0))
+						/* Halve damage bonus */
+						tdam += i_ptr->to_d / 2 + bow_to_d + style_dam;
+					else
+						/* Apply launcher, missile and style bonus */
+						tdam += i_ptr->to_d + bow_to_d + style_dam;
 
 					/* No negative damage */
 					if (tdam < 0) tdam = 0;
