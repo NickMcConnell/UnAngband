@@ -4,7 +4,7 @@
  * Copyright (c) 1997 Ben Harrison, James E. Wilson, Robert A. Koeneke
  *
  * This software may be copied and distributed for educational, research,
- * and not for profit purposes provided that this copyright and statement
+ * and not for protv_fit purposes provided that this copyright and statement
  * are included in all such copies.  Other copyrights may also apply.
  *
  * UnAngband (c) 2001-2009 Andrew Doull. Modifications to the Angband 2.9.1
@@ -5775,12 +5775,14 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 				case 28: tval_drop_idx = TV_STAFF; break;
 				case 29:	tval_drop_idx = TV_HARD_ARMOR; break;
 				case 30:	tval_drop_idx = TV_AMULET; break;
-				case 32: tval_drop_idx = TV_ROD; break;
-				case 33: tval_drop_idx = TV_MAGIC_BOOK; break;
-				case 34:	tval_drop_idx = TV_PRAYER_BOOK; break;
-				case 35:	tval_drop_idx = TV_SONG_BOOK; break;
-				case 36:	tval_drop_idx = TV_INSTRUMENT; break;
-				case 37:	tval_drop_idx = TV_RUNESTONE; break;
+				case 31: tval_drop_idx = TV_POTION; break;
+				case 32: tval_drop_idx = TV_SCROLL; break;
+				case 33: tval_drop_idx = TV_ROD; break;
+				case 34: tval_drop_idx = TV_MAGIC_BOOK; break;
+				case 35:	tval_drop_idx = TV_PRAYER_BOOK; break;
+				case 36:	tval_drop_idx = TV_SONG_BOOK; break;
+				case 37:	tval_drop_idx = TV_INSTRUMENT; break;
+				case 38:	tval_drop_idx = TV_RUNESTONE; break;
 			}
 
 			if (tval_drop_idx)
