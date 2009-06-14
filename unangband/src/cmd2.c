@@ -3934,7 +3934,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 					if (!fire && !throwing
 						&& (f6 & (TR6_BAD_THROW)) && (i_ptr->to_d > 0))
 						/* Halve damage bonus */
-						tdam += i_ptr->to_d / 2 + bow_to_d + style_dam;
+						tdam += i_ptr->to_d + style_dam;
 					else
 						/* Apply launcher, missile and style bonus */
 						tdam += i_ptr->to_d + bow_to_d + style_dam;

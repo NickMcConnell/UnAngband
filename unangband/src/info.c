@@ -3828,10 +3828,13 @@ void list_object(const object_type *o_ptr, int mode)
 							((f5 & (TR5_THROWING)) == 0) && ((f6 & (TR6_BAD_THROW)) != 0))
 					{
 						text_out(format("does %d", o_ptr->dd));
-						if (to_d > 0) to_d /= 2;
 					}
 					else
+					{
 						text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
+
+						if (vp[n] == vp_throw) to_d *= 2;
+					}
 					if (object_bonus_p(o_ptr) || spoil)
 					{
 						if (to_d > 0) text_out(format("+%d", to_d));
