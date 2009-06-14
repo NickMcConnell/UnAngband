@@ -12146,7 +12146,7 @@ static bool cave_gen(void)
 
 	/* Hack -- Build terrain */
 	/* XXX Get rid of this later */
-	if (zone->fill)
+	if ((zone->fill) && (zone->fill != zone->base))
 	{
 		for (y = 0; y < DUNGEON_HGT; y++)
 		{
