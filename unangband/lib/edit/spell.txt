@@ -4145,7 +4145,7 @@ N:343:Haste Monster
 A:65:1:1
 A:65:24:22
 P:0:0
-B:BOLT:HASTE:2/1
+B:BOLT:HASTE:50
 
 N:344:Clone Monster
 A:65:2:1

@@ -7025,7 +7025,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Speed up */
-				do_haste = 50 + rand_int(50);
+				do_haste = dam + rand_int(dam);
 
 				/* No "real" damage */
 				dam = 0;
