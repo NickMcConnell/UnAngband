@@ -6982,9 +6982,19 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_UNDEAD);
 				}
 				note_dies = " shrivels away from the touch of life.";
+
+				if (typ == GF_HEAL_PERC)
+				{
+					if (m_ptr->hp > 100) dam = m_ptr->hp * dam / 100;
+				}
 			}
 			else
 			{
+				if (typ == GF_HEAL_PERC)
+				{
+					if ((m_ptr->maxhp - m_ptr->hp) > 100) dam = (m_ptr->maxhp - m_ptr->hp) * dam / 100;
+				}
+
 				do_heal = dam;
 
 				/* No "real" damage */
@@ -7948,6 +7958,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Melee attack - lose mana */
 		case GF_MANA_DRAIN:
 		case GF_LOSE_MANA:
+		case GF_LOSE_MANA_PERC:
 		case GF_HURT_MANA:
 		{
 			/* Does no damage */
@@ -7974,7 +7985,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 				if (seen) obvious = TRUE;
 
-				if (typ == GF_LOSE_MANA) break;
+				if (typ != GF_MANA_DRAIN) break;
 
 				/* Convert to player mana */
 				drain = damroll(drain,5);
@@ -8015,6 +8026,12 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Monster may have mana */
 			if (r_ptr->mana)
 			{
+				if (typ == GF_GAIN_MANA_PERC)
+				{
+					/* XXX Note 5 times correction factor */
+					if ((r_ptr->mana - m_ptr->mana) > 100) dam = (r_ptr->mana - m_ptr->mana) * dam * 5 / 100;
+				}
+
 				/* Monster gains back all mana */
 				if (m_ptr->mana + dam / 5 >= r_ptr->mana)
 				{
@@ -11361,10 +11378,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Heal the player a percentage of hitpoints */
+		/* Heal the player a percentage of missing hitpoints */
 		case GF_HEAL_PERC:
 		{
-			if (p_ptr->mhp > 100) dam = p_ptr->mhp * dam / 100;
+			if ((p_ptr->mhp - p_ptr->chp) > 100) dam = (p_ptr->mhp - p_ptr->chp) * dam / 100;
 
 			/* Fall through */
 		}
@@ -11516,10 +11533,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Lose a percentage of total mana */
+		/* Lose a percentage of current mana */
 		case GF_LOSE_MANA_PERC:
 		{
-			if (p_ptr->msp > 100) dam = p_ptr->msp * dam / 100;
+			if (p_ptr->csp > 100) dam = p_ptr->csp * dam / 100;
 
 			/* Fall through */
 		}
@@ -11609,10 +11626,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Gain a percentage of total mana */
+		/* Gain a percentage of missing mana */
 		case GF_GAIN_MANA_PERC:
 		{
-			if (p_ptr->msp > 100) dam = p_ptr->msp * dam / 100;
+			if ((p_ptr->msp - p_ptr->csp) > 100) dam = (p_ptr->msp - p_ptr->csp) * dam / 100;
 
 			/* Fall through */
 		}
