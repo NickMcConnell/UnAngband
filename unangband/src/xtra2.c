@@ -3148,7 +3148,7 @@ bool modify_panel(int wy, int wx)
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Verify wy, adjust if needed */
-	if (!zone->fill)
+	if ((level_flag & (LF1_TOWN)) != 0)
 	{
 		if (wy > TOWN_HGT - SCREEN_HGT) wy = TOWN_HGT - SCREEN_HGT;
 		else if (wy < 0) wy = 0;
@@ -3158,7 +3158,7 @@ bool modify_panel(int wy, int wx)
 	if (wy < 0) wy = 0;
 
 	/* Verify wx, adjust if needed */
-	if (!zone->fill)
+	if ((level_flag & (LF1_TOWN)) != 0)
 	{
 		if (wx > TOWN_WID - SCREEN_WID) wx = TOWN_WID - SCREEN_WID;
 		else if (wx < 0) wx = 0;

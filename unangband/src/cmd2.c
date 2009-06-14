@@ -498,7 +498,7 @@ static void do_cmd_travel(void)
 		{
 			msg_print("You need to recover from any poison, cuts or stun damage.");
 		}
-		else if (!edge_y && !edge_x && zone->fill)
+		else if (!edge_y && !edge_x && ((level_flag & (LF1_TOWN)) == 0))
 		{
 			msg_format("You need to be close to the edge of %s.", str);
 		}
