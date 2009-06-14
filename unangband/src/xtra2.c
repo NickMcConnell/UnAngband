@@ -245,7 +245,7 @@ bool set_slow_poison(int v)
 	/* Open */
 	if (v)
 	{
-		if (p_ptr->timed[TMD_POISONED])
+		if ((p_ptr->timed[TMD_POISONED]) && !(p_ptr->timed[TMD_SLOW_POISON]))
 		{
 			msg_print("The poison in your veins is slowed.");
 			notice = TRUE;
