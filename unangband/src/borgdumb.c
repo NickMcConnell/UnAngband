@@ -187,7 +187,7 @@ void do_cmd_borg(void)
 				/* Get the zone */
 				get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
-				if (level_flag & (LF1_TOWN)) break;
+				if (zone->flags1 & (LF1_TOWN)) break;
 			}
 
 			/* New depth */
