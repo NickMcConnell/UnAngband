@@ -2636,7 +2636,7 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 			}
 			else if (o_ptr->to_d > o_ptr->dd * o_ptr->ds + 5) chance = 1000;
 			else if (o_ptr->to_d < o_ptr->dd * o_ptr->ds) chance = enchant_table[o_ptr->to_d * 10 / o_ptr->dd / o_ptr->ds];
-			else chance = enchant_table[o_ptr->to_d + 10 - o_ptr->dd - o_ptr->ds];
+			else chance = enchant_table[o_ptr->to_d + 10 - o_ptr->dd * o_ptr->ds];
 
 			/* Attempt to enchant */
 			if ((randint(1000) > chance) && (!a || (rand_int(100) < 50)))
