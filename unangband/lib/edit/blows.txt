@@ -471,7 +471,7 @@ N:53:ARROW
 T:0-9999:shoot~ & with an arrow
 W:0:17:0
 M:10
-F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
+F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED | SCALE_AMMO |
 D:create~ @ arrow#:@ target#
 
@@ -479,7 +479,7 @@ N:54:XBOLT
 T:0-9999:shoot~ & with a crossbow bolt
 W:0:18:0
 M:12
-F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
+F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED | SCALE_AMMO |
 D:create~ @ crossbow bolt#:@ target#
 
@@ -487,7 +487,7 @@ N:55:DART
 T:0-9999:throw~ a dart at &
 W:0:22:1
 M:6
-F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
+F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED |
 D:create~ @ dart#:@ target#
 
@@ -495,7 +495,7 @@ N:56:DAGGER
 T:0-9999:throw~ a dagger at &
 W:0:23:4
 M:6
-F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
+F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED |
 D:create~ @ dagger:@ target#
 
@@ -503,7 +503,7 @@ N:57:SHOT
 T:0-9999:hurl~ a shot at &
 W:0:16:0
 M:8
-F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
+F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED | SCALE_AMMO |
 D:create~ @ shot#:@ target#
 
@@ -665,7 +665,7 @@ N:75:SPIKE
 T:0-9999:shoot~ & with a spike
 W:0:5:0
 M:6
-F:MISS | GRID | KILL | PLAY | MAGIC | STOP |
+F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED |
 D:create~ @ spike#:one target
 
@@ -828,7 +828,14 @@ F:BOOM | WALL | PASS | AREA | GRID | ITEM | KILL | PLAY | SELF | HIDE |
 F:RANGED | SAFE
 D:surround~ & with magic:
 
-#$# 93 - Unused ###
+N:93:HAMMER
+T:0-9999:throw~ a hammer at &
+W:0:21:1
+M:5
+F:MISS | GRID | KILL | PLAY | STOP |
+F:RANGED |
+D:create~ @ hammer:@ target#
+
 
 #$# 94 - Unused ###
 

@@ -2855,6 +2855,9 @@ static void store_sell(int store_index)
 	/* Allow user abort */
 	if (amt <= 0) return;
 
+	/* Forget about what item may do */
+	if (amt == o_ptr->number) inven_drop_flags(o_ptr);
+
 	/* Get local object */
 	i_ptr = &object_type_body;
 
@@ -2907,9 +2910,6 @@ static void store_sell(int store_index)
 
 			/* Update the display */
 			store_prt_gold();
-
-			/* Forget about object */
-			if (amt == o_ptr->number) inven_drop_flags(o_ptr);
 
 			/* Reset the stack */
 			i_ptr->stackc = 0;
@@ -3006,9 +3006,6 @@ static void store_sell(int store_index)
 	{
 		/* Describe */
 		msg_format("You drop %s (%c).", o_name, index_to_label(item));
-
-		/* Forget about object */
-		if (amt == o_ptr->number) inven_drop_flags(o_ptr);
 
 		/* Take it from the players inventory */
 		inven_item_increase(item, -amt);

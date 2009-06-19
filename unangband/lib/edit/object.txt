@@ -2054,7 +2054,14 @@ P:0:1d1:0:0:0
 Y:26:2
 F:THROWING |
 
-#$# 252 - Unused ###
+N:252:Resist Fear
+G:=:w
+I:45:12:0
+W:15:0:2:400
+A:15/1
+P:0:0d0:0:0:0
+Y:7:2
+F:RES_FEAR |
 
 #$# 253 - Unused ###
 

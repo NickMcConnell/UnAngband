@@ -316,7 +316,7 @@ bool set_afraid(int v)
 	if (v > 100)
 	{
 		p_ptr->timed[TMD_AFRAID] = 100;
-		inc_timed(TMD_PETRIFY, p_ptr->timed[TMD_AFRAID] - 100 / 10, TRUE);
+		inc_timed(TMD_PETRIFY, (v - 100) / 10, TRUE);
 	}
 
 	/* Use the value */

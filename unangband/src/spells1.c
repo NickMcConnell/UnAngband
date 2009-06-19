@@ -9679,7 +9679,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0)
 			{
 				/* Notice */
-				player_not_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				player_can_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
 			}
 
 			take_hit(who, what, dam);
@@ -10367,11 +10367,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					o_ptr->stackc--;
 				}
 
-				/* Forget about it */
-				drop_may_flags(i_ptr);
-
 				/* Forget about item */
 				if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+
+				/* Forget about it */
+				drop_may_flags(i_ptr);
 
 				/* Steal the items */
 				inven_item_increase(i, -1);
