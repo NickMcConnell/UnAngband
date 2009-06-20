@@ -6094,6 +6094,14 @@ D:surrounded by shimmering portals.
 F:976:0:0:0:0
 S:SEEN
 
+N:152:153:0:0:25:1:1:128
+A:watched
+B:
+D:surrounded by silent watchers. 
+R:SMART
+F:699:0:0:0:0
+S:SEEN
+
 N:153:107:0:0:25:1:1:128
 P:PLACE | SCATTER
 
