@@ -450,6 +450,7 @@
  */
 #define MIN_M_ALLOC_LEVEL	14
 
+
 /*
  * The town starts out with 4 residents during the day
  */

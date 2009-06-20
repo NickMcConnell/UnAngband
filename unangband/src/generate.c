@@ -10486,8 +10486,8 @@ static void build_nature(void)
 				big = FALSE;
 			}
 
-			/* Shallow dungeons have separate lakes */
-			if (rand_int(75) > p_ptr->depth)
+			/* Shallow and roomless dungeons have separate lakes */
+			if (((level_flag & (LF1_ROOMS)) == 0) || (rand_int(75) > p_ptr->depth))
 			{
 				/* Report creation of lakes/rivers */
 				if (cheat_room)
@@ -11880,8 +11880,8 @@ static bool place_contents()
 	int i, k;
 
 	/* Hack -- have less monsters during day light */
-	if ((level_flag & (LF1_DAYLIGHT)) != 0) k = (p_ptr->depth / 6);
-	else k = (p_ptr->depth / 3);
+	if ((level_flag & (LF1_DAYLIGHT)) != 0) k = (p_ptr->depth / 10);
+	else k = (p_ptr->depth / 5);
 
 	if (k > 10) k = 10;
 	if (k < 2) k = 2;
@@ -11932,7 +11932,7 @@ static bool place_contents()
 
 	/* Pick a base number of monsters */
 	/* Strongholds and sewers have more monsters */
-	i = MIN_M_ALLOC_LEVEL + randint(8 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER | LF1_BATTLE)) != 0) ? 2 : 1));
+	i = MIN_M_ALLOC_LEVEL + randint(5 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER | LF1_BATTLE)) != 0) ? 2 : 1));
 
 	/* Generating */
 	if (cheat_room) message_add("Placing monsters.", MSG_GENERIC);
