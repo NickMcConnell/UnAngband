@@ -3072,6 +3072,21 @@ bool dec_stat(int stat, int amount)
 		/* Something happened */
 		if (cur != p_ptr->stat_cur[stat]) res = TRUE;
 	}
+	/* Inflict the character with appropriate disease if they lose stat while at the minimum */
+	else
+	{
+		u32b disease = 1L << (stat);
+
+		if (stat == A_AGI) disease = DISEASE_SLOW;
+		if (stat == A_SIZ) disease = DISEASE_LOSE_STR;
+
+		p_ptr->disease |= (disease);
+
+		p_ptr->redraw |= (PR_DISEASE);
+
+		/* XXX No message */
+	}
+
 
 	/* Apply changes */
 	if (res)
@@ -9512,7 +9527,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(10,k)) : k);
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 75)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(10,k)) : k);
+				}
 			}
 			else
 			{
@@ -9554,7 +9579,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 90)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				}
 			}
 			else
 			{
@@ -9704,7 +9739,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->timed[TMD_CUT]) && (randint(150) < dam)) inflict_disease(DISEASE_CUT, dam, 50);
+				if ((p_ptr->timed[TMD_CUT] > 100) && (randint(1500) < dam)) inflict_disease(DISEASE_CUT, dam, 50);
 
 				/* Inflict cuts */
 				(void)set_cut(p_ptr->timed[TMD_CUT] + dam);
@@ -9731,11 +9766,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				/* Inflict disease */
-				if ((p_ptr->timed[TMD_STUN]) && (randint(100) < k)) inflict_disease(DISEASE_STUN, k, 20);
-
-				/* Inflict stun */
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(10, k)) : k);
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 75)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(10, k)) : k);
+				}
 			}
 			take_hit(who, what, dam);
 			break;
@@ -9765,7 +9806,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->timed[TMD_CONFUSED]) && (randint(300) < dam)) inflict_disease(DISEASE_CONFUSE, dam, 50);
+				if ((p_ptr->timed[TMD_CONFUSED] > 100) && (randint(3000) < dam)) inflict_disease(DISEASE_CONFUSE, dam, 50);
 
 				/* Inflict confusion */
 				set_timed(TMD_CONFUSED, p_ptr->timed[TMD_CONFUSED] ? p_ptr->timed[TMD_CONFUSED] + 1 : randint(20) + 10, TRUE);
@@ -9790,7 +9831,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				int k = 6 + randint(dam / 2);
 
 				/* Inflict disease */
-				if ((p_ptr->timed[TMD_IMAGE]) && (randint(100) < k)) inflict_disease(DISEASE_HALLUC, k, 20);
+				if ((p_ptr->timed[TMD_IMAGE] > 100) && (randint(1000) < k)) inflict_disease(DISEASE_HALLUC, k, 20);
 
 				/* Inflict hallucination */
 				if (inc_timed(TMD_IMAGE, p_ptr->timed[TMD_IMAGE] ? 1 : k, TRUE))
@@ -9862,7 +9903,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(20));
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 80)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(20));
+				}
 			}
 			else
 			{
@@ -10021,7 +10072,18 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
 			{
 				k = (randint((dam > 90) ? 35 : (dam / 3 + 5)));
-				(void)set_stun(p_ptr->timed[TMD_STUN] + k);
+
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 75)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] + k);
+				}
 			}
 			take_hit(who, what, dam);
 
@@ -10072,7 +10134,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] + randint(15));
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 85)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] + randint(15));
+				}
 			}
 			else
 			{
@@ -10515,7 +10587,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->timed[TMD_BLIND]) && (randint(400) < dam)) inflict_disease(DISEASE_BLIND, dam, 50);
+				if ((p_ptr->timed[TMD_BLIND] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_BLIND, dam, 50);
 
 				/* Inflict blindness -- always cumulative */
 				if (inc_timed(TMD_BLIND, 10 + randint(dam), TRUE))
@@ -10573,7 +10645,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->timed[TMD_AFRAID]) && (randint(400) < dam)) inflict_disease(DISEASE_FEAR, dam, 50);
+				if ((p_ptr->timed[TMD_AFRAID] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_FEAR, dam, 50);
 
 				/* Inflict fear - always cumulative */
 				if (set_afraid(p_ptr->timed[TMD_AFRAID] + 3 + randint(dam)))
@@ -10609,7 +10681,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->timed[TMD_MSLEEP])
 			{
 				/* Inflict disease */
-				if (randint(400) < dam) inflict_disease(DISEASE_SLEEP, dam, 150);
+				if ((p_ptr->timed[TMD_MSLEEP] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_SLEEP, dam, 150);
 
 				/* Inflict sleepiness */
 				if (inc_timed(TMD_MSLEEP, dam, TRUE))
@@ -10653,7 +10725,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->timed[TMD_CURSED])
 			{
 				/* Inflict disease */
-				if (randint(400) < dam) inflict_disease(DISEASE_CURSE, dam, 150);
+				if ((p_ptr->timed[TMD_CURSED]) && (randint(4000) < dam)) inflict_disease(DISEASE_CURSE, dam, 150);
 
 				/* Inflict curse */
 				if (inc_timed(TMD_CURSED, k, TRUE))
@@ -10690,7 +10762,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->timed[TMD_AMNESIA])
 			{
 				/* Inflict disease */
-				if (randint(400) < dam) inflict_disease(DISEASE_AMNESIA, dam, 150);
+				if ((p_ptr->timed[TMD_AMNESIA] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_AMNESIA, dam, 150);
 
 				/* Inflict amnesia */
 				if (inc_timed(TMD_AMNESIA, k, TRUE))
@@ -10738,7 +10810,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->timed[TMD_PETRIFY])
 			{
 				/* Inflict disease */
-				if (randint(200) < dam) inflict_disease(DISEASE_PETRIFY, dam, 100);
+				if ((p_ptr->timed[TMD_PETRIFY] > 100) && (randint(2000) < dam)) inflict_disease(DISEASE_PETRIFY, dam, 100);
 
 				/* Inflict petrification */
 				if (inc_timed(TMD_PETRIFY, k, TRUE))
@@ -10791,7 +10863,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->timed[TMD_PARALYZED])
 			{
 				/* Inflict disease */
-				if (randint(20) < dam) inflict_disease(DISEASE_PARALYZE, dam, 20);
+				if (randint(2000) < dam) inflict_disease(DISEASE_PARALYZE, dam, 20);
 			}
 			else
 			{
@@ -10828,7 +10900,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (p_ptr->timed[TMD_STASTIS])
 			{
 				/* Inflict disease */
-				if (randint(400) < dam) inflict_disease(DISEASE_STASTIS, dam, 250);
+				if (randint(4000) < dam) inflict_disease(DISEASE_STASTIS, dam, 250);
 			}
 			else
 			{
@@ -10873,7 +10945,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
 
 				/* Inflict disease */
-				if ((p_ptr->timed[TMD_SLOW]) && (randint(200) < dam)) inflict_disease(DISEASE_SLOW, dam, 50);
+				if ((p_ptr->timed[TMD_SLOW] > 100) && (randint(2000) < dam)) inflict_disease(DISEASE_SLOW, dam, 50);
 
 				/* Inflict slowness */
 				if (inc_timed(TMD_SLOW, p_ptr->timed[TMD_SLOW] ? 3 : randint(25) + 15, TRUE)) obvious = TRUE;
@@ -11273,7 +11345,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 90)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				}
 			}
 			else
 			{
@@ -11307,7 +11389,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 90)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				}
 			}
 			else
 			{
@@ -11354,7 +11446,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				/* Always notice */
 				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 
-				(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				/* Work on preventing infinite knockout */
+				if (p_ptr->timed[TMD_STUN] > 90)
+				{
+					/* Inflict disease */
+					if (randint(1000) < k) inflict_disease(DISEASE_STUN, k, 20);
+				}
+				else
+				{
+					/* Inflict stun */
+					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
+				}
 			}
 			else
 			{
