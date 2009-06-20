@@ -595,7 +595,7 @@ static void sense_inventory(void)
 		}
 
 		/* Eggs become 'attuned' to the player if carried awhile, resulting in friendly monsters */
-		if (o_ptr->tval == TV_EGG) o_ptr->ident = (IDENT_FORGED);
+		if ((o_ptr->tval == TV_EGG) && (o_ptr->timeout)) o_ptr->ident = (IDENT_FORGED);
 
 		/* Sense flags to see if we have ability */
 		if ((i >= INVEN_WIELD) && !(IS_QUIVER_SLOT(i)))
