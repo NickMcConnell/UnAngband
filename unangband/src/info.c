@@ -4282,6 +4282,16 @@ void list_object(const object_type *o_ptr, int mode)
 			case ORIGIN_CHEST:
 				text_out("found in a chest");
 				break;
+
+			case ORIGIN_STORE_REWARD:
+				text_out("given as a reward");
+				break;
+
+			case ORIGIN_STORE_STORAGE:
+				text_out("found in storage");
+				break;
+
+
 		}
 
 		if (o_ptr->origin_depth)

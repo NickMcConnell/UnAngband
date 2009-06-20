@@ -875,6 +875,8 @@ static int home_carry(object_type *o_ptr, int store_index)
  * Adding an object to a "fixed" price stack will not change the fixed price.
  *
  * In all cases, return the slot (or -1) where the object was placed
+ *
+ * IDENT_STORE should be set by the calling routine if required.
  */
 static int store_carry(object_type *o_ptr, int store_index)
 {
@@ -883,9 +885,6 @@ static int store_carry(object_type *o_ptr, int store_index)
 	object_type *j_ptr;
 
 	store_type *st_ptr = store[store_index];
-
-	/* Item belongs to a store */
-	o_ptr->ident |= IDENT_STORE;
 
 	/* Evaluate the object */
 	value = object_value(o_ptr);
@@ -1013,7 +1012,11 @@ static bool store_services(object_type *i_ptr, int store_index)
 			object_prep(j_ptr, k_idx);
 
 			/* The object is "known" */
+			object_aware(j_ptr, TRUE);
 			object_known(j_ptr);
+
+			/* The object belongs to the store */
+			j_ptr->ident |= (IDENT_STORE);
 
 			/* Carry the object in the store */
 			if (store_carry(j_ptr, store_index) >= 0) service = TRUE;
@@ -1235,6 +1238,9 @@ static void store_create(int store_index)
 			object_aware(i_ptr, TRUE);
 			object_known(i_ptr);
 
+			/* Get store origina */
+			i_ptr->origin = ORIGIN_STORE_REWARD;
+
 			/* Attempt to carry the (known) object */
 			(void)store_carry(i_ptr, store_index);
 
@@ -1292,12 +1298,24 @@ static void store_create(int store_index)
 			if (i_ptr->sval == SV_LITE_LANTERN) i_ptr->charges = FUEL_LAMP / 2;
 		}
 
-		/* Item belongs to a store */
-		i_ptr->ident |= IDENT_STORE;
-		i_ptr->origin = ORIGIN_STORE;
+		/* Item belongs to storage */
+		if (st_ptr->base == STORE_STORAGE)
+		{
+			i_ptr->origin = ORIGIN_STORE_STORAGE;
 
-		/* The object is "known" */
-		object_known(i_ptr);
+			/* The object is "known" */
+			object_aware(i_ptr, TRUE);
+			object_known(i_ptr);
+		}
+		/* Item belongs to a store */
+		else
+		{
+			i_ptr->ident |= IDENT_STORE;
+			i_ptr->origin = ORIGIN_STORE;
+
+			/* The object is "known" */
+			object_known(i_ptr);
+		}
 
 		/* No "worthless" items */
 		if (object_value(i_ptr) <= 0) continue;
@@ -4105,7 +4123,11 @@ int store_init(int feat)
 			object_prep(i_ptr, k_idx);
 
 			/* The object is "known" */
+			object_aware(i_ptr, TRUE);
 			object_known(i_ptr);
+
+			/* The object belongs to a store */
+			i_ptr->ident |= (IDENT_STORE);
 
 			/* Carry the object in the store */
 			(void) store_carry(i_ptr, store_index);
