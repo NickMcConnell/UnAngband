@@ -4060,6 +4060,26 @@ void player_fire_or_throw_selected(int item, bool fire)
 					/* Check usage */
 					object_usage(item);
 
+					/* Copy learned values to the thrown/fired weapon.
+					 * We do this to help allow weapons to stack. */
+					i_ptr->ident = o_ptr->ident;
+					i_ptr->usage = o_ptr->usage;
+					i_ptr->feeling = o_ptr->feeling;
+					i_ptr->guess1 = o_ptr->guess1;
+					i_ptr->guess2 = o_ptr->guess2;
+					i_ptr->can_flags1 = o_ptr->can_flags1;
+					i_ptr->can_flags2 = o_ptr->can_flags2;
+					i_ptr->can_flags3 = o_ptr->can_flags3;
+					i_ptr->can_flags4 = o_ptr->can_flags4;
+					i_ptr->may_flags1 = o_ptr->may_flags1;
+					i_ptr->may_flags2 = o_ptr->may_flags2;
+					i_ptr->may_flags3 = o_ptr->may_flags3;
+					i_ptr->may_flags4 = o_ptr->may_flags4;
+					i_ptr->not_flags1 = o_ptr->not_flags1;
+					i_ptr->not_flags2 = o_ptr->not_flags2;
+					i_ptr->not_flags3 = o_ptr->not_flags3;
+					i_ptr->not_flags4 = o_ptr->not_flags4;
+
 					/* Stop looking */
 					break;
 				}
@@ -4090,29 +4110,6 @@ void player_fire_or_throw_selected(int item, bool fire)
 		/* Apply effects of activation/coating */
 		if (activate)
 		{
-			/* Check usage */
-			object_usage(item);
-
-			/* Copy learned values to the thrown/fired weapon.
-			 * We do this to help allow weapons to stack. */
-			i_ptr->ident = o_ptr->ident;
-			i_ptr->usage = o_ptr->usage;
-			i_ptr->feeling = o_ptr->feeling;
-			i_ptr->guess1 = o_ptr->guess1;
-			i_ptr->guess2 = o_ptr->guess2;
-			i_ptr->can_flags1 = o_ptr->can_flags1;
-			i_ptr->can_flags2 = o_ptr->can_flags2;
-			i_ptr->can_flags3 = o_ptr->can_flags3;
-			i_ptr->can_flags4 = o_ptr->can_flags4;
-			i_ptr->may_flags1 = o_ptr->may_flags1;
-			i_ptr->may_flags2 = o_ptr->may_flags2;
-			i_ptr->may_flags3 = o_ptr->may_flags3;
-			i_ptr->may_flags4 = o_ptr->may_flags4;
-			i_ptr->not_flags1 = o_ptr->not_flags1;
-			i_ptr->not_flags2 = o_ptr->not_flags2;
-			i_ptr->not_flags3 = o_ptr->not_flags3;
-			i_ptr->not_flags4 = o_ptr->not_flags4;
-
 			/* Apply additional effect from activation */
 			if (auto_activate(o_ptr))
 			{
