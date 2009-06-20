@@ -3683,8 +3683,8 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 			/* Player name */
 			if (*s == '&')
 			{
-				/* Hack -- townsfolk know the players name */
-				if ((m_ptr->mflag & (MFLAG_TOWN)) && (strlen(op_ptr->full_name)))
+				/* Hack -- townsfolk and allies know the players name */
+				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_ALLY)) && (strlen(op_ptr->full_name)))
 				{
 					u = op_ptr->full_name;
 
