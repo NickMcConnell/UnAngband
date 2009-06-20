@@ -13185,7 +13185,7 @@ K:CHASM:141:0
 #$ chasm
 K:PATH:415:0
 #$ open trail
-K:HURT_COLD:143:0
+K:HURT_COLD:145:0
 #$ ice
 K:TREE:634:0
 #$ shady wet ground
