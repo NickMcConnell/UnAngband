@@ -1126,6 +1126,7 @@ byte spell_color(int type)
 		case GF_POISON_WEAK:  return (pois_color());
 		case GF_POISON_HALF:  return (pois_color());
 		case GF_HURT_POISON:  return (pois_color());
+		case GF_SLIME:		  return (pois_color());
 
 		case GF_PLASMA:       return (plasma_color());
 		case GF_HELLFIRE:     return (hellfire_color());
@@ -6060,6 +6061,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_DELAY_POISON:
 		case GF_POIS:
 		case GF_HURT_POISON:
+		case GF_SLIME:
 		{
 			if (seen) obvious = TRUE;
 			if (r_ptr->flags3 & (RF3_IM_POIS))
@@ -9286,6 +9288,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_DELAY_POISON:
 		case GF_HURT_POISON:
 		case GF_POIS:
+		case GF_SLIME:
 		{
 			if (fuzzy) msg_print("You are hit by poison!");
 			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON, typ == GF_POISON_WEAK, typ == GF_POISON_HALF, typ == GF_HURT_POISON);
