@@ -700,7 +700,6 @@ X:2
 N:43:vault of the city of Erebor
 X:2
 
-#Service of Satisfy Hunger
 N:44:the Brandywine Barge House
 X:3
 O:31:1:2
