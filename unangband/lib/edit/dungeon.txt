@@ -475,7 +475,7 @@ Q:27:235
 Z:27:27
 G:C
 R:ESCORT
-L:30:407:414:56:153:235:0:0:DESTROYED | SURFACE | DAYLIGHT | BATTLE | WILD | TUNNELS:the Battle of
+L:30:407:414:56:153:235:0:0:SURFACE | DAYLIGHT | BATTLE | WILD | TUNNELS:the Battle of
 D:Five great armies have gathered at the promise of Smaug's riches hidden
 D: in the Lonely Mountain.
 
@@ -633,9 +633,9 @@ X:50:0:0:0
 Q:36:249
 G:t
 R:TROLL
-L:22:407:420:56:155:249:49:0:DESTROYED | SURFACE | DAYLIGHT | TOWER | BATTLE | WILD | TUNNELS:the Siege of
-L:23:141:420:56:155:249:49:0:TOWER | BATTLE | LESS | MORE:
-L:40:141:420:56:155:249:49:0:TOWER | BATTLE | MORE:
+L:22:407:420:56:155:249:49:0:SURFACE | DAYLIGHT | TOWER | BATTLE | WILD | TUNNELS:the Siege of
+L:23:141:56:0:0:249:49:0:TOWER | BATTLE | LESS | MORE:
+L:40:141:56:0:0:249:49:0:TOWER | BATTLE | MORE:
 D:Saruman's orcs have laid siege to the fortress of Hornburg.  You stand
 D: with your allies to relieve the siege --- fight your way through the
 D: narrow ravine of Helm's Deep and scale the tower to confront the leader

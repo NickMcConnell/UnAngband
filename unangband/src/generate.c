@@ -10737,13 +10737,15 @@ static void build_streamer(int feat)
 }
 
 
+#define SPELL_DESTRUCTION	32
+
 /*
  * Build a destroyed level
  */
 static void destroy_level(void)
 {
-	int y1, x1, y, x, k, t, n;
-
+	int y, x, n;
+	bool dummy = FALSE;
 
 	/* Note destroyed levels */
 	if (cheat_room) message_add("Destroyed Level", MSG_GENERIC);
@@ -10752,109 +10754,11 @@ static void destroy_level(void)
 	for (n = 0; n < randint(5); n++)
 	{
 		/* Pick an epi-center */
-		x1 = rand_range(5, DUNGEON_WID-1 - 5);
-		y1 = rand_range(5, DUNGEON_HGT-1 - 5);
+		x = rand_range(5, DUNGEON_WID-1 - 5);
+		y = rand_range(5, DUNGEON_HGT-1 - 5);
 
-		/* Big area of affect */
-		for (y = (y1 - 15); y <= (y1 + 15); y++)
-		{
-			for (x = (x1 - 15); x <= (x1 + 15); x++)
-			{
-				/* Skip illegal grids */
-				if (!in_bounds_fully(y, x)) continue;
-
-				/* Extract the distance */
-				k = distance(y1, x1, y, x);
-
-				/* Stay in the circle of death */
-				if (k >= 16) continue;
-
-				/* Delete the monster (if any) */
-				delete_monster(y, x);
-
-				/* Destroy "outside" grids */
-				if ((cave_valid_bold(y,x)) && (f_info[cave_feat[y][x]].flags3 & (FF3_OUTSIDE)))
-				{
-					/* Delete objects */
-					delete_object(y, x);
-
-					/* Burn stuff */
-					if (f_info[cave_feat[y][x]].flags2 & (FF2_HURT_FIRE))
-					{
-						cave_alter_feat(y,x,FS_HURT_FIRE);
-					}
-					/* Don't touch chasms */
-					else if (f_info[cave_feat[y][x]].flags2 & (FF2_CHASM))
-					{
-						/* Nothing */
-					}
-							/* Magma */
-					else if (rand_int(100)< 15)
-					{
-						/* Create magma vein */
-						cave_set_feat(y, x, FEAT_RUBBLE);
-					}
-
-
-				}
-				/* Destroy valid grids */
-				else if (cave_valid_bold(y, x))
-				{
-					/* Delete objects */
-					delete_object(y, x);
-
-					/* Wall (or floor) type */
-					t = rand_int(200);
-
-					/* Burn stuff */
-					if (f_info[cave_feat[y][x]].flags2 & (FF2_HURT_FIRE))
-					{
-						cave_alter_feat(y,x,FS_HURT_FIRE);
-					}
-
-					/* Granite */
-					else if (t < 20)
-					{
-						/* Create granite wall */
-						cave_set_feat(y, x, FEAT_WALL_EXTRA);
-					}
-
-					/* Quartz */
-					else if (t < 70)
-					{
-						/* Create quartz vein */
-						cave_set_feat(y, x, FEAT_QUARTZ);
-					}
-
-					/* Magma */
-					else if (t < 100)
-					{
-						/* Create magma vein */
-						cave_set_feat(y, x, FEAT_MAGMA);
-					}
-
-					/* Rubble */
-					else if (t < 130)
-					{
-						/* Create rubble */
-						cave_set_feat(y, x, FEAT_RUBBLE);
-					}
-
-					/* Floor */
-					else
-					{
-						/* Create floor */
-						cave_set_feat(y, x, FEAT_FLOOR);
-					}
-
-					/* No longer part of a room or vault */
-					cave_info[y][x] &= ~(CAVE_ROOM);
-
-					/* No longer illuminated */
-					cave_info[y][x] &= ~(CAVE_GLOW);
-				}
-			}
-		}
+		/* Apply destruction effect */
+		process_spell_target(0, 0, y, x, y, x, SPELL_DESTRUCTION, 0, 1, FALSE, TRUE, FALSE, &dummy, NULL);
 	}
 }
 

@@ -3420,7 +3420,8 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 	/* Hack -- prevent smoke/vapour etc on floors unless a feature or non-player object causes this */
 	if (((who != SOURCE_FEATURE) && (who != SOURCE_OBJECT)) &&
-			((f_ptr->flags1 & (FF1_FLOOR)) != 0))
+			(((f_ptr->flags1 & (FF1_FLOOR)) != 0) ||
+			((f_ptr->flags3 & (FF3_GROUND)) != 0)))
 	{
 		burnout = TRUE;
 	}
