@@ -481,6 +481,10 @@ more frequent while expensive */
 			if (cost <= 500L) size += mass_roll(5, 5);
 			break;
 		}
+
+		case TV_SERVICE:
+			/* Never discount services */
+			return;
 	}
 
 	if (!allow_discount) return;
