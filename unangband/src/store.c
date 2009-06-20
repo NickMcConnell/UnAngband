@@ -1229,7 +1229,6 @@ static void store_create(int store_index)
 
 			/* Its now safe to identify quest rewards */
 			object_aware(i_ptr, TRUE);
-			object_aware_tips(i_ptr, TRUE);
 			object_known(i_ptr);
 
 			/* Attempt to carry the (known) object */
@@ -1471,9 +1470,11 @@ static void display_entry(int item, int store_index)
 			/* Learn flavor */
 			object_aware(o_ptr, TRUE);
 		}
-
-		/* Mark object seen */
-		object_aware_tips(o_ptr, TRUE);
+		else
+		{
+			/* Mark object seen */
+			object_aware_tips(o_ptr, TRUE);
+		}
 
 		/* XXX XXX - Mark objects as "seen" (doesn't belong in this function) */
 		if (o_ptr->name2)
@@ -2559,9 +2560,11 @@ static void store_purchase(int store_index)
 					/* Learn flavor */
 					object_aware(o_ptr, TRUE);
 				}
-
-				/* Mark object seen */
-				object_aware_tips(o_ptr, TRUE);
+				else
+				{
+					/* Mark object seen */
+					object_aware_tips(o_ptr, TRUE);
+				}
 			}
 
 			/* Player cannot afford it */
@@ -2592,9 +2595,6 @@ static void store_purchase(int store_index)
 
 				/* Buying an object makes you aware of it */
 				object_aware(i_ptr, FALSE);
-
-				/* Mark object seen */
-				object_aware_tips(o_ptr, TRUE);
 
 				/* The object kind is not guessed */
 				k_info[i_ptr->k_idx].guess = 0;
@@ -2950,8 +2950,11 @@ static void store_sell(int store_index)
 
 			/* Identify original object */
 			object_aware(o_ptr, TRUE);
-			object_aware_tips(o_ptr, TRUE);
 			object_known(o_ptr);
+
+			/* Identify store object */
+			object_aware(i_ptr, TRUE);
+			object_known(i_ptr);
 
 			/* Combine / Reorder the pack (later) */
 			p_ptr->notice |= (PN_COMBINE | PN_REORDER);
