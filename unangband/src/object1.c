@@ -1892,6 +1892,11 @@ s16b wield_slot(const object_type *o_ptr)
 	else
 	  return -1;
       }
+    case TV_FLASK:
+    {
+    	return INVEN_QUIVER;
+    	break;
+    }
 
     default:
       {
