@@ -11931,8 +11931,8 @@ static bool place_contents()
 	if (((p_ptr->py == 0) || (p_ptr->px == 0)) && ! (new_player_spot())) return (FALSE);
 
 	/* Pick a base number of monsters */
-	/* Strongholds and sewers have more monsters */
-	i = MIN_M_ALLOC_LEVEL + randint(5 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER | LF1_BATTLE)) != 0) ? 2 : 1));
+	/* Strongholds, sewers, battlefields and wilderness areas have more monsters */
+	i = MIN_M_ALLOC_LEVEL + randint(5 * (((level_flag & (LF1_STRONGHOLD | LF1_SEWER | LF1_BATTLE | LF1_WILD)) != 0) ? 2 : 1));
 
 	/* Generating */
 	if (cheat_room) message_add("Placing monsters.", MSG_GENERIC);
