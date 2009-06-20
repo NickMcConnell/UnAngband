@@ -6875,6 +6875,13 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					msg_format("Your torch%s fully fueled.", o_ptr->number > 1 ? "es are" : " is");
 				}
 
+				/* Switch off light source if in inventory*/
+				if ((item >= 0) && (item < INVEN_WIELD))
+				{
+					o_ptr->charges = o_ptr->timeout;
+					o_ptr->timeout = 0;
+				}
+
 				/* Lite if necessary */
 				if (item == INVEN_LITE) p_ptr->update |= (PU_TORCH);
 				*cancel = FALSE;

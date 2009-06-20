@@ -1828,10 +1828,16 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			/* Fall through */
 		}
 
-		/* Rings, Amulets, Lites, Instruments */
+		/* Lites */
+		case TV_LITE:
+		{
+			if ((o_ptr->charges != 0) == (j_ptr->timeout != 0)) return (FALSE);
+			if ((o_ptr->timeout != 0) == (j_ptr->charges != 0)) return (FALSE);
+		}
+
+		/* Rings, Amulets, Instruments */
 		case TV_RING:
 		case TV_AMULET:
-		case TV_LITE:
 		case TV_INSTRUMENT:
 
 		/* Missiles */
@@ -8758,6 +8764,13 @@ s16b inven_carry(object_type *o_ptr)
 	object_type *j_ptr;
 
 	int book_tval= c_info[p_ptr->pclass].spell_book;
+
+	/* XXX Douse lights in inventory */
+	if ((o_ptr->tval == TV_LITE) && (o_ptr->timeout))
+	{
+		o_ptr->charges = o_ptr->timeout;
+		o_ptr->timeout = 0;
+	}
 
 	/* Check for combining */
 	for (j = 0; j < INVEN_PACK; j++)
