@@ -11289,7 +11289,7 @@ F:HIDE_DIG |
 F:HURT_WATER | GROUND | LIVING | NEED_TREE | ATTR_LITE |
 
 N:540:shady trail through grass
-G:<:Y
+G:.:Y
 U:421
 #$ tree
 O:0
