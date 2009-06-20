@@ -1025,7 +1025,7 @@ bool set_food(int v)
 			/* Normal */
 			case 4:
 			{
-				msg_print("You are no longer hungry.");
+				if (new_aux != old_aux) msg_print("You are no longer hungry.");
 				break;
 			}
 
