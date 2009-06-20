@@ -284,20 +284,20 @@ L:11:56:0:420:153:307:0:0:SURFACE | DAYLIGHT | TOWN | MORE:Tom
 L:12:56:56:1:420:307:0:0:ROOMS | TUNNELS | LESS:the basement under Tom
 D:Goldberry's gifts can be found at her pool.
 
-# TODO: perhaps split them: 5--17 initially, weak guardian at the bottom.
-# After Dol Guldur: 11--23 (Barrow-downs stirred by Dark Captain)
-# weak guardian at the surface, current big guardian at the bottom.
-
 N:10:Barrow-downs
 X:12:15:0:0
 Q:8:546
+Z:11:28
 L:4:407:420:420:56:0:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | MORE:
 L:5:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
+L:17:56:56:0:0:431:0:0:ROOMS | TUNNELS | LESS:
+
+N:11:Barrow-downs stirred by a Dark Captain
+X:12:15:0:0
+Q:8:546
+L:10:407:420:420:56:0:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | MORE:
+L:11:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
 L:23:56:56:0:0:1081:0:0:ROOMS | TUNNELS | LESS:
-
-#N:11 unused (future Barrow-downs basement)
-
-#$# 11 - Unused ###
 
 N:12:Bree
 X:10:13:14:0
