@@ -31,8 +31,8 @@
 # 7:Buckland (0)
 # 8:Old Forest (6-10)
 # 9:Bombadil's house (11-12)
-# 10:Barrow-downs (4-23)
-# 11:unused (future barrow-downs basement?)
+# 10:Barrow-downs (4-17)
+# 11:Tyrn Gorthad (10-23)
 
 # -- But they all get to Bree & Rivendell eventually --
 # 12:Bree (0-4)*
@@ -103,12 +103,15 @@
 # 65:Elemental Evil (21-40)
 # 66:Crystal Castle (30-45)
 
-# 67:unused
+# Oops - should move this to the appropriate section
+# 67:Black Gate
+# 69:Army of the West*
+# 70:Osgiliath
 
 # -- Angband --
 # 68:ruins of Angmar (30-51)
-# 69:Angband (0-60)*
-# 70:the West (0)
+# 72:Angband (0-60)*
+# 73:the West (0)
 
 # === Understanding dungeon.txt ===
 
@@ -181,7 +184,7 @@ V:0.6.3
 # The non-campaign start is the second to last dungeon.
 
 N:0:Nowhere Town
-X:69:0:0:0
+X:72:0:0:0
 S:954:955:0:0:0:0:0:0
 L:0:56:0:407:0:0:0:0:SURFACE | DAYLIGHT | TOWN:
 D:It feels like in the middle of nowhere.  You shouldn't be there.  Please
@@ -211,7 +214,7 @@ D:Someone with a silver-tongue and guile-full words has brought fair
 D: Hobbiton to its knees in a whir of devilish industry and foul pollution.
 
 N:3:Hobbiton rebuilt
-X:69:70:0:0
+X:72:73:0:0
 G:h
 S:264:515:265:266:772:773:774:0
 L:0:56:0:407:153:0:0:0:SURFACE | DAYLIGHT | TOWN:
@@ -811,7 +814,7 @@ D: lifeless place.
 # Goes upwards
 
 N:51:Minas Tirith
-X:31:52:54:0
+X:31:70:0:0
 Q:53:1085
 G:t
 R:MAGE
@@ -823,7 +826,9 @@ L:48:141:56:0:0:1085:46:0:TOWER | MORE:
 N:52:Pelennor Fields
 X:51:0:0:0
 G:W
-R:ESCORT
+R:ESCORTS
+Q:69:535
+Z:69:69
 L:43:407:435:411:420:535:0:0:SURFACE | DAYLIGHT | BATTLE | WILD | TUNNELS:the Battle of
 
 N:53:Mount Mindolluin
@@ -836,9 +841,10 @@ D: above Minas Tirith, a descendant of the sapling rescued from Numenor by
 D: King Isildur.  Come closer...
 
 N:54:Ithilien
-X:55:58:0:0
+X:55:58:70:0
 G:T
 R:WARRIOR
+Q:69:535
 S:512:520:521:522:0:0:0:0
 L:20:407:420:155:199:0:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | MORE:
 L:21:56:0:1:155:1084:0:0:TOWN | LESS:
@@ -876,6 +882,7 @@ N:58:Morannon
 X:54:59:0:0
 G:q
 R:EVIL
+Q:67:535
 L:40:407:407:56:397:538:43:0:DESTROYED | SURFACE | DAYLIGHT | TOWER | WILD | ROOMS | TUNNELS:
 L:41:141:56:0:397:0:43:0:TOWER | LESS | MORE:
 L:53:141:56:0:0:538:43:0:TOWER | MORE:
@@ -952,26 +959,43 @@ L:30:407:56:144:145:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNEL
 L:31:56:148:145:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the
 L:45:56:148:145:0:0:0:0:ROOMS | TUNNELS | LESS:the
 
-#N:67 unused
+N:67:Black-Gate
+X:54:59:69:0
+G:T
+R:ESCORTS
+L:45:407:407:56:397:538:43:0:SURFACE | DAYLIGHT | WILD | TUNNELS | BATTLE:the Battle of
 
 # Alternate to bypass Moria etc. and reach Angband...
 
-#$# 67 - Unused ###
-
 N:68:ruins of Angmar
-X:17:69:0:0
+X:17:72:0:0
 R:UNDEAD
 L:30:407:425:141:141:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNELS | MORE:the
 L:31:56:56:141:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the
 L:50:56:56:0:0:535:0:0:ROOMS | TUNNELS | LESS | MORE:the
 L:51:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:the
 
+N:69:Army of the West
+X:67:0:0:0
+R:WARRIOR
+S:992:993:994:995:0:0:0:0
+L:0:56:0:407:0:0:0:0:SURFACE | DAYLIGHT | TOWN:
+D:A great force, ready to assail the gates of Mordor.
+
+N:70:Osgiliath
+X:51:54:0:0
+G:o
+R:ESCORT
+Q:52:457
+Z:52:52
+L:40:407:49:155:199:457:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | ROOMS | DESTROYED | BATTLE:the siege of
+
 # The non-campaign starting dungeon.
 # Must always be second to last position
 
-N:69:Angband
+N:72:Angband
 X:68:0:0:0
-Q:70:547
+Q:73:547
 S:8:9:10:11:12:13:14:15
 L:0:56:0:407:0:0:0:0:SURFACE | DAYLIGHT | TOWN | MORE:the Siege Camp around
 L:1:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the Dungeon of
@@ -981,7 +1005,7 @@ D:It feels like home...
 
 # Must always be last position
 
-N:70:the West
+N:73:the West
 X:0:0:0:0
 G:M
 S:777:0:0:0:0:0:0:0

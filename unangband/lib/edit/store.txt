@@ -751,3 +751,6 @@ O:72:45:10
 
 N:49:the hut of Radagast the Brown
 X:0
+
+N:50:pavilion of the Army of the West
+X:2
