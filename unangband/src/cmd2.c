@@ -3247,14 +3247,12 @@ int breakage_chance(object_type *o_ptr)
 			return (31 - adj_int_break[p_ptr->stat_ind[A_INT]]);
 		}
 
-		/* Very rarely break: weapons (throwing and regular);
-		   break 0% of the time with 18/100 INT */
+		/* Don't break thrown weapons (throwing and regular) to
+		 * allow these to stack better. These weapons have enough
+		 * chance of breaking on the ground after throwing anyway. */
 		default:
 		{
-			int chance = 21 - adj_int_break[p_ptr->stat_ind[A_INT]];
-
-			if (chance > 0) return (chance);
-			else return (0);
+			return (0);
 		}
 	}
 }
