@@ -257,7 +257,6 @@ T:0-9999:intensif|y|ies| % aura
 W:4:0:0
 R:2
 F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | HIDE | SAFE |
-F:SPECIAL_CASE |
 D:surround~ & with @ aura#:$ enemies
 
 N:28:SELF
@@ -902,10 +901,9 @@ D:explode~:
 N:103:AURA
 I:0:1:0
 C:40:0:0:0:0:0:100
-R:1
-F:BOOM | WALL | GRID | ITEM | PLAY | SELF | MAGIC | HIDE | SAFE |
-F:SPECIAL_CASE |
-D::
+R:2
+F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | HIDE | SAFE |
+D:surround~ & with @ aura#:$ enemies
 
 #R:2 if powerful
 
