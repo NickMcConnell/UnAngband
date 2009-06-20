@@ -1769,10 +1769,11 @@ static void process_world(void)
 	sense_inventory();
 
 	/* Show tips */
-	if  (!p_ptr->command_rep
+	if  (((turn < old_turn + 1000) && !(turn % 100)) ||
+		(!p_ptr->command_rep
 		 && ((p_ptr->searching && !(turn % 1000))
 			 || (is_typical_town(p_ptr->dungeon, p_ptr->depth)
-				 && !(turn % 100))))
+				 && !(turn % 100)))))
 	{
 		/* Show a tip */
 		show_tip();
