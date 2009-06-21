@@ -3564,8 +3564,14 @@ void player_fire_or_throw_selected(int item, bool fire)
 	/* Minimum inaccuracy */
 	if (inaccuracy < 0) inaccuracy = 0;
 
+	/* Hack to avoid divide by zero, and give nonskilled users
+	 * a chance to shoot without fumbling */
+	if ((ranged_skill <= 1) && (rand_int(100) < 50)) ranged_skill = 2;
+	
 	/* Test for fumble */
-	if ((inaccuracy > 5) && (rand_int(ranged_skill) < inaccuracy))
+	/* XXX Avoid divide by zero here */
+	if ((ranged_skill <= 1)
+		|| ((inaccuracy > 5) && (rand_int(ranged_skill) < inaccuracy)))
 	{
 		int dir;
 
