@@ -8944,7 +8944,31 @@ F:LEVEL_CLASS | SCENT | LEVEL_POWER |
 S:BLOW_4 |
 D:It is a cross between a human and a bull.
 
-#$# 442 - Unused ###
+N:442:the Elf-king of Dagorlad
+G:l:T
+#$ Clear available
+#$ Metallics available:dwsrgbuWPyRGBUpvtmYVMzZ
+#$ Colors available:dyRBUmVIMzZ
+I:130:548:20:125:10
+W:42:6:27:4700
+C:45:6:27:9600:10000
+M:25:50:68:150
+B:HIT:EXP_80:8d16
+B:TOUCH:LOSE_DEX:8d8
+B:SHRIEK:LOSE_INT:8d8
+B:ARROW:UN_POWER:16d8
+F:UNIQUE | MALE | FORCE_MAXHP | FORCE_SLEEP | ESCORT | ESCORTS | ONLY_ITEM |
+F:DROP_1D3 | DROP_GOOD |
+F:SMART | HAS_LITE | INVISIBLE | COLD_BLOOD | WARRIOR | MAGE |
+F:UNDEAD | EVIL | NONLIVING | RES_NETHR | NO_STUN | NO_CONF | NO_SLEEP |
+F:DROP_MISSILE | DROP_TOOL | DROP_MUSIC | DROP_ARMOR |
+F:RES_LITE | IM_BLUNT | NO_CUTS | ELF | LEVEL_POWER |
+S:BLOW_3 | BLOW_4 |
+S:BALL_DARK | BOLT_POIS |
+S:HEAL | BLINK | DARKNESS | DRAIN_MANA | WOUND | BLIND | CONF |
+S:S_MONSTER | S_RACE | S_DEMON | S_UNDEAD |
+D:He rules only a devastated wasteland, contaminated and unhealthy, with
+D: ponds of poisonous slick and mounds of scorched earth.
 
 N:443:Great Wyrm of Shadow
 G:A:z
@@ -10140,7 +10164,28 @@ D:A vast dragon of power.  Storms and lightning crash around its titanic
 D: form.  Deep blue scales reflect the flashes and highlight the
 D: creature's great muscles.  It regards you with contempt.
 
-#$# 490 - Unused ###
+N:490:Corpse-candle
+G:G:Y
+#$ Metallics available:d
+#$ Colors available:d
+I:110:198:20:30:10
+W:41:4:21:4000
+M:24:12:26:64
+B:CLAW:WATER:5d5
+B:CLAW:WATER:5d5
+B:GAZE:PARALYZE:5d5
+F:FORCE_SLEEP | RAND_25 | ONLY_ITEM | DROP_60 | DROP_1D3 |
+F:HAS_LITE | COLD_BLOOD | CAN_SWIM | POWERFUL | CAN_FLY | PASS_WALL |
+F:TAKE_ITEM |
+F:UNDEAD | EVIL | NONLIVING | IM_FIRE | IM_COLD | IM_POIS | RES_WATER |
+F:NO_STUN | NO_CONF | NO_SLEEP |
+F:HAS_CLAW | DROP_TOOL | DROP_MUSIC | DROP_CLOTHES | DROP_JUNK |
+F:LEVEL_CLASS | IM_BLUNT | NO_CUTS | ATTR_METAL | LEVEL_POWER |
+S:BLOW_3 |
+S:BOLT_FIRE | BOLT_WATER |
+S:HOLD |
+D:A dead-faced drowned spirit which burns with the rage of the battle
+D: which killed it.  You are hypnotised by its flickering flames.
 
 N:491:Harowen the Black Hand
 G:t:v
