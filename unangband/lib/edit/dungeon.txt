@@ -461,7 +461,7 @@ Q:24:475
 Z:26:24
 G:B
 R:DRAGON
-L:26:407:435:56:154:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNELS | MORE:the
+L:26:407:435:56:56:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | TUNNELS | MORE:the
 L:27:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:western passage into the
 L:28:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the tunnels of
 L:36:56:56:0:0:475:0:0:ROOMS | TUNNELS | LESS:the Bottommost Hall under
@@ -790,7 +790,7 @@ D: you with gifts at her mirror.
 
 N:49:Parth Galen
 X:48:57:0:0
-L:20:407:420:155:56:0:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | MORE:
+L:20:407:420:155:56:0:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | MORE | ROOMS:
 L:21:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
 L:40:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:
 D:The ruins of a more ancient race lie here: the glens and hillocks strewn
