@@ -873,7 +873,7 @@ L:48:141:56:1:0:641:11:0:TOWER | MORE:
 N:57:Dead Marshes
 X:49:54:0:0
 R:UNDEAD
-L:41:407:199:200:201:442:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNELS:
+L:41:407:199:396:442:442:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS:
 D:A dreadful place.  Nobody who crosses these marshes returns.
 
 # Goes upwards

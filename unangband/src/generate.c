@@ -846,10 +846,24 @@ static void build_terrain(int y, int x, int feat)
 
 			newfeat = i;
 		}
+
 	}
 	else if ((f_ptr->flags2 & (FF2_CAN_DIG)) || (f2_ptr->flags2 & (FF2_CAN_DIG)))
 	{
 		newfeat = feat;
+	}
+
+	/* Hack -- unchanged? */
+	if (newfeat == oldfeat)
+	{
+		/* Get dungeon zone */
+		dungeon_zone *zone=&t_info[0].zone[0];
+
+		/* Get the zone */
+		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
+		if (feat == zone->big) newfeat = zone->big;
+		else if (feat == zone->small) newfeat = zone->small;
 	}
 
 	/* Vary the terrain */
@@ -10454,7 +10468,7 @@ static void build_nature(void)
 			break;
 		}
 
-		if ((dun->lake_n == 0) && (zone->big))
+		if ((dun->lake_n < (DUN_MAX_LAKES + 1) / 2) && (zone->big))
 		{
 			feat = zone->big;
 			big = TRUE;

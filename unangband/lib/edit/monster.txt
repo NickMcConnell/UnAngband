@@ -8950,8 +8950,7 @@ G:l:T
 #$ Metallics available:dwsrgbuWPyRGBUpvtmYVMzZ
 #$ Colors available:dyRBUmVIMzZ
 I:130:548:20:125:10
-W:42:6:27:4700
-C:45:6:27:9600:10000
+W:42:6:21:4700
 M:25:50:68:150
 B:HIT:EXP_80:8d16
 B:TOUCH:LOSE_DEX:8d8
