@@ -110,7 +110,9 @@
 /* DUN_ROOMS now defined in defines.h */
 #define DUN_NATURE_SURFACE	80	/* Chance in 100 of having lakes on surface */
 #define DUN_NATURE_DEEP		40	/* Chance in 100 of having lakes at depth */
-#define DUN_MAX_LAKES   5       /* Maximum number of lakes/rivers */
+#define DUN_MAX_LAKES		 8	/* Maximum number of lakes/rivers */
+#define DUN_MAX_LAKES_NONE   8	/* Maximum number of lakes/rivers in roomless areas */
+#define DUN_MAX_LAKES_ROOM   4	/* Maximum number of lakes/rivers in normal areas */
 #define DUN_FEAT_RNG    2       /* Width of lake */
 
 /*
@@ -606,6 +608,12 @@ static void build_terrain(int y, int x, int feat)
 	feature_type *f_ptr;
 	feature_type *f2_ptr;
 
+	/* Get dungeon zone */
+	dungeon_zone *zone=&t_info[0].zone[0];
+
+	/* Get the zone */
+	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
+
 	/* Get the feature */
 	oldfeat = cave_feat[y][x];
 	f_ptr = &f_info[oldfeat];
@@ -803,7 +811,7 @@ static void build_terrain(int y, int x, int feat)
 		else if (f_ptr->flags2 & (FF2_HURT_COLD)) newfeat = feat_state(oldfeat,FS_HURT_COLD);
 		else if (f_ptr->flags2 & (FF2_HIDE_DIG)) newfeat = feat;
 	}
-	else if ((f_ptr->flags2 & (FF2_WATER)) || (f2_ptr->flags2 & (FF2_WATER)))
+	else if ((f_ptr->flags2 & (FF2_WATER)) && (f2_ptr->flags2 & (FF2_WATER)))
 	{
 		/* Hack -- we try and match water properties */
 		u32b mask1 = (FF1_SECRET | FF1_LESS);
@@ -856,12 +864,6 @@ static void build_terrain(int y, int x, int feat)
 	/* Hack -- unchanged? */
 	if (newfeat == oldfeat)
 	{
-		/* Get dungeon zone */
-		dungeon_zone *zone=&t_info[0].zone[0];
-
-		/* Get the zone */
-		get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
-
 		if (feat == zone->big) newfeat = zone->big;
 		else if (feat == zone->small) newfeat = zone->small;
 	}
@@ -10429,6 +10431,20 @@ static bool build_feature(int feat, bool do_big_lake, bool merge_lakes)
 
 		/* Generate the river */
 		build_river(feat, y0, x0);
+
+		/* Usually build an outflow as well */
+		if ((!merge_lakes) && (rand_int(100) < 90))
+		{
+			/* Pick starting coordinates, if needed */
+			if ((y0 + x0) == 0)
+			{
+				y0 = randint(DUNGEON_HGT - 2);
+				x0 = randint(DUNGEON_WID - 2);
+			}
+
+			/* Generate the river */
+			build_river(feat, y0, x0);
+		}
 	}
 
 	/* Ensure interesting stuff in lake */
@@ -10447,8 +10463,10 @@ static void build_nature(void)
 {
 	bool big = FALSE;
 	bool done_big = FALSE;
+	bool force_big = FALSE;
 
 	int feat;
+	int max_lakes = level_flag & (LF1_ROOMS) ? DUN_MAX_LAKES_ROOM : DUN_MAX_LAKES_NONE;
 
 	/* Flavor */
 	bool merge_lakes = ((p_ptr->depth >= 30) && !rand_int(7));
@@ -10460,7 +10478,7 @@ static void build_nature(void)
 	get_zone(&zone,p_ptr->dungeon,p_ptr->depth);
 
 	/* Allocate some lakes and rivers */
-	for (dun->lake_n = 0; dun->lake_n < DUN_MAX_LAKES; )
+	for (dun->lake_n = 0; dun->lake_n < max_lakes; )
 	{
 		/* Have placed features */
 		if (!(zone->big) && !(zone->small) && (rand_int(100) >= ((level_flag & (LF1_SURFACE)) ? DUN_NATURE_SURFACE : DUN_NATURE_DEEP)))
@@ -10468,7 +10486,8 @@ static void build_nature(void)
 			break;
 		}
 
-		if ((dun->lake_n < (DUN_MAX_LAKES + 1) / 2) && (zone->big))
+		/* Place zone big terrain last */
+		if ((force_big) || ((dun->lake_n >= max_lakes - (max_lakes + 3) / 4) && (zone->big)))
 		{
 			feat = zone->big;
 			big = TRUE;
@@ -10487,21 +10506,16 @@ static void build_nature(void)
 		if (feat)
 		{
 			/* Try a big lake */
-			if (!done_big)
+			if ((!done_big) && (!big))
 			{
 				big = (randint(150) < p_ptr->depth);
 
 				/* Got one */
-				done_big = big;
-			}
-			else
-			{
-				/* We have a big one already */
-				big = FALSE;
+				done_big |= big;
 			}
 
 			/* Shallow and roomless dungeons have separate lakes */
-			if (((level_flag & (LF1_ROOMS)) == 0) || (rand_int(75) > p_ptr->depth))
+			if ((force_big) || ((level_flag & (LF1_ROOMS)) == 0) || (rand_int(75) > p_ptr->depth))
 			{
 				/* Report creation of lakes/rivers */
 				if (cheat_room)
@@ -10517,8 +10531,8 @@ static void build_nature(void)
 					}
 				}
 
-				/* Build one lake/river on surface */
-				if (!build_feature(feat, big, merge_lakes)) break;
+				/* Build one lake/river */
+				if ((!build_feature(feat, big, merge_lakes)) || (force_big)) break;
 			}
 			else
 			{
@@ -10531,9 +10545,14 @@ static void build_nature(void)
 				/* Flood the dungeon */
 				dun->flood_feat = feat;
 
-				break;
+				/* Must place one big feature */
+				if (zone->big) force_big = TRUE;
+				else break;
 			}
 		}
+
+		/* Clear big-ness for next iteration */
+		big = FALSE;
 	}
 }
 

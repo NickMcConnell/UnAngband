@@ -438,7 +438,7 @@ X:21:25:28:0
 Z:24:24
 G:t
 R:CAN_SWIM
-L:17:407:155:407:49:475:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS:the
+L:17:407:155:410:49:475:0:0:SURFACE | DAYLIGHT | WILD | TUNNELS | DESTROYED:the
 D:Smaug has laid waste to Lake-town.  The townsfolk gather, angry at you
 D: for disturbing his lair.  What is left of the songs of treasures and
 D: splendour you set out with?
