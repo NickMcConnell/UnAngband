@@ -3434,7 +3434,7 @@ void list_object(const object_type *o_ptr, int mode)
 				break;
 			case TV_RUNESTONE:
 				text_out("You can apply it to different objects to change them or enchant them with additional powers.  ");
-				/* Fall through */
+				break;
 			case TV_MAGIC_BOOK:
 			case TV_PRAYER_BOOK:
 			case TV_SONG_BOOK:
