@@ -7986,6 +7986,11 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* XXX Hack */
 			make_attack_ranged(who > 0 ? who : (who < 0 ?  0 : what), 101, y, x);
 
+			if (seen) obvious = TRUE;
+
+			/* Paranoia */
+			if (cave_m_idx[y][x] <= 0) return (obvious);
+
 			break;
 		}
 
