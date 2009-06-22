@@ -7956,11 +7956,27 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Melee attack - exp 80 */
 		case GF_EXP_80:
 		{
+			int new_maxhp;
+
 			/* Hack -- just completely ruin monster */
 			if (seen) obvious = TRUE;
 			note = " is ruined.";
 			m_ptr->mflag &= ~(MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
 			m_ptr->mflag |= (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK);
+
+			new_maxhp = calc_monster_hp(cave_m_idx[y][x]);
+
+			if (new_maxhp < m_ptr->maxhp)
+			{
+				/* Scale down hit points */
+				m_ptr->hp = m_ptr->hp * new_maxhp / m_ptr->maxhp;
+
+				/* To a minimum */
+				if (m_ptr->hp < 0) m_ptr->hp = 0;
+
+				/* Permanently reduce maximum hp */
+				m_ptr->maxhp = new_maxhp;
+			}
 			break;
 		}
 
@@ -7968,7 +7984,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_SHATTER:
 		{
 			/* XXX Hack */
-			make_attack_ranged(who, 101, y, x);
+			make_attack_ranged(who > 0 ? who : (who < 0 ?  0 : what), 101, y, x);
 
 			break;
 		}
@@ -11124,7 +11140,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Radius 8 earthquake centered at the player */
-				if (dam > 23) make_attack_ranged(who, 101, p_ptr->py, p_ptr->px);
+				if (dam > 23) make_attack_ranged(who ? 0 : what, 101, p_ptr->py, p_ptr->px);
 
 			}
 

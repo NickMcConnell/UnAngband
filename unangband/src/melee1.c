@@ -1217,7 +1217,7 @@ bool make_attack_normal(int m_idx)
 			}
 
 			/* Check for usage */
-			if (rand_int(100)<damage)
+			if (TRUE)
 			{
 				int slot;
 				int y = m_ptr->fy;

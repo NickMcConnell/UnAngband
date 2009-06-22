@@ -2958,7 +2958,7 @@ enum
 /*Who caused the projection*/
 #define SOURCE_MONSTER_START	0 /*Greater than 0 monster is the source*/
 
-#define SOURCE_SELF				0	/* Monster comitting suicide */
+#define SOURCE_SELF				0	/* Monster targetting itself */
 #define SOURCE_OBJECT			-1	/* Source is an object on floor/monster inventory */
 #define SOURCE_FEATURE			-2	/* Source is a feature */
 #define SOURCE_SPELL			-3	/* Source is a spell */
