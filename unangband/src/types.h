@@ -141,6 +141,7 @@ typedef struct ecology_type ecology_type;
 typedef struct do_cmd_item_type do_cmd_item_type;
 typedef struct color_type color_type;
 typedef struct timed_effect timed_effect;
+typedef struct sound_name_type sound_name_type;
 
 
 
@@ -2156,3 +2157,12 @@ struct timed_effect
   int msg;
 };
 
+
+/*
+ * Names and ids of sounds
+ */
+struct sound_name_type
+{
+	const char *name;
+	int id;
+};

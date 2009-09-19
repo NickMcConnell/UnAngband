@@ -158,19 +158,19 @@ B:
 
 N:13:104:0:0:1:1:0:128
 A:
-B:cave
+B:grotto
 
 # Medium fractal room - wall decorations.
 
 N:13:117:0:0:1:1:0:128
 A:
-B:cave
+B:grotto
 
 # Large fractal room - central feature.
 
 N:14:104:0:0:1:1:0:128
 A:
-B:cavern
+B:cave
 
 # Large fractal room - wall decorations.
 
@@ -214,9 +214,87 @@ N:19:117:0:0:1:1:0:128
 A:
 B:labyrinth
 
-# Monster pit.
+# Medium cellular cave - central feature.
+
+N:20:104:0:0:1:1:0:128
+A:
+B:grotto
+
+# Medium cellular cave - wall decorations.
 
 N:20:117:0:0:1:1:0:128
+A:
+B:grotto
+
+# Large cellular cave - central feature.
+
+N:21:104:0:0:1:1:0:128
+A:
+B:cave
+
+# Large cellular cave - wall decorations.
+
+N:21:117:0:0:1:1:0:128
+A:
+B:cave
+
+# Huge cellular cave - central feature
+
+N:22:104:0:0:1:1:0:128
+A:
+B:cavern
+
+# Huge cellular cave - wall decorations
+
+N:22:117:0:0:1:1:0:128
+A:
+B:cavern
+
+# Medium nest - central feature.
+
+N:23:104:0:0:1:1:0:128
+A:
+B:nest
+
+# Medium nest - wall decorations.
+
+N:23:117:0:0:1:1:0:128
+A:
+B:nest
+
+# Large nest - central feature.
+
+N:24:104:0:0:1:1:0:128
+A:
+B:warren
+
+# Large nest - wall decorations.
+
+N:24:117:0:0:1:1:0:128
+A:
+B:warren
+
+# Huge nest - central feature
+
+N:25:104:0:0:1:1:0:128
+A:
+B:hive
+
+# Huge nest - wall decorations
+
+N:25:117:0:0:1:1:0:128
+A:
+B:hive
+
+# Monster pit.
+
+N:26:117:0:0:1:1:0:128
+A:
+B:pit
+
+# Monster town.
+
+N:27:117:0:0:1:1:0:128
 A:
 B:pit
 

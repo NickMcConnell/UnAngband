@@ -156,7 +156,7 @@ static cptr d_info_lflags[] =
 	"STRONGHOLD",
 	"CRYPT",
 	"LAIR",
-	"MINE",
+	"NEST",
 	"CAVE",
 	"TOWN",
 	"WILD",

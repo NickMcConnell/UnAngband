@@ -205,7 +205,7 @@ extern term *angband_term[ANGBAND_TERM_MAX];
 extern char angband_term_name[ANGBAND_TERM_MAX][16];
 extern byte angband_color_table[256][4];
 extern color_type color_table[256];
-extern const cptr angband_sound_name[MSG_MAX];
+const sound_name_type angband_sound_name[MSG_MAX];
 extern sint view_n;
 extern u16b *view_g;
 extern sint fire_n;
@@ -1124,6 +1124,7 @@ extern void grid_queue_create(grid_queue_type *q, size_t max_size);
 extern void grid_queue_destroy(grid_queue_type *q);
 extern bool grid_queue_push(grid_queue_type *q, byte y, byte x);
 extern void grid_queue_pop(grid_queue_type *q);
+extern int uti_icbrt(int arg);
 
 
 /* xtra1.c */
