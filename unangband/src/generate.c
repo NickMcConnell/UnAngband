@@ -375,9 +375,9 @@ static room_data_type room_data[ROOM_MAX] =
    /* Cell cave */{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,		1, 0, LF1_CAVERN | LF1_SEWER},
    /* Lrg cell */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,		2, 0, LF1_CAVERN},
    /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_CAVERN},
-   /* Nest */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DESTROYED | LF1_DUNGEON | LF1_WILD)},
-   /* Lrg nest */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DESTROYED | LF1_DUNGEON | LF1_WILD)},
-   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_DESTROYED | LF1_DUNGEON | LF1_WILD)},
+   /* Nest */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Lrg nest */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
    /* Monst.pit */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		2, 0, LF1_DUNGEON | LF1_CRYPT},
    /* Monst.town */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		2, 0, LF1_DUNGEON | LF1_CAVERN},
    /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 11,	1,		2, 0, LF1_WILD | LF1_CAVERN | LF1_SEWER},
@@ -2524,6 +2524,11 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 }
 
 
+
+
+#define	NEST_TEMP	1	/* Limit nest building to temporary flags */
+#define NEST_CARD	2	/* Cardinal directions NSEEW only */
+
 /*
  * Builds a 'nest' - that is the organic looking patterns
  * discovered by Kusigrosz and documented in this thread
@@ -2571,12 +2576,12 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 #define TRN_YSIZE 400
 
 struct cellstore
-	{
+{
 	int* xs;
 	int* ys;
 	int index;
 	int size;
-	};
+};
 
 /* Globals: */
 int Xoff[8] = {1,  1,  0, -1, -1, -1,  0,  1};
@@ -2584,7 +2589,7 @@ int Yoff[8] = {0,  1,  1,  1,  0, -1, -1, -1};
 
 /* Functions */
 void rnd_perm(int *tab, int nelem)
-	{
+{
 	int i;
 	int rind;
 	int tmp;
@@ -2593,17 +2598,17 @@ void rnd_perm(int *tab, int nelem)
 	
 
 	for (i = 0; i < nelem; i++)
-		{
+	{
 		rind = rand_int(i + 1);
 		
 		tmp = tab[rind];
 		tab[rind] = tab[i];
 		tab[i] = tmp;
-		}
 	}
+}
 
 struct cellstore mkstore(int size)
-	{
+{
 	struct cellstore ret;
 	
 	assert(size > 0);
@@ -2617,10 +2622,10 @@ struct cellstore mkstore(int size)
 	ret.index = 0;
 
 	return (ret);
-	}
+}
 
 void delstore(struct cellstore* cstore)
-	{
+{
 	assert(cstore);
 
 	FREE(cstore->xs);
@@ -2631,43 +2636,43 @@ void delstore(struct cellstore* cstore)
 
 	cstore->size = 0;
 	cstore->index = 0;
-	}
+}
 
 int storecell(struct cellstore* cstore, int y, int x)
-	{
+{
 	int rind;
 
 	assert(cstore);
 	
 	if (cstore->index < cstore->size)
-		{
+	{
 		cstore->xs[cstore->index] = x;
 		cstore->ys[cstore->index] = y;
 		(cstore->index)++;
 		return (1); /* new cell stored */
-		}
+	}
 	else /* Replace another cell. Should not happen if lossless storage */
-		{
+	{
 		rind = rand_int(cstore->index);
 		cstore->xs[rind] = x;
 		cstore->ys[rind] = y;
 		return (0); /* old cell gone, new cell stored */
-		}
 	}
+}
 
 /* Remove a cell from the store and put its coords into x, y.
  * Note that pulling any cell except the topmost puts the topmost one in
  * its place. 
  */
 int rndpull(struct cellstore* cstore, int* y, int* x, bool compact)
-	{
+{
 	int rind;
 
 	assert(cstore && x && y);
 	if (cstore->index <= 0)
-		{
+	{
 		return(0); /* no cells */
-		}
+	}
 
 	/* compact patterns */
 	if (compact)
@@ -2686,39 +2691,39 @@ int rndpull(struct cellstore* cstore, int* y, int* x, bool compact)
 	*y = cstore->ys[rind];
 	
 	if (cstore->index - 1 != rind) /* not the topmost cell - overwrite */
-		{
+	{
 		cstore->xs[rind] = cstore->xs[cstore->index - 1];
 		cstore->ys[rind] = cstore->ys[cstore->index - 1];
-		}
+	}
 
 	cstore->index -= 1;
 
 	return(1);
-	}
+}
 
 /* Count neighbours of the given cells that contain terrain feat.
  */
 int ngbcount(int y, int x, s16b feat)
-	{
+{
 	int i;
 	int count = 0;
 	
 	for (i = 0; i < 8; i++)
-		{
+	{
 		if (in_bounds_fully(y + Yoff[i],x + Xoff[i]) && 
 			(cave_feat[y + Yoff[i]][x + Xoff[i]] == feat))
-			{
+		{
 			count++;
-			}
 		}
-	return (count);
 	}
+	return (count);
+}
 
 /* Number of groups of '1's in the 8 neighbours around a central cell.
  * The encoding is binary, lsb is to the right, then clockwise.
  */
 const int ngb_grouptab[256] = 
-	{
+{
 /**********  0  1  2  3  4  5  6  7  8  9  */
 /* 000 */	0, 1, 1, 1, 1, 1, 1, 1, 1, 2,
 /* 010 */	2, 2, 1, 1, 1, 1, 1, 2, 2, 2,
@@ -2746,47 +2751,47 @@ const int ngb_grouptab[256] =
 /* 230 */	2, 1, 2, 2, 3, 2, 2, 1, 2, 1,
 /* 240 */	1, 1, 2, 1, 1, 1, 1, 1, 1, 1,
 /* 250 */	2, 1, 1, 1, 1, 1
-	};
+};
 
 /* Examine the 8 neigbours of the given cell, and count the number
  * of separate groups of terrain cells. A groups contains cells that are
  * of the same type (feat) and are adjacent (diagonally, too!)
  */
 int ngbgroups(int y, int x, s16b feat)
-	{
+{
 	int bitmap = 0; /* lowest bit is the cell to the right, then clockwise */
 	int i;
 	
 	for (i = 0; i < 8; i++)
-		{
+	{
 		bitmap >>= 1;
 
 		if (in_bounds_fully(y + Yoff[i], x + Xoff[i]) &&
 			cave_feat[y + Yoff[i]][x + Xoff[i]] == feat)
-			{
+		{
 			bitmap |= 0x80;
-			}
 		}
+	}
 
 	return (ngb_grouptab[bitmap]);
-	}
+}
 
 /* Dig out an available cell to floor and store its available neighbours in
  * random order.
  */
 int digcell(struct cellstore* cstore,
-	int y, int x, s16b floor, s16b available, byte cave_flag)
-	{
+	int y, int x, s16b floor, s16b available, byte cave_flag, byte nest_flag)
+{
 	int order[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 	int i, j;
 
 	assert(cstore);
 
 	if ((!in_bounds_fully(y, x)) || ((available) && (cave_feat[y][x] != available)) ||
-			((play_info[y][x] & (PLAY_TEMP)) == 0))
-		{
+			(((nest_flag & (NEST_TEMP)) != 0) && ((play_info[y][x] & (PLAY_TEMP)) == 0)))
+	{
 		return (0); /* did nothing */
-		}
+	}
 
 	/* Dig the cell */
 	cave_alter_feat(y, x, FS_TUNNEL);
@@ -2798,24 +2803,25 @@ int digcell(struct cellstore* cstore,
 	cave_info[y][x] |= (cave_flag);
 	
 	/* Clear the temp flag */
-	play_info[y][x] &= ~(PLAY_TEMP);
+	if ((nest_flag & (NEST_TEMP)) != 0) play_info[y][x] &= ~(PLAY_TEMP);
 
 	rnd_perm(order, 8);
 
-	for (i = 0; i < 8; i++) 
-		{
+	for (i = 0; i < 8; i += ((nest_flag & (NEST_CARD)) != 0) ? 2 : 1) 
+	{
 		j = order[i];
 		if (in_bounds_fully(y + Yoff[j], x + Xoff[j]) &&
 			((!available) || (cave_feat[y + Yoff[j]][x + Xoff[j]] == available)) &&
-			((play_info[y + Yoff[j]][x + Xoff[j]] & (PLAY_TEMP)) != 0))
-			{
+			(((nest_flag & (NEST_TEMP)) == 0) ||
+					((play_info[y + Yoff[j]][x + Xoff[j]] & (PLAY_TEMP)) != 0)))
+		{
 			storecell(cstore, y + Yoff[j], x + Xoff[j]);
-			}
-		cave_info[y + Yoff[j]][x + Xoff[j]] |= (cave_flag);
 		}
+		cave_info[y + Yoff[j]][x + Xoff[j]] |= (cave_flag);
+	}
 
 	return (1); /* dug 1 cell */
-	}
+}
 
 /* Continue digging until cellnum or no more cells in store. Digging is
  * allowed if the terrain in the cell is 'ava'ilable, cell has from
@@ -2825,8 +2831,8 @@ int digcell(struct cellstore* cstore,
  */
 int delveon(struct cellstore* cstore,
 	int ngb_min, int ngb_max, int connchance, int cellnum,
-	s16b floor, s16b available, bool compact, byte cave_flag)
-	{
+	s16b floor, s16b available, bool compact, byte cave_flag, byte nest_flag)
+{
 	int count = 0;
 	int ngb_count;
 	int ngb_groups;
@@ -2840,26 +2846,26 @@ int delveon(struct cellstore* cstore,
 	assert(floor != available);
 
 	while ((count < cellnum) && rndpull(cstore, &y, &x, compact))
-		{
+	{
 		ngb_count = ngbcount(y, x, floor);
 		ngb_groups = ngbgroups(y, x, floor);
 
 		if ( in_bounds_fully(y, x) && ((!available) || (cave_feat[y][x] == available)) &&
-			((play_info[y][x] & (PLAY_TEMP)) != 0) &&
+			(((nest_flag & (NEST_TEMP)) == 0) || ((play_info[y][x] & (PLAY_TEMP)) != 0)) &&
 			(ngb_count >= ngb_min) && (ngb_count <= ngb_max) && 
 			((ngb_groups <= 1) || (rand_int(100) < connchance)) )
 		{
-				count += digcell(cstore, y, x, floor, available, cave_flag);
+				count += digcell(cstore, y, x, floor, available, cave_flag, nest_flag);
 		}
-		}
+	}
 	
 	return (count);
-	}
+}
 
 /* Estimate a sensible number of cells for given ngb_min, ngb_max.
  */
 int cellnum_est(int totalcells, int ngb_min, int ngb_max)
-	{
+{
 	int denom[12] = {8, 8, 8, 7, 6, 5, 5, 4, 4, 4, 3, 3};
 	/* two first entries are not used */
 
@@ -2867,7 +2873,7 @@ int cellnum_est(int totalcells, int ngb_min, int ngb_max)
 	assert((ngb_min + ngb_max >= 2) && (ngb_min + ngb_max < 12));
 	
 	return (totalcells / denom[ngb_min + ngb_max]);
-	}
+}
 
 
 /*
@@ -2875,7 +2881,7 @@ int cellnum_est(int totalcells, int ngb_min, int ngb_max)
  */
 bool generate_nest(int y1, int x1, int y2, int x2,
 	int ngb_min, int ngb_max, int connchance, int cellnum, 
-	s16b floor, s16b available, bool compact, byte cave_flag)
+	s16b floor, s16b available, bool compact, byte cave_flag, byte nest_flag)
 {
 	struct cellstore cstore;
 	int count = 0;
@@ -2900,29 +2906,27 @@ bool generate_nest(int y1, int x1, int y2, int x2,
 
 	while ((count < 2 * ngb_min) && (count < cellnum) && 
 		rndpull(&cstore, &y, &x, compact))
-		{
+	{
 		ngb_count = ngbcount(y, x, floor);
 		ngb_groups = ngbgroups(y, x, floor);
 
 		/* stay close to origin, ignore ngb_min */
 		if ( in_bounds_fully(y, x) && ((!available) || (cave_feat[y][x] == available)) &&
-			((play_info[y][x] & (PLAY_TEMP)) != 0) &&
+			(((nest_flag & (NEST_TEMP)) == 0) || ((play_info[y][x] & (PLAY_TEMP)) != 0)) &&
 			(abs(x - xorig) < 2) && (abs(y - yorig) < 2) &&
 			(ngb_count <= ngb_max) && 
 			((ngb_groups <= 1) || (rand_int(100) < connchance)) )
-			{
-			count += digcell(&cstore, y, x, floor, available, cave_flag);
-			}
+		{
+			count += digcell(&cstore, y, x, floor, available, cave_flag, nest_flag);
 		}
+	}
 
 	if (count < cellnum)
 		{
 		count += delveon(&cstore, ngb_min, ngb_max, connchance, 
-			cellnum - count, floor, available, compact, cave_flag);
+			cellnum - count, floor, available, compact, cave_flag, nest_flag);
 		}
 
-	msg_format("count %d out of %d", count, cellnum);
-	
 	delstore(&cstore);
 	return (count > 0);
 }
@@ -10844,10 +10848,11 @@ static bool build_type232425(int room, int type)
 	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
 	bool compact;
 	bool succeed;
-	int ngb_min = 3;
-	int ngb_max = 8;
+	int ngb_min = 1;
+	int ngb_max = 5;
 	int connchance = 20;
 	int cellnum;
+	bool cardinal = FALSE;
 
 	/* Deeper in the dungeon, chambers are less likely to be lit. */
 	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
@@ -10857,32 +10862,31 @@ static bool build_type232425(int room, int type)
 	s16b edge = FEAT_WALL_OUTER;
 	s16b inner = FEAT_NONE;
 	s16b alloc = FEAT_NONE;
-	u32b exclude = (RG1_INNER | RG1_STARBURST);
+	u32b exclude = (RG1_STARBURST);
 
 	pool_type pool;
 
-	int n_pools = 0;
+	int n_pools = 1; /* Only allow one pool */
 	
 	/* Hack -- nest and no theme: pick one at random */
 	if ((level_flag & (LF1_THEME)) == 0)
 	{
-		switch(randint(12))
+		switch(randint(10))
 		{
 			case 1: level_flag |= (LF1_CRYPT); break;
 			case 2: level_flag |= (LF1_CAVE); break;
-			case 3: level_flag |= (LF1_STRONGHOLD); break;
-			case 4: level_flag |= (LF1_SEWER); break;
-			case 5: level_flag |= (LF1_CAVERN); break;
-			case 6: level_flag |= (LF1_LABYRINTH); break;
+			case 3: level_flag |= (LF1_SEWER); break;
+			case 4: level_flag |= (LF1_CAVERN); break;
+			case 5: level_flag |= (LF1_LABYRINTH); break;
 			default: level_flag |= (LF1_NEST); break;
 		}
 	}
 	
 	/* Pick neighbours based on level theme */
-	if (level_flag & (LF1_LABYRINTH)) { ngb_min = 1; ngb_max = 1; }
+	if (level_flag & (LF1_DESTROYED)) { ngb_min = 1; ngb_max = 1; }
+	else if (level_flag & (LF1_LABYRINTH)) { ngb_min = 1; ngb_max = 3; cardinal = TRUE;}
 	else if (level_flag & (LF1_CRYPT)) { ngb_min = 2; ngb_max = 3; }
 	else if (level_flag & (LF1_CAVE)) { ngb_min = 2; ngb_max = 4; }
-	else if (level_flag & (LF1_STRONGHOLD)) { ngb_min = 1; ngb_max = 8; }
 	else if (level_flag & (LF1_SEWER)) { ngb_min = 3; ngb_max = 5; }
 	else if (level_flag & (LF1_CAVERN)) { ngb_min = 3; ngb_max = 7; }
 
@@ -10914,9 +10918,9 @@ static bool build_type232425(int room, int type)
 	set_irregular_room_info(room, type, light, exclude, &feat, &edge, &inner, &alloc, &pool, &n_pools);
 	
 	/* Mark grid to fill with temp flags */
-	for (y = y1; y < y2; y++)
+	for (y = y1 + 1; y < y2 - 1; y++)
 	{
-		for (x = x1; x < x2; x++)
+		for (x = x1 + 1; x < x2 - 1; x++)
 		{
 			/* Mark */
 			play_info[y][x] |= (PLAY_TEMP);
@@ -10924,14 +10928,14 @@ static bool build_type232425(int room, int type)
 	}
 	
 	/* Find maximum number of cells */
-	cellnum = (y2 - y1 - 1) * (x2 - x1 - 1);
+	cellnum = (y2 - y1 - 2) * (x2 - x1 - 2);
 	
 	/* Re-esimate number of cells required */
 	cellnum = cellnum_est(cellnum, ngb_min, ngb_max);
 	
 	/* Build the nest */
-	succeed = generate_nest(y1, x1, y2, x2, ngb_min, ngb_max, connchance, cellnum, 
-	    feat, 0, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0));
+	succeed = generate_nest(y1 + 1, x1 + 1, y2 - 1, x2 - 1, ngb_min, ngb_max, connchance, cellnum, 
+	    feat, 0, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0), (NEST_TEMP) | (cardinal ? (NEST_CARD) : 0));
 
 	/* Clear temp flags */
 	for (y = y1; y < y2; y++)
@@ -10939,25 +10943,63 @@ static bool build_type232425(int room, int type)
 		for (x = x1; x < x2; x++)
 		{
 			/* Clear temp flag */
-			if ((play_info[y][x] & (PLAY_TEMP)) != 0)
+			if (((play_info[y][x] & (PLAY_TEMP)) != 0) || (x == x1) || (x == x2 - 1) ||
+					(y == y1) || (y == y2 - 1))
 			{
+				int d;
+				
 				/* Unmark */
 				play_info[y][x] &= ~(PLAY_TEMP);
-				
+
 				/* Marked as room - this indicates inner/outer wall */
 				if ((cave_info[y][x] & (CAVE_ROOM)) != 0)
 				{
-					cave_set_feat(y, x, edge);
+					/* Check adjacent squares */
+					for (d = 0; d < 8; d++)
+					{
+						/* On edge of dungeon */
+						if (!in_bounds_fully(y + ddy_ddd[d], x + ddx_ddd[d])) break;
+						
+						/* On outside of room */
+						if ((cave_info[y+ddy_ddd[d]][x+ddx_ddd[d]] & (CAVE_ROOM)) == 0) break;
+					}
+					
+					/* Not on edge of room */
+					if (d == 8)
+					{
+						cave_set_feat(y, x, inner ? inner : edge);
+						
+						if ((!inner) && ((f_info[edge].flags1 & (FF1_OUTER)) != 0)) cave_alter_feat(y, x, FS_INNER);
+					}
+					else
+					{
+						/* Set the cave edge */
+						cave_set_feat(y, x, edge);
+					}
 					
 					/* Not a 'proper' outer wall */
 					if ((f_info[edge].flags1 & (FF1_OUTER)) == 0)
 					{
+						/* Clear the room flag */
 						cave_info[y][x] &= ~(CAVE_ROOM);
 					}
 				}
 			}			
 		}
-	}	
+	}
+	
+	/* Build pool */
+	if (n_pools == 2)
+	{
+		succeed = generate_nest(y1, x1, y2, x2, ngb_min, ngb_max, connchance, (cellnum + 7)/4, 
+		    pool[n_pools-1], feat, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0),0);
+	}
+	
+	/* Build alloc */
+	if (alloc)
+	{
+		cave_set_feat((y1 + y2)/2, (x1 + x2)/2, alloc);
+	}
 	
 	if (!succeed)
 	{
@@ -11323,7 +11365,7 @@ static bool room_build(int room, int type)
 		/* This floods 1 room, plus a second room if terrain is more than 10 levels shallow, plus a third room if terrain is more than
 		 * 20 levels shallow, then 25, 35, 40, 50, 55 etc. */
 	}
-
+	
 	/* Build a room */
 	switch (type)
 	{
