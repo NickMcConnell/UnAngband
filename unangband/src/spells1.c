@@ -4370,6 +4370,50 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 	{
 		cave_alter_feat(y,x,FS_SPREAD);
 	}
+	
+	/* XXX Important: Prevent the caster 'entombing' themselves - for earthquakes but
+	 * we generalize this to all cases. */
+	/* XXX XXX Should really check PROJECT_SAFE to allow the monster to do this if the effect
+	 * is unsafe, but we don't pass the project flags. This keeps project_f function definition
+	 * identical to the other projection functions.
+	 */
+	/* Feature has changed */
+	if (feat != cave_feat[y][x])
+	{
+		bool restore = FALSE;
+		
+		/* Check if monster can move and survive in terrain */
+		if (cave_m_idx[y][x] > 0)
+		{
+			if ((who == cave_m_idx[y][x]) && (place_monster_here(y, x, m_list[who].r_idx) <= MM_FAIL))
+			{
+				restore = TRUE;
+			}
+			else if ((what == cave_m_idx[y][x]) && (!(who) || (who == SOURCE_PLAYER_ALLY)) &&
+					 (place_monster_here(y, x, m_list[what].r_idx) <= MM_FAIL))
+			{
+				restore = TRUE;
+			}
+		}
+		/* Check if player can move and survive in terrain */
+		else if ((cave_m_idx[y][x] < 0) && (who < SOURCE_PLAYER_ALLY) && ((f_info[cave_feat[y][x]].flags1 & (FF1_MOVE)) == 0)
+					&& ((f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)) == 0))
+		{
+			restore = TRUE;
+		}
+		
+		/* Protecting the caster */
+		if (restore)
+		{
+			int feat2 = feat;
+			
+			/* Try alternative passable terrain */
+			if (f_info[feat].flags1 & (FF1_TUNNEL)) feat2 = feat_state(feat, FS_TUNNEL);
+			
+			/* Restore */
+			cave_set_feat(y, x, feat2);
+		}
+	}
 
 	/* Check for monster */
 	if (feat != cave_feat[y][x])
@@ -7983,7 +8027,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Melee attack - shatter */
 		case GF_SHATTER:
 		{
-			/* XXX Hack */
+			/* XXX Hack -- earthquake */
 			make_attack_ranged(who > 0 ? who : (who < 0 ?  0 : what), 101, y, x);
 
 			if (seen) obvious = TRUE;
@@ -12316,14 +12360,28 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Delete monsters */
-		case GF_DESTROY:
+		/* Delete monsters - this prevents the player abusing these effects */
 		case GF_QUAKE:
 		{
+			/* Quaking allies don't delete other allies */
+			if ((who == SOURCE_PLAYER_ALLY) && (m_ptr->mflag & (MFLAG_ALLY))) break;
+			
+			/* Non-player quake effects don't delete monsters */
+			else if (who > SOURCE_PLAYER_ALLY) break;
+		}
+		case GF_DESTROY:
+		{
+			/* Destroying monsters don't delete themselves, except if allies */
+			/* XXX This allows Gandalf to 'fall' from the bridge in Moria */
+			if (((who > 0) && (who == cave_m_idx[y][x]))
+					|| ((who == 0) && (what == cave_m_idx[y][x]))) break;
+			
 			if (affect_monster)
 			{
 				delete_monster(y,x);
 			}
+			
+			break;
 		}
 	}
 
@@ -13706,6 +13764,9 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 
 		/* Hack the monster */
 		else if ((who > 0) && (y == m_list[who].fy) && (x == m_list[who].fx)) play_hack = 1;
+
+		/* Hack the monster */
+		else if (((who == 0) || (who == SOURCE_PLAYER_ALLY)) && (what > 0) && (y == m_list[what].fy) && (x == m_list[what].fx)) play_hack = 1;
 	}
 
 	/* Display the "blast area" if allowed */
@@ -13870,6 +13931,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 
 			{
 			 	monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+			 	int res_magic = (who != SOURCE_PLAYER_CAST ? 10 : 30);
 
 				/* Safe projections */
 				if (flg & (PROJECT_SAFE))
@@ -13880,10 +13942,11 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 				}
 
 				/* Hack -- handle resist magic. Deeper monsters are more resistant to spells.
-				 * All monsters are more resistant to devices and spells from each other. */
+				 * All monsters are much more resistant to devices and spells from each other.
+				 * Resist magic progresses geometrically based on depth */
 				if ((flg & (PROJECT_MAGIC)) && (cave_m_idx[y][x] > 0)
 					&& ((r_info[m_list[cave_m_idx[y][x]].r_idx].flags9 & (RF9_RES_MAGIC)) != 0)
-					&& (rand_int(100) < 20 + p_ptr->depth / (who != SOURCE_PLAYER_CAST ? 1 : 2)))
+					&& (rand_int(res_magic + p_ptr->depth + 1) >= res_magic))
 				{
 					/* Hack -- resist magic */
 					if (project_m(who, what, y, x, 0, GF_RES_MAGIC)) notice = TRUE;
@@ -13892,7 +13955,8 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 				/* Area-effect and jumping spells cannot be dodged */
 				else if (!(flg & (PROJECT_ARC | PROJECT_STAR | PROJECT_JUMP |
 			             PROJECT_BOOM)) && (cave_m_idx[y][x] > 0) &&
-					(mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i], who <= SOURCE_PLAYER_START ? " your magic" : ""))) continue;
+					(mon_evade(cave_m_idx[y][x],((m_ptr->confused || m_ptr->stunned) ? 1 : 3) + gd[i], 5 + gd[i],
+							who <= SOURCE_PLAYER_SAFE ? " your magic" : ""))) continue;
 
 				/* Affect the monster in the grid */
 				else if (project_m(who, what, y, x, gd[i], typ))	notice = TRUE;
@@ -13957,7 +14021,8 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 	if ((flg & (PROJECT_TEMP)) == 0)
 	{
 		/* Teleport monsters and player around, alter certain features. */
-		for (i = play_hack; i < grids; i++)
+		/* XXX To help monsters get out of the way we process this in reverse order */
+		for (i = grids-1; i >= play_hack; i--)
 		{
 			/* Get the grid location */
 			y = GRID_Y(grid[i]);
@@ -14146,9 +14211,11 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 
 				int degree = (deg_dest + rand_int(deg_vary)) % 180;
 				int dist = target_path_d[i];
+				
+				int speed = (damage + dist) / (dist + 1);
 
 				/* Insert angle and speed into grid damage */
-				target_path_d[i] = GRID(degree, (damage + dist) / (dist + 1));
+				target_path_d[i] = GRID(degree, (r_ptr->flags1 & (RE1_RANDOM)) != 0 ? damroll(2, speed) : speed);
 
 				/* Hack -- All pieces of a vector start at the origin */
 				target_path_g[i] = GRID(y0, x0);

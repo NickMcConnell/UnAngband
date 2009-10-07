@@ -9590,12 +9590,9 @@ void region_move_vector_hook(int y, int x, int d, s16b region, int *ty, int *tx)
 
 	/* Speed of travel */
 	speed = GRID_X(d);
-
+	
 	/* Does this fragment move at this age? */
 	if ((r_ptr->age * speed / 100) == ((r_ptr->age - 1) * speed / 100)) return;
-
-	/* If random, we only move vertexes 50% of the time */
-	if ((r_ptr->flags1 & (RE1_RANDOM)) && (rand_int(100) < 50)) return;
 
 	/* Angle of travel */
 	angle = GRID_Y(d);

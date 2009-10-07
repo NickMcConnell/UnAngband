@@ -11013,7 +11013,7 @@ F:OUTSIDE | ATTR_LITE | INSTANT |
 N:525:sand dune
 G:<:y
 O:0
-W:22:3:7:0
+W:22:3:7:192
 K:DEFAULT:525:0
 K:KILL_MOVE:526:0
 #$ steep sandy trail

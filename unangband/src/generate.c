@@ -3578,8 +3578,8 @@ static bool find_space(int *y, int *x, int height, int width)
 		if (i < dun->lake_n)
 		{
 			/* Pick a block 'near' the lake */
-			block_y = (dun->lake[i].y / BLOCK_HGT) - rand_int(blocks_high);
-			block_x = (dun->lake[i].x / BLOCK_WID) - rand_int(blocks_wide);
+			block_y = (dun->lake[i].y / BLOCK_HGT) + 1 - rand_int(blocks_high + 2);
+			block_x = (dun->lake[i].x / BLOCK_WID) + 1 - rand_int(blocks_wide + 2);
 
 			/* Keep in dungeon */
 			if (block_y < 0) block_y = 0;
@@ -4362,7 +4362,7 @@ static void set_room_flags(int room, int type, bool light)
 	int j = 0;
 
 	u32b place_flag = 0L;
-	u32b exclude = 0L;
+	u32b exclude = (RG1_NORTH | RG1_SOUTH | RG1_EAST | RG1_WEST);
 
 	byte place_tval = 0;
 	byte place_min_sval = 0;
@@ -5669,6 +5669,8 @@ static bool fractal_map_has_pools(fractal_map map, fractal_template *t_ptr, int 
 static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int x0, bool light, s16b floor, s16b wall, pool_type pool)
 {
 	int x, y, y1, x1, wid, hgt;
+	int irregular = randint(3)*25;
+
 
 	/* Get the dimensions of the fractal map */
 	hgt = fractal_dim[fractal_type].hgt;
@@ -5746,10 +5748,14 @@ static void fractal_map_to_room(fractal_map map, byte fractal_type, int y0, int 
 			}
 			else if ((grid_type == FRACTAL_EDGE) && (wall))
 			{
-				cave_set_feat(yy, xx, wall);
+				/* Hack -- irregular rooms */
+				if (rand_int(100) < irregular) cave_set_feat(yy, xx, FEAT_WALL_OUTER);
+				
+				/* Set the wall */
+				else cave_set_feat(yy, xx, wall);
 
 				/* Mark the grid as a part of the room */
-				cave_info[yy][xx] |= (CAVE_ROOM);
+				if (f_info[cave_feat[yy][xx]].flags1 & (FF1_OUTER)) cave_info[yy][xx] |= (CAVE_ROOM);
 
 				/* Allow light to spill out of rooms through transparent edges */
 				if (light)
@@ -7753,8 +7759,14 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 	 */
 	bool solid_lake = ((f_info[feat].flags1 & (FF1_WALL)) != 0);
 
+	/* Wilderness dungeon */
+	if (!solid_lake)
+	{
+		level_flag |= (LF1_WILD);
+	}
+	
 	/* Solid lakes are made very large sometimes */
-	if (solid_lake && !rand_int(3)) do_big_lake = TRUE;
+	if (solid_lake || !rand_int(3)) do_big_lake = TRUE;
 
 	/* Choose an initial size for the lake */
 	if (do_big_lake)
@@ -7861,6 +7873,9 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 		{
 			flag |= (STAR_BURST_LIGHT);
 		}
+		
+		/* Block out exactly the centre grid only */
+		dun->room_map[by0][bx0] = TRUE;
 	}
 
 	/*
@@ -10848,11 +10863,12 @@ static bool build_type232425(int room, int type)
 	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
 	bool compact;
 	bool succeed;
-	int ngb_min = 1;
-	int ngb_max = 5;
+	int ngb_min = 2;
+	int ngb_max = 4;
 	int connchance = 20;
 	int cellnum;
 	bool cardinal = FALSE;
+	int irregular = randint(3)*25;
 
 	/* Deeper in the dungeon, chambers are less likely to be lit. */
 	bool light = (rand_range(25, 60) > p_ptr->depth) ? TRUE : FALSE;
@@ -10886,9 +10902,9 @@ static bool build_type232425(int room, int type)
 	if (level_flag & (LF1_DESTROYED)) { ngb_min = 1; ngb_max = 1; }
 	else if (level_flag & (LF1_LABYRINTH)) { ngb_min = 1; ngb_max = 3; cardinal = TRUE;}
 	else if (level_flag & (LF1_CRYPT)) { ngb_min = 2; ngb_max = 3; }
-	else if (level_flag & (LF1_CAVE)) { ngb_min = 2; ngb_max = 4; }
+	else if (level_flag & (LF1_CAVE)) { ngb_min = randint(3); ngb_max = ngb_min +rand_int(8-ngb_min); exclude |= (RG1_INNER);}
 	else if (level_flag & (LF1_SEWER)) { ngb_min = 3; ngb_max = 5; }
-	else if (level_flag & (LF1_CAVERN)) { ngb_min = 3; ngb_max = 7; }
+	else if (level_flag & (LF1_CAVERN)) { ngb_min = 1; ngb_max = 8; exclude |= (RG1_INNER);}
 
 	switch (type)
 	{
@@ -10973,15 +10989,39 @@ static bool build_type232425(int room, int type)
 					}
 					else
 					{
+						/* Hack -- irregular rooms */
+						if (rand_int(100) < irregular) cave_set_feat(y, x, FEAT_WALL_OUTER);
+						
 						/* Set the cave edge */
-						cave_set_feat(y, x, edge);
-					}
-					
-					/* Not a 'proper' outer wall */
-					if ((f_info[edge].flags1 & (FF1_OUTER)) == 0)
-					{
-						/* Clear the room flag */
-						cave_info[y][x] &= ~(CAVE_ROOM);
+						else cave_set_feat(y, x, edge);
+						
+						/* Not a 'proper' outer wall */
+						if ((f_info[cave_feat[y][x]].flags1 & (FF1_OUTER)) == 0)
+						{
+							/* Clear the room flag */
+							cave_info[y][x] &= ~(CAVE_ROOM);
+						}
+						
+						/* Allow light to spill out of rooms through transparent edges */
+						if (light)
+						{
+							/* Allow lighting up rooms to work correctly */
+							if (f_info[cave_feat[y][x]].flags1 & (FF1_LOS))
+							{
+								int d;
+
+								/* Look in all directions. */
+								for (d = 0; d < 8; d++)
+								{
+									/* Extract adjacent location */
+									int yy = y + ddy_ddd[d];
+									int xx = x + ddx_ddd[d];
+
+									/* Hack -- light up outside room */
+									cave_info[yy][xx] |= (CAVE_GLOW);
+								}
+							}
+						}
 					}
 				}
 			}			
@@ -10992,7 +11032,7 @@ static bool build_type232425(int room, int type)
 	if (n_pools == 2)
 	{
 		succeed = generate_nest(y1, x1, y2, x2, ngb_min, ngb_max, connchance, (cellnum + 7)/4, 
-		    pool[n_pools-1], feat, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0),0);
+		    pool[n_pools-1], cave_feat[(y1 + y2)/2][(x1 + x2)/2], compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0),0);
 	}
 	
 	/* Build alloc */
@@ -11539,7 +11579,7 @@ static void build_nature(void)
 			}
 			else
 			{
-				/* Report creation of lakes/rivers */
+				/* Report creation of flooded dungeons */
 				if (cheat_room)
 				{
 					message_add(format("Flooding dungeon with %s.", f_name + f_info[feat].name), MSG_GENERIC);
@@ -12105,6 +12145,9 @@ static bool place_rooms()
 				/* Pick a theme */
 				for (j = 0; j < 32; j++)
 				{
+					/* Place nature and destroyed elsewhere */
+					if (((1L << j) == (LF1_WILD)) || ((1L << j) == (LF1_DESTROYED))) continue;
+					
 					/* Pick a theme */
 					if ( ((room_data[room_type].theme & (1L << j)) != 0) && (rand_int(++k) == 0)) choice = j;
 				}
@@ -13306,7 +13349,7 @@ static bool cave_gen(void)
 	{
 		/* Generating */
 		if (cheat_room) message_add("Building nature.", MSG_GENERIC);
-
+		
 		build_nature();
 	}
 

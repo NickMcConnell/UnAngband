@@ -214,35 +214,17 @@ N:19:117:0:0:1:1:0:128
 A:
 B:labyrinth
 
-# Medium cellular cave - central feature.
-
-N:20:104:0:0:1:1:0:128
-A:
-B:grotto
-
 # Medium cellular cave - wall decorations.
 
 N:20:117:0:0:1:1:0:128
 A:
 B:grotto
 
-# Large cellular cave - central feature.
-
-N:21:104:0:0:1:1:0:128
-A:
-B:cave
-
 # Large cellular cave - wall decorations.
 
 N:21:117:0:0:1:1:0:128
 A:
 B:cave
-
-# Huge cellular cave - central feature
-
-N:22:104:0:0:1:1:0:128
-A:
-B:cavern
 
 # Huge cellular cave - wall decorations
 
@@ -2840,7 +2822,7 @@ R:ORC
 N:112:133:107:115:15:1:15:128
 A:
 B:
-D:defeaning drums 
+D:defeaning drums beating 
 R:TROLL
 
 N:112:115:0:0:15:1:15:128
