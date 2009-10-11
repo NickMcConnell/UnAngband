@@ -7870,15 +7870,15 @@ void pick_trap(int y, int x, bool player)
 		/* We have a region */
 		region = i;
 
+		/* Use this to pick the trap later */
+		pick_attr = f_ptr->d_attr;
+
 		break;
 	}
 
 	/* Region found */
 	if (region)
 	{
-		/* Use this to pick the trap later */
-		pick_attr = f_info[cave_feat[y][x]].d_attr;
-
 		/* Set hook*/
 		get_feat_num_hook = vault_trap_attr;
 	}
@@ -8036,7 +8036,7 @@ void pick_trap(int y, int x, bool player)
 	else
 	{
 		/* Set attribute */
-		pick_attr = f_info[cave_feat[y][x]].d_attr;
+		pick_attr = f_ptr->d_attr;
 
 		/* Set hook*/
 		get_feat_num_hook = vault_trap_attr;

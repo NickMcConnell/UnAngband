@@ -1106,7 +1106,7 @@ enum
 #define GF_POISON_WEAK	149
 #define GF_POISON_HALF	150
 #define GF_HURT_POISON	151
-
+#define GF_POTS	152
 
 
 
@@ -2045,6 +2045,7 @@ enum
 /* The "sval" codes for TV_STATUE */
 #define SV_STATUE_STONE       2
 #define SV_STATUE_WOOD		3
+#define SV_STATUE_POT		16
 
 /* The "sval" codes for TV_ASSEMBLY */
 #define SV_ASSEMBLY_NONE   	 1
@@ -2903,20 +2904,28 @@ enum
 #define RE1_INVERSE				0x00040000	/* Invert source and target when spawning attack/subsequent region */
 #define RE1_NOTICE				0x00080000	/* Noticed region? */
 
-#define RE1_CHAIN				0x00100000	/* Set region source and destination to source and target determined when attacking */
+#define RE1_CHAIN				0x00100000	/* Set region target to be triggering location and recompute affected area. Do source as well if inversed. */
 #define RE1_TRIGGER_DROP		0x00200000	/* Trigger if something dropped into the region */
-#define RE1_TRIGGER_AIM			0x00400000	/* Triggered by and targetted by an adjacent creature/player */
+#define RE1_FIXED				0x00400000	/* Ignores triggering location when triggered and use original target. */
 #define RE1_SPREAD				0x00800000	/* Region pieces drift randomly. Affected by the wind. */
 
 #define RE1_CLOCKWISE			0x01000000	/* Rotates clockwise every turn. If both, randomly choose one. */
 #define RE1_COUNTER_CLOCKWISE	0x02000000	/* Rotates counter-clockwise every turn. If both, randomly choose one. */
 #define RE1_TRIGGER_OPEN		0x04000000	/* Triggered by being 'opened' */
-#define RE1_TRIGGER_CLOSE		0x08000000	/* Triggered by being 'closed'. Note that closing a region ages it backwards */
+#define RE1_TRIGGER_CLOSE		0x08000000	/* Triggered by being 'closed'. Note that closing a region makes it age backwards */
 
 #define RE1_BACKWARDS			0x10000000	/* Region ages backwards instead of forwards */
 #define RE1_SOURCE_FEATURE		0x20000000	/* Attacks occur from all features in the region that match the source feature */
 #define	RE1_ROOM				0x40000000	/* Region fills a room */
 #define RE1_DISPLAY				0x80000000	/* Display region */
+
+
+#define RE2_AUTO_LITE			0x00000000	/* Automatically apply update if in perma light  */
+#define RE2_HIDE_LITE			0x00000000	/* Don't display region in perma light */
+#define RE2_AIMED				0x00000000	/* Update destination if player aims while on source */
+
+
+
 
 
 

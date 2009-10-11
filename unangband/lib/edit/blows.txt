@@ -835,8 +835,14 @@ F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED |
 D:create~ @ hammer:@ target#
 
-
-#$# 94 - Unused ###
+N:94:DARTS
+T:0-9999:throw~ a dart at &
+W:0:22:1
+M:6
+U:2+1/5
+F:MISS | GRID | KILL | PLAY | STOP |
+F:RANGED |
+D:create~ @ dart#:@ target#
 
 #$# 95 - Unused ###
 

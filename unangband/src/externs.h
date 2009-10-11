@@ -462,7 +462,7 @@ extern void find_secret(int y, int x);
 extern void search(void);
 extern bool auto_pickup_ignore(const object_type *o_ptr);
 extern byte py_pickup(int py, int px, int pickup);
-extern bool avoid_trap(int y, int x);
+extern bool avoid_trap(int y, int x, int feat);
 extern bool discharge_trap(int y, int x, int ty, int tx, s16b child_region);
 extern void hit_trap(int y, int x);
 extern void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int *to_dam, int *to_crit);
@@ -703,8 +703,8 @@ extern int sauron_shape(int old_form);
 extern bool make_attack_ranged(int who, int attack, int py, int px);
 extern bool mon_evade(int m_idx, int chance, int out_of, cptr r);
 extern bool mon_resist_object(int m_idx, const object_type *o_ptr);
-extern bool race_avoid_trap(int r_idx, int y, int x);
-extern bool mon_avoid_trap(monster_type *m_ptr, int y, int x);
+extern bool race_avoid_trap(int r_idx, int y, int x, int feat);
+extern bool mon_avoid_trap(monster_type *m_ptr, int y, int x, int feat);
 extern void mon_hit_trap(int m_idx, int y, int x);
 
 /* melee2.c */
@@ -1020,6 +1020,7 @@ extern void region_refresh(s16b region);
 extern void region_highlight(s16b region);
 extern void region_update(s16b region);
 extern void region_terminate(s16b region);
+extern s16b region_random_piece(s16b region);
 extern void trigger_region(int y, int x, bool move);
 extern s16b init_region(int who, int what, int type, int dam, int method, int effect, int level, int y0, int x0, int y1, int x1);
 extern void process_regions(void);

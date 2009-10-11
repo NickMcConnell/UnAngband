@@ -3418,7 +3418,7 @@ int place_monster_here(int y, int x, int r_idx)
 		if (f_ptr->flags1 & (FF1_TRAP))
 		{
 			/* Unavoidable */
-			if (race_avoid_trap(r_idx, y, x))
+			if (race_avoid_trap(r_idx, y, x, cave_feat[y][x]))
 			{
 				resist = TRUE;
 			}
@@ -3452,7 +3452,7 @@ int place_monster_here(int y, int x, int r_idx)
 			/* Trapped regions */
 			if (re_ptr->flags1 & (RE1_HIT_TRAP))
 			{
-				if (race_avoid_trap(re_ptr->y0, re_ptr->y1, r_idx)) trap |= !mon_resist_feat(cave_feat[re_ptr->y0][re_ptr->x0], r_idx);
+				if (race_avoid_trap(r_idx, y, x, cave_feat[re_ptr->y0][re_ptr->y1])) trap |= !mon_resist_feat(cave_feat[re_ptr->y0][re_ptr->x0], r_idx);
 			}
 
 			/* Non-trapped regions */

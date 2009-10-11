@@ -12011,6 +12011,27 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 			break;
 		}
+		
+		/* Valuable pots - hack. Player can catch these */
+		case GF_POTS:
+		{
+			object_type object_type_body;
+			object_type *i_ptr = &object_type_body;
+			
+			/* Saving throw (unless paralyzed) based on dexterity and level */
+			bool save = (!p_ptr->timed[TMD_PARALYZED] &&
+				    (rand_int(100) < (adj_agi_safe[p_ptr->stat_ind[A_DEX]] +
+						      p_ptr->lev)));
+
+			/* Message */
+			msg_format("You %s a valuable looking pot.", save ? "safely catch" : "fumble and drop");
+			
+			/* Prepare the object */
+			object_prep(i_ptr, save ? lookup_kind(TV_STATUE, SV_STATUE_POT) : lookup_kind(TV_JUNK, SV_JUNK_SHARD));
+
+			/* Drop it near the new location */
+			drop_near(i_ptr, -1, y, x, FALSE);
+		}
 
 		/* Default */
 		default:
@@ -13010,6 +13031,16 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 
 			/* Mark the area nearby -- limit range, ignore rooms */
 			spread_cave_temp(y0, x0, rad, FALSE);
+		}
+		
+		/* Arcs projected at themslves make no sense. Change to a regular ball */
+		if ((flg & (PROJECT_ARC)) && (y0 == y1) && (x0 == x1))
+		{
+			flg &= ~(PROJECT_ARC);
+			
+			/* Approximate radius */
+			rad = degrees / 15;
+			degrees = 0;
 		}
 
 		/* Pre-calculate some things for arcs. */
@@ -14111,7 +14142,7 @@ bool project(int who, int what, int rad, int rng, int y0, int x0, int y1, int x1
 	{
 		if (!blind) notice = TRUE;
 	}
-
+	
 	/* Determine projection shape */
 	notice |= project_shape(grid, gd, &grids, 1024, rad, rng, y0, x0, y1, x1, dam, typ, flg, degrees, source_diameter);
 
@@ -14200,22 +14231,33 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 		/* Requesting a vector */
 		else if (r_ptr->flags1 & (RE1_SCALAR_VECTOR))
 		{
-			int deg_vary = degrees_of_arc ? degrees_of_arc / 2 : 45;
+			int deg_vary = degrees_of_arc ? degrees_of_arc / 2 : 180;
 
 			/* Randomize the scalar */
 			for (i = 0; i < target_path_n; i++)
 			{
 				int yi = GRID_Y(target_path_g[i]);
 				int xi = GRID_X(target_path_g[i]);
-				int deg_dest = get_angle_to_target(y0, yi, x0, xi, 0);
-
-				int degree = (deg_dest + rand_int(deg_vary)) % 180;
+				int degree = get_angle_to_target(y0, x0, yi, xi, 0);
 				int dist = target_path_d[i];
 				
-				int speed = (damage + dist) / (dist + 1);
-
+				int speed = 100 / (dist + 1);
+				
+				/* Invalid degrees - choose a random direction */
+				if ((y0 == yi) && (x0 == xi)) degree = rand_int(180);
+				if (degree == -1) degree = rand_int(180);
+				
+				/* Pick a random direction and speed */
+				if (r_ptr->flags1 & (RE1_RANDOM))
+				{
+					degree = (degree + rand_int(deg_vary)) % 180;
+					
+					speed = (speed / 2) + damroll(2, speed / 2);
+					if (speed > 100) speed = 100;
+				}
+				
 				/* Insert angle and speed into grid damage */
-				target_path_d[i] = GRID(degree, (r_ptr->flags1 & (RE1_RANDOM)) != 0 ? damroll(2, speed) : speed);
+				target_path_d[i] = GRID(degree, speed);
 
 				/* Hack -- All pieces of a vector start at the origin */
 				target_path_g[i] = GRID(y0, x0);

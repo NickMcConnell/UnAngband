@@ -331,7 +331,7 @@ static cptr region_info_flags1[] =
 	"NOTICE",
 	"CHAIN",
 	"TRIGGER_DROP",
-	"TRIGGER_AIM",
+	"FIXED",
 	"SPREAD",
 	"CLOCKWISE",
 	"COUNTER_CLOCKWISE",

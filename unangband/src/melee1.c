@@ -1943,7 +1943,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		r_ptr = &r_info[0];
 
 		what = cave_feat[y][x];
-
+		
 		/* Feature is seen */
 		if (play_info[y][x] & (PLAY_SEEN))
 		{
@@ -4440,13 +4440,13 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 /*
  *  Check if race avoids the trap
  */
-bool race_avoid_trap(int r_idx, int y, int x)
+bool race_avoid_trap(int r_idx, int y, int x, int feat)
 {
 	feature_type *f_ptr;
 	monster_race *r_ptr = &r_info[r_idx];
 
 	/* Get feature */
-	f_ptr = &f_info[cave_feat[y][x]];
+	f_ptr = &f_info[feat];
 
 	/* Hack - test whether we hit trap based on the attr of the trap */
 	switch (f_ptr->d_attr)
@@ -4578,8 +4578,7 @@ bool race_avoid_trap(int r_idx, int y, int x)
 		case TERM_L_YELLOW:
 		{
 			/* Avoid by being unlit */
-			if (((cave_info[y][x] & (CAVE_LITE)) == 0) &&
-					((play_info[y][x] & (PLAY_LITE)) == 0)) return (TRUE);
+			if ((cave_info[y][x] & (CAVE_GLOW)) == 0) return (TRUE);
 			break;
 		}
 		/* Glowing glyph */
@@ -4640,12 +4639,12 @@ bool race_avoid_trap(int r_idx, int y, int x)
  *  Note we only apply specific monster checks. All racial checks
  *  are done above.
  */
-bool mon_avoid_trap(monster_type *m_ptr, int y, int x)
+bool mon_avoid_trap(monster_type *m_ptr, int y, int x, int feat)
 {
 	feature_type *f_ptr;
 
 	/* Get feature */
-	f_ptr = &f_info[cave_feat[y][x]];
+	f_ptr = &f_info[feat];
 
 	/* Hack - test whether we hit trap based on the attr of the trap */
 	switch (f_ptr->d_attr)
@@ -4695,7 +4694,7 @@ bool mon_avoid_trap(monster_type *m_ptr, int y, int x)
 	}
 
 	/* Avoid trap racially */
-	return (race_avoid_trap(m_ptr->r_idx, y, x));
+	return (race_avoid_trap(m_ptr->r_idx, y, x, feat));
 }
 
 
@@ -4717,7 +4716,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 	f_ptr = &f_info[cave_feat[y][x]];
 
 	/* Avoid trap */
-	if ((f_ptr->flags1 & (FF1_TRAP)) && (mon_avoid_trap(m_ptr, y, x))) return;
+	if ((f_ptr->flags1 & (FF1_TRAP)) && (mon_avoid_trap(m_ptr, y, x, cave_feat[y][x]))) return;
 
 	/* Hack -- monster falls onto trap */
 	if ((m_ptr->fy!=y)|| (m_ptr->fx !=x))

@@ -849,7 +849,7 @@ U:56
 #$ granite wall
 O:434
 W:1:1:20:0
-T:DART:SLOW:1d4
+T:DARTS:SLOW:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -874,7 +874,7 @@ U:56
 #$ granite wall
 O:434
 W:2:1:20:0
-T:DART:LOSE_STR:1d4
+T:DARTS:LOSE_STR:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -899,7 +899,7 @@ U:56
 #$ granite wall
 O:434
 W:3:1:20:0
-T:DART:LOSE_DEX:1d4
+T:DARTS:LOSE_DEX:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -924,7 +924,7 @@ U:56
 #$ granite wall
 O:434
 W:4:1:20:0
-T:DART:LOSE_CON:1d4
+T:DARTS:LOSE_CON:1d4
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -19418,7 +19418,7 @@ U:56
 #$ granite wall
 O:0
 W:8:2:20:0
-T:ARC_30:HURT:9d6
+T:FLASK:HURT:9d6
 K:DEFAULT:1:70
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -19435,7 +19435,7 @@ U:56
 #$ granite wall
 O:0
 W:16:2:20:0
-T:ARC_30:HURT:27d6
+T:FLASK:HURT:27d6
 K:DEFAULT:1:70
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -19452,7 +19452,7 @@ U:56
 #$ granite wall
 O:0
 W:4:2:20:0
-T:ARC_30:HURT:3d6
+T:FLASK:HURT:3d6
 K:DEFAULT:1:70
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -19469,14 +19469,14 @@ U:56
 #$ granite wall
 O:0
 W:2:2:20:0
-T:ARC_30:HURT:1d6
+T:FLASK:HURT:1d6
 K:DEFAULT:1:70
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
-D:You've dropped an jumble of junk from the ceiling.
+D:You've dropped a jumble of junk from the ceiling.
 
 N:965:deadfall
 G:^:m
@@ -19486,7 +19486,7 @@ U:56
 #$ granite wall
 O:0
 W:1:2:20:0
-T:ARC_30:HURT
+T:FLASK:POTS
 K:DEFAULT:1:70
 #$ open floor
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
@@ -19506,8 +19506,10 @@ K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:966:5
 #$ siege engine
+K:OPEN:966:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | OPEN
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:The catapult hurls a handful of stone shot.
@@ -19525,8 +19527,10 @@ K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:967:5
 #$ siege engine
+K:OPEN:967:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | OPEN
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:The ballista shoots a great steel bolt.
@@ -19544,8 +19548,10 @@ K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:968:5
 #$ siege engine
+K:OPEN:968:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | OPEN
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:The mangonel launches a block of stone.
@@ -19563,8 +19569,10 @@ K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:969:5
 #$ siege engine
+K:OPEN:969:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | OPEN
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:The trebuchet lobs a lump of old architecture.
@@ -19582,8 +19590,10 @@ K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:970:5
 #$ siege engine
+K:HIT_TRAP:970:5
+#$ siege engine
 F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
-F:HIT_TRAP |
+F:HIT_TRAP | OPEN
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:The cannon fires an ornate iron ball in a roar of gunpowder.
