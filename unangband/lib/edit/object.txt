@@ -2063,7 +2063,7 @@ P:0:0d0:0:0:0
 Y:7:2
 F:RES_FEAR |
 
-N:253:& valuable Urn~ with scenes #
+N:253:& valuable Urn~ with scenes of #
 G:9:z
 I:11:16:0
 W:5:0:200:50
