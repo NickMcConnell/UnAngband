@@ -781,3 +781,8 @@ I:10
 D:hit~:::with valuable pottery:::
 T:smashing pots
 
+N:153:CHARM_PLANT
+I:0
+D:charm~::plants:::power:pow
+T:charming plants
+

@@ -17,7 +17,7 @@ V:0.6.3
 M:m:225
 
 # Maximum number of effect types
-M:e:153
+M:e:154
 
 # Maximum number of feature types
 M:F:996
@@ -80,7 +80,7 @@ M:B:8
 M:Q:8
 
 # Maximum number of region info
-M:i:45
+M:i:46
 
 # Maximum number of region pieces
 M:p:2048

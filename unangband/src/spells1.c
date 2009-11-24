@@ -5384,6 +5384,22 @@ static bool charm_insect_hook(int r_idx)
 /*
  * Hack -- help decide if a monster race is "okay" to charm.
  *
+ * Accept any plants.
+ */
+static bool charm_plant_hook(int r_idx)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	/* Require plants */
+	if ((r_ptr->flags3 & (RF3_PLANT)) == 0) return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Hack -- help decide if a monster race is "okay" to charm.
+ *
  * Accept reptiles.
  */
 static bool charm_reptile_hook(int r_idx)
@@ -5418,7 +5434,7 @@ static bool charm_reptile_hook(int r_idx)
 /*
  * Hack -- help decide if a monster race is "okay" to charm.
  *
- * Accept reptiles.
+ * Accept mammals and birds - not reptiles.
  */
 static bool charm_animal_hook(int r_idx)
 {
@@ -5891,10 +5907,17 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Hack -- pre-stage charm hooks for efficiency */
 	switch(typ)
 	{
-		/* Teleport from darkness to darkness */
+		/* Insects */
 		case GF_CHARM_INSECT:
 		{
 			charm_hook = charm_insect_hook;
+			break;
+		}
+
+		/* Plants */
+		case GF_CHARM_PLANT:
+		{
+			charm_hook = charm_plant_hook;
 			break;
 		}
 
@@ -8554,6 +8577,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_CHARM_REPTILE:
 		case GF_CHARM_MONSTER:
 		case GF_CHARM_PERSON:
+		case GF_CHARM_PLANT:
 
 		/* Bind effects for the moment */
 		case GF_BIND_DRAGON:
@@ -8565,7 +8589,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			{
 				if (seen) obvious = TRUE;
 
-				/* Cannot be charmed */
+				/* Cannot be charmed -- use a separate flag to NO_SLEEP */
+#if 0
 				if (r_ptr->flags3 & (RF3_NO_SLEEP))
 				{
 					if ((seen) && !(l_ptr->flags3 & (RF3_NO_SLEEP)))
@@ -8576,11 +8601,13 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				}
 
 				/* Attempt a saving throw */
-				else if (monster_save(m_ptr, dam, &near))
+				else
+#endif
+					if (monster_save(m_ptr, dam, &near))
 				{
-					if ((near) && (seen))
+					if (near)
 					{
-						note = " appears somewhat persuaded.";
+						if (seen) note = " appears somewhat persuaded.";
 						m_ptr->mflag |= (MFLAG_IGNORE);
 					}
 					else

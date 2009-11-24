@@ -1107,6 +1107,7 @@ enum
 #define GF_POISON_HALF	150
 #define GF_HURT_POISON	151
 #define GF_POTS	152
+#define GF_CHARM_PLANT	153
 
 
 
