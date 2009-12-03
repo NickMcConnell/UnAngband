@@ -353,7 +353,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* Depth:         0   6   12   18   24   30   36   42   48   54  60  min max_num count, theme*/
 
    /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_NEST | LF1_WILD | LF1_CAVERN},
-   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_CAVERN | LF1_NEST | LF1_LABYRINTH)},
+   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_LABYRINTH)},
    /* Walls   */  {{80,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_CRYPT | LF1_WILD},
    /* Centre */   {{60,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_WILD},
@@ -361,23 +361,26 @@ static room_data_type room_data[ROOM_MAX] =
    /* Xlg cent */ {{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 11,  3,	3, 0, LF1_STRONGHOLD},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	6,		3, 0, LF1_DUNGEON},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  4,		1, 0, LF1_DUNGEON},
-   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	4,		2, 0, LF1_VAULT | LF1_CRYPT | LF1_DUNGEON},
-   /* G. Vault */ {{ 0,   0,   0,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_VAULT | LF1_STRONGHOLD},
+   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	4,		2, 0, LF1_CRYPT | LF1_DUNGEON},
+   /* G. Vault */ {{ 0,   0,   0,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_STRONGHOLD},
    /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	2, 0, LF1_DUNGEON | LF1_CAVERN | LF1_LAIR | LF1_SEWER},
    /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		3, 0, LF1_LAIR | LF1_SEWER},
    /* Fractal */  {{ 0,  30,  60,  80,  90,  95,  90,  90,  90,  90,  90},  3,DUN_ROOMS,	2, 0, LF1_CAVE | LF1_SEWER},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_CAVE},
    /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		1, 0, LF1_LAIR | LF1_WILD},
-   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_NEST | LF1_DESTROYED)},
-   /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_NEST | LF1_DUNGEON | LF1_DESTROYED)},
-   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_NEST | LF1_DUNGEON | LF1_DESTROYED)},
+   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DESTROYED)},
+   /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_DESTROYED)},
+   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_DESTROYED)},
    /* Cell cave */{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,		1, 0, LF1_CAVERN | LF1_SEWER},
    /* Lrg cell */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,		2, 0, LF1_CAVERN},
    /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_CAVERN},
    /* Nest */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
-   /* Lrg nest */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
-   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Lrg nest */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Concave */  {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_DUNGEON | LF1_POLYGON | LF1_LAIR | LF1_SEWER},
+   /* Lrg c.cave*/{{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_POLYGON | LF1_DUNGEON},
+   /* Xlg ccave */{{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 11,  3,	3, 0, LF1_POLYGON},
    /* Monst.pit */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		2, 0, LF1_DUNGEON | LF1_CRYPT},
    /* Monst.town */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		2, 0, LF1_DUNGEON | LF1_CAVERN},
    /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 11,	1,		2, 0, LF1_WILD | LF1_CAVERN | LF1_SEWER},
@@ -2319,10 +2322,398 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 }
 
 
-#define GRID_NONE	0
+#define GRID_WALL	0
 #define GRID_FLOOR	1
-#define GRID_WALL	2
-#define GRID_EDGE	3
+#define GRID_EDGE	2
+
+/*
+ * Given a map of floors and walls, replaces walls with edges when adjacent to an existing edge, or an edge of the map.
+ * 
+ * Note that GRID_EDGE fills all walls which are 'outside' the boundaries of the room, and GRID_WALL all walls inside
+ * this boundary.
+ */
+void edge_room(byte **grid, int size_y, int size_x)
+{
+	bool edges_finished = FALSE;
+	int yi, xi;
+	
+	/* Surround the outside of the map with edges */
+	for(yi=0; yi<size_y; yi++)
+	{
+		if (grid[yi][0] == GRID_WALL) grid[yi][0] = GRID_EDGE;
+		if (grid[yi][size_x-1] == GRID_WALL) grid[yi][size_x-1] = GRID_EDGE;
+	}
+	for(xi=0; xi<size_x; xi++)
+	{
+		if (grid[0][xi] == GRID_WALL) grid[0][xi] = GRID_EDGE;
+		if (grid[size_y-1][xi] == GRID_WALL) grid[size_y-1][xi] = GRID_EDGE;
+	}
+
+	/* Flow all edges to connected walls until none remain next to walls */
+	while (!edges_finished)
+	{
+		edges_finished = TRUE;
+		
+	 	for(yi=1; yi<size_y - 1; yi++)
+	 	for(xi=1; xi<size_x - 1; xi++)
+	 	{
+	 		if (grid[yi][xi] == GRID_WALL)
+	 		{
+	 			int d;
+	 			
+	 			/* Is an edge if adjacent grid is an edge */
+	 			for (d = 0; d < 9; d++)
+	 			{
+ 					if (grid[yi+ddy_ddd[d]][xi+ddx_ddd[d]] == GRID_EDGE)
+ 					{
+ 						grid[yi][xi] = GRID_EDGE;
+ 						edges_finished = FALSE;
+ 						break;
+ 					}
+	 			}
+	 		}
+	 	}
+	}
+}
+
+
+
+/*
+ * The following function is from http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The%20C%20Code
+ * 
+ * Copyright (c) 1970-2003, Wm. Randolph Franklin
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
+ * (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, 
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
+ * 2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided 
+ * with the distribution.
+ * 3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific 
+ * prior written permission. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ */
+int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
+{
+	int i, j, c = 0;
+	
+	for (i = 0, j = nvert-1; i < nvert; j = i++) {
+		if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+				(testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+				c = !c;
+	}
+	return c;
+}
+
+
+
+/* It is possible to generate poly rooms with very small sizes. We ensure that these rooms have
+ * a minimum size */
+#define MIN_POLY_ROOM_SIZE	17
+
+/*
+ * Generates a room from a convex or concave polygon. We don't completely handle the complex (self-intersecting) case
+ * but it could be extended to do so. Most of the smarts are on pnpoly (above).
+ * 
+ * *y and *x represent pairs of vertex coordinates. These should probably be ordered but may not require this.
+ */
+static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16b edge, s16b pool, s16b require, byte cave_flag)
+{
+	float *verty, *vertx;
+	int i, xi, yi, size_y, size_x;
+	int y0 = 256;
+	int x0 = 256;
+	int y1 = 0;
+	int x1 = 0;
+	int floors = 0;
+	
+	byte **grid;
+
+	byte cave_flag_edge = (edge && f_info[edge].flags1 & (FF1_OUTER)) ? (cave_flag) : ((cave_flag) & ~(CAVE_ROOM));
+	
+	/* Allocate spaces for floating vertices */
+	verty = C_ZNEW(n+1,float);
+	vertx = C_ZNEW(n+1,float);
+	
+	/* Copy contents to floating array */
+	for (i = 0; i < n; i++)
+	{
+		verty[i] = (float)y[i];
+		vertx[i] = (float)x[i];
+		
+		/* Determine extents */
+		if (y[i] > y1) y1 = y[i];
+		if (y[i] < y0) y0 = y[i];
+		if (x[i] > x1) x1 = x[i];
+		if (x[i] < x0) x0 = x[i];
+	}
+	
+	/* Safety - repeat initial vertex at end of polygon */
+	if ((y[n-1] != y[0]) || (x[n-1] != x[0]))
+	{
+		verty[n] = (float)y[0];
+		vertx[n] = (float)x[0];
+		n++;
+	}
+
+	/* Get grid size */
+	size_y = y1 - y0 + 1;
+	size_x = x1 - x0 + 1;
+	
+	/* Allocate space for room */
+	grid  = C_ZNEW(size_y, byte*);
+		
+	/* Allocate space */
+	for(yi=0; yi<size_y; yi++)
+	{
+		grid[yi] = C_ZNEW(size_x, byte);
+	}
+	
+	/* Draw the polygon */
+	for (yi = 0; yi < size_y; yi++)
+	{
+		for (xi = 0; xi < size_x; xi++)
+		{
+			/* Point in the polygon */
+			if (pnpoly(n, verty, vertx, (float)(yi + y0), (float)(xi + x0)))
+			{
+				grid[yi][xi] = GRID_FLOOR;
+				floors++;
+			}
+			else
+			{
+				grid[yi][xi] = GRID_WALL;				
+			}
+		}
+	}
+	
+	/* Ensure minimum size */
+	if (floors < MIN_POLY_ROOM_SIZE) return (FALSE);
+	
+	/* Compute edge of room */
+	edge_room(grid, size_y, size_x);
+	
+	/* Write final grids out to map */
+ 	for(yi=0; yi<size_y; yi++)
+ 	for(xi=0; xi<size_x; xi++)
+ 	{
+ 		/* Paranoia - if require defined, don't overwrite anything else */
+ 		if (require && (cave_feat[y1+yi][x1+xi] != require)) continue;
+ 		
+ 		switch(grid[yi][xi])
+ 		{
+	 		case GRID_FLOOR:
+	 		{
+	 			if (floor) cave_set_feat(y1 + yi, x1 + xi, floor);
+	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
+
+	 			break;
+	 		}
+	 		case GRID_WALL:
+	 		{
+	 			if (wall || pool) cave_set_feat(y1 + yi, x1 + xi, pool ? pool : wall);
+	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
+	 			break;
+	 		}
+	 		case GRID_EDGE:
+	 		{
+	 			int d;
+	 			bool edged = FALSE;
+
+	 			if (edge || wall)
+	 			{
+		 			for (d = 0; d < 9; d++)
+		 			{
+		 				if ((yi + ddy_ddd[d] < 0) || (yi + ddy_ddd[d] >= size_y) || (xi + ddx_ddd[d] < 0) || (xi + ddx_ddd[d] >= size_x)) continue;
+		 				
+		 				if (grid[yi + ddy_ddd[d]][xi + ddx_ddd[d]] == GRID_FLOOR)
+		 				{
+							cave_set_feat(y1 + yi, x1 + xi, edge ? edge : wall);
+							cave_info[y1+yi][x1 + xi] |= (cave_flag_edge);
+							edged = TRUE;
+		 					break;
+		 				}
+		 			}
+	 			}
+	 			
+	 			/*if (!edged && wall) cave_set_feat(y1 + yi, x1 + xi, wall);*/
+	 			
+				break;
+	 		}
+ 		}
+ 	}
+	
+ 	/* Free memory */
+	for(yi=0; yi<size_y; yi++)
+	{
+		FREE(grid[yi]);
+	}
+
+	FREE(grid);
+	FREE(verty);
+	FREE(vertx);
+	
+	return (TRUE);
+}
+
+
+
+
+
+
+#define REGION 25
+
+/*
+ * The following 3 functions (floodfill, floodall, joinall) are creditted to Ray Dillinger.
+ * 
+ * These can be used to join disconnected regions.
+ */ 
+void floodfill(byte **map, int size_y, int size_x, int y, int x, int mark,
+		int miny[REGION], int minx[REGION])
+{ 
+	int i; 
+	int j; 
+	for (i=-1;i<=1;i++) 
+		for (j=-1;j<=1;j++) 
+			if (i+x < size_x && i+x >= 0 && 
+					j+y < size_y && j+y >= 0 && 
+					map[j+y][i+x] != 0 && map[j+y][i+x] != mark)
+			{ 
+				map[j+y][i+x] = mark; 
+				/* side effect of floodfilling is recording minimum x and y 
+					for each region*/ 
+				if (mark < REGION)
+				{ 
+					if (i+x < minx[mark]) minx[mark] = i+x; 
+					if (j+y < miny[mark]) miny[mark] = j+y; 
+				} 
+				floodfill(map, size_y, size_x, j+y, i+x, mark, miny, minx); 
+			}
+
+}
+
+/* find all regions, mark each open cell (by floodfill) with an integer 
+	2 or greater indicating what region it's in. */ 
+int floodall(byte **map, int size_y, int size_x, int miny[REGION],int minx[REGION])
+{ 
+	int x; 
+	int y; 
+	int count = 2; 
+	int retval = 0; 
+	/* start by setting all floor tiles to 1. */ 
+	/* wall spaces are marked 0. */ 
+	for (y=0;y< size_y;y++)
+	{ 
+		for (x=0;x< size_x;x++)
+		{ 
+			if (map[y][x] != 0)
+			{ 
+				map[y][x] = 1; 
+			} 
+		} 
+	}
+	
+	/* reset region extent marks to -1 invalid */ 
+	for (x=0;x<REGION;x++)
+	{ 
+		minx[x] = -1; 
+		miny[x] = -1; 
+	}
+	
+	/* now mark regions starting with the number 2. */ 
+	for (y=0;y< size_y;y++)
+	{ 
+		for (x=0;x< size_x;x++)
+		{ 
+			if (map[y][x] == 1)
+			{ 
+				if (count < REGION)
+				{ 
+					minx[count] = x; 
+					miny[count] = y; 
+				} 
+				floodfill(map, size_y, size_x, y, x, count, miny, minx); 
+				count++; 
+				retval++; 
+			} 
+		} 
+	} 
+	/* return the number of floodfill regions found */ 
+	return(retval); 
+
+} 
+
+/* joinall is an iterative step toward joining all map regions. 
+	The output map is guaranteed to have the same number of 
+	open spaces, or fewer, than the input. With enough 
+	iterations, an output map having exactly one open space 
+	will be produced. Further iterations will just copy that 
+	map. 
+*/ 
+int joinall(byte **mapin, byte **mapout, int size_y, int size_x)
+{ 
+	int minx[REGION]; 
+	int miny[REGION]; 
+	int x; 
+	int y; 
+	int count; 
+	int retval; 
+	retval = floodall(mapin, size_y, size_x, miny, minx); 
+	/* if we have multiple unconnected regions */ 		
+	if (retval > 1)
+	{ 
+		/* check to see if there are still regions that can be moved toward 
+			0,0. */ 
+		count = 0; 
+		for (x = 2; x < REGION; x++) 
+			if (minx[x] > 0 || miny[x] > 0) count = 1; 
+		/* if no regions can still be moved toward (0,0) */ 
+		if (count == 0)
+		{ 
+			/* the new map is the old map flipped about the diagonal. */ 
+			for (y = 0; y < size_y; y++) 
+				for (x = 0; x < size_x; x++) 
+					mapout[size_y-y-1][size_x-x-1] = mapin[y][x]; 
+			return(retval); 
+		} 
+		else
+		{ /* there exist regions that can be moved toward 0,0 */ 
+			/* write rock to every square of new map that is either 
+				ærock or a region we can move; copy the map to all other squares. */ 
+			for (y = 0; y < size_y; y++)
+				for (x = 0; x < size_x; x++) 
+				{ 
+					if (mapin[y][x] >= REGION) mapout[y][x] = mapin[y][x]; 
+					else mapout[y][x] = 0; 
+				} 
+			/* now copy regions we can move to new map, each with a shift 
+				toward (0,0).*/ 
+			for (y = 0; y < size_y; y++) 
+				for (x = 0; x < size_x; x++) 
+					if (mapin[y][x] != 0 && mapin[y][x] < REGION)
+					{ 
+						mapout[y-( miny[mapin[y][x]] > 0)]
+									 [x-(minx[mapin[y][x]] > 0)] = 1; 
+					} 
+			return(retval); 	
+		} 
+	} 
+	else
+	{ /* there was only one connected region - the output map is the 
+					input map. */ 
+		for (y = 0; y < size_y; y++) 
+			for (x = 0; x < size_x; x++) 
+				if (mapin[y][x] == 0) mapout[y][x] = 0; 
+				else mapout[y][x] = 1; 
+		return(1); 
+	}
+
+}
+
 
 
 /*
@@ -2356,10 +2747,10 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 	
 	int ii, jj;
 	
+	int count;
+	
 	byte **grid  = C_ZNEW(size_y, byte*);
 	byte **grid2 = C_ZNEW(size_y, byte*);
-	
-	bool edges_finished = FALSE;
 	
 	/* Allocate space */
 	for(yi=0; yi<size_y; yi++)
@@ -2396,7 +2787,7 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 	 		for(ii=-1; ii<=1; ii++)
 			for(jj=-1; jj<=1; jj++)
 	 		{
-	 			if(grid[yi+ii][xi+jj] != floor)
+	 			if(grid[yi+ii][xi+jj] != GRID_FLOOR)
 	 				adjcount_r1++;
 	 		}
 	 		for(ii=yi-2; ii<=yi+2; ii++)
@@ -2406,7 +2797,7 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 	 				continue;
 	 			if(ii<0 || jj<0 || ii>=size_y || jj>=size_x)
 	 				continue;
-	 			if(grid[ii][jj] != floor)
+	 			if(grid[ii][jj] != GRID_FLOOR)
 	 				adjcount_r2++;
 	 		}
 	 		if(adjcount_r1 >= r1 || ((gen2 > 0) && (adjcount_r2 <= r2)))
@@ -2419,43 +2810,15 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 	 		grid[yi][xi] = grid2[yi][xi];
 	}
 	
-	/* Surround the starting grids with edges */
-	for(yi=0; yi<size_y; yi++)
+	/* Join all regions */
+	do
 	{
-		if (grid[yi][0] == GRID_WALL) grid[yi][0] = GRID_EDGE;
-		if (grid[yi][size_x-1] == GRID_WALL) grid[yi][size_x-1] = GRID_EDGE;
-	}
-	for(xi=0; xi<size_x; xi++)
-	{
-		if (grid[0][xi] == GRID_WALL) grid[0][xi] = GRID_EDGE;
-		if (grid[size_y-1][xi] == GRID_WALL) grid[size_y-1][xi] = GRID_EDGE;
-	}
+		joinall(grid,grid2, size_y, size_x);
+		count = joinall(grid2,grid, size_y, size_x); 
+	} while (count > 1);
 	
-	/* Flow all edges to connected walls until none remain next to walls */
-	while (!edges_finished)
-	{
-		edges_finished = TRUE;
-		
-	 	for(yi=1; yi<size_y-1; yi++)
-	 	for(xi=1; xi<size_x-1; xi++)
-	 	{
-	 		if (grid[yi][xi] == GRID_WALL)
-	 		{
-	 			int d;
-	 			
-	 			/* Is an edge if adjacent grid is an edge */
-	 			for (d = 0; d < 9; d++)
-	 			{
- 					if (grid[yi+ddy_ddd[d]][xi+ddx_ddd[d]] == GRID_EDGE)
- 					{
- 						grid[yi][xi] = GRID_EDGE;
- 						edges_finished = FALSE;
- 						break;
- 					}
-	 			}
-	 		}
-	 	}
-	}
+	/* Edge the room */
+	edge_room(grid, size_y, size_x);	
 	
 	/* Write final grids out to map */
  	for(yi=0; yi<size_y; yi++)
@@ -4619,6 +4982,135 @@ static void check_windows_x(int x1, int x2, int y)
 			cave_info[y][x] |= (CAVE_GLOW);
 	}
 }
+
+
+/*
+ * Build a concave polygonal room using the algorithm described at
+ * http://roguebasin.roguelikedevelopment.org/index.php?title=Irregular_Shaped_Rooms
+ */
+static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a,
+	int y1b, int x1b, int y2b, int x2b, bool light)
+{
+	int floor = FEAT_FLOOR;
+	int edge = FEAT_WALL_OUTER;
+	int pool = 0;
+	
+	int verty[12];
+	int vertx[12];
+	int n = 0;
+	int d, i;
+	
+	/* Make certain the overlapping room does not cross the dungeon edge. */
+	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
+		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
+
+	/* Flood dungeon if required */
+	if (room_info[room].flags & (ROOM_FLOODED))
+	{
+		if ((!f_info[dun->flood_feat].edge) || ((f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_MOVE)) == 0))
+		{
+			floor = dun->flood_feat;
+			edge = f_info[dun->flood_feat].edge;
+
+			room_info[room].flags |= (ROOM_BRIDGED);
+		}
+		else
+		{
+			/* Generate pool */
+			pool = dun->flood_feat;
+
+			room_info[room].flags |= (ROOM_EDGED);
+		}
+	}
+	
+	/* If edged, shrink boundaries to fit */
+	if (edge)
+	{
+		y1a++; y1b++; x1a++; x1b++;
+		y2a--; y2b--; x2a--; x2b--;
+	}
+	
+	/* Generate 1 or more points for each edge */
+	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	
+	/* Add vertices */
+	for (i = 0; i < d; i++)
+	{
+		int y1w = (x1a < x1b ? y1a : (x1a == x1b ? MIN(y1a, y1b) : y1b));
+		int y2w = (x1a < x1b ? y2a : (x1a == x1b ? MAX(y2a, y2b) : y2b));
+		int x1w = MIN(x1a, x1b);
+		int x2w = (x1a == x1b ? x1a + 1 : MAX(x1a, x1b) - 1);
+		
+		int y = y1w + rand_int(y2w - y1w + 1);
+		int x = x1w + rand_int(x2w - x1w + 1);
+		
+		verty[n] = y;
+		vertx[n] = x;
+		n++;
+	}
+
+	/* Generate 1 or more points for each edge */
+	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	
+	/* Add vertices */
+	for (i = 0; i < d; i++)
+	{
+		int y1n = MIN(y1a, y1b);
+		int y2n = (y1a == y1b ? y1a + 1 : MAX(y1a, y1b) - 1);
+		int x1n = (y1a < y1b ? x1a : (y1a == y1b ? MIN(x1a, x1b): x1b));
+		int x2n = (y1a < y1b ? x2a : (y1a == y1b ? MAX(x2a, x2b): x2b));
+		
+		int y = y1n + rand_int(y2n - y1n + 1);
+		int x = x1n + rand_int(x2n - x1n + 1);
+		
+		verty[n] = y;
+		vertx[n] = x;
+		n++;
+	}
+
+	/* Generate 1 or more points for each edge */
+	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	
+	/* Add vertices */
+	for (i = 0; i < d; i++)
+	{
+		int y1e = (x2a > x2b ? y1a : (x1a == x1b ? MIN(y1a, y1b): y1b));
+		int y2e = (x2a > x2b ? y2a : (x1a == x1b ? MAX(y2a, y2b): y2b));
+		int x1e = (x2a == x2b ? x2a - 1 : MIN(x2a, x2b) + 1);
+		int x2e = MAX(x2a, x2b);
+		
+		int y = y1e + rand_int(y2e - y1e + 1);
+		int x = x1e + rand_int(x2e - x1e + 1);
+		
+		verty[n] = y;
+		vertx[n] = x;
+		n++;
+	}
+
+	/* Generate 1 or more points for each edge */
+	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	
+	/* Add vertices */
+	for (i = 0; i < d; i++)
+	{
+		int y1s = (y2a == y2b ? y2a - 1 : MIN(y2a, y2b) + 1);
+		int y2s = MAX(y2a, y2b);
+		int x1s = (y2a > y2b ? x1a : (y2a == y2b ? MIN(x1a, x1b): x1b));
+		int x2s = (y2a > y2b ? x2a : (y2a == y2b ? MAX(x2a, x2b): x2b));
+		
+		int y = y1s + rand_int(y2s - y1s + 1);
+		int x = x1s + rand_int(x2s - x1s + 1);
+		
+		verty[n] = y;
+		vertx[n] = x;
+		n++;
+	}
+
+	/* Generate the polygon */
+	return(generate_poly_room(n, verty, vertx, FEAT_WALL_EXTRA, floor, edge, 0, 0, (CAVE_ROOM) | (light ? (CAVE_GLOW) : 0)));
+}
+
+
 
 
 /*
@@ -10027,8 +10519,19 @@ static bool build_type123(int room, int type)
 	y2b = y0 + y2b + 1;
 	x2b = x0 + x2b + 1;
 
+	/* Build a polygonal room */
+	if (type == ROOM_NORMAL_CONCAVE)
+	{
+		if (!build_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light))
+		{
+			free_space(y0, x0, height, width);
+			
+			return (FALSE);
+		}
+	}
+	
 	/* Build an overlapping room with the above shape */
-	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, 1, NUM_SCATTER, pillars))
+	else if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, 1, NUM_SCATTER, pillars))
 	{
 		free_space(y0, x0, height, width);
 		
@@ -10136,8 +10639,19 @@ static bool build_type45(int room, int type)
 	y2b = y0 + y2b + 1;
 	x2b = x0 + x2b + 1;
 
+	/* Build a polygonal room */
+	if (type == ROOM_LARGE_CONCAVE)
+	{
+		if (!build_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light))
+		{
+			free_space(y0, x0, height, width);
+			
+			return (FALSE);
+		}
+	}
+	
 	/* Build an overlapping room with the above shape */
-	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, 1, NUM_SCATTER + 3, pillars))
+	else if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, 1, NUM_SCATTER + 3, pillars))
 	{
 		free_space(y0, x0, height, width);
 		
@@ -10256,8 +10770,19 @@ static bool build_type6(int room, int type)
 	y2b = y0 + y2b + 1;
 	x2b = x0 + x2b + 1;
 
+	/* Build a polygonal room */
+	if (type == ROOM_HUGE_CONCAVE)
+	{
+		if (!build_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light))
+		{
+			free_space(y0, x0, height, width);
+			
+			return (FALSE);
+		}
+	}
+	
 	/* Build an overlapping room with the above shape */
-	if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, scale, NUM_SCATTER + 8, pillars))
+	else if (!build_overlapping(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, spacing, scale, NUM_SCATTER + 8, pillars))
 	{
 		free_space(y0, x0, height, width);
 		
@@ -11060,8 +11585,6 @@ static bool build_type232425(int room, int type)
 
 
 
-
-
 /* The number of different races used for the pit ecology */
 /* XXX We assume this is at least 16 */
 #define NUM_PIT_RACES	16
@@ -11410,32 +11933,35 @@ static bool room_build(int room, int type)
 	switch (type)
 	{
 		/* Build an appropriate room */
-		case ROOM_MONSTER_TOWN: if (build_type2627(room, type)) return (TRUE); break;
+		case ROOM_MONSTER_TOWN:
 		case ROOM_MONSTER_PIT: if (build_type2627(room, type)) return (TRUE); break;
-		case ROOM_HUGE_NEST: if (build_type232425(room,type)) return(TRUE); break;
-		case ROOM_LARGE_NEST: if (build_type232425(room,type)) return(TRUE); break;
+		case ROOM_HUGE_NEST:
+		case ROOM_LARGE_NEST:
 		case ROOM_NEST: if (build_type232425(room,type)) return(TRUE); break;
-		case ROOM_HUGE_CAVE: if (build_type202122(room,type)) return(TRUE); break;
-		case ROOM_LARGE_CAVE: if (build_type202122(room,type)) return(TRUE); break;
+		case ROOM_HUGE_CAVE:
+		case ROOM_LARGE_CAVE:
 		case ROOM_CELL_CAVE: if (build_type202122(room,type)) return(TRUE); break;
-		case ROOM_HUGE_MAZE: if (build_type171819(room,type)) return(TRUE); break;
-		case ROOM_LARGE_MAZE: if (build_type171819(room,type)) return(TRUE); break;
+		case ROOM_HUGE_MAZE:
+		case ROOM_LARGE_MAZE:
 		case ROOM_MAZE: if (build_type171819(room,type)) return(TRUE); break;
 		case ROOM_LAIR: if (build_type16(room, type)) return(TRUE); break;
-		case ROOM_HUGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
-		case ROOM_LARGE_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
+		case ROOM_HUGE_FRACTAL:
+		case ROOM_LARGE_FRACTAL:
 		case ROOM_FRACTAL: if (build_type131415(room, type)) return(TRUE); break;
-		case ROOM_HUGE_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
+		case ROOM_HUGE_STAR_BURST:
 		case ROOM_STAR_BURST: if (build_type1112(room, type)) return(TRUE); break;
-		case ROOM_GREATER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
-		case ROOM_LESSER_VAULT: if (build_type8910(room, type)) return(TRUE); break;
+		case ROOM_GREATER_VAULT:
+		case ROOM_LESSER_VAULT:
 		case ROOM_INTERESTING: if (build_type8910(room, type)) return(TRUE); break;
 		case ROOM_CHAMBERS: if (build_type7(room, type)) return(TRUE); break;
+		case ROOM_HUGE_CONCAVE:
 		case ROOM_HUGE_CENTRE: if (build_type6(room, type)) return(TRUE); break;
-		case ROOM_LARGE_CENTRE: if (build_type45(room, type)) return(TRUE); break;
+		case ROOM_LARGE_CONCAVE:
+		case ROOM_LARGE_CENTRE:
 		case ROOM_LARGE_WALLS: if (build_type45(room, type)) return(TRUE); break;
-		case ROOM_NORMAL_CENTRE: if (build_type123(room, type)) return(TRUE); break;
-		case ROOM_NORMAL_WALLS: if (build_type123(room, type)) return(TRUE); break;
+		case ROOM_NORMAL_CONCAVE:
+		case ROOM_NORMAL_CENTRE:
+		case ROOM_NORMAL_WALLS:
 		case ROOM_NORMAL: if (build_type123(room, type)) return(TRUE); break;
 
 		default: if (build_type0(room, type)) return(TRUE); break;
