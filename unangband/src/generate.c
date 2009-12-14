@@ -144,6 +144,11 @@
 #define DUN_TRIES		5		/* Number of tries to connect two rooms, before increasing 'scope' for
 									connection attempts */
 
+/*
+ * Minimum rooms to try to generate in a dungeon
+ */
+#define MIN_DUN_ROOMS 	7
+
 
 /*
  * Dungeon streamer generation values
@@ -392,9 +397,9 @@ static room_data_type room_data[ROOM_MAX] =
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
 static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_CHAMBERS, ROOM_MONSTER_TOWN, ROOM_HUGE_MAZE, 
-						ROOM_HUGE_NEST, ROOM_HUGE_CAVE, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CENTRE, ROOM_LESSER_VAULT,
-						ROOM_MONSTER_PIT, ROOM_LARGE_NEST, ROOM_LARGE_MAZE, ROOM_LARGE_CAVE, ROOM_LARGE_FRACTAL, ROOM_LARGE_CENTRE,
-						ROOM_LARGE_WALLS, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_NEST, ROOM_MAZE, ROOM_CELL_CAVE, ROOM_FRACTAL,
+						ROOM_HUGE_NEST, ROOM_HUGE_CAVE, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CONCAVE, ROOM_HUGE_CENTRE, ROOM_LESSER_VAULT,
+						ROOM_MONSTER_PIT, ROOM_LARGE_NEST, ROOM_LARGE_MAZE, ROOM_LARGE_CAVE, ROOM_LARGE_FRACTAL, ROOM_LARGE_CONCAVE, ROOM_LARGE_CENTRE,
+						ROOM_LARGE_WALLS, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_NEST, ROOM_MAZE, ROOM_CELL_CAVE, ROOM_FRACTAL, ROOM_NORMAL_CONCAVE,
 						ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0, 0, 0, 0};
 
 
@@ -2377,194 +2382,6 @@ void edge_room(byte **grid, int size_y, int size_x)
 }
 
 
-
-/*
- * The following function is from http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The%20C%20Code
- * 
- * Copyright (c) 1970-2003, Wm. Randolph Franklin
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
- * (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, 
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
- * 2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided 
- * with the distribution.
- * 3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific 
- * prior written permission. 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
- */
-int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
-{
-	int i, j, c = 0;
-	
-	for (i = 0, j = nvert-1; i < nvert; j = i++) {
-		if ( ((verty[i]>testy) != (verty[j]>testy)) &&
-				(testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
-				c = !c;
-	}
-	return c;
-}
-
-
-
-/* It is possible to generate poly rooms with very small sizes. We ensure that these rooms have
- * a minimum size */
-#define MIN_POLY_ROOM_SIZE	17
-
-/*
- * Generates a room from a convex or concave polygon. We don't completely handle the complex (self-intersecting) case
- * but it could be extended to do so. Most of the smarts are on pnpoly (above).
- * 
- * *y and *x represent pairs of vertex coordinates. These should probably be ordered but may not require this.
- */
-static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16b edge, s16b pool, s16b require, byte cave_flag)
-{
-	float *verty, *vertx;
-	int i, xi, yi, size_y, size_x;
-	int y0 = 256;
-	int x0 = 256;
-	int y1 = 0;
-	int x1 = 0;
-	int floors = 0;
-	
-	byte **grid;
-
-	byte cave_flag_edge = (edge && f_info[edge].flags1 & (FF1_OUTER)) ? (cave_flag) : ((cave_flag) & ~(CAVE_ROOM));
-	
-	/* Allocate spaces for floating vertices */
-	verty = C_ZNEW(n+1,float);
-	vertx = C_ZNEW(n+1,float);
-	
-	/* Copy contents to floating array */
-	for (i = 0; i < n; i++)
-	{
-		verty[i] = (float)y[i];
-		vertx[i] = (float)x[i];
-		
-		/* Determine extents */
-		if (y[i] > y1) y1 = y[i];
-		if (y[i] < y0) y0 = y[i];
-		if (x[i] > x1) x1 = x[i];
-		if (x[i] < x0) x0 = x[i];
-	}
-	
-	/* Safety - repeat initial vertex at end of polygon */
-	if ((y[n-1] != y[0]) || (x[n-1] != x[0]))
-	{
-		verty[n] = (float)y[0];
-		vertx[n] = (float)x[0];
-		n++;
-	}
-
-	/* Get grid size */
-	size_y = y1 - y0 + 1;
-	size_x = x1 - x0 + 1;
-	
-	/* Allocate space for room */
-	grid  = C_ZNEW(size_y, byte*);
-		
-	/* Allocate space */
-	for(yi=0; yi<size_y; yi++)
-	{
-		grid[yi] = C_ZNEW(size_x, byte);
-	}
-	
-	/* Draw the polygon */
-	for (yi = 0; yi < size_y; yi++)
-	{
-		for (xi = 0; xi < size_x; xi++)
-		{
-			/* Point in the polygon */
-			if (pnpoly(n, verty, vertx, (float)(yi + y0), (float)(xi + x0)))
-			{
-				grid[yi][xi] = GRID_FLOOR;
-				floors++;
-			}
-			else
-			{
-				grid[yi][xi] = GRID_WALL;				
-			}
-		}
-	}
-	
-	/* Ensure minimum size */
-	if (floors < MIN_POLY_ROOM_SIZE) return (FALSE);
-	
-	/* Compute edge of room */
-	edge_room(grid, size_y, size_x);
-	
-	/* Write final grids out to map */
- 	for(yi=0; yi<size_y; yi++)
- 	for(xi=0; xi<size_x; xi++)
- 	{
- 		/* Paranoia - if require defined, don't overwrite anything else */
- 		if (require && (cave_feat[y1+yi][x1+xi] != require)) continue;
- 		
- 		switch(grid[yi][xi])
- 		{
-	 		case GRID_FLOOR:
-	 		{
-	 			if (floor) cave_set_feat(y1 + yi, x1 + xi, floor);
-	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
-
-	 			break;
-	 		}
-	 		case GRID_WALL:
-	 		{
-	 			if (wall || pool) cave_set_feat(y1 + yi, x1 + xi, pool ? pool : wall);
-	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
-	 			break;
-	 		}
-	 		case GRID_EDGE:
-	 		{
-	 			int d;
-	 			bool edged = FALSE;
-
-	 			if (edge || wall)
-	 			{
-		 			for (d = 0; d < 9; d++)
-		 			{
-		 				if ((yi + ddy_ddd[d] < 0) || (yi + ddy_ddd[d] >= size_y) || (xi + ddx_ddd[d] < 0) || (xi + ddx_ddd[d] >= size_x)) continue;
-		 				
-		 				if (grid[yi + ddy_ddd[d]][xi + ddx_ddd[d]] == GRID_FLOOR)
-		 				{
-							cave_set_feat(y1 + yi, x1 + xi, edge ? edge : wall);
-							cave_info[y1+yi][x1 + xi] |= (cave_flag_edge);
-							edged = TRUE;
-		 					break;
-		 				}
-		 			}
-	 			}
-	 			
-	 			/*if (!edged && wall) cave_set_feat(y1 + yi, x1 + xi, wall);*/
-	 			
-				break;
-	 		}
- 		}
- 	}
-	
- 	/* Free memory */
-	for(yi=0; yi<size_y; yi++)
-	{
-		FREE(grid[yi]);
-	}
-
-	FREE(grid);
-	FREE(verty);
-	FREE(vertx);
-	
-	return (TRUE);
-}
-
-
-
-
-
-
 #define REGION 25
 
 /*
@@ -2647,6 +2464,8 @@ int floodall(byte **map, int size_y, int size_x, int miny[REGION],int minx[REGIO
 
 } 
 
+
+
 /* joinall is an iterative step toward joining all map regions. 
 	The output map is guaranteed to have the same number of 
 	open spaces, or fewer, than the input. With enough 
@@ -2714,6 +2533,49 @@ int joinall(byte **mapin, byte **mapout, int size_y, int size_x)
 
 }
 
+
+/*
+ * Instead of joining the regions, we remove all but the largest region, and renumber
+ * this largest region 
+ */
+int removeallbutlargest(byte **map, int size_y, int size_x)
+{
+	int count[REGION];
+	int y, x, c = 2;
+	int retval;
+
+	retval = floodall(map, size_y, size_x, count, count); 
+
+	/* if we have multiple unconnected regions */ 		
+	if (retval > 1)
+	{ 
+		for (x = 0; x < REGION; x++)
+		{
+			count[REGION]=0;
+		}
+		
+		for (y = 0; y < size_y; y++)
+			for (x = 0; x < size_x; x++) 
+			{ 
+				count[map[y][x]]++;
+			}
+		
+		c = 0;
+		
+		for (x = 0; x < REGION; x++)
+		{
+			if (count[x] > count[c]) c = x;
+		}
+	}
+
+	/* Remove all but largest region */
+	for (y = 0; y < size_y; y++) 
+			for (x = 0; x < size_x; x++) 
+				if (map[y][x] == c) map[y][x] = 1; 
+				else map[y][x] = 0; 
+	
+	return(1);
+}
 
 
 /*
@@ -2885,6 +2747,200 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 	
 	return (TRUE);
 }
+
+
+/*
+ * The following function is from http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The%20C%20Code
+ * 
+ * Copyright (c) 1970-2003, Wm. Randolph Franklin
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
+ * (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, 
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimers.
+ * 2. Redistributions in binary form must reproduce the above copyright notice in the documentation and/or other materials provided 
+ * with the distribution.
+ * 3. The name of W. Randolph Franklin may not be used to endorse or promote products derived from this Software without specific 
+ * prior written permission. 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ */
+int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
+{
+	int i, j, c = 0;
+	
+	for (i = 0, j = nvert-1; i < nvert; j = i++) {
+		if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+				(testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+				c = !c;
+	}
+	return c;
+}
+
+
+
+
+/* It is possible to generate poly rooms with very small sizes. We ensure that these rooms have
+ * a minimum size */
+#define MIN_POLY_ROOM_SIZE	17
+
+/*
+ * Generates a room from a convex or concave polygon. We don't completely handle the complex (self-intersecting) case
+ * but it could be extended to do so. Most of the smarts are on pnpoly (above).
+ * 
+ * *y and *x represent pairs of vertex coordinates. These should probably be ordered but may not require this.
+ */
+static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16b edge, s16b pool, s16b require, byte cave_flag)
+{
+	float *verty, *vertx;
+	int i, xi, yi, size_y, size_x;
+	int y0 = 256;
+	int x0 = 256;
+	int y1 = 0;
+	int x1 = 0;
+	int floors = 0;
+	
+	byte **grid;
+
+	byte cave_flag_edge = (edge && f_info[edge].flags1 & (FF1_OUTER)) ? (cave_flag) : ((cave_flag) & ~(CAVE_ROOM));
+	
+	/* Allocate spaces for floating vertices */
+	verty = C_ZNEW(n+1,float);
+	vertx = C_ZNEW(n+1,float);
+	
+	/* Copy contents to floating array */
+	for (i = 0; i < n; i++)
+	{
+		verty[i] = (float)y[i];
+		vertx[i] = (float)x[i];
+		
+		/* Determine extents */
+		if (y[i] > y1) y1 = y[i];
+		if (y[i] < y0) y0 = y[i];
+		if (x[i] > x1) x1 = x[i];
+		if (x[i] < x0) x0 = x[i];
+	}
+	
+	/* Safety - repeat initial vertex at end of polygon */
+	if ((y[n-1] != y[0]) || (x[n-1] != x[0]))
+	{
+		verty[n] = (float)y[0];
+		vertx[n] = (float)x[0];
+		n++;
+	}
+	
+	/* Allocate space for the region borders */
+	y0--; x0--; y1++; x1++;
+
+	/* Get grid size */
+	size_y = y1 - y0 + 1;
+	size_x = x1 - x0 + 1;
+	
+	/* Allocate space for room */
+	grid  = C_ZNEW(size_y, byte*);
+		
+	/* Allocate space */
+	for(yi=0; yi<size_y; yi++)
+	{
+		grid[yi] = C_ZNEW(size_x, byte);
+	}
+	
+	/* Draw the polygon */
+	for (yi = 0; yi < size_y; yi++)
+	{
+		for (xi = 0; xi < size_x; xi++)
+		{
+			/* Point in the polygon */
+			if (pnpoly(n, verty, vertx, (float)(yi + y0), (float)(xi + x0)))
+			{
+				grid[yi][xi] = GRID_FLOOR;
+				floors++;
+			}
+			else
+			{
+				grid[yi][xi] = GRID_WALL;
+			}
+		}
+	}
+	
+	/* Ensure minimum size */
+	if (floors < MIN_POLY_ROOM_SIZE) return (FALSE);
+	
+	/* Remove all but largest region */
+	removeallbutlargest(grid, size_y, size_x);
+	
+	/* Compute edge of room */
+	edge_room(grid, size_y, size_x);
+	
+	/* Write final grids out to map */
+ 	for(yi=0; yi<size_y; yi++)
+ 	for(xi=0; xi<size_x; xi++)
+ 	{
+ 		/* Paranoia - if require defined, don't overwrite anything else */
+ 		if (require && (cave_feat[y1+yi][x1+xi] != require)) continue;
+ 		
+ 		switch(grid[yi][xi])
+ 		{
+	 		case GRID_FLOOR:
+	 		{
+	 			if (floor) cave_set_feat(y1 + yi, x1 + xi, floor);
+	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
+
+	 			break;
+	 		}
+	 		case GRID_WALL:
+	 		{
+	 			if (wall || pool) cave_set_feat(y1 + yi, x1 + xi, pool ? pool : wall);
+	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
+	 			break;
+	 		}
+	 		case GRID_EDGE:
+	 		{
+	 			int d;
+	 			bool edged = FALSE;
+
+	 			if (edge || wall)
+	 			{
+		 			for (d = 0; d < 9; d++)
+		 			{
+		 				if ((yi + ddy_ddd[d] < 0) || (yi + ddy_ddd[d] >= size_y) || (xi + ddx_ddd[d] < 0) || (xi + ddx_ddd[d] >= size_x)) continue;
+		 				
+		 				if (grid[yi + ddy_ddd[d]][xi + ddx_ddd[d]] == GRID_FLOOR)
+		 				{
+							cave_set_feat(y1 + yi, x1 + xi, edge ? edge : wall);
+							cave_info[y1+yi][x1 + xi] |= (cave_flag_edge);
+							edged = TRUE;
+		 					break;
+		 				}
+		 			}
+	 			}
+	 			
+	 			/*if (!edged && wall) cave_set_feat(y1 + yi, x1 + xi, wall);*/
+	 			
+				break;
+	 		}
+ 		}
+ 	}
+	
+ 	/* Free memory */
+	for(yi=0; yi<size_y; yi++)
+	{
+		FREE(grid[yi]);
+	}
+
+	FREE(grid);
+	FREE(verty);
+	FREE(vertx);
+	
+	return (TRUE);
+}
+
+
+
+
 
 
 
@@ -3899,6 +3955,10 @@ static void generate_patt(int y1, int x1, int y2, int x2, s16b feat, u32b flag, 
  * We allocate space in 11x11 blocks, but want to make sure that rooms
  * align neatly on the standard screen.  Therefore, we make them use
  * blocks in few 11x33 rectangles as possible.
+ * 
+ * AD - This routine fails far too frequently, so have attempted to
+ * reduce the failures by sliding the room around a little if it fails,
+ * rather than randomly generating new possible location.
  *
  * Be careful to include the edges of the room in height and width!
  *
@@ -3909,10 +3969,10 @@ static bool find_space(int *y, int *x, int height, int width)
 {
 	int i;
 	int by, bx, by1, bx1, by2, bx2;
-	int block_y, block_x;
+	int block_y = 0;
+	int block_x = 0;
 
 	bool filled;
-
 
 	/* Find out how many blocks we need. */
 	int blocks_high = 1 + ((height - 1) / BLOCK_HGT);
@@ -3947,14 +4007,45 @@ static bool find_space(int *y, int *x, int height, int width)
 			/* Keep in dungeon */
 			if (block_y < 0) block_y = 0;
 			if (block_x < 0) block_x = 0;
-			if (block_y + blocks_high > dun->row_rooms) block_y = dun->row_rooms - blocks_high;
-			if (block_x + blocks_wide > dun->col_rooms) block_x = dun->col_rooms - blocks_wide;
+			if (block_y + blocks_high >= dun->row_rooms) block_y = dun->row_rooms - blocks_high - 1;
+			if (block_x + blocks_wide >= dun->col_rooms) block_x = dun->col_rooms - blocks_wide - 1;
 		}
+		/* We try to use the previous attempt as an indicator where not to try this iteration */
 		else
 		{
-			/* Pick a top left block at random */
-			block_y = rand_int(dun->row_rooms - blocks_high);
-			block_x = rand_int(dun->col_rooms - blocks_wide);
+			/* Let sufficient random picks occur */
+			if ((i % 3 != 2) || (dun->cent_n < MIN_DUN_ROOMS))
+			{
+				/* Pick a random y */
+				block_y = rand_int(dun->row_rooms - blocks_high);
+			}
+			/* Flip y if previous pick was near an edge */
+			else if ((block_y < blocks_high) || (block_y >= dun->row_rooms - 2 * blocks_high))
+			{
+				block_y = dun->row_rooms - blocks_high - block_y - 1;
+			}
+			/* Otherwise try a random edge */
+			else
+			{
+				block_y = rand_int(100) < 50 ? 0 : dun->row_rooms - blocks_high - 1;
+			}
+			
+			/* Let sufficient random picks occur */
+			if ((i % 3 != 1) || (dun->cent_n < MIN_DUN_ROOMS))
+			{
+				block_x = rand_int(dun->col_rooms - blocks_wide);
+			}
+			/* Flip x if previous pick was an edge */
+			else if ((block_x < blocks_wide) || (block_x >= dun->col_rooms - 2 * blocks_wide))
+			{
+				block_x = dun->col_rooms - blocks_wide - block_x - 1;
+			}
+			/* Otherwise try a random edge */
+			else
+			{
+				/* Pick a random x */
+				block_x = rand_int(100) < 50 ? 0 : dun->col_rooms - blocks_wide - 1;
+			}
 		}
 		
 		/* Itty-bitty rooms can shift about within their rectangle */
@@ -4020,7 +4111,7 @@ static bool find_space(int *y, int *x, int height, int width)
 				}
 			}
 		}
-
+		
 		/* If space filled, try again. */
 		if (filled) continue;
 
@@ -8652,18 +8743,25 @@ static void rand_dir_cave(int *row_dir, int *col_dir, int y, int x)
  * corridors
  */
 
-#define TUNNEL_STYLE	4L	/* First 'real' style */
-#define TUNNEL_CRYPT_L	4L
-#define TUNNEL_CRYPT_R	8L
-#define TUNNEL_LARGE_L	16L
-#define TUNNEL_LARGE_R	32L
-#define TUNNEL_CAVE		64L
-#define TUNNEL_PATH		128L
+#define TUNNEL_STYLE	0x00000004L	/* First 'real' style */
+#define TUNNEL_CRYPT_L	0x00000004L
+#define TUNNEL_CRYPT_R	0x00000008L
+#define TUNNEL_LARGE_L	0x00000010L
+#define TUNNEL_LARGE_R	0x00000020L
+#define TUNNEL_CAVE		0x00000040L
+#define TUNNEL_PATH		0x00000080L
+#define TUNNEL_ANGLE	0x00000100L
 
 static u32b get_tunnel_style(void)
 {
 	int style = 0;
 	int i = rand_int(100);
+
+	/* Polygonal levels have direct straight paths between locations */
+	if (level_flag & (LF1_POLYGON))
+	{
+		style |= (TUNNEL_ANGLE);
+	}	
 
 	/* Wilderness have direct paths between locations */
 	/* From FAAngband */
@@ -8671,7 +8769,7 @@ static u32b get_tunnel_style(void)
 	{
 		style |= (TUNNEL_PATH);
 	}
-
+	
 	/* Stronghold levels have width 2 corridors, or width 3 corridors, often with pillars */
 	/* The style of the tunnel does not change after initial selection */
 	else if (level_flag & (LF1_STRONGHOLD))
@@ -8681,7 +8779,7 @@ static u32b get_tunnel_style(void)
 	}
 	/* Dungeon levels have width 1 corridors, or width 2 corridors deeper in the dungeon */
 	/* The style of the tunnel does not change after initial selection */
-	else if (level_flag & (LF1_DUNGEON))
+	else if (level_flag & (LF1_DUNGEON | LF1_POLYGON))
 	{
 		if (i < p_ptr->depth) style |= (i % 2) ? (TUNNEL_LARGE_L) : (TUNNEL_LARGE_R);
 	}
@@ -8714,7 +8812,7 @@ static u32b get_tunnel_style(void)
 	}
 
 	style |= rand_int(TUNNEL_STYLE);
-
+	
 	return (style);
 }
 
@@ -8743,6 +8841,7 @@ static bool add_decor(int y, int x, int t)
 
 	return (FALSE);
 }
+
 
 /*
  * Record location for entrance to room through outer wall
@@ -8991,22 +9090,22 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	/* Partition to mark array with */
 	int part1 = CENT_MAX;
 
-	/* Details for tunnel style TUNNEL_PATH */
+	/* Details for tunnel style TUNNEL_PATH & TUNNEL_ANGLE*/
 	u16b path[512];
 	int path_n = 0;
 	int path_i = 0;
-
+	
 	/* Keep stronghold / dungeon / sewer corridors tidy */
-	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON | LF1_SEWER | LF1_WILD)) != 0) tunnel_style_timer = -1;
+	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON | LF1_SEWER | LF1_WILD | LF1_POLYGON)) != 0) tunnel_style_timer = -1;
 
 	/* Readjust movement counter for caves */
 	if ((style & TUNNEL_CAVE) != 0) rand_dir_timer = randint(DUN_TUN_CAV * 2);
 
-	/* Don't adjust paths */
-	if ((style & TUNNEL_PATH) != 0)
+	/* Don't adjust paths / angles */
+	if ((style & (TUNNEL_PATH | TUNNEL_ANGLE)) != 0)
 	{
-		rand_dir_timer = 0;
-		adjust_dir_timer = 0;
+		rand_dir_timer = -1;
+		adjust_dir_timer = -1;
 	}
 
 	/* Reset the arrays */
@@ -9041,7 +9140,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	}
 
 	/* Get path direction */
-	if (style & (TUNNEL_PATH))
+	if (style & (TUNNEL_PATH | TUNNEL_ANGLE))
 	{
 		int tmp_row2 = row2;
 		int tmp_col2 = col2;
@@ -9153,7 +9252,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			}
 
 			/* Get path direction */
-			if ((style & (TUNNEL_PATH)) && (path_i))
+			if ((style & (TUNNEL_PATH | TUNNEL_ANGLE)) && (path_i))
 			{
 				if (path_i < path_n)
 				{
@@ -9164,6 +9263,28 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				else
 				{
 					correct_dir_timer = 1;
+				}
+			}
+			
+			/* Get path direction */
+			if ((style & (TUNNEL_PATH | TUNNEL_ANGLE)) &&
+				((correct_dir_timer == 0) || (rand_dir_timer == 0) || (adjust_dir_timer == 0)))
+			{
+				int tmp_row2 = row2;
+				int tmp_col2 = col2;
+
+				/* Start out in correct direction */
+				path_n = project_path(path, 512, row1, col1, &tmp_row2, &tmp_col2, (PROJECT_THRU | PROJECT_PASS));
+
+				/* Reset path_i */
+				path_i = 0;
+
+				/* Distance to go */
+				if (path_n)
+				{
+					/* Sanity check */
+					row_dir = GRID_Y(path[path_i]) - row1;
+					col_dir = GRID_X(path[path_i]) - col1;
 				}
 			}
 
@@ -9195,27 +9316,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Go in correct direction. */
 			if (correct_dir_timer == 0)
 			{
-				/* Get path direction */
-				if (style & (TUNNEL_PATH))
-				{
-					int tmp_row2 = row2;
-					int tmp_col2 = col2;
-
-					/* Start out in correct direction */
-					path_n = project_path(path, 512, row1, col1, &tmp_row2, &tmp_col2, (PROJECT_THRU | PROJECT_PASS));
-
-					/* Reset path_i */
-					path_i = 0;
-
-					/* Distance to go */
-					if (path_n)
-					{
-						/* Sanity check */
-						row_dir = GRID_Y(path[path_i]) - row1;
-						col_dir = GRID_X(path[path_i]) - col1;
-					}
-				}
-				else if ((style & TUNNEL_CAVE) != 0)
+				if ((style & (TUNNEL_CAVE)) != 0)
 				{
 					/* Allow diagonals */
 					correct_dir_cave(&row_dir, &col_dir, row1, col1, row2, col2);
@@ -9248,7 +9349,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 				row1 = dun->tunn[last_turn - 1].y;
 				col1 = dun->tunn[last_turn - 1].x;
 
-				if (style & (TUNNEL_PATH)) correct_dir_timer = 1;
+				if (style & (TUNNEL_PATH | TUNNEL_ANGLE)) correct_dir_timer = 1;
 			}
 
 			/* Clear temp flags */
@@ -9474,6 +9575,17 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					/* Merging successfully */
 					if (cheat_room) message_add(format("Merging partition %d (room %d) with %d (room %d) (length %d).", part1, start_room, part2, end_room, dun->tunn_n), MSG_GENERIC);
 
+					/* Report tunnel style */
+					if (cheat_room)
+					{
+						message_add(format("Tunnel style: %s%s%s%s%s%s", (style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R)) ? "Crypt" : "",
+								(style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R)) ? "Large" : "",
+								(style & (TUNNEL_CAVE)) ? "Cave" : "",
+								(style & (TUNNEL_PATH)) ? "Path" : "",
+								(style & (TUNNEL_ANGLE)) ? "Angle" : "",
+								(style < (TUNNEL_STYLE)) ? "None" : ""), MSG_GENERIC);
+					}
+					
 					/* Merge partitions */
 					for (i = 0; i < dun->cent_n; i++)
 					{
@@ -9521,7 +9633,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 		}
 
 		/* Handle corridor intersections or overlaps */
-		else if (((play_info[tmp_row][tmp_col] & (PLAY_SAFE)) != 0) && ((style & (TUNNEL_PATH)) == 0))
+		else if (((play_info[tmp_row][tmp_col] & (PLAY_SAFE)) != 0) && ((style & (TUNNEL_PATH | TUNNEL_ANGLE)) == 0))
 		{
 			bool pillar = FALSE;
 
@@ -10020,12 +10132,23 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					abort_and_cleanup = FALSE;
 				}
 			}
+			
+			/* Report tunnel style */
+			if (cheat_room)
+			{
+				message_add(format("Tunnel style: %s%s%s%s%s%s", (style & (TUNNEL_CRYPT_L | TUNNEL_CRYPT_R)) ? "Crypt" : "",
+						(style & (TUNNEL_LARGE_L | TUNNEL_LARGE_R)) ? "Large" : "",
+						(style & (TUNNEL_CAVE)) ? "Cave" : "",
+						(style & (TUNNEL_PATH)) ? "Path" : "",
+						(style & (TUNNEL_ANGLE)) ? "Angle" : "",
+						(style < (TUNNEL_STYLE)) ? "None" : ""), MSG_GENERIC);
+			}
 
 			/* Accept tunnel */
 			break;
 		}
 
-		if (style & (TUNNEL_PATH))
+		if (style & (TUNNEL_PATH | TUNNEL_ANGLE))
 		{
 			/* Increase path count if required */
 			path_i++;
@@ -12606,18 +12729,23 @@ static bool place_rooms()
 	int i, j, k;
 
 	int rooms_built = 0;
+	bool chance, not_max_n, not_max_t;
+	int count = 0;
+
+	/* Check if this is the last room type we can place for this theme. If so, continue to place it. */
+	bool last = FALSE;
+
+	int try_rooms = MIN_DUN_ROOMS + rand_int(DUN_ROOMS - MIN_DUN_ROOMS - 1);
 
 	/*
 	 * Build each type of room in turn until we cannot build any more.
 	 */
 	for (i = ((level_flag & (LF1_ROOMS)) != 0) ? 0 : ROOM_MAX - 1;
-			(i < ROOM_MAX) && (dun->cent_n < DUN_ROOMS - 1); i++)
+			(count++ < 100) && (i < ROOM_MAX) && (dun->cent_n < try_rooms - 1);
+			last ? /* Do nothing */ : i++)
 	{
 		/* What type of room are we building now? */
 		int room_type = room_build_order[i];
-
-		/* Check if this is the last room type we can place for this theme. If so, continue to place it. */
-		bool last = FALSE;
 
 		/* A series of checks for rooms only */
 		if ((level_flag & (LF1_ROOMS)) != 0)
@@ -12647,14 +12775,26 @@ static bool place_rooms()
 			/* Place tunnel endpoints only */
 			room_type = 0;
 		}
+		
+		/*
+		 * Used to track why room building fails
+		 */
+		chance = rand_int(100) < room_data[room_type].chance[p_ptr->depth < 60 ? p_ptr->depth / 6 : 10];
+		not_max_n = rooms_built < room_data[room_type].max_number;
+		not_max_t = dun->cent_n < try_rooms - 1;
 
 		/* Build the room. */
-		while (((last) || (rand_int(100) < room_data[room_type].chance[p_ptr->depth < 60 ? p_ptr->depth / 6 : 6]))
+		while (((last) || (chance)) && (not_max_n) && (not_max_t)
+				&& (room_build(dun->cent_n + 1, room_type)))
+#if 0		
+		/* Build the room. */
+		while (((last) || (rand_int(100) < room_data[room_type].chance[p_ptr->depth < 60 ? p_ptr->depth / 6 : 10]))
 			&& (rooms_built < room_data[room_type].max_number) && (dun->cent_n < DUN_ROOMS - 1) &&
 				(room_build(dun->cent_n + 1, room_type)))
+#endif
 		{
 			/* Built room */
-			if (cheat_room) message_add(format("Built room type %d.", room_type), MSG_GENERIC);
+			if (cheat_xtra) message_add(format("Built room type %d.", room_type), MSG_GENERIC);
 
 			/* Increase the room built count. */
 			rooms_built += room_data[room_type].count_as;
@@ -12684,6 +12824,15 @@ static bool place_rooms()
 					level_flag |= (1L << choice);
 				}
 			}
+		}
+		
+		/* Track failures */
+		if (cheat_room)
+		{
+			if (!chance) message_add(format("Chance to generate room %d failed.", room_type), MSG_GENERIC);
+			else if (!not_max_n) message_add(format("Maximum number of room %d reached.", room_type), MSG_GENERIC);
+			else if (!not_max_t) message_add("Maximum number of rooms reached.", MSG_GENERIC);
+			else message_add(format("Unable to place any room %d.", room_type), MSG_GENERIC);
 		}
 	}
 
