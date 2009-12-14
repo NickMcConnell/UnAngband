@@ -145,10 +145,10 @@
 									connection attempts */
 
 /*
- * Minimum rooms to try to generate in a dungeon
+ * Number of rooms to try to generate in a dungeon
  */
-#define MIN_DUN_ROOMS 	7
-
+#define MIN_DUN_ROOMS 	8 - (p_ptr->depth / 10)
+#define MAX_DUN_ROOMS	DUN_ROOMS - (p_ptr->depth / 6)
 
 /*
  * Dungeon streamer generation values
@@ -357,37 +357,37 @@ static room_data_type room_data[ROOM_MAX] =
 {
    /* Depth:         0   6   12   18   24   30   36   42   48   54  60  min max_num count, theme*/
 
-   /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_NEST | LF1_WILD | LF1_CAVERN},
-   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_THEME & ~(LF1_STRONGHOLD | LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_LABYRINTH)},
+   /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_WILD | LF1_CAVERN | LF1_MINE | LF1_LABYRINTH},
+   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_DUNGEON | LF1_MINE | LF1_DESTROYED | LF1_WILD | LF1_CRYPT},
    /* Walls   */  {{80,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_CRYPT | LF1_WILD},
    /* Centre */   {{60,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_WILD},
-   /* Lrg cent */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_WILD},
+   /* Lrg cent */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
    /* Xlg cent */ {{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 11,  3,	3, 0, LF1_STRONGHOLD},
-   /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	6,		3, 0, LF1_DUNGEON},
-   /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  4,		1, 0, LF1_DUNGEON},
-   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	4,		2, 0, LF1_CRYPT | LF1_DUNGEON},
-   /* G. Vault */ {{ 0,   0,   0,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		3, 0, LF1_STRONGHOLD},
-   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS,	2, 0, LF1_DUNGEON | LF1_CAVERN | LF1_LAIR | LF1_SEWER},
-   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		3, 0, LF1_LAIR | LF1_SEWER},
-   /* Fractal */  {{ 0,  30,  60,  80,  90,  95,  90,  90,  90,  90,  90},  3,DUN_ROOMS,	2, 0, LF1_CAVE | LF1_SEWER},
-   /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS / 2,	3, 0, LF1_CAVE},
-   /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	1,		4, 0, LF1_CAVE},
-   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		1, 0, LF1_LAIR | LF1_WILD},
-   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DESTROYED)},
-   /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_DESTROYED)},
-   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_DESTROYED)},
-   /* Cell cave */{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,		1, 0, LF1_CAVERN | LF1_SEWER},
+   /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	4,		5, 0, LF1_DUNGEON},
+   /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  6,		1, 0, LF1_THEME},
+   /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	3,		3, 0, LF1_THEME},
+   /* G. Vault */ {{ 0,   0,   0,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		6, 0, LF1_THEME},
+   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS/2,	2, 0, LF1_CAVERN | LF1_MINE | LF1_SEWER},
+   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		4, 0, LF1_MINE | LF1_SEWER},
+   /* Fractal */  {{ 0,  30,  60,  80,  90,  95,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	1, 0, LF1_CAVE | LF1_MINE},
+   /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS/3,	2, 0, LF1_CAVE},
+   /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	3,		3, 0, LF1_CAVE},
+   /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		6, 0, LF1_MINE | LF1_WILD},
+   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DESTROYED)},
+   /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/3,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
+   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
+   /* Cell cave */{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,		1, 0, LF1_CAVERN | LF1_MINE},
    /* Lrg cell */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,		2, 0, LF1_CAVERN},
-   /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_CAVERN},
+   /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_CAVERN},
    /* Nest */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
    /* Lrg nest */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
-   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
-   /* Concave */  {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_DUNGEON | LF1_POLYGON | LF1_LAIR | LF1_SEWER},
-   /* Lrg c.cave*/{{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_POLYGON | LF1_DUNGEON},
+   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Monst.pit */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	2,		2, 0, LF1_DUNGEON | LF1_CRYPT | LF1_LABYRINTH},
+   /* Monst.town */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		6, 0, LF1_DUNGEON | LF1_CAVERN | LF1_MINE},
+   /* Concave */  {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90}, 1,DUN_ROOMS,	1, 0, LF1_DUNGEON | LF1_POLYGON | LF1_MINE},
+   /* Lrg c.cave*/{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50},  3,DUN_ROOMS/2,	2, 0, LF1_POLYGON},
    /* Xlg ccave */{{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 11,  3,	3, 0, LF1_POLYGON},
-   /* Monst.pit */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	1,		2, 0, LF1_DUNGEON | LF1_CRYPT},
-   /* Monst.town */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		2, 0, LF1_DUNGEON | LF1_CAVERN},
    /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 11,	1,		2, 0, LF1_WILD | LF1_CAVERN | LF1_SEWER},
    /* Huge lake */{{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 21,	1,		3, 0, LF1_WILD | LF1_CAVERN | LF1_SEWER},
    /* Tower */    {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 1,	1,		3, 0, LF1_TOWER}
@@ -2880,21 +2880,21 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
  	for(xi=0; xi<size_x; xi++)
  	{
  		/* Paranoia - if require defined, don't overwrite anything else */
- 		if (require && (cave_feat[y1+yi][x1+xi] != require)) continue;
+ 		if (require && (cave_feat[y0+yi][x0+xi] != require)) continue;
  		
  		switch(grid[yi][xi])
  		{
 	 		case GRID_FLOOR:
 	 		{
-	 			if (floor) cave_set_feat(y1 + yi, x1 + xi, floor);
-	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
+	 			if (floor) cave_set_feat(y0 + yi, x0 + xi, floor);
+	 			cave_info[y0+yi][x0+xi] |= (cave_flag);
 
 	 			break;
 	 		}
 	 		case GRID_WALL:
 	 		{
-	 			if (wall || pool) cave_set_feat(y1 + yi, x1 + xi, pool ? pool : wall);
-	 			cave_info[y1+yi][x1+xi] |= (cave_flag);
+	 			if (wall || pool) cave_set_feat(y0 + yi, x0 + xi, pool ? pool : wall);
+	 			cave_info[y0+yi][x0+xi] |= (cave_flag);
 	 			break;
 	 		}
 	 		case GRID_EDGE:
@@ -2910,15 +2910,15 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
 		 				
 		 				if (grid[yi + ddy_ddd[d]][xi + ddx_ddd[d]] == GRID_FLOOR)
 		 				{
-							cave_set_feat(y1 + yi, x1 + xi, edge ? edge : wall);
-							cave_info[y1+yi][x1 + xi] |= (cave_flag_edge);
+							cave_set_feat(y0 + yi, x0 + xi, edge ? edge : wall);
+							cave_info[y0+yi][x0 + xi] |= (cave_flag_edge);
 							edged = TRUE;
 		 					break;
 		 				}
 		 			}
 	 			}
 	 			
-	 			/*if (!edged && wall) cave_set_feat(y1 + yi, x1 + xi, wall);*/
+	 			/*if (!edged && wall) cave_set_feat(y0 + yi, x0 + xi, wall);*/
 	 			
 				break;
 	 		}
@@ -4013,8 +4013,8 @@ static bool find_space(int *y, int *x, int height, int width)
 		/* We try to use the previous attempt as an indicator where not to try this iteration */
 		else
 		{
-			/* Let sufficient random picks occur */
-			if ((i % 3 != 2) || (dun->cent_n < MIN_DUN_ROOMS))
+			/* Random initial pick, else vary y half the time */
+			if (i % 3 != 2)
 			{
 				/* Pick a random y */
 				block_y = rand_int(dun->row_rooms - blocks_high);
@@ -4030,8 +4030,8 @@ static bool find_space(int *y, int *x, int height, int width)
 				block_y = rand_int(100) < 50 ? 0 : dun->row_rooms - blocks_high - 1;
 			}
 			
-			/* Let sufficient random picks occur */
-			if ((i % 3 != 1) || (dun->cent_n < MIN_DUN_ROOMS))
+			/* Random initial pick, else vary x half the time */
+			if (i % 3 != 1)
 			{
 				block_x = rand_int(dun->col_rooms - blocks_wide);
 			}
@@ -4290,12 +4290,9 @@ bool cave_feat_lake(int f_idx)
 	feature_type *f_ptr = &f_info[f_idx];
 
 	/* Require lake or river */
-	if (!(f_ptr->flags2 & (FF2_RIVER)))
+	if ((f_ptr->flags2 & (FF2_LAKE | FF2_RIVER)) == 0)
 	{
-		if (!(f_ptr->flags2 & (FF2_LAKE)))
-		{
-			return (FALSE);
-		}
+		return (FALSE);
 	}
 
 	/* Okay */
@@ -8342,12 +8339,6 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 	 */
 	bool solid_lake = ((f_info[feat].flags1 & (FF1_WALL)) != 0);
 
-	/* Wilderness dungeon */
-	if (!solid_lake)
-	{
-		level_flag |= (LF1_WILD);
-	}
-	
 	/* Solid lakes are made very large sometimes */
 	if (solid_lake || !rand_int(3)) do_big_lake = TRUE;
 
@@ -8398,13 +8389,13 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 	while (TRUE)
 	{
 		/* Too many tries. Reject lake */
-		if (++tries >= 75) return (FALSE);
+		if (++tries >= 25) return (FALSE);
 
 		/* Pick a random block */
 		if (!merge_lakes || solid_lake)
 		{
-			by0 = rand_int(dun->row_rooms);
-			bx0 = rand_int(dun->col_rooms);
+			by0 = ld->dy1 + rand_int(dun->row_rooms - ld->dy2);
+			bx0 = ld->dx1 + rand_int(dun->col_rooms - ld->dx2);
 		}
 		/* Force lake overlapping */
 		else
@@ -8456,9 +8447,6 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 		{
 			flag |= (STAR_BURST_LIGHT);
 		}
-		
-		/* Block out exactly the centre grid only */
-		dun->room_map[by0][bx0] = TRUE;
 	}
 
 	/*
@@ -8470,8 +8458,21 @@ static bool build_lake(int feat, bool do_big_lake, bool merge_lakes,
 	wid = (wid - 4) / 2;
 
 	/* Place the lake */
-	generate_starburst_room(*y0 - hgt, *x0 - wid, *y0 + hgt, *x0 + wid,
-		feat, f_info[feat].edge, flag);
+	if (!generate_starburst_room(*y0 - hgt, *x0 - wid, *y0 + hgt, *x0 + wid,
+		feat, f_info[feat].edge, flag))
+	{
+		return (FALSE);
+	}
+	
+	/* Store extra information for passable lakes */
+	if (!solid_lake)
+	{
+		/* Wilderness dungeon */
+		level_flag |= (LF1_WILD);
+
+		/* Block out exactly the centre grid only */
+		dun->room_map[by0][bx0] = TRUE;
+	}
 
 #ifdef ENABLE_WAVES
 	/* Special case -- Give some flavor to water lakes */
@@ -8798,10 +8799,9 @@ static u32b get_tunnel_style(void)
 		if (i < 50) style |= (TUNNEL_CRYPT_L);
 		if ((i < 25) || (i >= 75)) style |= (TUNNEL_CRYPT_R);
 	}
-	/* Cave levels have narrow, frequently random corridors. Mines occasionally do. */
+	/* Cave and nest levels have narrow, frequently random corridors. Mines occasionally do. */
 	/* Caverns have wider corridors than caves */
-	/* Nests have longer straights than other levels. */
-	else if (((level_flag & (LF1_CAVE | LF1_CAVERN)) != 0) || (((level_flag & (LF1_NEST)) != 0) && (i < 33)))
+	else if (((level_flag & (LF1_CAVE | LF1_CAVERN | LF1_NEST)) != 0) || (((level_flag & (LF1_MINE)) != 0) && (i < 33)))
 	{
 		style |= (TUNNEL_CAVE);
 		if ((level_flag & (LF1_CAVERN)) != 0)
@@ -12729,13 +12729,12 @@ static bool place_rooms()
 	int i, j, k;
 
 	int rooms_built = 0;
-	bool chance, not_max_n, not_max_t;
 	int count = 0;
 
 	/* Check if this is the last room type we can place for this theme. If so, continue to place it. */
 	bool last = FALSE;
 
-	int try_rooms = MIN_DUN_ROOMS + rand_int(DUN_ROOMS - MIN_DUN_ROOMS - 1);
+	int try_rooms = MIN_DUN_ROOMS + rand_int(MAX_DUN_ROOMS - MIN_DUN_ROOMS);
 
 	/*
 	 * Build each type of room in turn until we cannot build any more.
@@ -12776,25 +12775,13 @@ static bool place_rooms()
 			room_type = 0;
 		}
 		
-		/*
-		 * Used to track why room building fails
-		 */
-		chance = rand_int(100) < room_data[room_type].chance[p_ptr->depth < 60 ? p_ptr->depth / 6 : 10];
-		not_max_n = rooms_built < room_data[room_type].max_number;
-		not_max_t = dun->cent_n < try_rooms - 1;
-
-		/* Build the room. */
-		while (((last) || (chance)) && (not_max_n) && (not_max_t)
-				&& (room_build(dun->cent_n + 1, room_type)))
-#if 0		
 		/* Build the room. */
 		while (((last) || (rand_int(100) < room_data[room_type].chance[p_ptr->depth < 60 ? p_ptr->depth / 6 : 10]))
 			&& (rooms_built < room_data[room_type].max_number) && (dun->cent_n < DUN_ROOMS - 1) &&
 				(room_build(dun->cent_n + 1, room_type)))
-#endif
 		{
 			/* Built room */
-			if (cheat_xtra) message_add(format("Built room type %d.", room_type), MSG_GENERIC);
+			if (cheat_room) message_add(format("Built room type %d.", room_type), MSG_GENERIC);
 
 			/* Increase the room built count. */
 			rooms_built += room_data[room_type].count_as;
@@ -12824,16 +12811,7 @@ static bool place_rooms()
 					level_flag |= (1L << choice);
 				}
 			}
-		}
-		
-		/* Track failures */
-		if (cheat_room)
-		{
-			if (!chance) message_add(format("Chance to generate room %d failed.", room_type), MSG_GENERIC);
-			else if (!not_max_n) message_add(format("Maximum number of room %d reached.", room_type), MSG_GENERIC);
-			else if (!not_max_t) message_add("Maximum number of rooms reached.", MSG_GENERIC);
-			else message_add(format("Unable to place any room %d.", room_type), MSG_GENERIC);
-		}
+		}		
 	}
 
 	/* No tunnels if only zero or one room */
@@ -13711,7 +13689,7 @@ static bool place_contents()
 
 		/* Put some objects/gold in the dungeon */
 		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_OBJECT, Rand_normal(DUN_AMT_ITEM * (((level_flag & (LF1_CRYPT)) != 0) ? 2 : 1), 3));
-		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* (((level_flag & (LF1_NEST)) != 0) ? 2 : 1), 3));
+		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_GOLD, Rand_normal(DUN_AMT_GOLD* (((level_flag & (LF1_MINE)) != 0) ? 2 : 1), 3));
 	}
 
 	/* Successfully placed some stuff */
@@ -14554,16 +14532,6 @@ void generate_cave(void)
 	/* Reset level flags */
 	level_flag = 0;
 
-	/* Initialise level flags */
-	init_level_flags();
-
-	/* Reset 'quest' status of monsters and count of current number on level */
-	for (i = 0; i < z_info->r_max; i++)
-	{
-		r_info[i].flags1 &= ~(RF1_QUESTOR);
-		r_info[i].cur_num = 0;
-	}
-
 	/* Hack -- ensure quest monsters not randomly generated */
 	for (i = 0; i < MAX_Q_IDX; i++)
 	{
@@ -14587,22 +14555,22 @@ void generate_cave(void)
 		if ((!qe_ptr->feat) && (qe_ptr->race)) r_info[qe_ptr->race].flags1 |= (RF1_QUESTOR);
 	}
 
+	/* Are we using seeded dungeon generation? */
+	if (seed_dungeon)
+	{
+		/* Hack -- Use the "simple" RNG */
+		Rand_quick = TRUE;
+
+		/* Hack -- Induce consistant dungeon layout */
+		Rand_value = seed_dungeon;
+	}
+
 	/* Generate */
 	for (num = 0; TRUE; num++)
 	{
 		bool okay = TRUE;
 
 		cptr why = NULL;
-
-		/* Are we using seeded dungeon generation? */
-		if (seed_dungeon)
-		{
-			/* Hack -- Use the "simple" RNG */
-			Rand_quick = TRUE;
-
-			/* Hack -- Induce consistant dungeon layout */
-			Rand_value = seed_dungeon;
-		}
 
 		/* Reset */
 		o_max = 1;
@@ -14611,6 +14579,16 @@ void generate_cave(void)
 		/* There is no dynamic terrain */
 		dyna_full = FALSE;
 		dyna_n = 0;
+
+		/* Initialise level flags */
+		init_level_flags();
+
+		/* Reset 'quest' status of monsters and count of current number on level */
+		for (i = 0; i < z_info->r_max; i++)
+		{
+			r_info[i].flags1 &= ~(RF1_QUESTOR);
+			r_info[i].cur_num = 0;
+		}
 
 		/* Start with a blank cave */
 		for (y = 0; y < DUNGEON_HGT; y++)

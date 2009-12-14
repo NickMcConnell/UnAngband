@@ -3253,7 +3253,7 @@ enum
 #define LF1_DUNGEON	0x00004000L	/* Dungeon level */
 #define LF1_STRONGHOLD	0x00008000L	/* Stronghold (giant/dwarf) level */
 #define LF1_CRYPT	0x00010000L	/* Crypt level */
-#define LF1_LAIR	0x00020000L	/* Lair level */
+#define LF1_MINE	0x00020000L	/* Lair level */
 #define LF1_NEST	0x00040000L	/* Nest level */
 #define LF1_CAVE	0x00080000L	/* Cave level */
 #define LF1_TOWN	0x00100000L	/* Town level */
@@ -3272,7 +3272,7 @@ enum
 
 #define LF1_THEME \
 	(LF1_DESTROYED | LF1_POLYGON | LF1_DUNGEON | LF1_STRONGHOLD | \
-	LF1_CRYPT | LF1_LAIR | LF1_NEST | LF1_CAVE | LF1_WILD | \
+	LF1_CRYPT | LF1_MINE | LF1_NEST | LF1_CAVE | LF1_WILD | \
 	LF1_SEWER | LF1_LABYRINTH | LF1_CAVERN)
 
 #define LF1_TERRAIN \
