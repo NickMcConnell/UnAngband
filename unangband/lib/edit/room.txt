@@ -1194,7 +1194,7 @@ P:OUTER
 N:104:146:107:105:50:2:20:128
 A:waterfall
 B:
-D:A water fall 
+D:A waterfall 
 L:WATER
 F:126:0:0:0:0
 S:SEEN
@@ -1203,7 +1203,7 @@ P:ALLOC
 N:104:155:107:105:50:2:20:128
 A:toxic
 B:
-D:A poisonous water fall 
+D:A poisonous waterfall 
 L:WATER
 F:990:0:0:0:0
 S:SEEN
@@ -1212,7 +1212,7 @@ P:ALLOC
 N:104:147:107:105:50:0:41:128
 A:boiling
 B:
-D:A boiling water fall 
+D:A boiling waterfall 
 L:WATER | LAVA
 F:160:0:0:0:0
 S:SEEN
