@@ -145,13 +145,13 @@
 									connection attempts */
 
 /*
- * Number of rooms to try to generate in a dungeon
+ * Number of rooms to try to generate in a dungeon. This reduces with increasing depth -(depth/12).
  */
-#define MIN_DUN_ROOMS 	8 - (p_ptr->depth / 10)
-#define MAX_DUN_ROOMS	DUN_ROOMS - (p_ptr->depth / 6)
+#define MIN_DUN_ROOMS 	9
+#define MAX_DUN_ROOMS	DUN_ROOMS
 
 /*
- * Dungeon streamer generation values
+ * Dungeon streamer generation vaÄlues
  */
 #define DUN_STR_WID          2  /* Width of streamers (can be higher) */
 #define DUN_STR_CHG          16 /* 1/(4 + chance) of altering direction */
@@ -358,7 +358,7 @@ static room_data_type room_data[ROOM_MAX] =
    /* Depth:         0   6   12   18   24   30   36   42   48   54  60  min max_num count, theme*/
 
    /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_WILD | LF1_CAVERN | LF1_MINE | LF1_LABYRINTH},
-   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_DUNGEON | LF1_MINE | LF1_DESTROYED | LF1_WILD | LF1_CRYPT},
+   /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_DUNGEON | LF1_DESTROYED | LF1_WILD | LF1_CRYPT},
    /* Walls   */  {{80,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_CRYPT | LF1_WILD},
    /* Centre */   {{60,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_WILD},
@@ -368,25 +368,25 @@ static room_data_type room_data[ROOM_MAX] =
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  6,		1, 0, LF1_THEME},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	3,		3, 0, LF1_THEME},
    /* G. Vault */ {{ 0,   0,   0,   2,   3,   4,   6,   7,   8,  10,  12}, 20,	1,		6, 0, LF1_THEME},
-   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS/2,	2, 0, LF1_CAVERN | LF1_MINE | LF1_SEWER},
-   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		4, 0, LF1_MINE | LF1_SEWER},
-   /* Fractal */  {{ 0,  30,  60,  80,  90,  95,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	1, 0, LF1_CAVE | LF1_MINE},
+   /* Starbrst */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS/2,	2, 0, LF1_CAVERN | LF1_MINE},
+   /* Hg star */  {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		4, 0, LF1_MINE},
+   /* Fractal */  {{ 0,  30,  60,  80,  90,  95,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	1, 0, LF1_CAVE},
    /* Lrg fra */  {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,DUN_ROOMS/3,	2, 0, LF1_CAVE},
    /* Huge fra */ {{ 0,   0,   0,   0,   0,   4,   4,   4,   4,   4,   4}, 11,	3,		3, 0, LF1_CAVE},
    /* Lair */     {{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		6, 0, LF1_MINE | LF1_WILD},
-   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DESTROYED)},
-   /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/3,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
-   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_NEST | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
+   /* Maze */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS/2,	1, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_BURROWS | LF1_DESTROYED)},
+   /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/3,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_BURROWS | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
+   /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_BURROWS | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
    /* Cell cave */{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,		1, 0, LF1_CAVERN | LF1_MINE},
    /* Lrg cell */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,		2, 0, LF1_CAVERN},
    /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_CAVERN},
-   /* Nest */     {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_STRONGHOLD | LF1_WILD)},
-   /* Lrg nest */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
-   /* Huge nest */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Burrows */  {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Lrg burrow*/{{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
+   /* Huge burr.*/{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
    /* Monst.pit */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	2,		2, 0, LF1_DUNGEON | LF1_CRYPT | LF1_LABYRINTH},
    /* Monst.town */{{ 0,   0,   0,   0,   4,   4,   4,   4,   4,   4,   4}, 25,	1,		6, 0, LF1_DUNGEON | LF1_CAVERN | LF1_MINE},
-   /* Concave */  {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90}, 1,DUN_ROOMS,	1, 0, LF1_DUNGEON | LF1_POLYGON | LF1_MINE},
-   /* Lrg c.cave*/{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50},  3,DUN_ROOMS/2,	2, 0, LF1_POLYGON},
+   /* Concave */  {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90}, 1,DUN_ROOMS,	1, 0, LF1_DUNGEON | LF1_POLYGON},
+   /* Lrg c.cave*/{{ 0,   8,  15,  20,  22,  22,  25,  25,  25,  25,  25},  3,DUN_ROOMS/2,	2, 0, LF1_POLYGON},
    /* Xlg ccave */{{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 11,  3,	3, 0, LF1_POLYGON},
    /* Lake */     {{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 11,	1,		2, 0, LF1_WILD | LF1_CAVERN | LF1_SEWER},
    /* Huge lake */{{ 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0}, 21,	1,		3, 0, LF1_WILD | LF1_CAVERN | LF1_SEWER},
@@ -397,9 +397,9 @@ static room_data_type room_data[ROOM_MAX] =
 
 /* Build rooms in descending order of difficulty of placing e.g. size, frequency. */
 static byte room_build_order[ROOM_MAX] = {ROOM_LAIR, ROOM_GREATER_VAULT, ROOM_CHAMBERS, ROOM_MONSTER_TOWN, ROOM_HUGE_MAZE, 
-						ROOM_HUGE_NEST, ROOM_HUGE_CAVE, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CONCAVE, ROOM_HUGE_CENTRE, ROOM_LESSER_VAULT,
-						ROOM_MONSTER_PIT, ROOM_LARGE_NEST, ROOM_LARGE_MAZE, ROOM_LARGE_CAVE, ROOM_LARGE_FRACTAL, ROOM_LARGE_CONCAVE, ROOM_LARGE_CENTRE,
-						ROOM_LARGE_WALLS, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_NEST, ROOM_MAZE, ROOM_CELL_CAVE, ROOM_FRACTAL, ROOM_NORMAL_CONCAVE,
+						ROOM_HUGE_BURROW, ROOM_HUGE_CAVE, ROOM_HUGE_FRACTAL, ROOM_HUGE_STAR_BURST, ROOM_HUGE_CONCAVE, ROOM_HUGE_CENTRE, ROOM_LESSER_VAULT,
+						ROOM_MONSTER_PIT, ROOM_LARGE_BURROW, ROOM_LARGE_MAZE, ROOM_LARGE_CAVE, ROOM_LARGE_FRACTAL, ROOM_LARGE_CONCAVE, ROOM_LARGE_CENTRE,
+						ROOM_LARGE_WALLS, ROOM_INTERESTING, ROOM_STAR_BURST, ROOM_BURROW, ROOM_MAZE, ROOM_CELL_CAVE, ROOM_FRACTAL, ROOM_NORMAL_CONCAVE,
 						ROOM_NORMAL_CENTRE, ROOM_NORMAL_WALLS, ROOM_NORMAL, 0, 0, 0, 0};
 
 
@@ -2331,6 +2331,7 @@ static bool generate_starburst_room(int y1, int x1, int y2, int x2,
 #define GRID_FLOOR	1
 #define GRID_EDGE	2
 
+
 /*
  * Given a map of floors and walls, replaces walls with edges when adjacent to an existing edge, or an edge of the map.
  * 
@@ -2709,10 +2710,12 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 	 			bool edged = FALSE;
 	 			byte cave_flag_edge = (edge && f_info[edge].flags1 & (FF1_OUTER)) ? (cave_flag) : ((cave_flag) & ~(CAVE_ROOM));
 
-	 			if ((edge || wall) && (yi > 0) && (yi < size_y - 1) && (xi > 0) && (xi < size_x - 1))
+	 			if (edge || wall)
 	 			{
 		 			for (d = 0; d < 9; d++)
 		 			{
+		 				if ((yi + ddy_ddd[d] < 0) || (yi + ddy_ddd[d] >= size_y) || (xi + ddx_ddd[d] < 0) || (xi + ddx_ddd[d] >= size_x)) continue;
+		 				
 		 				if (grid[yi + ddy_ddd[d]][xi + ddx_ddd[d]] == GRID_FLOOR)
 		 				{
 							cave_set_feat(y1 + yi, x1 + xi, edge ? edge : wall);
@@ -2722,8 +2725,6 @@ static bool generate_cellular_cave(int y1, int x1, int y2, int x2, s16b wall, s1
 		 				}
 		 			}
 	 			}
-	 			
-	 			if (!edged && wall) cave_set_feat(y1 + yi, x1 + xi, wall);
 	 			
 				break;
 	 		}
@@ -2785,7 +2786,7 @@ int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
 
 /* It is possible to generate poly rooms with very small sizes. We ensure that these rooms have
  * a minimum size */
-#define MIN_POLY_ROOM_SIZE	17
+#define MIN_POLY_ROOM_SIZE	17 + (p_ptr->depth / 6)
 
 /*
  * Generates a room from a convex or concave polygon. We don't completely handle the complex (self-intersecting) case
@@ -2917,8 +2918,6 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
 		 				}
 		 			}
 	 			}
-	 			
-	 			/*if (!edged && wall) cave_set_feat(y0 + yi, x0 + xi, wall);*/
 	 			
 				break;
 	 		}
@@ -3296,9 +3295,10 @@ int cellnum_est(int totalcells, int ngb_min, int ngb_max)
 
 
 /*
- * Generate a random 'nest-like' cavern of cellnum cells. 
+ * Generate a random 'nest-like' cavern of cellnum cells.
+ * I've renamed this to burrows. 
  */
-bool generate_nest(int y1, int x1, int y2, int x2,
+bool generate_burrows(int y1, int x1, int y2, int x2,
 	int ngb_min, int ngb_max, int connchance, int cellnum, 
 	s16b floor, s16b available, bool compact, byte cave_flag, byte nest_flag)
 {
@@ -4014,7 +4014,7 @@ static bool find_space(int *y, int *x, int height, int width)
 		else
 		{
 			/* Random initial pick, else vary y half the time */
-			if (i % 3 != 2)
+			if (i % 2 == 0)
 			{
 				/* Pick a random y */
 				block_y = rand_int(dun->row_rooms - blocks_high);
@@ -4031,7 +4031,7 @@ static bool find_space(int *y, int *x, int height, int width)
 			}
 			
 			/* Random initial pick, else vary x half the time */
-			if (i % 3 != 1)
+			if ((i % 4 == 0) || (i % 4 == 3))
 			{
 				block_x = rand_int(dun->col_rooms - blocks_wide);
 			}
@@ -4309,6 +4309,30 @@ static bool cave_feat_pool(int f_idx)
 
 	/* Hack -- Ignore solid features */
 	if ((f_ptr->flags1 & (FF1_MOVE)) == 0)
+	{
+		return (FALSE);
+	}
+
+	/* All remaining lake features will be fine */
+	return (cave_feat_lake(f_idx));
+}
+
+
+/*
+ * Returns TRUE if f_idx is a valid sewer feature
+ */
+static bool cave_feat_sewer(int f_idx)
+{
+	feature_type *f_ptr = &f_info[f_idx];
+
+	/* Hack -- Ignore solid features */
+	if ((f_ptr->flags1 & (FF1_MOVE)) == 0)
+	{
+		return (FALSE);
+	}
+	
+	/* Hack -- require shallow, deep or covered */
+	if ((f_ptr->flags2 & (FF2_SHALLOW | FF2_DEEP | FF2_COVERED)) == 0)
 	{
 		return (FALSE);
 	}
@@ -5072,17 +5096,16 @@ static void check_windows_x(int x1, int x2, int y)
 }
 
 
+/* This ensures we have enough variation at each edge */
+#define MIN_CONCAVITY	9
+
 /*
- * Build a concave polygonal room using the algorithm described at
- * http://roguebasin.roguelikedevelopment.org/index.php?title=Irregular_Shaped_Rooms
+ * Helper function for build_type_concave. We use this to generate
+ * inner concave spaces as well.
  */
-static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a,
-	int y1b, int x1b, int y2b, int x2b, bool light)
+static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int x2a,
+	int y1b, int x1b, int y2b, int x2b, bool light, int floor, int edge, int requires)
 {
-	int floor = FEAT_FLOOR;
-	int edge = FEAT_WALL_OUTER;
-	int pool = 0;
-	
 	int verty[12];
 	int vertx[12];
 	int n = 0;
@@ -5092,25 +5115,6 @@ static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a
 	if ((!in_bounds_fully(y1a, x1a)) || (!in_bounds_fully(y1b, x1b))
 		 || (!in_bounds_fully(y2a, x2a)) || (!in_bounds_fully(y2b, x2b))) return (FALSE);
 
-	/* Flood dungeon if required */
-	if (room_info[room].flags & (ROOM_FLOODED))
-	{
-		if ((!f_info[dun->flood_feat].edge) || ((f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_MOVE)) == 0))
-		{
-			floor = dun->flood_feat;
-			edge = f_info[dun->flood_feat].edge;
-
-			room_info[room].flags |= (ROOM_BRIDGED);
-		}
-		else
-		{
-			/* Generate pool */
-			pool = dun->flood_feat;
-
-			room_info[room].flags |= (ROOM_EDGED);
-		}
-	}
-	
 	/* If edged, shrink boundaries to fit */
 	if (edge)
 	{
@@ -5132,8 +5136,19 @@ static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a
 		int y = y1w + rand_int(y2w - y1w + 1);
 		int x = x1w + rand_int(x2w - x1w + 1);
 		
-		verty[n] = y;
-		vertx[n] = x;
+		int j = n;
+		
+		/* Sort from highest to lowest y */
+		while ((j > 0) && (verty[j-1] <= y))
+		{
+			verty[j] = verty[j-1];
+			vertx[j] = vertx[j-1];
+			j--;
+		}
+
+		/* Insert new value */
+		verty[j] = y;
+		vertx[j] = x;
 		n++;
 	}
 
@@ -5151,8 +5166,19 @@ static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a
 		int y = y1n + rand_int(y2n - y1n + 1);
 		int x = x1n + rand_int(x2n - x1n + 1);
 		
-		verty[n] = y;
-		vertx[n] = x;
+		int j = n;
+		
+		/* Sort from lowest to highest x */
+		while ((j > 0) && (vertx[j-1] >= x))
+		{
+			verty[j] = verty[j-1];
+			vertx[j] = vertx[j-1];
+			j--;
+		}
+
+		/* Insert new value */
+		verty[j] = y;
+		vertx[j] = x;
 		n++;
 	}
 
@@ -5170,8 +5196,19 @@ static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a
 		int y = y1e + rand_int(y2e - y1e + 1);
 		int x = x1e + rand_int(x2e - x1e + 1);
 		
-		verty[n] = y;
-		vertx[n] = x;
+		int j = n;
+		
+		/* Sort from lowest to highest y */
+		while ((j > 0) && (verty[j-1] >= y))
+		{
+			verty[j] = verty[j-1];
+			vertx[j] = vertx[j-1];
+			j--;
+		}
+
+		/* Insert new value */
+		verty[j] = y;
+		vertx[j] = x;
 		n++;
 	}
 
@@ -5189,15 +5226,122 @@ static bool build_concave(int room, int type, int y1a, int x1a, int y2a, int x2a
 		int y = y1s + rand_int(y2s - y1s + 1);
 		int x = x1s + rand_int(x2s - x1s + 1);
 		
-		verty[n] = y;
-		vertx[n] = x;
+		int j = n;
+		
+		/* Sort from highest to lowest x */
+		while ((j > 0) && (vertx[j-1] <= x))
+		{
+			verty[j] = verty[j-1];
+			vertx[j] = vertx[j-1];
+			j--;
+		}
+
+		/* Insert new value */
+		verty[j] = y;
+		vertx[j] = x;
 		n++;
 	}
 
+	/* Remove duplicate vertices */
+	for (i = 1; i < n; i++)
+	{
+		if ((verty[i] == verty[i-1]) && (vertx[i] == vertx[i-1]))
+		{
+			int j;
+			
+			for (j = i + 1; j < n; j++)
+			{
+				verty[j-1] = verty[j];
+				vertx[j-1] = vertx[j];
+			}
+			
+			n--;
+		}
+	}
+	
 	/* Generate the polygon */
-	return(generate_poly_room(n, verty, vertx, FEAT_WALL_EXTRA, floor, edge, 0, 0, (CAVE_ROOM) | (light ? (CAVE_GLOW) : 0)));
+	return(generate_poly_room(n, verty, vertx, FEAT_WALL_EXTRA, floor, edge, 0, requires, (CAVE_ROOM) | (light ? (CAVE_GLOW) : 0)));
 }
 
+
+
+/*
+ * Build a concave polygonal room using the algorithm described at
+ * http://roguebasin.roguelikedevelopment.org/index.php?title=Irregular_Shaped_Rooms
+ */
+static bool build_type_concave(int room, int type, int y0, int x0, int y1a, int x1a, int y2a, int x2a,
+	int y1b, int x1b, int y2b, int x2b, bool light, bool inner_allowed)
+{
+	s16b floor = FEAT_FLOOR;
+	s16b edge = FEAT_WALL_OUTER;
+	s16b inner = 0;
+	s16b alloc = 0;
+	pool_type pool;
+	int n_pools = 3;
+	
+	u32b exclude = (RG1_RANDOM);
+
+	/* Inner allowed */
+	if (!inner_allowed) exclude |= (RG1_INNER | RG1_STARBURST);
+
+	/* No pool to start */
+	pool[0] = 0;
+	
+	/* Flood dungeon if required */
+	if (room_info[room].flags & (ROOM_FLOODED))
+	{
+		if ((!f_info[dun->flood_feat].edge) || ((f_info[f_info[dun->flood_feat].edge].flags1 & (FF1_MOVE)) == 0))
+		{
+			floor = dun->flood_feat;
+			edge = f_info[dun->flood_feat].edge;
+
+			room_info[room].flags |= (ROOM_BRIDGED);
+		}
+		else
+		{
+			/* Generate pool */
+			inner = dun->flood_feat;
+
+			room_info[room].flags |= (ROOM_EDGED);
+		}
+	}
+
+	/* Set up the room */
+	set_irregular_room_info(room, type, light, exclude, &floor, &edge, &inner, &alloc, &pool, &n_pools);
+	
+	/* Build the room */
+	if (!generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, floor, edge, 0))
+	{
+		return (FALSE);
+	}
+	
+	/* Build the inner room if required */
+	if (inner)
+	{
+		int d = rand_range(2, 4);
+		
+		/* Shrink the room boundaries */
+		y1a = ((d*y1a) + y2a) / (d+1);
+		y2a = ((d*y2a) + y1a) / (d+1) +1;
+		x1a = ((d*x1a) + x2a) / (d+1);
+		x2a = ((d*x2a) + x1a) / (d+1) +1;
+		y1b = ((d*y1b) + y2b) / (d+1);
+		y2b = ((d*y2b) + y1b) / (d+1) +1;
+		x1b = ((d*x1b) + x2b) / (d+1);
+		x2b = ((d*x2b) + x1b) / (d+1) +1;
+		
+		/* Build the inner room */
+		generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, inner, 0, floor);
+	}
+	
+	/* Place allocation */
+	if (alloc)
+	{
+		cave_set_feat(y0, x0, alloc);
+	}
+	
+	return (TRUE);
+}
 
 
 
@@ -8766,7 +8910,7 @@ static u32b get_tunnel_style(void)
 
 	/* Wilderness have direct paths between locations */
 	/* From FAAngband */
-	if (level_flag & (LF1_WILD))
+	else if (level_flag & (LF1_WILD))
 	{
 		style |= (TUNNEL_PATH);
 	}
@@ -8801,7 +8945,7 @@ static u32b get_tunnel_style(void)
 	}
 	/* Cave and nest levels have narrow, frequently random corridors. Mines occasionally do. */
 	/* Caverns have wider corridors than caves */
-	else if (((level_flag & (LF1_CAVE | LF1_CAVERN | LF1_NEST)) != 0) || (((level_flag & (LF1_MINE)) != 0) && (i < 33)))
+	else if (((level_flag & (LF1_CAVE | LF1_CAVERN | LF1_BURROWS)) != 0) || (((level_flag & (LF1_MINE)) != 0) && (i < 33)))
 	{
 		style |= (TUNNEL_CAVE);
 		if ((level_flag & (LF1_CAVERN)) != 0)
@@ -9077,7 +9221,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int end_room = 0;
 
 	/* Initialize some movement counters */
-	int adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_NEST)) != 0) ? 2 : 1);
+	int adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_MINE)) != 0) ? 2 : 1);
 	int rand_dir_timer   = randint(DUN_TUN_RND * 2);
 	int correct_dir_timer = 0;
 	int tunnel_style_timer = randint(DUN_TUN_STYLE * 2);
@@ -9310,7 +9454,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			{
 				adjust_dir(&row_dir, &col_dir, row1, col1, row2, col2);
 
-				adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_NEST)) != 0) ? 2 : 1);
+				adjust_dir_timer = randint(DUN_TUN_ADJ * 2) * (((level_flag & (LF1_BURROWS)) != 0) ? 2 : 1);
 			}
 
 			/* Go in correct direction. */
@@ -10276,7 +10420,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Guarantee flooded feature */
 			while (!dun->flood_feat)
 			{
-				dun->flood_feat = pick_proper_feature(cave_feat_pool);
+				dun->flood_feat = pick_proper_feature(cave_feat_sewer);
 			}
 
 			/* Clear previous contents, write terrain */
@@ -10284,11 +10428,11 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 
 			/*
 			 * Only accept movement squares terrain in tunnels.
-			 * Never fill tunnels with terrain that hits adjacent grids.
+			 * Never fill tunnels with terrain that hits adjacent grids, unless flooded
 			 */
 			if (((f_info[cave_feat[y][x]].flags1 & (FF1_MOVE))
 				|| (f_info[cave_feat[y][x]].flags3 & (FF3_EASY_CLIMB)))
-				&& ((f_info[dun->flood_feat].flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_ERUPT)) == 0))
+				&& ((flood_tunnel) || ((f_info[dun->flood_feat].flags3 & (FF3_SPREAD | FF3_ADJACENT | FF3_ERUPT)) == 0)))
 			{
 				continue;
 			}
@@ -10645,7 +10789,8 @@ static bool build_type123(int room, int type)
 	/* Build a polygonal room */
 	if (type == ROOM_NORMAL_CONCAVE)
 	{
-		if (!build_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light))
+		/* Build the room */
+		if (!build_type_concave(room, type, y0, x0, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, FALSE))
 		{
 			free_space(y0, x0, height, width);
 			
@@ -10765,7 +10910,8 @@ static bool build_type45(int room, int type)
 	/* Build a polygonal room */
 	if (type == ROOM_LARGE_CONCAVE)
 	{
-		if (!build_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light))
+		/* Build the room */
+		if (!build_type_concave(room, type, y0, x0, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, TRUE))
 		{
 			free_space(y0, x0, height, width);
 			
@@ -10896,7 +11042,8 @@ static bool build_type6(int room, int type)
 	/* Build a polygonal room */
 	if (type == ROOM_HUGE_CONCAVE)
 	{
-		if (!build_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light))
+		/* Build the room */
+		if (!build_type_concave(room, type, y0, x0, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, TRUE))
 		{
 			free_space(y0, x0, height, width);
 			
@@ -11542,7 +11689,7 @@ static bool build_type232425(int room, int type)
 			case 3: level_flag |= (LF1_SEWER); break;
 			case 4: level_flag |= (LF1_CAVERN); break;
 			case 5: level_flag |= (LF1_LABYRINTH); break;
-			default: level_flag |= (LF1_NEST); break;
+			default: level_flag |= (LF1_BURROWS); break;
 		}
 	}
 	
@@ -11556,8 +11703,8 @@ static bool build_type232425(int room, int type)
 
 	switch (type)
 	{
-		case ROOM_HUGE_NEST: height = 33; width = 65; compact = (rand_range(25, 60) > p_ptr->depth); break;
-		case ROOM_LARGE_NEST: height = 33; width = 33; compact = TRUE; break;
+		case ROOM_HUGE_BURROW: height = 33; width = 65; compact = (rand_range(25, 60) > p_ptr->depth); break;
+		case ROOM_LARGE_BURROW: height = 33; width = 33; compact = TRUE; break;
 		default: height = 17; width = 33; compact = TRUE; break;
 	}
 
@@ -11598,7 +11745,7 @@ static bool build_type232425(int room, int type)
 	cellnum = cellnum_est(cellnum, ngb_min, ngb_max);
 	
 	/* Build the nest */
-	succeed = generate_nest(y1 + 1, x1 + 1, y2 - 1, x2 - 1, ngb_min, ngb_max, connchance, cellnum, 
+	succeed = generate_burrows(y1 + 1, x1 + 1, y2 - 1, x2 - 1, ngb_min, ngb_max, connchance, cellnum, 
 	    feat, 0, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0), (NEST_TEMP) | (cardinal ? (NEST_CARD) : 0));
 
 	/* Clear temp flags */
@@ -11679,7 +11826,7 @@ static bool build_type232425(int room, int type)
 	/* Build pool */
 	if (n_pools == 2)
 	{
-		succeed = generate_nest(y1, x1, y2, x2, ngb_min, ngb_max, connchance, (cellnum + 7)/4, 
+		succeed = generate_burrows(y1, x1, y2, x2, ngb_min, ngb_max, connchance, (cellnum + 7)/4, 
 		    pool[n_pools-1], cave_feat[(y1 + y2)/2][(x1 + x2)/2], compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0),0);
 	}
 	
@@ -12058,9 +12205,9 @@ static bool room_build(int room, int type)
 		/* Build an appropriate room */
 		case ROOM_MONSTER_TOWN:
 		case ROOM_MONSTER_PIT: if (build_type2627(room, type)) return (TRUE); break;
-		case ROOM_HUGE_NEST:
-		case ROOM_LARGE_NEST:
-		case ROOM_NEST: if (build_type232425(room,type)) return(TRUE); break;
+		case ROOM_HUGE_BURROW:
+		case ROOM_LARGE_BURROW:
+		case ROOM_BURROW: if (build_type232425(room,type)) return(TRUE); break;
 		case ROOM_HUGE_CAVE:
 		case ROOM_LARGE_CAVE:
 		case ROOM_CELL_CAVE: if (build_type202122(room,type)) return(TRUE); break;
@@ -12734,8 +12881,8 @@ static bool place_rooms()
 	/* Check if this is the last room type we can place for this theme. If so, continue to place it. */
 	bool last = FALSE;
 
-	int try_rooms = MIN_DUN_ROOMS + rand_int(MAX_DUN_ROOMS - MIN_DUN_ROOMS);
-
+	int try_rooms = MIN_DUN_ROOMS + rand_int(MAX_DUN_ROOMS - MIN_DUN_ROOMS) - (p_ptr->depth / 12);
+	
 	/*
 	 * Build each type of room in turn until we cannot build any more.
 	 */
@@ -12777,7 +12924,7 @@ static bool place_rooms()
 		
 		/* Build the room. */
 		while (((last) || (rand_int(100) < room_data[room_type].chance[p_ptr->depth < 60 ? p_ptr->depth / 6 : 10]))
-			&& (rooms_built < room_data[room_type].max_number) && (dun->cent_n < DUN_ROOMS - 1) &&
+			&& (rooms_built < room_data[room_type].max_number + p_ptr->depth / 12) && (dun->cent_n < DUN_ROOMS - 1) &&
 				(room_build(dun->cent_n + 1, room_type)))
 		{
 			/* Built room */
@@ -13634,7 +13781,7 @@ static bool place_contents()
 		alloc_stairs(0, 2, 3);
 
 		/* Put some rubble in corridors -- we want to exclude towers unless other rooms on level */
-		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k * (((level_flag & (LF1_CRYPT | LF1_NEST | LF1_CAVE)) != 0) ? 3 : 1)));
+		if ((level_flag & (LF1_ROOMS)) != 0) alloc_object(ALLOC_SET_CORR, ALLOC_TYP_RUBBLE, randint(k * (((level_flag & (LF1_CRYPT | LF1_BURROWS | LF1_CAVE)) != 0) ? 3 : 1)));
 
 		/* Place some traps in the dungeon */
 		alloc_object(ALLOC_SET_BOTH, ALLOC_TYP_TRAP, randint(k * (((level_flag & (LF1_STRONGHOLD | LF1_CRYPT)) != 0) ? 2 : 1)));

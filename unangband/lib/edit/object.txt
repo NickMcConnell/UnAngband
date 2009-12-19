@@ -3962,7 +3962,12 @@ F:SUST_STR |
 F:REGEN_HP |
 F:HURT_LITE | TROLL |
 
-### 471 - Unused ###
+N:471:& Piece~ of Ambrosia
+G:,:B
+I:80:30:0
+W:5:2500:3:10
+A:20/4
+P:0:0d0:0:0:0
 
 ### 472 - Unused ###
 
