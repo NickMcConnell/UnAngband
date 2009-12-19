@@ -2944,11 +2944,11 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
 
 
 
-#define	NEST_TEMP	1	/* Limit nest building to temporary flags */
-#define NEST_CARD	2	/* Cardinal directions NSEEW only */
+#define	BURROW_TEMP	1	/* Limit burrows building to temporary flags */
+#define BURROW_CARD	2	/* Cardinal directions NSEW only */
 
 /*
- * Builds a 'nest' - that is the organic looking patterns
+ * Builds a 'burrow' - that is the organic looking patterns
  * discovered by Kusigrosz and documented in this thread
  * http://groups.google.com/group/rec.games.roguelike.development/browse_thread/thread/4c56271970c253bf
  */
@@ -3198,7 +3198,7 @@ int ngbgroups(int y, int x, s16b feat)
  * random order.
  */
 int digcell(struct cellstore* cstore,
-	int y, int x, s16b floor, s16b available, byte cave_flag, byte nest_flag)
+	int y, int x, s16b floor, s16b available, byte cave_flag, byte burrows_flag)
 {
 	int order[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 	int i, j;
@@ -3206,7 +3206,7 @@ int digcell(struct cellstore* cstore,
 	assert(cstore);
 
 	if ((!in_bounds_fully(y, x)) || ((available) && (cave_feat[y][x] != available)) ||
-			(((nest_flag & (NEST_TEMP)) != 0) && ((play_info[y][x] & (PLAY_TEMP)) == 0)))
+			(((burrows_flag & (BURROW_TEMP)) != 0) && ((play_info[y][x] & (PLAY_TEMP)) == 0)))
 	{
 		return (0); /* did nothing */
 	}
@@ -3221,16 +3221,16 @@ int digcell(struct cellstore* cstore,
 	cave_info[y][x] |= (cave_flag);
 	
 	/* Clear the temp flag */
-	if ((nest_flag & (NEST_TEMP)) != 0) play_info[y][x] &= ~(PLAY_TEMP);
+	if ((burrows_flag & (BURROW_TEMP)) != 0) play_info[y][x] &= ~(PLAY_TEMP);
 
 	rnd_perm(order, 8);
 
-	for (i = 0; i < 8; i += ((nest_flag & (NEST_CARD)) != 0) ? 2 : 1) 
+	for (i = 0; i < 8; i += ((burrows_flag & (BURROW_CARD)) != 0) ? 2 : 1) 
 	{
 		j = order[i];
 		if (in_bounds_fully(y + Yoff[j], x + Xoff[j]) &&
 			((!available) || (cave_feat[y + Yoff[j]][x + Xoff[j]] == available)) &&
-			(((nest_flag & (NEST_TEMP)) == 0) ||
+			(((burrows_flag & (BURROW_TEMP)) == 0) ||
 					((play_info[y + Yoff[j]][x + Xoff[j]] & (PLAY_TEMP)) != 0)))
 		{
 			storecell(cstore, y + Yoff[j], x + Xoff[j]);
@@ -3249,7 +3249,7 @@ int digcell(struct cellstore* cstore,
  */
 int delveon(struct cellstore* cstore,
 	int ngb_min, int ngb_max, int connchance, int cellnum,
-	s16b floor, s16b available, bool compact, byte cave_flag, byte nest_flag)
+	s16b floor, s16b available, bool compact, byte cave_flag, byte burrows_flag)
 {
 	int count = 0;
 	int ngb_count;
@@ -3269,11 +3269,11 @@ int delveon(struct cellstore* cstore,
 		ngb_groups = ngbgroups(y, x, floor);
 
 		if ( in_bounds_fully(y, x) && ((!available) || (cave_feat[y][x] == available)) &&
-			(((nest_flag & (NEST_TEMP)) == 0) || ((play_info[y][x] & (PLAY_TEMP)) != 0)) &&
+			(((burrows_flag & (BURROW_TEMP)) == 0) || ((play_info[y][x] & (PLAY_TEMP)) != 0)) &&
 			(ngb_count >= ngb_min) && (ngb_count <= ngb_max) && 
 			((ngb_groups <= 1) || (rand_int(100) < connchance)) )
 		{
-				count += digcell(cstore, y, x, floor, available, cave_flag, nest_flag);
+				count += digcell(cstore, y, x, floor, available, cave_flag, burrows_flag);
 		}
 	}
 	
@@ -3295,12 +3295,11 @@ int cellnum_est(int totalcells, int ngb_min, int ngb_max)
 
 
 /*
- * Generate a random 'nest-like' cavern of cellnum cells.
- * I've renamed this to burrows. 
+ * Generate a random 'burrow-like' cavern of cellnum cells.
  */
 bool generate_burrows(int y1, int x1, int y2, int x2,
 	int ngb_min, int ngb_max, int connchance, int cellnum, 
-	s16b floor, s16b available, bool compact, byte cave_flag, byte nest_flag)
+	s16b floor, s16b available, bool compact, byte cave_flag, byte burrows_flag)
 {
 	struct cellstore cstore;
 	int count = 0;
@@ -3331,19 +3330,19 @@ bool generate_burrows(int y1, int x1, int y2, int x2,
 
 		/* stay close to origin, ignore ngb_min */
 		if ( in_bounds_fully(y, x) && ((!available) || (cave_feat[y][x] == available)) &&
-			(((nest_flag & (NEST_TEMP)) == 0) || ((play_info[y][x] & (PLAY_TEMP)) != 0)) &&
+			(((burrows_flag & (BURROW_TEMP)) == 0) || ((play_info[y][x] & (PLAY_TEMP)) != 0)) &&
 			(abs(x - xorig) < 2) && (abs(y - yorig) < 2) &&
 			(ngb_count <= ngb_max) && 
 			((ngb_groups <= 1) || (rand_int(100) < connchance)) )
 		{
-			count += digcell(&cstore, y, x, floor, available, cave_flag, nest_flag);
+			count += digcell(&cstore, y, x, floor, available, cave_flag, burrows_flag);
 		}
 	}
 
 	if (count < cellnum)
 		{
 		count += delveon(&cstore, ngb_min, ngb_max, connchance, 
-			cellnum - count, floor, available, compact, cave_flag, nest_flag);
+			cellnum - count, floor, available, compact, cave_flag, burrows_flag);
 		}
 
 	delstore(&cstore);
@@ -8943,7 +8942,7 @@ static u32b get_tunnel_style(void)
 		if (i < 50) style |= (TUNNEL_CRYPT_L);
 		if ((i < 25) || (i >= 75)) style |= (TUNNEL_CRYPT_R);
 	}
-	/* Cave and nest levels have narrow, frequently random corridors. Mines occasionally do. */
+	/* Cave and burrows levels have narrow, frequently random corridors. Mines occasionally do. */
 	/* Caverns have wider corridors than caves */
 	else if (((level_flag & (LF1_CAVE | LF1_CAVERN | LF1_BURROWS)) != 0) || (((level_flag & (LF1_MINE)) != 0) && (i < 33)))
 	{
@@ -11648,7 +11647,7 @@ static bool build_type202122(int room, int type)
 
 
 /*
- * Build nest
+ * Build a burrows
  */
 static bool build_type232425(int room, int type)
 {
@@ -11679,7 +11678,7 @@ static bool build_type232425(int room, int type)
 
 	int n_pools = 1; /* Only allow one pool */
 	
-	/* Hack -- nest and no theme: pick one at random */
+	/* Hack -- burrows and no theme: pick one at random */
 	if ((level_flag & (LF1_THEME)) == 0)
 	{
 		switch(randint(10))
@@ -11744,9 +11743,9 @@ static bool build_type232425(int room, int type)
 	/* Re-esimate number of cells required */
 	cellnum = cellnum_est(cellnum, ngb_min, ngb_max);
 	
-	/* Build the nest */
+	/* Build the burrows */
 	succeed = generate_burrows(y1 + 1, x1 + 1, y2 - 1, x2 - 1, ngb_min, ngb_max, connchance, cellnum, 
-	    feat, 0, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0), (NEST_TEMP) | (cardinal ? (NEST_CARD) : 0));
+	    feat, 0, compact, (CAVE_ROOM) | (light ? (CAVE_LITE) : 0), (BURROW_TEMP) | (cardinal ? (BURROW_CARD) : 0));
 
 	/* Clear temp flags */
 	for (y = y1; y < y2; y++)
