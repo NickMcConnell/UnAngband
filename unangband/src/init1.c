@@ -91,7 +91,7 @@ static cptr d_info_sflags[] =
 	"PUZZLE",
 	"LAIR",
 	"OBJECT",
-	"TRAP"
+	"SIMPLE"
 };
 
 /*

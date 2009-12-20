@@ -359,11 +359,11 @@ static room_data_type room_data[ROOM_MAX] =
 
    /* Nothing */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_WILD | LF1_CAVERN | LF1_MINE | LF1_LABYRINTH},
    /* 'Empty' */  {{100,100, 100, 100, 100, 100, 100, 100, 100, 100, 100},  0,DUN_ROOMS * 3,	1, 0, LF1_DUNGEON | LF1_DESTROYED | LF1_WILD | LF1_CRYPT},
-   /* Walls   */  {{80,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_CRYPT | LF1_WILD},
-   /* Centre */   {{60,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  1,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
+   /* Walls   */  {{80,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  0,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_CRYPT | LF1_WILD},
+   /* Centre */   {{60,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95},  0,DUN_ROOMS,	1, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
    /* Lrg wall */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_WILD},
    /* Lrg cent */ {{ 0,  30,  60,  80,  90,  90,  90,  90,  90,  90,  90},  3,DUN_ROOMS/2,	2, 0, LF1_STRONGHOLD | LF1_SEWER | LF1_WILD},
-   /* Xlg cent */ {{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 11,  3,	3, 0, LF1_STRONGHOLD},
+   /* Xlg cent */ {{ 0,   0,   3,   3,   9,   9,  15,  15,  15,  15,  15}, 13,  3,	3, 0, LF1_STRONGHOLD},
    /* Chambers */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20},  7,	4,		5, 0, LF1_DUNGEON},
    /* I. Room */  {{30,  60,  70,  80,  80,  75,  70,  67,  65,  62,  60},  0,  6,		1, 0, LF1_THEME},
    /* L. Vault */ {{ 0,   1,   4,   9,  16,  27,  40,  55,  70,  80,  90},  7,	3,		3, 0, LF1_THEME},
@@ -378,8 +378,8 @@ static room_data_type room_data[ROOM_MAX] =
    /* Lrg maze */ {{ 0,   2,  6,   12,  18,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/3,	2, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_BURROWS | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
    /* Huge maze */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_CAVE | LF1_CAVERN | LF1_POLYGON | LF1_BURROWS | LF1_DUNGEON | LF1_MINE | LF1_DESTROYED)},
    /* Cell cave */{{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,		1, 0, LF1_CAVERN | LF1_MINE},
-   /* Lrg cell */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,		2, 0, LF1_CAVERN},
-   /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_CAVERN},
+   /* Lrg cell */ {{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 9,DUN_ROOMS/2,		2, 0, LF1_CAVERN},
+   /* Huge cell */{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 21,	3,		3, 0, LF1_CAVERN},
    /* Burrows */  {{ 0,  15,  30,  40,  45,  45,  50,  50,  50,  50,  50}, 1,DUN_ROOMS,	1, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
    /* Lrg burrow*/{{ 0,   2,   6,  12,  15,  18,  19,  20,  20,  20,  20}, 6,DUN_ROOMS/2,	2, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
    /* Huge burr.*/{{ 0,   0,   0,   4,   6,   6,   8,   8,  10,  10,  10}, 18,	3,		3, 0, LF1_THEME & ~(LF1_DUNGEON | LF1_POLYGON | LF1_STRONGHOLD | LF1_WILD)},
@@ -2794,7 +2794,7 @@ int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
  * 
  * *y and *x represent pairs of vertex coordinates. These should probably be ordered but may not require this.
  */
-static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16b edge, s16b pool, s16b require, byte cave_flag)
+static bool generate_poly_room(int n, int *y, int *x, s16b edge, s16b floor, s16b wall, s16b requires, byte cave_flag)
 {
 	float *verty, *vertx;
 	int i, xi, yi, size_y, size_x;
@@ -2881,7 +2881,7 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
  	for(xi=0; xi<size_x; xi++)
  	{
  		/* Paranoia - if require defined, don't overwrite anything else */
- 		if (require && (cave_feat[y0+yi][x0+xi] != require)) continue;
+ 		if (requires && (cave_feat[y0+yi][x0+xi] != requires)) continue;
  		
  		switch(grid[yi][xi])
  		{
@@ -2894,7 +2894,7 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
 	 		}
 	 		case GRID_WALL:
 	 		{
-	 			if (wall || pool) cave_set_feat(y0 + yi, x0 + xi, pool ? pool : wall);
+	 			if (wall) cave_set_feat(y0 + yi, x0 + xi, wall);
 	 			cave_info[y0+yi][x0+xi] |= (cave_flag);
 	 			break;
 	 		}
@@ -2903,7 +2903,7 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
 	 			int d;
 	 			bool edged = FALSE;
 
-	 			if (edge || wall)
+	 			if (edge)
 	 			{
 		 			for (d = 0; d < 9; d++)
 		 			{
@@ -2911,7 +2911,7 @@ static bool generate_poly_room(int n, int *y, int *x, s16b wall, s16b floor, s16
 		 				
 		 				if (grid[yi + ddy_ddd[d]][xi + ddx_ddd[d]] == GRID_FLOOR)
 		 				{
-							cave_set_feat(y0 + yi, x0 + xi, edge ? edge : wall);
+							cave_set_feat(y0 + yi, x0 + xi, edge);
 							cave_info[y0+yi][x0 + xi] |= (cave_flag_edge);
 							edged = TRUE;
 		 					break;
@@ -4610,7 +4610,7 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 			}
 
 			/* Themes */
-			if (dun->theme_feat)
+			if ((dun->theme_feat) || ((dun->flood_feat) && ((room_info[room].flags & (ROOM_FLOODED)) != 0)))
 			{
 				int k;
 				bool theme_match = FALSE;
@@ -4623,6 +4623,16 @@ static bool get_room_info(int room, int *chart, int *j, u32b *place_flag, s16b *
 						any_match = TRUE;
 					}
 
+					/* If room is flooded match flooding */
+					if ((dun->flood_feat) && ((room_info[room].flags & (ROOM_FLOODED)) != 0))
+					{
+						if (d_info[i].theme[k] == dun->flood_feat)
+						{
+							theme_match = TRUE;
+						}
+					}
+					
+					/* Match theme all of the time */
 					if (d_info[i].theme[k] == dun->theme_feat)
 					{
 						theme_match = TRUE;
@@ -5103,7 +5113,7 @@ static void check_windows_x(int x1, int x2, int y)
  * inner concave spaces as well.
  */
 static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int x2a,
-	int y1b, int x1b, int y2b, int x2b, bool light, int floor, int edge, int requires)
+	int y1b, int x1b, int y2b, int x2b, bool light, int edge, int floor, int requires)
 {
 	int verty[12];
 	int vertx[12];
@@ -5259,7 +5269,7 @@ static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int 
 	}
 	
 	/* Generate the polygon */
-	return(generate_poly_room(n, verty, vertx, FEAT_WALL_EXTRA, floor, edge, 0, requires, (CAVE_ROOM) | (light ? (CAVE_GLOW) : 0)));
+	return(generate_poly_room(n, verty, vertx, edge, floor, edge, requires, (CAVE_ROOM) | (light ? (CAVE_GLOW) : 0)));
 }
 
 
@@ -5309,7 +5319,7 @@ static bool build_type_concave(int room, int type, int y0, int x0, int y1a, int 
 	set_irregular_room_info(room, type, light, exclude, &floor, &edge, &inner, &alloc, &pool, &n_pools);
 	
 	/* Build the room */
-	if (!generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, floor, edge, 0))
+	if (!generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, edge, floor, 0))
 	{
 		return (FALSE);
 	}
@@ -5330,7 +5340,7 @@ static bool build_type_concave(int room, int type, int y0, int x0, int y1a, int 
 		x2b = ((d*x2b) + x1b) / (d+1) +1;
 		
 		/* Build the inner room */
-		generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, inner, 0, floor);
+		generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, f_info[inner].edge, inner, floor);
 	}
 	
 	/* Place allocation */
@@ -8923,7 +8933,7 @@ static u32b get_tunnel_style(void)
 	}
 	/* Dungeon levels have width 1 corridors, or width 2 corridors deeper in the dungeon */
 	/* The style of the tunnel does not change after initial selection */
-	else if (level_flag & (LF1_DUNGEON | LF1_POLYGON))
+	else if (level_flag & (LF1_DUNGEON))
 	{
 		if (i < p_ptr->depth) style |= (i % 2) ? (TUNNEL_LARGE_L) : (TUNNEL_LARGE_R);
 	}
@@ -9238,6 +9248,25 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	int path_n = 0;
 	int path_i = 0;
 	
+	/* Record initial partition number */
+	if (start_room)
+	{
+		part1 = dun->part[start_room-1];
+
+		/* Flood if part of flooded dungeon */
+		if ((room_info[start_room].flags & (ROOM_FLOODED)) != 0)
+		{
+			flood_tunnel = TRUE;
+		}
+		
+		/* Simple corridors from simple starting rooms */
+		if ((room_info[start_room].flags & (ROOM_SIMPLE)) != 0)
+		{
+			style &= (TUNNEL_STYLE -1);
+			tunnel_style_timer *= 2;
+		}
+	}
+
 	/* Keep stronghold / dungeon / sewer corridors tidy */
 	if ((level_flag & (LF1_STRONGHOLD | LF1_DUNGEON | LF1_SEWER | LF1_WILD | LF1_POLYGON)) != 0) tunnel_style_timer = -1;
 
@@ -9269,18 +9298,6 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 	first_tunn = dun->tunn_n;
 	first_next = dun->next_n;
 	first_stair = dun->stair_n;
-
-	/* Record initial partition number */
-	if (start_room)
-	{
-		part1 = dun->part[start_room-1];
-
-		/* Flood if part of flooded dungeon */
-		if ((room_info[start_room].flags & (ROOM_FLOODED)) != 0)
-		{
-			flood_tunnel = TRUE;
-		}
-	}
 
 	/* Get path direction */
 	if (style & (TUNNEL_PATH | TUNNEL_ANGLE))
@@ -9703,6 +9720,15 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					break;
 				}
 
+				/* Trying to connect simple room to non-simple room with simple style */
+				else if (((room_info[start_room].flags & (ROOM_SIMPLE)) != 0)
+						&& ((room_info[end_room].flags & (ROOM_SIMPLE)) == 0) && (style < TUNNEL_STYLE))
+				{
+					abort_and_cleanup = TRUE;
+					if (cheat_room) message_add(format("Trying to simply connect complex partition %d. Aborting.", part1), MSG_GENERIC);
+					break;
+				}
+				
 				/* Trying to connect flooded to unflooded area */
 				else if ((flood_tunnel) && ((room_info[end_room].flags & (ROOM_FLOODED)) == 0))
 				{
@@ -10250,6 +10276,16 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 					break;
 				}
 
+				
+				/* Trying to connect simple room to non-simple room with simple style */
+				else if (((room_info[start_room].flags & (ROOM_SIMPLE)) != 0)
+						&& ((room_info[end_room].flags & (ROOM_SIMPLE)) == 0) && (style < TUNNEL_STYLE))
+				{
+					abort_and_cleanup = TRUE;
+					if (cheat_room) message_add(format("Trying to simply connect complex partition %d. Aborting.", part1), MSG_GENERIC);
+					break;
+				}
+				
 				/* Trying to connect flooded to unflooded area */
 				else if ((flood_tunnel) && ((room_info[end_room].flags & (ROOM_FLOODED)) == 0))
 				{
@@ -12198,6 +12234,13 @@ static bool room_build(int room, int type)
 		 * 20 levels shallow, then 25, 35, 40, 50, 55 etc. */
 	}
 	
+	/* Keep dungeons somewhat 'simple' when deeper rooms first encountered */
+	if ((room > 1) && (room % 2) && (room_data[room_info[1].type].min_level >= 5) && (room_data[room_info[1].type].min_level >= p_ptr->depth - 12))
+	{
+		/* Make empty rooms half the time */
+		type = ROOM_NORMAL;
+	}
+	
 	/* Build a room */
 	switch (type)
 	{
@@ -12231,7 +12274,7 @@ static bool room_build(int room, int type)
 		case ROOM_NORMAL_CONCAVE:
 		case ROOM_NORMAL_CENTRE:
 		case ROOM_NORMAL_WALLS:
-		case ROOM_NORMAL: if (build_type123(room, type)) return(TRUE); break;
+		case ROOM_NORMAL: if (build_type123(room, type)) { if (type == ROOM_NORMAL) room_info[room].flags |= (ROOM_SIMPLE); return(TRUE); } break;
 
 		default: if (build_type0(room, type)) return(TRUE); break;
 	}
@@ -12941,8 +12984,18 @@ static bool place_rooms()
 				/* Reset count */
 				k = 0;
 
+				/* Keep dungeons 'simple' when deeper rooms first encountered */
+				if ((room_data[room_type].min_level >= 5) && (room_data[room_type].min_level >= p_ptr->depth - 6))
+				{
+					/* Make corridors 'dungeon-like' */
+					level_flag &= ~(LF1_THEME);
+					level_flag |= (LF1_DUNGEON);
+					
+					/* Empty rooms for remainder of level */
+					i = ROOM_NORMAL;
+				}
 				/* Pick a theme */
-				for (j = 0; j < 32; j++)
+				else for (j = 0; j < 32; j++)
 				{
 					/* Place nature and destroyed elsewhere */
 					if (((1L << j) == (LF1_WILD)) || ((1L << j) == (LF1_DESTROYED))) continue;

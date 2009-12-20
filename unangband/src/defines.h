@@ -3349,7 +3349,7 @@ enum
 #define ROOM_PUZZLE	0x10000000L	   /* room requires features contained destroyed */
 #define ROOM_GUARD	0x20000000L	   /* room requires monsters contained destroyed */
 #define ROOM_OBJECT	0x40000000L	   /* room requires objects contained destroyed */
-#define ROOM_TRAP	0x80000000L	   /* whole room is a trap */
+#define ROOM_SIMPLE	0x80000000L	   /* room has simple corridor to other simple rooms */
 
 
 /*** Quest flags ***/
