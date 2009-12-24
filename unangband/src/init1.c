@@ -2994,7 +2994,18 @@ errr parse_d_info(char *buf, header *head)
 		d_ptr->not_chance = noc;
 		d_ptr->level_min = min;
 		d_ptr->level_max = max;
+		
+		/* Big hack -- we scale this internally because I can't be bothered
+		 * fixing the emit_d_info code to handle comments correctly. */
+		/* Scale these */
+		if (min > 80) d_ptr->level_min = 40 + (min-80)/4;
+		else if (min > 50) d_ptr->level_min = 40 + (min-50)/3;
+		else if (min > 30) d_ptr->level_min = 30 + (min-30)/2;
 
+		if (max > 80) d_ptr->level_max = 50 + (max-80)/4;
+		else if (max > 50) d_ptr->level_max = 40 + (max-50)/3;
+		else if (max > 30) d_ptr->level_max = 30 + (max-30)/2;
+		
 		/* Initialize other values */
 		d_ptr->flags = 0;
 		d_ptr->tval = 0;
