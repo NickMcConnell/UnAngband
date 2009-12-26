@@ -3410,6 +3410,8 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 	bool ammo_can_break = TRUE;
 	bool trick_failure = FALSE;
+	bool point_blank = FALSE;
+	bool short_range = FALSE;
 	bool chasm = FALSE;
 	bool fumble = FALSE;
 	bool activate = FALSE;
@@ -3663,7 +3665,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 		/* Hack -- Handle stuff */
 		handle_stuff();
-
+		
 		/* Save the source of the shot/throw */
 		old_y = y;
 		old_x = x;
@@ -3680,9 +3682,9 @@ void player_fire_or_throw_selected(int item, bool fire)
 			ammo_can_break = FALSE;
 		}
 
-		/* Throwing/firing an item at the character's feet */
-		if (!path_n) activate = TRUE;
-
+		/* Throwing/firing an item at the character's feet activates it always */
+		if (path_n < 1) activate = TRUE;
+		
 		/* Project along the path */
 		for (i = 0; i < path_n; ++i)
 		{
@@ -3699,10 +3701,18 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 				break;
 			}
-
+			
 			/* Advance */
 			x = nx;
 			y = ny;
+
+			/* Hack -- Stop if we are throwing/firing at short range */
+			if (target_okay() && (y == p_ptr->target_col) && (x == p_ptr->target_row) && (i < tdis / 2))
+			{
+				short_range = TRUE;
+				
+				break;
+			}
 
 			/* Handle rope over chasm */
 			if (k_ptr)
@@ -3798,6 +3808,9 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 				/* If the weapon returns, ignore monsters */
 				if (tdis == 256) continue;
+				
+				/* Not point blank if hitting a monster */
+				point_blank = FALSE;
 
 				/* Badly balanced weapons do minimum damage
 			 	Various junk (non-weapons) do not use damage for anything else
@@ -4331,6 +4344,10 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 		/* Forget information on dropped object --- FIXME: say why it is needed */
 		drop_may_flags(i_ptr);
+
+		/* At point blank or short range, don't break weapons which miss a monster, and put them exactly on the
+		 * target square. */
+		if ((point_blank) || (short_range)) j = -2;
 
 		/* Drop (or break) near that location */
 		drop_near(i_ptr, j, y, x, FALSE);

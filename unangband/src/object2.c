@@ -6971,6 +6971,11 @@ bool check_object_lite(object_type *j_ptr)
  * This function takes a parameter "chance".  This is the percentage
  * chance that the item will "disappear" instead of drop.  If the object
  * has been thrown, then this is the chance of disappearance on contact.
+ * 
+ * Some special chance values:
+ *  0 = no chance of breakage, don't report it if it is dropped under the player
+ * -1 = no chance of breakage, report it if it is dropped under the player
+ * -2 = no chance of breakage, place it exactly on the square specified
  *
  * Hack -- this function uses "chance" to determine if it should produce
  * some form of "description" of the drop event (under the player).
@@ -7044,11 +7049,15 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 			/* Skip illegal grids */
 			if (!in_bounds_fully(ty, tx)) continue;
 
-			/* Require drop space */
-			if ((f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP)) == 0) continue;
-
-			/* Requires terrain that won't destroy it */
-			if (hates_terrain(j_ptr, cave_feat[ty][tx])) continue;
+			/* We are not placing an object exactly */
+			if ((chance != -2) || (ty != y) || (tx != x))
+			{
+				/* Require drop space */
+				if ((f_info[cave_feat[ty][tx]].flags1 & (FF1_DROP)) == 0) continue;
+	
+				/* Requires terrain that won't destroy it */
+				if ((chance <= 0) && hates_terrain(j_ptr, cave_feat[ty][tx])) continue;
+			}
 
 			/* No objects */
 			k = 0;
@@ -7091,6 +7100,9 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 			if (!generic_los(y, x, ty, tx, CAVE_XLOF))
 				s = s / 4;
 
+			/* We are placing an object exactly */
+			if ((chance == -2) && (ty == y) && (tx == x)) s = 20000;
+			
 			/* Skip bad values */
 			if (s < bs) continue;
 
@@ -7117,7 +7129,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 	if (!flag && !artifact_p(j_ptr))
 	{
 		/* Message */
-		msg_format("The %s disappear%s.",
+		if ((character_dungeon) || (cheat_peek)) msg_format("The %s disappear%s.",
 			   o_name, (plural ? "" : "s"));
 
 		/* Debug */
@@ -7161,7 +7173,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 	if (!floor_carry(by, bx, j_ptr))
 	{
 		/* Message */
-		msg_format("The %s disappear%s.",
+		if ((character_dungeon) || (cheat_peek)) msg_format("The %s disappear%s.",
 			   o_name, (plural ? "" : "s"));
 
 		/* Debug */
@@ -7184,7 +7196,7 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 		if ((character_dungeon) && (!auto_pickup_ignore(j_ptr)))
 		{
 			/* Message */
-			msg_format("The %s disappear%s from view.",
+			if ((character_dungeon) || (cheat_peek)) msg_format("The %s disappear%s from view.",
 				   o_name, (plural ? "" : "s"));
 		}
 	}
@@ -7193,11 +7205,11 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 	if (check_object_lite(j_ptr))
 	{
 		/* Message */
-		msg_format("The %s light%s up the surroundings.", o_name, (plural ? "" : "s"));
+		if ((character_dungeon) || (cheat_peek)) msg_format("The %s light%s up the surroundings.", o_name, (plural ? "" : "s"));
 
 		gain_attribute(by, bx, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
 	}
-
+	
 	/* Sound */
 	sound(MSG_DROP);
 
@@ -7206,14 +7218,24 @@ void drop_near(object_type *j_ptr, int chance, int y, int x, bool dont_trigger)
 	if (chance && (cave_m_idx[by][bx] < 0))
 	{
 		/* Skip message on auto-ignored items */
-		if (!auto_pickup_ignore(j_ptr))
+		if ((!auto_pickup_ignore(j_ptr)) && ((character_dungeon) || (cheat_peek)))
 		{
 			msg_print("You feel something roll beneath your feet.");
 		}
 	}
 
-	/* Trigger regions. Note that this is the original location dropped, not where the object ends up. */
-	if (!dont_trigger) trigger_region(y, x, FALSE);
+	/* Trigger regions. */
+	if (!dont_trigger) trigger_region(by, bx, FALSE);
+	
+	/* Hates terrain */
+	if ((!dont_trigger) && (hates_terrain(j_ptr, cave_feat[by][bx])))
+	{
+		feature_type *f_ptr = &f_info[cave_feat[by][bx]];
+		
+		/* Hack -- this affects all objects in the grid */
+		/* We can't use project_o directly because objects get marked for later breakage */
+		project_one(SOURCE_FEATURE, f_ptr->mimic, p_ptr->py, p_ptr->px,damroll(f_ptr->blow.d_side,f_ptr->blow.d_dice), f_ptr->blow.effect, (PROJECT_ITEM | PROJECT_HIDE));
+	}
 }
 
 

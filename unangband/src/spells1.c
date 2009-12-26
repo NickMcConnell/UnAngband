@@ -1691,6 +1691,12 @@ static bool hates_warpwood(object_type *o_ptr)
  */
 bool hates_terrain(object_type *o_ptr, int f_idx)
 {
+	/* Is terrain covered? */
+	if (f_info[f_idx].flags2 & (FF2_COVERED))
+	{
+		f_idx = f_info[f_idx].mimic;
+	}
+	
 	/* Require non-destructive space */
 	switch(f_info[f_idx].blow.effect)
 	{
@@ -4719,6 +4725,23 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Chasms -- very destructive to objects */
+			case GF_FALL_MORE:
+			{
+				do_kill = TRUE;
+				note_kill = (plural ? " fall from view!" : " falls from view!");
+				
+				/* Hack -- allow rediscovery of artifacts later */
+				if (is_art)
+				{
+					is_art = FALSE;
+					
+					/* Mega-Hack -- Preserve the artifact */
+					a_info[o_ptr->name1].cur_num = 0;
+				}
+				break;
+			}
+
 			/* Holy Orb -- destroys cursed non-artifacts */
 			case GF_HOLY_ORB:
 			{
@@ -5123,7 +5146,9 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					n3 = o_ptr->can_flags3 & ~(k3);
 					n4 = o_ptr->can_flags3 & ~(k4);
 
-					if (n1 || n2 || n3 || n4) msg_format("The %s%s unaffected!",
+					if ((n1 || n2 || n3 || n4)
+							&& ((o_ptr->ident & (IDENT_MARKED)) != 0))
+						msg_format("The %s%s unaffected!",
 									o_name,
 									plural ? " are" : " is");
 
@@ -9042,6 +9067,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		}
 	}
 
+	/* Hide notes if player yet not in the dungeon */
+	if (!(character_dungeon) && !(cheat_hear)) note = FALSE;
+	
 	/* If another non-allied monster or trap did the damage, hurt the monster by hand */
 	if (who > SOURCE_PLAYER_START)
 	{
@@ -9074,7 +9102,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (note && seen) msg_format("%^s%s", m_name, note);
 
 			/* Hack -- Pain message */
-			else if (dam > 0) message_pain(cave_m_idx[y][x], dam);
+			else if ((dam > 0) && ((character_dungeon) || (cheat_hear))) message_pain(cave_m_idx[y][x], dam);
 
 			/* Hack -- handle sleep */
 			if (do_sleep) m_ptr->csleep = do_sleep;
