@@ -11417,28 +11417,44 @@ static bool build_type8910(int room, int type)
 {
 	vault_type *v_ptr = NULL;
 	int y0, x0;
-	int limit = 0;
 	int height, width;
-	int v;
+	int v = -1;
+	int i, j;
+	int count = 0;
 
 	bool flooded = ((room_info[room].flags & (ROOM_FLOODED)) != 0);
 	bool spaced = (flooded) || ((level_flag & (LF1_ISLANDS)) != 0);
 
-	/* Pick a lesser vault */
-	while (TRUE)
+	/* Pick a vault */
+	for (i = 0; i < z_info->v_max; i++)
 	{
-		/* Limit */
-		if (limit++ > 500) return (FALSE);
-
-		/* Get a random vault */
-		v = rand_int(z_info->v_max);
+		u32b vault_flag = v_info[v].level_flag;
 		
-		/* Get a random vault record */
-		v_ptr = &v_info[v];
+		/* Match vault type */
+		if (v_info[i].typ != type) continue;
+		
+		/* Clear vault themes if we haven't picked a theme yet */
+		if ((level_flag & (LF1_THEME)) == 0) vault_flag &= ~(LF1_THEME);
+		
+		/* Vault flags? */
+		if ((vault_flag) && ((level_flag & (vault_flag)) == 0)) continue;
 
-		/* Accept the first room of this type */
-		if (v_ptr->typ == type) break;
+		/* Chance of room entry */
+		if (v_info[i].rarity)
+		{
+			/* Add to chances */
+			count += v_info[i].rarity;
+
+			/* Check chance */
+			if (rand_int(count) < v_info[i].rarity) v = i;
+		}
 	}
+	
+	/* Paranoia - no vault found? */
+	if (v <= 0) return (FALSE);
+	
+	/* Get the vault record */
+	v_ptr = &v_info[v];
 
 	if (cheat_room) message_add(format("Building vault %d.", v_ptr - v_info), MSG_GENERIC);
 	
@@ -11515,7 +11531,51 @@ static bool build_type8910(int room, int type)
 				break;
 		}
 	}
+	
+	/* Vault affects the rest of level generation */
+	/* XXX This is mostly duplicated from place_rooms and should be refactored */
+	if ((level_flag & (LF1_THEME)) == 0)
+	{
+		/* Hack -- no choice */
+		int choice = -1;
 
+		/* Reset count */
+		count = 0;
+
+		/* Keep dungeons 'simple' when deeper rooms first encountered */
+		if ((v_info[v].min_lev >= 5) && (v_info[v].min_lev >= p_ptr->depth - 6))
+		{
+			/* Make corridors 'dungeon-like' */
+			level_flag &= ~(LF1_THEME);
+			level_flag |= (LF1_DUNGEON);
+			
+			/* Empty rooms for remainder of level */
+			i = ROOM_NORMAL;
+			
+			/* Message */
+			if (cheat_room) message_add("One unique room. Rest of level is normal.", MSG_GENERIC);
+		}
+		/* Pick a theme */
+		else for (j = 0; j < 32; j++)
+		{
+			/* Place nature and destroyed elsewhere */
+			if (((1L << j) == (LF1_WILD)) || ((1L << j) == (LF1_DESTROYED))) continue;
+			
+			/* Pick a theme */
+			if ( ((v_info[v].level_flag & (1L << j)) != 0) && (rand_int(++count) == 0)) choice = j;	
+		}
+
+		/* Set a theme if picked */
+		if (choice >= 0)
+		{
+			level_flag |= (1L << choice);
+			
+			/* Message */
+			if (cheat_room) message_add(format("Theme chosen for level is %d.", choice), MSG_GENERIC);					
+		}
+
+	}
+	
 	return (TRUE);
 }
 

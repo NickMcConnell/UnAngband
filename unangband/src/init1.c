@@ -1899,13 +1899,53 @@ errr parse_z_info(char *buf, header *head)
 
 
 /*
+ * Grab one flag from a textual string
+ */
+static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
+{
+	int i;
+
+	/* Check flags */
+	for (i = 0; i < 32; i++)
+	{
+		if (streq(what, names[i]))
+		{
+			*flags |= (1L << i);
+
+			return (0);
+		}
+	}
+
+	return (-1);
+}
+
+
+
+/*
+ * Grab one level flag in an vault_type from a textual string
+ */
+static errr grab_one_vault_level_flag(vault_type *v_ptr, cptr what)
+{
+	if (grab_one_flag(&v_ptr->level_flag, d_info_lflags, what) == 0)
+		return (0);
+
+	/* Oops */
+	msg_format("Unknown vault level flag '%s'.", what);
+
+	/* Error */
+	return (PARSE_ERROR_GENERIC);
+}
+
+
+
+/*
  * Initialize the "v_info" array, by parsing an ascii "template" file
  */
 errr parse_v_info(char *buf, header *head)
 {
 	int i;
 
-	char *s;
+	char *s, *t;
 
 	/* Current entry */
 	static vault_type *v_ptr = NULL;
@@ -1959,6 +1999,33 @@ errr parse_v_info(char *buf, header *head)
 			return (PARSE_ERROR_OUT_OF_MEMORY);
 	}
 
+	/* Hack -- Process 'L' for level flags */
+	else if (buf[0] == 'L')
+	{
+		/* There better be a current v_ptr */
+		if (!v_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
+
+		/* Parse every entry textually */
+		for (s = buf + 2; *s; )
+		{
+			/* Find the end of this entry */
+			for (t = s; *t && (*t != ' ') && (*t != '|'); ++t) /* loop */;
+
+			/* Nuke and skip any dividers */
+			if (*t)
+			{
+				*t++ = '\0';
+				while (*t == ' ' || *t == '|') t++;
+			}
+
+			/* Parse this entry */
+			if (0 != grab_one_vault_level_flag(v_ptr, s)) return (PARSE_ERROR_INVALID_FLAG);
+
+			/* Start the next entry */
+			s = t;
+		}
+	}
+
 	/* Process 'X' for "Extra info" (one line only) */
 	else if (buf[0] == 'X')
 	{
@@ -1978,6 +2045,9 @@ errr parse_v_info(char *buf, header *head)
 		v_ptr->wid = wid;
 		v_ptr->min_lev = min_lev;
 		v_ptr->max_lev = max_lev;
+		
+		/* Hack -- include rarity in "extra info" later */
+		v_ptr->rarity = 1;
 	}
 	else
 	{
@@ -1987,28 +2057,6 @@ errr parse_v_info(char *buf, header *head)
 
 	/* Success */
 	return (0);
-}
-
-
-/*
- * Grab one flag from a textual string
- */
-static errr grab_one_flag(u32b *flags, cptr names[], cptr what)
-{
-	int i;
-
-	/* Check flags */
-	for (i = 0; i < 32; i++)
-	{
-		if (streq(what, names[i]))
-		{
-			*flags |= (1L << i);
-
-			return (0);
-		}
-	}
-
-	return (-1);
 }
 
 

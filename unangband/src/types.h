@@ -919,6 +919,9 @@ struct vault_type
 	byte typ;       /* Vault type */
 
 	byte rat;       /* Vault rating */
+	s16b rarity;	/* Vault rarity */
+	
+	u32b level_flag;	/* Vault requires this flag on level */
 
 	byte hgt;       /* Vault height */
 	byte wid;       /* Vault width */
