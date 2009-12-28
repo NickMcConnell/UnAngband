@@ -7211,7 +7211,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				bool result;
 
 				/* Accurate blow */
-				p_ptr->to_h = s_ptr->param;
+				p_ptr->to_h += s_ptr->param;
 
 				/* Allow direction to be cancelled for free */
 				result = process_spell_blow_shot_hurl(s_ptr->type - SPELL_ACCURATE_BLOW);
