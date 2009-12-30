@@ -5544,7 +5544,7 @@ static void hook_quit(cptr str)
  */
 static void init_stuff(void)
 {
-	//int i;
+	/* int i; */
 
 	char path[1024];
 #ifdef USE_SAVER
