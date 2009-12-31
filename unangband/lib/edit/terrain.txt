@@ -15461,7 +15461,7 @@ K:ADJACENT:738:0
 #$ open lever on a granite wall
 K:PATH:1:0
 #$ open floor
-K:INSTANT:753:0
+K:INSTANT:738:0
 #$ opening lever on a granite wall
 F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
 F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
