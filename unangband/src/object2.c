@@ -4362,6 +4362,9 @@ bool sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 		{
 			/* Torches don't pseudo id */
 			if (o_ptr->sval == SV_LITE_TORCH) break;
+			
+			/* Lanterns only pseudo id if magical/ego/artifact */
+			if (!(o_ptr->name1) && !(o_ptr->name2) && !(o_ptr->xtra1)) break;
 		}
 
 		case TV_RING:
