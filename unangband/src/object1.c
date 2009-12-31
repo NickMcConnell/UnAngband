@@ -946,7 +946,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		if (o_ptr->ident & (IDENT_MENTAL)) object_desc_chr_macro(t,'f');
 		if (o_ptr->ident & (IDENT_CURSED)) object_desc_chr_macro(t,'c');
 		if (o_ptr->ident & (IDENT_BROKEN)) object_desc_chr_macro(t,'w');
-		if (o_ptr->ident & (IDENT_BREAKS)) object_desc_chr_macro(t,'k');
+		if (o_ptr->ident & (IDENT_BREAKS)) object_desc_chr_macro(t,'d');
 		if (o_ptr->ident & (IDENT_CHARGES)) object_desc_chr_macro(t,'s');
 		if (o_ptr->ident & (IDENT_VALUE)) object_desc_chr_macro(t,'v');
 		if (o_ptr->ident & (IDENT_RUNES)) object_desc_chr_macro(t,'r');

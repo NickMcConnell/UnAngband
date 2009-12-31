@@ -1846,10 +1846,26 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_SHOT:
 		{
 			/* Require identical knowledge of both items */
-			if (object_known_p(o_ptr) != object_known_p(j_ptr)) return (0);
-			if (object_named_p(o_ptr) != object_named_p(j_ptr)) return (0);
-			if (object_bonus_p(o_ptr) != object_bonus_p(j_ptr)) return (0);
-			if (object_pval_p(o_ptr) != object_pval_p(j_ptr)) return (0);
+			if (object_known_p(o_ptr) != object_known_p(j_ptr))
+			{
+				if (cheat_xtra) msg_print("Known state does not match");
+				return (0);
+			}
+			if (object_named_p(o_ptr) != object_named_p(j_ptr))
+			{
+				if (cheat_xtra) msg_print("Named state does not match");
+				return (0);
+			}
+			if (object_bonus_p(o_ptr) != object_bonus_p(j_ptr))
+			{
+				if (cheat_xtra) msg_print("Bonus state does not match");
+				return (0);
+			}
+			if (object_pval_p(o_ptr) != object_pval_p(j_ptr))
+			{
+				if (cheat_xtra) msg_print("Pval state does not match");
+				return (0);
+			}
 
 			/* Require identical "bonuses" */
 			if (o_ptr->to_h != j_ptr->to_h) return (FALSE);
@@ -1893,7 +1909,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		}
 	}
 
-	/* Hack -- Require identical "cursed" and "broken" status and "breaking" and "stored" staus */
+	/* Hack -- Require identical "cursed" and "broken" status and "breaking" and "stored" status */
 	if (((o_ptr->ident & (IDENT_CURSED)) != (j_ptr->ident & (IDENT_CURSED))) ||
 	    ((o_ptr->ident & (IDENT_BROKEN)) != (j_ptr->ident & (IDENT_BROKEN))) ||
 	    ((o_ptr->ident & (IDENT_BREAKS)) != (j_ptr->ident & (IDENT_BREAKS))) ||
