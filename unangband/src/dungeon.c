@@ -3235,8 +3235,8 @@ static void process_player(void)
 			/* Check monster recall */
 			process_player_aux();
 
-			/* Display the monlist */
-			if (auto_monlist) display_monlist(1, 0, 11, TRUE, FALSE);
+			/* Display the monlist - unless a command queued */
+			if ((auto_monlist) && !(p_ptr->command_new.key)) display_monlist(1, 0, 11, TRUE, FALSE);
 
 			/* Place the cursor on the player */
 			move_cursor_relative(p_ptr->py, p_ptr->px);
