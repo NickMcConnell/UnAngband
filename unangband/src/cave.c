@@ -6453,8 +6453,12 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			}
 		}
 
-		/* Pick the first grid if possible, the second if necessary */
-		if ((num == 1) || (blockage[0] <= blockage[1]))
+		/* Pick the first grid if possible, the second if necessary.
+		 * Hack -- try to pick the blocked path if we are require_strict_lof
+		 * and are at the end of the path. This helps ensure we end on a
+		 * blocked grid. */
+		if ((num == 1) || (blockage[0] <= blockage[1])
+			|| ((require_strict_lof) && (blockage[1] < 1) && (j >= grids - 2)))
 		{
 			/* Store the first grid, advance */
 			if (blockage[0] < 3) gp[step++] = tmp_grids[j];
@@ -6570,6 +6574,21 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 		j += num;
 	}
 
+	/* Hack - if we are checking for require_strict_lof, it is possible
+	 * that the projection could stop without hitting a CAVE_XLOF square.
+	 * This might occur because a nearby grid created a projection shadow
+	 * without directly impinging on the projection path. */
+	if ((require_strict_lof) && !(monster_in_way) && !(full_stop)
+			&& ((p_ptr->py != GRID_Y(gp[step -1])) || (p_ptr->px != GRID_X(gp[step -1]))))
+	{
+		/* Final grid is projectable */
+		if (cave_project_bold(GRID_Y(gp[step -1]), GRID_X(gp[step -1])))
+		{
+			/* Just warn for the moment */
+			if (cheat_xtra) msg_print("Path does not end correctly.");
+		}
+	}
+	
 	/* Accept last grid as the new endpoint */
 	*y2 = GRID_Y(gp[step -1]);
 	*x2 = GRID_X(gp[step -1]);
