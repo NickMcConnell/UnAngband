@@ -4390,11 +4390,27 @@ bool item_tester_hook_throwable(const object_type *o_ptr)
 	/* Spell cannot be thrown */
 	if (o_ptr->tval == TV_SPELL) return (FALSE);
 
-	/* Cannot thrown any 'built-in' item type */
+	/* Cannot throw any 'built-in' item type */
 	if (o_ptr->ident & (IDENT_STORE)) return (FALSE);
 
 	/* Allowed */
 	return (TRUE);
+}
+
+
+/*
+ * Returns TRUE if an object is permitted to be slung
+ */
+bool item_tester_hook_slingable(const object_type *o_ptr)
+{
+	/* Known throwing items can be slung */
+	if (is_known_throwing_item(o_ptr)) return (TRUE);
+
+	/* Sling shots */
+	if (o_ptr->tval == TV_SHOT) return (TRUE);
+
+	/* Not allowed */
+	return (FALSE);
 }
 
 

@@ -3258,7 +3258,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			(CONDITION_NO_WIND | CONDITION_SKILL_THROW), TMD_CONDITION(TMD_BERSERK), 0, NULL},
 
 	{ player_fire, 'f', "Sling which item? ", "You have nothing to sling around.",
-			is_known_throwing_item, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG),
+			item_tester_hook_slingable, 0, (USE_EQUIP | USE_INVEN | USE_FLOOR | USE_FEATG),
 			(CONDITION_NO_WIND | CONDITION_SKILL_FIRE), TMD_CONDITION(TMD_BERSERK), 0, NULL},
 
 	{ player_fire, 'f', "Fire which arrow? ", "You have no arrows to fire.",

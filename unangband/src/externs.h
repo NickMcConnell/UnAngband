@@ -493,6 +493,7 @@ extern void do_cmd_rest(void);
 extern int breakage_chance(object_type *o_ptr);
 extern int fire_or_throw_path(u16b *gp, int range, int y0, int x0, int *ty, int *tx, int inaccuracy);
 extern bool item_tester_hook_throwable(const object_type *o_ptr);
+extern bool item_tester_hook_slingable(const object_type *o_ptr);
 extern bool player_fire(int item);
 extern bool player_throw(int item);
 extern int set_routes(s16b *routes, int max_num, int from);

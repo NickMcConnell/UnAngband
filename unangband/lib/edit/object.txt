@@ -643,7 +643,6 @@ I:16:2:0
 W:3:0:5:2
 A:3/1:20/1:35/1
 P:0:1d4:0:0:0
-F:THROWING |
 
 ##### Shovels and Picks #####
 
@@ -3704,7 +3703,6 @@ W:35:0:4:20
 A:35/4:47/1
 P:0:2d5:5:5:0
 F:IGNORE_ACID |
-F:THROWING
 
 N:438:& Golden Arrow~
 G:{:y
@@ -6459,8 +6457,6 @@ I:16:5:0
 W:14:0:4:7
 A:14/1:24/1:32/1
 P:0:1d5:0:0:0
-F:THROWING |
-
 
 # Enchant Weapon services
 
