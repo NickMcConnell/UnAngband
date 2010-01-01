@@ -3279,7 +3279,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_BLIND) | TMD_CONDITION(TMD_AMNESIA), 0, NULL},
 
 	{ player_study, 'G', "Study which book? ", "You have no books that you can read.",
-			inven_book_okay, 0, (USE_INVEN | USE_FLOOR | USE_FEATU),
+			inven_study_okay, 0, (USE_INVEN | USE_FLOOR | USE_FEATU),
 			(CONDITION_LITE | CONDITION_LITERATE | CONDITION_NEED_SPELLS),
 			TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_BLIND) | TMD_CONDITION(TMD_AMNESIA), 0, NULL},
 

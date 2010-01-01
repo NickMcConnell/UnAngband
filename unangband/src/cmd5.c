@@ -366,6 +366,46 @@ bool inven_book_okay(const object_type *o_ptr)
 
 
 /*
+ * Is the book okay to study from?
+ *
+ * This requires that the player has spells in it that
+ * they can 'study'.
+ */
+bool inven_study_okay(const object_type *o_ptr)
+{
+	int tval = o_ptr->tval;
+	
+	if ((o_ptr->tval != TV_MAGIC_BOOK) &&
+  	  (o_ptr->tval != TV_PRAYER_BOOK) &&
+  	  (o_ptr->tval != TV_SONG_BOOK) &&
+	  (o_ptr->tval != TV_STUDY)) return (0);
+
+	/* Study notes */
+	if (o_ptr->tval == TV_STUDY)
+	{
+		return (spell_okay(o_ptr->pval, FALSE));
+	}
+
+	/* Book */
+	else
+	{
+		s16b book[26];
+		int num;
+		int i;
+
+		fill_book(o_ptr, book, &num);
+
+		for (i=0; i < num; i++)
+		{
+			if (spell_okay(book[i], FALSE)) return (TRUE);
+		}
+	}
+
+	return (FALSE);
+}
+
+
+/*
  * Peruse the spells/prayers in a Book.
  *
  * Takes an object as a parameter

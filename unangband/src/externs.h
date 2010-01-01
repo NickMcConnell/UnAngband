@@ -561,6 +561,7 @@ extern void do_knowledge_dungeons(void);
 /* cmd5.c */
 extern int get_spell(int *sn, cptr prompt, object_type *o_ptr, bool known);
 extern bool inven_book_okay(const object_type *o_ptr);
+extern bool inven_study_okay(const object_type *o_ptr);
 extern bool player_browse_object(object_type *o_ptr);
 extern bool player_browse(int item);
 extern bool player_study(int item);

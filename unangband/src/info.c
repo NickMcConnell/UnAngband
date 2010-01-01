@@ -3438,11 +3438,69 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_MAGIC_BOOK:
 			case TV_PRAYER_BOOK:
 			case TV_SONG_BOOK:
-				text_out("You can study this to learn new spells.  ");
-				text_out("You can cast spells from this that you have learnt.  ");
-				text_out("You can sell this to a shopkeeper for them to offer additional services.  ");
-				anything = TRUE;
+			{
+				int vn = 0;
+				cptr vp[128];
+				
+				/* Can we study spells from this book? */
+				if (inven_study_okay(o_ptr))
+				{					
+					text_out("You can study this to learn new spells.  ");
+					if (o_ptr->tval == TV_PRAYER_BOOK) text_out("The luck of the gods decides the order you learn these spells.  ");
+					else if (o_ptr->tval == TV_SONG_BOOK) text_out("You must learn these spells in the listed order.  ");
+					
+					anything = TRUE;
+				}
+
+				/* Can we cast spells from this book? */
+				if (inven_cast_okay(o_ptr))
+				{
+					text_out("You can cast spells from this that you have learnt.  ");
+					
+					anything = TRUE;
+				}
+				
+				/* Check for services */
+				for (i = 0; i < z_info->s_max; i++)
+				{
+					bool in_item = FALSE;
+					int service_sval = 0;
+					int ii;
+
+					for (ii = 0; ii < MAX_SPELL_APPEARS; ii++)
+					{
+						spell_appears *s_object = &s_info[i].appears[ii];
+
+						if ((s_object->tval == o_ptr->tval) && (s_object->sval == o_ptr->sval)) in_item = TRUE;
+
+						if (s_object->tval == TV_SERVICE)
+						{
+							service_sval = s_object->sval;
+						}
+					}
+
+					/* Create service object */
+					if ((in_item == TRUE) && (service_sval > 0))
+					{
+						int k_idx = lookup_kind(TV_SERVICE,service_sval);
+
+						vp[vn++] = k_name + k_info[k_idx].name;
+					}
+				}
+				
+				/* Scan */
+				for (n = 0; n < vn; n++)
+				{
+					if (n == 0) text_out(format("You can sell this to a shopkeeper for them to offer the service%s of ", vn > 1 ? "s" : ""));
+					text_out(vp[n]);
+					if (n == vn - 1) text_out(".  ");
+					else if (n == vn - 2) text_out(" and ");
+					else text_out(", ");
+				}
+
 				break;
+
+			}
 			case TV_STUDY:
 				text_out("You can study this to research a new field of magic.  ");
 				anything = TRUE;
