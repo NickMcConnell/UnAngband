@@ -3017,6 +3017,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					teleport_player_to(m_ptr->fy, m_ptr->fx);
 				}
 			}
+			
+			break;
 		}
 
 		/* RF6_TELE_AWAY */
