@@ -4019,12 +4019,25 @@ static const byte chome[] =
 
 
 
+#define OPENING(Y,X) ((f_info[cave_feat[(Y)][(X)]].mimic == p_ptr->run_cur_feat) \
+		|| ((f_info[f_info[cave_feat[(Y)][(X)]].mimic].flags1 & (FF1_MOVE)) != 0))
+
+#define CLOSING_LEFT(Y,X) ((f_info[cave_feat[(Y)][(X)]].mimic == p_ptr->run_left_feat) \
+		|| ((f_info[f_info[cave_feat[(Y)][(X)]].mimic].flags1 & (FF1_WALL)) != 0))
+
+#define CLOSING_RIGHT(Y,X) ((f_info[cave_feat[(Y)][(X)]].mimic == p_ptr->run_right_feat) \
+		|| ((f_info[f_info[cave_feat[(Y)][(X)]].mimic].flags1 & (FF1_WALL)) != 0))
+
+#define CLOSING(Y,X,F) ((f_info[cave_feat[(Y)][(X)]].mimic == (F)) \
+		|| ((f_info[f_info[cave_feat[(Y)][(X)]].mimic].flags1 & (FF1_WALL)) != 0))
+
+
 /*
- * We use this to ignore isolated pillars
+ * We use this to ignore dead ends
  *
  * XXX Note we don't check whether the player can
  * see the dead end. Otherwise we'd stop at every
- * pillar the first time, which would make navigating
+ * dead end the first time, which would make navigating
  * unknown pillared rooms and corridors unnecessarily
  * annoying.
  */
@@ -4046,7 +4059,7 @@ static bool see_dead_end(int y, int x)
 
 		/*if (!(play_info[yy][xx] & (PLAY_MARK))) continue;*/
 
-		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags1 & (FF1_MOVE))
+		if (OPENING(yy, xx))
 		{
 			move |= 1L << i;
 		}
@@ -4088,12 +4101,12 @@ static bool see_dead_end(int y, int x)
  * unknown pillared rooms and corridors unnecessarily
  * annoying.
  */
-static bool see_pillar(int y, int x)
+static bool see_pillar(int y, int x, int feat)
 {
 	int yy, xx, i;
 
 	/* Not a wall */
-	if ((f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_WALL)) == 0) return (FALSE);
+	if (!CLOSING(y, x, feat)) return (FALSE);
 
 	/* Isolated pillars are not known walls */
 	for (i = 0; i < 8; i++)
@@ -4105,7 +4118,7 @@ static bool see_pillar(int y, int x)
 
 		/*if (!(play_info[yy][xx] & (PLAY_MARK))) break;*/
 
-		if (f_info[f_info[cave_feat[yy][xx]].mimic].flags1 & (FF1_WALL)) break;
+		if (CLOSING(y, x, feat)) break;
 	}
 
 	/* Checked all locations -- pillar is isolated */
@@ -4114,24 +4127,43 @@ static bool see_pillar(int y, int x)
 	return (FALSE);
 }
 
+#define SET_NONE 		0
+#define SET_LEFT_FEAT 	1
+#define SET_RIGHT_FEAT 	2
+#define SEE_LEFT_FEAT	4
+#define SEE_RIGHT_FEAT	8
+
 
 /*
  * Hack -- Check for a "known wall" (see below)
  */
-static int see_wall(int dir, int y, int x)
+static int see_wall(int dir, int y, int x, int setting)
 {
+	int feat = 0;
+
 	/* Get the new location */
 	y += ddy[dir];
 	x += ddx[dir];
+
+	/* Get feature */
+	if (setting & (SEE_LEFT_FEAT)) feat = p_ptr->run_left_feat;
+	else if (setting & (SEE_RIGHT_FEAT)) feat = p_ptr->run_right_feat;
 
 	/* Illegal grids are not known walls XXX XXX XXX */
 	if (!in_bounds(y, x)) return (FALSE);
 
 	/* Non-wall grids are not known walls */
-	if (!(f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_WALL)))
+	if (!CLOSING(y, x, feat))
 	{
 		/* Except where the non-wall grid is a short known dead end */
 		if (see_dead_end(y, x)) return (TRUE);
+
+		/* Use this to initialize noticeable features to ignore */
+		if (f_info[f_info[cave_feat[y][x]].mimic].flags1 & (FF1_NOTICE))
+		{
+			if (setting & (SET_LEFT_FEAT)) p_ptr->run_left_feat = f_info[cave_feat[y][x]].mimic;
+			if (setting & (SET_RIGHT_FEAT)) p_ptr->run_right_feat = f_info[cave_feat[y][x]].mimic;
+		}
 
 		return (FALSE);
 	}
@@ -4139,12 +4171,13 @@ static int see_wall(int dir, int y, int x)
 	/* Unknown walls are not known walls */
 	if (!(play_info[y][x] & (PLAY_MARK))) return (FALSE);
 
-	/* Isolated pillars are not know walls */
-	if (see_pillar(y, x)) return (FALSE);
+	/* Isolated pillars are not known walls */
+	if (see_pillar(y, x, feat)) return (FALSE);
 
 	/* Default */
 	return (TRUE);
 }
+
 
 /*
  * Hack -- Check for a "known obstacle" (see below)
@@ -4399,28 +4432,28 @@ static void run_init(int dir)
 	i = chome[dir];
 
 	/* Check for nearby wall */
-	if (see_wall(cycle[i+1], py, px))
+	if (see_wall(cycle[i+1], py, px, SET_LEFT_FEAT))
 	{
 		p_ptr->run_break_left = TRUE;
 		shortleft = TRUE;
 	}
 
 	/* Check for distant wall */
-	else if (see_wall(cycle[i+1], row, col))
+	else if (see_wall(cycle[i+1], row, col, SET_LEFT_FEAT))
 	{
 		p_ptr->run_break_left = TRUE;
 		deepleft = TRUE;
 	}
 
 	/* Check for nearby wall */
-	if (see_wall(cycle[i-1], py, px))
+	if (see_wall(cycle[i-1], py, px, SET_RIGHT_FEAT))
 	{
 		p_ptr->run_break_right = TRUE;
 		shortright = TRUE;
 	}
 
 	/* Check for distant wall */
-	else if (see_wall(cycle[i-1], row, col))
+	else if (see_wall(cycle[i-1], row, col, SET_RIGHT_FEAT))
 	{
 		p_ptr->run_break_right = TRUE;
 		deepright = TRUE;
@@ -4446,13 +4479,16 @@ static void run_init(int dir)
 		}
 
 		/* Hack -- allow blunt corridor entry */
-		else if (see_wall(cycle[i], row, col))
+		else if (see_wall(cycle[i], row, col, SEE_LEFT_FEAT))
 		{
 			if (shortleft && !shortright)
 			{
 				p_ptr->run_old_dir = cycle[i - 2];
 			}
-			else if (shortright && !shortleft)
+		}
+		else if (see_wall(cycle[i], row, col, SEE_RIGHT_FEAT))
+		{
+			if (shortright && !shortleft)
 			{
 				p_ptr->run_old_dir = cycle[i + 2];
 			}
@@ -4625,10 +4661,9 @@ static bool run_test(void)
 		else
 		{
 			/* Check for pillars if we're looking for open areas and not breaks */
-			if (((p_ptr->run_open_area) ||
-					((i < 0) && (!p_ptr->run_break_left)) ||
-					((i > 0) && (!p_ptr->run_break_right))) &&
-					(see_pillar(row, col)))
+			if ((p_ptr->run_open_area) ||
+					((i < 0) && (!p_ptr->run_break_left) && (see_pillar(row, col, p_ptr->run_left_feat))) ||
+					((i > 0) && (!p_ptr->run_break_right)  && (see_pillar(row, col, p_ptr->run_right_feat))) )
 			{
 				pillar = TRUE;
 			}
@@ -4666,17 +4701,11 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-			/* Get feature */
-			feat = cave_feat[row][col];
-
-			/* Get mimiced feature */
-			feat = f_info[feat].mimic;
-
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(play_info[row][col] & (PLAY_MARK)) ||
-			    (!(f_info[feat].flags1 & (FF1_WALL))) ||
-			    see_pillar(row, col))
+			    (!(CLOSING_LEFT(row, col))) ||
+			    see_pillar(row, col, p_ptr->run_left_feat))
 			{
 				/* Looking to break right */
 				if (p_ptr->run_break_right)
@@ -4704,17 +4733,11 @@ static bool run_test(void)
 			row = py + ddy[new_dir];
 			col = px + ddx[new_dir];
 
-			/* Get feature */
-			feat = cave_feat[row][col];
-
-			/* Get mimiced feature */
-			feat = f_info[feat].mimic;
-
 			/* Unknown grid or non-wall */
 			/* Was: cave_floor_bold(row, col) */
 			if (!(play_info[row][col] & (PLAY_MARK)) ||
-			    (!(f_info[feat].flags1 & (FF1_WALL))) ||
-			    (see_pillar(row, col)))
+			    (!(CLOSING_RIGHT(row, col))) ||
+			    (see_pillar(row, col, p_ptr->run_right_feat)))
 			{
 				/* Looking to break left */
 				if (p_ptr->run_break_left)
