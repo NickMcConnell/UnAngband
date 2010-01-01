@@ -18160,7 +18160,7 @@ F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_MISSILE | DROP_TOOL | DROP_WEAPON |
 F:DROP_CLOTHES | DROP_ARMOR | DROP_LITE | DROP_WRITING | DROP_POTION |
 F:DROP_FOOD |
 S:BLOW_1 |
-D:|He|She| makes you glad to be sober.
+D:|He|She| makes you sad to be leaving the Shire.
 
 N:872:Hobbit merchant
 G:h:B
