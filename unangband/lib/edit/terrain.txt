@@ -11931,7 +11931,7 @@ F:EASY_CLIMB | MUST_CLIMB | ATTR_LITE | INSTANT |
 D:You are surrounded by a geyser of water!
 
 N:571:open valve
-G:':U
+G:':m
 U:56
 #$ granite wall
 O:0
@@ -17352,7 +17352,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:ALLOC | GET_FEAT | ATTR_LITE |
 
 N:854:loose chain
-G:~:y
+G:~:m
 M:853
 #$ linked chain
 U:56
@@ -17372,7 +17372,7 @@ F:ALLOC | GET_FEAT | ATTR_LITE |
 D:The chain is loose here.  You need something to link it together.
 
 N:855:opening chain
-G:~:y
+G:~:M
 U:56
 #$ granite wall
 O:345
@@ -17391,7 +17391,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:ALLOC | GET_FEAT | ATTR_LITE | INSTANT | ADJACENT |
 
 N:856:closing chain
-G:~:y
+G:~:M
 U:56
 #$ granite wall
 O:345
@@ -17410,7 +17410,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:ALLOC | GET_FEAT | ATTR_LITE | INSTANT | ADJACENT |
 
 N:857:loose chain
-G:~:y
+G:~:m
 U:56
 #$ granite wall
 O:845
@@ -17425,7 +17425,7 @@ F:HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:ALLOC | GET_FEAT | ATTR_LITE |
 
 N:858:opening valve
-G:':u
+G:':M
 U:56
 #$ granite wall
 O:0
