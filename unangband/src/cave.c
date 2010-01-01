@@ -6118,6 +6118,7 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 
 	/* Require projections to be strictly LOF when possible  XXX XXX */
 	bool require_strict_lof = FALSE;
+	bool really_require_strict_lof = TRUE;
 	bool allow_los = (flg & (PROJECT_LOS)) != 0;
 
 	/* Count of grids in LOF, storage of LOF grids */
@@ -6346,8 +6347,27 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 			if ((!require_strict_lof) || (play_info[y][x] & (PLAY_FIRE))
 				|| ((allow_los) && (play_info[y][x] & (PLAY_VIEW))))
 			{
+				/* Hack - only end on a LOF exception */
+				if (really_require_strict_lof)
+				{
+					grids--;
+					really_require_strict_lof = FALSE;
+				}
+				
 				/* Store grid value */
 				tmp_grids[grids++] = g;
+			}
+			/* Really require strict lof. We allow exceptions for a final
+			 * grid which blocks line of fire. */
+			else if ((require_strict_lof) && !(really_require_strict_lof)
+					&& !(cave_project_bold(y, x))
+							&& (!(allow_los) || !(cave_los_bold(y, x))))
+			{
+				/* Store grid value */
+				tmp_grids[grids++] = g;
+				
+				/* Great variable name */
+				really_require_strict_lof = TRUE;
 			}
 
 			/* Remember previous coordinates */
