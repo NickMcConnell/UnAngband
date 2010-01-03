@@ -373,8 +373,6 @@ bool inven_book_okay(const object_type *o_ptr)
  */
 bool inven_study_okay(const object_type *o_ptr)
 {
-	int tval = o_ptr->tval;
-	
 	if ((o_ptr->tval != TV_MAGIC_BOOK) &&
   	  (o_ptr->tval != TV_PRAYER_BOOK) &&
   	  (o_ptr->tval != TV_SONG_BOOK) &&

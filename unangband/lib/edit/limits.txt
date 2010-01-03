@@ -26,7 +26,7 @@ M:F:996
 M:D:900
 
 # Maximum number of object kinds
-M:K:984
+M:K:1008
 
 # Maximum number of standard artifacts
 M:a:137
@@ -65,10 +65,10 @@ M:H:350
 M:C:13
 
 # Maximum number of weapon style lines
-M:W:164
+M:W:180
 
 # Maximum number of spells
-M:S:622
+M:S:623
 
 # Maximum number of runes
 M:Y:30

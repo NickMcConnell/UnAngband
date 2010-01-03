@@ -5313,15 +5313,9 @@ static bool kind_is_good(int k_idx)
 		/* Books -- high level books are good if not seen previously */
 		case TV_MAGIC_BOOK:
 		case TV_PRAYER_BOOK:
-		{
-			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && ((k_ptr->aware & (AWARE_SEEN)) == 0)) return (TRUE);
-			return (FALSE);
-		}
-
-		/* Books -- high level books are good if not seen previously */
 		case TV_SONG_BOOK:
 		{
-			if ((k_ptr->sval >= SV_BOOK_MIN_GOOD) && ((k_ptr->aware & (AWARE_SEEN)) == 0)) return (TRUE);
+			if ((k_ptr->sval < SV_BOOK_MAX_GOOD) && ((k_ptr->aware & (AWARE_SEEN)) == 0)) return (TRUE);
 			return (FALSE);
 		}
 
@@ -9040,6 +9034,8 @@ s16b inven_carry(object_type *o_ptr)
  *
  * Destroys spells if taken off, rather than placing in inventory.
  *
+ * It is now possible to drop an item from an ally, so we have
+ * to handle this here.
  */
 s16b inven_takeoff(int item, int amt)
 {
@@ -9054,9 +9050,22 @@ s16b inven_takeoff(int item, int amt)
 	cptr act2 = "";
 
 	char o_name[80];
+	char m_name[80];
 
-	/* Get the item to take off */
-	o_ptr = &inventory[item];
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+		
+		/* Get the monster name (or "it") */
+		monster_desc(m_name, sizeof(m_name), o_ptr->held_m_idx, 0);
+	}
 
 	/* Paranoia */
 	if (amt <= 0) return (-1);
@@ -9103,8 +9112,15 @@ s16b inven_takeoff(int item, int amt)
 	/* Describe the object */
 	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
+	/* Take from monster */
+	if (item < 0)
+	{
+		my_strcat(m_name, " was carrying", sizeof(m_name));
+		act = m_name;
+	}
+	
 	/* Destroy spell */
-	if (i_ptr->tval == TV_SPELL)
+	else if (i_ptr->tval == TV_SPELL)
 	{
 		act = "You were enchanted with";
 	}
@@ -9154,9 +9170,18 @@ s16b inven_takeoff(int item, int amt)
 		act = "You were wearing";
 	}
 
-	/* Modify, Optimize */
-	inven_item_increase(item, -amt);
-	inven_item_optimize(item);
+	/* Eliminate the item (from the pack) */
+	if (item >= 0)
+	{
+		inven_item_increase(item, -amt);
+		inven_item_optimize(item);
+	}
+	/* Eliminate the item (from the floor) */
+	else
+	{
+		floor_item_increase(0 - item, -amt);
+		floor_item_optimize(0 - item);
+	}
 
 	/* Carry the object - spells are destroyed */
 	if (i_ptr->tval != TV_SPELL) slot = inven_carry(i_ptr);
@@ -9183,6 +9208,9 @@ s16b inven_takeoff(int item, int amt)
  * Drop (some of) a non-cursed inventory/equipment item
  *
  * The object will be dropped "near" the current location
+ * 
+ * It is now possible to drop an item from an ally, so we have
+ * to handle this here.
  */
 void inven_drop(int item, int amt)
 {
@@ -9195,9 +9223,26 @@ void inven_drop(int item, int amt)
 	object_type object_type_body;
 
 	char o_name[80];
+	char m_name[80];
 
-	/* Get the original object */
-	o_ptr = &inventory[item];
+	/* Get the item (in the pack) */
+	if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+		
+		/* Get the monster name (or "it") */
+		monster_desc(m_name, sizeof(m_name), o_ptr->held_m_idx, 0);
+		
+		/* Drop near monster instead */
+		py = m_list[o_ptr->held_m_idx].fy;
+		px = m_list[o_ptr->held_m_idx].fx;
+	}
 
 	/* Error check */
 	if (amt <= 0) return;
@@ -9219,7 +9264,7 @@ void inven_drop(int item, int amt)
 	}
 
 	/* Forget about object */
-	if (amt == o_ptr->number) inven_drop_flags(o_ptr);
+	if ((item >= 0) && (amt == o_ptr->number)) inven_drop_flags(o_ptr);
 
 	/* Get local object */
 	i_ptr = &object_type_body;
@@ -9265,17 +9310,28 @@ void inven_drop(int item, int amt)
 	object_desc(o_name, sizeof(o_name), i_ptr, TRUE, 3);
 
 	/* Message */
-	msg_format("You drop %s (%c).", o_name, index_to_label(item));
+	msg_format("%s drop%s %s (%c).", item >= 0 ? "You" : m_name, item >= 0 ? "" : "s", o_name, index_to_label(item));
 
-	/* Modify, Describe, Optimize */
-	inven_item_increase(item, -amt);
-	inven_item_describe(item);
-	inven_item_optimize(item);
+	/* Eliminate the item (from the pack) */
+	if (item >= 0)
+	{
+		inven_item_increase(item, -amt);
+		inven_item_describe(item);
+		inven_item_optimize(item);
+	}
+	/* Eliminate the item (from the floor) */
+	else
+	{
+		floor_item_increase(0 - item, -amt);
+		floor_item_describe(0 - item);
+		floor_item_optimize(0 - item);
+	}
 
-	/* Drop it near the player */
+	/* Drop it near the player / monster */
 	/* XXX Happens last for safety reasons */
 	drop_near(i_ptr, 0, py, px, FALSE);
 }
+
 
 /*
  * Check for pack overflow

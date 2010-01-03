@@ -1459,11 +1459,6 @@ static bool get_player_book(void)
 	int     i, j = 0;
 	birth_menu *books;
 
-	/* Hack -- until we set up schools for song books,
-	 * we use this to determine whether we check sval < SV_BOOK_MAX_GOOD
-	 * or sval >= SV_BOOK_MIN_GOOD */
-	bool max_good = FALSE;
-
 	/*** Player book speciality ***/
 
 	int bookc = 0;
@@ -1478,13 +1473,11 @@ static bool get_player_book(void)
 	{
 		case WS_MAGIC_BOOK:
 			tval = TV_MAGIC_BOOK;
-			max_good = TRUE;
 			help = "magic.txt";
 			break;
 
 		case WS_PRAYER_BOOK:
 			tval = TV_PRAYER_BOOK;
-			max_good = TRUE;
 			help = "prayers.txt";
 			break;
 
@@ -1503,14 +1496,14 @@ static bool get_player_book(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
-		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
+		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (k_ptr->sval < SV_BOOK_MAX_GOOD)) continue;
 
 		/* Hack -- count one of non-dungeon books per school */
-		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL /* != SV_BOOK_SCHOOL - 1 */)) continue;
+		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && ((k_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 2)) continue;
 
-		/* Hack -- count one of non-dungeon books per school */
-		if (!(max_good) && (k_ptr->sval < SV_BOOK_MIN_GOOD) && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
-
+		/* Hack -- count only the first half of dungeon books */
+		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD / 2) && (k_ptr->sval < SV_BOOK_MAX_GOOD)) continue;
+		
 		/* Book */
 		if (k_ptr->tval == tval) bookc++;
 	}
@@ -1527,23 +1520,21 @@ static bool get_player_book(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- ignore books that the player has not seen yet */
-		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (max_good ? k_ptr->sval < SV_BOOK_MAX_GOOD : k_ptr->sval >= SV_BOOK_MIN_GOOD)) continue;
+		if ((birth_intermediate) && !(k_ptr->aware & (AWARE_EXISTS)) && (k_ptr->sval < SV_BOOK_MAX_GOOD)) continue;
 
 		/* Hack -- count one of non-dungeon books per school */
-		if (max_good && k_ptr->sval >= SV_BOOK_MAX_GOOD && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD) && ((k_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 2)) continue;
 
-		/* Hack -- count one of non-dungeon books per school */
-		if (!max_good && k_ptr->sval < SV_BOOK_MIN_GOOD && (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+		/* Hack -- count only the first half of dungeon books */
+		if ((k_ptr->sval >= SV_BOOK_MAX_GOOD / 2) && (k_ptr->sval < SV_BOOK_MAX_GOOD)) continue;
 
 		/* Correct tval */
 		if (k_ptr->tval == tval)
 		{
 			/* Save the string. Note offset to skip 'of ' */
 			books[j].name = k_name + k_ptr->name + 3;
-			books[j].choice = k_ptr->sval;
-			books[j++].ghost =
-				(max_good && k_ptr->sval >= SV_BOOK_MAX_GOOD)
-				|| (!max_good && k_ptr->sval < SV_BOOK_MIN_GOOD);
+			books[j].choice = (k_ptr->sval >= SV_BOOK_MAX_GOOD) ? (k_ptr->sval - 3) : k_ptr->sval;
+			books[j++].ghost = (k_ptr->sval < SV_BOOK_MAX_GOOD);
 		}
 	}
 
@@ -1645,7 +1636,7 @@ static bool get_player_school(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- count one of non-dungeon books per school */
-		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || ((k_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 2)) continue;
 
 		if (k_ptr->tval == tval) schoolc++;
 	}
@@ -1660,28 +1651,29 @@ static bool get_player_school(void)
 		k_ptr = &k_info[i];
 
 		/* Hack -- count one of non-dungeon books per school */
-		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || (k_ptr->sval % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 1)) continue;
+		if ((k_ptr->sval < SV_BOOK_MAX_GOOD) || ((k_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL != SV_BOOK_SCHOOL - 2)) continue;
 
 		/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
 		if (p_ptr->psval >= SV_BOOK_MAX_GOOD)
 		{
 			/* Sval hackery */
-			if (k_ptr->sval - (k_ptr->sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 != p_ptr->psval) continue;
+			if (k_ptr->sval - ((k_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 2 != p_ptr->psval) continue;
 		}
 
 		if (k_ptr->tval == tval)
 		{
 			/* Save the string. Note offset to skip 'of ' */
 			schools[k].name = k_name + k_ptr->name + 3;
-			schools[k].choice = k_ptr->sval - SV_BOOK_SCHOOL + 1;
+			schools[k].choice = k_ptr->sval - 3;
 			schools[k].ghost = FALSE;
 
 			/* Mega-hack for ghosting starting mages/rangers/artisans */
 			switch (p_ptr->pclass)
 			{
-				case 1: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval >= SV_BOOK_MAX_GOOD + 20)) schools[k].ghost = TRUE; break;
-				case 3: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval < SV_BOOK_MAX_GOOD + 20)) schools[k].ghost = TRUE; break;
-				case 4: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval < SV_BOOK_MAX_GOOD + 20)) schools[k].ghost = TRUE; break;
+				case 1: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval >= SV_BOOK_MAX_GOOD + 5 * SV_BOOK_SCHOOL)) schools[k].ghost = TRUE; break;
+				case 3: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval < SV_BOOK_MAX_GOOD + 5 * SV_BOOK_SCHOOL)) schools[k].ghost = TRUE; break;
+				case 4: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval < SV_BOOK_MAX_GOOD + 5 * SV_BOOK_SCHOOL)) schools[k].ghost = TRUE; break;
+				case 12: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval < SV_BOOK_MAX_GOOD + 5 * SV_BOOK_SCHOOL)) schools[k].ghost = TRUE; break;
 				default:
 				{
 					/* Gifted or chosen mage */

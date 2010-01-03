@@ -2640,15 +2640,14 @@ enum
 #define SV_CHEST_MIN_LARGE	4
 
 /*
- * Special "sval" limit -- first/last "good" magic/prayer book
+ * Special "sval" limit -- last "good" magic/prayer book
  */
-#define SV_BOOK_MIN_GOOD	4
-#define SV_BOOK_MAX_GOOD	32
+#define SV_BOOK_MAX_GOOD	52
 
 /*
  * How many books in a school?
  */
-#define SV_BOOK_SCHOOL		4
+#define SV_BOOK_SCHOOL		5
 
 /*
  * Special "sval" limit -- maximum number of bags
@@ -3071,8 +3070,10 @@ enum
 #define USE_BAGC		0x00000100L	/* Allow bag contents */
 #define USE_BAGS		0x00000200L	/* Allow whole of bag */
 #define USE_SKIN		0x00000400L	/* Allow bare skin */
-
-
+#define USE_ALLY		0x00000800L	/* Allow items carried by allies */
+#define USE_TARGET		0x00001000L	/* Allow items carried by target */
+#define USE_RANGE		0x00002000L	/* Allow ranged targets and/or allies */
+#define USE_KNOWN		0x00004000L	/* Allow known targets and/or allies */
 
 
 /*** Player flags ***/

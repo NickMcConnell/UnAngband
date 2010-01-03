@@ -3844,6 +3844,7 @@ errr parse_k_info(char *buf, header *head)
 			case TV_EGG:
 					k_ptr->flags6 |= (TR6_BREAK_THROW | TR6_NAMED);
 					k_ptr->flags6 |= (TR6_EAT_BODY | TR6_EAT_ANIMAL | TR6_EAT_INSECT);
+					k_ptr->flags6 |= (TR6_NO_TIMEOUT);
 					break;
 
 			case TV_ARROW:
@@ -4073,6 +4074,7 @@ errr parse_k_info(char *buf, header *head)
 			{
 				k_ptr->flags6 |= (TR6_NAMED);
 				k_ptr->flags6 |= (TR6_EAT_BODY | TR6_EAT_INSECT);
+				k_ptr->flags6 |= (TR6_NO_TIMEOUT);
 				break;
 
 			}
@@ -10634,7 +10636,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 	for (n = 0; n < MAX_SPELL_APPEARS; n++)
 	{
 		if (!s_ptr->appears[n].tval) continue;
-
+		
 		fprintf(fp, "A:%d:%d:%d\n", s_ptr->appears[n].tval, s_ptr->appears[n].sval,
 				s_ptr->appears[n].slot);
 	}
@@ -10661,6 +10663,12 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 
 			if (s_ptr->cast[n].class == 1) mage_spell = TRUE;
 			if (s_ptr->cast[n].class == 2) priest_spell = TRUE;
+			
+			if (s_ptr->cast[n].class == 3)
+			{
+				fprintf(fp, "C:12:%d:%d:%d:%d\n",
+						s_ptr->cast[n].level,s_ptr->cast[n].mana,s_ptr->cast[n].fail,s_ptr->cast[n].min);
+			}
 		}
 
 		/* Hack -- note when sub-classes cannot cast spell */
@@ -10691,7 +10699,7 @@ errr emit_s_info_index(FILE *fp, header *head, int i)
 
 		fprintf(fp, "B:%s", method_name + method_info[s_ptr->blow[n].method].name);
 
-		if (s_ptr->blow[n].effect)
+		if (TRUE /*s_ptr->blow[n].effect*/)
 		{
 			fprintf(fp, ":%s", effect_name + effect_info[s_ptr->blow[n].effect].name);
 
