@@ -9703,12 +9703,15 @@ bool spell_match_style(int spell)
 
 		/* Outright match */
 		if (sval == p_ptr->psval) return (TRUE);
+		
+		/* Match high version of book */
+		if ((sval < SV_BOOK_MAX_GOOD) && (p_ptr->psval == sval % (SV_BOOK_MAX_GOOD / 2)))
 
 		/* Match because we have specialised in a 'basic spellbook style, and book falls into this category */
 		if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (sval >= SV_BOOK_MAX_GOOD))
 		{
-			/* Sval hackery */
-			if (sval - (sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 == p_ptr->psval) return (TRUE);
+			/* Confirm in same school */
+			if ((sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL == (p_ptr->psval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL) return (TRUE);
 		}
 	}
 

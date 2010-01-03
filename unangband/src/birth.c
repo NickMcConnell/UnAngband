@@ -1294,6 +1294,26 @@ static void class_aux_hook(birth_menu c_str)
 	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 2, -1, TERM_WHITE, s);
 	sprintf(s, "Infravision: %d ft  ", rp_ptr->infra * 10);
 	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 3, -1, TERM_WHITE, s);
+	
+	/* Display primary stat */
+	i = cp_ptr->spell_power ? cp_ptr->spell_stat_mana : A_STR;
+	sprintf(s, "%s", stat_names[i]);
+	s[3] = '\0';
+	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 5, -1, TERM_WHITE, "Primary stat: ");
+	Term_putstr(CLASS_AUX2_COL + 14, TABLE_ROW + A_MAX + 5, -1, cp_ptr->c_adj[i] + rp_ptr->r_adj[i] < -4 ? TERM_RED :
+	( cp_ptr->c_adj[i] + rp_ptr->r_adj[i] < 0? TERM_YELLOW :
+		( cp_ptr->c_adj[i] + rp_ptr->r_adj[i] ? TERM_L_GREEN : TERM_WHITE)), s);
+	
+	/* Display secondary stat */
+	i = cp_ptr->spell_first < 99 ? cp_ptr->spell_stat_fail :
+		(cp_ptr->c_skill_base[SKILL_TO_HIT_BOW] > cp_ptr->c_skill_base[SKILL_TO_HIT_MELEE] ? A_DEX :
+		(cp_ptr->c_skill_base[SKILL_TO_HIT_THROW] > cp_ptr->c_skill_base[SKILL_TO_HIT_MELEE] ? A_AGI : A_SIZ));
+	sprintf(s, "%s", stat_names[i]);
+	s[3] = '\0';
+	Term_putstr(CLASS_AUX2_COL, TABLE_ROW + A_MAX + 6, -1, TERM_WHITE, "Secondary stat: ");
+	Term_putstr(CLASS_AUX2_COL + 16, TABLE_ROW + A_MAX + 6, -1, cp_ptr->c_adj[i] + rp_ptr->r_adj[i] < -4 ? TERM_RED :
+	( cp_ptr->c_adj[i] + rp_ptr->r_adj[i] < 0? TERM_YELLOW :
+		( cp_ptr->c_adj[i] + rp_ptr->r_adj[i] ? TERM_L_GREEN : TERM_WHITE)), s);
 
 	/* Enumerate through skills */
 	for (i = 0; skill_table[i].skill >= 0; i++)
@@ -1656,8 +1676,8 @@ static bool get_player_school(void)
 		/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
 		if (p_ptr->psval >= SV_BOOK_MAX_GOOD)
 		{
-			/* Sval hackery */
-			if (k_ptr->sval - ((k_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 2 != p_ptr->psval) continue;
+			/* Confirm in same school */
+			if ((k_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->psval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL) continue;
 		}
 
 		if (k_ptr->tval == tval)
@@ -1667,7 +1687,7 @@ static bool get_player_school(void)
 			schools[k].choice = k_ptr->sval - 3;
 			schools[k].ghost = FALSE;
 
-			/* Mega-hack for ghosting starting mages/rangers/artisans */
+			/* Mega-hack for ghosting starting mages/rangers/artisans/rogues */
 			switch (p_ptr->pclass)
 			{
 				case 1: if ((tval == TV_MAGIC_BOOK) && (k_ptr->sval >= SV_BOOK_MAX_GOOD + 5 * SV_BOOK_SCHOOL)) schools[k].ghost = TRUE; break;

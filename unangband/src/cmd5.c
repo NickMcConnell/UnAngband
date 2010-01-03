@@ -462,18 +462,22 @@ bool player_browse_object(object_type *o_ptr)
 	}
 
 	/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
-	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD))
+	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD)
+			&& ( ((p_ptr->pstyle == WS_MAGIC_BOOK) && (o_ptr->tval == TV_MAGIC_BOOK))
+			|| ((p_ptr->pstyle == WS_PRAYER_BOOK) && (o_ptr->tval == TV_PRAYER_BOOK))
+			|| ((p_ptr->pstyle == WS_SONG_BOOK) && (o_ptr->tval == TV_SONG_BOOK))))
 	{
-		/* Sval hackery */
-		if (o_ptr->sval - (o_ptr->sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 != p_ptr->psval)
+		/* Confirm in same school */
+		if ((o_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->psval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL)
 		{
-			msg_format("You cannot read that %s.",p);
-			switch(o_ptr->sval % 4)
+			msg_format("You cannot read any %ss in it.",p);
+			switch ((o_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL)
 			{
 				case 0: msg_print("It shows a lack of grasp of simple theory."); break;
 				case 1: msg_print("It could never work due to harmonic instability."); break;
 				case 2: msg_print("It's the deranged scribblings from a lunatic asylum."); break;
 				case 3: msg_print("The book snaps itself shut and jumps from your fingers."); break;
+				default: msg_print("Your eyes twist away from the pages... there were some things man was not meant to know."); break;
 			}
 
 			return (FALSE);
@@ -854,10 +858,13 @@ bool player_study(int item)
 	}
 
 	/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
-	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD))
+	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD)
+			&& ( ((p_ptr->pstyle == WS_MAGIC_BOOK) && (o_ptr->tval == TV_MAGIC_BOOK))
+			|| ((p_ptr->pstyle == WS_PRAYER_BOOK) && (o_ptr->tval == TV_PRAYER_BOOK))
+			|| ((p_ptr->pstyle == WS_SONG_BOOK) && (o_ptr->tval == TV_SONG_BOOK))))
 	{
-		/* Sval hackery */
-		if (o_ptr->sval - (o_ptr->sval % SV_BOOK_SCHOOL) + SV_BOOK_SCHOOL - 1 != p_ptr->psval) disdain = TRUE;
+		/* Confirm in same school */
+		if ((o_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->psval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL) disdain = TRUE;
 	}
 
 	/* Spell is illegible */
@@ -865,18 +872,19 @@ bool player_study(int item)
 	{
 		msg_format("You cannot study that %s.",p);
 
-		switch(o_ptr->sval % 4)
+		switch ((o_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL)
 		{
 			case 0: msg_print("You lack the grasp of simple theory."); break;
 			case 1: msg_print("You can't master it due to harmonic instability."); break;
 			case 2: msg_print(format("Your %ss resemble deranged scribblings from a lunatic asylum.", p)); break;
 			case 3: msg_print("The book burns red hot in your hands!"); break;
+			default: msg_print("There were some things man was not meant to know, and those things are now crawling around your brain like worms..."); break;
 		}
 
 		msg_print("You pass out from the strain!");
 
 		/* Hack -- Bypass free action */
-		inc_timed(TMD_PARALYZED, randint(o_ptr->sval % 4 + 1), FALSE);
+		inc_timed(TMD_PARALYZED, randint((o_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL + 1), FALSE);
 
 		return (FALSE);
 	}
