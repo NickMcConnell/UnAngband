@@ -2742,6 +2742,7 @@ static void calc_mana(void)
 
 		/* Normal gloves hurt mage-type spells */
 		if (o_ptr->k_idx &&
+			(o_ptr->tval != TV_TATTOO) &&
 		    !(f3 & (TR3_FREE_ACT)) &&
 		    !((f1 & (TR1_INT | TR1_WIS | TR1_DEX)) && (o_ptr->pval > 0)))
 		{
