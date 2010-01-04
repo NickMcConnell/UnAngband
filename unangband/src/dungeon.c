@@ -950,7 +950,7 @@ void suffer_disease(bool allow_cure)
 					p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 				}
 
-				(void)project_p(SOURCE_DISEASE, effect, p_ptr->py, p_ptr->px, 0, GF_DISPEL);
+				(void)project_one(SOURCE_DISEASE, effect, p_ptr->py, p_ptr->px, 0, GF_DISPEL, (PROJECT_PLAY | PROJECT_HIDE));
 				break;
 			}
 
@@ -1368,10 +1368,7 @@ static void process_world(void)
 		msg_format("You are drowning %s%s!",(f_ptr->flags2 & (FF2_FILLED)?"":"in the "),name);
 
 		/* Apply the blow */
-		project_p(SOURCE_FEATURE, mimic, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER);
-
-		/* Apply the blow */
-		project_t(SOURCE_FEATURE, mimic, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER);
+		project_one(SOURCE_FEATURE, mimic, p_ptr->py, p_ptr->px, damroll(4,6), GF_WATER, (PROJECT_PLAY | PROJECT_HIDE));
 	}
 
 	/* Take damage from poison */

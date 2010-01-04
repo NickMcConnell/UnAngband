@@ -9263,7 +9263,7 @@ void trigger_region(int y, int x, bool move)
 			else
 			{
 				/* Damage objects directly if dropping an object. */
-				notice |= project_o(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect);
+				notice |= project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, (PROJECT_GRID));
 			}
 		}
 

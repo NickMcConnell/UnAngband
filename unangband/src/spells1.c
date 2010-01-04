@@ -4433,6 +4433,11 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 }
 
 
+/*
+ * Forward declare these functions referenced by project_o
+ */
+bool project_f(int who, int what, int y, int x, int dam, int typ);
+
 
 /*
  * We are called from "project()" to "damage" objects

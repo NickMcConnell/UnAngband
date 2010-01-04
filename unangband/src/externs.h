@@ -931,10 +931,12 @@ extern bool hates_fire(object_type *o_ptr);
 extern void check_monster_quest(int m_idx, bool (*questor_test_hook)(int m_idx), u32b event);
 extern bool temp_lite(int y, int x);
 extern u16b bolt_pict(int y, int x, int ny, int nx, int typ);
+#if 0
 extern bool project_f(int who, int what, int y, int x, int dam, int typ);
 extern bool project_o(int who, int what, int y, int x, int dam, int typ);
 extern bool project_m(int who, int what, int y, int x, int dam, int typ);
 extern bool project_p(int who, int what, int y, int x, int dam, int typ);
+#endif
 extern bool project_t(int who, int what, int y, int x, int dam, int typ);
 extern bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);

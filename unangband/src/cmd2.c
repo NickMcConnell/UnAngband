@@ -4237,7 +4237,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 			if (k < 0) k = 0;
 
 			/* Damage */
-			project_p(fire ? SOURCE_PLAYER_SHOT : SOURCE_PLAYER_THROW, i_ptr->k_idx, y, x, k, GF_HURT);
+			project_one(fire ? SOURCE_PLAYER_SHOT : SOURCE_PLAYER_THROW, i_ptr->k_idx, y, x, k, GF_HURT, (PROJECT_PLAY | PROJECT_HIDE));
 
 			/* Apply additional effect from activation */
 			if (auto_activate(o_ptr))

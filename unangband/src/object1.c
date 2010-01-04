@@ -4570,8 +4570,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				/* Mega-Hack -- we are setting the floor alight with a torch */
 				if (use_feath)
 				{
-					project_o(0, 0, p_ptr->py, p_ptr->px, 1, GF_FIRE);
-					project_f(0, 0, p_ptr->py, p_ptr->px, 1, GF_FIRE);
+					project_one(0, 0, p_ptr->py, p_ptr->px, 1, GF_FIRE, (PROJECT_ITEM | PROJECT_GRID));
 
 					done = TRUE;
 					break;

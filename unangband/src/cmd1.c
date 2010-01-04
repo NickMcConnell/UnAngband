@@ -2314,10 +2314,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								obvious = TRUE;
 
 								/* Apply damage directly */
-								if (player)
-									project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, ny, nx, k, GF_HURT);
-								else
-									project_m(SOURCE_PLAYER_TRAP, o_ptr->k_idx, ny, nx, k, GF_HURT);
+								project_one(SOURCE_PLAYER_TRAP, o_ptr->k_idx, ny, nx, k, GF_HURT, (PROJECT_PLAY | PROJECT_KILL));
 
 								/* Apply additional effect from coating or sometimes activate */
 								if ((coated_p(o_ptr)) || (auto_activate(o_ptr)))
@@ -2528,7 +2525,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 			case TV_SPIKE:
 			{
 				/* Apply damage directly */
-				project_p(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, damroll(6, 6), GF_FALL_SPIKE);
+				project_one(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, damroll(6, 6), GF_FALL_SPIKE, (PROJECT_PLAY));
 
 				/* Decrease the item */
 				floor_item_increase(cave_o_idx[y][x], -1);
@@ -3419,7 +3416,7 @@ void py_attack(int dir)
 			/* Fumble - damage self */
 			if (fumble)
 			{
-				project_p(SOURCE_PLAYER_ATTACK, o_ptr->k_idx, y, x, k, GF_HURT);
+				project_one(SOURCE_PLAYER_ATTACK, o_ptr->k_idx, y, x, k, GF_HURT, (PROJECT_PLAY));
 			}
 
 			/* Damage, check for fear and death */

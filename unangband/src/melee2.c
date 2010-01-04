@@ -5373,10 +5373,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					if (m_ptr->mflag & (MFLAG_ALLY)) m_ptr->mflag |= (MFLAG_PUSH);
 
 					/* New result routine */
-					project_m(who, what, ny, nx, damage, effect);
-
-					/* Apply teleport and other effects */
-					project_t(who, what, ny, nx, damage, effect);
+					project_one(who, what, ny, nx, damage, effect, (PROJECT_KILL | PROJECT_HIDE));
 				}
 			}
 		}
@@ -7271,10 +7268,7 @@ static void recover_monster(int m_idx, bool regen)
 		if (daytime && hurt_lite && outside)
 		{
 			/* Burn the monster */
-			project_m(SOURCE_DAYLIGHT, 0, y, x, damroll(4,6), GF_LITE);
-
-			/* Burn the monster */
-			project_t(SOURCE_DAYLIGHT, 0, y, x, damroll(4,6), GF_LITE);
+			project_one(SOURCE_DAYLIGHT, 0, y, x, damroll(4,6), GF_LITE, (PROJECT_KILL));
 		}
 		else if ((f_info[cave_feat[y][x]].blow.method) && !(f_info[cave_feat[y][x]].flags1 & (FF1_HIT_TRAP)))
 		{
@@ -7285,10 +7279,7 @@ static void recover_monster(int m_idx, bool regen)
 		else
 		{
 			/* Suffocate the monster */
-			project_m(SOURCE_FEATURE, cave_feat[y][x], y, x, damroll(4,6), GF_SUFFOCATE);
-
-			/* Suffocate the monster */
-			project_t(SOURCE_FEATURE, cave_feat[y][x], y, x, damroll(4,6), GF_SUFFOCATE);
+			project_one(SOURCE_FEATURE, cave_feat[y][x], y, x, damroll(4,6), GF_SUFFOCATE, (PROJECT_KILL | PROJECT_HIDE));
 		}
 
 		/* Is the monster hidden?*/
