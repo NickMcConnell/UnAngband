@@ -1066,8 +1066,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	vn = 0;
 
 	if (s_ptr->flags3 & (SF3_DEC_FOOD)) vp[vn++] = "makes you weak from hunger";
-	if (s_ptr->flags2 & (SF2_CURSE_WEAPON)) vp[vn++] = "curses your weapon";
-	if (s_ptr->flags2 & (SF2_CURSE_ARMOR)) vp[vn++] = "curses your armor";
+	if (s_ptr->flags2 & (SF2_SLOW_POIS)) vp[vn++] = "delays the onset of poison";
+	if (s_ptr->flags2 & (SF2_SLOW_DIGEST)) vp[vn++] = "digests food more efficiently";
 	if (s_ptr->flags2 & (SF2_AGGRAVATE)) vp[vn++] = "wakes up nearby monsters and hastes those in line of sight";
 	if (s_ptr->type == SPELL_SUMMON)
 	{
@@ -1099,8 +1099,9 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 			default: vp[vn++] = "summons monsters"; break;
 		}
 	}
-	if (s_ptr->type == SPELL_SUMMON_RACE) vp[vn++] = format("summons %s%s",
-		is_a_vowel((r_name+r_info[s_ptr->param].name)[0])?"an ":"a ",
+	if (s_ptr->type == SPELL_SUMMON_RACE) vp[vn++] = format("summons %s",
+		r_name+r_info[s_ptr->param].name);
+	if (s_ptr->type == SPELL_RAISE_RACE) vp[vn++] = format("summons %s from beyond the grave",
 		r_name+r_info[s_ptr->param].name);
 	if (s_ptr->type == SPELL_SUMMON_GROUP_IDX) vp[vn++] = "summons related monsters";
 	if (s_ptr->type == SPELL_CREATE_KIND) vp[vn++] = "creates gold";
@@ -1114,7 +1115,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_TELE_LEVEL)) vp[vn++] = "pushes you through floor or ceiling";
 	if (s_ptr->flags2 & (SF2_RECALL)) vp[vn++]="returns you to the surface, or teleports you into the depths";
 	if (s_ptr->flags2 & (SF2_ALTER_LEVEL)) vp[vn++] = "alters the level you are on";
-	if (s_ptr->type == SPELL_XXX1) vp[vn++] = format("does XXX1 %d",s_ptr->param);
 	if (s_ptr->type == SPELL_XXX2) vp[vn++] = format("does XXX2 %d",s_ptr->param);
 	if (s_ptr->flags2 & (SF2_BANISHMENT)) vp[vn++] = "allows you to remove a monster type from a level (1d4 damage per monster)";
 	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT)) vp[vn++] = "removes all nearby monsters";
@@ -1150,8 +1150,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->type == SPELL_DAMAGING_BLOW) vp[vn++] = "increases the damage of a single round of blows";
 	if (s_ptr->type == SPELL_DAMAGING_SHOT) vp[vn++] = "increases the damage of a single round of firing";
 	if (s_ptr->type == SPELL_DAMAGING_HURL) vp[vn++] = "increases the damage of a single round of thrown weapons";
-	if ((s_ptr->type == SPELL_SLOW_POIS) || (s_ptr->type == SPELL_SLOW_META)) vp[vn++] = "delays the onset of poison";
-	if ((s_ptr->type == SPELL_SLOW_DIGEST) || (s_ptr->type == SPELL_SLOW_META)) vp[vn++] = "digests food more efficiently";
+	if (s_ptr->type == SPELL_CURSE_WEAPON) vp[vn++] = "curses your weapon";
+	if (s_ptr->type == SPELL_CURSE_ARMOR) vp[vn++] = "curses your armor";
 
 
 	/* Describe miscellaneous effects */

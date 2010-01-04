@@ -1048,6 +1048,13 @@ static bool set_recall(void)
 		msg_print("Nothing happens.");
 		return (FALSE);
 	}
+	
+	/* Nothing to recall to */
+	if (min_depth(p_ptr->dungeon) == max_depth(p_ptr->dungeon))
+	{
+		msg_print("Nothing happens.");
+		return (FALSE);
+	}
 
 	/* Activate recall */
 	if (!p_ptr->word_recall)
@@ -6004,6 +6011,20 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		obvious = TRUE;
 	}
 
+	/* Process word of recall */
+	if (s_ptr->flags2 & (SF2_RECALL))
+	{
+		if (!set_recall() && !(*cancel))
+		{
+			return (TRUE);
+		}
+		*cancel = FALSE;
+		obvious = TRUE;
+	}
+
+	/*** From this point forward, any abilities cannot be cancelled ***/
+	if (s_ptr->flags1 || s_ptr->flags2 || s_ptr->flags3) *cancel = FALSE;
+	
 	/* Process the flags -- basic feature detection */
 	if ((s_ptr->flags1 & (SF1_DETECT_DOORS)) && (detect_feat_flags(FF1_DOOR, 0x0L, 0x0L, 2 * MAX_SIGHT, known))) vp[vn++] = "doors";
 	if ((s_ptr->flags1 & (SF1_DETECT_TRAPS)) && (detect_feat_flags(FF1_TRAP, 0x0L, 0x0L, 2 * MAX_SIGHT, known))) vp[vn++] = "traps";
@@ -6016,7 +6037,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	/* Process the flags -- basic monster detection */
 	if ((s_ptr->flags1 & (SF1_DETECT_EVIL)) && (detect_monsters(monster_tester_hook_evil, known))) vp[vn++] = "evil";
 	if ((s_ptr->flags1 & (SF1_DETECT_MONSTER)) && (detect_monsters(monster_tester_hook_normal, known))) vp[vn++] = "monsters";
-
+	
 	/* Process the flags -- specific monster detection */
 	if (s_ptr->type == SUMMON_RACE)
 	{
@@ -6030,36 +6051,36 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	/* Process the flags -- detect water */
 	if (s_ptr->flags1 & (SF1_DETECT_WATER))
-	{
-                if (detect_feat_flags(0x0L, FF2_WATER, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "water";
-                if (detect_monsters(monster_tester_hook_water, known)) vp[vn++] = "watery creatures";
+	{		
+		if (detect_feat_flags(0x0L, FF2_WATER, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "water";
+		if (detect_monsters(monster_tester_hook_water, known)) vp[vn++] = "watery creatures";	
 	}
 
 	/* Process the flags -- detect water */
 	if (s_ptr->type == SPELL_DETECT_FIRE)
 	{
-                if (detect_feat_blows(GF_FIRE, 2 * MAX_SIGHT, known)) vp[vn++] = "fire";
-                if (detect_feat_blows(GF_SMOKE, 2 * MAX_SIGHT, known)) vp[vn++] = "smoke";
-                if (detect_feat_blows(GF_LAVA, 2 * MAX_SIGHT, known)) vp[vn++] = "lava";
-                if (detect_monsters(monster_tester_hook_fire, known)) vp[vn++] = "fiery creatures";
+        if (detect_feat_blows(GF_FIRE, 2 * MAX_SIGHT, known)) vp[vn++] = "fire";
+        if (detect_feat_blows(GF_SMOKE, 2 * MAX_SIGHT, known)) vp[vn++] = "smoke";
+        if (detect_feat_blows(GF_LAVA, 2 * MAX_SIGHT, known)) vp[vn++] = "lava";
+        if (detect_monsters(monster_tester_hook_fire, known)) vp[vn++] = "fiery creatures";
 	}
 
 	/* Process the flags -- detect gold */
 	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
-        {
-                if (detect_objects_tval(TV_GOLD)) vp[vn++] = "gold";
-                if (detect_objects_tval(TV_GEMS)) vp[vn++] = "gems";
-                if (detect_feat_flags(FF1_HAS_GOLD, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "buried treature";
-                if (detect_monsters(monster_tester_hook_mineral, known)) vp[vn++] = "mineral creatures";
-        }
+    {
+        if (detect_objects_tval(TV_GOLD)) vp[vn++] = "gold";
+        if (detect_objects_tval(TV_GEMS)) vp[vn++] = "gems";
+        if (detect_feat_flags(FF1_HAS_GOLD, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "buried treature";
+        if (detect_monsters(monster_tester_hook_mineral, known)) vp[vn++] = "mineral creatures";
+    }
 
 	/* Process the flags -- detect objects and object monsters */
 	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
-        {
-                if (detect_objects_normal()) vp[vn++] = "objects";
+    {
+	    if (detect_objects_normal()) vp[vn++] = "objects";
 		if (detect_feat_flags(FF1_HAS_ITEM, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "hidden items";
-                if (detect_monsters(monster_tester_hook_mimic, known)) vp[vn++] = "mimics";
-        }
+        if (detect_monsters(monster_tester_hook_mimic, known)) vp[vn++] = "mimics";
+    }
 
 	/* Process the flags -- detect magic */
 	if (s_ptr->flags1 & (SF1_DETECT_MAGIC))
@@ -6155,10 +6176,10 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		obvious = TRUE;
 	}
 
-
-	/* SF2 - timed abilities and modifying level */
-	if ((s_ptr->flags2 & (SF2_CURSE_WEAPON)) && (curse_weapon())) obvious = TRUE;
-	if ((s_ptr->flags2 & (SF2_CURSE_ARMOR)) && (curse_armor())) obvious = TRUE;
+	/* SF2 - timed abilities and modifying */
+	/* Note slow poison is silent in its effect */
+	if ((s_ptr->flags2 & (SF2_SLOW_POIS)) && (set_slow_poison(p_ptr->timed[TMD_SLOW_POISON] + lasts))) obvious = TRUE;
+	if ((s_ptr->flags2 & (SF2_SLOW_DIGEST)) && (inc_timed(TMD_SLOW_DIGEST, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_INFRA)) && (inc_timed(TMD_INFRA, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_HERO)) && (inc_timed(TMD_HERO, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_SHERO)) && (inc_timed(TMD_BERSERK, lasts, TRUE))) obvious = TRUE;
@@ -6167,14 +6188,16 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags2 & (SF2_INVIS)) && (inc_timed(TMD_INVIS, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_SEE_INVIS)) && (inc_timed(TMD_SEE_INVIS, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_PROT_EVIL)) && (inc_timed(TMD_PROTEVIL, lasts + (level== 0 ? 3 * p_ptr->lev : 0), TRUE))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (set_timed(TMD_CURSED, p_ptr->timed[TMD_CURSED] / 2, TRUE))) obvious = TRUE;
-	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (clear_timed(TMD_CURSED, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_FIRE)) && (inc_timed(TMD_OPP_FIRE, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_COLD)) && (inc_timed(TMD_OPP_COLD, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_ACID)) && (inc_timed(TMD_OPP_ACID, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_ELEC)) && (inc_timed(TMD_OPP_ELEC, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (inc_timed(TMD_OPP_POIS, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags2 & (SF2_OPP_POIS)) && (inc_timed(TMD_OPP_POIS, lasts, TRUE))) obvious = TRUE;
+
+	/* SF3 - timed abilities */
+	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (set_timed(TMD_CURSED, p_ptr->timed[TMD_CURSED] / 2, TRUE))) obvious = TRUE;
+	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (clear_timed(TMD_CURSED, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_INC_STR)) && (inc_timed(TMD_INC_STR, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_INC_STR)) && (inc_timed(TMD_INC_SIZ, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_INC_INT)) && (inc_timed(TMD_INC_INT, lasts, TRUE))) obvious = TRUE;
@@ -6183,8 +6206,6 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags3 & (SF3_INC_DEX)) && (inc_timed(TMD_INC_AGI, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_INC_CON)) && (inc_timed(TMD_INC_CON, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_INC_CHR)) && (inc_timed(TMD_INC_CHR, lasts, TRUE))) obvious = TRUE;
-
-	/* SF3 - free action only */
 	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (inc_timed(TMD_FREE_ACT, lasts, TRUE))) obvious = TRUE;
 
 	if (s_ptr->flags2 & (SF2_AGGRAVATE))
@@ -6407,19 +6428,6 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		if (inc_timed(TMD_FAST, p_ptr->timed[TMD_FAST] ? rand_int(s_ptr->lasts_side/3): lasts + level, TRUE)) obvious = TRUE;
 	}
 
-	if (s_ptr->flags2 & (SF2_RECALL))
-	{
-		if (set_recall())
-		{
-			*cancel = FALSE;
-			obvious = TRUE;
-		}
-		else
-		{
-			return (TRUE);
-		}
-	}
-
 	/* SF3 - healing self, and untimed improvements */
 	if (s_ptr->flags3 & (SF3_CURE_STR))
 	  {
@@ -6493,8 +6501,6 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		gain_exp(ee);
 		obvious = TRUE;
 	}
-
-	if (s_ptr->flags1 || s_ptr->flags2 || s_ptr->flags3) *cancel = FALSE;
 
 	return (obvious);
 
@@ -6667,8 +6673,18 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_SUMMON_RACE:
 			{
-				if (summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
-				*cancel = FALSE;
+				/* Cancel if unique is dead */
+				if (!r_info[s_ptr->param].max_num)
+				{
+					msg_format("%^s cannot be summoned from beyond the grave.", r_name + r_info[s_ptr->param].name);
+					if (*cancel) return (TRUE);
+				}
+				/* Summoning a monster */
+				else
+				{
+					if (summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+					*cancel = FALSE;
+				}
 				break;
 			}
 			case SPELL_SUMMON_GROUP_IDX:
@@ -6684,6 +6700,23 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				create_gold();
 				*cancel = FALSE;
 				obvious = TRUE;
+				break;
+			}
+			case SPELL_RAISE_RACE:
+			{
+				/* Cancel if unique is alive */
+				if (r_info[s_ptr->param].max_num)
+				{
+					msg_format("%^s is already alive.", r_name + r_info[s_ptr->param].name);
+					if (*cancel) return (TRUE);
+				}
+				
+				/* Summons unique */
+				msg_format("%^s has been summoned from beyond the grave.", r_name + r_info[s_ptr->param].name);
+				r_info[s_ptr->param].max_num = 1;
+				summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L);
+				obvious = TRUE;
+				*cancel = FALSE;
 				break;
 			}
 			case SPELL_CURE_DISEASE:
@@ -6780,23 +6813,16 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				if (pfix_timed(TMD_POISONED, TRUE)) obvious = TRUE;
 				break;
 			}
-			case SPELL_SLOW_POIS:
+			case SPELL_CURSE_WEAPON:
 			{
 				*cancel = FALSE;
-				if (set_slow_poison(p_ptr->timed[TMD_SLOW_POISON] + lasts)) obvious = TRUE;
+				if (curse_weapon()) obvious = TRUE;
 				break;
 			}
-			case SPELL_SLOW_DIGEST:
+			case SPELL_CURSE_ARMOR:
 			{
 				*cancel = FALSE;
-				if (inc_timed(TMD_SLOW_DIGEST, lasts, TRUE)) obvious = TRUE;
-				break;
-			}
-			case SPELL_SLOW_META:
-			{
-				*cancel = FALSE;
-				if (inc_timed(TMD_SLOW_DIGEST, lasts, TRUE)) obvious = TRUE;
-				if (inc_timed(TMD_SLOW_POISON, lasts, TRUE)) obvious = TRUE;
+				if (curse_armor()) obvious = TRUE;
 				break;
 			}
 			case SPELL_IDENT_PACK:
