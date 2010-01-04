@@ -2194,7 +2194,8 @@ void ang_sort_swap_hook(vptr u, vptr v, int a, int b)
 static void roff_top(int r_idx)
 {
 	monster_race *r_ptr = &r_info[r_idx];
-
+	char m_name[80];
+	
 	byte a1, a2;
 	char c1, c2;
 
@@ -2214,14 +2215,11 @@ static void roff_top(int r_idx)
 	/* Reset the cursor */
 	Term_gotoxy(0, 0);
 
-	/* A title (use "The" for non-uniques) */
-	if (!(r_ptr->flags1 & (RF1_UNIQUE)))
-	{
-		Term_addstr(-1, TERM_WHITE, "The ");
-	}
-
+	/* Get the name */
+	race_desc(m_name, sizeof(m_name), r_idx, 0x400, 1);
+	
 	/* Dump the name */
-	Term_addstr(-1, TERM_WHITE, (r_name + r_ptr->name));
+	Term_addstr(-1, TERM_WHITE, m_name);
 
 	if (!use_dbltile && !use_trptile)
 	{

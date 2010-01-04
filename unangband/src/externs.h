@@ -747,6 +747,7 @@ extern s16b m_pop(void);
 extern errr get_mon_num_prep(void);
 extern s16b get_mon_num(int level);
 extern void display_monlist(int row, unsigned int width, int mode, bool command, bool force);
+extern void race_desc(char *desc, size_t max, int m_idx, int mode, int number);
 extern void monster_desc(char *desc, size_t max, int m_idx, int mode);
 extern void lore_do_probe(int m_idx);
 extern void lore_treasure(int m_idx, int num_item, int num_gold);

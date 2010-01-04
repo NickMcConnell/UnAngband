@@ -1099,10 +1099,27 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 			default: vp[vn++] = "summons monsters"; break;
 		}
 	}
-	if (s_ptr->type == SPELL_SUMMON_RACE) vp[vn++] = format("summons %s",
-		r_name+r_info[s_ptr->param].name);
-	if (s_ptr->type == SPELL_RAISE_RACE) vp[vn++] = format("summons %s from beyond the grave",
-		r_name+r_info[s_ptr->param].name);
+	
+	if (s_ptr->type == SPELL_SUMMON_RACE)
+	{
+		char m_name[80];
+		
+		/* Get the name */
+		race_desc(m_name, sizeof(m_name), s_ptr->param, 0x408, 1);
+
+		vp[vn++] = format("summons %s",	m_name);
+	}
+	
+	if (s_ptr->type == SPELL_RAISE_RACE)
+	{
+		char m_name[80];
+		
+		/* Get the name */
+		race_desc(m_name, sizeof(m_name), s_ptr->param, 0x408, 1);
+
+		vp[vn++] = format("summons %s from beyond the grave",	m_name);
+	}
+
 	if (s_ptr->type == SPELL_SUMMON_GROUP_IDX) vp[vn++] = "summons related monsters";
 	if (s_ptr->type == SPELL_CREATE_KIND) vp[vn++] = "creates gold";
 	if (s_ptr->flags2 & (SF2_CREATE_STAIR)) vp[vn++] = "creates a staircase under you";
@@ -4308,16 +4325,15 @@ void list_object(const object_type *o_ptr, int mode)
 
 			case ORIGIN_DROP:
 			{
-				const char *name = r_name + r_info[o_ptr->origin_xtra].name;
-				bool unique = (r_info[o_ptr->origin_xtra].flags1 & RF1_UNIQUE) ? TRUE : FALSE;
+				char m_name[80];
 
 				text_out("dropped by ");
 
-				if (unique)
-					text_out(format("%s", name));
-				else
-					text_out(format("dropped by %s%s", is_a_vowel(name[0]) ? "an " : "a ", name));
+				/* Get the name */
+				race_desc(m_name, sizeof(m_name), o_ptr->origin_xtra, 0x408, 1);
 
+				text_out(m_name);
+				
 				break;
 			}
 

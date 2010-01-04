@@ -1410,10 +1410,13 @@ void take_hit(int who, int what, int dam)
 				case SOURCE_BLOOD_DEBT:
 				{
 					/* Get the source feature */
-					monster_race *r_ptr = &r_info[what];
-
+					char m_name[80];
+					
+					/* Get the name */
+					race_desc(m_name, sizeof(m_name), what, 0x08, 1);
+					
 					/* Get the feature name */
-					(void)my_strcat(p_ptr->died_from, format("%s %s", is_a_vowel((r_name + r_ptr->name)[0]) ? "an" : "a", r_name + r_ptr->name), sizeof(p_ptr->died_from));
+					(void)my_strcat(p_ptr->died_from, m_name, sizeof(p_ptr->died_from));
 
 					break;
 				}

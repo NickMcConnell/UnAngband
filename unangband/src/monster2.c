@@ -1777,6 +1777,222 @@ void display_monlist(int row, unsigned int width, int mode, bool command, bool f
 
 
 /*
+ * Build a string describing a monster race in some way
+ * 
+ * We correctly handle masculine, feminine and pluralisation.
+ * Note the mode flags are designed for compatibility with
+ * monster_desc below, which is why there are duplicates.
+ * 
+ * Mode Flags:
+ *   0x01 --> Unused
+ *   0x02 --> Unused
+ *   0x04 --> Unused
+ *   0x08 --> Use indefinites for monsters ("a goblin" or "16 goblins")
+ *   0x10 --> Unused
+ *   0x20 --> Unused
+ *   0x40 --> Unused
+ *   0x80 --> Unused
+ *   0x100 --> Pluralize the monster
+ *   0x200 --> Unused
+ *   0x400 --> Describe all possible monsters ("the goblin priest or goblin priestess")
+ *   0x800 --> Describe without an article ("goblin")
+ *
+ * Useful Modes:
+ *   0x88 --> Killing name ("a goblin")
+ *   0x400 --> Recall name ("goblin priest or goblin priestess")
+ */
+void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
+{
+	monster_race *r_ptr = &r_info[r_idx];
+
+	cptr name = (r_name + r_ptr->name);
+
+	int state = 0;
+	
+	/* Assume male - primarily to prevent descration of female corpses */
+	int match = 1;
+	char *s, *t;
+
+	bool append_s = TRUE;
+
+	/* Extract pluralized if requested */
+	if ((mode & (0x100)) || (number != 1)) match = 3;
+	
+	/* Hack -- we try to allow pluralisation of male and female genders */
+	if (mode & (0x400))
+	{
+		bool differs = FALSE;
+		
+		/* Check if male and female description identical */
+		for (t = s = desc; *s; s++)
+		{
+			if (*s == '|')
+			{
+				state++;
+				if (state == 4) state = 0;
+			}
+			
+			if ((state % 2) == 0)
+			{
+				*t++;
+				
+				if ((state == 2) && (*s != *t))
+				{
+					differs = TRUE;
+					break;
+				}
+			}
+		}
+		
+		/* We have a difference */
+		if (differs)
+		{
+			/* Display "goblin priest or priestess" */
+			match = 1;
+		}
+		else
+		{
+			/* Display "mice" */
+			mode &= ~(0x400);
+		}
+		
+		/* Restart state */
+		state = 0;
+	}
+
+	/* It could be a Unique */
+	if (r_ptr->flags1 & (RF1_UNIQUE))
+	{
+		/* Start with the name (thus nominative and objective) */
+		my_strcpy(desc, name, max);
+		
+		/* Only one possible unique */
+		mode &= ~(0x400);
+	}
+
+	/* It could be an indefinite monster */
+	else
+	{
+		/* XXX Check plurality for "some" */
+		if (mode & 0x100) my_strcpy(desc, "", max);
+
+		/* Indefinite monsters need an indefinite article */
+		else if (mode & 0x08) my_strcpy(desc, !number ? "no " : (number != 1 ? format("%d ", number) :
+			(is_a_vowel(name[0]) ? "an " : "a ")), max);
+
+		/* It could be a normal, definite, monster */
+		else if ((mode & 0x800) != 0) my_strcpy(desc, !number ? "no " : (number != 1 ? format("the %d ", number) : "the "), max);
+		
+		/* Clear string */
+		else my_strcpy(desc, "", max);
+		
+		/* Otherwise */
+		my_strcat(desc, name, max);
+	}
+
+	/* Remove gender sensitivity */
+	for (t = s = desc; *s; s++)
+	{
+		if (*s == '|')
+		{
+			state++;
+			if (state == 4) state = 0;
+			append_s = FALSE;
+		}
+		else if (!state || (state == match))
+		{
+			*t++ = *s;
+		}
+	}
+
+	/* Terminate buffer */
+	*t = '\0';
+
+	/* Pluralize */
+	if ((number != 1) && (((mode & (0x400)) != 0) || ((append_s) && ((mode & (0x100)) != 0))))
+	{
+		/* We're hacking pluralisation - check for final s */
+		if (mode & (0x400))
+		{
+			if ((desc[strlen(desc) - 1] == 's') || 
+				(desc[strlen(desc) - 1] == 'x') ||
+				((desc[strlen(desc) - 1] == 'h') &&
+					(desc[strlen(desc) - 2] == 'c')))
+			{					
+				/* Hack -- add an 'e' for final 's', 'x' or 'ch' */
+				my_strcat(desc, "e", max);
+			}
+		}
+		
+		/* Simply append "s" for plural */
+		my_strcat(desc, "s", max);
+	}
+	
+	/* Describe feminine as well if requested */
+	if (mode & 0x400)
+	{
+		/* Add 'and' */
+		if (number > 1)
+		{
+			my_strcat(desc, " and ", max);
+		}
+		/* Add 'or */
+		else
+		{
+			my_strcat(desc, " or ", max);
+		}
+		
+		/* Otherwise */
+		my_strcat(desc, name, max);
+		
+		/* Describe feminine */
+		state = 0;
+		match = 2;
+		append_s = TRUE;
+
+		/* Remove gender sensitivity */
+		for (t = s = desc; *s; s++)
+		{
+			if (*s == '|')
+			{
+				state++;
+				if (state == 4) state = 0;
+				append_s = FALSE;
+			}
+			else if (!state || (state == match))
+			{
+				*t++ = *s;
+			}
+		}
+
+		/* Terminate buffer */
+		*t = '\0';
+		
+		/* Pluralize */
+		if ((number != 1) && (((mode & (0x400)) != 0) || ((append_s) && ((mode & (0x100)) != 0))))
+		{
+			/* We're hacking pluralisation - check for final s */
+			if (mode & (0x400))
+			{
+				if ((desc[strlen(desc) - 1] == 's') || 
+					(desc[strlen(desc) - 1] == 'x') ||
+					((desc[strlen(desc) - 1] == 'h') &&
+						(desc[strlen(desc) - 2] == 'c')))
+				{					
+					/* Hack -- add an 'e' for final 's', 'x' or 'ch' */
+					my_strcat(desc, "e", max);
+				}
+			}
+			
+			/* Simply append "s" for plural */
+			my_strcat(desc, "s", max);
+		}		
+	}
+}
+
+
+
+/*
  * Build a string describing a monster in some way.
  *
  * We can correctly describe monsters based on their visibility.

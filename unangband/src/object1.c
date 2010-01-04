@@ -704,25 +704,8 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Describe monster */
 		if (o_ptr->name3 > 0)
 		{
-			/* Save the monster name */
-			my_strcpy(mon_buf, r_name + r_info[o_ptr->name3].name, sizeof(mon_buf));
-
-			/* Fix up genderised descriptions manually */
-			for (t = s = mon_buf; *s; s++)
-			{
-				if (*s == '|')
-				{
-					state++;
-					if (state == 4) state = 0;
-				}
-				else if (!state || (state == 1 /* Male */))
-				{
-					*t++ = *s;
-				}
-			}
-
-			/* Terminate */
-			*t = '\0';
+			/* Get the name */
+			race_desc(mon_buf, sizeof(mon_buf), o_ptr->name3, 0x08, 1);
 		}
 
 		/* Describe player */

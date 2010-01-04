@@ -3572,7 +3572,11 @@ void do_cmd_store(void)
 		&& (!(t_ptr->town_lockup_ifvisited) || t_info[t_ptr->town_lockup_ifvisited].visited))
 	{
 		cptr closed_reason;
-
+		char m_name[80];
+		
+		/* Get the name */
+		race_desc(m_name, sizeof(m_name), t_ptr->town_lockup_monster, 0x08, 1);
+		
 		switch(store_index % 4)
 		{
 			case 0:
@@ -3589,7 +3593,7 @@ void do_cmd_store(void)
 				break;
 		}
 
-		msg_format(closed_reason, r_name + r_info[t_ptr->town_lockup_monster].name);
+		msg_format(closed_reason, m_name);
 		return;
 	}
 
@@ -3597,7 +3601,11 @@ void do_cmd_store(void)
 	if ((actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)) && (r_info[actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)].cur_num > 0))
 	{
 		cptr closed_reason;
-
+		char m_name[80];
+		
+		/* Get the name */
+		race_desc(m_name, sizeof(m_name), actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone), 0x08, 1);
+		
 		switch(store_index % 4)
 		{
 			case 0:
@@ -3614,7 +3622,7 @@ void do_cmd_store(void)
 				break;
 		}
 
-		msg_format(closed_reason, r_name + r_info[actual_guardian(zone->guard, p_ptr->dungeon, zone - t_ptr->zone)].name);
+		msg_format(closed_reason, m_name);
 		return;
 	}
 

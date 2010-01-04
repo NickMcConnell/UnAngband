@@ -6676,7 +6676,12 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Cancel if unique is dead */
 				if (!r_info[s_ptr->param].max_num)
 				{
-					msg_format("%^s cannot be summoned from beyond the grave.", r_name + r_info[s_ptr->param].name);
+					char m_name[80];
+					
+					/* Get the name */
+					race_desc(m_name, sizeof(m_name), s_ptr->param, 0x400, 1);
+					
+					msg_format("%^s cannot be summoned from beyond the grave.", m_name);
 					if (*cancel) return (TRUE);
 				}
 				/* Summoning a monster */
@@ -6704,15 +6709,20 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_RAISE_RACE:
 			{
+				char m_name[80];
+				
+				/* Get the name */
+				race_desc(m_name, sizeof(m_name), s_ptr->param, 0x400, 1);
+				
 				/* Cancel if unique is alive */
 				if (r_info[s_ptr->param].max_num)
 				{
-					msg_format("%^s is already alive.", r_name + r_info[s_ptr->param].name);
+					msg_format("%^s is already alive.", m_name);
 					if (*cancel) return (TRUE);
 				}
 				
 				/* Summons unique */
-				msg_format("%^s has been summoned from beyond the grave.", r_name + r_info[s_ptr->param].name);
+				msg_format("%^s has been summoned from beyond the grave.", m_name);
 				r_info[s_ptr->param].max_num = 1;
 				summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L);
 				obvious = TRUE;
