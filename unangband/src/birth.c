@@ -2401,6 +2401,19 @@ static bool player_birth_aux_2(void)
 		{
 			stats[stat]++;
 		}
+		
+		/* Requesting help */
+		if (ch == '?')
+		{
+			sprintf(buf, "%s#%s", "stats.txt", stat_names_reduced_short[stat]);
+
+			screen_save();
+			(void)show_file(buf, NULL, 0, 0);
+			(void)show_file("birth.hlp", NULL, 0, 0);
+			screen_load();
+			
+			continue;
+		}
 	}
 
 
@@ -2465,7 +2478,7 @@ static bool player_birth_aux_3(void)
 			    "get perfect (or even high) values for all your stats.");
 
 		/* Prompt for the minimum stats */
-		put_str("Enter minimum value for: ", 15, 2);
+		put_str("Enter minimum value for (? for help): ", 15, 2);
 
 		/* Output the maximum stats */
 		for (i = 0; i < A_MAX; i++)
@@ -2521,6 +2534,19 @@ static bool player_birth_aux_3(void)
 				/* Get a response (or escape) */
 				if (!askfor_aux(inp, 9)) inp[0] = '\0';
 
+				/* Requesting help */
+				if (inp[0] == '?')
+				{
+					sprintf(buf, "%s#%s", "stats.txt", stat_names_reduced_short[i]);
+
+					screen_save();
+					(void)show_file(buf, NULL, 0, 0);
+					(void)show_file("birth.hlp", NULL, 0, 0);
+					screen_load();
+					
+					continue;
+				}
+				
 				/* Hack -- add a fake slash */
 				my_strcat(inp, "/", sizeof(inp));
 
@@ -2712,7 +2738,7 @@ static bool player_birth_aux_3(void)
 			/* Prepare a prompt (must squeeze everything in) */
 			Term_gotoxy(2, 23);
 			Term_addch(TERM_WHITE, b1);
-			Term_addstr(-1, TERM_WHITE, "'r' to reroll");
+			Term_addstr(-1, TERM_WHITE, "'r' to reroll, '?' for help");
 			if (prev) Term_addstr(-1, TERM_WHITE, ", 'p' for prev");
 			Term_addstr(-1, TERM_WHITE, ", or Enter to accept");
 			Term_addch(TERM_WHITE, b2);
@@ -2749,7 +2775,11 @@ static bool player_birth_aux_3(void)
 			/* Help */
 			if (ke.key == '?')
 			{
-				do_cmd_help();
+				screen_save();
+				(void)show_file("stats.txt", NULL, 0, 0);
+				(void)show_file("birth.hlp", NULL, 0, 0);
+				screen_load();
+				
 				continue;
 			}
 

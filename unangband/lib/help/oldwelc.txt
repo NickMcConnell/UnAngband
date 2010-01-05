@@ -1,4 +1,11 @@
-[This file is outdated (due to some intrigues of Morgoth servants, for sure).]
+=== Old Welcome ===
+
+This file is left here for historical trivia - it has long been superseded.
+However, in a game that has been in development for such a long time and
+has such an interesting history, I am loath to remove anything that has
+been put here by previous maintainers. So feel free to have a read - more
+voices may better help your understanding of the game.
+                                                 - Andrew Doull
 
 === General Information ===
 
