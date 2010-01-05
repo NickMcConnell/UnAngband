@@ -1338,7 +1338,7 @@ static bool get_player_class(void)
 	/* Extra info */
 	Term_putstr(QUESTION_COL, QUESTION_ROW, -1, TERM_YELLOW,
 		"Your 'class' determines various intrinsic abilities and bonuses.");
-	if (!birth_intermediate) Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
+	Term_putstr(QUESTION_COL, QUESTION_ROW + 1, -1, TERM_YELLOW,
 	    "Any greyed-out entries should only be used by advanced players.");
 
 	/* Tabulate classes */
@@ -1346,9 +1346,6 @@ static bool get_player_class(void)
 	{
 		/* Ghost classes based on available choices */
 		bool ghost = (rp_ptr->choice & (1 << i)) == FALSE;
-
-		/* 'Ghosted' entries unavailable for intermediate players */
-		if (birth_intermediate && ghost) continue;
 
 		/* Save the string */
 		classes[k].name = c_name + c_info[i].name;
