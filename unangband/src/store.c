@@ -737,29 +737,31 @@ static int store_index_buy;
 static bool store_will_buy(const object_type *o_ptr)
 {
 	int i;
+	bool blessed_weapons = FALSE;
 
 	store_type *st_ptr = store[store_index_buy];
 
 	/* Hack -- The Home is simple */
 	if (st_ptr->base < STORE_MIN_BUY_SELL) return (TRUE);
 
+	/* Hack -- Every store will buy books for services */
+	if ((o_ptr->tval == TV_MAGIC_BOOK) || (o_ptr->tval == TV_PRAYER_BOOK) || (o_ptr->tval == TV_SONG_BOOK)) return (TRUE);
+
+	/* Hack -- Every store will buy statues */
+	if (o_ptr->tval == TV_STATUE) return (TRUE);
+	
 	/* Ignore "worthless" items XXX XXX XXX */
 	if (object_value(o_ptr) <= 0) return (FALSE);
-
-	/* Buy tvals that store will sell */
-	for (i = 0;i < STORE_CHOICES; i++)
-	{
-		if (st_ptr->tval[i] == o_ptr->tval) return (TRUE);
-	}
 
 	/* Buy tvals that the store will buy */
 	for (i = 0; i < STORE_WILL_BUY; i++)
 	{
 		if (st_ptr->tvals_will_buy[i] == o_ptr->tval) return (TRUE);
+		if (st_ptr->tvals_will_buy[i] == TV_BLESSED) blessed_weapons = TRUE;
 	}
 
 	/* Hack -- temples buy blessed items */
-	if (st_ptr->base == STORE_TEMPLE)
+	if (blessed_weapons)
 	{
 		u32b f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
 
@@ -976,13 +978,16 @@ static bool store_services(object_type *i_ptr, int store_index)
 	/* No services in black market */
 	if (st_ptr->base == STORE_B_MARKET) return (FALSE);
 
+	/* No services in library */
+	if (st_ptr->base == STORE_LIBRARY) return (FALSE);
+
 	/* No services in quest locations */
 	if (st_ptr->base < STORE_MIN_BUY_SELL) return (FALSE);
 
 	/* Must be a book */
 	if ((i_ptr->tval != TV_PRAYER_BOOK) && (i_ptr->tval != TV_MAGIC_BOOK) && (i_ptr->tval != TV_SONG_BOOK)) return (FALSE);
 
-	/* Check for services */
+	/* Hack -- Check for services -- except library */
 	for (i = 0; i < z_info->s_max; i++)
 	{
 		bool in_item = FALSE;

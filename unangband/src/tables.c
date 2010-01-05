@@ -2096,6 +2096,7 @@ const object_grouper object_group[] =
 	{"Junk",	TV_JUNK},
 	{"Gold",	TV_GOLD},
 	{"Gemstones",	TV_GEMS},
+	{"Blessed Weapon", TV_BLESSED},
 	{NULL, 0}
 };
 

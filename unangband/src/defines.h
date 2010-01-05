@@ -185,16 +185,17 @@
  * Store index definitions (see "store.c", etc)
  */
 
-#define STORE_HOME		0
-#define STORE_STORAGE           1
-#define STORE_QUEST_REWARD      2
+#define STORE_HOME		0	/* Doesn't stock items, store items here freely, shared location */
+#define STORE_STORAGE           1	/* Store items here freely */
+#define STORE_QUEST_REWARD      2	/* Quest rewards, store items here freely */
 #define STORE_GENERAL		3
 #define STORE_ARMOR		4
 #define STORE_WEAPON		5
 #define STORE_TEMPLE		6
 #define STORE_ALCHEMY		7
 #define STORE_MAGIC		8
-#define STORE_B_MARKET		9
+#define STORE_B_MARKET		9	/* Doesn't stock services, higher prices, random contents */
+#define STORE_LIBRARY		10	/* Doesn't stock services */
 
 #define STORE_MIN_BUY_SELL      3
 
@@ -1973,6 +1974,7 @@ enum
 #define TV_SWORD 23      /* Edged Weapons */
 #define TV_INSTRUMENT   24      /* Musical instruments */
 #define TV_FIREARM 25		/* Guns */
+#define TV_BLESSED 26	/* Fake tval to indicate temple will buy blessed weapons */
 #define TV_BOOTS 30      /* Boots */
 #define TV_GLOVES       31      /* Gloves */
 #define TV_HELM  32      /* Helms */
