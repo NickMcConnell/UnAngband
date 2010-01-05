@@ -2090,10 +2090,6 @@ static bool player_birth_aux_1(void)
 	/* First time player */
 	if (birth_first_time)
 	{
-		FILE *fff;
-
-		char buf[1024];
-
 		/* Choose the player's keyboard layout */
 		if (!get_player_keyboard()) return (FALSE);
 
@@ -2108,39 +2104,9 @@ static bool player_birth_aux_1(void)
 
 		/* Answered these questions for good */
 		birth_first_time = FALSE;
-
-		/* Build the filename */
-		path_build(buf, 1024, ANGBAND_DIR_USER, "Startup.prf");
-
-		/* File type is "TEXT" */
-		FILE_TYPE(FILE_TYPE_TEXT);
-
-		/* Write to the file */
-		fff = my_fopen(buf, "w");
-
-		/* Failure */
-		if (!fff) return (FALSE);
-
-		/* Skip some lines */
-		fprintf(fff, "\n\n");
-
-		/* Start dumping */
-		fprintf(fff, "# Automatic startup option dump\n\n");
-
-		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", birth_first_time ? 'Y' : 'X', option_name(OPT_birth_first_time));
-
-		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", rogue_like_commands ? 'Y' : 'X', option_name(OPT_rogue_like_commands));
-
-		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", birth_beginner ? 'Y' : 'X', option_name(OPT_birth_beginner));
-
-		/* Dump startup options */
-		fprintf(fff, "%c:%s\n", birth_intermediate ? 'Y' : 'X', option_name(OPT_birth_intermediate));
-
-		/* Close */
-		my_fclose(fff);
+		
+		/* Save the pref file */
+		dump_startup_prefs();
 	}
 
 	/* Allow quickstart? */

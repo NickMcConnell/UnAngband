@@ -607,6 +607,7 @@ extern s16b tokenize(char *buf, s16b num, char **tokens);
 extern errr process_pref_file_command(char *buf);
 extern errr process_pref_file(cptr name);
 extern void dump_html(void);
+extern void dump_startup_prefs(void);
 extern errr check_time(void);
 extern errr check_time_init(void);
 extern errr check_load(void);

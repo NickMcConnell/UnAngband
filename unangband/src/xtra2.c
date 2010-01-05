@@ -1854,7 +1854,28 @@ void check_experience(void)
 		}
 
 		/* Save the highest level */
-		if (p_ptr->lev > p_ptr->max_lev) p_ptr->max_lev = p_ptr->lev;
+		if (p_ptr->lev > p_ptr->max_lev)
+		{
+			/* Increase max level */
+			p_ptr->max_lev = p_ptr->lev;
+		
+			/* Queue level tips for beginners */
+			if (birth_beginner)
+			{
+				/* Assume the player is no longer a beginner after reaching level 10 */
+				if (p_ptr->max_lev >= 10)
+				{
+					/* No longer a beginner */
+					birth_beginner = FALSE;
+					
+					/* Save changes */
+					dump_startup_prefs();
+				}
+				
+				/* Queue tip */
+				queue_tip(format("begin%s.txt", p_ptr->max_lev));
+			}
+		}
 
 		/* Update some stuff */
 		p_ptr->update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);

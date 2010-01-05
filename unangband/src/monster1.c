@@ -1766,7 +1766,7 @@ void screen_roff(const int r_idx, const monster_lore *l_ptr)
 	describe_monster_race(r_ptr, l_ptr, FALSE);
 
 	/* Describe monster */
-	roff_top(r_ptr, 0);
+	roff_top(r_idx, 0);
 }
 
 
@@ -1797,7 +1797,7 @@ void display_roff(const int r_idx, const monster_lore *l_ptr)
 	describe_monster_race(r_ptr, l_ptr, FALSE);
 
 	/* Describe monster */
-	roff_top(r_ptr, 0);
+	roff_top(r_idx, 0);
 }
 
 
@@ -1839,7 +1839,7 @@ void screen_monster_look(const int m_idx)
 	describe_monster_race(&race, &l_list[m_ptr->r_idx], FALSE);
 
 	/* Describe monster */
-	roff_top(r_ptr, m_idx);
+	roff_top(m_ptr->r_idx, m_idx);
 }
 
 
