@@ -9162,9 +9162,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Hack -- wake up nearby allies */
 		if (was_asleep)
 		{
-			m_ptr->mflag |= (MFLAG_AGGR);
+			m_ptr->mflag |= (MFLAG_ACTV);
 
-			(void)tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+			(void)tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, "& has attacked me!");
 		}
 		else if (fear)
 		{

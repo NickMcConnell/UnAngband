@@ -3077,7 +3077,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			(*fear) = FALSE;
 
 			/* Warn allies */
-			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_AGGR, "& has attacked me!");
+			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, "& has attacked me!");
 		}
 	}
 
