@@ -1792,10 +1792,10 @@ void display_monlist(int row, unsigned int width, int mode, bool command, bool f
  *   0x20 --> Unused
  *   0x40 --> Unused
  *   0x80 --> Unused
- *   0x100 --> Pluralize the monster
+ *   0x100 --> Unused
  *   0x200 --> Unused
  *   0x400 --> Describe all possible monsters ("the goblin priest or goblin priestess")
- *   0x800 --> Describe without an article ("goblin")
+ *   0x800 --> Describe without an article ("goblins")
  *
  * Useful Modes:
  *   0x88 --> Killing name ("a goblin")
@@ -1813,10 +1813,10 @@ void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
 	int match = 1;
 	char *s, *t;
 
-	bool append_s = TRUE;
+	bool append_s = number != 1;
 
 	/* Extract pluralized if requested */
-	if ((mode & (0x100)) || (number != 1)) match = 3;
+	if (number != 1) match = 3;
 	
 	/* Hack -- we try to allow pluralisation of male and female genders */
 	if (mode & (0x400))
@@ -1826,28 +1826,25 @@ void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
 		/* Check if male and female description identical */
 		for (t = s = desc; *s; s++)
 		{
+			if ((state == 2) && (*s != *t))
+			{
+				differs = TRUE;
+				break;
+			}
+			
+			if (state != 1) t++;
+			
 			if (*s == '|')
 			{
 				state++;
 				if (state == 4) state = 0;
-			}
-			
-			if ((state % 2) == 0)
-			{
-				*t++;
-				
-				if ((state == 2) && (*s != *t))
-				{
-					differs = TRUE;
-					break;
-				}
 			}
 		}
 		
 		/* We have a difference */
 		if (differs)
 		{
-			/* Display "goblin priest or priestess" */
+			/* Display "goblin priest or goblin priestess" */
 			match = 1;
 		}
 		else
@@ -1969,7 +1966,7 @@ void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
 		*t = '\0';
 		
 		/* Pluralize */
-		if ((number != 1) && (((mode & (0x400)) != 0) || ((append_s) && ((mode & (0x100)) != 0))))
+		if ((number != 1) && (((mode & (0x400)) != 0) || (append_s)))
 		{
 			/* We're hacking pluralisation - check for final s */
 			if (mode & (0x400))
@@ -1986,7 +1983,7 @@ void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
 			
 			/* Simply append "s" for plural */
 			my_strcat(desc, "s", max);
-		}		
+		}
 	}
 }
 

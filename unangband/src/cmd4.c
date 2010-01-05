@@ -1242,7 +1242,7 @@ static char *m_xchar(int oid)
 static byte *m_xattr(int oid)
 	{ return &r_info[default_join[oid].oid].x_attr; }
 static const char *race_name(int gid) { return monster_group_text[gid]; }
-static void mon_lore(int oid) { screen_roff(&r_info[default_join[oid].oid], &l_list[default_join[oid].oid]); anykey(); }
+static void mon_lore(int oid) { screen_roff(default_join[oid].oid, &l_list[default_join[oid].oid]); anykey(); }
 
 /*
  * Display known monsters.
@@ -2000,7 +2000,7 @@ static void describe_zone_guardian(int dun, int zone)
 
     text_out_c(TERM_SLATE, format("  It %s guarded by %s%s%s.",
 				  r_info[guard].max_num ? "is" : "was",
-				  r_name,
+				  m_name,
 				  bars ? ", who bars the way to " : "",
 				  bars ? str : ""));
   }
@@ -6293,11 +6293,15 @@ void do_cmd_save_screen_html(void)
 	for (i = 0; i < z_info->r_max; i++)
 	{
 		monster_race *r_ptr = &r_info[i];
+		char m_name[80];
 
 		if (!r_ptr->name) continue;
 
+		/* Get the name */
+		race_desc(m_name, sizeof(m_name), i, 0x400, 1);
+
 		/* Dump a comment */
-		fprintf(fff, "# %s\n", (r_name + r_ptr->name));
+		fprintf(fff, "# %s\n", m_name);
 
 		/* Dump the attr/char info */
 		fprintf(fff, "R:%d:0x%02X:0x%02X\n\n", i,

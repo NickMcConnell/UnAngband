@@ -1684,12 +1684,13 @@ void describe_monster_race(const monster_race *r_ptr, const monster_lore *l_ptr,
 /*
  * Hack -- Display the "name" and "attr/chars" of a monster race
  */
-static void roff_top(const monster_race *r_ptr, int m_idx)
+static void roff_top(const int r_idx, int m_idx)
 {
 	byte a1, a2;
 	char c1, c2;
 
 	char desc[80];
+	monster_race *r_ptr = &r_info[r_idx];
 
 	/* Describe the monster */
 	if (m_idx)
@@ -1703,38 +1704,11 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 	/* Not describing a specific monster, so hack a description */
 	else
 	{
-		int state = 0;
-		char *s, *t;
-
-		/* It could be a Unique - no prefix */
-		if (r_ptr->flags1 & (RF1_UNIQUE))
-		{
-			my_strcpy(desc, "", sizeof(desc));
-		}
-		else
-		{
-			my_strcpy(desc, "The ", sizeof(desc));
-		}
-
-		/* Start with the name (thus nominative and objective) */
-		my_strcat(desc, r_name + r_ptr->name, sizeof(desc));
-
-		/* Fix up genderised descriptions manually */
-		for (t = s = desc; *s; s++)
-		{
-			if (*s == '|')
-			{
-				state++;
-				if (state == 3) state = 0;
-			}
-			else if (!state || (state == 2 /* Female */))
-			{
-				*t++ = *s;
-			}
-		}
-
-		/* Terminate */
-		*t = '\0';
+		/* Get the name */
+		race_desc(desc, sizeof(desc), r_idx, 0x400, 1);
+		
+		/* Capitalise the first letter */
+		if (islower(desc[0])) desc[0] = toupper(desc[0]);
 	}
 
 	/* Get the chars */
@@ -1775,8 +1749,10 @@ static void roff_top(const monster_race *r_ptr, int m_idx)
 /*
  * Hack -- describe the given monster race at the top of the screen
  */
-void screen_roff(const monster_race *r_ptr, const monster_lore *l_ptr)
+void screen_roff(const int r_idx, const monster_lore *l_ptr)
 {
+	monster_race *r_ptr = &r_info[r_idx];
+	
 	/* Flush messages */
 	message_flush();
 
@@ -1799,8 +1775,9 @@ void screen_roff(const monster_race *r_ptr, const monster_lore *l_ptr)
 /*
  * Hack -- describe the given monster race in the current "term" window
  */
-void display_roff(const monster_race *r_ptr, const monster_lore *l_ptr)
+void display_roff(const int r_idx, const monster_lore *l_ptr)
 {
+	monster_race *r_ptr = &r_info[r_idx];
 	int y;
 
 	/* Erase the window */
