@@ -3290,7 +3290,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 	{ player_offer, 'O', "Offer which item? ", "You are not carrying anything to offer.",
 			item_tester_hook_droppable, 0, (USE_INVEN | USE_BAGC | USE_BAGS | USE_GOLD), 0L, TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), 0, NULL},
 
-	{ player_takeoff, 'T', "Trade for which item? ", "You see nothing to trade.",
+	{ player_trade, 'T', "Trade for which item? ", "You see nothing to trade.",
 			item_tester_hook_tradeable, 0, (USE_TARGET | USE_RANGE | USE_GOLD), 0L, TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), 0, NULL}
 };
 
