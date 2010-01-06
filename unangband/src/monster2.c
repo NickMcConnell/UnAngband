@@ -4446,7 +4446,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 		return (FALSE);
 	}
 
-
+	
 	/* Powerful monster */
 	if (r_ptr->level > p_ptr->depth)
 	{
@@ -4562,6 +4562,18 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	/* Created allies do not carry treasure */
 	if (flg & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_MADE);
 
+	/* Good monsters - note that these do carry treasure */
+	if (((r_ptr->flags9 & (RF9_GOOD)) != 0) && ((birth_evil) == 0))
+	{
+		n_ptr->mflag |= (MFLAG_ALLY | MFLAG_IGNORE);
+	}
+	else
+	{
+		/* Monster must wait a while until summoning anything if summoned/wandering */
+		/* Now uses charisma */
+		if (character_dungeon) n_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+	}
+	
 	/* Force monster to wait for player */
 	if (r_ptr->flags1 & (RF1_FORCE_SLEEP))
 	{
@@ -4597,9 +4609,6 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 
 	/* And start out with full mana */
 	n_ptr->mana = r_ptr->mana;
-
-	/* Monster must wait a while until summoning anything if summoned/wandering */
-	if (character_dungeon) n_ptr->summoned = 100;
 
 	/* Calculate the monster_speed*/
 	n_ptr->mspeed = calc_monster_speed(cave_m_idx[y][x]);

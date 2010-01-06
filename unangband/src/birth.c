@@ -1895,21 +1895,25 @@ static bool get_player_difficulty(void)
 		case 0:
 			birth_beginner = TRUE;
 /*			birth_small_levels = FALSE; */
+			birth_evil = FALSE;
 			birth_intermediate = FALSE;
 			break;
 		case 1:
 			birth_beginner = FALSE;
 /*			birth_small_levels = TRUE; */
+			birth_evil = FALSE;
 			birth_intermediate = TRUE;
 			break;
 		case 2:
 			birth_beginner = FALSE;
 /*			birth_small_levels = FALSE; */
+			birth_evil = TRUE;	/* Note we don't save birth_evil */
 			birth_intermediate = TRUE;
 			break;
 		case 3:
 			birth_beginner = FALSE;
 /*			birth_small_levels = FALSE; */
+			birth_evil = TRUE;
 			birth_intermediate = FALSE;
 			break;
 	}

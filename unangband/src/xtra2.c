@@ -2402,10 +2402,11 @@ bool monster_death(int m_idx)
 	m_ptr->hold_o_idx = 0;
 
 	/* Hack -- only sometimes drop bodies */
-	if ((rand_int(100)<30) || ((r_ptr->flags1 & (RF1_UNIQUE)) != 0) ||
+	if (((r_ptr->flags1 & (RF1_UNIQUE)) != 0) ||
 		((r_ptr->flags2 & (RF2_REGENERATE)) != 0) ||
+		((r_ptr->flags8 & (RF8_ASSEMBLY)) != 0) || 
 		(r_ptr->level > p_ptr->depth) ||
-		((r_ptr->flags8 & (RF8_ASSEMBLY)) != 0))
+		(rand_int(100) < 30))
 	{
 		/* Get local object */
 		i_ptr = &object_type_body;
@@ -6305,6 +6306,54 @@ bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diamet
 	/* A "valid" direction was entered */
 	return (TRUE);
 }
+
+
+/*
+ * Lets the player select a known monster by aiming.
+ */
+int get_monster_by_aim(void)
+{
+	int ty = p_ptr->py;
+	int tx = p_ptr->px;
+	int dir;
+	
+	/* Get direction */
+	if (!get_aim_dir(&dir, 0, 0, 0, 0, 0))
+	{
+		return (FALSE);
+	}
+
+	/* Check for "target request" */
+	if (dir == 5 && target_okay())
+	{
+		tx = p_ptr->target_col;
+		ty = p_ptr->target_row;
+	}
+	else
+	{
+		while (in_bounds(ty, tx))
+		{
+			/* Predict the "target" location */
+			ty += ddy[dir];
+			tx += ddx[dir];
+			
+			/* Get first monster in direction */
+			if ((cave_m_idx[ty][tx] > 0) && (m_list[cave_m_idx[ty][tx]].ml)) break;
+			
+			/* Require projection */
+			if (!cave_project_bold(ty, tx)) break;
+		}
+	}
+	
+	/* Not in bounds */
+	if (!in_bounds(ty, tx)) return (FALSE);
+
+	/* Monster has to be visible and known */
+	if ((cave_m_idx[ty][tx] > 0) && (m_list[cave_m_idx[ty][tx]].ml)) return (cave_m_idx[ty][tx]);
+	
+	return (0);
+}
+
 
 
 /*

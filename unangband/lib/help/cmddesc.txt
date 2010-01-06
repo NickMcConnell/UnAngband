@@ -53,6 +53,17 @@ Drop an item (d)
         determining if the space is occupied.  This command may take
         a quantity, and takes some energy.
 
+Offer an item (O)
+        This gives an item from your inventory to an allied monster
+        or allows you to buy, trade or sell items with townsfolk as
+        well as monsters in the dungeon.  Whether an unfriendly monster
+        is willing to trade with you depends on whether it is injured
+        or offended, whether it is smart enough to understand you and
+        whether you speak a common language. Monsters near death may
+        be more willing to consider terms of trade but only if you are
+        offering an item that may heal or otherwise immediately benefit
+        them.  This command may take a quantity, and takes some energy.
+
 Destroy an item (k) or Destroy an item (^D)
         This destroys an item in your inventory or on the dungeon floor.
         If the selected pile contains multiple objects, you may specify

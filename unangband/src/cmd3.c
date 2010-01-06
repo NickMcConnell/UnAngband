@@ -840,8 +840,40 @@ bool player_drop(int item)
 
 	object_type *o_ptr;
 
+	object_type object_type_body;
+	
+	/* Get gold */
+	if (item == INVEN_GOLD)
+	{
+		o_ptr = &object_type_body;
+		
+		/* Get a quantity */
+		amt = get_quantity(NULL, p_ptr->au);		
+		
+		/* Allow abort */
+		if (amt <= 0) return (FALSE);
+		
+		/* Prepare the gold */
+		object_prep(o_ptr, lookup_kind(TV_GOLD, 9));
+		
+		/* Make it worth the amount */
+		o_ptr->charges = amt;
+		
+		/* Lose it */
+		p_ptr->au -= amt;
+
+		/* Give it to the floor */
+		floor_carry(p_ptr->py, p_ptr->px, o_ptr);
+		
+		/* Take a partial turn */
+		p_ptr->energy_use = 50;
+
+		/* We are done */
+		return (TRUE);
+	}
+	
 	/* Get the item (in the pack) */
-	if (item >= 0)
+	else if (item >= 0)
 	{
 		o_ptr = &inventory[item];
 	}
@@ -892,11 +924,437 @@ bool player_drop(int item)
 	p_ptr->energy_use = 50;
 
 	/* Drop (some of) the item */
-	inven_drop(item, amt);
+	inven_drop(item, amt, 0);
 
 	return (TRUE);
 }
 
+
+static int trade_value = 0;
+static int trade_amount = 0;
+static int trade_m_idx = 0;
+
+/*
+ * The "trade" tester
+ */
+bool item_tester_hook_tradeable(const object_type *o_ptr)
+{
+	/* Forbid not droppable */
+	if (!item_tester_hook_droppable(o_ptr)) return (FALSE);
+
+	/* Ensure value - monsters always know real value */
+	if (object_value_real(o_ptr) > trade_value) return (FALSE);
+
+	return (TRUE);
+}
+
+
+/*
+ * Give an item to a monster
+ */
+bool player_offer(int item)
+{
+	int amt, m_idx;
+
+	object_type *o_ptr = NULL; /* Assignment to suppress warning */
+	monster_type *m_ptr;
+	monster_race *r_ptr;
+	
+	char m_name[80];
+	
+	/* Get gold */
+	if (item == INVEN_GOLD)
+	{
+		/* Get a quantity */
+		amt = get_quantity(NULL, p_ptr->au);
+	}
+	
+	/* Get the item (in the pack) */
+	else if (item >= 0)
+	{
+		o_ptr = &inventory[item];
+		
+		/* Get a quantity */
+		amt = get_quantity(NULL, o_ptr->number);
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		o_ptr = &o_list[0 - item];
+		
+		/* Get a quantity */
+		amt = get_quantity(NULL, o_ptr->number);
+	}
+
+	/* Allow user abort */
+	if (amt <= 0) return (FALSE);
+
+	/* Get monster */
+	m_idx = get_monster_by_aim();
+	
+	/* Not a monster */
+	if (m_idx <= 0) return (FALSE);
+
+	/* Get monster */
+	m_ptr = &m_list[m_idx];
+	r_ptr = &r_info[m_ptr->r_idx];
+	
+	/* Ensure projectable */
+	if (!player_can_fire_bold(m_ptr->fy, m_ptr->fx)) return (FALSE);
+
+	/* Set target */
+	p_ptr->target_who = m_idx;
+	p_ptr->target_row = m_ptr->fy;
+	p_ptr->target_col = m_ptr->fx;
+	
+	/* Check for allowed flags */
+	if (item != INVEN_GOLD)
+	{
+		u32b f1, f2, f3, f4;
+
+		u32b flg3 = 0L;
+		
+		char o_name[80];
+			
+		/* Extract some flags */
+		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+		/* Acquire the object name */
+		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+		/* Acquire the monster name */
+		monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
+
+		/* React to objects that hurt the monster */
+		if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
+		if (f1 & (TR1_SLAY_TROLL)) flg3 |= (RF3_TROLL);
+		if (f1 & (TR1_SLAY_GIANT)) flg3 |= (RF3_GIANT);
+		if (f1 & (TR1_SLAY_ORC)) flg3 |= (RF3_ORC);
+		if (f1 & (TR1_SLAY_DEMON)) flg3 |= (RF3_DEMON);
+		if (f1 & (TR1_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
+		if (f1 & (TR1_SLAY_NATURAL)) flg3 |= (RF3_ANIMAL | RF3_PLANT | RF3_INSECT);
+		if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
+
+		/* The object cannot be picked up by the monster */
+		if (artifact_p(o_ptr) || (r_ptr->flags3 & flg3))
+		{
+			/* Don't accept */
+			msg_format("%^s refuses %s.", m_name, o_name);
+			
+			/* Mark object as ungettable? */
+			if (!(o_ptr->feeling) &&
+				!(o_ptr->ident & (IDENT_SENSE))
+				&& !(object_named_p(o_ptr)))
+			{
+				/* Sense the object */
+				o_ptr->feeling = INSCRIP_UNGETTABLE;
+
+				/* The object has been "sensed" */
+				o_ptr->ident |= (IDENT_SENSE);
+			}
+		}
+	}	
+	
+	/* Just give stuff to allies - except townsfolk */
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) == 0))
+	{
+		/* Oops */
+		if (item == INVEN_GOLD)
+		{
+			msg_print("You can't give gold to your allies to carry.");
+			return (FALSE);
+		}
+		
+		/* Drop (some of) the item */
+		inven_drop(item, amt, m_idx);
+		
+		/* Take a partial turn */
+		p_ptr->energy_use = 50;
+	}
+	else
+	{
+		int highly_value = 0;
+		
+		/* Get the monster name (or "it") */
+		monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
+
+		/* Guardians ignore you */
+		if (r_ptr->flags1 & (RF1_GUARDIAN))
+		{
+			msg_format("%^s guards this place and cannot be bought.", m_name);
+			
+			return (FALSE);
+		}
+
+		/* Too stupid */
+		if (r_ptr->flags2 & (RF2_STUPID))
+		{
+			msg_format("%^s ignores your offer.", m_name);
+			
+			return (FALSE);
+		}
+
+		/* Only undead/insect are cannibals */
+		if ((item != INVEN_GOLD) && (o_ptr->name3) && (r_info[o_ptr->name3].d_char == r_ptr->d_char) && ((r_ptr->flags3 & (RF3_UNDEAD | RF3_INSECT)) == 0))
+		{
+			/* Oops */
+			if (r_ptr->flags2 & (RF2_SMART))
+			{
+				msg_format("%^s is offended by your desecration of a corpse.", m_name);
+				
+				m_ptr->mflag |= (MFLAG_AGGR);
+			}
+			else
+			{
+				msg_format("%^s ignores your offer.", m_name);
+			}
+			
+			return (FALSE);
+		}
+		
+		/* Townsfolk are more mercenary */
+		if ((m_ptr->mflag & (MFLAG_TOWN)) == 0)
+		{
+			/* Mustn't be aggressive */
+			if (m_ptr->mflag & (MFLAG_AGGR))
+			{
+				msg_format("%^s is offended and seeking revenge.", m_name);
+				return (FALSE);
+			}
+			
+			/* Mustn't be injured -- unless critically injured and the player offering healing */
+			/* This critically injured definition must match the critically injured and looking to feed monster definition in melee2.c so that the
+			 * monster can use the item after being given it. */
+			if ((m_ptr->hp < m_ptr->maxhp) && !((m_ptr->hp < m_ptr->maxhp / 10) || ((m_ptr->blind) && (r_ptr->freq_spell >= 25))  || (m_ptr->mana < r_ptr->mana / 5)))
+			{
+				msg_format("%^s is hurt and not interested.", m_name);
+				return (FALSE);
+			}
+			
+			/* Looking for healing / mana recovery or not smart and doesn't speak the player's language */
+			if ((m_ptr->hp < m_ptr->maxhp)
+					|| (((r_ptr->flags2 & (RF2_SMART)) != 0) && !(player_understands(monster_language(m_ptr->r_idx)))))
+			{
+				/* Check kind */
+				object_kind *k_ptr;
+				
+				/* Hack -- kind for gold. Injured monsters never accept gold, but we do want to respond with the correct message for what they want. */
+				if (item == INVEN_GOLD)
+				{
+					k_ptr = &k_info[lookup_kind(TV_GOLD, 9)];
+				}
+				/* Get kind */
+				else
+				{
+					k_ptr= &k_info[o_ptr->k_idx];
+				}
+
+				/* Edible - mana recovery */
+				if ((k_ptr->flags6 & (TR6_EAT_MANA)) && (m_ptr->mana < r_ptr->mana / 5)) highly_value = 5 * p_ptr->depth * p_ptr->depth;
+
+				/* Edible - healing */
+				else if ((k_ptr->flags6 & (TR6_EAT_HEAL)) && ((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) highly_value = 4 * p_ptr->depth * p_ptr->depth;
+				
+				/* General food requirements */
+				else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) highly_value = p_ptr->depth * p_ptr->depth;
+				else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) highly_value = p_ptr->depth * p_ptr->depth;
+				else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) highly_value = p_ptr->depth * p_ptr->depth;
+				else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) highly_value = p_ptr->depth * p_ptr->depth;
+
+				/* Alert the player to the monster's needs */
+				else if (((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0))
+				{
+					msg_format("%^s is hurt and needs a way to heal.", m_name);
+					return (FALSE);
+				}
+				
+				/* Alert the player to the monster's needs */
+				else if (m_ptr->mana < r_ptr->mana / 5)
+				{
+					msg_format("%^s is low on mana and needs a way to recover it.", m_name);
+					return (FALSE);
+				}
+
+				/* Alert the player to the monster's needs */
+				else if ((m_ptr->mflag & (MFLAG_WEAK)) != 0)
+				{
+					msg_format("%^s is hungry and needs food.", m_name);
+					return (FALSE);
+				}
+				
+				/* No needs */
+				else
+				{
+					msg_format("%^s ignores you for the moment.", m_name);
+					return (FALSE);
+				}
+			}
+			
+			/* XXX More reasons might be too annoying */
+		}
+		
+		/* Cash is king */
+		if (item == INVEN_GOLD)
+		{
+			trade_value = amt * (200 - adj_chr_gold[p_ptr->stat_ind[A_CHR]]) / 200;
+		}
+		else
+		{
+			/* Get the trade value - monsters always know real value */
+			trade_value = amt * object_value_real(&inventory[item]) * (200 - adj_chr_gold[p_ptr->stat_ind[A_CHR]]) / 400 + highly_value;
+		}
+		
+		/* Evil monsters are easier to buy, but more likely to betray you */
+		if ((r_ptr->flags3 & (RF3_EVIL)) == 0) trade_value /= 2;
+		
+		/* Note the amount */
+		trade_amount = amt;
+		
+		/* Note the recipient */
+		trade_m_idx = m_idx;
+		
+		/* Set up for second command */
+		p_ptr->command_trans = COMMAND_ITEM_TRADE;
+		p_ptr->command_trans_item = item;
+	}
+	
+	return (TRUE);
+}
+
+
+/*
+ * Trade with a monster
+ */
+bool player_trade(int item2)
+{
+	int item = p_ptr->command_trans_item;
+	int amt, max, value;
+	
+	object_type *j_ptr;
+
+	/* Get gold */
+	
+	/* Get value */
+	value = object_value_real(j_ptr);
+
+	/* Get gold */
+	if (item == INVEN_GOLD)
+	{
+		/* Get a quantity */
+		amt = get_quantity(NULL, p_ptr->au);
+		
+		/* And the value is equivalent */
+		value = amt;
+	}
+	
+	/* Get the item (in the pack) */
+	else if (item2 >= 0)
+	{
+		j_ptr = &inventory[item2];
+		
+		/* Get max quantity */
+		if (value)
+		{
+			max = trade_value / value;
+		}
+		else
+		{
+			max = 99;
+		}
+		
+		/* Get a quantity */
+		amt = get_quantity(NULL, MIN(j_ptr->number, max));
+	}
+
+	/* Get the item (on the floor) */
+	else
+	{
+		j_ptr = &o_list[0 - item2];
+		
+		/* Get max quantity */
+		if (value)
+		{
+			max = trade_value / value;
+		}
+		else
+		{
+			max = 99;
+		}
+		
+		/* Get a quantity */
+		amt = get_quantity(NULL, MIN(j_ptr->number, max));
+	}
+
+	/* Allow user abort */
+	if (amt <= 0) return (FALSE);
+	
+	/* Get the item from the monster */
+	if (item2 == INVEN_GOLD)
+	{
+		/* Gambling */
+		if (item == INVEN_GOLD)
+		{
+			msg_print("You'll be able to gamble with monsters in a future version of Unangband.");
+			return (FALSE);
+		}
+		
+		/* In town, we can sell stuff */
+		else if ((level_flag & (LF1_TOWN)) && !(birth_no_selling))
+		{
+			/* Money well earned? */
+			p_ptr->au += trade_amount;
+			
+			/* Update display */
+			p_ptr->redraw |= (PR_GOLD);
+		}
+		else
+		{
+			/* In the dungeon, monsters don't have gold on them 'quite yet' */
+			value = 0;
+			
+			/* The player is a sucker */
+			trade_value /= 2;
+		}
+	}
+
+	/* Give up the item promised */
+	if (item == INVEN_GOLD)
+	{
+		/* Money well spent? */
+		if (p_ptr->au >= trade_amount) p_ptr->au -= trade_amount;
+		
+		/* Paranoia */
+		else (p_ptr->au = 0);
+		
+		/* Update display */
+		p_ptr->redraw |= (PR_GOLD);
+	}
+	else
+	{
+		/* Drop (some of) the item */
+		inven_drop(item, trade_amount, trade_m_idx);
+	}
+	
+	/*
+	 * To do: Use monster profit (trade_value - value) to make monsters
+	 * 1. Reveal their inventory (generate items they carry and mark with MFLAG_MADE)
+	 * 2. Become neutral to the player (mark with MFLAG_TOWN and set m_ptr->summoned - this will require this AI be adapted for the dungeon)
+	 * 3. Become an allied mercenary to the player (mark with MFLAG_ALLY | MFLAG_TOWN). Mercenaries and townsfolk in
+	 * the dungeon will ask the player for further moneys when their summoned time runs out.
+	 * 4. Reveal the territory that the monster is familiar with once allied (grids with matching ecologies). This might involve taking
+	 * the player to the core of the territory, where they will be introduced to their leaders and/or betrayed. Or bypassing the territory
+	 * and taking the player to up or downstairs.
+	 * 
+	 * Profit must exceed either depth * depth (e.g. level 10 requires 100 gold) or even depth*depth*depth (e.g. level 20 requires 8000 gold).
+	 */
+	
+	/* Take a turn */
+	p_ptr->energy_use = 100;
+
+	return (TRUE);
+	
+}
 
 
 /*

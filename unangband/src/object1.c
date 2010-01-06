@@ -698,9 +698,6 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	/* Prep the monster name if required */
 	if (k_ptr->flags6 & (TR6_NAMED))
 	{
-		char *s, *t;
-		int state = 0;
-
 		/* Describe monster */
 		if (o_ptr->name3 > 0)
 		{
@@ -3541,6 +3538,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 	bool use_target = ((mode & (USE_TARGET)) ? TRUE: FALSE);
 	bool use_range = ((mode & (USE_RANGE)) ? TRUE: FALSE);
 	bool use_known = ((mode & (USE_KNOWN)) ? TRUE: FALSE);
+	bool use_gold = ((mode & (USE_GOLD)) ? TRUE: FALSE);
 
 	bool allow_inven = FALSE;
 	bool allow_equip = FALSE;
@@ -3774,7 +3772,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 		allow_self = TRUE;
 
 	/* Require at least one legal choice */
-	if (!allow_inven && !allow_equip && !allow_floor && !allow_feats && !allow_self)
+	if (!allow_inven && !allow_equip && !allow_floor && !allow_feats && !allow_self && !use_gold)
 	{
 		/* Cancel p_ptr->command_see */
 		if (!OPT(show_lists)) p_ptr->command_see = FALSE;
@@ -4085,6 +4083,9 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 
 		/* Indicate legality of the "self" */
 		if (allow_self) my_strcat(out_val, " @ for self,", sizeof(out_val));
+
+		/* Indicate legality of the "self" */
+		if (use_gold) my_strcat(out_val, " $ for gold,", sizeof(out_val));
 
 		/* Indicate legality of the "feature" */
 		if (allow_feats)
@@ -4591,7 +4592,23 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				done = TRUE;
 
 				break;
+				
+			case '$':
 
+				/* Paranoia */
+				if (!use_gold)
+				{
+					bell("Cannot select gold!");
+					break;
+				}
+
+				/* Accept that choice */
+				(*cp) = INVEN_GOLD;
+				item = TRUE;
+				done = TRUE;
+
+				break;
+				
 			default:
 			{
 				bool verify;

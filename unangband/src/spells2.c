@@ -6943,7 +6943,8 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_MINDS_EYE:
 			{
 				/* This whole spell is a mega-hack of the highest order */
-				int ty, tx;
+				int ty = p_ptr->py;
+				int tx = p_ptr->px;
 				int old_py = p_ptr->py;
 				int old_px = p_ptr->px;
 				int old_lite = p_ptr->cur_lite;
@@ -6953,15 +6954,31 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Allow direction to be cancelled for free */
 				if (!get_aim_dir(&dir, 0, 0, 0, 0, 0)) return (!(*cancel));
 
-				/* Use the given direction */
-				ty = p_ptr->py + 99 * ddy[dir];
-				tx = p_ptr->px + 99 * ddx[dir];
-
 				/* Hack -- Use an actual "target" */
 				if ((dir == 5) && target_okay())
 				{
 					ty = p_ptr->target_row;
 					tx = p_ptr->target_col;
+				}
+				else
+				{
+					bool wall = FALSE;
+					
+					while (in_bounds_fully(ty, tx))
+					{
+						/* Predict the "target" location */
+						ty += ddy[dir];
+						tx += ddx[dir];
+						
+						/* Get first monster in direction */
+						if ((cave_m_idx[ty][tx] > 0) && (m_list[cave_m_idx[ty][tx]].ml)) break;
+						
+						/* Look on the other side of the first wall found */
+						if ((wall) && (cave_project_bold(ty,tx))) break;
+						
+						/* Look for wall */
+						if (!(wall) && !(cave_project_bold(ty, tx))) wall = TRUE;
+					}
 				}
 
 				/* Paranoia - ensure we have no outstanding updates before messing with
@@ -7911,7 +7928,7 @@ void region_piece_copy(region_piece_type *rp_ptr, const region_piece_type *rp_pt
 /*
  * Move a region piece from index i1 to index i2 in the region piece list
  */
-static void compact_region_pieces_aux(int i1, int i2)
+void compact_region_pieces_aux(int i1, int i2)
 {
 	int i, y, x;
 
@@ -8153,7 +8170,7 @@ void wipe_region_list(void)
 /*
  * Move a region piece from index i1 to index i2 in the region piece list
  */
-static void compact_regions_aux(int i1, int i2)
+void compact_regions_aux(int i1, int i2)
 {
 	int i;
 

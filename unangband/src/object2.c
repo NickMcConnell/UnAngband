@@ -4337,6 +4337,29 @@ bool sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	/* Skip empty slots */
 	if (!o_ptr->k_idx) return (0);
 
+	/* Fully identify items */
+	if (birth_no_identify)
+	{
+		/* Important!!! Note different treatment for artifacts. Otherwise the player can
+		   potentially lose artifacts by leaving a level after they are 'automatically'
+		   identified. Note that for some artifacts - at the moment rings and amulets,
+		   even calling object_aware is dangerous at this stage. */
+		if (artifact_p(o_ptr))
+		{
+			/* Identify the name */
+			o_ptr->ident |= (IDENT_NAME);
+
+			/* Mark as an artifact */
+			feel = value_check_aux5(o_ptr);
+		}
+		else
+		{
+			object_known(o_ptr);
+		}
+		
+		return (TRUE);
+	}
+	
 	/* Sensed this kind? */
 	if (k_info[o_ptr->tval].aware & (AWARE_SENSEX))
 	{
@@ -5973,7 +5996,8 @@ bool make_gold(object_type *j_ptr, bool good, bool great)
 	/* Apply "extra" magic */
 	if (rand_int(GREAT_OBJ) == 0)
 	{
-		i += randint(object_level + 1);
+		/* This used to cause too much adamantium */
+		i += MAX_GOLD / 3;
 	}
 
 	/* Hack -- Creeping Coins only generate "themselves" */
@@ -5989,12 +6013,18 @@ bool make_gold(object_type *j_ptr, bool good, bool great)
 	base = k_info[OBJ_GOLD_LIST+i].cost;
 
 	/* Determine how much the treasure is "worth" */
-	j_ptr->charges = (base + (8 * randint(base)) + randint(8));
+	base = (base + (8 * randint(base)) + randint(8));
 
 	/* Apply good or great flags */
-	if (great) j_ptr->charges *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 100 : damroll(7, 4));
-	else if (good) j_ptr->charges *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 10 : damroll(2, 3));
+	if (great) base *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 100 : damroll(7, 4));
+	else if (good) base *= (k_info[OBJ_GOLD_LIST + i].tval == TV_GEMS ? 10 : damroll(2, 3));
 
+	/* Prevent overrun */
+	if (base > 31000) base = 30500 + rand_int(1000);
+	
+	/* Set item value */
+	j_ptr->charges = base;
+	
 	/* Success */
 	return (TRUE);
 }
@@ -9207,12 +9237,13 @@ s16b inven_takeoff(int item, int amt)
 /*
  * Drop (some of) a non-cursed inventory/equipment item
  *
- * The object will be dropped "near" the current location
+ * If m_idx = 0, the object will be dropped "near" the current location
+ * otherwise it will be given to the monster m_idx.
  * 
  * It is now possible to drop an item from an ally, so we have
  * to handle this here.
  */
-void inven_drop(int item, int amt)
+void inven_drop(int item, int amt, int m_idx)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
@@ -9327,9 +9358,18 @@ void inven_drop(int item, int amt)
 		floor_item_optimize(0 - item);
 	}
 
-	/* Drop it near the player / monster */
-	/* XXX Happens last for safety reasons */
-	drop_near(i_ptr, 0, py, px, FALSE);
+	/* Give it to the monster */
+	if (m_idx)
+	{
+		/* Carry the object */
+		(void)monster_carry(m_idx, i_ptr);
+	}
+	else
+	{
+		/* Drop it near the player / monster */
+		/* XXX Happens last for safety reasons */
+		drop_near(i_ptr, 0, py, px, FALSE);
+	}
 }
 
 

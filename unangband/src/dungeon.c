@@ -2306,6 +2306,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Offer an item */
+		case 'O':
+		{
+			do_cmd_item(COMMAND_ITEM_OFFER);
+			break;
+		}
+
 
 		/*** Various commands ***/
 

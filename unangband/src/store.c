@@ -743,6 +743,9 @@ static bool store_will_buy(const object_type *o_ptr)
 
 	/* Hack -- The Home is simple */
 	if (st_ptr->base < STORE_MIN_BUY_SELL) return (TRUE);
+	
+	/* Hack -- No selling at all */
+	if (birth_no_selling) return (FALSE);
 
 	/* Hack -- Every store will buy books for services */
 	if ((o_ptr->tval == TV_MAGIC_BOOK) || (o_ptr->tval == TV_PRAYER_BOOK) || (o_ptr->tval == TV_SONG_BOOK)) return (TRUE);
@@ -3165,7 +3168,7 @@ static void store_process_command(char *choice, int store_index)
 		else if ((y == 10 + store_size) && (x < 55)) *choice = 'g';
 		else if (y == 10 + store_size) *choice = 'l';
 		else if ((y == 11 + store_size) && (x < 31)) *choice = ' ';
-		else if ((y == 11 + store_size) && (x < 55)) *choice = 'd';
+		else if (((st_ptr->base < STORE_MIN_BUY_SELL) || ((birth_no_selling) == 0)) && ((y == 11 + store_size) && (x < 55))) *choice = 'd';
 
 		/* Hack -- execute command */
 		if (p_ptr->command_cmd_ex.mousebutton)
@@ -3707,7 +3710,7 @@ void do_cmd_store(void)
 
 		/* Commands */
 		c_prt(choice == 'g' ? TERM_L_BLUE : TERM_WHITE, " g) Get/Purchase an item.", 10 + store_size, 31);
-		c_prt(choice == 'd' ? TERM_L_BLUE : TERM_WHITE, " d) Drop/Sell an item.", 11 + store_size, 31);
+		if ((st_ptr->base < STORE_MIN_BUY_SELL) || ((birth_no_selling) == 0)) c_prt(choice == 'd' ? TERM_L_BLUE : TERM_WHITE, " d) Drop/Sell an item.", 11 + store_size, 31);
 
 		/* Add in the eXamine option */
 		if (rogue_like_commands)

@@ -3219,7 +3219,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			item_tester_hook_removable, 0, (USE_EQUIP | USE_ALLY | USE_RANGE), 0L, 0L, 0, NULL},
 
 	{ player_drop, 'd', "Drop which item? ", "You have nothing to drop.",
-			item_tester_hook_droppable, 0, (USE_EQUIP | USE_INVEN | USE_BAGC | USE_BAGS | USE_ALLY | USE_RANGE), 0L, 0L, 0, NULL},
+			item_tester_hook_droppable, 0, (USE_EQUIP | USE_INVEN | USE_BAGC | USE_BAGS | USE_ALLY | USE_RANGE /*| USE_GOLD */), 0L, 0L, 0, NULL},
 
 	{ player_destroy, 'k', "Destroy which item? ", "You have nothing to destroy.",
 			NULL, 0, (USE_INVEN | USE_FLOOR | USE_FEATG | USE_BAGC | USE_BAGS | USE_ALLY | USE_RANGE), 0L, 0L, 0, NULL},
@@ -3286,7 +3286,12 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 
 	{ player_browse, 'b', "Browse which book? ", "You have no books that you can browse.",
 			inven_book_okay, 0, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_ALLY | USE_TARGET | USE_RANGE | USE_KNOWN), (CONDITION_LITERATE), 0L, 0, NULL},
+			
+	{ player_offer, 'O', "Offer which item? ", "You are not carrying anything to offer.",
+			item_tester_hook_droppable, 0, (USE_INVEN | USE_BAGC | USE_BAGS | USE_GOLD), 0L, TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), 0, NULL},
 
+	{ player_takeoff, 'T', "Trade for which item? ", "You see nothing to trade.",
+			item_tester_hook_tradeable, 0, (USE_TARGET | USE_RANGE | USE_GOLD), 0L, TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), 0, NULL}
 };
 
 
