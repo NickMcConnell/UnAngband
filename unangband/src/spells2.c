@@ -6989,6 +6989,9 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Paranoia - ensure bounds */
 				if (in_bounds_fully(ty, tx))
 				{
+					/* No lite by default */
+					p_ptr->cur_lite = 0;
+
 					/* If target is a monster */
 					if (cave_m_idx[ty][tx])
 					{
@@ -7001,11 +7004,6 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 						{
 							/* Get maximum light */
 							p_ptr->cur_lite = 2;
-						}
-						else
-						{
-							/* No lite */
-							p_ptr->cur_lite = 0;
 						}
 
 						/* Hack - special darknes sight for monsters that don't need lite */
@@ -7023,12 +7021,9 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 						/* XXX Show player scent?? */
 					}
+					
 					/* Hack -- second sight */
-					else
-					{
-						/* Does not have innate light */
-						p_ptr->cur_lite = 0;
-					}
+					if (p_ptr->cur_lite < s_ptr->param) p_ptr->cur_lite = s_ptr->param;
 
 					/* Use target location */
 					p_ptr->py = ty;
