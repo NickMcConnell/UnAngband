@@ -647,6 +647,20 @@ static void do_cmd_travel(void)
 
 				/* Hack -- Time passes (at 4* food use rate) */
 				turn += PY_FOOD_FULL/10*journey*4;
+				
+				/*
+				 * Hack -- To prevent a player starving to death a few steps after arriving from travelling,
+				 * we reduce a stat and leave them only very hungry if they would end up weak.
+				 * This also prevents the player from infinitely travelling.
+				 */
+				while (p_ptr->food < (PY_FOOD_ALERT + PY_FOOD_WEAK) / 2)
+				{
+					/* Decrease random stat */
+					do_dec_stat(rand_int(A_MAX));
+					
+					/* Feed the player */
+					set_food(p_ptr->food + PY_FOOD_FAINT);
+				}
 
 				/* XXX Recharges, stop temporary speed etc. */
 				/* We don't do this to e.g. allow the player to buff themselves before fighting Beorn. */
