@@ -528,6 +528,8 @@ static void do_cmd_travel(void)
 			if (get_list(print_routes, routes, num, "Routes", "Travel to where", ", L=locations, M=map", 1, 22, route_commands, &selection))
 			{
 				int found = 0;
+				
+				bool risk_stat_loss = FALSE;
 
 				if (!t_info[selection].visited)
 				{
@@ -613,15 +615,17 @@ static void do_cmd_travel(void)
 					if (!get_check("Are you sure you want to travel? "))
 						/* Bail out */
 						return;
+					
+					risk_stat_loss = TRUE;
 				}
 
 				/* Longer and more random journeys via map */
-				journey = damroll(3 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 4);
+				journey = damroll(2 + (risk_stat_loss ? 1 : 0) + (level_flag & LF1_DAYLIGHT ? 1 : 0), 4);
 
 				/* Shorter and more predictable distance if nearby */
 				for (i = 0; i < MAX_NEARBY; i++)
 				{
-					if (t_info[p_ptr->dungeon].nearby[i] == selection) journey = damroll(2 + (level_flag & LF1_DAYLIGHT ? 1 : 0), 3);
+					if (t_info[p_ptr->dungeon].nearby[i] == selection) journey = damroll(1 + (risk_stat_loss ? 1 : 0) + (level_flag & LF1_DAYLIGHT ? 1 : 0), 3);
 				}
 
 				if (journey < 4)
@@ -643,7 +647,7 @@ static void do_cmd_travel(void)
 				}
 
 				/* Hack -- Get hungry/tired/sore */
-				set_food(p_ptr->food-(PY_FOOD_FULL/10*journey));
+				set_food(p_ptr->food - PY_FOOD_FULL/10*journey);
 
 				/* Hack -- Time passes (at 4* food use rate) */
 				turn += PY_FOOD_FULL/10*journey*4;
@@ -653,10 +657,10 @@ static void do_cmd_travel(void)
 				 * we reduce a stat and leave them only very hungry if they would end up weak.
 				 * This also prevents the player from infinitely travelling.
 				 */
-				while (p_ptr->food < (PY_FOOD_ALERT + PY_FOOD_WEAK) / 2)
+				while (p_ptr->food < PY_FOOD_WEAK + PY_FOOD_STARVE)
 				{
 					/* Decrease random stat */
-					do_dec_stat(rand_int(A_MAX));
+					if (risk_stat_loss) do_dec_stat(rand_int(A_MAX));
 					
 					/* Feed the player */
 					set_food(p_ptr->food + PY_FOOD_FAINT);
