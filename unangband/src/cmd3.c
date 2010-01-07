@@ -1113,16 +1113,16 @@ bool player_offer(int item)
 			return (FALSE);
 		}
 		
+		/* Mustn't be aggressive */
+		if (m_ptr->mflag & (MFLAG_AGGR))
+		{
+			msg_format("%^s is offended and seeking revenge.", m_name);
+			return (FALSE);
+		}
+		
 		/* Townsfolk are more mercenary */
 		if ((m_ptr->mflag & (MFLAG_TOWN)) == 0)
 		{
-			/* Mustn't be aggressive */
-			if (m_ptr->mflag & (MFLAG_AGGR))
-			{
-				msg_format("%^s is offended and seeking revenge.", m_name);
-				return (FALSE);
-			}
-			
 			/* Mustn't be injured -- unless critically injured and the player offering healing */
 			/* This critically injured definition must match the critically injured and looking to feed monster definition in melee2.c so that the
 			 * monster can use the item after being given it. */
@@ -1232,20 +1232,15 @@ bool player_trade(int item2)
 	int amt, max, value;
 	
 	object_type *j_ptr;
+	monster_type *m_ptr = &m_list[trade_m_idx];
 
-	/* Get gold */
-	
-	/* Get value */
-	value = object_value_real(j_ptr);
+	char m_name[80];
 
 	/* Get gold */
 	if (item == INVEN_GOLD)
 	{
-		/* Get a quantity */
-		amt = get_quantity(NULL, p_ptr->au);
-		
-		/* And the value is equivalent */
-		value = amt;
+		/* Gold earned based on value of trade */
+		value = amt = trade_value;
 	}
 	
 	/* Get the item (in the pack) */
@@ -1253,6 +1248,9 @@ bool player_trade(int item2)
 	{
 		j_ptr = &inventory[item2];
 		
+		/* Get value */
+		value = object_value_real(j_ptr);
+
 		/* Get max quantity */
 		if (value)
 		{
@@ -1272,6 +1270,9 @@ bool player_trade(int item2)
 	{
 		j_ptr = &o_list[0 - item2];
 		
+		/* Get value */
+		value = object_value_real(j_ptr);
+
 		/* Get max quantity */
 		if (value)
 		{
@@ -1289,21 +1290,27 @@ bool player_trade(int item2)
 	/* Allow user abort */
 	if (amt <= 0) return (FALSE);
 	
+	/* Get the monster name */
+	monster_desc(m_name, sizeof(m_name), trade_m_idx, 0);
+	
 	/* Get the item from the monster */
 	if (item2 == INVEN_GOLD)
 	{
 		/* Gambling */
 		if (item == INVEN_GOLD)
 		{
-			msg_print("You'll be able to gamble with monsters in a future version of Unangband.");
+			msg_print("You'll be able to gamble with %s in a future version of Unangband.");
 			return (FALSE);
 		}
 		
 		/* In town, we can sell stuff */
 		else if ((level_flag & (LF1_TOWN)) && !(birth_no_selling))
 		{
+			/* Evil monsters betray the player 66% of the time */
+			if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
+			
 			/* Money well earned? */
-			p_ptr->au += trade_amount;
+			p_ptr->au += value;
 			
 			/* Update display */
 			p_ptr->redraw |= (PR_GOLD);
@@ -1336,6 +1343,9 @@ bool player_trade(int item2)
 		inven_drop(item, trade_amount, trade_m_idx);
 	}
 	
+	/* XXX Need to make this interesting */
+	monster_speech(trade_m_idx, "Taken.", FALSE);
+	
 	/*
 	 * To do: Use monster profit (trade_value - value) to make monsters
 	 * 1. Reveal their inventory (generate items they carry and mark with MFLAG_MADE)
@@ -1349,11 +1359,26 @@ bool player_trade(int item2)
 	 * Profit must exceed either depth * depth (e.g. level 10 requires 100 gold) or even depth*depth*depth (e.g. level 20 requires 8000 gold).
 	 */
 	
+	/* Prevent GTA style takedowns */
+	if ((level_flag & (LF1_TOWN)) && !(birth_no_selling))
+	{
+		int y = m_ptr->fy;
+		int x = m_ptr->fx;
+		
+		/* "Kill" the monster */
+		delete_monster_idx(trade_m_idx);
+
+		/* Give detailed messages if destroyed */
+		msg_format("%^s leaves town.", m_name);
+
+		/* Redraw the monster grid */
+		lite_spot(y, x);
+	}
+	
 	/* Take a turn */
 	p_ptr->energy_use = 100;
 
 	return (TRUE);
-	
 }
 
 
