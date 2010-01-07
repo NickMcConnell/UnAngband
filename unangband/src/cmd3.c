@@ -1299,7 +1299,7 @@ bool player_trade(int item2)
 		/* Gambling */
 		if (item == INVEN_GOLD)
 		{
-			msg_print("You'll be able to gamble with %s in a future version of Unangband.");
+			msg_format("You'll be able to gamble with %s in a future version of Unangband.", m_name);
 			return (FALSE);
 		}
 		

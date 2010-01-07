@@ -1046,8 +1046,10 @@ bool mon_check_hit(int m_idx, int power, int level, int who, bool ranged)
 /*
  * Attack the player via physical attacks.
  * TODO: join with other (monster?) attack routines
+ * 
+ * Harmless indicates we only do harmless attacks
  */
-bool make_attack_normal(int m_idx)
+bool make_attack_normal(int m_idx, bool harmless)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
@@ -1113,6 +1115,9 @@ bool make_attack_normal(int m_idx)
 
 		/* Handle "leaving" */
 		if (p_ptr->leaving) break;
+		
+		/* Exclude attacks which damage the player if we're being harmless */
+		if ((harmless) && (effect)) continue;
 
 		/* Handle "automatic" attacks */
 		if (method_ptr->flags2 & (PR2_AUTOMATIC))

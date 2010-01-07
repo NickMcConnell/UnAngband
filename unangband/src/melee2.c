@@ -78,8 +78,8 @@ void find_range(int m_idx)
 	else if ((r_ptr->flags2 & (RF2_LOW_MANA_RUN)) &&
 	    (m_ptr->mana < r_ptr->mana / 6)) m_ptr->min_range = FLEE_RANGE;
 
-	/* Hack -- townsmen go about their business */
-	else if (m_ptr->mflag & (MFLAG_TOWN)) m_ptr->min_range = 1;
+	/* Hack -- townsmen go about their business in town, and are suspicious otherwise*/
+	else if (m_ptr->mflag & (MFLAG_TOWN)) m_ptr->min_range = (level_flag & (LF1_TOWN)) ? 1 : 3;
 
 	/* Breeders cannot be terrified */
 	else if (r_ptr->flags2 & (RF2_MULTIPLY)) m_ptr->min_range = 1;
@@ -1178,6 +1178,55 @@ static void init_ranged_attack(monster_race *r_ptr)
 	}
 }
 
+
+/*
+ * Does the monster attack the player if they walk
+ * into them?
+ */
+bool choose_to_attack_player(const monster_type *m_ptr)
+{
+	/* Allies don't attack player */
+	if (m_ptr->mflag & (MFLAG_ALLY)) return (FALSE);
+	
+	/* Aggressive do attack player */
+	if (m_ptr->mflag & (MFLAG_AGGR)) return (TRUE);
+	
+	/* Townsfolk don't attack player */
+	if (m_ptr->mflag & (MFLAG_TOWN)) return (FALSE);
+	
+	/* Otherwise attack */
+	return (TRUE);
+}
+
+
+/*
+ * Does the monster attack another monster if they walk
+ * into them?
+ * 
+ * Important: This routine must be symetric.
+ */
+bool choose_to_attack_monster(const monster_type *m_ptr, const monster_type *n_ptr)
+{
+	/* Allies and enemies of the player don't attack each other */
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0)) return (FALSE);
+	
+	/* Aggressive enemies attack allies and vice versa - note 1st check ensures both sides are not friends */
+	if (((m_ptr->mflag & (MFLAG_ALLY)) == 0) && ((n_ptr->mflag & (MFLAG_AGGR)) != 0)) return (TRUE);
+	if (((n_ptr->mflag & (MFLAG_ALLY)) == 0) && ((m_ptr->mflag & (MFLAG_AGGR)) != 0)) return (TRUE);	
+	
+	/* Townsfolk don't attack each other */
+	if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && ((n_ptr->mflag & (MFLAG_TOWN)) != 0)) return (FALSE);
+	
+	/* Allies don't attack townsfolk and vice versa*/
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((n_ptr->mflag & (MFLAG_TOWN)) != 0)) return (FALSE);
+	if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0)) return (FALSE);
+	
+	/* Otherwise attack */
+	return (TRUE);
+}
+
+
+
 /*
  * Have a monster choose a spell.
  *
@@ -1307,8 +1356,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
-	/* Eliminate all summoning spells if monster has recently summoned or been summoned or an ally */
-	if ((m_ptr->summoned) || (m_ptr->mflag & (MFLAG_ALLY)))
+	/* Eliminate all summoning spells if monster has recently summoned or been summoned or an ally or townsfolk */
+	if ((m_ptr->summoned) || ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN)) != 0))
 	{
 		f4 &= ~(RF4_SUMMON_MASK);
 		f5 &= ~(RF5_SUMMON_MASK);
@@ -1319,8 +1368,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
-	/* Allies do not teleport unless afraid or blink unless we need to reposition */
-	if (m_ptr->mflag & (MFLAG_ALLY))
+	/* Allies / townsfolk do not teleport unless afraid or blink unless we need to reposition */
+	if (m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN))
 	{
 		/* Prevent blinking unless target is at wrong range - note check to see if we can blink for efficiency */
 		if (((f6 & (RF6_BLINK)) != 0) && (m_ptr->cdis >= MAX_SIGHT / 3) &&
@@ -1384,7 +1433,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			if (n_ptr->mflag & (MFLAG_HIDE)) continue;
 
 			/* Monster has an enemy */
-			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
+			if (choose_to_attack_monster(m_ptr, n_ptr))
 			{
 				bool see_target = aggressive;
 
@@ -1394,7 +1443,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 				/* Ignore targets out of range */
 				if (d > MAX_RANGE * 16) continue;
-
+				
 				/* Prefer targets at about range 3 */
 				if (d < 4 * 16) d = (6 * 16) - d;
 
@@ -1649,7 +1698,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		}
 
 		/* Additional checks for allies */
-		if ((m_ptr->mflag & (MFLAG_ALLY)) && (!(r_ptr->flags2 & (RF2_STUPID))))
+		if (!(choose_to_attack_player(m_ptr)) && ((r_ptr->flags2 & (RF2_STUPID)) == 0))
 		{
 			/* Prevent ball spells if they could hit player */
 			if ((player_can_fire_bold(*tar_y, *tar_x)) &&
@@ -1976,9 +2025,9 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		/* Monster has no melee blows - character's grid is off-limits. */
 		if (r_ptr->flags1 & (RF1_NEVER_BLOW)) return (0);
 
-		/* Monster is an ally - character's grid is off-limits */
-		else if (m_ptr->mflag & (MFLAG_ALLY)) return (0);
-
+		/* Monster is an ally or townsfolk - character's grid is off-limits */
+		else if (!choose_to_attack_player(m_ptr)) return (0);
+		
 		/* Any monster with melee blows can attack the character. */
 		else move_chance = 100;
 	}
@@ -1990,7 +2039,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 		monster_race *nr_ptr = &r_info[n_ptr->r_idx];
 
 		/* Enemies can always attack */
-		if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
+		if (choose_to_attack_monster(m_ptr, n_ptr))
 		{
 			/* Can always attack */
 			return (100);
@@ -2996,11 +3045,15 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 
 			if (cave_m_idx[y1][x1] <= 0) continue;
 
-			if (((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) d = i;
+			/* Attack if enemies */
+			if (choose_to_attack_monster(m_ptr, &m_list[cave_m_idx[y1][x1]]))
+			{
+				d = i;
+			}
 		}
 
 		/* Is character in range? */
-		if ((m_ptr->cdis <= 1) || (d < 9))
+		if ((d < 9) || ((choose_to_attack_player(m_ptr)) && (m_ptr->cdis <= 1)))
 		{
 			/* Monster can't melee either (pathetic little creature) */
 			if (r_ptr->flags1 & (RF1_NEVER_BLOW))
@@ -3683,8 +3736,9 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 			/* Player name */
 			if (*s == '&')
 			{
-				/* Hack -- townsfolk and allies know the players name */
-				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_ALLY)) && (strlen(op_ptr->full_name)))
+				/* Hack -- townsfolk from town and allies know the players name */
+				if (((((m_ptr->mflag & (MFLAG_TOWN)) != 0) && ((level_flag & (LF1_TOWN)) != 0))
+						|| ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) && (strlen(op_ptr->full_name)))
 				{
 					u = op_ptr->full_name;
 
@@ -4861,8 +4915,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	feat = cave_feat[ny][nx];
 
 	/* The monster is hidden in terrain, trying to attack.*/
-	if (do_move && (m_ptr->mflag & (MFLAG_HIDE)) && ((cave_m_idx[ny][nx] < 0) ||
-			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[ny][nx]].mflag & (MFLAG_ALLY)) != 0))))
+	if (do_move && (m_ptr->mflag & (MFLAG_HIDE))
+			&& (((cave_m_idx[ny][nx] < 0) && (choose_to_attack_player(m_ptr)))
+			 || ((cave_m_idx[ny][nx] > 0) && (choose_to_attack_monster(m_ptr, &m_list[cave_m_idx[ny][nx]])))))
 	{
 		/* Monster is under covered terrain and can't slip out */
 		if (!(r_ptr->flags2 & (RF2_PASS_WALL)) && !(m_ptr->tim_passw) &&
@@ -4948,7 +5003,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		/* Attack if possible */
 		if (!(r_ptr->flags1 & (RF1_NEVER_BLOW)) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 		{
-			(void)make_attack_normal(m_idx);
+			(void)make_attack_normal(m_idx, !choose_to_attack_player(m_ptr));
 		}
 
 		/* End move */
@@ -5256,7 +5311,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 	{
 		/* Attack adjacent monsters, if confused or enemies */
 		if ((cave_m_idx[ny][nx] > 0) && ((m_ptr->confused) ||
-			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[ny][nx]].mflag & (MFLAG_ALLY)) != 0))))
+			(choose_to_attack_monster(m_ptr, &m_list[cave_m_idx[ny][nx]]))))
 		{
 			monster_type *n_ptr = &m_list[cave_m_idx[ny][nx]];
 
@@ -6066,7 +6121,7 @@ static void process_monster(int m_idx)
 	{
 		/* Monster will be very upset if it can't shoot the player
 		   or wasn't expecting player attack. */
-		if ((!player_can_fire_bold(m_ptr->fy, m_ptr->fx)) || (m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE)))
+		if ((!player_can_fire_bold(m_ptr->fy, m_ptr->fx)) || ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
 		{
 			m_ptr->mflag |= (MFLAG_AGGR);
 
@@ -6129,7 +6184,7 @@ static void process_monster(int m_idx)
 		 * Monster will be very upset if it isn't next to the
 		 * player (pillar dance, hack-n-back, etc)
 		 */
-		if ((m_ptr->cdis > 1) || (m_ptr->mflag & (MFLAG_TOWN | MFLAG_IGNORE)))
+		if ((m_ptr->cdis > 1) || ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
 		{
 			m_ptr->mflag |= (MFLAG_AGGR);
 
@@ -6566,7 +6621,8 @@ static void process_monster(int m_idx)
 
 	/*
 	 * Innate semi-random movement.  Monsters adjacent to the character
-	 * can always strike accurately at him (monster isn't confused).
+	 * can always strike accurately at him (monster isn't confused) or
+	 * move out of his way.
 	 */
 	if ((r_ptr->flags1 & (RF1_RAND_50 | RF1_RAND_25)) && (m_ptr->cdis > 1) && ((level_flag & (LF1_BATTLE)) == 0))
 	{
@@ -6594,9 +6650,10 @@ static void process_monster(int m_idx)
 
 			if (!in_bounds_fully(y1, x1)) continue;
 
-			if (!cave_m_idx[y1][x1]) continue;
+			if (cave_m_idx[y1][x1] <= 0) continue;
 
-			if (((m_list[cave_m_idx[y1][x1]].mflag & (MFLAG_ALLY)) != 0) != ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) chance = 0;
+			/* Adjacent monster we want to fight */
+			if (choose_to_attack_monster(m_ptr, &m_list[cave_m_idx[y1][x1]])) chance = 0;
 		}
 
 		/* Chance of moving randomly */
@@ -6671,8 +6728,8 @@ static void process_monster(int m_idx)
 		}
 	}
 
-	/* Monster is using the special "townsman" AI */
-	if (m_ptr->mflag & (MFLAG_TOWN))
+	/* Monster is using the special "townsman" AI in town */
+	if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && ((level_flag & (LF1_TOWN)) != 0))
 	{
 		/* Town monster been attacked */
 		if (m_ptr->mflag & (MFLAG_AGGR))
@@ -6800,7 +6857,7 @@ static void process_monster(int m_idx)
 			if (restrict_targets && !(n_ptr->ml)) continue;
 
 			/* Monster has an enemy */
-			if (ally != ((n_ptr->mflag & (MFLAG_ALLY)) != 0))
+			if (choose_to_attack_monster(m_ptr, n_ptr))
 			{
 				bool see_target = FALSE;
 
@@ -7103,7 +7160,7 @@ static void process_monster(int m_idx)
 	}
 
 	/* Allies try not to disturb the players rest */
-	else if ((m_ptr->mflag & (MFLAG_ALLY)) && !(m_ptr->ty) && !(m_ptr->tx) && (p_ptr->resting))
+	else if ((!choose_to_attack_player(m_ptr)) && !(m_ptr->ty) && !(m_ptr->tx) && (p_ptr->resting))
 	{
 		/* Don't move as this disturbs the player */
 		return;
