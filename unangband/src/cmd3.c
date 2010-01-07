@@ -1304,7 +1304,7 @@ bool player_trade(int item2)
 		}
 		
 		/* In town, we can sell stuff */
-		else if ((level_flag & (LF1_TOWN)) && !(birth_no_selling))
+		else if ((level_flag & (LF1_TOWN)) && !(adult_no_selling))
 		{
 			/* Evil monsters betray the player 66% of the time */
 			if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
@@ -1360,7 +1360,7 @@ bool player_trade(int item2)
 	 */
 	
 	/* Prevent GTA style takedowns - or the player paying off people to leave town too easily */
-	if ((level_flag & (LF1_TOWN)) && !(birth_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))
+	if ((level_flag & (LF1_TOWN)) && !(adult_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))
 	{
 		int y = m_ptr->fy;
 		int x = m_ptr->fx;

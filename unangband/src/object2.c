@@ -4338,7 +4338,7 @@ bool sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
 	if (!o_ptr->k_idx) return (0);
 
 	/* Fully identify items */
-	if (birth_no_identify)
+	if (adult_no_identify)
 	{
 		/* Important!!! Note different treatment for artifacts. Otherwise the player can
 		   potentially lose artifacts by leaving a level after they are 'automatically'

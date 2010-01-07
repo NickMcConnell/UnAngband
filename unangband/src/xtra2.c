@@ -1458,7 +1458,7 @@ static void improve_stat(void)
 		for (stat_gain_selected = 0; stat_gain_selected < count; stat_gain_selected++)
 		{
 			/* Random pick */
-			if (birth_rand_stats)
+			if (adult_rand_stats)
 			{
 				/* Pick a random stat */
 				stat_gain_selection[stat_gain_selected] = rand_int(A_MAX);
@@ -1526,7 +1526,7 @@ static void improve_stat(void)
 		}
 
 		/* Done? */
-		if (birth_rand_stats) break;
+		if (adult_rand_stats) break;
 
 		/* Save screen */
 		screen_save();
@@ -1860,7 +1860,7 @@ void check_experience(void)
 			p_ptr->max_lev = p_ptr->lev;
 		
 			/* Queue level tips for beginners */
-			if (birth_beginner)
+			if (adult_beginner)
 			{
 				/* Assume the player is no longer a beginner after reaching level 10 */
 				if (p_ptr->max_lev >= 10)

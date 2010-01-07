@@ -4563,7 +4563,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	if (flg & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_MADE);
 
 	/* Good monsters - note that these do carry treasure */
-	if (((r_ptr->flags9 & (RF9_GOOD)) != 0) && ((birth_evil) == 0))
+	if (((r_ptr->flags9 & (RF9_GOOD)) != 0) && ((adult_evil) == 0))
 	{
 		n_ptr->mflag |= (MFLAG_ALLY | MFLAG_IGNORE);
 	}

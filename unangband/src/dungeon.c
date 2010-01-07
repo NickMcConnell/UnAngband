@@ -3540,7 +3540,7 @@ static void dungeon(void)
 	object_level = p_ptr->depth;
 
 	/* Beginners get a tip */
-	if (birth_beginner) show_tip();
+	if (adult_beginner) show_tip();
 
 	/* Main loop */
 	while (TRUE)
