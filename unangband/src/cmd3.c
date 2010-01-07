@@ -1344,7 +1344,7 @@ bool player_trade(int item2)
 	}
 	
 	/* XXX Need to make this interesting */
-	monster_speech(trade_m_idx, "Taken.", FALSE);
+	monster_speech(trade_m_idx, format("Taken%s", value ? "." : "... sorry, did you want something back?"), FALSE);
 	
 	/*
 	 * To do: Use monster profit (trade_value - value) to make monsters
@@ -1359,8 +1359,8 @@ bool player_trade(int item2)
 	 * Profit must exceed either depth * depth (e.g. level 10 requires 100 gold) or even depth*depth*depth (e.g. level 20 requires 8000 gold).
 	 */
 	
-	/* Prevent GTA style takedowns */
-	if ((level_flag & (LF1_TOWN)) && !(birth_no_selling))
+	/* Prevent GTA style takedowns - or the player paying off people to leave town too easily */
+	if ((level_flag & (LF1_TOWN)) && !(birth_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))
 	{
 		int y = m_ptr->fy;
 		int x = m_ptr->fx;
