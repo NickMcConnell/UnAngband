@@ -9651,7 +9651,7 @@ void region_move_vector_hook(int y, int x, s16b d, s16b region, int *ty, int *tx
 	speed32 = speed;
 	
 	/* Does this fragment move at this age? */
-	if ((r_ptr->age * speed32 / 100) == ((r_ptr->age - 1) * speed32 / 100));
+	if ((r_ptr->age * speed32 / 100) == ((r_ptr->age - 1) * speed32 / 100)) return;
 
 	/* Angle of travel */
 	angle = GRID_Y(d);
