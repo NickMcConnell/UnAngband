@@ -3057,7 +3057,7 @@ enum
 #define USE_TARGET		0x00001000L	/* Allow items carried by target */
 #define USE_RANGE		0x00002000L	/* Allow ranged targets and/or allies */
 #define USE_KNOWN		0x00004000L	/* Allow known targets and/or allies */
-#define USE_GOLD		0x00004000L	/* Allow gold - note this is unsafe for the 'default' way of handling items. See player_drop for changes. */
+#define USE_GOLD		0x00008000L	/* Allow gold - note this is unsafe for the 'default' way of handling items. See player_drop for changes. */
 
 
 /*** Player flags ***/
