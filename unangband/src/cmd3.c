@@ -1127,7 +1127,7 @@ bool player_offer(int item)
 			/* Mustn't be injured -- unless critically injured and the player offering healing */
 			/* This critically injured definition must match the critically injured and looking to feed monster definition in melee2.c so that the
 			 * monster can use the item after being given it. */
-			if ((m_ptr->hp < m_ptr->maxhp) && !((m_ptr->hp < m_ptr->maxhp / 10) || ((m_ptr->blind) && (r_ptr->freq_spell >= 25))  || (m_ptr->mana < r_ptr->mana / 5)))
+			if ((m_ptr->hp < m_ptr->maxhp) && !((m_ptr->hp < m_ptr->maxhp / 10) || (m_ptr->mana < r_ptr->mana / 5)))
 			{
 				msg_format("%^s is hurt and not interested.", m_name);
 				return (FALSE);
@@ -1158,10 +1158,10 @@ bool player_offer(int item)
 				else if ((k_ptr->flags6 & (TR6_EAT_HEAL)) && ((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) trade_highly_value = 2;
 				
 				/* General food requirements */
-				else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) trade_highly_value = 1;
-				else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) trade_highly_value = 1;
-				else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) trade_highly_value = 1;
-				else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) trade_highly_value = 1;
+				else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) trade_highly_value = rand_int(3);
+				else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) trade_highly_value = rand_int(3);
+				else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) trade_highly_value = rand_int(3);
+				else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) trade_highly_value = rand_int(3);
 
 				/* Alert the player to the monster's needs */
 				else if (((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0))
