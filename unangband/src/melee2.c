@@ -7262,7 +7262,7 @@ static cptr comment_1a[MAX_COMMENT_1a] =
 static cptr comment_1b[MAX_COMMENT_1b] =
 {
 	"Is that the extent of your largess? You'd better have more for me, and soon...",
-	"The dark lords are far more generous than you. Should I turn to them?",
+	"The dark lords are far more generous than you. Should we turn to them?",
 	"Is the meagre gifts you've given all you have? You disgust me...",
 	"What more have you got for me? Hurry up or else...",
 	"I'm running out of patience with you. You'll regret not giving me more...",
@@ -7293,7 +7293,7 @@ static cptr comment_2b[MAX_COMMENT_2a] =
 	"Blackheart! Your villiany has been exposed...",
 	"Fiend! You betrayed us in our hour of need...",
 	"Liar! You've broken your word one time too many...",
-	"Thief! Are all @ as conniving as you?",
+	"Thief! Are all who call themselves a @ as conniving as you?",
 	"Scoundrel! Your # code is just threadbare rags..."
 };
 
@@ -7360,13 +7360,16 @@ static void recover_monster(int m_idx, bool regen)
 					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
 					/* And get other town allies to fight as well */
-					if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_AGGR), comment_2b[rand_int(MAX_COMMENT_2b)]))
+					if ((tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_AGGR), comment_2b[rand_int(MAX_COMMENT_2b)])) && !(rand_int(10)))
 					{
 						/* Warn the player */
 						msg_format("%^s turns to fight.",m_name);
 
 						/* Become an enemy */
 						m_ptr->mflag &= ~(MFLAG_TOWN);
+
+						/* Don't allow the player to buy his way out of trouble */
+						m_ptr->mflag &= (MFLAG_AGGR);
 					}
 				}
 

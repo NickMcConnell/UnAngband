@@ -933,6 +933,7 @@ bool player_drop(int item)
 static int trade_value = 0;
 static int trade_amount = 0;
 static int trade_m_idx = 0;
+static int trade_highly_value = 0;
 
 /*
  * The "trade" tester
@@ -1074,7 +1075,7 @@ bool player_offer(int item)
 	}
 	else
 	{
-		int highly_value = 0;
+		trade_highly_value = 0;
 		
 		/* Get the monster name (or "it") */
 		monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
@@ -1151,16 +1152,16 @@ bool player_offer(int item)
 				}
 
 				/* Edible - mana recovery */
-				if ((k_ptr->flags6 & (TR6_EAT_MANA)) && (m_ptr->mana < r_ptr->mana / 5)) highly_value = 5 * p_ptr->depth * p_ptr->depth;
+				if ((k_ptr->flags6 & (TR6_EAT_MANA)) && (m_ptr->mana < r_ptr->mana / 5)) trade_highly_value = 4;
 
 				/* Edible - healing */
-				else if ((k_ptr->flags6 & (TR6_EAT_HEAL)) && ((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) highly_value = 4 * p_ptr->depth * p_ptr->depth;
+				else if ((k_ptr->flags6 & (TR6_EAT_HEAL)) && ((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) trade_highly_value = 2;
 				
 				/* General food requirements */
-				else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) highly_value = p_ptr->depth * p_ptr->depth;
-				else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) highly_value = p_ptr->depth * p_ptr->depth;
-				else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) highly_value = p_ptr->depth * p_ptr->depth;
-				else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) highly_value = p_ptr->depth * p_ptr->depth;
+				else if ((k_ptr->flags6 & (TR6_EAT_BODY)) && (r_ptr->flags2 & (RF2_EAT_BODY))) trade_highly_value = 1;
+				else if ((k_ptr->flags6 & (TR6_EAT_INSECT)) && (r_ptr->flags3 & (RF3_INSECT))) trade_highly_value = 1;
+				else if ((k_ptr->flags6 & (TR6_EAT_ANIMAL)) && (r_ptr->flags3 & (RF3_ANIMAL)) && ((r_ptr->flags2 & (RF2_EAT_BODY)) == 0)) trade_highly_value = 1;
+				else if ((k_ptr->flags6 & (TR6_EAT_SMART)) && (r_ptr->flags2 & (RF2_SMART)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0)) trade_highly_value = 1;
 
 				/* Alert the player to the monster's needs */
 				else if (((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->blind)) && ((r_ptr->flags3 & (RF3_UNDEAD)) == 0))
@@ -1202,7 +1203,7 @@ bool player_offer(int item)
 		else
 		{
 			/* Get the trade value - monsters always know real value */
-			trade_value = amt * object_value_real(&inventory[item]) * (200 - adj_chr_gold[p_ptr->stat_ind[A_CHR]]) / 400 + highly_value;
+			trade_value = amt * object_value_real(&inventory[item]) * (200 - adj_chr_gold[p_ptr->stat_ind[A_CHR]]) / 400;
 		}
 		
 		/* Evil monsters are easier to buy, but more likely to betray you */
@@ -1245,7 +1246,7 @@ static cptr comment_1b[MAX_COMMENT_1b] =
 	"Hmmm...",
 	"Humph!",
 	"Huh?",
-	"Heh... heh... heh...",
+	"Heh heh heh...",
 	"Mmmm...",
 	"Maybe..."
 };
@@ -1567,7 +1568,7 @@ bool player_trade(int item2)
 	/* The monster made some profit - let's do business */
 	else
 	{
-		int deal = value / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5));
+		int deal = (value / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5))) + trade_highly_value;
 
 		/* Aggressive monsters get insulted - handle out of bounds cases */
 		if (((m_ptr->mflag & (MFLAG_AGGR)) != 1) && ((deal < 1) || (deal > 9))) deal = 1;
@@ -1606,6 +1607,9 @@ bool player_trade(int item2)
 					{
 						/* XXX Create monster drops and carry them. Mark with made flag. */
 					}
+
+					/* Lots of money doesn't buy as much respect */
+					m_ptr->summoned = 300 - 2 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
 
 					/* Get quietly excited. */
 					monster_speech(trade_m_idx, comment_1d[rand_int(MAX_COMMENT_1d)], FALSE);
