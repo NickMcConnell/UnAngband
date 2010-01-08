@@ -3766,6 +3766,28 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 					while (*u) *t++ = *u++;
 				}
 			}
+			/* Player race only */
+			else if (*s == '@')
+			{
+				/* Get race only */
+				u = p_name + rp_ptr->name;
+
+				/* Copy the string */
+				while (*u) *t++ = *u++;
+
+				*t++ = ' ';
+			}
+			/* Player class only */
+			else if (*s == '#')
+			{
+				/* Get race only */
+				u = c_name + cp_ptr->name;
+
+				/* Copy the string */
+				while (*u) *t++ = *u++;
+
+				*t++ = ' ';
+			}
 			/* Normal */
 			else
 			{
@@ -4128,9 +4150,9 @@ bool tell_allies_death(int y, int x, cptr saying)
 
 
 /*
- * Alert others around the monster about something, set their minimum range and wake them up
+ * Alert others around the monster about something, set their minimum range and/or summoned value and wake them up
  */
-bool tell_allies_best_range(int y, int x, int range, cptr saying)
+bool tell_allies_best_range_or_summoned(int y, int x, int range, int summoned, cptr saying)
 {
 	int i, language, d;
 	bool vocal = FALSE;
@@ -4167,7 +4189,8 @@ bool tell_allies_best_range(int y, int x, int range, cptr saying)
 		/* Activate all other monsters and communicate to them */
 		n_ptr->csleep = 0;
 		n_ptr->mflag |= (MFLAG_ACTV);
-		n_ptr->best_range = range;
+		if (range) n_ptr->best_range = range;
+		if (summoned) n_ptr->summoned = summoned;
 		vocal = TRUE;
 	}
 
@@ -4183,7 +4206,7 @@ bool tell_allies_best_range(int y, int x, int range, cptr saying)
 
 
 /*
- * Alert others around the monster about something, set their minimum range and wake them up
+ * Alert others around the monster about something, set their target and wake them up
  */
 bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 {
@@ -6126,7 +6149,7 @@ static void process_monster(int m_idx)
 			m_ptr->mflag |= (MFLAG_AGGR);
 
 			/* Tell allies to close */
-			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, (aware) ? "& has attacked me!" : "Something has attacked me!"))
+			if (tell_allies_best_range_or_summoned(m_ptr->fy, m_ptr->fx, 1, 0, (aware) ? "& has attacked me!" : "Something has attacked me!"))
 			{
 				/* Close oneself */
 				if (m_ptr->min_range > 1) m_ptr->min_range--;
@@ -6189,7 +6212,7 @@ static void process_monster(int m_idx)
 			m_ptr->mflag |= (MFLAG_AGGR);
 
 			/* Tell allies to close */
-			if (tell_allies_best_range(m_ptr->fy, m_ptr->fx, 1, (aware) ? "& has attacked me!" : "Something has attacked me!"))
+			if (tell_allies_best_range_or_summoned(m_ptr->fy, m_ptr->fx, 1, 0, (aware) ? "& has attacked me!" : "Something has attacked me!"))
 			{
 				/* Close oneself if only option is melee */
 				if (!r_ptr->freq_spell && !r_ptr->freq_innate) m_ptr->min_range = m_ptr->best_range = 1;
@@ -7219,6 +7242,62 @@ static void process_monster(int m_idx)
 }
 
 
+/* The ally needs to be paid again */
+#define MAX_COMMENT_1a   6
+
+static cptr comment_1a[MAX_COMMENT_1a] =
+{
+	"I need more gold to stay in your service, my lord.",
+	"The coffers of my home have grown empty, master.",
+	"I need to be paid again, and soon.",
+	"How will I pay for my upkeep without your assistance?",
+	"I need a sign of favour from you to continue.",
+	"I need a token of your esteem."
+};
+
+
+/* The townsfolk grow restless */
+#define MAX_COMMENT_1b   6
+
+static cptr comment_1b[MAX_COMMENT_1b] =
+{
+	"Is that the extent of your largess? You'd better have more for me, and soon...",
+	"The dark lords are far more generous than you. Should I turn to them?",
+	"Is the meagre gifts you've given all you have? You disgust me...",
+	"What more have you got for me? Hurry up or else...",
+	"I'm running out of patience with you. You'll regret not giving me more...",
+	"Miser! I have children to feed and you give me nothing..."
+};
+
+
+/* Ally mercenary leaving */
+#define MAX_COMMENT_2a   6
+
+static cptr comment_2a[MAX_COMMENT_2a] =
+{
+	"No more gold? I quit your service...",
+	"I've had enough. I'm off...",
+	"I've gone too long without pay. I resign this comission.",
+	"I've run out of money and can't afford to stay with you.",
+	"Your lack of faith in me forces me to leave you.",
+	"I would have stayed, if only you acknowledged my devotion."
+};
+
+
+/* Townsfolk turning on you */
+#define MAX_COMMENT_2b   6
+
+static cptr comment_2b[MAX_COMMENT_2a] =
+{
+	"Traitor! Have it at you!",
+	"Blackheart! Your villiany has been exposed...",
+	"Fiend! You betrayed us in our hour of need...",
+	"Liar! You've broken your word one time too many...",
+	"Thief! Are all @ as conniving as you?",
+	"Scoundrel! Your # code is just threadbare rags..."
+};
+
+
 /*
  * Monster regeneration of HPs and mana, and recovery from all temporary
  * conditions.
@@ -7253,43 +7332,86 @@ static void recover_monster(int m_idx, bool regen)
 	{
 		m_ptr->summoned--;
 
+		/* Warn the player we're running out of patience */
+		if ((m_ptr->summoned == MIN_TOWN_WARNING) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
+		{
+			/* Note loss of patience. */
+			monster_speech(m_idx, (m_ptr->mflag & (MFLAG_ALLY))? comment_1a[rand_int(MAX_COMMENT_1a)] : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
+		}
+
 		if (!m_ptr->summoned)
 		{
+			/* Monsters not on a town level will lose the town flag when they stopped being summoned */
+			if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && ((level_flag & (LF1_TOWN)) != 0))
+			{
+				/* Allies take a while to attack */
+				if (m_ptr->mflag & (MFLAG_ALLY))
+				{
+					/* Stop allegiance */
+					/*m_ptr->mflag &= ~(MFLAG_ALLY);*/
+
+					/* Note loss of allegiance. */
+					monster_speech(m_idx, comment_2a[rand_int(MAX_COMMENT_2a)], FALSE);
+				}
+				/* Only betray when the monster has support */
+				else
+				{
+					/* Get the monster name */
+					monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+					/* And get other town allies to fight as well */
+					if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_AGGR), comment_2b[rand_int(MAX_COMMENT_2b)]))
+					{
+						/* Warn the player */
+						msg_format("%^s turns to fight.",m_name);
+
+						/* Become an enemy */
+						m_ptr->mflag &= ~(MFLAG_TOWN);
+					}
+				}
+
+				/* Give the player some more time to make amends */
+				m_ptr->summoned = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+			}
+
 			/* Delete monster summoned by player */
 			if (m_ptr->mflag & (MFLAG_ALLY))
 			{
 				s16b this_o_idx, next_o_idx = 0;
 
-				/* Drop objects being carried */
-				for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+				/* Drop objects being carried - unless a mercenary */
+				if ((m_ptr->mflag & (MFLAG_TOWN)) == 0)
 				{
-					object_type *o_ptr, *i_ptr;
-					object_type object_type_body;
+					for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+					{
+						object_type *o_ptr, *i_ptr;
+						object_type object_type_body;
 
-					/* Get the object */
-					o_ptr = &o_list[this_o_idx];
+						/* Get the object */
+						o_ptr = &o_list[this_o_idx];
 
-					/* Get the next object */
-					next_o_idx = o_ptr->next_o_idx;
+						/* Get the next object */
+						next_o_idx = o_ptr->next_o_idx;
 
-					/* Paranoia */
-					o_ptr->held_m_idx = 0;
+						/* Paranoia */
+						o_ptr->held_m_idx = 0;
 
-					/* Get local object */
-					i_ptr = &object_type_body;
+						/* Get local object */
+						i_ptr = &object_type_body;
 
-					/* Copy the object */
-					object_copy(i_ptr, o_ptr);
+						/* Copy the object */
+						object_copy(i_ptr, o_ptr);
 
-					/* Delete the object */
-					delete_object_idx(this_o_idx);
+						/* Delete the object */
+						delete_object_idx(this_o_idx);
 
-					/* Drop it */
-					drop_near(i_ptr, -1, y, x, TRUE);
+						/* Drop it */
+						drop_near(i_ptr, -1, y, x, TRUE);
+					}
+
+					/* Forget objects */
+					m_ptr->hold_o_idx = 0;
 				}
-
-				/* Forget objects */
-				m_ptr->hold_o_idx = 0;
 
 				/* Get the monster name */
 				monster_desc(m_name, sizeof(m_name), m_idx, 0);

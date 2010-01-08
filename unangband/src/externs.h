@@ -722,7 +722,7 @@ extern bool tell_allies_player_can(int y, int x, u32b flag);
 extern bool tell_allies_player_not(int y, int x, u32b flag);
 extern bool tell_allies_mflag(int y, int x, u32b flag, cptr saying);
 extern bool tell_allies_death(int y, int x, cptr saying);
-extern bool tell_allies_best_range(int y, int x, int range, cptr saying);
+extern bool tell_allies_best_range_or_summoned(int y, int x, int range, int summoned, cptr saying);
 extern bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying);
 extern void feed_monster(int m_idx);
 extern void find_range(int m_idx);

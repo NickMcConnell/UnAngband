@@ -1223,6 +1223,217 @@ bool player_offer(int item)
 }
 
 
+/* The normal sales acceptance text */
+#define MAX_COMMENT_1a   6
+
+static cptr comment_1a[MAX_COMMENT_1a] =
+{
+	"Okay.",
+	"Fine.",
+	"Accepted!",
+	"Agreed!",
+	"Done!",
+	"Taken!"
+};
+
+/* Offer just distracts the monster momentarily from killing the player */
+
+#define MAX_COMMENT_1b   6
+
+static cptr comment_1b[MAX_COMMENT_1b] =
+{
+	"Hmmm...",
+	"Humph!",
+	"Huh?",
+	"Heh... heh... heh...",
+	"Mmmm...",
+	"Maybe..."
+};
+
+
+/* Consider not killing the player for a short while */
+
+#define MAX_COMMENT_1c   6
+
+static cptr comment_1c[MAX_COMMENT_1c] =
+{
+	"Do you want to talk before I kill you, puny @?",
+	"Why are you not fighting me? Are you a coward, @, like the rest?",
+	"This feels like a typical @ trick!",
+	"I've never met a @ I didn't hate. Why should you be any different?",
+	"I find your insolence... amusing. Pray tell me, @, why you don't deserve to die.",
+	"Let me put this away for safe keeping, @... you death is still a... little way off..."
+};
+
+
+/* Some terms of trade */
+
+#define MAX_COMMENT_1d   6
+
+static cptr comment_1d[MAX_COMMENT_1d] =
+{
+	"I might consider another offer, @.",
+	"Maybe we can continue doing business, @.",
+	"You might find further discussion more profitable, @.",
+	"I'll scratch your back, @. You scratch... here, where I itch the most...",
+	"Your stench taints what you touch @. It'll be hard to trade what you gave me. But keep trying...",
+	"We seem to have come to terms, @. I might have something more for you."
+};
+
+
+/* Become (temporary) friends */
+
+#define MAX_COMMENT_1e   6
+
+static cptr comment_1e[MAX_COMMENT_1e] =
+{
+	"You're look pretty ugly... but not for a @, I'm sure!",
+	"You're not so bad, after all... for a @.",
+	"Tell me more about your # ways...",
+	"You might learn from me, @, before you can become a better #.",
+	"Forgive my friends, #. They see only a @.",
+	"Parley with a @? A @ #? Who would have thought?"
+};
+
+
+/* Become a bribed servant */
+
+#define MAX_COMMENT_1f   6
+
+static cptr comment_1f[MAX_COMMENT_1f] =
+{
+	"That is, precious, to me...",
+	"Your gift has... affected me.",
+	"Wow! I hadn't seen something of so much worth...",
+	"Are the streets of your home paved with gold?",
+	"Money is something I have never valued... until now.",
+	"A @ bearing gifts? You deserve reward fit for a king!"
+};
+
+
+
+/* Comments for when player gets cheated of item or money */
+
+#define MAX_COMMENT_2   6
+
+static cptr comment_2[MAX_COMMENT_2] =
+{
+	"The cheque is in the mail.",
+	"Taken! Sorry, did you want something more?",
+	"You'll get want you want soon enough.",
+	"I've got it for you. Just try and get it off me.",
+	"I've left it for you in Nowhere town.",
+	"I've had some... supply issues at the moment and the merchandise has been delayed."
+};
+
+
+/* Comments for when monster doesn't have the cash on them in the dungeon */
+
+#define MAX_COMMENT_3   6
+
+static cptr comment_3[MAX_COMMENT_3] =
+{
+	"I'll have to take you to my master for the money.",
+	"I keep what you want in a hiding place near where I sleep.",
+	"Someone owes this to me. I need you to help collect the debt.",
+	"It's just up ahead.  Not much further now...",
+	"It's near the entrance to the next level. Let me take you there.",
+	"I left it around here somewhere. Let me think..."
+};
+
+
+/* Comments for when monster speaks to his allies - when heard by the player (proposal) */
+
+#define MAX_COMMENT_4a   6
+
+static cptr comment_4a[MAX_COMMENT_4a] =
+{
+	"& proposes an interesting conundrum.",
+	"& has set a challenge to us.",
+	"& may make this worth our while to listen.",
+	"& may have much wealth and goods to distribute.",
+	"& has not tried to fight back. This is shows some... respect.",
+	"& comes to us open-handed."
+};
+
+
+/* Comments for when monster speaks to his allies - when heard by the player (silver-tongued) */
+
+#define MAX_COMMENT_4b   6
+
+static cptr comment_4b[MAX_COMMENT_4b] =
+{
+	"I have not seen such a brave or noble endeavour.",
+	"I would place much trust in such a @.",
+	"We should all profit from this good work.",
+	"We can turn the tide of battle through words, not war.",
+	"There will be peace in our time.",
+	"Let us walk together and talk on this further."
+};
+
+
+/* Comments for when monster speaks to his allies - when heard by the player (haughty) */
+
+#define MAX_COMMENT_4c   6
+
+static cptr comment_4c[MAX_COMMENT_4c] =
+{
+	"This is an omen, whether for good or ill I cannot yet tell.",
+	"The gods work in mysterious ways.",
+	"We must discuss this... without undue influence from you, @.",
+	"But the @ may just be spreading lies with a silver tongue...",
+	"But what has gold bought us until now?",
+	"But a sharpened blade cuts both ways."
+};
+
+
+/* Comments for when monster speaks to his allies - when not heard by the player (proposal) */
+
+#define MAX_COMMENT_5a   6
+
+static cptr comment_5a[MAX_COMMENT_5a] =
+{
+	"& swaggers in here like the place was already bought and paid for.",
+	"& disgraces the spirits of our ancestors.",
+	"& tries to buy a way out of trouble.",
+	"& is not worth the weight of gold.",
+	"& is clearly a coward.",
+	"& thinks to bribe us as if we were savages."
+};
+
+
+/* Comments for when monster speaks to his allies - when not heard by the player (quick betrayal) */
+
+#define MAX_COMMENT_5b   6
+
+static cptr comment_5b[MAX_COMMENT_5b] =
+{
+	"I have need of the entrails of a @. Which cut do you want?",
+	"The gods demand sacrifice of a @. Be quick about it!",
+	"Wait a moment, and see what spoils we'll loot from this walking corpse.",
+	"Bide your time. Strike when the @ least expects it.",
+	"The walls whispered 'Blood for Morgoth' to me in my dreams. This @ answers that vision.",
+	"Do we have a cooking pot big enough for a @?"
+};
+
+
+/* Comments for when monster speaks to his allies - when not heard by the player (intrigued/desperate) */
+
+#define MAX_COMMENT_5c   6
+
+static cptr comment_5c[MAX_COMMENT_5c] =
+{
+	"But we are poor and in need of money, so let us find some profit here.",
+	"This may be a way for us to curry favour elsewhere.",
+	"This morning, I saw a sign from our gods. Now I know why...",
+	"But I am tired of fighting. Should we not rest a while?",
+	"But that display of bravado impresses me, nonetheless.",
+	"If nothing else, this @ # will be amusing sport."
+};
+
+
+
+
 /*
  * Trade with a monster
  */
@@ -1296,6 +1507,9 @@ bool player_trade(int item2)
 	/* Get the item from the monster */
 	if (item2 == INVEN_GOLD)
 	{
+		/* Evil monsters betray the player 66% of the time */
+		if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
+
 		/* Gambling */
 		if (item == INVEN_GOLD)
 		{
@@ -1304,11 +1518,8 @@ bool player_trade(int item2)
 		}
 		
 		/* In town, we can sell stuff */
-		else if ((level_flag & (LF1_TOWN)) && !(adult_no_selling))
+		else if (((level_flag & (LF1_TOWN)) != 0) && !(adult_no_selling))
 		{
-			/* Evil monsters betray the player 66% of the time */
-			if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
-			
 			/* Money well earned? */
 			p_ptr->au += value;
 			
@@ -1343,21 +1554,152 @@ bool player_trade(int item2)
 		inven_drop(item, trade_amount, trade_m_idx);
 	}
 	
-	/* XXX Need to make this interesting */
-	monster_speech(trade_m_idx, format("Taken%s", value ? "." : "... sorry, did you want something back?"), FALSE);
-	
-	/*
-	 * To do: Use monster profit (trade_value - value) to make monsters
-	 * 1. Reveal their inventory (generate items they carry and mark with MFLAG_MADE)
-	 * 2. Become neutral to the player (mark with MFLAG_TOWN and set m_ptr->summoned - this will require this AI be adapted for the dungeon)
-	 * 3. Become an allied mercenary to the player (mark with MFLAG_ALLY | MFLAG_TOWN). Mercenaries and townsfolk in
-	 * the dungeon will ask the player for further moneys when their summoned time runs out.
-	 * 4. Reveal the territory that the monster is familiar with once allied (grids with matching ecologies). This might involve taking
-	 * the player to the core of the territory, where they will be introduced to their leaders and/or betrayed. Or bypassing the territory
-	 * and taking the player to up or downstairs.
-	 * 
-	 * Profit must exceed either depth * depth (e.g. level 10 requires 100 gold) or even depth*depth*depth (e.g. level 20 requires 8000 gold).
-	 */
+	/* Cheated the player out of money */
+	if ((item2 == INVEN_GOLD) && (!value) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
+	{
+		/* Really ripping the player off */
+		if (level_flag & (LF1_TOWN)) monster_speech(trade_m_idx, comment_3[rand_int(MAX_COMMENT_3)], FALSE);
+
+		/* Otherwise it's just a day in the life of ripping the player off */
+		else monster_speech(trade_m_idx, comment_2[rand_int(MAX_COMMENT_2)], FALSE);
+	}
+
+	/* The monster made some profit - let's do business */
+	else
+	{
+		int deal = value / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5));
+
+		/* Aggressive monsters get insulted - handle out of bounds cases */
+		if (((m_ptr->mflag & (MFLAG_AGGR)) != 1) && ((deal < 1) || (deal > 9))) deal = 1;
+
+		/*
+		 * To do: Use monster profit (trade_value - value) to make monsters reveal
+		 * the territory that the monster is familiar with once allied (grids with
+		 * matching ecologies). This might involve taking the player to the core of
+		 * the territory, where they will be introduced to their leaders and/or
+		 * betrayed. Or bypassing the territory and taking the player to up or downstairs.
+		 */
+
+		switch(deal)
+		{
+			case 7: case 8: case 9:
+				/* We can offer stuff to business associates to make them allies */
+				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE))
+				{
+					/* Make them an ally */
+					m_ptr->mflag |= (MFLAG_ALLY);
+
+					/* Buy more time before they turn on us */
+					m_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+
+					/* Get moderately excited. */
+					monster_speech(trade_m_idx, comment_1e[rand_int(MAX_COMMENT_1e)], FALSE);
+
+					break;
+				}
+
+			case 4: case 5: case 6:
+				/* We can offer stuff to neutral monsters to reveal their inventory */
+				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_AGGR)) == (MFLAG_TOWN))
+				{
+					if ((m_ptr->mflag & (MFLAG_MADE)) == 0)
+					{
+						/* XXX Create monster drops and carry them. Mark with made flag. */
+					}
+
+					/* Get quietly excited. */
+					monster_speech(trade_m_idx, comment_1d[rand_int(MAX_COMMENT_1d)], FALSE);
+
+					break;
+				}
+			case 1: case 2: case 3:
+				/* We can offer stuff to monsters to either slow them down or make them 'neutral' */
+				if (((m_ptr->mflag & (MFLAG_TOWN)) == 0) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0))
+				{
+					/* Enough to at least make him not attack. */
+					if (deal > 1)
+					{
+						m_ptr->mflag |= (MFLAG_TOWN);
+
+						/* Buy more time before they turn on us */
+						m_ptr->summoned = 70 - adj_chr_gold[p_ptr->stat_ind[A_CHR]] / 2;
+
+						/* Handle aggressive response */
+						if (m_ptr->mflag & (MFLAG_AGGR)) deal = 1;
+					}
+
+					/* At least block some other monsters */
+					if (deal % 2) m_ptr->mflag |= (MFLAG_PUSH);
+
+					/* Don't register much excitement. */
+					monster_speech(trade_m_idx, (deal > 1) ? comment_1c[rand_int(MAX_COMMENT_1c)] : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
+
+					break;
+				}
+				/* Fall through */
+			case 0:
+				/* Don't register much excitement */
+				monster_speech(trade_m_idx, comment_1a[rand_int(MAX_COMMENT_1a)], FALSE);
+
+				break;
+
+			default:
+				/* Buy friends outright. Note don't add the made flag, so it is possible to do business with a lesser offer later. */
+				m_ptr->mflag |= (MFLAG_ALLY | MFLAG_TOWN /* | MFLAG_MADE */);
+
+				/* Lots of money doesn't buy as much respect */
+				m_ptr->summoned = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+
+				/* Get moderately excited. */
+				monster_speech(trade_m_idx, comment_1f[rand_int(MAX_COMMENT_1f)], FALSE);
+
+				break;
+		}
+
+		/* For valuable deals, we talk to our allies and assess the situation */
+		if (deal >= 3)
+		{
+			/* If we don't think the player is listening */
+			u32b hack_cur_flags4 = p_ptr->cur_flags4;
+
+			/* Monster assumes based on the player shape what language they understand. */
+			p_ptr->cur_flags4 = k_info[p_info[p_ptr->pshape].innate].flags4;
+
+			/* Appear more innocuous */
+			if (player_understands(monster_language(m_ptr->r_idx)))
+			{
+				/* Unhack */
+				p_ptr->cur_flags4 = hack_cur_flags4;
+
+				/* Tell allies to cool their heels */
+				if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), comment_4a[rand_int(MAX_COMMENT_4a)]))
+				{
+					/* Allies are impressed to varying degree - evil speakers are silver tongued */
+					tell_allies_best_range_or_summoned(m_ptr->fy, m_ptr->fx, 0, MIN_TOWN_WARNING + rand_int(m_ptr->summoned / 2 + 1),
+							r_info[m_ptr->r_idx].flags3 & (RF3_EVIL) ? comment_4b[rand_int(MAX_COMMENT_4b)] : comment_4c[rand_int(MAX_COMMENT_4c)]);
+				}
+			}
+
+			/* Appear more haughty, Outright betrayal, if evil */
+			else
+			{
+				/* Unhack */
+				p_ptr->cur_flags4 = hack_cur_flags4;
+
+				/* Tell allies to cool their heels */
+				if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), comment_5a[rand_int(MAX_COMMENT_5a)]))
+				{
+					/* If evil, we schedule a random time to coordinate a quick betrayal */
+					if (r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) m_ptr->summoned = rand_int(MIN_TOWN_WARNING);
+
+					/* Coordinate a quick betrayal if evil, or risk of outright attack if allies sufficiently unimpressed */
+					tell_allies_best_range_or_summoned(m_ptr->fy, m_ptr->fx, (r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) ? 3 : 0,
+							r_info[m_ptr->r_idx].flags3 & (RF3_EVIL) ? m_ptr->summoned : MIN_TOWN_WARNING / 2 + rand_int(m_ptr->summoned / 2 + 1) / 2,
+									r_info[m_ptr->r_idx].flags3 & (RF3_EVIL) ? comment_5b[rand_int(MAX_COMMENT_5b)] : comment_5c[rand_int(MAX_COMMENT_5c)]);
+				}
+			}
+		}
+	}
 	
 	/* Prevent GTA style takedowns - or the player paying off people to leave town too easily */
 	if ((level_flag & (LF1_TOWN)) && !(adult_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))

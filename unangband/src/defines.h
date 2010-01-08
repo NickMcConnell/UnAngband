@@ -3844,6 +3844,12 @@ enum
 #define MAX_SAURON_FORMS	5
 
 
+/*
+ * The minimum warning that 'town' monsters give before reverting to attack
+ * the player.
+ */
+#define MIN_TOWN_WARNING	20
+
 
 /*
  * Special Monster Flags (all temporary)
