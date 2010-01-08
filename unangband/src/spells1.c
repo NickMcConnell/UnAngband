@@ -10116,18 +10116,35 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Weak darkness -- blinding only */
+		/* Weak darkness -- douses light now instead of blinding */
 		case GF_DARK_WEAK:
 		{
+			object_type *o_ptr = &inventory[INVEN_LITE];
+			
 			dam = 0;
+			
+			/* Douse light */
+			if (o_ptr->timeout)
+			{
+				o_ptr->charges = o_ptr->timeout;
+				o_ptr->timeout = 0;
+				
+				msg_print("Your light goes out!");
+				
+				/* Update torch */
+				p_ptr->update |= (PU_TORCH);
 
-			/* Fall through */
+				/* Fully update the visuals */
+				p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
+			}
+
+			break;
 		}
 
 		/* Dark -- blinding */
 		case GF_DARK:
 		{
-			if ((fuzzy) && (typ == GF_DARK)) msg_print("You are hit by something!");
+			if (fuzzy) msg_print("You are hit by something!");
 			if ((p_ptr->cur_flags2 & (TR2_RES_DARK)) != 0)
 			{
 				/* Always notice */

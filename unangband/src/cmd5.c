@@ -427,6 +427,8 @@ bool player_browse_object(object_type *o_ptr)
 
 	char out_val[160];
 
+	bool disdain = FALSE;
+	
 	/* Get fake tval */
 	if (o_ptr->tval == TV_STUDY) tval = o_ptr->sval;
 	else tval = o_ptr->tval;
@@ -461,29 +463,45 @@ bool player_browse_object(object_type *o_ptr)
 		return (FALSE);
 	}
 
-	/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
-	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD)
-			&& ( ((p_ptr->pstyle == WS_MAGIC_BOOK) && (o_ptr->tval == TV_MAGIC_BOOK))
-			|| ((p_ptr->pstyle == WS_PRAYER_BOOK) && (o_ptr->tval == TV_PRAYER_BOOK))
-			|| ((p_ptr->pstyle == WS_SONG_BOOK) && (o_ptr->tval == TV_SONG_BOOK))))
+	/* Specialists naturally disdain other books */
+	if ((p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))
 	{
-		/* Confirm in same school */
-		if ((o_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->psval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL)
+		/* Reject some/all song books */
+		if (((p_ptr->pstyle == WS_MAGIC_BOOK) && (o_ptr->tval != TV_MAGIC_BOOK)) ||
+				((p_ptr->pstyle == WS_PRAYER_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)) ||
+				((p_ptr->pstyle == WS_SONG_BOOK) && (o_ptr->tval != TV_SONG_BOOK)))
 		{
-			msg_format("You cannot read any %ss in it.",p);
-			switch ((o_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL)
+			/* School specialists reject all alternate spellbooks, other specialists just reject the basic books */
+			if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) || (o_ptr->sval >= SV_BOOK_MAX_GOOD))
 			{
-				case 0: msg_print("It shows a lack of grasp of simple theory."); break;
-				case 1: msg_print("It could never work due to harmonic instability."); break;
-				case 2: msg_print("It's the deranged scribblings from a lunatic asylum."); break;
-				case 3: msg_print("The book snaps itself shut and jumps from your fingers."); break;
-				default: msg_print("Your eyes twist away from the pages... there were some things man was not meant to know."); break;
+				disdain = TRUE;
 			}
-
-			return (FALSE);
+		}
+		/* Reject books outside of their school */
+		else if ((o_ptr->sval >= SV_BOOK_MAX_GOOD)
+			&& ((o_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->pschool - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL))
+		{
+			disdain = TRUE;
 		}
 	}
 
+	/* Reject spellbooks if a specialist */
+	if (disdain)
+	{
+		msg_format("You cannot read any %ss in it.",p);
+		
+		switch ((o_ptr->sval - SV_BOOK_MAX_GOOD) % SV_BOOK_SCHOOL)
+		{
+			case 0: msg_print("It shows a lack of grasp of simple theory."); break;
+			case 1: msg_print("It could never work due to harmonic instability."); break;
+			case 2: msg_print("It's the deranged scribblings from a lunatic asylum."); break;
+			case 3: msg_print("The book snaps itself shut and jumps from your fingers."); break;
+			default: msg_print("Your eyes twist away from the pages... there were some things man was not meant to know."); break;
+		}
+
+		return (FALSE);
+	}
+	
 	/* Display the spells */
 	print_spells(book, num, 1, 20);
 
@@ -857,14 +875,26 @@ bool player_study(int item)
 			break;
 	}
 
-	/* 'School' specialists cannot learn spells from basic 'school' books other than their school */
-	if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (o_ptr->sval >= SV_BOOK_MAX_GOOD)
-			&& ( ((p_ptr->pstyle == WS_MAGIC_BOOK) && (o_ptr->tval == TV_MAGIC_BOOK))
-			|| ((p_ptr->pstyle == WS_PRAYER_BOOK) && (o_ptr->tval == TV_PRAYER_BOOK))
-			|| ((p_ptr->pstyle == WS_SONG_BOOK) && (o_ptr->tval == TV_SONG_BOOK))))
+	/* Specialists naturally disdain other books */
+	if ((p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))
 	{
-		/* Confirm in same school */
-		if ((o_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->psval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL) disdain = TRUE;
+		/* Reject some/all song books */
+		if (((p_ptr->pstyle == WS_MAGIC_BOOK) && (o_ptr->tval != TV_MAGIC_BOOK)) ||
+				((p_ptr->pstyle == WS_PRAYER_BOOK) && (o_ptr->tval != TV_PRAYER_BOOK)) ||
+				((p_ptr->pstyle == WS_SONG_BOOK) && (o_ptr->tval != TV_SONG_BOOK)))
+		{
+			/* School specialists reject all alternate spellbooks, other specialists just reject the basic books */
+			if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) || (o_ptr->sval >= SV_BOOK_MAX_GOOD))
+			{
+				disdain = TRUE;
+			}
+		}
+		/* Reject books outside of their school */
+		else if ((o_ptr->sval >= SV_BOOK_MAX_GOOD)
+			&& ((o_ptr->sval - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL != (p_ptr->pschool - SV_BOOK_MAX_GOOD) / SV_BOOK_SCHOOL))
+		{
+			disdain = TRUE;
+		}
 	}
 
 	/* Spell is illegible */

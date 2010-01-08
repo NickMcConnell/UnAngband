@@ -9745,7 +9745,7 @@ bool spell_match_style(int spell)
 		if (sval == p_ptr->psval) return (TRUE);
 		
 		/* Match high version of book */
-		if ((sval < SV_BOOK_MAX_GOOD) && (p_ptr->psval == sval % (SV_BOOK_MAX_GOOD / 2)))
+		if ((sval < SV_BOOK_MAX_GOOD) && (p_ptr->psval == sval % (SV_BOOK_MAX_GOOD / 2))) return (TRUE);
 
 		/* Match because we have specialised in a 'basic spellbook style, and book falls into this category */
 		if ((p_ptr->psval >= SV_BOOK_MAX_GOOD) && (sval >= SV_BOOK_MAX_GOOD))
@@ -9852,51 +9852,39 @@ spell_cast *spell_cast_details(int spell)
 
 	/* Get our casting information */
 	int i;
+	int worst = 0;
+	int best = 0;
 
-	for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	/* Note check for warriors. */
+	if (p_ptr->pclass) for (i = 0;i < MAX_SPELL_CASTERS; i++)
 	{
 		if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
 			sc_ptr=&(s_ptr->cast[i]);
+			
+			/* Is this ability worse? */
+			if (s_ptr->cast[i].level > s_ptr->cast[worst].level) worst = i;
+			
+			/* Is this ability better? */
+			if (s_ptr->cast[i].level < s_ptr->cast[best].level) best = i;
 		}
 	}
 
 	/* Hack -- if the character doesn't have the ability to cast a spell,
-	 * choose the first one if they are a specialist */
-	if (spell_match_style(spell)) sc_ptr = &(s_ptr->cast[0]);
+	 * choose the worst one if they are a specialist and not powerful,
+	 * or the best one if they are a specialist and powerful */
+	if (!sc_ptr && spell_match_style(spell)) sc_ptr = &(s_ptr->cast[cp_ptr->spell_power ? best : worst]);
 
 	return (sc_ptr);
 }
 
 
 /*
- * Spell could be learnt by the player.
- *
- * This differs from spell_read_okay, in that the spell could appear
- * in another book that the player is allowed to use.
+ * Returns level for a spell.
+ * 
+ * We don't check legibility here because spell_legible calls this.
  */
-bool spell_legible(int spell)
-{
-	int i;
-	spell_type *s_ptr = &s_info[spell];
-
-	for (i = 0; i < MAX_SPELL_CASTERS; i++)
-	{
-		/* Class is allowed to cast the spell */
-		if (s_ptr->cast[i].class == p_ptr->pclass) return (TRUE);
-	}
-
-	/* Gifted and chosen spell casters can read all spells from the book they have specialised in */
-	if (spell_match_style(spell)) return (TRUE);
-
-	return (FALSE);
-}
-
-
-/*
- * Returns level for a spell
- */
-s16b spell_level(int spell)
+s16b spell_level_aux(int spell)
 {
 	int i;
 
@@ -9908,15 +9896,13 @@ s16b spell_level(int spell)
 
 	bool fix_level = TRUE;
 
-	/* Illegible */
-	if (!spell_legible(spell)) return (100);
-
 	/* Check we have casting details */
 	if (!sc_ptr) return (100);
 
 	/* Hack -- check if we can 'naturally' cast it,
-	 * as opposed to relying on speciality. */
-	for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	 * as opposed to relying on speciality.
+	 * Note check for warriors. */
+	if (p_ptr->pclass) for (i = 0;i < MAX_SPELL_CASTERS; i++)
 	{
 		if (s_ptr->cast[i].class == p_ptr->pclass)
 		{
@@ -9964,6 +9950,48 @@ s16b spell_level(int spell)
 
 	return(level);
 }
+
+
+/*
+ * Spell could be learnt by the player.
+ *
+ * This differs from spell_read_okay, in that the spell could appear
+ * in another book that the player is allowed to use.
+ */
+bool spell_legible(int spell)
+{
+	int i;
+	spell_type *s_ptr = &s_info[spell];
+
+	/* Note check for warriors. */
+	if (p_ptr->pclass) for (i = 0;i < MAX_SPELL_CASTERS; i++)
+	{
+		/* Class is allowed to cast the spell */
+		if (s_ptr->cast[i].class == p_ptr->pclass) return (TRUE);
+	}
+
+	/* Gifted and chosen spell casters can read all spells from the book they have specialised in,
+	 * unless the computed level is too high. */
+	if (spell_match_style(spell) && (spell_level_aux(spell) <= 50)) return (TRUE);
+
+	return (FALSE);
+}
+
+
+/*
+ * Is the spell legible?
+ */
+s16b spell_level(int spell)
+{
+	/* Illegible */
+	if (!spell_legible(spell)) return (100);
+
+	return (spell_level_aux(spell));
+}
+
+
+
+
 
 
 /*
