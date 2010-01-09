@@ -191,6 +191,13 @@ bool do_cmd_item(int command)
 		}
 	}
 
+	/* Check some conditions - need to not be sneaking */
+	if ((cmd_item_list[command].conditions & (CONDITION_NO_SNEAKING)) && (p_ptr->sneaking))
+	{
+		msg_print("You cannot do this sneakily.");
+		return (FALSE);
+	}
+
 	/* Hack --- fuel equipment from inventory */
 	if (command == COMMAND_ITEM_FUEL)
 		p_ptr->command_wrk = (USE_EQUIP); /* TODO: this one does not work here */

@@ -3271,6 +3271,10 @@ static void process_player(void)
 			    if (player_cast_spell(p_ptr->held_song, spell_power(p_ptr->held_song), ((p_ptr->pstyle == WS_INSTRUMENT)?"play":"sing"), "song"))
 					/* Hack -- if not aborted, always use a full turn */
 					p_ptr->energy_use = 100;
+
+			    /* Cannot sneak with a held song */
+				if (p_ptr->sneaking) p_ptr->redraw |= (PR_STATE);
+				p_ptr->sneaking = FALSE;
 			}
 
 			/* Use some energy */

@@ -79,6 +79,12 @@ bool do_cmd_test(int y, int x, int action)
 	}
 
 
+	if (p_ptr->sneaking)
+	{
+		msg_print("You cannot do this sneakily.");
+		return (FALSE);
+	}
+
 	if (action < FS_FLAGS2)
 	{
 		flag = bitzero << (action - FS_FLAGS1);

@@ -664,6 +664,7 @@ enum
 #define CONDITION_LITERATE		0x00000020L	/* Player can read books */
 #define CONDITION_HOLD_SONG		0x00000040L	/* Player can choose to change the song they're singing */
 #define CONDITION_NEED_SPELLS	0x00000080L	/* Player must have new spells to learn */
+#define CONDITION_NO_SNEAKING	0x00000100L	/* Player must not be sneaking */
 
 
 

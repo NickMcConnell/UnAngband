@@ -7617,6 +7617,12 @@ static void recover_monster(int m_idx, bool regen)
 			/* Wake up faster near the player */
 			if (m_ptr->cdis < 50) d = (100 / m_ptr->cdis);
 
+			/* Reduce effectiveness of waking up if the player is sneaking */
+			if (p_ptr->sneaking)
+			{
+				d = rand_int(d);
+			}
+
 			/* Still asleep */
 			if (m_ptr->csleep > d)
 			{

@@ -3069,6 +3069,12 @@ void py_attack(int dir)
 	 */
 	p_ptr->dodging = dir;
 
+	/*
+	 * No longer sneaking
+	 */
+	if (p_ptr->sneaking) p_ptr->redraw |= (PR_STATE);
+	p_ptr->sneaking = FALSE;
+
 	/* Restrict blows if charging */
 	if (charging)
 	{
