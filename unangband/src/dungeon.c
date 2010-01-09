@@ -3081,6 +3081,9 @@ static void process_player(void)
 		/* Start searching */
 		p_ptr->searching = TRUE;
 
+		/* Stop sneaking */
+		p_ptr->sneaking = FALSE;
+
 		/* Recalculate bonuses */
 		p_ptr->update |= (PU_BONUS);
 
@@ -3106,6 +3109,12 @@ static void process_player(void)
 
 		/* Redraw the state */
 		p_ptr->redraw |= (PR_STATE);
+	}
+
+	/*** Clear not sneaking ***/
+	if (p_ptr->not_sneaking)
+	{
+		p_ptr->not_sneaking = FALSE;
 	}
 
 	/*** Handle actual user input ***/
@@ -3271,10 +3280,6 @@ static void process_player(void)
 			    if (player_cast_spell(p_ptr->held_song, spell_power(p_ptr->held_song), ((p_ptr->pstyle == WS_INSTRUMENT)?"play":"sing"), "song"))
 					/* Hack -- if not aborted, always use a full turn */
 					p_ptr->energy_use = 100;
-
-			    /* Cannot sneak with a held song */
-				if (p_ptr->sneaking) p_ptr->redraw |= (PR_STATE);
-				p_ptr->sneaking = FALSE;
 			}
 
 			/* Use some energy */
@@ -3385,8 +3390,15 @@ static void process_player(void)
 	/*** Clear charging ***/
 	if (p_ptr->charging)
 	{
-		/* Set dodging */
+		/* Clear charging */
 		p_ptr->charging = 0;
+	}
+
+	/*** Clear dodging ***/
+	if ((p_ptr->dodging) && (p_ptr->sneaking) && !(p_ptr->not_sneaking))
+	{
+		/* Lose benefits of dodging and be unable to charge */
+		p_ptr->dodging = 0;
 	}
 
 	/* Update noise flow information */

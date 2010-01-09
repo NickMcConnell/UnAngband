@@ -1300,6 +1300,15 @@ static errr rd_extra(void)
 	rd_byte(&p_ptr->charging);
 	rd_byte(&p_ptr->climbing);
 	rd_byte(&p_ptr->searching);
+
+	/* Oops */
+	if (!older_than(0,6,3,11))
+	{
+		rd_byte(&p_ptr->blocking);
+		rd_byte(&p_ptr->dodging);
+		rd_byte(&p_ptr->not_sneaking);
+	}
+
 	rd_byte(&p_ptr->sneaking);
 	rd_byte(&p_ptr->reserves);
 	rd_byte(&tmp8u);	/* oops */
@@ -1315,6 +1324,18 @@ static errr rd_extra(void)
 
 	/* Get held song */
 	rd_s16b(&p_ptr->held_song);
+
+	/* Oops */
+	if (!older_than(0,6,3,11))
+	{
+		/* Get spell trap */
+		rd_s16b(&p_ptr->spell_trap);
+
+		/* Get delayed spell */
+		rd_s16b(&p_ptr->delay_spell);
+	}
+
+
 
 	/* Returning */
 	rd_s16b(&p_ptr->word_return);

@@ -3069,11 +3069,14 @@ void py_attack(int dir)
 	 */
 	p_ptr->dodging = dir;
 
-	/*
-	 * No longer sneaking
-	 */
-	if (p_ptr->sneaking) p_ptr->redraw |= (PR_STATE);
-	p_ptr->sneaking = FALSE;
+	/* Player is sneaking */
+	if (p_ptr->sneaking)
+	{
+		/* If the player is trying to be stealthy, they lose the benefit of this for
+		 * the following turn.
+		 */
+		p_ptr->not_sneaking = TRUE;
+	}
 
 	/* Restrict blows if charging */
 	if (charging)
@@ -3888,6 +3891,9 @@ void move_player(int dir)
 		/* No longer climbing */
 		p_ptr->climbing = 0;
 
+		/* Allow running to abort sneaking */
+		if (p_ptr->running) p_ptr->not_sneaking;
+
 		/* Spontaneous Searching */
 		if ((p_ptr->skills[SKILL_SEARCH] >= 50) ||
 		    (0 == rand_int(50 - p_ptr->skills[SKILL_SEARCH])))
@@ -3913,9 +3919,6 @@ void move_player(int dir)
 		{
 			/* Dodging -- reverse direction 180 degrees */
 			p_ptr->dodging = 10 - dir;
-
-			/* Hack -- redraw straight away */
-			redraw_stuff();
 		}
 
 		/* Handle "store doors" */

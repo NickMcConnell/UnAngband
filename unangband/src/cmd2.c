@@ -78,13 +78,6 @@ bool do_cmd_test(int y, int x, int action)
 		default: break;
 	}
 
-
-	if (p_ptr->sneaking)
-	{
-		msg_print("You cannot do this sneakily.");
-		return (FALSE);
-	}
-
 	if (action < FS_FLAGS2)
 	{
 		flag = bitzero << (action - FS_FLAGS1);
@@ -113,6 +106,15 @@ bool do_cmd_test(int y, int x, int action)
 		 msg_format("You see nothing %s%s.",here,act);
 		 return (FALSE);
 		}
+	}
+
+	/* Player is sneaking */
+	if (p_ptr->sneaking)
+	{
+		/* If the player is trying to be stealthy, they lose the benefit of this for
+		 * the following turn.
+		 */
+		p_ptr->not_sneaking = TRUE;
 	}
 
 	return (TRUE);

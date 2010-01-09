@@ -7617,11 +7617,13 @@ static void recover_monster(int m_idx, bool regen)
 			/* Wake up faster near the player */
 			if (m_ptr->cdis < 50) d = (100 / m_ptr->cdis);
 
-			/* Reduce effectiveness of waking up if the player is sneaking */
-			if (p_ptr->sneaking)
-			{
-				d = rand_int(d);
-			}
+			/* Cap effectiveness of waking up if the player is sneaking */
+			/* XXX We do this so that it is never worthwhile just sneaking
+			 * around the dungeon, but it is worthwhile switching to sneaking
+			 * when you are near a monster you are aware of, which is about
+			 * to wake up.
+			 */
+			if ((p_ptr->sneaking) && !(p_ptr->not_sneaking) && (m_ptr->ml) && (d > 20)) d = 20;
 
 			/* Still asleep */
 			if (m_ptr->csleep > d)
@@ -7648,7 +7650,7 @@ static void recover_monster(int m_idx, bool regen)
 						msg_format("%^s is nearly awake.", m_name);
 					}
 					/* Notice when waking up a lot */
-					else if ((m_ptr->cdis < 5) && (m_ptr->csleep < 3 * d))
+					else if ((m_ptr->cdis < 6) && (m_ptr->csleep < 3 * d))
 					{
 						/* Get the monster poss */
 						monster_desc(m_name, sizeof(m_name), m_idx, 0x02);

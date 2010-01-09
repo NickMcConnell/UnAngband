@@ -191,13 +191,6 @@ bool do_cmd_item(int command)
 		}
 	}
 
-	/* Check some conditions - need to not be sneaking */
-	if ((cmd_item_list[command].conditions & (CONDITION_NO_SNEAKING)) && (p_ptr->sneaking))
-	{
-		msg_print("You cannot do this sneakily.");
-		return (FALSE);
-	}
-
 	/* Hack --- fuel equipment from inventory */
 	if (command == COMMAND_ITEM_FUEL)
 		p_ptr->command_wrk = (USE_EQUIP); /* TODO: this one does not work here */
@@ -251,6 +244,15 @@ bool do_cmd_item(int command)
 
 	/* Auxiliary function */
 	result = (cmd_item_list[command].player_command)(item);
+
+	/* Did we use some energy for an action we can't sneakily do. */
+	if ((p_ptr->energy_use) && (p_ptr->sneaking) && (cmd_item_list[command].conditions & (CONDITION_NO_SNEAKING)))
+	{
+		/* If the player is trying to be stealthy, they lose the benefit of this for
+		 * the following turn.
+		 */
+		p_ptr->not_sneaking = TRUE;
+	}
 
 	/* Return whether we cancelled */
 	return (result);
