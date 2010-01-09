@@ -1156,6 +1156,16 @@ retry:
 		goto retry;
 	}
 
+	/* Seen something */
+	if ((detect) || (*known))
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_MAP);
+	}
+
 	/* Result */
 	return (detect);
 }
@@ -1207,6 +1217,16 @@ retry:
 		*known = TRUE;
 
 		goto retry;
+	}
+
+	/* Seen something */
+	if ((detect) || (*known))
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_MAP);
 	}
 
 	/* Result */
@@ -1262,6 +1282,16 @@ bool detect_objects_tval(int tval)
 		}
 	}
 
+	/* Seen something */
+	if (detect)
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_MAP);
+	}
+
 	/* Result */
 	return (detect);
 }
@@ -1312,6 +1342,16 @@ bool detect_objects_normal(void)
 			/* Detect */
 			detect = TRUE;
 		}
+	}
+
+	/* Seen something */
+	if (detect)
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_MAP);
 	}
 
 	/* Result */
@@ -1724,6 +1764,16 @@ static bool detect_objects_type(bool (*detect_item_hook)(const object_type *o_pt
 		}
 	}
 
+	/* Seen something */
+	if (detect)
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_MAP);
+	}
+
 	/* Return result */
 	return (detect);
 }
@@ -1967,6 +2017,16 @@ bool detect_monsters(bool (*monster_test_hook)(const int m_idx), bool *known)
 
 	/* Hack -- mark as safe */
 	if (view_detect_grids) detect_feat_flags(0L, 0L, 0L, 2 * MAX_SIGHT, known);
+
+	/* Seen something */
+	if ((flag) || (view_detect_grids))
+	{
+		/* Redraw map */
+		p_ptr->redraw |= (PR_MAP);
+
+		/* Window stuff */
+		p_ptr->window |= (PW_OVERHEAD | PW_MAP);
+	}
 
 	/* Result */
 	return (flag);

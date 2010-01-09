@@ -2407,29 +2407,36 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 }
 
 
-
-
 /*
  * Learn about a monster (by "probing" it)
  */
-void lore_do_probe(int m_idx)
+void lore_do_probe(int r_idx)
 {
-	monster_type *m_ptr = &m_list[m_idx];
-	monster_race *r_ptr = &r_info[m_ptr->r_idx];
-	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
+	monster_race *r_ptr = &r_info[r_idx];
+	monster_lore *l_ptr = &l_list[r_idx];
 
+	char race_name[80];
 
 	/* Hack -- Memorize some flags */
 	l_ptr->flags1 = r_ptr->flags1;
 	l_ptr->flags2 = r_ptr->flags2;
 	l_ptr->flags3 = r_ptr->flags3;
+	/* Skip spells */
+	l_ptr->flags7 = r_ptr->flags7;
+	l_ptr->flags8 = r_ptr->flags8;
+	l_ptr->flags9 = r_ptr->flags9;
 
 	/* Update monster recall window */
-	if (p_ptr->monster_race_idx == m_ptr->r_idx)
+	if (p_ptr->monster_race_idx == r_idx)
 	{
 		/* Window stuff */
 		p_ptr->window |= (PW_MONSTER);
 	}
+
+	/* Describe the race */
+	race_desc(race_name, sizeof(race_name), r_idx, 0x400, 1);
+
+	msg_format("You learn information about %s.", race_name);
 }
 
 

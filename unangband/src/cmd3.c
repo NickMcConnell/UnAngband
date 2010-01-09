@@ -1528,7 +1528,7 @@ bool player_trade(int item2)
 		if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
 
 		/* In town, we can sell stuff */
-		if (((level_flag & (LF1_TOWN)) != 0) /* && room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN)*/ && !(adult_no_selling))
+		if ((room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN)) && !(adult_no_selling))
 		{
 			/* Money well earned? */
 			p_ptr->au += value;
@@ -1578,107 +1578,153 @@ bool player_trade(int item2)
 	else
 	{
 		int deal = ((trade_value - value) * 10 / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5))) + trade_highly_value;
-
-		/* Aggressive monsters get insulted - handle out of bounds cases */
-		if (((m_ptr->mflag & (MFLAG_AGGR)) != 0) && ((deal < 1) || (deal > 9))) deal = 1;
+		int hire = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
 
 		/*
-		 * To do: Use monster profit (trade_value - value) to make monsters reveal
-		 * the territory that the monster is familiar with once allied (grids with
-		 * matching ecologies). This might involve taking the player to the core of
-		 * the territory, where they will be introduced to their leaders and/or
-		 * betrayed. Or bypassing the territory and taking the player to up or downstairs.
+		 * Deal boosters - as a player trades further with a monster, they have a small chance of getting a deal boosted
+		 * to a higher level of effectiveness.
 		 */
-
-		switch(deal)
+		if ((deal >= 1) && (deal < 15))
 		{
-			case 7: case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
-				/* We can offer stuff to business associates to make them allies */
-				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE))
+			/* Boost a deal */
+			while (!rand_int((m_ptr->mflag & (MFLAG_ALLY)) ? 3 : 4)) deal++;
+
+			/* Maximum boost */
+			if (deal > 15) deal = 15;
+		}
+
+		/* The player is spending too much */
+		if ((deal > 15) && ((m_ptr->mflag & (MFLAG_AGGR)) == 0))
+		{
+			/* Buy friends outright. */
+			m_ptr->mflag |= (MFLAG_ALLY | MFLAG_TOWN);
+
+			/* Clear old targets */
+			m_ptr->ty = p_ptr->target_row;
+			m_ptr->tx = p_ptr->target_col;
+
+			/* Act over excited excited. */
+			monster_speech(trade_m_idx, comment_1f[rand_int(MAX_COMMENT_1f)], FALSE);
+		}
+
+		/* We can offer stuff to business associates to make them allies */
+		else if ((deal > 4) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE)))
+		{
+			/* Make them an ally */
+			m_ptr->mflag |= (MFLAG_ALLY);
+
+			/* Clear old targets */
+			m_ptr->ty = p_ptr->target_row;
+			m_ptr->tx = p_ptr->target_col;
+
+			/* Buy more time before they turn on us */
+			m_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+
+			/* Get moderately excited. */
+			monster_speech(trade_m_idx, comment_1e[rand_int(MAX_COMMENT_1e)], FALSE);
+		}
+
+		/* We can offer stuff to neutral monsters to reveal their inventory */
+		else if ((deal > 2) && ((m_ptr->mflag & (MFLAG_MADE | MFLAG_TOWN | MFLAG_AGGR)) == (MFLAG_TOWN))
+				&& (monster_drop(trade_m_idx)))
+		{
+			/* Get quietly excited. */
+			monster_speech(trade_m_idx, comment_1d[rand_int(MAX_COMMENT_1d)], FALSE);
+
+			/* Get more respect from trading */
+			m_ptr->summoned = 300 - 2 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+		}
+
+		/* We get told useful information from bigger deals, if we're not actively fighting */
+		else if ((deal > 3) && (player_understands(monster_language(trade_m_idx)))
+				 && ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_AGGR)) == (MFLAG_TOWN)))
+		{
+			/* Possible reveals */
+			switch(rand_int(deal - 3))
+			{
+				/* Tells the player about home */
+				case 7: case 8: case 9: case 10:
 				{
-					/* Make them an ally */
-					m_ptr->mflag |= (MFLAG_ALLY);
-
-					/* Clear old targets */
-					m_ptr->ty = p_ptr->target_row;
-					m_ptr->tx = p_ptr->target_col;
-
-					/* Buy more time before they turn on us */
-					m_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
-
-					/* Get moderately excited. */
-					monster_speech(trade_m_idx, comment_1e[rand_int(MAX_COMMENT_1e)], FALSE);
-
-					break;
-				}
-
-			case 4: case 5: case 6:
-				/* We can offer stuff to neutral monsters to reveal their inventory */
-				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_AGGR)) == (MFLAG_TOWN))
-				{
-					if ((m_ptr->mflag & (MFLAG_MADE)) == 0)
+					/* Only if we trust the player */
+					if (((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR))
+							== (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE))
+							&& (map_home(trade_m_idx)))
 					{
-						/* XXX Create monster drops and carry them. Mark with made flag. */
-						m_ptr->mflag |= (MFLAG_MADE);
+						monster_speech(trade_m_idx, "You should see the rest of my home.", FALSE);
+						break;
 					}
-
-					/* Lots of money doesn't buy as much respect */
-					m_ptr->summoned = 300 - 2 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
-
-					/* Get quietly excited. */
-					monster_speech(trade_m_idx, comment_1d[rand_int(MAX_COMMENT_1d)], FALSE);
-
-					break;
 				}
-			case 1: case 2: case 3:
-				/* We can offer stuff to monsters to either slow them down or make them 'neutral' */
-				if (((m_ptr->mflag & (MFLAG_TOWN)) == 0) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0))
+
+				/* Tells the player about the most powerful monster in the ecology */
+				case 4: case 5: /* case 6: - to allow another chance at family history */
 				{
-					/* Enough to at least make him not attack. */
-					if (deal > 1)
+					/* Do we have a deepest race? */
+					if (room_info[room_idx(m_ptr->fy, m_ptr->fx)].deepest_race)
 					{
-						m_ptr->mflag |= (MFLAG_TOWN);
+						monster_speech(trade_m_idx, "You are right to be cautious around here.", FALSE);
 
-						/* Buy more time before they turn on us */
-						m_ptr->summoned = 70 - adj_chr_gold[p_ptr->stat_ind[A_CHR]] / 2;
+						lore_do_probe(room_info[room_idx(m_ptr->fy, m_ptr->fx)].deepest_race);
 
-						/* Handle aggressive response */
-						if (m_ptr->mflag & (MFLAG_AGGR)) deal = 1;
+						break;
 					}
+				}
 
-					/* At least block some other monsters */
-					if (deal % 2) m_ptr->mflag |= (MFLAG_PUSH);
-
-					/* Don't register much excitement. */
-					/* But make sure harmless monsters don't threaten the player */
-					monster_speech(trade_m_idx, (deal > 1) ?
-							((r_info[m_ptr->r_idx].blow[0].effect == GF_NOTHING) ? comment_1a[rand_int(MAX_COMMENT_1a)] :
-							comment_1c[rand_int(MAX_COMMENT_1c)]) : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
-
+				/* Tells the player about the local region. */
+				case 2: case 3:
+				{
+					monster_speech(trade_m_idx, "This is an especially interesting area.", FALSE);
+					map_area();
 					break;
 				}
-				/* Fall through */
-			case 0:
-				/* Don't register much excitement */
-				monster_speech(trade_m_idx, comment_1a[rand_int(MAX_COMMENT_1a)], FALSE);
 
-				break;
+				/* Tell the player about yourself */
+				default:
+				{
+					monster_speech(trade_m_idx, "You may not know everything about my family history.", FALSE);
+					lore_do_probe(m_ptr->r_idx);
+					break;
+				}
+			}
 
-			default:
-				/* Buy friends outright. Note don't add the made flag, so it is possible to do business with a lesser offer later. */
-				m_ptr->mflag |= (MFLAG_ALLY | MFLAG_TOWN /* | MFLAG_MADE */);
+			/* Buy more time before they turn on us */
+			m_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+		}
 
-				/* Clear old targets */
-				m_ptr->ty = p_ptr->target_row;
-				m_ptr->tx = p_ptr->target_col;
+		/* We can offer stuff to monsters to either slow them down or make them 'neutral' */
+		else if ((deal > 0) && (((m_ptr->mflag & (MFLAG_TOWN)) == 0) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0)))
+		{
+			/* Enough to at least make him not attack. */
+			if (deal > 1)
+			{
+				m_ptr->mflag |= (MFLAG_TOWN);
 
-				/* Lots of money doesn't buy as much respect */
-				m_ptr->summoned = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+				/* Buy more time before they turn on us */
+				m_ptr->summoned = 70 - adj_chr_gold[p_ptr->stat_ind[A_CHR]] / 2;
 
-				/* Get moderately excited. */
-				monster_speech(trade_m_idx, comment_1f[rand_int(MAX_COMMENT_1f)], FALSE);
+				/* Handle aggressive response */
+				if (m_ptr->mflag & (MFLAG_AGGR)) deal = 1;
+			}
 
-				break;
+			/* At least block some other monsters */
+			if (deal % 2) m_ptr->mflag |= (MFLAG_PUSH);
+
+			/* Don't register much excitement. */
+			/* But make sure harmless monsters don't threaten the player */
+			monster_speech(trade_m_idx, (deal > 1) ?
+					((r_info[m_ptr->r_idx].blow[0].effect == GF_NOTHING) ? comment_1a[rand_int(MAX_COMMENT_1a)] :
+					comment_1c[rand_int(MAX_COMMENT_1c)]) : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
+		}
+		else
+		{
+			/* Don't register much excitement */
+			monster_speech(trade_m_idx, comment_1a[rand_int(MAX_COMMENT_1a)], FALSE);
+		}
+
+		/* We made a deal - minimal extension */
+		if (deal)
+		{
+			/* Get grudging respect */
+			if (m_ptr->summoned < hire) m_ptr->summoned = hire;
 		}
 
 		/* For valuable deals, we talk to our allies and assess the situation */
@@ -1725,7 +1771,7 @@ bool player_trade(int item2)
 			}
 		}
 	}
-	
+
 	/* Prevent GTA style takedowns - or the player paying off people to leave town too easily */
 	if (((level_flag & (LF1_TOWN)) != 0) && (item2 == INVEN_GOLD) && (item != INVEN_GOLD) && !(adult_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))
 	{

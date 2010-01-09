@@ -6741,7 +6741,8 @@ static void process_monster(int m_idx)
 	}
 
 	/* Monster is using the special "townsman" AI in town */
-	if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && (room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN)))
+	if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
+			&& (room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN)))
 	{
 		/* Town monster been attacked */
 		if (m_ptr->mflag & (MFLAG_AGGR))

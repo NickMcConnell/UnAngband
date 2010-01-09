@@ -4790,6 +4790,112 @@ void update_smell(void)
 
 
 
+/*
+ * Map all rooms and neighbourhood belonging to a particular
+ * monster's ecology membership. We also show some monsters
+ * which occur in that region.
+ */
+bool map_home(int m_idx)
+{
+	u32b ecology = 0L;
+	int i, y, x;
+
+	/* No ecology */
+	if (!cave_ecology.ready)
+	{
+		/* Show the whole level instead */
+		wiz_lite();
+		return (TRUE);
+	}
+
+	/* Get the flags */
+	for (i = 0; i < cave_ecology.num_races; i++)
+	{
+		/* This monster exists here */
+		if (cave_ecology.race[i] == m_idx)
+		{
+			/* Note ecologies */
+			ecology |= cave_ecology.race_ecologies[i];
+		}
+	}
+
+	/* Nothing? */
+	if (!ecology)
+	{
+		/* Not a native of these parts */
+		return (FALSE);
+	}
+
+	/* Scan that area */
+	for (y = 1; y < DUNGEON_HGT - 1; y++)
+	{
+		for (x = 1; x < DUNGEON_WID - 1; x++)
+		{
+			/* All non-walls are "checked" */
+			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_WALL)))
+			{
+				/* Skip if not in the ecology */
+				if ((room_info[room_idx_ignore_valid(y, x)].ecology & (ecology)) == 0) continue;
+
+				/* Memorize normal features */
+				if (f_info[cave_feat[y][x]].flags1 & (FF1_REMEMBER))
+				{
+					/* Memorize the object */
+					play_info[y][x] |= (PLAY_MARK);
+				}
+
+				/* Memorize known walls */
+				for (i = 0; i < 8; i++)
+				{
+					int yy = y + ddy_ddd[i];
+					int xx = x + ddx_ddd[i];
+
+					/* Memorize walls (etc) */
+					if (f_info[cave_feat[yy][xx]].flags1 & (FF1_REMEMBER))
+					{
+						/* Memorize the walls */
+						play_info[yy][xx] |= (PLAY_MARK);
+					}
+				}
+
+				/* Get monster */
+				i = cave_m_idx[y][x];
+
+				/* Show monsters */
+				if (i <= 0) continue;
+
+				/* Reveal own kind */
+				if ((r_info[m_list[i].r_idx].d_char == r_info[m_list[m_idx].r_idx].d_char)
+
+					/* Reveal animals, insects, plants */
+					|| ((r_info[i].flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT)) != 0))
+				{
+					/* Reveal half of monsters */
+					if (i % 2)
+					{
+						/* Optimize -- Repair flags */
+						repair_mflag_mark = repair_mflag_show = TRUE;
+
+						/* Hack -- Detect the monster */
+						m_list[i].mflag |= (MFLAG_MARK | MFLAG_SHOW);
+
+						/* Update the monster */
+						update_mon(i, FALSE);
+					}
+				}
+			}
+		}
+	}
+
+	/* Redraw map */
+	p_ptr->redraw |= (PR_MAP);
+
+	/* Window stuff */
+	p_ptr->window |= (PW_OVERHEAD | PW_MAP);
+
+	return (TRUE);
+}
+
 
 /*
  * Map the current panel (plus some) ala "magic mapping"
@@ -4851,7 +4957,7 @@ void map_area(void)
 	p_ptr->redraw |= (PR_MAP);
 
 	/* Window stuff */
-	p_ptr->window |= (PW_OVERHEAD);
+	p_ptr->window |= (PW_OVERHEAD | PW_MAP);
 }
 
 

@@ -2278,29 +2278,17 @@ bool check_quest(quest_event *qe1_ptr, bool advance)
 
 
 /*
- * Handle the "death" of a monster.
- *
- * Disperse treasures centered at the monster location based on the
- * various flags contained in the monster flags fields.
- *
- * Check for "Quest" completion when a quest monster is killed.
- *
- * Note that only the player can induce "monster_death()" on Uniques.
- * Thus (for now) all Quest monsters should be Uniques.
- *
- * Note that monsters can now carry objects, and when a monster dies,
- * it drops all of its objects, which may disappear in crowded rooms.
+ * Generate items which a monster carries into the monster's inventory.
  */
-bool monster_death(int m_idx)
+bool monster_drop(int m_idx)
 {
-	int j, y, x, ny, nx;
+	int j;
 
 	int dump_item = 0;
 	int dump_gold = 0;
+	int dump_chest = 0;
 
 	int number = 0;
-
-	s16b this_o_idx, next_o_idx = 0;
 
 	monster_type *m_ptr = &m_list[m_idx];
 
@@ -2308,7 +2296,6 @@ bool monster_death(int m_idx)
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
 	bool visible = (m_ptr->ml || (r_ptr->flags1 & (RF1_UNIQUE)));
-
 	bool good = (r_ptr->flags1 & (RF1_DROP_GOOD)) ? TRUE : FALSE;
 	bool great = (r_ptr->flags1 & (RF1_DROP_GREAT)) ? TRUE : FALSE;
 
@@ -2321,180 +2308,6 @@ bool monster_death(int m_idx)
 
 	object_type *i_ptr;
 	object_type object_type_body;
-
-	quest_event quest_check;
-
-	/* Get the location */
-	y = m_ptr->fy;
-	x = m_ptr->fx;
-
-	/* Incur summoning debt */
-	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) == 0) && (m_ptr->summoned))
-	{
-		/* Summoning debt requires blood */
-		if (r_ptr->level > p_ptr->csp)
-		{
-			/* Incur blood debt */
-			take_hit(SOURCE_BLOOD_DEBT, m_ptr->r_idx, damroll(r_ptr->level - p_ptr->csp, 3));
-
-			/* No mana left */
-			p_ptr->csp = 0;
-			p_ptr->csp_frac = 0;
-		}
-
-		/* Debt can be met by mana */
-		else
-		{
-			p_ptr->csp -= r_ptr->level;
-		}
-
-		/* Update mana */
-		p_ptr->update |= (PU_MANA);
-		p_ptr->redraw |= (PR_MANA);
-		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
-
-		/* Player death */
-		if (p_ptr->is_dead) return (TRUE);
-	}
-
-	/* Extinguish lite */
-	delete_monster_lite(m_idx);
-
-	/* Clear the quest */
-	WIPE(&quest_check, quest_event);
-
-	/* Set the quest */
-	quest_check.flags = EVENT_KILL_RACE;
-	quest_check.race = m_ptr->r_idx;
-	quest_check.number = 1;
-
-	/* Check quest events */
-	check_quest(&quest_check, TRUE);
-
-	/* Drop objects being carried */
-	for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
-	{
-		object_type *o_ptr;
-
-		/* Get the object */
-		o_ptr = &o_list[this_o_idx];
-
-		/* Get the next object */
-		next_o_idx = o_ptr->next_o_idx;
-
-		/* Paranoia */
-		o_ptr->held_m_idx = 0;
-
-		/* Get local object */
-		i_ptr = &object_type_body;
-
-		/* Copy the object */
-		object_copy(i_ptr, o_ptr);
-
-		/* Delete the object */
-		delete_object_idx(this_o_idx);
-
-		/* Drop it */
-		drop_near(i_ptr, -1, y, x, TRUE);
-	}
-
-	/* Forget objects */
-	m_ptr->hold_o_idx = 0;
-
-	/* Hack -- only sometimes drop bodies */
-	if (((r_ptr->flags1 & (RF1_UNIQUE)) != 0) ||
-		((r_ptr->flags2 & (RF2_REGENERATE)) != 0) ||
-		((r_ptr->flags8 & (RF8_ASSEMBLY)) != 0) || 
-		(r_ptr->level > p_ptr->depth) ||
-		(rand_int(100) < 30))
-	{
-		/* Get local object */
-		i_ptr = &object_type_body;
-
-		/* Wipe the object */
-		object_wipe(i_ptr);
-
-		/* Drop a body? */
-		if (make_body(i_ptr, m_ptr->r_idx))
-		{
-			/* Note who dropped it */
-			i_ptr->name3 = m_ptr->r_idx;
-
-			/* I'll be back, Bennett */
-			if (r_ptr->flags2 & (RF2_REGENERATE)) i_ptr->timeout = damroll(3,6);
-
-			/* Drop it in the dungeon */
-			drop_near(i_ptr, -1, y, x, TRUE);
-		}
-	}
-
-	/* Monster death updates visible monsters */
-	p_ptr->window |= (PW_MONLIST);
-
-	/* Add some residue */
-	if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
-	if (r_ptr->flags3 & (RF3_UNDEAD)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
-	if (r_ptr->flags8 & (RF8_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
-
-	/* Do we drop more treasure? */
-	if (m_ptr->mflag & (MFLAG_MADE)) return (TRUE);
-
-	/* Mega-Hack -- drop "winner" treasures */
-	if (r_ptr->flags1 & (RF1_DROP_CHOSEN))
-	{
-		/* Get local object */
-		i_ptr = &object_type_body;
-
-		/* Mega-Hack -- Prepare to make "Grond" */
-		object_prep(i_ptr, lookup_kind(TV_HAFTED, SV_GROND));
-
-		/* Mega-Hack -- Mark this item as "Grond" */
-		i_ptr->name1 = ART_GROND;
-
-		/* Mega-Hack -- Actually create "Grond" */
-		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
-
-		/* Mark origin */
-		i_ptr->origin = ORIGIN_DROP;
-		i_ptr->origin_depth = p_ptr->depth;
-		i_ptr->origin_xtra = m_ptr->r_idx;
-
-		/* Drop it in the dungeon */
-		drop_near(i_ptr, -1, y, x, TRUE);
-
-		/* Get local object */
-		i_ptr = &object_type_body;
-
-		/* Mega-Hack -- Prepare to make "Morgoth" */
-		object_prep(i_ptr, lookup_kind(TV_CROWN, SV_MORGOTH));
-
-		/* Mega-Hack -- Mark this item as "Morgoth" */
-		i_ptr->name1 = ART_MORGOTH;
-
-		/* Mega-Hack -- Actually create "Morgoth" */
-		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
-
-		/* Mark origin */
-		i_ptr->origin = ORIGIN_DROP;
-		i_ptr->origin_depth = p_ptr->depth;
-		i_ptr->origin_xtra = m_ptr->r_idx;
-
-		/* Drop it in the dungeon */
-		drop_near(i_ptr, -1, y, x, TRUE);
-
-		/* Hack -- this is temporary */
-		/* Total winner */
-		p_ptr->total_winner = TRUE;
-
-		/* Redraw the "title" */
-		p_ptr->redraw |= (PR_TITLE);
-
-		/* Congratulations */
-		msg_print("*** CONGRATULATIONS ***");
-		msg_print("You have won the game!");
-		msg_print("You may retire (commit suicide) when you are ready.");
-
-	}
 
 	/* Determine how much we can drop */
 	if ((r_ptr->flags1 & (RF1_DROP_30)) && (rand_int(100) < 30)) number++;
@@ -2534,11 +2347,16 @@ bool monster_death(int m_idx)
 			int chest;
 
 			/* Drop it in the dungeon */
-			if (make_chest(&chest)) feat_near(chest,y,x);
+			if (make_chest(&chest))
+			{
+				feat_near(chest,m_ptr->fy,m_ptr->fx);
 
-			l_ptr->flags8 |= (RF8_DROP_CHEST);
+				l_ptr->flags8 |= (RF8_DROP_CHEST);
 
-			hack_monster_equip |= (RF8_DROP_CHEST);
+				hack_monster_equip |= (RF8_DROP_CHEST);
+
+				dump_chest++;
+			}
 
 			continue;
 		}
@@ -2756,7 +2574,7 @@ bool monster_death(int m_idx)
 		i_ptr->origin_xtra = m_ptr->r_idx;
 
 		/* Drop it in the dungeon */
-		drop_near(i_ptr, -1, y, x, TRUE);
+		monster_carry(m_idx, i_ptr);
 	}
 
 	/* Reset monster equipment */
@@ -2783,6 +2601,219 @@ bool monster_death(int m_idx)
 		/* Take notes on treasure */
 		lore_treasure(m_idx, dump_item, dump_gold);
 	}
+
+	/* We've made the inventory for this monster */
+	m_ptr->mflag |= (MFLAG_MADE);
+
+	/* Was anything dropped? */
+	return (dump_chest || dump_item || dump_gold);
+}
+
+
+/*
+ * Handle the "death" of a monster.
+ *
+ * Disperse treasures centered at the monster location based on the
+ * various flags contained in the monster flags fields.
+ *
+ * Check for "Quest" completion when a quest monster is killed.
+ *
+ * Note that only the player can induce "monster_death()" on Uniques.
+ * Thus (for now) all Quest monsters should be Uniques.
+ *
+ * Note that monsters can now carry objects, and when a monster dies,
+ * it drops all of its objects, which may disappear in crowded rooms.
+ */
+bool monster_death(int m_idx)
+{
+	int y, x, ny, nx;
+
+	s16b this_o_idx, next_o_idx = 0;
+
+	monster_type *m_ptr = &m_list[m_idx];
+
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	object_type *i_ptr;
+	object_type object_type_body;
+
+	quest_event quest_check;
+
+	/* Get the location */
+	y = m_ptr->fy;
+	x = m_ptr->fx;
+
+	/* Incur summoning debt */
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) == 0) && (m_ptr->summoned))
+	{
+		/* Summoning debt requires blood */
+		if (r_ptr->level > p_ptr->csp)
+		{
+			/* Incur blood debt */
+			take_hit(SOURCE_BLOOD_DEBT, m_ptr->r_idx, damroll(r_ptr->level - p_ptr->csp, 3));
+
+			/* No mana left */
+			p_ptr->csp = 0;
+			p_ptr->csp_frac = 0;
+		}
+
+		/* Debt can be met by mana */
+		else
+		{
+			p_ptr->csp -= r_ptr->level;
+		}
+
+		/* Update mana */
+		p_ptr->update |= (PU_MANA);
+		p_ptr->redraw |= (PR_MANA);
+		p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1 | PW_PLAYER_2 | PW_PLAYER_3);
+
+		/* Player death */
+		if (p_ptr->is_dead) return (TRUE);
+	}
+
+	/* Extinguish lite */
+	delete_monster_lite(m_idx);
+
+	/* Clear the quest */
+	WIPE(&quest_check, quest_event);
+
+	/* Set the quest */
+	quest_check.flags = EVENT_KILL_RACE;
+	quest_check.race = m_ptr->r_idx;
+	quest_check.number = 1;
+
+	/* Check quest events */
+	check_quest(&quest_check, TRUE);
+
+	/* Do we drop more treasure? */
+	if ((m_ptr->mflag & (MFLAG_MADE)) == 0)
+	{
+		/* Give the monster the items to carry */
+		monster_drop(m_idx);
+	}
+
+	/* Drop objects being carried */
+	for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+	{
+		object_type *o_ptr;
+
+		/* Get the object */
+		o_ptr = &o_list[this_o_idx];
+
+		/* Get the next object */
+		next_o_idx = o_ptr->next_o_idx;
+
+		/* Paranoia */
+		o_ptr->held_m_idx = 0;
+
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Copy the object */
+		object_copy(i_ptr, o_ptr);
+
+		/* Delete the object */
+		delete_object_idx(this_o_idx);
+
+		/* Drop it */
+		drop_near(i_ptr, -1, y, x, TRUE);
+	}
+
+	/* Forget objects */
+	m_ptr->hold_o_idx = 0;
+
+	/* Mega-Hack -- drop "winner" treasures */
+	if (r_ptr->flags1 & (RF1_DROP_CHOSEN))
+	{
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Mega-Hack -- Prepare to make "Grond" */
+		object_prep(i_ptr, lookup_kind(TV_HAFTED, SV_GROND));
+
+		/* Mega-Hack -- Mark this item as "Grond" */
+		i_ptr->name1 = ART_GROND;
+
+		/* Mega-Hack -- Actually create "Grond" */
+		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
+
+		/* Mark origin */
+		i_ptr->origin = ORIGIN_DROP;
+		i_ptr->origin_depth = p_ptr->depth;
+		i_ptr->origin_xtra = m_ptr->r_idx;
+
+		/* Drop it in the dungeon */
+		drop_near(i_ptr, -1, y, x, TRUE);
+
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Mega-Hack -- Prepare to make "Morgoth" */
+		object_prep(i_ptr, lookup_kind(TV_CROWN, SV_MORGOTH));
+
+		/* Mega-Hack -- Mark this item as "Morgoth" */
+		i_ptr->name1 = ART_MORGOTH;
+
+		/* Mega-Hack -- Actually create "Morgoth" */
+		apply_magic(i_ptr, -1, TRUE, TRUE, TRUE);
+
+		/* Mark origin */
+		i_ptr->origin = ORIGIN_DROP;
+		i_ptr->origin_depth = p_ptr->depth;
+		i_ptr->origin_xtra = m_ptr->r_idx;
+
+		/* Drop it in the dungeon */
+		drop_near(i_ptr, -1, y, x, TRUE);
+
+		/* Hack -- this is temporary */
+		/* Total winner */
+		p_ptr->total_winner = TRUE;
+
+		/* Redraw the "title" */
+		p_ptr->redraw |= (PR_TITLE);
+
+		/* Congratulations */
+		msg_print("*** CONGRATULATIONS ***");
+		msg_print("You have won the game!");
+		msg_print("You may retire (commit suicide) when you are ready.");
+
+	}
+
+	/* Hack -- only sometimes drop bodies */
+	if (((r_ptr->flags1 & (RF1_UNIQUE)) != 0) ||
+		((r_ptr->flags2 & (RF2_REGENERATE)) != 0) ||
+		((r_ptr->flags8 & (RF8_ASSEMBLY)) != 0) ||
+		(r_ptr->level > p_ptr->depth) ||
+		(rand_int(100) < 30))
+	{
+		/* Get local object */
+		i_ptr = &object_type_body;
+
+		/* Wipe the object */
+		object_wipe(i_ptr);
+
+		/* Drop a body? */
+		if (make_body(i_ptr, m_ptr->r_idx))
+		{
+			/* Note who dropped it */
+			i_ptr->name3 = m_ptr->r_idx;
+
+			/* I'll be back, Bennett */
+			if (r_ptr->flags2 & (RF2_REGENERATE)) i_ptr->timeout = damroll(3,6);
+
+			/* Drop it in the dungeon */
+			drop_near(i_ptr, -1, y, x, TRUE);
+		}
+	}
+
+	/* Monster death updates visible monsters */
+	p_ptr->window |= (PW_MONLIST);
+
+	/* Add some residue */
+	if (r_ptr->flags3 & (RF3_DEMON)) feat_near(FEAT_FLOOR_FIRE_T,m_ptr->fy,m_ptr->fx);
+	if (r_ptr->flags3 & (RF3_UNDEAD)) feat_near(FEAT_FLOOR_DUST_T,m_ptr->fy,m_ptr->fx);
+	if (r_ptr->flags8 & (RF8_HAS_SLIME)) feat_near(FEAT_FLOOR_SLIME_T,m_ptr->fy,m_ptr->fx);
 
 	/* Only process "Quest Monsters" */
 	if (!(r_ptr->flags1 & (RF1_QUESTOR | RF1_GUARDIAN)))

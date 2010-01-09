@@ -8202,7 +8202,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				msg_format("%^s has %d hit points.", m_name, m_ptr->hp);
 
 				/* Learn all of the non-spell, non-treasure flags */
-				lore_do_probe(cave_m_idx[y][x]);
+				lore_do_probe(m_list[cave_m_idx[y][x]].r_idx);
 
 				/* Probe worked */
 				obvious = TRUE;
