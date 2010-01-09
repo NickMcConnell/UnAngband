@@ -3288,7 +3288,7 @@ const do_cmd_item_type cmd_item_list[MAX_COMMANDS] =
 			inven_book_okay, 0, (USE_INVEN | USE_FLOOR | USE_FEATU | USE_ALLY | USE_TARGET | USE_RANGE | USE_KNOWN), (CONDITION_LITERATE), 0L, 0, NULL},
 			
 	{ player_offer, 'O', "Offer which item? ", "You are not carrying anything to offer.",
-			item_tester_hook_droppable, 0, (USE_INVEN | USE_BAGC | USE_BAGS | USE_GOLD), (CONDITION_NO_SNEAKING), TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), 0, NULL},
+			item_tester_hook_droppable, 0, (USE_INVEN | USE_BAGC | USE_BAGS | USE_GOLD), (CONDITION_NO_SNEAKING), TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), COMMAND_ITEM_TRADE, NULL},
 
 	{ player_trade, 'T', "Trade for which item? ", "You see nothing to trade.",
 			item_tester_hook_tradeable, 0, (USE_TARGET | USE_RANGE | USE_GOLD), (CONDITION_NO_SNEAKING), TMD_CONDITION(TMD_BERSERK) | TMD_CONDITION(TMD_CONFUSED), 0, NULL}

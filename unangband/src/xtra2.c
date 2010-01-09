@@ -3849,7 +3849,13 @@ cptr look_mon_desc(int m_idx)
 	if (m_ptr->cut) return("bleeding");
 	if (m_ptr->poisoned) return("poisoned");
 	if (find_monster_ammo(m_idx, -1, FALSE) < 0) return("out of ammo");
-	if (m_ptr->mflag & (MFLAG_TOWN)) return((level_flag & (LF1_TOWN)) ? "townsfolk" : "suspicious");
+
+	if (m_ptr->mflag & (MFLAG_TOWN))
+	{
+		if (m_ptr->mflag & (MFLAG_ALLY)) return ("hired");
+		if (m_ptr->mflag & (MFLAG_AGGR)) return ("offended");
+		return((level_flag & (LF1_TOWN)) ? "townsfolk" : "suspicious");
+	}
 
 	/* Determine if the monster is "living" (vs "undead") */
 	if (r_ptr->flags3 & (RF3_UNDEAD)) living = FALSE;
@@ -6318,7 +6324,7 @@ int get_monster_by_aim(void)
 	int dir;
 	
 	/* Get direction */
-	if (!get_aim_dir(&dir, 0, 0, 0, 0, 0))
+	if (!get_aim_dir(&dir, MAX_SIGHT, 0, 0, 0, 0))
 	{
 		return (FALSE);
 	}

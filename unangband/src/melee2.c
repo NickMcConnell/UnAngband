@@ -1204,6 +1204,7 @@ bool choose_to_attack_player(const monster_type *m_ptr)
  * into them?
  * 
  * Important: This routine must be symetric.
+ * However, we make it asymetric for 'harmless' monsters.
  */
 bool choose_to_attack_monster(const monster_type *m_ptr, const monster_type *n_ptr)
 {
@@ -1221,6 +1222,9 @@ bool choose_to_attack_monster(const monster_type *m_ptr, const monster_type *n_p
 	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((n_ptr->mflag & (MFLAG_TOWN)) != 0)) return (FALSE);
 	if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0)) return (FALSE);
 	
+	/* Allies and townsfolk don't attack harmless monsters */
+	if (((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN)) != 0) && (r_info[n_ptr->r_idx].blow[0].effect == GF_NOTHING)) return (FALSE);
+
 	/* Otherwise attack */
 	return (TRUE);
 }
@@ -3777,8 +3781,6 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 
 				/* Copy the string */
 				while (*u) *t++ = *u++;
-
-				*t++ = ' ';
 			}
 			/* Player class only */
 			else if (*s == '#')
@@ -3788,8 +3790,6 @@ void monster_speech(int m_idx, cptr saying, bool understand)
 
 				/* Copy the string */
 				while (*u) *t++ = *u++;
-
-				*t++ = ' ';
 			}
 			/* Normal */
 			else
@@ -4166,8 +4166,8 @@ bool query_ally_summoned(const monster_type *n_ptr, int u, int v, int w)
 	(void)v;
 	(void)w;
 
-	/* Query if townsfolk */
-	if (n_ptr->mflag & (MFLAG_TOWN)) return (TRUE);
+	/* Check if not townsfolk */
+	if ((n_ptr->mflag & (MFLAG_TOWN)) == 0) return (TRUE);
 
 	return (FALSE);
 }

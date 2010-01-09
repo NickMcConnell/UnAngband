@@ -6952,7 +6952,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				u32b old_cur_flags3 = p_ptr->cur_flags3;
 
 				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir, 0, 0, 0, 0, 0)) return (!(*cancel));
+				if (!get_aim_dir(&dir, 99, 0, 0, 0, 0)) return (!(*cancel));
 
 				/* Hack -- Use an actual "target" */
 				if ((dir == 5) && target_okay())

@@ -2323,7 +2323,17 @@ void monster_desc(char *desc, size_t max, int m_idx, int mode)
 		if (m_ptr->mflag & (MFLAG_ALLY))
 		{
 			/* Append special notation */
-			my_strcat(desc, " (allied)", max);
+			if (m_ptr->mflag & (MFLAG_TOWN)) my_strcat(desc, " (hired)", max);
+			else my_strcat(desc, " (allied)", max);
+		}
+
+		/* XXX Perhaps we should use a different attr/char */
+		else if (m_ptr->mflag & (MFLAG_TOWN))
+		{
+			/* Append special notation */
+			if (r_ptr->flags9 & (RF9_TOWNSFOLK)) /* Do nothing */;
+			else if (m_ptr->mflag & (MFLAG_AGGR)) my_strcat(desc, " (offended)", max);
+			else my_strcat(desc, " (neutral)", max);
 		}
 
 		/* XXX Perhaps we should use a different attr/char */

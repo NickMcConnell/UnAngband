@@ -3822,6 +3822,18 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 			p_ptr->command_wrk = (USE_FLOOR);
 		}
 
+		/* Use allies if allowed */
+		else if (use_allies)
+		{
+			p_ptr->command_wrk = (USE_ALLY);
+		}
+
+		/* Use target if allowed */
+		else if (use_target)
+		{
+			p_ptr->command_wrk = (USE_TARGET);
+		}
+
 		/* Hack -- Use (empty) inventory */
 		else
 		{

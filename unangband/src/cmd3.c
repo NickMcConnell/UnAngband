@@ -1021,12 +1021,6 @@ bool player_offer(int item)
 		/* Extract some flags */
 		object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
-		/* Acquire the object name */
-		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
-
-		/* Acquire the monster name */
-		monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
-
 		/* React to objects that hurt the monster */
 		if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
 		if (f1 & (TR1_SLAY_TROLL)) flg3 |= (RF3_TROLL);
@@ -1040,6 +1034,12 @@ bool player_offer(int item)
 		/* The object cannot be picked up by the monster */
 		if (artifact_p(o_ptr) || (r_ptr->flags3 & flg3))
 		{
+			/* Acquire the object name */
+			object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+
+			/* Acquire the monster name */
+			monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
+
 			/* Don't accept */
 			msg_format("%^s refuses %s.", m_name, o_name);
 			
@@ -1073,12 +1073,21 @@ bool player_offer(int item)
 		/* Take a partial turn */
 		p_ptr->energy_use = 50;
 	}
+	/* Trade with monsters and townsfolk */
 	else
 	{
 		trade_highly_value = 0;
 		
 		/* Get the monster name (or "it") */
 		monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
+
+		/* Sleeping monsters ignore you */
+		if (m_ptr->csleep)
+		{
+			msg_format("%^s is asleep.", m_name);
+
+			return (FALSE);
+		}
 
 		/* Guardians ignore you */
 		if (r_ptr->flags1 & (RF1_GUARDIAN))
@@ -1216,7 +1225,7 @@ bool player_offer(int item)
 		trade_m_idx = m_idx;
 		
 		/* Set up for second command */
-		p_ptr->command_trans = COMMAND_ITEM_TRADE;
+		p_ptr->command_trans = COMMAND_ITEM_OFFER;
 		p_ptr->command_trans_item = item;
 	}
 	
@@ -1505,14 +1514,21 @@ bool player_trade(int item2)
 	/* Get the monster name */
 	monster_desc(m_name, sizeof(m_name), trade_m_idx, 0);
 	
-	/* Get the item from the monster */
-	if (item2 == INVEN_GOLD)
+	/* Gifting the monster money */
+	if ((item2 == INVEN_GOLD) && (item == INVEN_GOLD))
+	{
+		/* Will be giving services back later */
+		value = 0;
+	}
+
+	/* Buying an item from the monster */
+	else if (item2 == INVEN_GOLD)
 	{
 		/* Evil monsters betray the player 66% of the time */
 		if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
 
 		/* In town, we can sell stuff */
-		if (room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN) && !(adult_no_selling))
+		if (((level_flag & (LF1_TOWN)) != 0) /* && room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN)*/ && !(adult_no_selling))
 		{
 			/* Money well earned? */
 			p_ptr->au += value;
@@ -1525,8 +1541,8 @@ bool player_trade(int item2)
 			/* In the dungeon, monsters don't have gold on them 'quite yet' */
 			value = 0;
 			
-			/* If trying to sell stuff, the player is a sucker. However a gold to gold (e.g. pay the monster) transaction is fine. */
-			if (item != INVEN_GOLD) trade_value /= 2;
+			/* If trying to sell stuff, the player is a sucker. */
+			trade_value /= 2;
 		}
 	}
 
@@ -1549,22 +1565,22 @@ bool player_trade(int item2)
 	}
 	
 	/* Cheated the player out of money */
-	if ((item2 == INVEN_GOLD) && (!value) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
+	if ((item2 == INVEN_GOLD) && (item != INVEN_GOLD) && (!value) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
 	{
 		/* Really ripping the player off */
-		if (level_flag & (LF1_TOWN)) monster_speech(trade_m_idx, comment_3[rand_int(MAX_COMMENT_3)], FALSE);
+		if (level_flag & (LF1_TOWN)) monster_speech(trade_m_idx, comment_2[rand_int(MAX_COMMENT_2)], FALSE);
 
 		/* Otherwise it's just a day in the life of ripping the player off */
-		else monster_speech(trade_m_idx, comment_2[rand_int(MAX_COMMENT_2)], FALSE);
+		else monster_speech(trade_m_idx, comment_3[rand_int(MAX_COMMENT_3)], FALSE);
 	}
 
 	/* The monster made some profit - let's do business */
 	else
 	{
-		int deal = (value / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5))) + trade_highly_value;
+		int deal = ((trade_value - value) * 10 / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5))) + trade_highly_value;
 
 		/* Aggressive monsters get insulted - handle out of bounds cases */
-		if (((m_ptr->mflag & (MFLAG_AGGR)) != 1) && ((deal < 1) || (deal > 9))) deal = 1;
+		if (((m_ptr->mflag & (MFLAG_AGGR)) != 0) && ((deal < 1) || (deal > 9))) deal = 1;
 
 		/*
 		 * To do: Use monster profit (trade_value - value) to make monsters reveal
@@ -1582,6 +1598,10 @@ bool player_trade(int item2)
 				{
 					/* Make them an ally */
 					m_ptr->mflag |= (MFLAG_ALLY);
+
+					/* Clear old targets */
+					m_ptr->ty = p_ptr->target_row;
+					m_ptr->tx = p_ptr->target_col;
 
 					/* Buy more time before they turn on us */
 					m_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
@@ -1644,6 +1664,10 @@ bool player_trade(int item2)
 				/* Buy friends outright. Note don't add the made flag, so it is possible to do business with a lesser offer later. */
 				m_ptr->mflag |= (MFLAG_ALLY | MFLAG_TOWN /* | MFLAG_MADE */);
 
+				/* Clear old targets */
+				m_ptr->ty = p_ptr->target_row;
+				m_ptr->tx = p_ptr->target_col;
+
 				/* Lots of money doesn't buy as much respect */
 				m_ptr->summoned = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
 
@@ -1699,7 +1723,7 @@ bool player_trade(int item2)
 	}
 	
 	/* Prevent GTA style takedowns - or the player paying off people to leave town too easily */
-	if ((level_flag & (LF1_TOWN)) && !(adult_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))
+	if (((level_flag & (LF1_TOWN)) != 0) && (item2 == INVEN_GOLD) && (item != INVEN_GOLD) && !(adult_no_selling) && (trade_value >= 100 + p_ptr->depth * p_ptr->depth * 10))
 	{
 		int y = m_ptr->fy;
 		int x = m_ptr->fx;
