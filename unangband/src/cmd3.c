@@ -1592,7 +1592,7 @@ bool player_trade(int item2)
 
 		switch(deal)
 		{
-			case 7: case 8: case 9:
+			case 7: case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 				/* We can offer stuff to business associates to make them allies */
 				if ((m_ptr->mflag & (MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE))
 				{
@@ -1619,6 +1619,7 @@ bool player_trade(int item2)
 					if ((m_ptr->mflag & (MFLAG_MADE)) == 0)
 					{
 						/* XXX Create monster drops and carry them. Mark with made flag. */
+						m_ptr->mflag |= (MFLAG_MADE);
 					}
 
 					/* Lots of money doesn't buy as much respect */
