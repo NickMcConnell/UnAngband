@@ -1449,7 +1449,7 @@ bool player_trade(int item2)
 	char m_name[80];
 
 	/* Get gold */
-	if (item == INVEN_GOLD)
+	if (item2 == INVEN_GOLD)
 	{
 		/* Gold earned based on value of trade */
 		value = amt = trade_value;
@@ -1511,15 +1511,8 @@ bool player_trade(int item2)
 		/* Evil monsters betray the player 66% of the time */
 		if (((r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) != 0) && (rand_int(3))) value = 0;
 
-		/* Gambling */
-		if (item == INVEN_GOLD)
-		{
-			msg_format("You'll be able to gamble with %s in a future version of Unangband.", m_name);
-			return (FALSE);
-		}
-		
 		/* In town, we can sell stuff */
-		else if (room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN) && !(adult_no_selling))
+		if (room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN) && !(adult_no_selling))
 		{
 			/* Money well earned? */
 			p_ptr->au += value;
@@ -1532,8 +1525,8 @@ bool player_trade(int item2)
 			/* In the dungeon, monsters don't have gold on them 'quite yet' */
 			value = 0;
 			
-			/* The player is a sucker */
-			trade_value /= 2;
+			/* If trying to sell stuff, the player is a sucker. However a gold to gold (e.g. pay the monster) transaction is fine. */
+			if (item != INVEN_GOLD) trade_value /= 2;
 		}
 	}
 
