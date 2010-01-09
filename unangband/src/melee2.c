@@ -3812,7 +3812,7 @@ void monster_speech(int m_idx, cptr saying, bool understand)
  *
  * u, v and w are parameters for the information conveyed.
  */
-bool tell_allies_info(int y, int x, cptr saying, int u, int v, int w,
+bool tell_allies_info(int y, int x, cptr saying, int u, int v, int w, bool wakeup,
 		bool query_ally_hook(const monster_type *n_ptr, int u, int v, int w),
 		void tell_ally_hook(monster_type *n_ptr, int u, int v, int w))
 {
@@ -3835,7 +3835,10 @@ bool tell_allies_info(int y, int x, cptr saying, int u, int v, int w,
 		if (i == cave_m_idx[y][x]) continue;
 
 		/* Ignore if monster awake and knows already */
-		if ((n_ptr->csleep) && (query_ally_hook) && query_ally_hook(n_ptr, u, v, w)) continue;
+		if (!(n_ptr->csleep) && (query_ally_hook) && query_ally_hook(n_ptr, u, v, w)) continue;
+
+		/* Ignore if monster is asleep and we're not waking them */
+		if ((n_ptr->csleep) && !wakeup) continue;
 
 		/* Ignore allies or vice versa */
 		if (((n_ptr->mflag & (MFLAG_ALLY)) != 0) != ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
@@ -3909,7 +3912,7 @@ void tell_ally_can(monster_type *n_ptr, int u, int v, int w)
  */
 bool tell_allies_player_can(int y, int x, u32b flag)
 {
-	cptr saying = "& resists nothing.";
+	cptr saying = NULL;
 
 	/* Define saying */
 	if (flag & (SM_IMM_ACID)) saying = "& is immune to acid.";
@@ -3940,7 +3943,7 @@ bool tell_allies_player_can(int y, int x, u32b flag)
 	else if (flag & (SM_RES_DISEN)) saying = "& resists disenchantment.";
 
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, query_ally_can, tell_ally_can));
+	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, FALSE, query_ally_can, tell_ally_can));
 }
 
 
@@ -3978,7 +3981,7 @@ void tell_ally_not(monster_type *n_ptr, int u, int v, int w)
  */
 bool tell_allies_player_not(int y, int x, u32b flag)
 {
-	cptr saying = "& no longer resists nothing.";
+	cptr saying = NULL;
 
 	/* Define saying */
 	if (flag & (SM_IMM_ACID)) saying = "& no longer is immune to acid.";
@@ -4009,7 +4012,7 @@ bool tell_allies_player_not(int y, int x, u32b flag)
 	else if (flag & (SM_RES_DISEN)) saying = "& no longer resists disenchantment.";
 
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, query_ally_not, tell_ally_not));
+	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, FALSE, query_ally_not, tell_ally_not));
 }
 
 
@@ -4048,7 +4051,7 @@ void tell_ally_mflag(monster_type *n_ptr, int u, int v, int w)
 bool tell_allies_mflag(int y, int x, u32b flag, cptr saying)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, query_ally_mflag, tell_ally_mflag));
+	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, TRUE, query_ally_mflag, tell_ally_mflag));
 }
 
 
@@ -4088,7 +4091,7 @@ void tell_ally_not_mflag(monster_type *n_ptr, int u, int v, int w)
 bool tell_allies_not_mflag(int y, int x, u32b flag, cptr saying)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, query_ally_not_mflag, tell_ally_not_mflag));
+	return (tell_allies_info(y, x, saying, (int)flag, 0, 0, TRUE, query_ally_not_mflag, tell_ally_not_mflag));
 }
 
 
@@ -4102,7 +4105,7 @@ void tell_ally_death(monster_type *n_ptr, int u, int v, int w)
 	(void)w;
 
 	/* Tell the allies of the ally */
-	tell_allies_info(n_ptr->fy, n_ptr->fx, saying, 0, 0, 0, NULL, NULL);
+	tell_allies_info(n_ptr->fy, n_ptr->fx, saying, 0, 0, 0, TRUE, NULL, NULL);
 }
 
 
@@ -4112,7 +4115,7 @@ void tell_ally_death(monster_type *n_ptr, int u, int v, int w)
 bool tell_allies_death(int y, int x, cptr saying)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, NULL, (int)saying, 0, 0, NULL, tell_ally_death));
+	return (tell_allies_info(y, x, NULL, (int)saying, 0, 0, TRUE, NULL, tell_ally_death));
 }
 
 
@@ -4150,7 +4153,7 @@ void tell_ally_range(monster_type *n_ptr, int u, int v, int w)
 bool tell_allies_range(int y, int x, int best_range, int min_range, cptr saying)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, best_range, min_range, 0, query_ally_range, tell_ally_range));
+	return (tell_allies_info(y, x, saying, best_range, min_range, 0, TRUE, query_ally_range, tell_ally_range));
 }
 
 
@@ -4189,7 +4192,7 @@ void tell_ally_summoned(monster_type *n_ptr, int u, int v, int w)
 bool tell_allies_summoned(int y, int x, int summoned, cptr saying)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, summoned, 0, 0, query_ally_summoned, tell_ally_summoned));
+	return (tell_allies_info(y, x, saying, summoned, 0, 0, TRUE, query_ally_summoned, tell_ally_summoned));
 }
 
 
@@ -4231,7 +4234,7 @@ void tell_ally_target(monster_type *n_ptr, int u, int v, int w)
 bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, saying, ty, tx, scent, query_ally_target, tell_ally_target));
+	return (tell_allies_info(y, x, saying, ty, tx, scent, TRUE, query_ally_target, tell_ally_target));
 }
 
 
@@ -4241,7 +4244,7 @@ bool tell_allies_target(int y, int x, int ty, int tx, bool scent, cptr saying)
 bool check_allies_exist(int y, int x)
 {
 	/* Something said? */
-	return (tell_allies_info(y, x, "", 0, 0, 0, NULL, NULL));
+	return (tell_allies_info(y, x, "", 0, 0, 0, FALSE, NULL, NULL));
 }
 
 
@@ -7361,7 +7364,7 @@ static void recover_monster(int m_idx, bool regen)
 					monster_speech(m_idx, comment_2a[rand_int(MAX_COMMENT_2a)], FALSE);
 				}
 				/* Only betray when the monster has support and not in town, or evil */
-				else if ((room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN)) != 0)
+				else
 				{
 					/* Get the monster name */
 					monster_desc(m_name, sizeof(m_name), m_idx, 0);
@@ -7545,6 +7548,37 @@ static void recover_monster(int m_idx, bool regen)
 			/* Fully healed -> flag minimum range for recalculation */
 			if (m_ptr->hp == m_ptr->maxhp) m_ptr->min_range = 0;
 		}
+
+
+		/* Monster is a town monster - do some interesting stuff */
+		if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && !(m_ptr->csleep) && !(m_ptr->summoned) && !(rand_int(9)))
+		{
+			/* We don't care about the player */
+			if ((m_ptr->mflag & (MFLAG_AGGR)) == 0)
+			{
+				/* Get the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* Notice and attack the player */
+				if ((m_ptr->cdis <= r_ptr->aaf) && (p_ptr->skills[SKILL_STEALTH] < rand_int(100)))
+				{
+					/* Give detailed messages */
+					if (m_ptr->ml) msg_format("%^s decides you are an easy target.", m_name);
+
+					/* Notice the player */
+					m_ptr->mflag &= ~(MFLAG_TOWN);
+				}
+				/* Bored - go to sleep */
+				else
+				{
+					int val = r_ptr->sleep;
+					m_ptr->csleep = ((val * 2) + (s16b)randint(val * 10));
+
+					/* Give detailed messages */
+					if (m_ptr->ml) msg_format("%^s falls asleep.", m_name);
+				}
+			}
+		}
 	}
 
 
@@ -7597,6 +7631,25 @@ static void recover_monster(int m_idx, bool regen)
 					{
 						l_ptr->ignore++;
 					}
+
+					/* Notice when nearly awake */
+					if (m_ptr->csleep < 2 * d)
+					{
+						/* Get the monster name */
+						monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+						/* Dump a message */
+						msg_format("%^s is nearly awake.", m_name);
+					}
+					/* Notice when waking up a lot */
+					else if ((m_ptr->cdis < 5) && (m_ptr->csleep < 3 * d))
+					{
+						/* Get the monster poss */
+						monster_desc(m_name, sizeof(m_name), m_idx, 0x02);
+
+						/* Dump a message */
+						msg_format("%^s slumber is disturbed.", m_name);
+					}
 				}
 			}
 
@@ -7627,6 +7680,7 @@ static void recover_monster(int m_idx, bool regen)
 			}
 		}
 	}
+
 
 	/* Some monsters radiate damage when awake */
 	if (!(m_ptr->csleep) && (r_ptr->flags2 & (RF2_HAS_AURA)))

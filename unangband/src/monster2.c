@@ -4555,7 +4555,10 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 			if (qe_ptr->flags & (EVENT_HATE_RACE)) n_ptr->mflag &= ~(MFLAG_ALLY | MFLAG_IGNORE);
 			if (qe_ptr->flags & (EVENT_FEAR_RACE)) n_ptr->monfear = 100;
 			if (qe_ptr->flags & (EVENT_HEAL_RACE)) n_ptr->mflag |= (MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
-			if (qe_ptr->flags & (EVENT_BANISH_RACE | EVENT_KILL_RACE)) return (FALSE);
+			if (qe_ptr->flags & (EVENT_BANISH_RACE)) return (FALSE);
+
+			/* TODO: Drop bodies around if race killed */
+			if (qe_ptr->flags & (EVENT_KILL_RACE)) return (FALSE);
 		}
 	}
 
@@ -4567,11 +4570,12 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	{
 		n_ptr->mflag |= (MFLAG_ALLY | MFLAG_IGNORE);
 	}
-	else
+	/* If in the dungeon, and not a town monster prevent summoning */
+	else if ((character_dungeon) && ((n_ptr->mflag & (MFLAG_TOWN)) == 0))
 	{
 		/* Monster must wait a while until summoning anything if summoned/wandering */
 		/* Now uses charisma */
-		if (character_dungeon) n_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+		n_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
 	}
 	
 	/* Force monster to wait for player */
