@@ -4080,6 +4080,9 @@ void tell_ally_not_mflag(monster_type *n_ptr, int u, int v, int w)
 	(void)v;
 	(void)w;
 
+	/* Don't get rid of MFLAG_TOWN on allies */
+	if (((n_ptr->mflag) & (MFLAG_ALLY)) != 0) flag &= ~(MFLAG_TOWN);
+
 	/* Tell the ally */
 	n_ptr->mflag &= ~(flag);
 }
@@ -4104,8 +4107,11 @@ void tell_ally_death(monster_type *n_ptr, int u, int v, int w)
 	(void)v;
 	(void)w;
 
+	/* Clear the town flag */
+	n_ptr->mflag &= ~(MFLAG_TOWN);
+
 	/* Tell the allies of the ally */
-	tell_allies_info(n_ptr->fy, n_ptr->fx, saying, 0, 0, 0, TRUE, NULL, NULL);
+	tell_allies_not_mflag(n_ptr->fy, n_ptr->fx, (MFLAG_TOWN), saying);
 }
 
 
@@ -7348,6 +7354,9 @@ static void recover_monster(int m_idx, bool regen)
 
 						/* And wait for assistance most of the time */
 						if ((!rand_int(10)) || (!check_allies_exist(m_ptr->fy, m_ptr->fx))) m_ptr->mflag = flag_hack;
+
+						/* Try to summon assistance quietly */
+						else (tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), NULL));
 					}
 					/* We're alone */
 					else if (!check_allies_exist(m_ptr->fy, m_ptr->fx))
@@ -7364,24 +7373,21 @@ static void recover_monster(int m_idx, bool regen)
 					/* Note loss of allegiance. */
 					monster_speech(m_idx, comment_2a[rand_int(MAX_COMMENT_2a)], FALSE);
 				}
-				/* Only betray when the monster has support and not in town, or evil */
-				else
+				/* Only betray when the monster has support except rarely */
+				else if ((tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), comment_2b[rand_int(MAX_COMMENT_2b)]))
+						|| !(rand_int(10)))
 				{
 					/* Get the monster name */
 					monster_desc(m_name, sizeof(m_name), m_idx, 0);
 
-					/* And get other town allies to fight as well */
-					if ((tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_AGGR), comment_2b[rand_int(MAX_COMMENT_2b)])) && !(rand_int(10)))
-					{
-						/* Warn the player */
-						msg_format("%^s turns to fight.",m_name);
+					/* Warn the player */
+					msg_format("%^s turns to fight.",m_name);
 
-						/* Become an enemy */
-						m_ptr->mflag &= ~(MFLAG_TOWN);
+					/* Become an enemy */
+					m_ptr->mflag &= ~(MFLAG_TOWN);
 
-						/* Don't allow the player to buy his way out of trouble */
-						m_ptr->mflag &= (MFLAG_AGGR);
-					}
+					/* Don't allow the player to buy his way out of trouble */
+					m_ptr->mflag &= (MFLAG_AGGR);
 				}
 
 				/* Give the player some more time to make amends */

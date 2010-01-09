@@ -4075,13 +4075,15 @@ void player_fire_or_throw_selected(int item, bool fire)
 						/* Alert fellows */
 						if (was_asleep)
 						{
+							m_ptr->mflag |= (MFLAG_AGGR);
+
 							/* Let allies know */
-							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV,
+							tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN),
 									"& has attacked me!");
 						}
 						else if (fear)
 						{
-							tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV,
+							tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN),
 									"& has hurt me badly!");
 						}
 

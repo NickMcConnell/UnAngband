@@ -1878,7 +1878,7 @@ void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
 			(is_a_vowel(name[0]) ? "an " : "a ")), max);
 
 		/* It could be a normal, definite, monster */
-		else if ((mode & 0x800) != 0) my_strcpy(desc, !number ? "no " : (number != 1 ? format("the %d ", number) : "the "), max);
+		else if ((mode & 0x800) == 0) my_strcpy(desc, !number ? "no " : (number != 1 ? format("the %d ", number) : "the "), max);
 		
 		/* Clear string */
 		else my_strcpy(desc, "", max);

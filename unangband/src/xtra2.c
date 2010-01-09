@@ -3130,7 +3130,7 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 			(*fear) = FALSE;
 
 			/* Warn allies */
-			tell_allies_mflag(m_ptr->fy, m_ptr->fx, MFLAG_ACTV, "& has attacked me!");
+			tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has attacked me!");
 		}
 	}
 
@@ -3881,11 +3881,11 @@ cptr look_mon_desc(int m_idx)
 	if (m_ptr->poisoned) return("poisoned");
 	if (find_monster_ammo(m_idx, -1, FALSE) < 0) return("out of ammo");
 
-	if (m_ptr->mflag & (MFLAG_TOWN))
+	/* Real townsfolk */
+	if (((m_ptr->mflag & (MFLAG_ALLY | MFLAG_AGGR | MFLAG_TOWN)) == (MFLAG_TOWN))
+			&& ((level_flag & (LF1_TOWN)) != 0))
 	{
-		if (m_ptr->mflag & (MFLAG_ALLY)) return ("hired");
-		if (m_ptr->mflag & (MFLAG_AGGR)) return ("offended");
-		return((level_flag & (LF1_TOWN)) ? "townsfolk" : "suspicious");
+		return("townsfolk");
 	}
 
 	/* Determine if the monster is "living" (vs "undead") */

@@ -1643,7 +1643,7 @@ bool player_trade(int item2)
 			switch(rand_int(deal - 3))
 			{
 				/* Tells the player about home */
-				case 7: case 8: case 9: case 10:
+				case 3: case 8: case 10:
 				{
 					/* Only if we trust the player */
 					if (((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR))
@@ -1656,24 +1656,44 @@ bool player_trade(int item2)
 				}
 
 				/* Tells the player about the most powerful monster in the ecology */
-				case 4: case 5: /* case 6: - to allow another chance at family history */
+				case 2: case 7:
 				{
 					/* Do we have a deepest race? */
-					if (room_info[room_idx(m_ptr->fy, m_ptr->fx)].deepest_race)
+					if (room_info[room_idx_ignore_valid(m_ptr->fy, m_ptr->fx)].deepest_race)
 					{
 						monster_speech(trade_m_idx, "You are right to be cautious around here.", FALSE);
 
-						lore_do_probe(room_info[room_idx(m_ptr->fy, m_ptr->fx)].deepest_race);
+						lore_do_probe(room_info[room_idx_ignore_valid(m_ptr->fy, m_ptr->fx)].deepest_race);
 
 						break;
 					}
 				}
 
 				/* Tells the player about the local region. */
-				case 2: case 3:
+				case 1: case 5:
 				{
-					monster_speech(trade_m_idx, "This is an especially interesting area.", FALSE);
-					map_area();
+					int i;
+					u32b ecology = 0L;
+
+					/* Check to see if monster is local to this region */
+					if (cave_ecology.ready) for (i = 0; i < cave_ecology.num_races; i++)
+					{
+						/* Get the ecology membership */
+						if (cave_ecology.race[i] == m_ptr->r_idx) ecology |= cave_ecology.race_ecologies[i];
+					}
+
+					/* Do we know this area? */
+					if ((!cave_ecology.ready) || ((room_info[room_idx_ignore_valid(m_ptr->fy, m_ptr->fx)].ecology & (ecology)) != 0))
+					{
+						monster_speech(trade_m_idx, "This is an especially interesting area.", FALSE);
+						map_area();
+					}
+					/* At least tell the player we're not local */
+					else
+					{
+						monster_speech(trade_m_idx, "I don't know this area.", FALSE);
+					}
+
 					break;
 				}
 
@@ -1756,6 +1776,9 @@ bool player_trade(int item2)
 			{
 				/* Unhack */
 				p_ptr->cur_flags4 = hack_cur_flags4;
+
+				/* If smart, we try to talk in common language to trick the player */
+				if (r_info[m_ptr->r_idx].flags2 & (RF2_SMART)) monster_speech(trade_m_idx, comment_5a[rand_int(MAX_COMMENT_5a)], TRUE);
 
 				/* Tell allies to cool their heels */
 				if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), comment_5a[rand_int(MAX_COMMENT_5a)]))

@@ -722,6 +722,7 @@ extern void monster_speech(int m_idx, cptr saying, bool understand);
 extern bool tell_allies_player_can(int y, int x, u32b flag);
 extern bool tell_allies_player_not(int y, int x, u32b flag);
 extern bool tell_allies_mflag(int y, int x, u32b flag, cptr saying);
+extern bool tell_allies_not_mflag(int y, int x, u32b flag, cptr saying);
 extern bool tell_allies_death(int y, int x, cptr saying);
 extern bool tell_allies_range(int y, int x, int best_range, int min_range, cptr saying);
 extern bool tell_allies_summoned(int y, int x, int summoned, cptr saying);
