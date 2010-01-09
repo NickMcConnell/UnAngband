@@ -5819,7 +5819,7 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 		if (retarget_blows_subsequent && !(target_okay())) p_ptr->command_dir = 0;
 
 		/* Allow direction to be cancelled for free */
-		if (!get_aim_dir(&retarget_blows_dir, retarget_blows_known ? range : MAX_RANGE, retarget_blows_known ? radius : 0,
+		if (!get_aim_dir(&retarget_blows_dir, TARGET_KILL, retarget_blows_known ? range : MAX_RANGE, retarget_blows_known ? radius : 0,
 						retarget_blows_known ? *flg : (PROJECT_BEAM),
 						retarget_blows_known ? method_ptr->arc : 0,
 						retarget_blows_known ? method_ptr->diameter_of_source : 0)) return (FALSE);
@@ -6952,7 +6952,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				u32b old_cur_flags3 = p_ptr->cur_flags3;
 
 				/* Allow direction to be cancelled for free */
-				if (!get_aim_dir(&dir, 99, 0, 0, 0, 0)) return (!(*cancel));
+				if (!get_aim_dir(&dir, TARGET_KILL, 99, 0, 0, 0, 0)) return (!(*cancel));
 
 				/* Hack -- Use an actual "target" */
 				if ((dir == 5) && target_okay())

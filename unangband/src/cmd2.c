@@ -3603,7 +3603,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 		int dir;
 
 		/* Fake get a direction */
-		if (!get_aim_dir(&dir, tdis, 0, (PROJECT_BEAM), 0, 0)) return;
+		if (!get_aim_dir(&dir, TARGET_KILL, tdis, 0, (PROJECT_BEAM), 0, 0)) return;
 
 		fumble = TRUE;
 	}
@@ -3640,7 +3640,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 				/* Reset the chosen direction */
 				p_ptr->command_dir = 0;
 
-				if (!get_aim_dir(&dir, tdis, 0, (PROJECT_BEAM), 0, 0))
+				if (!get_aim_dir(&dir, TARGET_KILL, tdis, 0, (PROJECT_BEAM), 0, 0))
 				{
 					/* Canceled */
 					if (tricks > 0)

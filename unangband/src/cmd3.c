@@ -992,7 +992,7 @@ bool player_offer(int item)
 	if (amt <= 0) return (FALSE);
 
 	/* Get monster */
-	m_idx = get_monster_by_aim();
+	m_idx = get_monster_by_aim(TARGET_KILL | TARGET_ALLY);
 	
 	/* Not a monster */
 	if (m_idx <= 0) return (FALSE);

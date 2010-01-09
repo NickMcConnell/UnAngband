@@ -2329,7 +2329,7 @@ bool monster_death(int m_idx)
 	x = m_ptr->fx;
 
 	/* Incur summoning debt */
-	if ((m_ptr->mflag & (MFLAG_ALLY)) && (m_ptr->summoned))
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) == 0) && (m_ptr->summoned))
 	{
 		/* Summoning debt requires blood */
 		if (r_ptr->level > p_ptr->csp)
@@ -4442,12 +4442,12 @@ static void target_set_interactive_prepare(int mode)
 				/* Must be a targettable monster */
 				if (!target_able(cave_m_idx[y][x])) continue;
 
-				/* Must not be an ally */
-				if (m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) continue;
+				/* Must not be an ally , unless TARGET_ALLY set as well */
+				if (((mode & (TARGET_ALLY)) == 0) && ((m_list[cave_m_idx[y][x]].mflag & (MFLAG_ALLY)) != 0)) continue;
 			}
 
 			/* Special mode */
-			if (mode & (TARGET_ALLY))
+			else if (mode & (TARGET_ALLY))
 			{
 				/* Must contain a monster */
 				if (!(cave_m_idx[y][x] > 0)) continue;
@@ -6185,7 +6185,7 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
  *
  * Currently this function applies confusion directly.
  */
-bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diameter_of_source)
+bool get_aim_dir(int *dp, int mode, int range, int radius, u32b flg, byte arc, byte diameter_of_source)
 {
 	int dir;
 
@@ -6254,7 +6254,7 @@ bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diamet
 			/* Set new target, use target if legal */
 			case '*':
 			{
-				if (target_set_interactive(TARGET_KILL, range, radius, flg, arc, diameter_of_source)) dir = 5;
+				if (target_set_interactive(mode, range, radius, flg, arc, diameter_of_source)) dir = 5;
 				break;
 			}
 
@@ -6317,14 +6317,14 @@ bool get_aim_dir(int *dp, int range, int radius, u32b flg, byte arc, byte diamet
 /*
  * Lets the player select a known monster by aiming.
  */
-int get_monster_by_aim(void)
+int get_monster_by_aim(int mode)
 {
 	int ty = p_ptr->py;
 	int tx = p_ptr->px;
 	int dir;
 	
 	/* Get direction */
-	if (!get_aim_dir(&dir, MAX_SIGHT, 0, 0, 0, 0))
+	if (!get_aim_dir(&dir, mode, MAX_SIGHT, 0, 0, 0, 0))
 	{
 		return (FALSE);
 	}

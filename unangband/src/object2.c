@@ -7852,7 +7852,7 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 	if (player)
 	{
 		if (((flg & (PROJECT_SELF)) == 0) &&
-				(!get_aim_dir(&dir, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
+				(!get_aim_dir(&dir, TARGET_KILL, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
 						return;
 
 		msg_format("%d", dir);

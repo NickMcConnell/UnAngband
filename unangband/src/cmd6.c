@@ -1427,7 +1427,7 @@ bool player_zap_rod(int item)
 	sound(MSG_ZAP_ROD);
 
 	/* Hack -- get fake direction */
-	if (!object_aware_p(o_ptr) && (o_ptr->sval < SV_ROD_MIN_DIRECTION)) get_aim_dir(&dir, MAX_RANGE, 0, (PROJECT_BEAM), 0, 0);
+	if (!object_aware_p(o_ptr) && (o_ptr->sval < SV_ROD_MIN_DIRECTION)) get_aim_dir(&dir, TARGET_KILL, MAX_RANGE, 0, (PROJECT_BEAM), 0, 0);
 
 	/* Set if known */
 	if (object_aware_p(o_ptr)) known = TRUE;

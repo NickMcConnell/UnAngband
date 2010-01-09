@@ -3892,7 +3892,7 @@ void move_player(int dir)
 		p_ptr->climbing = 0;
 
 		/* Allow running to abort sneaking */
-		if (p_ptr->running) p_ptr->not_sneaking;
+		if (p_ptr->running) p_ptr->not_sneaking = FALSE;
 
 		/* Spontaneous Searching */
 		if ((p_ptr->skills[SKILL_SEARCH] >= 50) ||
