@@ -1649,7 +1649,10 @@ bool player_trade(int item2)
 					if (deal % 2) m_ptr->mflag |= (MFLAG_PUSH);
 
 					/* Don't register much excitement. */
-					monster_speech(trade_m_idx, (deal > 1) ? comment_1c[rand_int(MAX_COMMENT_1c)] : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
+					/* But make sure harmless monsters don't threaten the player */
+					monster_speech(trade_m_idx, (deal > 1) ?
+							((r_info[m_ptr->r_idx].blow[0].effect == GF_NOTHING) ? comment_1a[rand_int(MAX_COMMENT_1a)] :
+							comment_1c[rand_int(MAX_COMMENT_1c)]) : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
 
 					break;
 				}
