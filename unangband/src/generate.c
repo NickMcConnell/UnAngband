@@ -5115,7 +5115,7 @@ static void check_windows_x(int x1, int x2, int y)
  * Helper function for build_type_concave. We use this to generate
  * inner concave spaces as well.
  */
-static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int x2a,
+static bool generate_concave(int points, int y1a, int x1a, int y2a, int x2a,
 	int y1b, int x1b, int y2b, int x2b, bool light, int edge, int floor, int requires)
 {
 	int verty[12];
@@ -5135,7 +5135,7 @@ static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int 
 	}
 	
 	/* Generate 1 or more points for each edge */
-	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	d = randint(points);
 	
 	/* Add vertices */
 	for (i = 0; i < d; i++)
@@ -5165,7 +5165,7 @@ static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int 
 	}
 
 	/* Generate 1 or more points for each edge */
-	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	d = randint(points);
 	
 	/* Add vertices */
 	for (i = 0; i < d; i++)
@@ -5195,7 +5195,7 @@ static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int 
 	}
 
 	/* Generate 1 or more points for each edge */
-	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	d = randint(points);
 	
 	/* Add vertices */
 	for (i = 0; i < d; i++)
@@ -5225,7 +5225,7 @@ static bool generate_concave(int room, int type, int y1a, int x1a, int y2a, int 
 	}
 
 	/* Generate 1 or more points for each edge */
-	d = randint(type - ROOM_NORMAL_CONCAVE + 1);
+	d = randint(points);
 	
 	/* Add vertices */
 	for (i = 0; i < d; i++)
@@ -5322,7 +5322,7 @@ static bool build_type_concave(int room, int type, int y0, int x0, int y1a, int 
 	set_irregular_room_info(room, type, light, exclude, &floor, &edge, &inner, &alloc, &pool, &n_pools);
 	
 	/* Build the room */
-	if (!generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, edge, floor, 0))
+	if (!generate_concave(type - ROOM_NORMAL_CONCAVE + 1, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, edge, floor, 0))
 	{
 		return (FALSE);
 	}
@@ -5343,7 +5343,7 @@ static bool build_type_concave(int room, int type, int y0, int x0, int y1a, int 
 		x2b = ((d*x2b) + x1b) / (d+1) +1;
 		
 		/* Build the inner room */
-		generate_concave(room, type, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, f_info[inner].edge, inner, floor);
+		generate_concave(type - ROOM_NORMAL_CONCAVE + 1, y1a, x1a, y2a, x2a, y1b, x1b, y2b, x2b, light, f_info[inner].edge, inner, floor);
 	}
 	
 	/* Place allocation */
@@ -13207,7 +13207,7 @@ static bool place_rooms()
 	 */
 	for (i = ((level_flag & (LF1_ROOMS)) != 0) ? 0 : ROOM_MAX - 1;
 			(count++ < 100) && (i < ROOM_MAX) && (dun->cent_n < try_rooms);
-			last ? /* Do nothing */ : i++)
+			last ? /* Do nothing */ i : i++)
 	{
 		/* What type of room are we building now? */
 		int room_type = room_build_order[i];
@@ -14802,6 +14802,12 @@ static void build_store(int feat, int yy, int xx)
 
 	/* Clear previous contents, add a store door */
 	cave_set_feat(y, x, feat);
+
+	/* Let monsters shop as well */
+	if (u_info[f_info[feat].power].base >= STORE_MIN_BUY_SELL)
+	{
+		room_info[0].flags |= (ROOM_TOWN);
+	}
 }
 
 

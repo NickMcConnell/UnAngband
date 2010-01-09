@@ -1519,7 +1519,7 @@ bool player_trade(int item2)
 		}
 		
 		/* In town, we can sell stuff */
-		else if (((level_flag & (LF1_TOWN)) != 0) && !(adult_no_selling))
+		else if (room_near_has_flag(m_ptr->fy, m_ptr->fx, ROOM_TOWN) && !(adult_no_selling))
 		{
 			/* Money well earned? */
 			p_ptr->au += value;
@@ -1679,7 +1679,7 @@ bool player_trade(int item2)
 				if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), comment_4a[rand_int(MAX_COMMENT_4a)]))
 				{
 					/* Allies are impressed to varying degree - evil speakers are silver tongued */
-					tell_allies_best_range_or_summoned(m_ptr->fy, m_ptr->fx, 0, MIN_TOWN_WARNING + rand_int(m_ptr->summoned / 2 + 1),
+					tell_allies_summoned(m_ptr->fy, m_ptr->fx, MIN_TOWN_WARNING + rand_int(m_ptr->summoned / 2 + 1),
 							r_info[m_ptr->r_idx].flags3 & (RF3_EVIL) ? comment_4b[rand_int(MAX_COMMENT_4b)] : comment_4c[rand_int(MAX_COMMENT_4c)]);
 				}
 			}
@@ -1697,7 +1697,7 @@ bool player_trade(int item2)
 					if (r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) m_ptr->summoned = rand_int(MIN_TOWN_WARNING);
 
 					/* Coordinate a quick betrayal if evil, or risk of outright attack if allies sufficiently unimpressed */
-					tell_allies_best_range_or_summoned(m_ptr->fy, m_ptr->fx, (r_info[m_ptr->r_idx].flags3 & (RF3_EVIL)) ? 3 : 0,
+					tell_allies_summoned(m_ptr->fy, m_ptr->fx,
 							r_info[m_ptr->r_idx].flags3 & (RF3_EVIL) ? m_ptr->summoned : MIN_TOWN_WARNING / 2 + rand_int(m_ptr->summoned / 2 + 1) / 2,
 									r_info[m_ptr->r_idx].flags3 & (RF3_EVIL) ? comment_5b[rand_int(MAX_COMMENT_5b)] : comment_5c[rand_int(MAX_COMMENT_5c)]);
 				}

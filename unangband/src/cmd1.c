@@ -3638,9 +3638,11 @@ void move_player(int dir)
 	}
 
 	/* Hack -- attack monsters --- except hidden ones, allies or townsfolk */
-	if ((cave_m_idx[y][x] > 0) && !(m_list[cave_m_idx[y][x]].mflag & (MFLAG_HIDE | MFLAG_ALLY)) &&
+	if ((cave_m_idx[y][x] > 0) && (choose_to_attack_player(&m_list[cave_m_idx[y][x]])) &&
+
 	 /* Note hack to also ignore monsters on town level who don't do damage. */
 		(((level_flag & (LF1_TOWN)) == 0) || (r_info[m_list[cave_m_idx[y][x]].r_idx].blow[0].effect != GF_NOTHING)) &&
+
 		 /* Allow the player to run over most monsters -- except those that can't move */
 		 (!(p_ptr->running) || (r_info[m_list[cave_m_idx[y][x]].r_idx].flags1 & (RF1_NEVER_MOVE))))
 	{

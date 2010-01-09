@@ -3329,7 +3329,7 @@ enum
 #define ROOM_WINDY	0x00800000L	   /* room prevents missiles/thrown items */
 #define ROOM_GRAVE	0x01000000L	   /* room brings monsters back to life */
 #define ROOM_STORE	0x02000000L	   /* room prevents objects being taken */
-#define ROOM_DISPEL	0x04000000L	   /* room dispels enchantments */
+#define ROOM_TOWN	0x04000000L	   /* room is part of a town */
 #define ROOM_RANDOM	0x08000000L	   /* room activates randomly for effect */
 #define ROOM_PUZZLE	0x10000000L	   /* room requires features contained destroyed */
 #define ROOM_GUARD	0x20000000L	   /* room requires monsters contained destroyed */
@@ -5138,19 +5138,30 @@ enum
 	 (dun_room[Y/BLOCK_HGT][X/BLOCK_WID]) : \
 	 (0))
 
+
 /*
- * Determine if a "room" grid has a flag
- *
- * Note that we don't check for flags for room 0 (e.g. the dungeon)
- * for various sanity reasons such as teleportation and so on.
- *
- * This means dungeon room flags will never apply.
+ * Determine if a "room" grid has a flag. If we
+ * are not in a room, we check the dungeon instead.
  */
 #define room_has_flag(Y,X,FLAG) \
  (((cave_info[Y][X] & (CAVE_ROOM)) != 0) &&\
  	(dun_room[Y/BLOCK_HGT][X/BLOCK_WID] < DUN_ROOMS) ? \
 	 (room_info[dun_room[Y/BLOCK_HGT][X/BLOCK_WID]].flags & (FLAG)) : \
 	 (room_info[0].flags & (FLAG)))
+
+
+
+/*
+ * Determine if near a "room" grid has a flag
+ *
+ * This is almost always used to check if we are in a 'town'-like area.
+ */
+#define room_near_has_flag(Y,X,FLAG) \
+ ((dun_room[Y/BLOCK_HGT][X/BLOCK_WID] < DUN_ROOMS) ? \
+	 (room_info[dun_room[Y/BLOCK_HGT][X/BLOCK_WID]].flags & (FLAG)) : \
+	 (room_info[0].flags & (FLAG)))
+
+
 
 
 /*
