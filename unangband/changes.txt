@@ -26,8 +26,17 @@ monsters are good at the moment (The ones people complain about having to kill).
 
 - Add 'O'ffer an item command. This allows you to give items to your allies,
 sell items to townsfolk and trade items with monsters in the dungeon. There
-is plenty of testing and balancing still to do here but the basic
-functionality is all in.
+is plenty of testing and balancing still to do here. You should be able to
+bribe monsters in the dungeon to have them progressively become less likely
+to kill you and more friendly by trading at a loss. However, such monsters
+will usually turn on you or leave you if you don't continue to pay them (You
+will be warned in advance of this happening). Be especially wary of dealing
+with evil monsters although they tend to offer much better deals up front.
+There are several functions left to do here: a monster still needs to be able
+to 'prematurely drop' in order that it has a more interesting set of items
+to trade with you, and they need to be able to reveal the part of the dungeon
+where they live, so you can go there for any moneys they haven't paid you
+yet.
 
 - Allow all stores now buy books, statues.
 
