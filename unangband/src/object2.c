@@ -1227,6 +1227,12 @@ s32b object_value_real(const object_type *o_ptr)
 	/* Base cost */
 	value = k_ptr->cost;
 
+	/* Gold / gems */
+	if ((o_ptr->tval == TV_GOLD) || (o_ptr->tval == TV_GEMS))
+	{
+		return (o_ptr->charges);
+	}
+	
 	/* Artifact */
 	if (o_ptr->name1)
 	{
@@ -9103,6 +9109,16 @@ s16b inven_takeoff(int item, int amt)
 	/* Verify */
 	if (amt > o_ptr->number) amt = o_ptr->number;
 
+	/* Hack - it is possible to take gold/gems off monsters */
+	if ((o_ptr->tval == TV_GOLD) || (o_ptr->tval == TV_GEMS))
+	{
+		/* Money well earned? */
+		p_ptr->au += o_ptr->charges;
+		
+		/* Update display */
+		p_ptr->redraw |= (PR_GOLD);
+	}
+	
 	/* Get local object */
 	i_ptr = &object_type_body;
 
@@ -9213,14 +9229,19 @@ s16b inven_takeoff(int item, int amt)
 		floor_item_optimize(0 - item);
 	}
 
-	/* Carry the object - spells are destroyed */
-	if (i_ptr->tval != TV_SPELL) slot = inven_carry(i_ptr);
-	else
+	/* Carry the object - spells/gold/gems are destroyed */
+	if ((i_ptr->tval == TV_SPELL) || (i_ptr->tval == TV_GOLD) || (i_ptr->tval == TV_GEMS)) 
 	{
 		/* Forget the spell flags */
 		inven_drop_flags(i_ptr);
 
 		slot = -1;
+	}
+	/* All other items */
+	else
+	{
+		/* Carry the item */
+		slot = inven_carry(i_ptr);
 	}
 
 	/* Message, sound if not the quiver */

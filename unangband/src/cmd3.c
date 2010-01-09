@@ -861,6 +861,9 @@ bool player_drop(int item)
 		
 		/* Lose it */
 		p_ptr->au -= amt;
+		
+		/* Update display */
+		p_ptr->redraw |= (PR_GOLD);
 
 		/* Give it to the floor */
 		floor_carry(p_ptr->py, p_ptr->px, o_ptr);
@@ -930,6 +933,121 @@ bool player_drop(int item)
 }
 
 
+/*
+ * Steal from a monster
+ */
+bool player_steal(int item)
+{
+	char m_name[80];
+	char m_poss[80];
+	
+	/* Ensure we have a target already */
+	monster_type *m_ptr = &m_list[p_ptr->target_who];
+	
+	/* Paranoia */
+	if (p_ptr->target_who <= 0) return (FALSE);
+	
+	/* Acquire the monster name */
+	monster_desc(m_name, sizeof(m_name), p_ptr->target_who, 0x00);
+	
+	/* Skill check if monster is awake */
+	if (!m_ptr->csleep)
+	{
+		/* Disarm factor */
+		int i = p_ptr->skills[SKILL_DISARM];
+		int j;
+	
+		/* Penalize some conditions */
+		if (p_ptr->timed[TMD_BLIND] || no_lite()) i = i / 10;
+		if (p_ptr->timed[TMD_CONFUSED] || p_ptr->timed[TMD_IMAGE]) i = i / 10;
+	
+		/* Extract the difficulty */
+		j = r_info[m_ptr->r_idx].level;
+	
+		/* Extract the difficulty XXX XXX XXX */
+		j = i - (j * 4);
+	
+		/* Always have a small chance of success */
+		if (j < 2) j = 2;
+	
+		/* Failure */
+		if (rand_int(100) > j)
+		{
+			/* Acquire the monster poss */
+			monster_desc(m_poss, sizeof(m_name), p_ptr->target_who, 0x02);
+			
+			/* Message */
+			msg_format("%^s grabs a hold of %s possessions!", m_name, m_poss);
+			
+			/* Get aggrieved */
+			m_ptr->mflag|= (MFLAG_AGGR);
+			
+			/* And tell allies */
+			tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has tried to steal from me!");
+			
+			/* Use up energy */
+			p_ptr->energy_use = 100;
+			
+			return (FALSE);
+		}
+	}
+	
+	/* Monster has no more gold */
+	if (m_ptr->mflag & (MFLAG_MADE))
+	{
+		/* Only get bonus gold theft once */
+		if (item == INVEN_GOLD)
+		{
+			/* Message */
+			msg_format("%^s has no more gold to steal.", m_name, m_poss);
+			
+			return (FALSE);
+		}
+	}
+	else
+	{
+		/* Stealing monster first time reveals the rest of its inventory */
+		if (monster_drop(p_ptr->target_who))
+		{
+			/* Message */
+			msg_format("%^s has more to steal.", m_name);
+		}
+	}
+	
+	/* Stealing gold is a straight reward */
+	if (item == INVEN_GOLD)
+	{
+		/* Monsters carries something */
+		if (((r_info[m_ptr->r_idx].flags1 & (RF1_ONLY_ITEM)) == 0)
+				&& (r_info[m_ptr->r_idx].flags1 >= RF1_DROP_30))
+		{
+			/* XXX Reward based on monster level - token amount for town */
+			p_ptr->au += randint(r_info[m_ptr->r_idx].level * 30 + 5);
+			
+			/* Update display */
+			p_ptr->redraw |= (PR_GOLD);
+		}
+		
+		/* TODO: Go through inventory and take gold / gems? */
+	}
+	else
+	{
+		object_type *o_ptr = &o_list[0 - item];
+		
+		/* Get a quantity */
+		int amt = get_quantity(NULL, o_ptr->number);
+
+		/* Get the item */
+		inven_takeoff(item, amt);
+	}
+	
+	/* Use up energy */
+	p_ptr->energy_use = 100;
+	
+	return (TRUE);
+}
+
+
 static int trade_value = 0;
 static int trade_amount = 0;
 static int trade_m_idx = 0;
@@ -992,7 +1110,7 @@ bool player_offer(int item)
 	if (amt <= 0) return (FALSE);
 
 	/* Get monster */
-	m_idx = get_monster_by_aim(TARGET_KILL | TARGET_ALLY);
+	m_idx = get_monster_by_aim((TARGET_KILL | TARGET_ALLY));
 	
 	/* Not a monster */
 	if (m_idx <= 0) return (FALSE);
@@ -1233,6 +1351,7 @@ bool player_offer(int item)
 }
 
 
+
 /* The normal sales acceptance text */
 #define MAX_COMMENT_1a   6
 
@@ -1304,22 +1423,6 @@ static cptr comment_1e[MAX_COMMENT_1e] =
 	"Forgive my friends, #. They see only a @.",
 	"Parley with a @? A @ #? Who would have thought?"
 };
-
-
-/* Become a bribed servant */
-
-#define MAX_COMMENT_1f   6
-
-static cptr comment_1f[MAX_COMMENT_1f] =
-{
-	"That is, precious, to me...",
-	"Your gift has... affected me.",
-	"Wow! I hadn't seen something of so much worth...",
-	"Are the streets of your home paved with gold?",
-	"Money is something I have never valued... until now.",
-	"A @ bearing gifts? You deserve reward fit for a king!"
-};
-
 
 
 /* Comments for when player gets cheated of item or money */
@@ -1560,8 +1663,8 @@ bool player_trade(int item2)
 	}
 	else
 	{
-		/* Drop (some of) the item */
-		inven_drop(item, trade_amount, trade_m_idx);
+		/* Take off (some of) the item */
+		inven_takeoff(item, trade_amount);
 	}
 	
 	/* Cheated the player out of money */
@@ -1577,38 +1680,22 @@ bool player_trade(int item2)
 	/* The monster made some profit - let's do business */
 	else
 	{
-		int deal = ((trade_value - value) * 10 / ((p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5))) + trade_highly_value;
+		int level = MAX(r_info[m_ptr->r_idx].level, p_ptr->depth);
+		int deal = ((trade_value - value) * 10 / ((level + 5) * (level + 5) * (level + 5))) + trade_highly_value;
 		int hire = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
-
+		
 		/*
 		 * Deal boosters - as a player trades further with a monster, they have a small chance of getting a deal boosted
 		 * to a higher level of effectiveness.
 		 */
-		if ((deal >= 1) && (deal < 15))
+		if (deal >= 1)
 		{
 			/* Boost a deal */
 			while (!rand_int((m_ptr->mflag & (MFLAG_ALLY)) ? 3 : 4)) deal++;
-
-			/* Maximum boost */
-			if (deal > 15) deal = 15;
-		}
-
-		/* The player is spending too much */
-		if ((deal > 15) && ((m_ptr->mflag & (MFLAG_AGGR)) == 0))
-		{
-			/* Buy friends outright. */
-			m_ptr->mflag |= (MFLAG_ALLY | MFLAG_TOWN);
-
-			/* Clear old targets */
-			m_ptr->ty = p_ptr->target_row;
-			m_ptr->tx = p_ptr->target_col;
-
-			/* Act over excited excited. */
-			monster_speech(trade_m_idx, comment_1f[rand_int(MAX_COMMENT_1f)], FALSE);
 		}
 
 		/* We can offer stuff to business associates to make them allies */
-		else if ((deal > 4) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE)))
+		if ((deal > 4) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE)))
 		{
 			/* Make them an ally */
 			m_ptr->mflag |= (MFLAG_ALLY);

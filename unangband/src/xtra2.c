@@ -6374,8 +6374,17 @@ int get_monster_by_aim(int mode)
 			ty += ddy[dir];
 			tx += ddx[dir];
 			
-			/* Get first monster in direction */
-			if ((cave_m_idx[ty][tx] > 0) && (m_list[cave_m_idx[ty][tx]].ml)) break;
+			/* No moster */
+			if (cave_m_idx[ty][tx] <= 0) continue;
+			
+			/* Not known */
+			if (m_list[cave_m_idx[ty][tx]].ml) continue;
+			
+			/* Not allied if only accepting enemies */
+			if (((m_list[cave_m_idx[ty][tx]].mflag & (MFLAG_ALLY)) != 0) && ((mode & (MFLAG_ALLY)) == 0)) continue;
+			
+			/* Not enemy if only accepting allies */
+			if (((m_list[cave_m_idx[ty][tx]].mflag & (MFLAG_ALLY | MFLAG_TOWN)) == 0) && ((mode & (MFLAG_ALLY)) == 0)) continue;
 			
 			/* Require projection */
 			if (!cave_project_bold(ty, tx)) break;
