@@ -3579,7 +3579,7 @@ bool get_string(cptr prompt, char *buf, int len)
  *
  * Allow "p_ptr->command_arg" to specify a quantity
  */
-s16b get_quantity_aux(cptr prompt, int max, int amt)
+int get_quantity_aux(cptr prompt, int max, int amt)
 {
 	/* Use "command_arg" */
 	if (p_ptr->command_arg)

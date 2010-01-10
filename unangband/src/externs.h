@@ -1107,7 +1107,7 @@ extern void text_out_c(byte a, cptr str);
 extern void clear_from(int row);
 extern bool askfor_aux(char *buf, int len);
 extern bool get_string(cptr prompt, char *buf, int len);
-extern s16b get_quantity_aux(cptr prompt, int max, int amt);
+extern int get_quantity_aux(cptr prompt, int max, int amt);
 extern s16b get_quantity(cptr prompt, int max);
 extern bool get_check(cptr prompt);
 extern bool get_com(cptr prompt, char *command);
