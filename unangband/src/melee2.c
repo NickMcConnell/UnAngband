@@ -4108,7 +4108,7 @@ void tell_ally_death(monster_type *n_ptr, int u, int v, int w)
 	(void)w;
 
 	/* Clear the town flag */
-	n_ptr->mflag &= ~(MFLAG_TOWN);
+	if (((n_ptr->mflag) & (MFLAG_ALLY)) != 0) n_ptr->mflag &= ~(MFLAG_TOWN);
 
 	/* Tell the allies of the ally */
 	tell_allies_not_mflag(n_ptr->fy, n_ptr->fx, (MFLAG_TOWN), saying);

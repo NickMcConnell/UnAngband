@@ -2384,10 +2384,10 @@ static void process_command(void)
 			break;
 		}
 
-		/* Search for traps/doors */
+		/* Search for traps/doors/ steal from monsters */
 		case 's':
 		{
-			do_cmd_search();
+			do_cmd_search_or_steal();
 			break;
 		}
 

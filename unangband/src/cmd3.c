@@ -954,7 +954,7 @@ bool player_steal(int item)
 	if (!m_ptr->csleep)
 	{
 		/* Disarm factor */
-		int i = p_ptr->skills[SKILL_DISARM];
+		int i = p_ptr->skills[SKILL_STEALTH] * 10;
 		int j;
 	
 		/* Penalize some conditions */
@@ -965,7 +965,7 @@ bool player_steal(int item)
 		j = r_info[m_ptr->r_idx].level;
 	
 		/* Extract the difficulty XXX XXX XXX */
-		j = i - (j * 4);
+		j = i - j * 2;
 	
 		/* Always have a small chance of success */
 		if (j < 2) j = 2;
@@ -974,13 +974,16 @@ bool player_steal(int item)
 		if (rand_int(100) > j)
 		{
 			/* Acquire the monster poss */
-			monster_desc(m_poss, sizeof(m_name), p_ptr->target_who, 0x02);
+			monster_desc(m_poss, sizeof(m_name), p_ptr->target_who, 0x22);
 			
 			/* Message */
 			msg_format("%^s grabs a hold of %s possessions!", m_name, m_poss);
 			
 			/* Get aggrieved */
 			m_ptr->mflag|= (MFLAG_AGGR);
+			
+			/* Disturb */
+			disturb(0, 0);
 			
 			/* And tell allies */
 			tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has tried to steal from me!");
@@ -999,7 +1002,7 @@ bool player_steal(int item)
 		if (item == INVEN_GOLD)
 		{
 			/* Message */
-			msg_format("%^s has no more gold to steal.", m_name, m_poss);
+			msg_format("%^s has no more gold to steal.", m_name);
 			
 			return (FALSE);
 		}
@@ -1026,6 +1029,11 @@ bool player_steal(int item)
 			
 			/* Update display */
 			p_ptr->redraw |= (PR_GOLD);
+		}
+		else
+		{
+			/* Message */
+			msg_format("%^s has no gold to steal.", m_name);
 		}
 		
 		/* TODO: Go through inventory and take gold / gems? */

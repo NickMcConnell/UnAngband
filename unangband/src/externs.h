@@ -476,7 +476,7 @@ extern void run_step(int dir);
 /* cmd2.c */
 extern void do_cmd_go_up(void);
 extern void do_cmd_go_down(void);
-extern void do_cmd_search(void);
+extern void do_cmd_search_or_steal(void);
 extern void do_cmd_toggle_search(void);
 extern void do_cmd_open(void);
 extern void do_cmd_close(void);

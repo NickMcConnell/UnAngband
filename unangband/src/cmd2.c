@@ -942,13 +942,17 @@ void do_cmd_go_down(void)
 
 /*
  * Simple command to "search" for one turn
+ * Now also allows you to steal from monsters
  */
-void do_cmd_search(void)
+void do_cmd_search_or_steal(void)
 {
-
 	/* Get the feature */
 	feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
 
+	int d, y, x;
+	
+	u16b valid_dir = 0;
+	
 	/* Allow repeated command */
 	if (p_ptr->command_arg)
 	{
@@ -962,18 +966,57 @@ void do_cmd_search(void)
 		p_ptr->command_arg = 0;
 	}
 
-	/* Take a turn */
-	p_ptr->energy_use = 100;
-
-	/* Catch breath */
-	if (!(f_ptr->flags2 & (FF2_FILLED)))
+	/* Check around the character */
+	for (d = 0; d < 8; d++)
 	{
-		/* Rest the player */
-		set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
+		/* Extract adjacent (legal) location */
+		y = p_ptr->py + ddy_ddd[d];
+		x = p_ptr->px + ddx_ddd[d];
+
+		/* Must have monster */
+		if (cave_m_idx[y][x] <= 0) continue;
+
+		/* Must be able to see monster */
+		if (!m_list[cave_m_idx[y][x]].ml) continue;
+		
+		/* Valid direction for a monster */
+		valid_dir |= (1 << ddd[d]);
+	}
+	
+	/* We have a monster to steal from */
+	if (valid_dir)
+	{	
+		/* Get a direction (or abort) */
+		if ((get_rep_dir(&d)) && ((valid_dir & (1 << d)) != 0))
+		{
+			/* Extract adjacent (legal) location */
+			y = p_ptr->py + ddy[d];
+			x = p_ptr->px + ddx[d];
+
+			/* Set player target */
+			p_ptr->target_who = cave_m_idx[y][x];
+			
+			/* Steal stuff */
+			do_cmd_item(COMMAND_ITEM_STEAL);
+		}
 	}
 
-	/* Search */
-	search();
+	/* We want to search instead. Allow aborted steals to search instead. */
+	if ((!valid_dir) || ((p_ptr->energy_use == 0) && (get_check("Search instead? "))))
+	{
+		/* Catch breath */
+		if (!(f_ptr->flags2 & (FF2_FILLED)))
+		{
+			/* Rest the player */
+			set_rest(p_ptr->rest + PY_REST_RATE - p_ptr->tiring);
+		}
+	
+		/* Search */
+		search();
+		
+		/* Take a turn */
+		p_ptr->energy_use = 100;
+	}
 }
 
 
