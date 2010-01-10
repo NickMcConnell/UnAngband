@@ -1092,8 +1092,15 @@ bool player_offer(int item)
 	/* Get gold */
 	if (item == INVEN_GOLD)
 	{
+		if (!p_ptr->au)
+		{
+			msg_print("You have no gold.");
+			
+			return (FALSE);
+		}
+		
 		/* Get a quantity */
-		amt = get_quantity(NULL, p_ptr->au);
+		amt = get_quantity_aux(NULL, p_ptr->au, (p_ptr->depth + 5) * (p_ptr->depth + 5) * (p_ptr->depth + 5));
 	}
 	
 	/* Get the item (in the pack) */

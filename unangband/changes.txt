@@ -6,9 +6,14 @@ Unangband 0.6.4 pre-release
 in return for losing charging and dodging through normal movement. Sneaking
 should be used for 2 specific situations: a) if you don't want your allies
 to wake up sleeping monsters and b) to avoid waking monsters you are aware
-of which are at range 4 or less. I don't want this to be a min/max decision
-- more of a 'I do want to sneak up to/past these guys in return for losing
-charging/blocking/dodging'.
+of which are at range 4 or less.
+
+- You can now 's'teal from monsters. This is automatically successful if
+they are asleep and uses your stealth skill if they are awake. If you
+are detected the monster will be aggravated and alert it's allies. The
+'s' command still searches if monsters are not adjacent to you - you can
+also cancel out of the steal attempt to be offered the chance to search
+instead.
 
 - You get warned several turns before a monster wakes up that it is about
 to be disturbed. Sneaking will buy you more time this way.

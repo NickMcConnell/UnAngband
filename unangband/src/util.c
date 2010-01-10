@@ -3579,11 +3579,8 @@ bool get_string(cptr prompt, char *buf, int len)
  *
  * Allow "p_ptr->command_arg" to specify a quantity
  */
-s16b get_quantity(cptr prompt, int max)
+s16b get_quantity_aux(cptr prompt, int max, int amt)
 {
-	int amt = 1;
-
-
 	/* Use "command_arg" */
 	if (p_ptr->command_arg)
 	{
@@ -3648,6 +3645,19 @@ s16b get_quantity(cptr prompt, int max)
 
 	/* Return the result */
 	return (amt);
+}
+
+
+
+/*
+ * Request a "quantity" from the user
+ *
+ * Allow "p_ptr->command_arg" to specify a quantity
+ */
+s16b get_quantity(cptr prompt, int max)
+{
+	/* The old get_quantity function */
+	get_quantity_aux(prompt, max, 1);
 }
 
 
