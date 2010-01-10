@@ -11428,7 +11428,7 @@ static bool build_type8910(int room, int type)
 	/* Pick a vault */
 	for (i = 0; i < z_info->v_max; i++)
 	{
-		u32b vault_flag = v_info[v].level_flag;
+		u32b vault_flag = v_info[i].level_flag;
 		
 		/* Match vault type */
 		if (v_info[i].typ != type) continue;
