@@ -3835,7 +3835,7 @@ F:SCENT | SUPER_SCENT | LEVEL_SIZE |
 D:A completely translucent hound.
 
 N:204:Clay golem
-G:g:U
+G:g:m
 #$ Multihued available
 #$ Metallics available:drgbuPRGpvtmYiTVIMZ
 #$ Colors available:dwbPpvtmTVIMzZ
@@ -10351,7 +10351,20 @@ D:An immense dragon capable of awesome destruction.  You have never felt
 D: such extreme cold, or witnessed such an icy stare.  Begone quickly or
 D: feel its wrath!
 
-#$# 497 - Unused ###
+N:497:Wooden golem
+G:g:U
+#$ Multihued available
+#$ Metallics available:drgbuPRGpvtmYiTVIMZ
+#$ Colors available:dwbPpvtmTVIMzZ
+I:110:15:12:30:10
+W:6:2:20:16
+M:0:0:2:0
+B:HIT:WOUND:1d3
+F:EMPTY_MIND | FRIENDS |
+F:NONLIVING | IM_POIS | EVASIVE | NO_FEAR | NO_CONF |
+F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | ASSEMBLE |
+F:LEVEL_SPEED | LEVEL_SIZE | LEVEL_POWER |
+D:A small, wooden doll-like figure with a menacing painted face.
 
 N:498:Nightcrawler
 G:N:Z
