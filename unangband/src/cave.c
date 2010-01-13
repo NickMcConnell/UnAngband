@@ -6224,7 +6224,7 @@ int project_path(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b flg
 
 	/* Require projections to be strictly LOF when possible  XXX XXX */
 	bool require_strict_lof = FALSE;
-	bool really_require_strict_lof = TRUE;
+	bool really_require_strict_lof = FALSE;
 	bool allow_los = (flg & (PROJECT_LOS)) != 0;
 
 	/* Count of grids in LOF, storage of LOF grids */
