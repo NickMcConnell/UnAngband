@@ -6206,6 +6206,9 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	/* Process the 'fake flag' -- detect minds */
 	if ((s_ptr->type == SPELL_DETECT_MIND) || (s_ptr->type == SPELL_MINDS_EYE))
 	{
+		/* Hack -- forbid cancellation */
+		*cancel = FALSE;
+
 		if (detect_monsters(monster_tester_hook_mental, known)) vp[vn++] = "minds";
 	}
 
