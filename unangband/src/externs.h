@@ -767,6 +767,7 @@ extern void monster_swap(int y1, int x1, int y2, int x2);
 extern s16b player_place(int y, int x, bool escort_allowed);
 extern void monster_hide(int y, int x, int mmove, monster_type *n_ptr);
 extern s16b monster_place(int y, int x, monster_type *n_ptr);
+extern int mon_resist_effect(int effect, int r_idx);
 extern bool mon_resist_feat(int feat, int r_idx);
 extern int calc_monster_ac(int m_idx, bool ranged);
 extern int calc_monster_hp(int m_idx);

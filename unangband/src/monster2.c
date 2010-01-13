@@ -3372,7 +3372,7 @@ void monster_swap(int y1, int x1, int y2, int x2)
  * does not resist, and 1 if the monster resists if they are
  * able to correctly navigate the terrain.
  */
-static int mon_resist_effect(int effect, int r_idx)
+int mon_resist_effect(int effect, int r_idx)
 {
 	monster_race *r_ptr;
 
