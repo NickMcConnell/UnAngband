@@ -3069,7 +3069,7 @@ static bool make_ego_item(object_type *o_ptr, bool cursed, bool great)
 	o_ptr->name2 = (byte)table[i].index;
 
 	/* Auto-inscribe if necessary */
-	if (cheat_auto) o_ptr->note = e_info[o_ptr->name2].note;
+	if (adult_auto) o_ptr->note = e_info[o_ptr->name2].note;
 
 	/* Apply obvious flags */
 	object_obvious_flags(o_ptr, TRUE);
@@ -5765,7 +5765,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		object_prep(j_ptr, k_idx);
 
 		/* Auto-inscribe if necessary */
-		if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
+		if ((adult_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
 
 	}
 
@@ -5871,7 +5871,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		if (good || great) j_ptr->ident &= ~(IDENT_CURSED);
 
 		/* Auto-inscribe if necessary */
-		if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
+		if ((adult_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
 	}
 
 	/* Mark as dropped */
@@ -6382,7 +6382,8 @@ bool make_feat(object_type *j_ptr, int y, int x)
 	a_m_aux_4(j_ptr, object_level, 0);
 
 	/* Auto-inscribe if necessary */
-	if ((cheat_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
+	if ((adult_auto) || (object_aware_p(j_ptr))) j_ptr->note = k_info[k_idx].note;
+
 	/* Apply obvious flags */
 	object_obvious_flags(j_ptr, TRUE);
 

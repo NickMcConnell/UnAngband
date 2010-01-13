@@ -2971,9 +2971,17 @@ void player_birth(void)
 	/* Hack -- outfit the player */
 	player_outfit();
 
+	/* Hack -- set the depth. */
+	/* Note -- we're not quite as cruel as thrall mode, ghost mode etc
+	 * and we also choose this depth to ensure we end up correctly in
+	 * a relatively 'safe' dungeon, terrain-wise in Mordor.
+	 */
+	if (adult_gollum) p_ptr->depth = 54;
+
 	/* Hack -- set the dungeon. */
-	if (adult_campaign) p_ptr->dungeon = 1;
-	else p_ptr->dungeon = z_info->t_max - 2;
+	if (!adult_campaign) p_ptr->dungeon = z_info->t_max - 2;
+	else if (adult_gollum) p_ptr->dungeon = 61;
+	else  p_ptr->dungeon = 1;
 
 	/* Hack -- set the town. This is now required for shop restocking. */
 	if (adult_campaign) p_ptr->town = 1;

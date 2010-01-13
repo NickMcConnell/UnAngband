@@ -4348,7 +4348,7 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 		if (o_ptr->feeling == INSCRIP_AVERAGE) object_bonus(o_ptr, TRUE);
 
 		/* Auto-inscribe if necessary */
-		if ((cheat_auto) || (object_aware_p(o_ptr))) o_ptr->note = k_info[ammo_kind].note;
+		if ((adult_auto) || (object_aware_p(o_ptr))) o_ptr->note = k_info[ammo_kind].note;
 
 		/* Apply obvious flags */
 		object_obvious_flags(o_ptr, TRUE);

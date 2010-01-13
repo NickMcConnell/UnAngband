@@ -767,7 +767,7 @@ static void display_knowledge_start_at(
 					if (!g_funcs.group(oid) != i_ptr->tval) continue;
 
 					/* Auto-inscribe */
-					if (g_funcs.aware(i_ptr) || cheat_auto)
+					if (g_funcs.aware(i_ptr) || adult_auto)
 						i_ptr->note = note_idx;
 				}
 
@@ -1261,7 +1261,7 @@ static void do_cmd_knowledge_monsters(void)
 
 	for(i = 0; i < z_info->r_max; i++) {
 		monster_race *r_ptr = &r_info[i];
-		if(!cheat_lore && !l_list[i].sights) continue;
+		if(!adult_lore && !l_list[i].sights) continue;
 		if(!r_ptr->name) continue;
 
 		if(r_ptr->flags1 & RF1_UNIQUE) m_count++;
@@ -1277,7 +1277,7 @@ static void do_cmd_knowledge_monsters(void)
 	m_count = 0;
 	for(i = 0; i < z_info->r_max; i++) {
 		monster_race *r_ptr = &r_info[i];
-		if(!cheat_lore && !l_list[i].sights) continue;
+		if(!adult_lore && !l_list[i].sights) continue;
 		if(!r_ptr->name) continue;
 
 		for(j = 0; j < N_ELEMENTS(monster_group_char)-1; j++) {
@@ -1348,7 +1348,7 @@ static void desc_art_fake(int a_idx)
 	/* Make fake artifact */
 	make_fake_artifact(o_ptr, a_idx);
 	o_ptr->ident |= IDENT_STORE | IDENT_PVAL | IDENT_KNOWN;
-	if(cheat_lore) o_ptr->ident |= IDENT_MENTAL;
+	if(adult_lore) o_ptr->ident |= IDENT_MENTAL;
 
 	/* Hack -- Handle stuff */
 	handle_stuff();
@@ -1400,10 +1400,10 @@ static void do_cmd_knowledge_artifacts(void)
 
 	/* Collect valid artifacts */
 	for(i = 0; i < z_info->a_max; i++) {
-		if((cheat_lore || a_info[i].cur_num) && a_info[i].name)
+		if((adult_lore || a_info[i].cur_num) && a_info[i].name)
 			artifacts[a_count++] = i;
 	}
-	for(i = 0; !cheat_lore && i < z_info->o_max; i++) {
+	for(i = 0; !adult_lore && i < z_info->o_max; i++) {
 		int a = o_list[i].name1;
 		if(a && !object_known_p(&o_list[i])) {
 			for(j = 0; j < a_count && a != artifacts[j]; j++);
@@ -1454,7 +1454,7 @@ static void desc_ego_fake(int oid)
 	Term_gotoxy(0, 1);
 
 	/* List can flags */
-	if(cheat_lore) list_object_flags(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3,
+	if(adult_lore) list_object_flags(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3,
 									e_ptr->flags4, 0, 1);
 
 	else {
@@ -1472,7 +1472,7 @@ static void desc_ego_fake(int oid)
 	}
 
 	/* List the runes required to make this item */
-	list_ego_item_runes(e_idx, cheat_lore);
+	list_ego_item_runes(e_idx, adult_lore);
 
 	Term_flush();
 	(void)anykey();
@@ -1511,7 +1511,7 @@ static void do_cmd_knowledge_ego_items(void)
 	egoitems = C_ZNEW(z_info->e_max*3, int);
 	default_join = C_ZNEW(z_info->e_max*3, join_t);
 	for(i = 0; i < z_info->e_max; i++) {
-		if((e_info[i].aware & (AWARE_EXISTS)) || cheat_lore) {
+		if((e_info[i].aware & (AWARE_EXISTS)) || adult_lore) {
 			for(j = 0; j < 3 && e_info[i].tval[j]; j++) {
 				int gid = obj_group_order[e_info[i].tval[j]];
 				/* HACK: Ignore duplicate tvals */
@@ -1583,7 +1583,7 @@ static void display_object(int col, int row, bool cursor, int oid)
 						: ((k_ptr->aware & (AWARE_SEEN)) != 0) ? 1 : 0][(int)cursor];
 
 	/* Symbol is unknown.  This should never happen.*/
-	if (!(k_ptr->aware & (AWARE_EXISTS)) && !k_ptr->flavor && !p_ptr->wizard && !cheat_lore)
+	if (!(k_ptr->aware & (AWARE_EXISTS)) && !k_ptr->flavor && !p_ptr->wizard && !adult_lore)
 	{
 		assert(FALSE);
 		c = ' ';
@@ -1697,10 +1697,10 @@ static void do_cmd_knowledge_objects(void)
 	objects = C_ZNEW(z_info->k_max * 2, int);
 
 	for(i = 0; i < z_info->k_max; i++) {
-		if((k_info[i].aware & (AWARE_EXISTS)) || (k_info[i].flavor) || cheat_lore) {
+		if((k_info[i].aware & (AWARE_EXISTS)) || (k_info[i].flavor) || adult_lore) {
 			int c = obj_group_order[k_info[i].tval];
 			if(c >= 0 && object_group[c].text) {
-				if ((k_info[i].aware & (AWARE_EXISTS)) || (cheat_lore))
+				if ((k_info[i].aware & (AWARE_EXISTS)) || (adult_lore))
 				{
 					objects[o_count++] = i;
 				}
@@ -6529,7 +6529,7 @@ static command_menu option_actions [] =
 	{'2', "Display options", do_cmd_options_aux, 1},
 	{'3', "Warning and disturbance options", do_cmd_options_aux, 2},
 	{'4', "Birth (difficulty) options", do_cmd_options_aux, 3},
-	{'5', "Cheat options", do_cmd_options_aux, 4},
+	{'5', "Cheat (debug) options", do_cmd_options_aux, 4},
 	{0, 0, 0, 0},
 	{'W', "Subwindow display settings", (action_f) do_cmd_options_win, 0},
 	{'D', "Set base delay factor", (action_f) do_cmd_delay, 0},
