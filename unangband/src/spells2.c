@@ -5847,9 +5847,6 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	/* Any further blows have slightly differing semantics */
-	retarget_blows_subsequent = TRUE;
-
 	/* Never retarget for spells which affect self */
 	if (*flg & (PROJECT_SELF))
 	{
@@ -5893,6 +5890,13 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 		{
 			*ty = p_ptr->target_row;
 			*tx = p_ptr->target_col;
+
+			/* Targetting a monster */
+			if (cave_m_idx[*ty][*tx])
+			{
+				/* Any further blows have slightly differing semantics - provided we targetted a monster */
+				retarget_blows_subsequent = TRUE;
+			}
 		}
 		/* Stop at first target if we're firing in a direction */
 		else if (method_ptr->flags2 & (PR2_DIR_STOP))
