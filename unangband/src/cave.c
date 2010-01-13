@@ -816,6 +816,20 @@ void modify_grid_interesting_view(byte *a, char *c, int y, int x, byte cinfo, by
 
 
 /*
+ * Checks if a square is at the (outer) edge of a trap detect area
+ */
+bool safe_edge(int y, int x)
+{
+ 	/* Check for non-dtrap adjacent grids */
+ 	if (in_bounds_fully(y + 1, x    ) && (play_info[y + 1][x    ] & PLAY_SAFE)) return TRUE;
+ 	if (in_bounds_fully(y    , x + 1) && (play_info[y    ][x + 1] & PLAY_SAFE)) return TRUE;
+ 	if (in_bounds_fully(y - 1, x    ) && (play_info[y - 1][x    ] & PLAY_SAFE)) return TRUE;
+ 	if (in_bounds_fully(y    , x - 1) && (play_info[y    ][x - 1] & PLAY_SAFE)) return TRUE;
+
+	return FALSE;
+}
+
+/*
  * Extract the attr/char to display at the given (legal) map location
  *
  * Note that this function, since it is called by "lite_spot()" which
@@ -1110,7 +1124,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
-		else if ((view_unsafe_grids || view_detect_grids) && !(pinfo & (PLAY_SAFE)))
+		else if ((view_unsafe_grids || view_detect_grids) && !(pinfo & (PLAY_SAFE))
+				&& (view_fogged_grids || safe_edge(y, x)))
 		{
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
@@ -1233,7 +1248,8 @@ void map_info(int y, int x, byte *ap, char *cp, byte *tap, char *tcp)
 		}
 
 		/* Hack -- Safe cave grid -- now use 'invisible trap' */
-		else if ((view_unsafe_grids || view_detect_grids) && !(pinfo & (PLAY_SAFE)))
+		else if ((view_unsafe_grids || view_detect_grids) && !(pinfo & (PLAY_SAFE))
+				&& (view_fogged_grids || safe_edge(y, x)))
 		{
 			/* Get the darkness feature */
 			f_ptr = &f_info[FEAT_INVIS];
