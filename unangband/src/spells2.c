@@ -5945,6 +5945,49 @@ bool process_spell_blows(int who, int what, int spell, int level, bool *cancel, 
 	/* No blows - return */
 	if (!blow_ptr->method) return (FALSE);
 
+	/* Hack - cancel casting of restricted teleports if we are not in the correct starting condition */
+	if (method_info[blow_ptr->method].flags1 & (PROJECT_SELF))
+	{
+		switch (blow_ptr->effect)
+		{
+			/* Teleport from darkness to darkness */
+			case GF_AWAY_DARK:
+			{
+				if (!teleport_darkness_hook(py, px, py, px))
+				{
+					if (*known) msg_print("You cannot do that unless you are in darkness.");
+
+					return (FALSE);
+				}
+				break;
+			}
+
+			/* Teleport from water/living to water/living */
+			case GF_AWAY_NATURE:
+			{
+				if (!teleport_nature_hook(py, px, py, px))
+				{
+					if (*known) msg_print("You cannot do that unless you are next to nature or running water.");
+
+					return (FALSE);
+				}
+				break;
+			}
+
+			/* Teleport from fire/lava to fire/lava */
+			case GF_AWAY_FIRE:
+			{
+				if (!teleport_fiery_hook(py, px, py, px))
+				{
+					if (*known) msg_print("You cannot do that unless you are next to smoke or flame.");
+
+					return (FALSE);
+				}
+				break;
+			}
+		}
+	}
+
 	/* Set up retargetting */
 	retarget_blows_dir = 0;
 	retarget_blows_known = *known;
@@ -6087,7 +6130,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	}
 
 	/*** From this point forward, any abilities cannot be cancelled ***/
-	if (s_ptr->flags1 || s_ptr->flags2 || s_ptr->flags3) *cancel = FALSE;
+	if (s_ptr->flags1 || s_ptr->flags2 || (s_ptr->flags3 & ~(SF3_HOLD_SONG | SF3_THAUMATURGY))) *cancel = FALSE;
 	
 	/* Process the flags -- basic feature detection */
 	if ((s_ptr->flags1 & (SF1_DETECT_DOORS)) && (detect_feat_flags(FF1_DOOR, 0x0L, 0x0L, 2 * MAX_SIGHT, known))) vp[vn++] = "doors";
