@@ -8878,7 +8878,7 @@ bool region_uplift_hook(int y, int x, s16b d, s16b region)
 	if ((r_ptr->flags1 & (RE1_SCALAR_FEATURE))== 0) return (FALSE);
 
 	/* Have we already collected a feature */
-	if ((rp_ptr->d) || ((r_ptr->effect == GF_FEATURE) && (rp_ptr->d == r_ptr->damage))) return (FALSE);
+	if (rp_ptr->d) return (FALSE);
 
 	/* Check overlapping regions */
 	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
@@ -8967,7 +8967,8 @@ bool region_project_hook(int y, int x, s16b d, s16b region)
 	/* Get the feature from the region */
 	if (r_ptr->effect == GF_FEATURE)
 	{
-		dam = d;
+		/* Always use base damage */
+		dam = r_ptr->damage;
 
 		/* Collecting the feature */
 		region_uplift_hook(y, x, d, region);
@@ -9186,8 +9187,6 @@ bool region_effect(int region, int y, int x)
 		int y1 = y ? y : r_ptr->y1;
 		int x1 = x ? x : r_ptr->x1;
 
-		region_info_type *ri_ptr = &region_info[r_ptr->type];
-
 		/* Attacks come from multiple source features in the region */
 		if (r_ptr->flags1 & (RE1_SOURCE_FEATURE))
 		{
@@ -9235,6 +9234,8 @@ bool region_effect(int region, int y, int x)
 		/* Method is defined */
 		else if (ri_ptr->method)
 		{
+			method_type *method_ptr = &method_info[ri_ptr->method];
+
 			/* Pick a random grid if required */
 			if (r_ptr->flags1 & (RE1_RANDOM))
 			{
@@ -9254,9 +9255,9 @@ bool region_effect(int region, int y, int x)
 				y1 = y;
 				x1 = x;
 			}
-
+			
 			/* Attack the target */
-			notice |= project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, child_region, 0L);
+			notice |= project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, child_region, method_ptr->flags1);
 		}
 
 		/* Method is not defined. Apply effect to all grids */

@@ -6837,9 +6837,6 @@ void scatter(int *yp, int *xp, int y, int x, int d, int m)
 
 	int tries;
 
-	/* Slight hack */
-	m++;
-
 	/* Pick a location */
 	for (tries = 0; tries < 100; tries++)
 	{
