@@ -1909,7 +1909,7 @@ void race_desc(char *desc, size_t max, int r_idx, int mode, int number)
 	*t = '\0';
 
 	/* Pluralize */
-	if ((number != 1) && (((mode & (0x400)) != 0) || ((append_s) && ((mode & (0x100)) != 0))))
+	if ((number != 1) && (((mode & (0x400)) != 0) || (append_s)))
 	{
 		/* We're hacking pluralisation - check for final s */
 		if (mode & (0x400))

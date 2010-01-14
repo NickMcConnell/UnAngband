@@ -6362,6 +6362,216 @@ void do_cmd_save_screen_html(void)
 }
 
 
+#define TOP_N	5
+
+/*
+ * Display some statistical summaries about the game
+ */
+void game_statistics(void)
+{
+	int i, j;
+	int most_kill[TOP_N];
+	int most_kill_count[TOP_N];
+	int deepest_kill[TOP_N];
+	int deepest_kill_level[TOP_N];
+	int deepest_unique_kill = 0;
+	int deepest_unique_kill_level = -1;
+	int sauron_form_kills = 0;
+	int total_kills = 0;
+	int total_unique_kills = 0;
+	int uniques_alive = 0;
+	
+	char race_name[80];
+	
+	/* Clear the top_n count */
+	for (i = 0; i < TOP_N; i++)
+	{
+		most_kill[i] = 0;
+		most_kill_count[i] = 0;
+		deepest_kill[i] = 0;
+		deepest_kill_level[i] = 0;
+	}
+	
+	/* Effectiveness against monsters */
+	for (i = 0; i < z_info->r_max; i++)
+	{
+		monster_race *r_ptr = &r_info[i];
+		monster_lore *l_ptr = &l_list[i];
+		
+		/* Uniques are worth knowing about */
+		if (r_ptr->flags1 & (RF1_UNIQUE))
+		{
+			/* Count kills */
+			if (l_ptr->pkills)
+			{
+				/* Count forms of sauron killed */
+				if ((i >= SAURON_FORM) && (i < SAURON_FORM + MAX_SAURON_FORMS))
+				{
+					/* Count uniques killed */
+					sauron_form_kills++;
+				}
+				else
+				{
+					/* Count uniques killed */
+					total_unique_kills++;
+				}
+				
+				/* Count as total kills regardless */
+				total_kills++;
+				
+				/* Is this the deepest unique killed? */
+				if (r_ptr->level > deepest_unique_kill_level)
+				{
+					deepest_unique_kill_level = r_ptr->level;
+					deepest_unique_kill = i;
+				}
+			}
+			/* Exclude uniques and various forms of sauron */
+			else if ((i != FAMILIAR_IDX ) && (i != FAMILIAR_BASE_IDX)
+					&& ((i < SAURON_FORM) || (i >= SAURON_FORM + MAX_SAURON_FORMS)))
+			{
+				uniques_alive++;
+			}
+		}
+		/* Track monsters separately */
+		else
+		{
+			if (l_ptr->pkills)
+			{
+				/* Count uniques killed */
+				total_kills += l_ptr->pkills;
+				
+				/* Is this in the top n monsters killed by number */
+				for (j = 0; j <= TOP_N; j++)
+				{
+					int k;
+					
+					/* Climb up the ranking table until we find a better ranking */
+					if ((j == TOP_N) || (l_ptr->pkills < most_kill_count[j]))
+					{
+						/* Shift everything below this down one */
+						for (k = 1; k < j; k++)
+						{
+							most_kill_count[k-1] = most_kill_count[k];
+							most_kill[k-1] = most_kill[k];
+						}
+						
+						/* Put current monster in table one place below */
+						if (j > 0)
+						{
+							most_kill_count[j-1] = l_ptr->pkills;
+							most_kill[j-1] = i;
+						}
+						
+						break;
+					}
+				}
+				
+				/* Is this in the top n monsters killed by depth */
+				for (j = 0; j <= TOP_N; j++)
+				{
+					int k;
+					
+					/* Climb up the ranking table until we find a better ranking */
+					if ((j == TOP_N) || (r_ptr->level < deepest_kill_level[j]))
+					{
+						/* Shift everything below this down one */
+						for (k = 1; k < j; k++)
+						{
+							deepest_kill_level[k-1] = deepest_kill_level[k];
+							deepest_kill[k-1] = deepest_kill[k];
+						}
+						
+						/* Put current monster in table one place below */
+						if (j > 0)
+						{
+							deepest_kill_level[j-1] = r_ptr->level;
+							deepest_kill[j-1] = i;
+						}
+						
+						break;
+					}
+				}
+
+			}
+		}
+	}
+	
+	/* Display monster death statistics */
+	text_out(format("Total monsters killed: %d\n", total_kills));
+	
+	/* Display unique death statistics */
+	if (total_unique_kills)
+	{
+		text_out(format("Total uniques killed: %d\n", total_unique_kills));
+		text_out(format("Deepest unique killed: %s\n", r_name + r_info[deepest_unique_kill].name));
+	}
+	
+	/* Don't spoil Sauron */
+	if (sauron_form_kills) text_out(format("Total forms of Sauron killed: %d\n", total_unique_kills));
+	
+	/* Give player something to aim for */
+	text_out(format("Total uniques left alive: %d\n", uniques_alive));
+
+	/* Get the top 5 monsters killed. We note townsfolk here. */
+	if (total_kills > total_unique_kills)
+	{
+		text_out(format("Top %d monsters killed (by depth, excluding uniques and townsfolk):\n", TOP_N));
+		
+		for (i = TOP_N - 1; i >= 0; i--)
+		{
+			if (!deepest_kill_level[i]) continue;
+			
+			/* XXX Should sort this list */
+			
+			race_desc(race_name, sizeof(race_name), deepest_kill[i], 0x408, l_list[deepest_kill[i]].pkills);
+			text_out(format(" %s\n", race_name));
+		}
+		
+		text_out(format("Top %d monsters killed (by number, excluding uniques):\n", TOP_N));
+		
+		for (i = TOP_N - 1; i >= 0; i--)
+		{
+			if (!most_kill_count[i]) continue;
+			
+			/* XXX Should sort this list */
+			
+			race_desc(race_name, sizeof(race_name), most_kill[i], 0x408, most_kill_count[i]);
+			text_out(format(" %s\n", race_name));
+		}
+
+	}
+}
+
+
+/*
+ * Display game statistics on screen
+ */
+void do_cmd_knowledge_game_statistics(void)
+{
+	/* Save screen */
+	screen_save();
+
+	/* Clear the screen */
+	Term_clear();
+
+	/* Set text_out hook */
+	text_out_hook = text_out_to_screen;
+
+	/* Head the screen */
+	text_out_c(TERM_L_BLUE, "Game statistics\n");
+
+	/* Really do game statistics */
+	game_statistics();
+
+	(void)anykey();
+
+	/* Load screen */
+	screen_load();
+}
+
+
+
 
 /*
  * Move the cursor using the mouse in a browser window
@@ -6574,6 +6784,7 @@ static command_menu knowledge_actions[] = {
 	{'7', "Display dungeon knowledge", (action_f)do_cmd_knowledge_dungeons, 0},
 	{'8', "Display help tips from the current game", (action_f)do_cmd_knowledge_help_tips, 0},
 	{'9', "Display self-knowledge", (action_f)self_knowledge, 0},
+	{'0', "Display game-play statistics", (action_f)do_cmd_knowledge_game_statistics, 0},
 	{0, 0, 0, 0},
 	{'L', "Load a user pref file", (action_f) do_cmd_pref_file_hack, 22},
 	{'D', "Dump auto-inscriptions", (action_f) cmd_autos_dump, 0},

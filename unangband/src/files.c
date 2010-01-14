@@ -4251,6 +4251,14 @@ errr file_character(cptr name, bool full)
 
 	text_out("\n");
 
+	/* Dump self-knowledge */
+	text_out("  [Game Statistics]\n\n");
+
+	/* Do non-spoiler self-knowledge */
+	game_statistics();
+
+	text_out("\n");
+
 	/* Dump spells learnt */
 	if ((c_info[p_ptr->pclass].spell_first <= PY_MAX_LEVEL)
 		 || (p_ptr->pstyle == WS_MAGIC_BOOK) || (p_ptr->pstyle == WS_PRAYER_BOOK) || (p_ptr->pstyle == WS_SONG_BOOK))

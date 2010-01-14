@@ -6886,7 +6886,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					/* Message */
 					if (p_ptr->disease)
 					{
-						msg_print("This cure is ineffective for what ails you.");
+						msg_print("This cure is ineffective for the disease you suffer from.");
 						obvious = TRUE;
 					}
 					break;
