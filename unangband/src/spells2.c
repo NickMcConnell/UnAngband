@@ -5682,8 +5682,8 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			/* Roll out the damage */
 			for (i = 1; i < num; i++) damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
 
-			/* Apply once */
-			if (forreal && project_one(who, what, y1, x1, damage, effect, flg))
+			/* Apply once - note hack for what it effects */
+			if (forreal && project_one(who, what, y1, x1, damage, effect, flg | (PROJECT_PLAY | PROJECT_KILL | PROJECT_ITEM | PROJECT_GRID)))
 			{
 				/* Noticed */
 				obvious = TRUE;
@@ -5870,6 +5870,21 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 		*ty = py + ddy[retarget_blows_dir];
 		*tx = px + ddx[retarget_blows_dir];
 	}
+	
+	/* Melee only attacks */
+	else if ((method_ptr->flags2 & (PR2_RANGED)) == 0)
+	{
+		*one_grid = TRUE;
+		
+		/* Get direction or escape */
+		if (!get_rep_dir(&retarget_blows_dir)) return (FALSE);
+		
+		/* Use the given direction */
+		*ty = py + ddy[retarget_blows_dir];
+		*tx = px + ddx[retarget_blows_dir];
+	}
+	
+	/* Ranged attacks */
 	else
 	{
 		/* Hack -- get new target if last target is dead / missing */
