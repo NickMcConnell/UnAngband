@@ -3006,6 +3006,9 @@ void player_birth(void)
 		/* Style tips */
 		queue_tip(format("style%d.txt", p_ptr->pstyle));
 
+		/* Style tips */
+		queue_tip(format("school%d.txt", p_ptr->pschool));
+
 		/* Specialists get tval tips */
 		if (style2tval[p_ptr->pstyle])
 		{

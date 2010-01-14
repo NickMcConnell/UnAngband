@@ -4976,7 +4976,7 @@ void show_tip(void)
 	if (p_ptr->command_rep) return;
 
 	/* Have tips to show */
-	if (tips_start != tips_end)
+	if (tips_start < tips_end)
 	{
 		cptr tip = quark_str(tips[tips_start++]);
 

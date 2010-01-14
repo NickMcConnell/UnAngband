@@ -909,7 +909,7 @@ void object_aware_tips(object_type *o_ptr, bool seen)
 	}
 
 	/* We didn't know the object */
-	if ((seen) && !(k_ptr->aware & (AWARE_SEEN)))
+	if ((seen) && ((k_ptr->aware & (AWARE_SEEN)) == 0))
 	{
 		/* Seen the object */
 		k_ptr->aware |= (AWARE_SEEN);
@@ -929,18 +929,18 @@ void object_aware_tips(object_type *o_ptr, bool seen)
 			/* Show tval based tip */
 			queue_tip(format("tval%d-%d.txt", k_ptr->tval, count));
 		}
+	}
+	
+	/* XXX XXX - Mark monster objects as "seen" */
+	if ((seen) && (o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
+	{
+		l_list[o_ptr->name3].sights++;
 
-		/* XXX XXX - Mark monster objects as "seen" */
-		if ((o_ptr->name3 > 0) && !(l_list[o_ptr->name3].sights))
-		{
-			l_list[o_ptr->name3].sights++;
-
-			queue_tip(format("look%d.txt", o_ptr->name3));
-		}
+		queue_tip(format("look%d.txt", o_ptr->name3));
 	}
 
 	/* We didn't note the object */
-	if (!(k_ptr->aware & (AWARE_EXISTS)) && (!(k_ptr->flavor) || (object_aware_p(o_ptr))))
+	if (((k_ptr->aware & (AWARE_EXISTS)) == 0) && (!(k_ptr->flavor) || (object_aware_p(o_ptr))))
 	{
 		/* Noted object */
 		k_ptr->aware |= (AWARE_EXISTS);

@@ -1851,6 +1851,10 @@ void check_experience(void)
 
 			/* Style tips */
 			queue_tip(format("spec%d-%d-%d.txt", p_ptr->pclass, p_ptr->pstyle, i));
+			
+			/* School tips */
+			queue_tip(format("scho%d-%d-%d.txt", p_ptr->pclass, p_ptr->pschool, i));
+			
 		}
 
 		/* Save the highest level */
