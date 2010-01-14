@@ -37,7 +37,7 @@ attacks are halved in the same situation.
  - Stinging a target may initially appear less effective than
 your Lightning Sparks. But in a situation when you are running
 low on mana, a well delivered set of stings will be a much more
-effecient use of this resource against a single target.
+efficient use of this resource against a single target.
 
 - Warping Wood may initially appear to provide little use beyond
 breaking open doors and wooden objects. But a cunning druid will
