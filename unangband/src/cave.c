@@ -2517,6 +2517,16 @@ void do_cmd_view_map(void)
 	int cy, cx;
 	cptr prompt = "Hit any key to continue";
 
+	/* Display the 'overworld' map if we are in a town */
+	if (level_flag & (LF1_TOWN))
+	{
+		screen_save();
+		(void)show_file("memap.txt", NULL, 0, 0);
+		screen_load();
+		
+		return;
+	}
+	
 	/* Save screen */
 	screen_save();
 
