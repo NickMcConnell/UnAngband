@@ -5055,7 +5055,6 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 }
 
-
 /*
  *  Change shape. Add 'built-in' equipment for that shape.
  */
@@ -5076,7 +5075,6 @@ void change_shape(int shape)
 	/* Window stuff */
 	p_ptr->window |= (PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 }
-
 
 /*
  * Enchant item --- a big pile of (fun) hack
@@ -7242,6 +7240,8 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_REST_UNTIL_DAWN:
 			{
 				feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
+				bool notice = FALSE;
+				int i;
 
 				/* Hack -- only on the surface for the moment */
 				if ((level_flag & (LF1_SURFACE | LF1_TOWN)) == 0)
@@ -7258,7 +7258,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				}
 
 				/* Check that it's day or night */
-				if (((level_flag & (LF1_DAYLIGHT)) != 0) != (s_ptr->type == SPELL_REST_UNTIL_DAWN))
+				if (((level_flag & (LF1_DAYLIGHT)) != 0) == (s_ptr->type == SPELL_REST_UNTIL_DAWN))
 				{
 					msg_format("It's still %s.", s_ptr->type == SPELL_REST_UNTIL_DAWN ? "daylight" : "night");
 					return (TRUE);
@@ -7291,6 +7291,24 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 				/* Hack -- regenerate level */
 				p_ptr->leaving = TRUE;
+
+				/* Recover one stat point */
+				for (i = 0; i < A_MAX; i++)
+				{
+					if (p_ptr->stat_cur[i]<p_ptr->stat_max[i])
+					{
+						if (p_ptr->stat_cur[i] < 18) p_ptr->stat_cur[i]++;
+						else p_ptr->stat_cur[i] += 10;
+
+						if (p_ptr->stat_cur[i] > p_ptr->stat_max[i]) p_ptr->stat_cur[i] = p_ptr->stat_max[i];
+
+						p_ptr->redraw |= (PR_STATS);
+
+						notice = TRUE;
+					}
+				}
+
+				if (notice) msg_print("You recover somewhat.");
 
 				*cancel = FALSE;
 				obvious = TRUE;
