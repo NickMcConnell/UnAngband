@@ -3685,7 +3685,7 @@ void list_object(const object_type *o_ptr, int mode)
 					}
 				}
 			}
-			text_out(format(" by %d and has a range of %d grids%s.  ", mult, 6 + mult * 3));
+			text_out(format(" by %d and has a range of %d grids.  ", mult, 6 + mult * 3));
 
 			/* Firearms */
 			if ((o_ptr->tval == TV_BOW) && (o_ptr->sval / 10 == 3))
