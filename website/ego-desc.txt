@@ -1,4 +1,4 @@
-Spoiler File -- Ego Items (0.6.2)
+Spoiler File -- Ego Items (0.6.3)
 
 Note: 1000 power equals no benefit
 
@@ -8,118 +8,118 @@ Description                              Power Lev Rar
 
 Edged Weapons
 
-of Flame                                  2481   0   8
-of Frost                                  1825   0   8
-of Corrosion                              2284   0  10
-of Lightning                              2170   0  10
-of Smite Nature                           2100   0  20
-of Holy Light                             2382   0  20
-of Smite Undead                           1576   0  20
-of Smite Demon                            1215   0  20
-of Orcslaying                             1076   0  20
-of Trollslaying                           1043   0  20
-of Dragonslaying                          1572   0  20
-of Giantslaying                           1108   0  25
-of the Sun                                1327  10  15
-'Flametongue'                             2481  20  10
+of Flame                                  1682   0   8
+of Frost                                  1637   0   8
+of Corrosion                              1828   0  10
+of Lightning                              1771   0  10
+of Smite Nature                           1863   0  20
+of Holy Light                             2529   0  20
+of Smite Undead                           1337   0  20
+of Smite Demon                            1254   0  20
+of Orcslaying                             1070   0  20
+of Trollslaying                           1041   0  20
+of Dragonslaying                          1470   0  20
+of Giantslaying                           1126   0  25
+of the Sun                                1129  10  15
+'Flametongue'                             1682  20  10
 (Enchanted)                               1000  20  10
-'Frostbite'                               1825  20  10
-'Acid wit'                                2284  20  15
-'Thunderhead'                             2170  20  15
-of Kinslaying                             1698  20  20
-of Arnor                                  2270  30  12
-of Numenor                                2251  30  12
-of the Valar                              2251  30  15
-of Westernesse                            1207  30  15
-'Foulheart'                               1725  30  15
-of the Night                              2535  30  15
-of Gondolin                               1513  40  20
-of Fury                                   1000  40  20
-'Skyblade'                                2284  50  20
-'Earthsblood'                             2477  50  20
-of Morgul                                 2143  64   1
+'Frostbite'                               1637  20  10
+'Acid wit'                                1828  20  15
+'Thunderhead'                             1771  20  15
+of Kinslaying                             2378  20  20
+of Arnor                                  2516  30  12
+of Numenor                                2495  30  12
+of the Valar                              2495  30  15
+of Westernesse                            1222  30  15
+'Foulheart'                               1494  30  15
+of the Night                              2761  30  15
+of Gondolin                               1473  35  20
+of Fury                                   1000  35  20
+'Skyblade'                                1893  40  20
+'Earthsblood'                             1966  40  20
+of Morgul                                 2627  47   1
 
 
 Polearms
 
-of Flame                                  2481   0   8
-of Frost                                  1825   0   8
-of Corrosion                              2284   0  10
-of Lightning                              2170   0  10
-of Smite Nature                           2100   0  20
-of Holy Light                             2382   0  20
-of Smite Undead                           1576   0  20
-of Smite Demon                            1215   0  20
-of Orcslaying                             1076   0  20
-of Trollslaying                           1043   0  20
-of Dragonslaying                          1572   0  20
-of Giantslaying                           1108   0  25
-of the Sun                                1327  10  15
-'Flametongue'                             2481  20  10
+of Flame                                  1682   0   8
+of Frost                                  1637   0   8
+of Corrosion                              1828   0  10
+of Lightning                              1771   0  10
+of Smite Nature                           1863   0  20
+of Holy Light                             2529   0  20
+of Smite Undead                           1337   0  20
+of Smite Demon                            1254   0  20
+of Orcslaying                             1070   0  20
+of Trollslaying                           1041   0  20
+of Dragonslaying                          1470   0  20
+of Giantslaying                           1126   0  25
+of the Sun                                1129  10  15
+'Flametongue'                             1682  20  10
 (Enchanted)                               1000  20  10
-'Frostbite'                               1825  20  10
-'Acid wit'                                2284  20  15
-'Thunderhead'                             2170  20  15
-of Kinslaying                             1698  20  20
-of Arnor                                  2270  30  12
-of Numenor                                2251  30  12
-of the Valar                              2251  30  15
-of Westernesse                            1207  30  15
-'Foulheart'                               1725  30  15
-of the Night                              2535  30  15
-of Gondolin                               1513  40  20
-of Fury                                   1000  40  20
-'Sunspike'                                2816  50  20
-'Forgehammer'                             2944  50  20
-of Morgul                                 2143  64   1
+'Frostbite'                               1637  20  10
+'Acid wit'                                1828  20  15
+'Thunderhead'                             1771  20  15
+of Kinslaying                             2378  20  20
+of Arnor                                  2516  30  12
+of Numenor                                2495  30  12
+of the Valar                              2495  30  15
+of Westernesse                            1222  30  15
+'Foulheart'                               1494  30  15
+of the Night                              2761  30  15
+of Gondolin                               1473  35  20
+of Fury                                   1000  35  20
+'Sunspike'                                1872  40  20
+'Forgehammer'                             1944  40  20
+of Morgul                                 2627  47   1
 
 
 Hafted Weapons
 
-of Flame                                  2481   0   8
-of Frost                                  1825   0   8
-of Corrosion                              2284   0  10
-of Lightning                              2170   0  10
-of Smite Nature                           2100   0  20
-of Holy Light                             2382   0  20
-of Smite Undead                           1576   0  20
-of Smite Demon                            1215   0  20
-of Orcslaying                             1076   0  20
-of Trollslaying                           1043   0  20
-of Dragonslaying                          1572   0  20
-of Giantslaying                           1108   0  25
-of the Sun                                1327  10  15
-'Flametongue'                             2481  20  10
+of Flame                                  1682   0   8
+of Frost                                  1637   0   8
+of Corrosion                              1828   0  10
+of Lightning                              1771   0  10
+of Smite Nature                           1863   0  20
+of Holy Light                             2529   0  20
+of Smite Undead                           1337   0  20
+of Smite Demon                            1254   0  20
+of Orcslaying                             1070   0  20
+of Trollslaying                           1041   0  20
+of Dragonslaying                          1470   0  20
+of Giantslaying                           1126   0  25
+of the Sun                                1129  10  15
+'Flametongue'                             1682  20  10
 (Enchanted)                               1000  20  10
-'Frostbite'                               1825  20  10
-'Acid wit'                                2284  20  15
-'Thunderhead'                             2170  20  15
-of Kinslaying                             1698  20  20
-of Arnor                                  2270  30  12
-of Numenor                                2251  30  12
-of the Valar                              2251  30  15
-of Westernesse                            1207  30  15
-'Foulheart'                               1725  30  15
-of the Night                              2535  30  15
-of Gondolin                               1513  40  20
-of Fury                                   1000  40  20
-'Starhammer'                              2343  50  20
-'Seaspire'                                2423  50  20
-of Morgul                                 2143  64   1
+'Frostbite'                               1637  20  10
+'Acid wit'                                1828  20  15
+'Thunderhead'                             1771  20  15
+of Kinslaying                             2378  20  20
+of Arnor                                  2516  30  12
+of Numenor                                2495  30  12
+of the Valar                              2495  30  15
+of Westernesse                            1222  30  15
+'Foulheart'                               1494  30  15
+of the Night                              2761  30  15
+of Gondolin                               1473  35  20
+of Fury                                   1000  35  20
+'Starhammer'                              1841  40  20
+'Seaspire'                                1978  40  20
+of Morgul                                 2627  47   1
 
 
 Bows
 
-of Buckland                               1000  40   4
-of Lothlorien                             1000  50   4
-of the Haradrim                           1000  50   4
-of the Nazgul                             1000 127   1
+of Buckland                               1000  35   4
+of Lothlorien                             1000  40   4
+of the Haradrim                           1000  40   4
+of the Nazgul                             1000  66   1
 
 
 Diggers
 
-of Digging                                2284   0   1
-of Earthquakes                            2284  20   4
+of Digging                                1828   0   1
+of Earthquakes                            1828  20   4
 
 
 Body Armor
@@ -131,13 +131,13 @@ of Permanence                             1000   0   4
 of the Magi                               1000   0   4
 of the Quendi                             1000   0   4
 of the Khazad                             1000  20   2
-of Preservation                           1000  60   4
-of Vulnerability                          1000 127   1
-of Aggravation                            1000 127   1
-of Vulnerability                          1000 127   1
-of Aggravation                            1000 127   1
-of Irritation                             1000 127   3
-of Irritation                             1000 127   3
+of Preservation                           1000  45   4
+of Vulnerability                          1000  66   1
+of Aggravation                            1000  66   1
+of Vulnerability                          1000  66   1
+of Aggravation                            1000  66   1
+of Irritation                             1000  66   3
+of Irritation                             1000  66   3
 
 
 Cloaks
@@ -151,19 +151,19 @@ of Shadows                                1000   0   4
 of Aman                                   1000   0   6
 of Stability                              1000   0  10
 of Silence                                1000  20   4
-of the Avarin                             1000  32   4
-of Preservation                           1000  60   4
-of Vulnerability                          1000 127   1
-of Enveloping                             1000 127   3
-of Irritation                             1000 127   3
+of the Avarin                             1000  31   4
+of Preservation                           1000  45   4
+of Vulnerability                          1000  66   1
+of Enveloping                             1000  66   3
+of Irritation                             1000  66   3
 
 
 Shields
 
 of Resistance                             1000   0   2
 of the Khazad                             1000  20   2
-of Preservation                           1000  60   4
-of Aggravation                            1000 127   1
+of Preservation                           1000  45   4
+of Aggravation                            1000  66   1
 
 
 Helms/Crowns
@@ -178,10 +178,10 @@ of Might                                  1000   0   3
 of the Magi                               1000   0   4
 of Health                                 1000   0   5
 of Serenity                               1000   0   6
-of Night and Day                          1000  35   6
-of Dullness                               1000 127   2
-of Dullness                               1000 127   2
-of Sickliness                             1000 127   2
+of Night and Day                          1000  32   6
+of Dullness                               1000  66   2
+of Dullness                               1000  66   2
+of Sickliness                             1000  66   2
 
 
 Gloves
@@ -189,17 +189,18 @@ Gloves
 of Might                                  1000   0   3
 of Power                                  1000   0   5
 of Thievery                               1000  30  12
-of Combat                                 1000  50  12
+of Combat                                 1000  40  12
 
 
 Boots
 
 of Stability                              1000   0  10
 of Silence                                1000  20   4
-of the Avarin                             1000  32   4
-(Seven League)                            1000  45  40
-of Elvenkind                              1000  65  30
-of Annoyance                              1000 127  10
+of the Avarin                             1000  31   4
+of Dancing                                1000  37  40
+(Seven League)                            1000  37  40
+of Elvenkind                              1000  47  30
+of Annoyance                              1000  66  10
 
 
 Light Sources

@@ -1,27 +1,27 @@
-Spoiler File -- Relative Slay Power (0.6.2)
+Spoiler File -- Relative Slay Power (0.6.3)
 
 Note: 1000 power equals no benefit
 
 Slay                                     Power
 -------------------------------------    -----
-Slay Nature                               1922
-Brand Holy                                2251
-Slay Undead                               1288
-Slay Demon                                1107
-Slay Orc                                  1076
-Slay Troll                                1043
-Slay Giant                                1108
-Slay Dragon                               1286
-Execute Dragon                            1572
-Execute Demon                             1215
-Execute Undead                            1576
-Brand Poison                              1725
-Brand Acid                                2284
-Brand Elec                                2170
-Brand Fire                                2481
-Brand Cold                                1825
-Brand Lite                                1327
-Brand Dark                                2535
-Slay Man                                  1179
-Slay Elf                                  1303
-Slay Dwarf                                1028
+Slay Nature                               1694
+Brand Holy                                2495
+Slay Undead                               1168
+Slay Demon                                1127
+Slay Orc                                  1070
+Slay Troll                                1041
+Slay Giant                                1126
+Slay Dragon                               1235
+Execute Dragon                            1470
+Execute Demon                             1254
+Execute Undead                            1337
+Brand Poison                              1494
+Brand Acid                                1828
+Brand Elec                                1771
+Brand Fire                                1682
+Brand Cold                                1637
+Brand Lite                                1129
+Brand Dark                                2761
+Slay Man                                  1175
+Slay Elf                                  2011
+Slay Dwarf                                1027
