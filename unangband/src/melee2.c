@@ -1464,7 +1464,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					{
 						/* Cannot see invisible, or use infravision to detect the monster */
 						if ((r_ptr->d_char != 'e') && ((r_ptr->flags9 & (RF9_RES_BLIND)) == 0)
-								&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+								&& ((r_ptr->aaf < d / 16) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
 					}
 
 					/* Monster needs light to see */
@@ -1505,8 +1505,8 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 						if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
 						{
 							/* Cannot see invisible, or use infravision to detect the monster */
-							if ((s_ptr->d_char != 'e') && ((s_ptr->flags2 & (RF2_INVISIBLE)) == 0)
-								&& ((s_ptr->aaf < d) || ((r_ptr->flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+							if ((s_ptr->d_char != 'e') && ((s_ptr->flags9 & (RF9_RES_BLIND)) == 0)
+								&& ((s_ptr->aaf < d /16) || ((r_ptr->flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
 						}
 
 						/* I'm in darkness and target can't see in darkness - ignore */
