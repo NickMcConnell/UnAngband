@@ -7191,7 +7191,7 @@ static void process_monster(int m_idx)
 					if (r_ptr->flags3 & flg3) continue;
 
 					/* Use value as a proxy for the order to get these */
-					value = object_value(o_ptr);
+					value = object_value(o_ptr) * o_ptr->number;
 
 					/* Not worth as much as required. Scale this by depth */
 					if (value <= best_value + d * p_ptr->depth * p_ptr->depth) continue;
