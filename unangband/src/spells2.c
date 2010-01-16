@@ -162,12 +162,20 @@ void generate_familiar(void)
 					r_ptr->flags1 &= ~(RF1_NEVER_BLOW);
 					break;
 				case FAMILIAR_SPIKE:
-					r_ptr->blow[blow-1].method = RBM_SPIKE;
-					r_ptr->flags4 |= (1 << blow);
-					r_ptr->freq_innate += 25;
+					/* Paranoia */
+					if (blow)
+					{
+						r_ptr->blow[blow-1].method = RBM_SPIKE;
+						r_ptr->flags4 |= (1 << blow);
+						r_ptr->freq_innate += 25;
+					}
 					break;
 				default:
-					r_ptr->blow[blow-1].effect = p_ptr->familiar_attr[i] - FAMILIAR_BLOW;
+					/* Paranoia */
+					if (blow)
+					{
+						r_ptr->blow[blow-1].effect = p_ptr->familiar_attr[i] - FAMILIAR_BLOW;
+					}
 					break;
 			}
 		}
@@ -177,6 +185,12 @@ void generate_familiar(void)
 	for (i = 0; i < blow; i++)
 	{
 		r_ptr->blow[blow].d_dice *= size;
+	}
+
+	/* No blows - mark appropriately */
+	if (!blow)
+	{
+		r_ptr->flags1 |= (RF1_NEVER_BLOW);
 	}
 
 	/* Fix up speed based on size */

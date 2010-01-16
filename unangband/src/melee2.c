@@ -7414,8 +7414,8 @@ static void recover_monster(int m_idx, bool regen)
 		m_ptr->hp = m_ptr->maxhp;
 	}
 
-	/* Handle "summoned" */
-	if (m_ptr->summoned)
+	/* Handle "summoned" - every 100 turns */
+	if ((m_ptr->summoned) && (regen))
 	{
 		m_ptr->summoned--;
 
