@@ -1433,10 +1433,10 @@ static void process_world(void)
 			if ((p_ptr->cur_flags3 & (TR3_HUNGER)) != 0) i += 100;
 
 			/* Regeneration takes more food */
-			if (p_ptr->regen_hp > 0) i += 30 * p_ptr->regen_hp;
+			if (p_ptr->regen_hp > 0) i += 15 * p_ptr->regen_hp;
 
 			/* Regeneration takes more food */
-			if (p_ptr->regen_mana > 0) i += 30 * p_ptr->regen_mana;
+			if (p_ptr->regen_mana > 0) i += 15 * p_ptr->regen_mana;
 
 			/* Slow digestion takes less food */
 			if ((p_ptr->timed[TMD_SLOW_DIGEST]) || (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
