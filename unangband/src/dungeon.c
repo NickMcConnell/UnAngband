@@ -641,8 +641,12 @@ static void sense_inventory(void)
 	if (f3 & (TR3_REGEN_MANA)) equip_can_flags(0x0L,0x0L,TR3_REGEN_MANA,0x0L);
 	else if (!(af3 & (TR3_REGEN_MANA))) equip_not_flags(0x0L,0x0L,TR3_REGEN_MANA,0x0L);
 
-	if (f3 & (TR3_HUNGER)) equip_can_flags(0x0L,0x0L,0x0L,TR3_HUNGER);
-	else if (!(af3 & (TR3_HUNGER))) equip_not_flags(0x0L,0x0L,0x0L,TR3_HUNGER);
+	if (f3 & (TR3_HUNGER)) equip_can_flags(0x0L,0x0L,TR3_HUNGER,0x0L);
+	else if (!(af3 & (TR3_HUNGER))) equip_not_flags(0x0L,0x0L,TR3_HUNGER,0x0L);
+
+	/* Hack -- only notice the absence of this ability */
+	if (f3 & (TR3_UNCONTROLLED)) /* Do nothing */;
+	else if (!(af3 & (TR3_UNCONTROLLED))) equip_not_flags(0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
 }
 
 
