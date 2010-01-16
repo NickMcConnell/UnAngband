@@ -2169,6 +2169,12 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 				move_chance /= 2;
 			}
 
+			/* Allies will avoid traps to avoid looking stupid/frustrating the player */
+			else if ((m_ptr->mflag & (MFLAG_ALLY)) != 0)
+			{
+				move_chance = 0;
+			}
+			
 			/* Monsters in line of fire to the player will consider moving
 			 * through traps, as will those monsters aggravated by the player. */
 			else if	((play_info[m_ptr->fy][m_ptr->fx] & (PLAY_FIRE)) ||
