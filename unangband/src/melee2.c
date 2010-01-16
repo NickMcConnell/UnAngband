@@ -5739,9 +5739,9 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		/* Scan all objects in the grid */
 
 		/* Can we get the objects */
-		if ((f_info[feat].flags1 & (FF1_DROP)) &&
-			!(m_ptr->mflag & (MFLAG_OVER | MFLAG_HIDE)))
+		if ((f_info[feat].flags1 & (FF1_DROP)) != 0)
 		{
+			/* Check all objects in grid */
 			for (this_o_idx = cave_o_idx[ny][nx]; this_o_idx; this_o_idx = next_o_idx)
 			{
 				object_type *o_ptr;
@@ -5752,13 +5752,13 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				/* Acquire next object */
 				next_o_idx = o_ptr->next_o_idx;
 
-				/* Skip gold */
-				if (o_ptr->tval >= TV_GOLD) continue;
+				/* Skip gold unless an ally or townsfolk */
+				if ((o_ptr->tval >= TV_GOLD) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN)) != 0)) continue;
 
 				/* Sneaky monsters hide behind big objects */
 				if ((o_ptr->weight > 1500)
 					&& (r_ptr->flags2 & (RF2_SNEAKY))
-					&& !(m_ptr->mflag & (MFLAG_HIDE | MFLAG_OVER)))
+					&& !(m_ptr->mflag & (MFLAG_HIDE)))
 				{
 					char m_name[80];
 					char o_name[80];
@@ -5777,7 +5777,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				}
 
 				/* Take objects on the floor */
-				if (r_ptr->flags2 & (RF2_TAKE_ITEM))
+				if (r_ptr->flags2 & (RF2_TAKE_ITEM | RF2_EAT_BODY))
 				{
 					u32b f1, f2, f3, f4;
 
@@ -5806,7 +5806,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
 
 					/* The object cannot be picked up by the monster */
-					if (artifact_p(o_ptr) || (r_ptr->flags3 & flg3))
+					if (artifact_p(o_ptr) || ((r_ptr->flags3 & flg3) != 0))
 					{
 						/* Only give a message for "take_item" */
 						if (r_ptr->flags2 & (RF2_TAKE_ITEM))
@@ -5836,6 +5836,19 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 									/* The object has been "sensed" */
 									o_ptr->ident |= (IDENT_SENSE);
 								}
+
+								/* Invert the flags */
+								if ((l_ptr->flags3 & (RF3_DRAGON)) == 0) f1 &= ~(TR1_SLAY_DRAGON);
+								if ((l_ptr->flags3 & (RF3_TROLL)) == 0) f1 &= ~(TR1_SLAY_TROLL);
+								if ((l_ptr->flags3 & (RF3_GIANT)) == 0) f1 &= ~(TR1_SLAY_GIANT);
+								if ((l_ptr->flags3 & (RF3_ORC)) == 0) f1 &= ~(TR1_SLAY_ORC);
+								if ((l_ptr->flags3 & (RF3_DEMON)) == 0) f1 &= ~(TR1_SLAY_DEMON);
+								if ((l_ptr->flags3 & (RF3_UNDEAD)) == 0) f1 &= ~(TR1_SLAY_UNDEAD);
+								if ((l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT)) == 0) f1 &= (TR1_SLAY_NATURAL);
+								if ((l_ptr->flags3 & (RF3_EVIL)) == 0) f1 &= ~(TR1_BRAND_HOLY);
+
+								/* Learn about flags on the object */
+								object_can_flags(o_ptr, f1, 0L, 0L, 0L, TRUE);
 							}
 						}
 					}
@@ -5848,7 +5861,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 					/* Pick up the item */
 					/* Hack -- eat body monsters can carry one body */
-					else if ((r_ptr->flags2 & (RF2_TAKE_ITEM)) || ((r_ptr->flags2 & (RF2_EAT_BODY))
+					else if (((r_ptr->flags2 & (RF2_TAKE_ITEM)) != 0) || (((r_ptr->flags2 & (RF2_EAT_BODY)) != 0)
 						&& !(m_ptr->hold_o_idx) && (o_ptr->tval == TV_BODY)))
 					{
 						object_type *i_ptr;
@@ -6817,8 +6830,8 @@ static void process_monster(int m_idx)
 			&& !(m_ptr->petrify)
 			&& (aggressive || !(m_ptr->monfear));
 
-		/* This allows smart monsters to report enemy positions to the player */
-		bool spying = ally && ((r_ptr->flags2 & (RF2_SMART)) != 0);
+		/* This allows smart monsters and the player's familiar to report enemy positions to the player */
+		bool spying = ally && (((r_ptr->flags2 & (RF2_SMART)) != 0) || (m_ptr->r_idx == FAMILIAR_IDX));
 
 		/* This prevents player monsters from being too effective whilst the player is not around */
 		bool restrict_targets = ally && !aggressive;
@@ -6877,6 +6890,9 @@ static void process_monster(int m_idx)
 
 			/* Skip itself */
 			if (m_idx == i) continue;
+
+			/* Skip dead monsters */
+			if (!m_ptr->r_idx) continue;
 
 			/* Allies only find targets visible to player, unless aggressive */
 			if (restrict_targets && !(n_ptr->ml)) continue;
@@ -7117,6 +7133,75 @@ static void process_monster(int m_idx)
 
 					/* But not closing anymore */
 					closing = FALSE;
+				}
+			}
+
+			/* Get items for the player */
+			else if (r_ptr->flags2 & (RF2_TAKE_ITEM))
+			{
+				int value, best_value = 0;
+
+				for (i = o_max - 1; i >= 1; i--)
+				{
+					u32b f1, f2, f3, f4;
+					u32b flg3 = 0L;
+					int d;
+
+					/* Access the object */
+					object_type *o_ptr = &o_list[i];
+
+					/* Skip dead objects */
+					if (!o_ptr->k_idx) continue;
+
+					/* Skip objects held by monsters */
+					if (o_ptr->held_m_idx) continue;
+
+					/* Allies only find objects visible to player */
+					if ((o_ptr->ident & (IDENT_MARKED)) == 0) continue;
+
+					/* Skip artifacts */
+					if (artifact_p(o_ptr)) continue;
+
+					/* Skip objects in ungettable locations */
+					if ((f_info[cave_feat[o_ptr->iy][o_ptr->ix]].flags1 & (FF1_DROP)) == 0) continue;
+
+					/* Paranoia - skip objects we are on top of */
+					if ((o_ptr->iy == m_ptr->fy) && (o_ptr->ix == m_ptr->fx)) continue;
+
+					/* Get distance */
+					d = distance(o_ptr->iy, o_ptr->ix, p_ptr->py, p_ptr->px);
+
+					/* Skip distant objects */
+					if (d > MAX_RANGE / 2) continue;
+
+					/* Extract some flags */
+					object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+					/* React to objects that hurt the monster */
+					if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
+					if (f1 & (TR1_SLAY_TROLL)) flg3 |= (RF3_TROLL);
+					if (f1 & (TR1_SLAY_GIANT)) flg3 |= (RF3_GIANT);
+					if (f1 & (TR1_SLAY_ORC)) flg3 |= (RF3_ORC);
+					if (f1 & (TR1_SLAY_DEMON)) flg3 |= (RF3_DEMON);
+					if (f1 & (TR1_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
+					if (f1 & (TR1_SLAY_NATURAL)) flg3 |= (RF3_ANIMAL | RF3_PLANT | RF3_INSECT);
+					if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
+
+					/* The object cannot be picked up by the monster */
+					if (r_ptr->flags3 & flg3) continue;
+
+					/* Use value as a proxy for the order to get these */
+					value = object_value(o_ptr);
+
+					/* Not worth as much as required. Scale this by depth */
+					if (value <= best_value + d * p_ptr->depth * p_ptr->depth) continue;
+
+					/* Remember best value */
+					best_value = value;
+
+					/* Get it */
+					m_ptr->ty = o_ptr->iy;
+					m_ptr->tx = o_ptr->ix;
 				}
 			}
 

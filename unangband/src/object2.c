@@ -1387,6 +1387,13 @@ s32b object_value(const object_type *o_ptr)
 		value = object_value_real(o_ptr);
 	}
 
+	/* Hack -- gold always worth something */
+	else if (o_ptr->tval >= TV_GOLD)
+	{
+		/* Quick estimate */
+		return ((o_ptr->k_idx - OBJ_GOLD_LIST + 1) * 4);
+	}
+
 	/* Hack -- Felt broken items */
 	else if (o_ptr->feeling == INSCRIP_TERRIBLE
 			  || o_ptr->feeling == INSCRIP_WORTHLESS
