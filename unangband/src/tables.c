@@ -3344,7 +3344,7 @@ const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES] =
 	{"act sneaky", 56, 0},
 	{"open doors and disarm traps", 48, 54},
 	{"communicate with you silently", 74, 0},
-	{"resist blindess", 231, 0},
+	{"resist blindness and see invisible monsters", 231, 0},
 	{"resist mental attack", 38, 0},
 	{"become harder to hit", FAMILIAR_AC, 0},
 	{"immunity to poison", 84, 0},
