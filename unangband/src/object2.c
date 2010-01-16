@@ -7824,7 +7824,7 @@ static bool vault_trap_attr(int f_idx)
 /*
  * Create trap region
  */
-void create_trap_region(int y, int x, int feat, int power, bool player)
+int create_trap_region(int y, int x, int feat, int power, bool player)
 {
 	/* Create region associated with trap */
 	feature_type *f_ptr = &f_info[feat];
@@ -7847,7 +7847,7 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 	int radius = scale_method(method_ptr->radius, player ? p_ptr->lev : p_ptr->depth);
 
 	/* Paranoia */
-	if (!method) return;
+	if (!method) return (0);
 
 	/* Paranoia */
 	if (effect == GF_FEATURE) effect = 0;
@@ -7860,7 +7860,7 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 	{
 		if (((flg & (PROJECT_SELF)) == 0) &&
 				(!get_aim_dir(&dir, TARGET_KILL, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
-						return;
+						return (0);
 
 		msg_format("%d", dir);
 
@@ -7900,6 +7900,8 @@ void create_trap_region(int y, int x, int feat, int power, bool player)
 		project_method(player ? SOURCE_PLAYER_TRAP : SOURCE_FEATURE, feat, method, effect, damage,
 			player ? p_ptr->lev : p_ptr->depth, y, x, r_ptr->y1, r_ptr->x1, region, flg);
 	}
+
+	return (region);
 }
 
 
@@ -8152,7 +8154,16 @@ void pick_trap(int y, int x, bool player)
 	f_ptr = &f_info[feat];
 
 	/* Create trap region */
-	if ((!region) && (power || (f_ptr->blow.method) || (f_ptr->spell))) create_trap_region(y, x, feat, power, player);
+	if ((!region) && (power || (f_ptr->blow.method) || (f_ptr->spell)))
+	{
+		region = create_trap_region(y, x, feat, power, player);
+	}
+
+	/* Ensure trap region is visible */
+	if ((region) && ((f_ptr->flags1 & (FF1_SECRET)) == 0))
+	{
+		region_list[region].flags1 |= (RE1_NOTICE | RE1_DISPLAY);
+	}
 }
 
 
