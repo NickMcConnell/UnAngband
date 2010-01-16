@@ -1913,7 +1913,7 @@ enum
  * Used for uncontrolled objects
  */
 #define UNCONTROLLED_CHANCE		100	/* Chance in 1 in x chance of uncontrolled object activating */
-#define UNCONTROLLED_CONTROL	200	/* Number of random activations before controlling this object */
+#define UNCONTROLLED_CONTROL	50	/* Number of random activations before controlling this object */
 
 
 /*

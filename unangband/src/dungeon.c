@@ -1926,8 +1926,8 @@ static void process_world(void)
 			}
 			else if (o_ptr->usage < UNCONTROLLED_CONTROL)
 			{
-				/* Message only - every 10 attempts */
-				if (!(o_ptr->usage % 10)) msg_print("You feel yourself gain a measure of control.");
+				/* Message only - every 5 attempts */
+				if (!(o_ptr->usage % (UNCONTROLLED_CONTROL / 10))) msg_print("You feel yourself gain a measure of control.");
 			}
 			else if (o_ptr->usage >= UNCONTROLLED_CONTROL)
 			{
