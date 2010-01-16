@@ -1948,10 +1948,10 @@ static void process_world(void)
 				/* Reveal functionality */
 				msg_print("You may now activate it when you wish.");
 			}
-		}
 
-		/* Used the object */
-		if (o_ptr->usage < MAX_SHORT) o_ptr->usage++;
+			/* Used the object */
+			if (o_ptr->usage < MAX_SHORT) o_ptr->usage++;
+		}
 
 		/* Always notice */
 		equip_can_flags(0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
