@@ -6885,6 +6885,16 @@ static void process_monster(int m_idx)
 		if (can_target || spying)
 			for (i = m_max - 1; i >= 1; i--)
 		{
+			bool see_target = FALSE;
+			bool los_target = FALSE;
+
+			/* We may manipulate the distance to get monsters to prefer differing
+			 * types of enemies. Currently this is used to get fast monsters to favour
+			 * isolated enemies so they can hack-and-back them more effectively, using
+			 * code similar to the player vulnerability code.
+			 * TODO: This could be used to implement racial hatred. */
+			int d, hack_d = 0;
+
 			/* Access the monster */
 			monster_type *n_ptr = &m_list[i];
 
@@ -6894,203 +6904,228 @@ static void process_monster(int m_idx)
 			/* Skip dead monsters */
 			if (!m_ptr->r_idx) continue;
 
-			/* Allies only find targets visible to player, unless aggressive */
-			if (restrict_targets && !(n_ptr->ml)) continue;
+			/* We calculate the distance with a scale factor to get monsters to prefer
+			 * difference equidistant enemies */
+			d = (distance(n_ptr->fy, n_ptr->fx, ny, nx) * 16) + ((m_idx + i) % 16);
 
-			/* Monster has an enemy */
-			if (choose_to_attack_monster(m_ptr, n_ptr))
+			/* Ignore targets out of range */
+			if (d > MAX_RANGE * 16) continue;
+
+			/* Check if the monster smells the target. */
+			if (r_ptr->flags9 & (RF9_SCENT | RF9_WATER_SCENT))
 			{
-				bool see_target = FALSE;
-
-				/* We calculate the distance with a scale factor to get monsters to prefer
-				 * difference equidistant enemies */
-				int d = (distance(n_ptr->fy, n_ptr->fx, ny, nx) * 16) + ((m_idx + i) % 16);
-
-				/* We may also manipulate the distance to get monsters to prefer differing
-				 * types of enemies. Currently this is used to get fast monsters to favour
-				 * isolated enemies so they can hack-and-back them more effectively, using
-				 * code similar to the player vulnerability code.
-				 * TODO: This could be used to implement racial hatred. */
-				int hack_d = 0;
-
-				/* Ignore targets out of range */
-				if (d > MAX_RANGE * 16) continue;
-
-				/*
-				 * Check if monster can see the target. We make various assumptions about what
-				 * monsters have a yet to be implemented TODO: SEE_INVIS flag, if the target is
-				 * invisible. We check if the target is in light, if the monster needs light to
-				 * see by.
-				 */
-				if (!see_target)
+				feature_type *f_ptr = &f_info[cave_feat[n_ptr->fy][n_ptr->fx]];
+				
+				/* We should compute the actual distance in steps to the target but we
+				 * don't. We just instead use distance as a proxy of scent strength */
+				if ((d < MAX_RANGE * 16 / 2) || ((r_ptr->flags9 & (RF9_SUPER_SCENT)) != 0))
 				{
-					/* Monster is hidden */
-					if (n_ptr->mflag & (MFLAG_HIDE))
+					/* Test for water and not mud */
+					if ((f_ptr->flags2 & (FF2_WATER | FF2_CAN_SWIM)) == (FF2_WATER | FF2_CAN_SWIM))
 					{
-						if ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0) continue;
+						see_target = (r_ptr->flags9 & (RF9_WATER_SCENT)) != 0;
 					}
+					else if ((f_ptr->flags2 & (FF2_WATER | FF2_LAVA | FF2_ICE | FF2_ACID | FF2_OIL | FF2_CHASM)) == 0)
+					{
+						see_target = (r_ptr->flags9 & (RF9_SCENT)) != 0;
+					}
+				}
+				
+				/* Check whether we have los as well. This allows us to report this to the player. */
+				if (see_target && spying && !(n_ptr->ml))
+				{
+					/* Needs line of sight. */
+					los_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS);
+				}
+			}
+			
+			/*
+			 * Check if monster can see the target. We make various assumptions about what
+			 * monsters have a yet to be implemented TODO: SEE_INVIS flag, if the target is
+			 * invisible - we currently use the test either an eye monster or monster can
+			 * resist blindness to determine whether it can see invisible. We check if the
+			 * target is in light, if the monster needs light to see by.
+			 */
+			if (!see_target)
+			{
+				/* Monster is hidden */
+				if (n_ptr->mflag & (MFLAG_HIDE))
+				{
+					if ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0) continue;
+				}
 
-					/* Monster is invisible */
-					if ((r_info[n_ptr->r_idx].flags2 & (RF2_INVISIBLE)) || (n_ptr->tim_invis))
+				/* Monster is invisible */
+				if ((r_info[n_ptr->r_idx].flags2 & (RF2_INVISIBLE)) || (n_ptr->tim_invis))
+				{
+					/* Cannot see invisible, or use infravision to detect the monster */
+					if ((r_ptr->d_char != 'e') && ((r_ptr->flags9 & (RF9_RES_BLIND)) == 0)
+							&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+				}
+
+				/* Monster needs light to see */
+				if (need_lite)
+				{
+					/* Check for light */
+					if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
+						&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
+					{
+						continue;
+					}
+				}
+
+				/* Needs line of sight. */
+				los_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS);
+				
+				/* Sees the target? */
+				see_target = los_target;
+			}
+
+			/* Can't see or smell the target */
+			if (!see_target) continue;
+
+			/* Allies report to player if spying on the enemy */
+			/* We need to ensure that the monster can tell the player what they are
+			 * seeing, either by using speech or telepathically from anywhere on
+			 * the map. */
+			if (spying && !(n_ptr->ml) && (los_target))
+			{
+				/* Optimize -- Repair flags */
+				repair_mflag_mark = repair_mflag_show = TRUE;
+
+				/* Hack -- Detect the monster */
+				n_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
+				
+				/* Hack -- Smell just gives limited information */
+				/* if (!los_target) n_ptr->mflag |= (MFLAG_DLIM); */
+
+				/* Update the monster */
+				update_mon(i, FALSE);
+			}
+
+			/* Allies only choose targets visible to player, unless aggressive. If sneaking, we ignore detected monsters */
+			if (restrict_targets && !(n_ptr->ml) && (!(sneaking) ||  ((n_ptr->mflag & (MFLAG_MARK | MFLAG_SHOW)) == 0))) continue;
+
+			/* Monster is not an enemy */
+			if (!choose_to_attack_monster(m_ptr, n_ptr)) continue;
+
+			/* Ignore certain targets if sneaking */
+			if (sneaking)
+			{
+				/* Target is asleep - ignore */
+				if (m_ptr->csleep) continue;
+
+				/* Target not aggressive */
+				if ((n_ptr->mflag & (MFLAG_AGGR)) == 0)
+				{
+					monster_race *s_ptr = &r_info[n_ptr->r_idx];
+
+					/* I'm invisible and target can't see me - ignore */
+					if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
 					{
 						/* Cannot see invisible, or use infravision to detect the monster */
-						if ((r_ptr->d_char != 'e') && ((r_ptr->flags9 & (RF9_RES_BLIND)) == 0)
-								&& ((r_ptr->aaf < d) || ((r_info[n_ptr->r_idx].flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
+						if ((s_ptr->d_char != 'e') && ((s_ptr->flags2 & (RF2_INVISIBLE)) == 0)
+							&& ((s_ptr->aaf < d) || ((r_ptr->flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
 					}
 
-					/* Monster needs light to see */
-					if (need_lite)
+					/* I'm in darkness and target can't see in darkness - ignore */
+					if (s_ptr->flags2 & (RF2_NEED_LITE))
 					{
 						/* Check for light */
 						if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
-							&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
+								&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
 						{
 							continue;
 						}
 					}
-
-					/* Needs line of sight. */
-					see_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS);
 				}
+			}
 
-				/* Can't see the target */
-				if (!see_target) continue;
+			/* Can't attack the target */
+			if (!(can_target))
+			{
+				/* Target set already */
+				if (m_ptr->ty) continue;
 
-				/* Allies report to player if spying on the enemy */
-				/* We need to ensure that the monster can tell the player what they are
-				 * seeing, either by using speech or telepathically from anywhere on
-				 * the map. */
-				if (spying && !(n_ptr->ml))
+				/* Run back to the player with tails between its legs,
+				 * unless ordered somewhere. */
+				if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && !(m_ptr->petrify) && ((!p_ptr->target_set) || (p_ptr->target_who)))
 				{
-					/* Optimize -- Repair flags */
-					repair_mflag_mark = repair_mflag_show = TRUE;
-
-					/* Hack -- Detect the monster */
-					n_ptr->mflag |= (MFLAG_MARK | MFLAG_SHOW);
-
-					/* Update the monster */
-					update_mon(i, FALSE);
-				}
-
-				/* Ignore certain targets if sneaking */
-				if (sneaking)
-				{
-					/* Target is asleep - ignore */
-					if (m_ptr->csleep) continue;
-
-					/* Target not aggressive */
-					if ((n_ptr->mflag & (MFLAG_AGGR)) == 0)
-					{
-						monster_race *s_ptr = &r_info[n_ptr->r_idx];
-
-						/* I'm invisible and target can't see me - ignore */
-						if ((r_ptr->flags2 & (RF2_INVISIBLE)) || (m_ptr->tim_invis))
-						{
-							/* Cannot see invisible, or use infravision to detect the monster */
-							if ((s_ptr->d_char != 'e') && ((s_ptr->flags2 & (RF2_INVISIBLE)) == 0)
-								&& ((s_ptr->aaf < d) || ((r_ptr->flags2 & (RF2_COLD_BLOOD)) != 0))) continue;
-						}
-
-						/* I'm in darkness and target can't see in darkness - ignore */
-						if (s_ptr->flags2 & (RF2_NEED_LITE))
-						{
-							/* Check for light */
-							if (((cave_info[n_ptr->fy][n_ptr->fx] & (CAVE_LITE)) == 0)
-									&& ((play_info[n_ptr->fy][n_ptr->fx] & (PLAY_LITE)) == 0))
-							{
-								continue;
-							}
-						}
-					}
-				}
-
-				/* Can't attack the target */
-				if (!(can_target))
-				{
-					/* Target set already */
-					if (m_ptr->ty) continue;
-
-					/* Run back to the player with tails between its legs,
-					 * unless ordered somewhere. */
-					if (((r_ptr->flags1 & (RF1_NEVER_MOVE)) == 0) && !(m_ptr->petrify) && ((!p_ptr->target_set) || (p_ptr->target_who)))
-					{
-						m_ptr->ty = p_ptr->py;
-						m_ptr->tx = p_ptr->px;
-
-						must_use_target = TRUE;
-					}
-
-					continue;
-				}
-
-				/* Check if forcing a particular kind */
-				if (ally && p_ptr->target_race)
-				{
-					/* No match */
-					if (p_ptr->target_race != n_ptr->r_idx)
-					{
-						/* Have already found a match */
-						if (force_one_race) continue;
-					}
-					else if (!force_one_race)
-					{
-						force_one_race = TRUE;
-						k = MAX_RANGE * 16;
-						i = m_max;
-					}
-				}
-
-				/* High speed differential. Compute vulnerability. */
-				if (m_ptr->mspeed > n_ptr->mspeed + 5)
-				{
-					/* We do the monster equivalent of computing vulnerability.
-					 * This allows fast monsters to try to surround isolated
-					 * individuals. Otherwise, they tend to get chewed up in
-					 * combat.
-					 */
-					int ii;
-					int v = 0;
-
-					for (ii = 0; ii < 8; ii++)
-					{
-						int yy = n_ptr->fy + ddy[ii];
-						int xx = n_ptr->fx + ddx[ii];
-
-						if (!in_bounds_fully(yy, xx)) continue;
-
-						if (place_monster_here(yy,xx,m_ptr->r_idx) <= MM_FAIL) continue;
-
-						/* Decrease range if the target has unaligned space around it */
-						if ((cave_m_idx[yy][xx]) ||
-							(ally != ((m_list[cave_m_idx[yy][xx]].mflag & (MFLAG_ALLY)) != 0)))
-						{
-							v++;
-							if (v > 4) hack_d -= 32;
-
-							/* Note we have to fix the distance later on by this adjustment factor */
-						}
-					}
-				}
-
-				/* Prefer not to attack fleeing targets */
-				if (n_ptr->monfear)
-				{
-					hack_d += 16 * n_ptr->monfear;
-				}
-
-				/* Pick a random target. Have checked for LOS already. */
-				if (d < k)
-				{
-					m_ptr->ty = n_ptr->fy;
-					m_ptr->tx = n_ptr->fx;
-					k = d + hack_d;
-
-					/* Fix adjustment factor later */
-					fix_k = hack_d;
-					hack_d = 0;
+					m_ptr->ty = p_ptr->py;
+					m_ptr->tx = p_ptr->px;
 
 					must_use_target = TRUE;
 				}
+
+				continue;
+			}
+
+			/* Check if forcing a particular kind */
+			if (ally && p_ptr->target_race)
+			{
+				/* No match */
+				if (p_ptr->target_race != n_ptr->r_idx)
+				{
+					/* Have already found a match */
+					if (force_one_race) continue;
+				}
+				else if (!force_one_race)
+				{
+					force_one_race = TRUE;
+					k = MAX_RANGE * 16;
+					i = m_max;
+				}
+			}
+
+			/* High speed differential. Compute vulnerability. */
+			if (m_ptr->mspeed > n_ptr->mspeed + 5)
+			{
+				/* We do the monster equivalent of computing vulnerability.
+				 * This allows fast monsters to try to surround isolated
+				 * individuals. Otherwise, they tend to get chewed up in
+				 * combat.
+				 */
+				int ii;
+				int v = 0;
+
+				for (ii = 0; ii < 8; ii++)
+				{
+					int yy = n_ptr->fy + ddy[ii];
+					int xx = n_ptr->fx + ddx[ii];
+
+					if (!in_bounds_fully(yy, xx)) continue;
+
+					if (place_monster_here(yy,xx,m_ptr->r_idx) <= MM_FAIL) continue;
+
+					/* Decrease range if the target has unaligned space around it */
+					if ((cave_m_idx[yy][xx]) ||
+						(ally != ((m_list[cave_m_idx[yy][xx]].mflag & (MFLAG_ALLY)) != 0)))
+					{
+						v++;
+						if (v > 4) hack_d -= 32;
+
+						/* Note we have to fix the distance later on by this adjustment factor */
+					}
+				}
+			}
+
+			/* Prefer not to attack fleeing targets */
+			if (n_ptr->monfear)
+			{
+				hack_d += 16 * n_ptr->monfear;
+			}
+
+			/* Pick a random target. Have checked for LOS already. */
+			if (d < k)
+			{
+				m_ptr->ty = n_ptr->fy;
+				m_ptr->tx = n_ptr->fx;
+				k = d + hack_d;
+
+				/* Fix adjustment factor later */
+				fix_k = hack_d;
+				hack_d = 0;
+
+				must_use_target = TRUE;
 			}
 		}
 
