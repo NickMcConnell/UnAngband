@@ -121,6 +121,12 @@ void generate_familiar(void)
 			else if (attr < 256) r_ptr->flags8 |= (1 << (attr - 224));
 			else r_ptr->flags9 |= (1 << (attr - 256));
 
+			/* Hack -- huge familiars lose evasion, gain lots of size */
+			if (attr == 73) { r_ptr->flags9 &= ~(RF9_EVASIVE); size += 3; }
+			
+			/* Hack -- monsters which gain permanent invisibility, lose temporary invisibility */
+			if (attr == 36) r_ptr->flags6 &= ~(RF6_INVIS);
+			
 			/* Hack -- ensure minimal mana */
 			if ((attr >= 96) && (attr <= 224)) r_ptr->mana += method_info[attr].mana_cost;
 		}
@@ -162,12 +168,16 @@ void generate_familiar(void)
 					r_ptr->flags1 &= ~(RF1_NEVER_BLOW);
 					break;
 				case FAMILIAR_SPIKE:
+				case FAMILIAR_SHOT:
 					/* Paranoia */
 					if (blow)
 					{
-						r_ptr->blow[blow-1].method = RBM_SPIKE;
-						r_ptr->flags4 |= (1 << blow);
+						r_ptr->blow[blow-1].method = p_ptr->familiar_attr[i] == FAMILIAR_SPIKE ? RBM_SPIKE : RBM_SHOT;
+						r_ptr->flags4 |= (1 << (blow-1));
 						r_ptr->freq_innate += 25;
+						
+						/* Spikes are ranged only */
+						if (blow == 1) r_ptr->flags1 |= (RF1_NEVER_BLOW);
 					}
 					break;
 				default:
@@ -198,6 +208,9 @@ void generate_familiar(void)
 
 	/* Increase hit points at every level */
 	r_ptr->hp *= p_ptr->max_lev;
+	
+	/* Huge monsters get more hp to compensate for loss of evasion */
+	if (r_ptr->flags3 & (RF3_HUGE)) r_ptr->hp *= 3;
 
 	/* Increase mana somewhat */
 	if (p_ptr->max_lev > 15) r_ptr->mana += r_ptr->mana * p_ptr->max_lev / 15;

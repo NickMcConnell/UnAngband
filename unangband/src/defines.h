@@ -213,24 +213,6 @@
 
 
 /*
- * Maximum number of familiar types
- */
-#define MAX_FAMILIARS 20
-
-
-/*
- * Maximum number of familiar abilities
- */
-#define MAX_FAMILIAR_ABILITIES 118
-
-
-/*
- * Maximum number of times abilities can be picked
- */
-#define MAX_FAMILIAR_GAINS	32
-
-
-/*
  * Hack -- Maximum number of quests
  */
 #define MAX_Q_IDX	100
@@ -3976,7 +3958,7 @@ enum
 #define RF2_ARCHER	0x00100000      /* Monster has extra ammo */
 #define RF2_EAT_BODY	0x00200000      /* Monster can eat body parts */
 #define RF2_TAKE_ITEM	0x00400000      /* Monster can pick up items */
-#define RF2_TRAIL	0x00800000      /* Monster leavs a trail behind it */
+#define RF2_TRAIL	0x00800000      /* Monster leaves a trail behind it */
 #define RF2_SNEAKY 	0x01000000 	/* Monster hides a lot of actions */
 #define RF2_ARMOR	0x02000000 	/* Monster is fully armoured (Reduces acid damage/stops some arrows) */
 #define RF2_PRIEST 	0x04000000 	/* Monster has access to priest spells ? */
@@ -4717,6 +4699,39 @@ enum
 #define FAMILIAR_IDX	330
 
 /*
+ * Maximum number of familiar types
+ */
+#define MAX_FAMILIARS 28
+
+
+/*
+ * Maximum number of familiar abilities
+ */
+#define MAX_FAMILIAR_ABILITIES 131
+
+/*
+ * Choices at each 'level' of picks
+ */
+#define FAMILIAR_CHOICES	10
+
+/*
+ * Picks before moving on to the next 'level' of choices
+ */
+#define FAMILIAR_PICKS		2
+
+/*
+ * Maximum number of times abilities can be picked
+ */
+#define MAX_FAMILIAR_GAINS	32
+
+/*
+ * Level at which all familiars get a melee attack
+ */
+#define FAMILIAR_FREE_BLOW	10
+
+
+
+/*
  * Familiar benefits
  *
  * Note the first 288 benefits correspond to monster flags.
@@ -4729,7 +4744,8 @@ enum
 #define FAMILIAR_SIZE	293
 #define FAMILIAR_MANA	294
 #define FAMILIAR_SPIKE	295
-#define FAMILIAR_BLOW	296
+#define FAMILIAR_SHOT	296
+#define FAMILIAR_BLOW	297
 
 /* And the remaining benefits correspond to modifying the blow effect */
 
