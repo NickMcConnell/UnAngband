@@ -5835,6 +5835,9 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 
 			/* Notice region? */
 			if (obvious && !ap_cnt) r_ptr->flags1 |= (RE1_NOTICE);
+			
+			/* Refresh the region */
+			region_refresh(region);
 		}
 
 		/* Can't cancel */
@@ -9281,6 +9284,26 @@ bool region_effect(int region, int y, int x)
 		{
 			method_type *method_ptr = &method_info[ri_ptr->method];
 
+			/* Pick a random source grid if required */
+			if ((r_ptr->flags1 & (RE1_RANDOM | RE1_INVERSE)) == (RE1_RANDOM | RE1_INVERSE))
+			{
+				int r = region_random_piece(region);
+
+				y0 = region_piece_list[r].y;
+				x0 = region_piece_list[r].x;
+			}
+
+			/* Reverse destination and source */
+			else if (r_ptr->flags1 & (RE1_INVERSE))
+			{
+				y = y0;
+				x = x0;
+				y0 = y1;
+				x0 = x1;
+				y1 = y;
+				x1 = x;
+			}
+			
 			/* Pick a random grid if required */
 			if (r_ptr->flags1 & (RE1_RANDOM))
 			{
@@ -9290,19 +9313,8 @@ bool region_effect(int region, int y, int x)
 				x1 = region_piece_list[r].x;
 			}
 
-			/* Reverse destination and source */
-			if (r_ptr->flags1 & (RE1_INVERSE))
-			{
-				y = y0;
-				x = x0;
-				y0 = x1;
-				x0 = x1;
-				y1 = y;
-				x1 = x;
-			}
-			
 			/* Attack the target */
-			notice |= project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, r_ptr->y0, r_ptr->x0, y1, x1, child_region, method_ptr->flags1);
+			notice |= project_method(r_ptr->who, r_ptr->what, ri_ptr->method, r_ptr->effect, r_ptr->damage, r_ptr->level, y0, x0, y1, x1, child_region, method_ptr->flags1);
 		}
 
 		/* Method is not defined. Apply effect to all grids */
