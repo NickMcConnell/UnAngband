@@ -6862,7 +6862,7 @@ static void process_monster(int m_idx)
 		if (spying && ((r_ptr->flags3 & (RF3_NONVOCAL)) == 0))
 		{
 			/* Too far away to hear */
-			if ((m_ptr->cdis > 3) && !player_can_fire_bold(m_ptr->fy, m_ptr->fx)) spying = FALSE;
+			if ((m_ptr->cdis > MAX_RANGE / 3) && !player_can_fire_bold(m_ptr->fy, m_ptr->fx)) spying = FALSE;
 
 			/* Cannot understand language */
 			if (spying && (m_ptr->r_idx != FAMILIAR_IDX) && !player_understands(monster_language(m_ptr->r_idx))) spying = FALSE;
@@ -6994,7 +6994,7 @@ static void process_monster(int m_idx)
 			/* We need to ensure that the monster can tell the player what they are
 			 * seeing, either by using speech or telepathically from anywhere on
 			 * the map. */
-			if (spying && !(n_ptr->ml) && ((los_target) ||
+			if (spying && !(n_ptr->ml) && (d /16 <= r_ptr->aaf) && ((los_target) ||
 
 				/* Hack -- we give occasional 'flashes' of scents */
 				(turn % 40 == m_idx % 40)))

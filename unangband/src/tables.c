@@ -3341,7 +3341,7 @@ const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES] =
 	{"", 0, 999},
 
 		/* Pick 2 */
-	{"increase range of vision", FAMILIAR_VISION, 0},
+	{"increase range of senses", FAMILIAR_VISION, 0},
 	{"become hidden to infravision", 37, 0},
 	{"swim", 42, 0},
 	{"dig through dirt and rubble", 34, 0},
@@ -3360,7 +3360,7 @@ const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES] =
 	{"resist blindness and see invisible monsters", 231, 0},
 	{"resist mental attack", 38, 0},
 	{"become harder to hit", FAMILIAR_AC, 0},
-	{"radiate lite", 35, 0},
+	{"radiate light", 35, 0},
 	{"track enemies by scent through water", 230, 42},
 	{"fly", 46, 45},
 
@@ -3490,7 +3490,7 @@ const familiar_ability_type familiar_ability[MAX_FAMILIAR_ABILITIES] =
 	{"immunity to blunt weapons", 239, 237},
 	{"breath powerfully", 44, FAMILIAR_SIZE},
 	{"make attack drain mana", FAMILIAR_BLOW + GF_MANA_DRAIN, FAMILIAR_BLOW + GF_VAMP_DRAIN},
-	{"tunnel through walls", 51, 49},
+	{"tunnel through walls", 51, 34},
 	{"increase size", FAMILIAR_SIZE, 0},
 	{"increase mana", FAMILIAR_MANA, 0},
 	{"increase spell attack damage", FAMILIAR_POWER, 0},
