@@ -6865,7 +6865,7 @@ static void process_monster(int m_idx)
 			if ((m_ptr->cdis > 3) && !player_can_fire_bold(m_ptr->fy, m_ptr->fx)) spying = FALSE;
 
 			/* Cannot understand language */
-			if (spying && !player_understands(monster_language(m_ptr->r_idx))) spying = FALSE;
+			if (spying && (m_ptr->r_idx != FAMILIAR_IDX) && !player_understands(monster_language(m_ptr->r_idx))) spying = FALSE;
 		}
 
 		/* Spies report their own position */
@@ -6918,7 +6918,14 @@ static void process_monster(int m_idx)
 				
 				/* We should compute the actual distance in steps to the target but we
 				 * don't. We just instead use distance as a proxy of scent strength */
-				if ((d < MAX_RANGE * 16 / 2) || ((r_ptr->flags9 & (RF9_SUPER_SCENT)) != 0))
+				if (((d < MAX_RANGE * 16 / 2) || ((r_ptr->flags9 & (RF9_SUPER_SCENT)) != 0)) &&
+
+					/* Pass wall and flyers don't leave scents */
+					((r_info[n_ptr->r_idx].flags2 & (RF2_CAN_FLY | RF2_MUST_FLY | RF2_PASS_WALL)) == 0) &&
+
+					/* Climbers only leave scents for other climbers */
+					(((r_ptr->flags2 & (RF2_CAN_CLIMB)) != 0) ||
+						((r_info[n_ptr->r_idx].flags2 & (RF2_CAN_CLIMB)) == 0)))
 				{
 					/* Test for water and not mud */
 					if ((f_ptr->flags2 & (FF2_WATER | FF2_CAN_SWIM)) == (FF2_WATER | FF2_CAN_SWIM))
@@ -6987,7 +6994,10 @@ static void process_monster(int m_idx)
 			/* We need to ensure that the monster can tell the player what they are
 			 * seeing, either by using speech or telepathically from anywhere on
 			 * the map. */
-			if (spying && !(n_ptr->ml) && (los_target))
+			if (spying && !(n_ptr->ml) && ((los_target) ||
+
+				/* Hack -- we give occasional 'flashes' of scents */
+				(turn % 40 == m_idx % 40)))
 			{
 				/* Optimize -- Repair flags */
 				repair_mflag_mark = repair_mflag_show = TRUE;
