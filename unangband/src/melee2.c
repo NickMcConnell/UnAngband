@@ -6939,7 +6939,7 @@ static void process_monster(int m_idx)
 				}
 				
 				/* Check whether we have los as well. This allows us to report this to the player. */
-				if (see_target && spying && !(n_ptr->ml))
+				if (see_target && spying && (!(n_ptr->ml) || (p_ptr->timed[TMD_BLIND])))
 				{
 					/* Needs line of sight. */
 					los_target = generic_los(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx, CAVE_XLOS);
@@ -6994,7 +6994,7 @@ static void process_monster(int m_idx)
 			/* We need to ensure that the monster can tell the player what they are
 			 * seeing, either by using speech or telepathically from anywhere on
 			 * the map. */
-			if (spying && !(n_ptr->ml) && (d /16 <= r_ptr->aaf) && ((los_target) ||
+			if (spying && (!(n_ptr->ml) || (p_ptr->timed[TMD_BLIND])) && (d /16 <= r_ptr->aaf) && ((los_target) ||
 
 				/* Hack -- we give occasional 'flashes' of scents */
 				(turn % 40 == m_idx % 40)))
