@@ -8728,6 +8728,8 @@ void describe_region_basic(region_type *r_ptr)
 	int n, vn;
 	cptr vp[128];
 
+	bool intro_hack = FALSE;
+	
 	text_out("This is a");
 
 	/* Collect sight and movement */
@@ -8736,16 +8738,14 @@ void describe_region_basic(region_type *r_ptr)
 	/* Collect basic behaviour */
 	if (r_ptr->flags1 & (RE1_CLOCKWISE | RE1_COUNTER_CLOCKWISE)) vp[vn++] = "spinning";
 	if (r_ptr->flags1 & (RE1_SPREAD)) vp[vn++] = "spreading";
-	if (((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) &&
-			(((r_ptr->flags1 & (RE1_DECELERATE)) == 0) || (r_ptr->age < r_ptr->lifespan / 2))) vp[vn++] = "accelerating";
-	if (((r_ptr->flags1 & (RE1_DECELERATE)) != 0) &&
-			(((r_ptr->flags1 & (RE1_ACCELERATE)) == 0) || (r_ptr->age > r_ptr->lifespan / 2))) vp[vn++] = "decelerating";
+	if (r_ptr->flags1 & (RE1_CHAIN)) vp[vn++] = "jumping";
+	if (r_ptr->flags1 & (RE1_SEEKER | RE1_WALL)) vp[vn++] = "moving";
 
 	/* Collect shape */
 	vp[vn++] = region_name + region_info[r_ptr->type].name;
 
 	/* Vowel? */
-	if (is_a_vowel(vp[0][0])) text_out("n ");
+	if (((is_a_vowel(vp[0][0])) && ((r_ptr->flags1 & (RE1_RANDOM)) == 0))) text_out("n ");
 	else text_out(" ");
 
 	/* Describe innate attacks */
@@ -8760,11 +8760,10 @@ void describe_region_basic(region_type *r_ptr)
 				if (r_ptr->flags1 & (RE1_RANDOM))
 				{
 					text_out("randomly ");
-					if (vn == 1) text_out("moving ");
 				}
 			}
-			else if ((n) && (n < vn-2)) text_out(", ");
-			else if (n == vn - 2) text_out(" ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
 
 			/* Dump */
 			text_out(vp[n]);
@@ -8777,6 +8776,8 @@ void describe_region_basic(region_type *r_ptr)
 	if (r_ptr->flags1 & (RE1_SHINING)) vp[vn++] = "shines with its own light";
 	if (r_ptr->flags1 & (RE1_SEEKER)) vp[vn++] = "seeks out nearby enemies";
 	if (r_ptr->flags1 & (RE1_WALL)) vp[vn++] = "advances in a straight line";
+	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR)) vp[vn++] = "spreads outwards from a single point";
+	
 
 	/* Describe innate attacks */
 	if (vn)
@@ -8786,8 +8787,8 @@ void describe_region_basic(region_type *r_ptr)
 		{
 			/* Intro */
 			if (!n) text_out(" which ");
-			else if ((n) && (n < vn-1)) text_out(", ");
-			else text_out(" ");
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
 
 			/* Dump */
 			text_out(vp[n]);
@@ -8798,11 +8799,13 @@ void describe_region_basic(region_type *r_ptr)
 
 	/* Collect future behaviour */
 	if ((r_ptr->flags1 & (RE1_CLOCKWISE)) && (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))) vp[vn++] = "change direction";
+	if (((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) &&
+			(((r_ptr->flags1 & (RE1_DECELERATE)) == 0) || (r_ptr->age < r_ptr->lifespan / 2))) vp[vn++] = "move faster and faster";
 	if (((r_ptr->flags1 & (RE1_DECELERATE)) != 0) &&
-			((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) && (r_ptr->age > r_ptr->lifespan / 2)) vp[vn++] = "begin to decelerate";
+			((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) && (r_ptr->age < r_ptr->lifespan / 2)) vp[vn++] = "eventually begin to decelerate";
+	else if ((r_ptr->flags1 & (RE1_DECELERATE)) != 0) vp[vn++] = "move slower and slower";
 	if (((r_ptr->flags1 & (RE1_MOVE_SOURCE)) == 0) &&
-			((r_ptr->flags1 & (RE1_SEEKER | RE1_SCALAR_VECTOR | RE1_SPREAD | RE1_WALL)) == 0)) vp[vn++] = "remain stationary";
-
+			((r_ptr->flags1 & (RE1_CHAIN | RE1_SEEKER | RE1_SCALAR_VECTOR | RE1_SPREAD | RE1_WALL)) == 0)) { vp[vn++] = "remain stationary"; intro_hack = TRUE; }
 
 	/* Describe innate attacks */
 	if (vn)
@@ -8812,8 +8815,9 @@ void describe_region_basic(region_type *r_ptr)
 		{
 			/* Intro */
 			if (!n) text_out(" and will ");
-			else if ((n) && (n < vn-1)) text_out(", ");
-			else text_out(" ");
+			else if (n < vn-1) text_out(", ");
+			else if ((n > 1) && (intro_hack)) text_out(" but otherwise ");
+			else text_out(" and ");
 
 			/* Dump */
 			text_out(vp[n]);
@@ -8827,8 +8831,8 @@ void describe_region_basic(region_type *r_ptr)
 
 	if (r_ptr->flags1 & (RE1_AUTOMATIC)) text_out("automatically ");
 
-	/* Hitting a trap */
-	if (r_ptr->flags1 & (RE1_HIT_TRAP))
+	/* Hitting a trap - note check to ensure we are really in the dungeon */
+	if ((r_ptr->flags1 & (RE1_HIT_TRAP)) && (r_ptr->y0) && (r_ptr->x0))
 	{
 		int feat = cave_feat[r_ptr->y0][r_ptr->x0];
 
@@ -8855,6 +8859,7 @@ void describe_region_basic(region_type *r_ptr)
 		describe_blow(r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->damage, "", format("%d", r_ptr->damage), TRUE, FALSE, FALSE, FALSE, 1);
 	}
 
+	/* Collect methods of triggering */
 	if (r_ptr->flags1 & (RE1_TRIGGER_MOVE)) vp[vn++] = "movement";
 	if (r_ptr->flags1 & (RE1_TRIGGER_DROP)) vp[vn++] = "throwing an item into the area of effect";
 	if ((r_ptr->flags1 & (RE1_TRIGGER_OPEN)) && !(r_ptr->age)) vp[vn++] = "opening a lever";
@@ -8878,6 +8883,7 @@ void describe_region_basic(region_type *r_ptr)
 
 	vn = 0;
 
+	/* Collect methods of stopping trap */
 	if (r_ptr->flags1 & (RE1_TRIGGER_CLOSE)) vp[vn++] = "closing a lever";
 	if (r_ptr->flags1 & (RE1_TRIGGER_CLOSE)) vp[vn++] = "wizard lock magic";
 
@@ -8900,20 +8906,32 @@ void describe_region_basic(region_type *r_ptr)
 	}
 
 	/* Trigger recharges */
-	if (((r_ptr->flags1 & (RE1_AUTOMATIC)) == 0) && (r_ptr->delay || r_ptr->delay_reset)) text_out("recharging ");
+	if (((r_ptr->flags1 & (RE1_AUTOMATIC)) == 0) && (r_ptr->delay || r_ptr->delay_reset)) text_out(" recharging");
 
 	/* Time to take effect */
 	if (r_ptr->delay)
 	{
-		text_out(format("in %d.%d turns", r_ptr->delay / 10, r_ptr->delay % 10));
+		int energy = r_ptr->delay * extract_energy[p_ptr->pspeed];
+		
+		text_out(format(" in %d game ticks", r_ptr->delay * 10));
+		text_out(format(", which is %d.%d turns at your current speed", energy / 100, energy % 100));
 
-		if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset)) text_out(" and then ");
+		if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset)) text_out(" and then");
 	}
 
 	/* Time to take effect */
 	if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset))
 	{
-		text_out(format("every %d.%d turns", r_ptr->delay_reset / 10, r_ptr->delay_reset % 10));
+		int energy = r_ptr->delay * extract_energy[p_ptr->pspeed];
+		
+		text_out(format(" every %d %s%s", r_ptr->delay_reset * 10));
+		text_out(format(", which is %d.%d turns at your current speed", energy / 100, energy % 100));
+	}
+	
+	/* Measure lifespan */
+	if ((r_ptr->lifespan) && (r_ptr->lifespan < 10000))
+	{
+		text_out(format(" and takes effect %s%d times", r_ptr->age ? "another " : "", r_ptr->lifespan - r_ptr->age));
 	}
 
 	/* End sentence */

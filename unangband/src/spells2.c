@@ -9187,7 +9187,8 @@ s16b region_random_piece(s16b region)
  *
  * If (y, x) defined, use this as the target.
  * If RE1_RANDOM, pick a random piece from the grid.
- * If RE1_INVERSE, reverse the source and destination.
+ * If RE1_INVERSE, reverse the source and destination. If combine with RANDOM
+ * we randomize both the source and destination.
  * If RE1_CLOSEST_MON, choose the closest monster as a target.
  * If RE1_CHAIN, update the region after affecting it.
  * If RE1_SOURCE_FEATURE is used, attack multiple times,
