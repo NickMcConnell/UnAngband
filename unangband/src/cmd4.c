@@ -2213,15 +2213,21 @@ static cptr tip_prefix[] =
 	"race",
 	"class",
 	"style",
+	"school",
+	"scho",
 	"spec",
+	"spell",
 	"tval",
 	"kind",
 	"ego",
+	"art",
+	"oflag",
 	"look",
+	"kill",
+	"rflag",
 	"dungeon",
 	"depth",
 	"level",
-	"kill",
 	NULL
 };
 
