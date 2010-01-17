@@ -2892,7 +2892,7 @@ enum
 #define RE2_AUTO_LITE			0x00000000	/* Automatically apply update if in perma light  */
 #define RE2_HIDE_LITE			0x00000000	/* Don't display region in perma light */
 #define RE2_AIMED				0x00000000	/* Update destination if player aims while on source */
-
+#define RE1_CLOSEST_MON			0x00000000
 
 
 
