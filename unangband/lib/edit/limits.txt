@@ -13,8 +13,8 @@
 
 V:0.6.3
 
-# Maximum number of method types
-M:m:225
+# Maximum number of method/blow types
+M:m:229
 
 # Maximum number of effect types
 M:e:154
