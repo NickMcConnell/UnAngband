@@ -4249,7 +4249,7 @@ errr file_character(cptr name, bool full)
 	/* Do non-spoiler self-knowledge */
 	self_knowledge_aux(FALSE, TRUE);
 
-	text_out("\n");
+	text_out("\n\n");
 
 	/* Dump self-knowledge */
 	text_out("  [Game Statistics]\n\n");

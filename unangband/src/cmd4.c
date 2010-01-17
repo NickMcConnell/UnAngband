@@ -6510,7 +6510,8 @@ void game_statistics(void)
 	if (total_unique_kills)
 	{
 		text_out(format("Total uniques killed: %d\n", total_unique_kills));
-		text_out(format("Deepest unique killed: %s\n", r_name + r_info[deepest_unique_kill].name));
+		text_out(format("Deepest unique killed: %s\n (normally at %d)",
+				r_name + r_info[deepest_unique_kill].name, deepest_unique_kill_level));
 	}
 	
 	/* Don't spoil Sauron */
