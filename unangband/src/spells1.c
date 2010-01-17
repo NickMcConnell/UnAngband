@@ -8219,6 +8219,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Monster was affected -- Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
 
+			/* No damage now */
+			dam = 0;
 			break;
 		}
 
@@ -11755,6 +11757,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				cave_temp_mark(y, x, FALSE);
 			}
 
+			dam = 0;
+			break;
+		}
+
+		/* Co-exist with a feature */
+		case GF_FEATURE:
+		{
+			/* Player was affected -- Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+
+			/* No damage now */
 			dam = 0;
 			break;
 		}
