@@ -14,6 +14,8 @@
  * Angband variants FAQ. See rec.games.roguelike.angband for FAQ.
  */
 
+
+
 #include "angband.h"
 
 /*
@@ -1774,11 +1776,34 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 	int m,n,r;
 
 	bool anything = FALSE;
+	bool initial_delay = FALSE;
 
 	int last_method = 0;
 	int last_effect = 0;
 
 	int last_num = 0;
+	
+	int delay = 0;
+	int region_id = 0;
+	
+	/* Get the region identity */
+	if ((p_ptr->spell_trap) || (p_ptr->delay_spell))
+	{
+		/* Override region */
+		region_id = p_ptr->spell_trap;
+
+		/* Delay the effect */
+		delay = p_ptr->delay_spell;
+
+		/* Start with a delay */
+		initial_delay = TRUE;
+	}
+
+	/* Hack -- create spell region */
+	else
+	{
+		region_id = s_ptr->param;
+	}	
 
 	/* Count the number of "known" attacks */
 	for (n = 0, m = 0; m < 4; m++)
@@ -1799,7 +1824,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 
 		int method  = blow_ptr->method;
 		int effect  = blow_ptr->effect;
-
+		
 		char buf[40];
 
 		const char *current_intro;
@@ -1889,10 +1914,120 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 				if (strcmp(effect_text + effect1_ptr->info[i], effect_text + effect2_ptr->info[i])) skip_method_more = FALSE;
 			}
 		}
+#if 0
+		/* We are describing a region */
+		if ((s_ptr->type == SPELL_REGION) || (s_ptr->type == SPELL_SET_TRAP) || (p_ptr->spell_trap) || (p_ptr->delay_spell))
+		{
+			region_type region_type_body;			
+			region_type *r_ptr = &region_type_body;
+			
+			region_info_type *ri_ptr = &region_info[region_id];
+			
+			/* Build a description of how long we last */
+			char buf2[20];
 
-		/* Describe blow */
-		describe_blow(method, effect, level, blow_ptr->d_plus, current_intro, buf, detail, method == last_method, skip_method_more, FALSE, num);
+			/* Start with how long we last */
+			if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_plus))
+			{
+				/* End */
+				my_strcpy(buf2, format("%dd%d+%d times",s_ptr->lasts_dice,s_ptr->lasts_side,s_ptr->lasts_plus), sizeof(buf2));
+			}
+			else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_side == 1))
+			{
+				/* End */
+				my_strcpy(buf2, format("%d time%s",s_ptr->lasts_dice, s_ptr->lasts_dice != 1 ? "s" : ""), sizeof(buf2));
+			}
+			else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
+			{
+				/* End */
+				my_strcpy(buf2, format("%dd%d time%s",s_ptr->lasts_dice,s_ptr->lasts_side), sizeof(buf2));
+			}
+			else if (s_ptr->lasts_plus)
+			{
+				/* End */
+				my_strcpy(buf2, format("%d time%s",s_ptr->lasts_plus, s_ptr->lasts_plus != 1 ? "s" : ""), sizeof(buf2));
+			}
+			
+			/* Initialise region values from parameters passed to this routine */
+			r_ptr->type = region_id;
+			r_ptr->level = level;
+			r_ptr->effect = effect;
+			r_ptr->lifespan = 10000;
+			r_ptr->method = method;
 
+			/* Initialise region values from region info type */
+			r_ptr->flags1 = ri_ptr->flags1;
+			r_ptr->delay_reset = ri_ptr->delay_reset;
+			r_ptr->child_region = ri_ptr->child_region;
+
+			/* Hack -- we delay subsequent regions from the same spell casting until the first has expired */
+			r_ptr->delay = delay;
+
+			/* Delaying casting of a spell */
+			if (initial_delay)
+			{
+				/* Lasts one turn only */
+				r_ptr->lifespan = 1;
+			}
+			/* Set the life span according to the duration */
+			else if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
+			{
+				r_ptr->lifespan = s_ptr->lasts_dice * (s_ptr->lasts_side + (s_ptr->lasts_side > 1 ? 1 : 0)) / (s_ptr->lasts_side > 1 ? 2 : 1) + s_ptr->lasts_plus;
+			}
+			else if (s_ptr->lasts_plus)
+			{
+				r_ptr->lifespan = s_ptr->lasts_plus;
+			}
+			
+			/* Increase delay - we predict effects of acceleration/deceleration */
+			if (r_ptr->flags1 & (RE1_ACCELERATE | RE1_DECELERATE))
+			{
+				int i;
+				int delay_current = r_ptr->delay_reset;
+
+				for (i = 0; i < r_ptr->lifespan; i++)
+				{
+					delay += delay_current;
+
+					if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (i < r_ptr->lifespan / 2)))
+					{
+						if (delay_current < 3) delay_current -= 1;
+						delay_current -= delay_current / 3;
+						if (delay_current < 1) delay_current = 1;
+					}
+
+					/* Decelerating */
+					if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (i > r_ptr->lifespan / 2)))
+					{
+						delay_current += delay_current / 3;
+						if (delay_current < 3) delay_current += 1;
+					}
+				}
+			}
+			/* Normal delay - this is the total lifespan of the effect for subsequent effects */
+			else
+			{
+				delay += r_ptr->lifespan * r_ptr->delay_reset;
+			}
+
+			/* Hack -- we add to delay if we apply more than once */
+			if (r_ptr->lifespan > 1)
+			{
+				r_ptr->delay += delay;
+			}
+
+			/* Describe region */
+			describe_region_basic(r_ptr, "creates", buf, buf2);
+
+		}
+		/* We describe the blow */
+		else
+#endif
+		{
+			/* Describe blow */
+			describe_blow(method, effect, level, blow_ptr->d_plus, current_intro, buf, detail, method == last_method, skip_method_more, FALSE, num);
+		}
+	
 		/* Count blows */
 		r++;
 
@@ -8723,14 +8858,17 @@ void display_feature_roff(int f_idx)
 /*
  * Hack -- display region information.
  */
-void describe_region_basic(region_type *r_ptr)
+void describe_region_basic(region_type *r_ptr, const char *create, const char *damage, const char *lasts)
 {
 	int n, vn;
 	cptr vp[128];
 
+	bool intro = FALSE;
 	bool intro_hack = FALSE;
 	
-	text_out("This is a");
+	region_info_type *ri_ptr = &region_info[r_ptr->type];
+	
+	text_out(format("This %s a", create));
 
 	/* Collect sight and movement */
 	vn = 0;
@@ -8740,13 +8878,6 @@ void describe_region_basic(region_type *r_ptr)
 	if (r_ptr->flags1 & (RE1_SPREAD)) vp[vn++] = "spreading";
 	if (r_ptr->flags1 & (RE1_CHAIN)) vp[vn++] = "jumping";
 	if (r_ptr->flags1 & (RE1_SEEKER | RE1_WALL)) vp[vn++] = "moving";
-
-	/* Collect shape */
-	vp[vn++] = region_name + region_info[r_ptr->type].name;
-
-	/* Vowel? */
-	if (((is_a_vowel(vp[0][0])) && ((r_ptr->flags1 & (RE1_RANDOM)) == 0))) text_out("n ");
-	else text_out(" ");
 
 	/* Describe innate attacks */
 	if (vn)
@@ -8759,7 +8890,13 @@ void describe_region_basic(region_type *r_ptr)
 			{
 				if (r_ptr->flags1 & (RE1_RANDOM))
 				{
-					text_out("randomly ");
+					text_out(" randomly ");
+				}
+				else
+				{
+					/* Vowel? */
+					if (is_a_vowel(vp[0][0])) text_out("n ");
+					else text_out(" ");
 				}
 			}
 			else if (n < vn-1) text_out(", ");
@@ -8767,9 +8904,18 @@ void describe_region_basic(region_type *r_ptr)
 
 			/* Dump */
 			text_out(vp[n]);
+			
+			intro = TRUE;
 		}
 	}
 
+	/* Describe shape */
+	text_out(" ");
+	text_out(region_name + region_info[r_ptr->type].name);
+	
+	/* TODO: Add description of shape */
+	
+	/* Collect behaviour */
 	vn = 0;
 
 	/* Collect behaviour */
@@ -8777,7 +8923,7 @@ void describe_region_basic(region_type *r_ptr)
 	if (r_ptr->flags1 & (RE1_SEEKER)) vp[vn++] = "seeks out nearby enemies";
 	if (r_ptr->flags1 & (RE1_WALL)) vp[vn++] = "advances in a straight line";
 	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR)) vp[vn++] = "spreads outwards from a single point";
-	
+	if (r_ptr->flags1 & (RE1_LINGER)) vp[vn++] = "lingers, damaging all who remain or move through it";
 
 	/* Describe innate attacks */
 	if (vn)
@@ -8792,18 +8938,21 @@ void describe_region_basic(region_type *r_ptr)
 
 			/* Dump */
 			text_out(vp[n]);
+			
+			intro = TRUE;
 		}
 	}
 
+	/* Collect more behaviour */
 	vn = 0;
 
 	/* Collect future behaviour */
 	if ((r_ptr->flags1 & (RE1_CLOCKWISE)) && (r_ptr->flags1 & (RE1_COUNTER_CLOCKWISE))) vp[vn++] = "change direction";
 	if (((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) &&
-			(((r_ptr->flags1 & (RE1_DECELERATE)) == 0) || (r_ptr->age < r_ptr->lifespan / 2))) vp[vn++] = "move faster and faster";
+			(((r_ptr->flags1 & (RE1_DECELERATE)) == 0) || (r_ptr->age < r_ptr->lifespan / 2))) vp[vn++] = "go faster and faster";
 	if (((r_ptr->flags1 & (RE1_DECELERATE)) != 0) &&
 			((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) && (r_ptr->age < r_ptr->lifespan / 2)) vp[vn++] = "eventually begin to decelerate";
-	else if ((r_ptr->flags1 & (RE1_DECELERATE)) != 0) vp[vn++] = "move slower and slower";
+	else if ((r_ptr->flags1 & (RE1_DECELERATE)) != 0) vp[vn++] = "go slower and slower";
 	if (((r_ptr->flags1 & (RE1_MOVE_SOURCE)) == 0) &&
 			((r_ptr->flags1 & (RE1_CHAIN | RE1_SEEKER | RE1_SCALAR_VECTOR | RE1_SPREAD | RE1_WALL)) == 0)) { vp[vn++] = "remain stationary"; intro_hack = TRUE; }
 
@@ -8814,13 +8963,18 @@ void describe_region_basic(region_type *r_ptr)
 		for (n = 0; n < vn; n++)
 		{
 			/* Intro */
-			if (!n) text_out(" and will ");
+			if (!n)
+			{
+				text_out(format(" %s will ", intro ? "and" : "which"));
+			}
 			else if (n < vn-1) text_out(", ");
 			else if ((n > 1) && (intro_hack)) text_out(" but otherwise ");
 			else text_out(" and ");
 
 			/* Dump */
 			text_out(vp[n]);
+			
+			intro = TRUE;
 		}
 	}
 
@@ -8828,6 +8982,8 @@ void describe_region_basic(region_type *r_ptr)
 
 	/* End this sentence */
 	text_out(".  It ");
+	
+	intro = FALSE;
 
 	if (r_ptr->flags1 & (RE1_AUTOMATIC)) text_out("automatically ");
 
@@ -8856,7 +9012,7 @@ void describe_region_basic(region_type *r_ptr)
 	else
 	{
 		/* Describe the blow */
-		describe_blow(r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->damage, "", format("%d", r_ptr->damage), TRUE, FALSE, FALSE, FALSE, 1);
+		describe_blow(ri_ptr->method ? ri_ptr->method : r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->damage, "", damage, TRUE, FALSE, FALSE, FALSE, 1);
 	}
 
 	/* Collect methods of triggering */
@@ -8879,6 +9035,8 @@ void describe_region_basic(region_type *r_ptr)
 			/* Dump */
 			text_out(vp[n]);
 		}
+		
+		intro = TRUE;
 	}
 
 	vn = 0;
@@ -8894,12 +9052,14 @@ void describe_region_basic(region_type *r_ptr)
 		for (n = 0; n < vn; n++)
 		{
 			/* Intro */
-			if (!n) text_out(" is stopped by ");
+			if (!n) text_out(format(" %sis stopped by ", intro ? "and" : ""));
 			else if ((n) && (n < vn-1)) text_out(", ");
 			else text_out(" ");
 
 			/* Dump */
 			text_out(vp[n]);
+			
+			intro = FALSE;
 		}
 
 		if (!r_ptr->age) text_out("when triggered");
@@ -8908,34 +9068,84 @@ void describe_region_basic(region_type *r_ptr)
 	/* Trigger recharges */
 	if (((r_ptr->flags1 & (RE1_AUTOMATIC)) == 0) && (r_ptr->delay || r_ptr->delay_reset)) text_out(" recharging");
 
+	/* Clear intro again */
+	intro = FALSE;
+	
 	/* Time to take effect */
 	if (r_ptr->delay)
 	{
 		int energy = r_ptr->delay * extract_energy[p_ptr->pspeed];
 		
-		text_out(format(" in %d game ticks", r_ptr->delay * 10));
-		text_out(format(", which is %d.%d turns at your current speed", energy / 100, energy % 100));
+		text_out(format(" %s %d game ticks", r_ptr->delay != r_ptr->delay_reset ? "in" : "every", r_ptr->delay * 10));
+		text_out(format(", which is %d.%d turns at your current speed", energy / 100, (energy / 10) % 10));
 
-		if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset)) text_out(" and then");
+		intro = TRUE;
 	}
 
 	/* Time to take effect */
-	if ((r_ptr->delay_reset) && (r_ptr->delay != r_ptr->delay_reset))
+	if ((r_ptr->delay_reset) && ((r_ptr->delay != r_ptr->delay_reset) || ((r_ptr->flags1 & (RE1_ACCELERATE | RE1_DECELERATE)) != 0)))
 	{
-		int energy = r_ptr->delay * extract_energy[p_ptr->pspeed];
+		int delay_reset = r_ptr->delay_reset;
+		int energy;
+
+		if (intro) text_out(" and then");
+
+		/* Accelerating */
+		if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (r_ptr->age < r_ptr->lifespan / 2)))
+		{
+			if (delay_reset < 3) delay_reset -= 1;
+			delay_reset -= delay_reset / 3;
+			if (delay_reset < 1) delay_reset = 1;
+		}
+
+		/* Decelerating */
+		if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (r_ptr->age > r_ptr->lifespan / 2)))
+		{
+			delay_reset += delay_reset / 3;
+			if (delay_reset < 3) delay_reset += 1;
+		}
 		
-		text_out(format(" every %d %s%s", r_ptr->delay_reset * 10));
-		text_out(format(", which is %d.%d turns at your current speed", energy / 100, energy % 100));
+		/* Now we've computed the modified delay, compute the player turns */
+		energy = delay_reset * extract_energy[p_ptr->pspeed];
+		
+		text_out(format(" %s %d game ticks", r_ptr->delay_reset != delay_reset ? "in" : "every", delay_reset * 10));
+		text_out(format(", which is %d.%d turns at your current speed", energy / 100, (energy / 10) % 10));
+		
+		intro = TRUE;
 	}
 	
 	/* Measure lifespan */
 	if ((r_ptr->lifespan) && (r_ptr->lifespan < 10000))
 	{
-		text_out(format(" and takes effect %s%d times", r_ptr->age ? "another " : "", r_ptr->lifespan - r_ptr->age));
-	}
+		int energy;
+		int i;
+		int delay = 0;
+		int delay_current = r_ptr->delay_reset;
 
-	/* End sentence */
-	text_out(".  ");
+		for (i = r_ptr->age; i < r_ptr->lifespan; i++)
+		{
+			delay += delay_current;
+
+			if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (i < r_ptr->lifespan / 2)))
+			{
+				if (delay_current < 3) delay_current -= 1;
+				delay_current -= delay_current / 3;
+				if (delay_current < 1) delay_current = 1;
+			}
+
+			/* Decelerating */
+			if ((r_ptr->flags1 & (RE1_DECELERATE)) && (!(r_ptr->flags1 & (RE1_ACCELERATE)) || (i > r_ptr->lifespan / 2)))
+			{
+				delay_current += delay_current / 3;
+				if (delay_current < 3) delay_current += 1;
+			}
+		}
+
+		energy = delay * extract_energy[p_ptr->pspeed];
+		
+		text_out(format(" %stakes effect %s%s", intro ? "and " : "", r_ptr->age ? "another " : "", lasts));
+		text_out(format(", or %s%d.%d turns at your current speed", strchr(lasts, 'd') ? "around " : "", energy / 100, (energy / 10) % 10));
+	}
 }
 
 
@@ -8949,9 +9159,18 @@ void describe_region_basic(region_type *r_ptr)
  */
 void describe_region(region_type *r_ptr)
 {
-
+	char damage[6];
+	char lasts[8];
+	
+	/* Initialise the strings */
+	my_strcpy(damage, format("%d", r_ptr->damage), sizeof(damage));
+	my_strcpy(lasts, format("%d time%s", r_ptr->lifespan - r_ptr->age, r_ptr->lifespan - r_ptr->age != 1 ? "s" : ""), sizeof(lasts));
+	
 	/* Describe the movement and level of the monster */
-	describe_region_basic(r_ptr);
+	describe_region_basic(r_ptr, "is", damage, lasts);
+
+	/* End sentence */
+	text_out(".  ");
 
 	/* All done */
 	text_out("\n");
