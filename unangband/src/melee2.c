@@ -4816,8 +4816,9 @@ static bool bash_from_under(int m_idx, int y, int x, bool *bash)
 				((f_ptr->flags2 & (FF2_FILLED))?"":"the "),
 				f_name+f_ptr->name);
 
-			if (disturb_move || ((m_ptr->mflag & (MFLAG_VIEW)) &&
+			if ((disturb_move || ((m_ptr->mflag & (MFLAG_VIEW)) &&
 		      		disturb_near))
+		      		&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				/* Disturb */
 				disturb(0, 0);
@@ -4859,8 +4860,9 @@ static bool crash_from_above(int m_idx, int y, int x)
 
 			msg_format("%^s crashes through the ceiling.",m_name);
 
-			if (disturb_move || ((m_ptr->mflag & (MFLAG_VIEW)) &&
+			if ((disturb_move || ((m_ptr->mflag & (MFLAG_VIEW)) &&
 		      		disturb_near))
+	      		&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				/* Disturb */
 				disturb(0, 0);
@@ -4999,10 +5001,11 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 			}
 
 			/* Disturb on "move" */
-			if (m_ptr->ml &&
+			if ((m_ptr->ml &&
 			    (disturb_move ||
 			     ((m_ptr->mflag & (MFLAG_VIEW)) &&
 			      disturb_near)))
+			      && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 			{
 				/* Disturb */
 				disturb(0, 0);
@@ -5657,10 +5660,11 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		}
 
 		/* Possible disturb */
-		if (m_ptr->ml &&
+		if ((m_ptr->ml &&
 		    (disturb_move ||
 		     ((m_ptr->mflag & (MFLAG_VIEW)) &&
 		      disturb_near)))
+		      && ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 		{
 			/* Disturb */
 			disturb(0, 0);
@@ -5722,14 +5726,16 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		}
 
 		/* Player will always be disturbed if a monster is adjacent */
-		if (m_ptr->cdis == 1)
+		if ((m_ptr->cdis == 1)
+      		&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 		{
 			disturb(1, 0);
 		}
 
 		/* Possible disturb */
-		else if (m_ptr->ml && (disturb_move ||
+		else if ((m_ptr->ml && (disturb_move ||
 			(m_ptr->mflag & (MFLAG_VIEW) && disturb_near)))
+			&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 		{
 			/* Disturb */
 			disturb(0, 0);
@@ -6408,8 +6414,9 @@ static void process_monster(int m_idx)
 				}
 
 				/* Disturb on "move" */
-				if (m_ptr->ml && (disturb_move ||
+				if ((m_ptr->ml && (disturb_move ||
 					((m_ptr->mflag & (MFLAG_VIEW)) && disturb_near)))
+						&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
 				{
 					/* Disturb */
 					disturb(0, 0);
