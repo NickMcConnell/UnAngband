@@ -3139,7 +3139,7 @@ void py_attack(int dir)
 		if (p_ptr->blocking) bonus += 20;
 
 		chance = (p_ptr->skills[SKILL_TO_HIT_MELEE] + (bonus * BTH_PLUS_ADJ));
-
+		
 		/* Test for hit */
 		if (!test_hit_norm(chance, calc_monster_ac(cave_m_idx[y][x], FALSE), m_ptr->ml))
 		{
@@ -3171,7 +3171,7 @@ void py_attack(int dir)
 			/* Test for fumble */
 			if (((p_ptr->heavy_wield)
 				  || (o_ptr->k_idx && o_ptr->ident & (IDENT_CURSED)))
-				 && (!rand_int(chance)))
+				 && (!rand_int(chance > 1 ? chance : 2)))
 			{
 				/* Hack -- use the player for the attack */
 				my_strcpy(m_name, "yourself", sizeof(m_name));
@@ -3490,7 +3490,7 @@ void py_attack(int dir)
 			else if (o_ptr->k_idx && coated_p(o_ptr))
 			{
 				/* Sometimes coating affects source player */
-				if (!rand_int(chance))
+				if (!rand_int(chance > 1 ? chance : 2))
 				{
 					y = p_ptr->py;
 					x = p_ptr->px;
