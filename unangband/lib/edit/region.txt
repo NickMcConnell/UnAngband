@@ -318,7 +318,7 @@ F:ATTR_EFFECT
 
 # Persistent area of effect - Used by tangle
 
-N:40:persist
+N:40:persistent effect
 G:*:w
 I:10
 F:AUTOMATIC | LINGER
@@ -326,7 +326,7 @@ F:ATTR_EFFECT
 
 # Slow, intermittent effect - Used by pyrokinesis/cyrokinesis
 
-N:41:kinesis
+N:41:kinetic region
 G:*:w
 I:20
 F:AUTOMATIC
@@ -340,7 +340,7 @@ F:PROJECTION | TRIGGER_MOVE
 
 # Delayed spell effect - Used by spell trap
 
-N:43:delayed
+N:43:delayed spell
 G:*:w
 F:AUTOMATIC | PROJECTION | ATTR_EFFECT
 

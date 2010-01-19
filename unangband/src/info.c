@@ -35,6 +35,9 @@
 #define SPELL_TARGET_AIMED    3 /* Always targets aimed target */
 #define SPELL_TARGET_COATED   4 /* Target applied from a weapon attack */
 #define SPELL_TARGET_EXPLODE  5 /* Always targets radius 1 ball attack */
+#define SPELL_TARGET_OTHER    6 /* Always affects a monster using it on itself */
+#define SPELL_TARGET_VICTIM   7 /* Always affects the victime of a trap */
+#define SPELL_TARGET_ATTACKER 8 /* Always affects the attacking monster */
 
 
 /*
@@ -1354,7 +1357,7 @@ bool spell_desc_damage(const spell_blow *blow_ptr, int target, int level, char *
 	 * Hack -- coatings do 20% damage, so have a completely different
 	 * damage output routine.
 	 */
-	if (target == SPELL_TARGET_COATED)
+	if ((target == SPELL_TARGET_COATED) || (target == SPELL_TARGET_ATTACKER))
 	{
 		int min = (d1 + d3 + d5) / 5;
 		int max = (d1 * d2 + d3 + d4 * d5) / 5;
@@ -1584,17 +1587,31 @@ static void text_out_blow(const char *s, int person, bool infinitive, int num)
 	text_out(buf);
 }
 
+/*
+ * Describe blow definitions
+ */
+#define DESC_SKIP_METHOD_INTRO	0x01
+#define DESC_SKIP_METHOD		0x02
+#define DESC_SKIP_METHOD_MORE	0x04
+#define DESC_SKIP_EFFECT		0x08
+#define DESC_SKIP_DAMAGE_DETAIL	0x10
+#define DESC_MELEE_ATTACK		0x20
+#define DESC_MONSTER_SELF		0x40
+#define DESC_TRAP_VICTIM		0x80
+#define DESC_MONSTER_ATTACKER	0x100
 
 /*
  * Hack -- Get spell description for effects on target based on blow.
  */
-void describe_blow(int method, int effect, int level, int feat, const char *intro, const char *damage, bool detail, bool skip_method, bool skip_method_more, bool attack, int num)
+void describe_blow(int method, int effect, int level, int feat, const char *intro, const char *damage, u16b details, int num)
 {
 	int i;
 
 	char *p[7];
 
 	feature_type *f_ptr;
+	
+	bool need_space = FALSE;
 
 	/* Get method details */
 	method_type *method_ptr = &method_info[method];
@@ -1604,8 +1621,11 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	int arc = method_ptr->arc;
 	int rng = scale_method(method_ptr->max_range, level);
 
+	/* No method - skip method */
+	if (!method) details |= (DESC_SKIP_METHOD);
+	
 	/* Hack -- quash range details for describing monster attacks */
-	if (attack)
+	if (details & (DESC_MELEE_ATTACK))
 	{
 		rad = 0;
 		rng = 0;
@@ -1631,7 +1651,16 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	if (!strlen(p[3])) p[3] = NULL;
 
 	/* Hack -- attack affects you */
-	if (attack) p[3] = "you";
+	if (details & (DESC_MELEE_ATTACK)) p[3] = "you";
+
+	/* Hack -- attack affects a monster using it on itself*/
+	if (details & (DESC_MONSTER_SELF)) p[3] = "them";
+
+	/* Hack -- attack affects a monster using it on itself*/
+	if (details & (DESC_TRAP_VICTIM)) p[3] = "the victim";
+
+	/* Hack -- attack affects a monster using it on itself*/
+	if (details & (DESC_MONSTER_ATTACKER)) p[3] = "the attacking monster";
 
 	/* Get effect info text */
 	for (i = 0; i < 6; i++)
@@ -1673,43 +1702,57 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	}
 
 	/* Describe the method */
-	if ((p[0]) && (!skip_method_more))
+	if ((p[0]) && ((details & (DESC_SKIP_METHOD_MORE)) == 0))
 	{
 		/* Display all method details */
-		if (!skip_method)
+		if ((details & (DESC_SKIP_METHOD)) == 0)
 		{
-			text_out_blow(p[0], 2, attack, num);
-			if (rng || arc || rad) text_out(" of ");
-			if (rng) text_out (format( "range %d",rng));
-			if (rng && arc) text_out(" and ");
-			if (arc) text_out (format( "%d degrees",arc));
-			if ((rng || arc) && rad) text_out(" and ");
-			if (rad) text_out (format( "%s %d",(method_ptr->flags1 & (PROJECT_BEAM)) ? "width" : "radius", rad));
-
-			text_out(" ");
+			if ((details & (DESC_SKIP_METHOD_INTRO)) == 0)
+			{
+				text_out_blow(p[0], 2, (details & (DESC_MELEE_ATTACK)) != 0, num);
+				need_space = TRUE;
+			}
+			
+			if ((details & (DESC_MONSTER_SELF | DESC_TRAP_VICTIM)) == 0)
+			{
+				if (rng || arc || rad) text_out(" of ");
+				if (rng) text_out (format( "range %d",rng));
+				if (rng && arc) text_out(" and ");
+				if (arc) text_out (format( "%d degrees",arc));
+				if ((rng || arc) && rad) text_out(" and ");
+				if (rad) text_out (format( "%s %d",(method_ptr->flags1 & (PROJECT_BEAM)) ? "width" : "radius", rad));
+				
+				if (rng || arc || rad) need_space = TRUE;
+			}
 		}
 
-		text_out("to");
-
-		if (p[1])
+		/* Display all effect details */
+		if ((details & (DESC_SKIP_EFFECT)) == 0)
 		{
-			text_out(" ");
-			text_out_blow(p[1], 2, TRUE, num);
+			if (need_space) text_out(" ");
+			
+			text_out("to");
+	
+			if (p[1])
+			{
+				text_out(" ");
+				text_out_blow(p[1], 2, TRUE, num);
+			}
+			if (p[2])
+			{
+				text_out(" ");
+				text_out_blow(p[2], 2, TRUE, num);
+			}
+			if (p[3])
+			{
+				text_out(" ");
+				text_out_blow(p[3], 2, TRUE, num);
+			}
+			
+			need_space = TRUE;
 		}
-		if (p[2])
-		{
-			text_out(" ");
-			text_out_blow(p[2], 2, TRUE, num);
-		}
-		if (p[3])
-		{
-			text_out(" ");
-			text_out_blow(p[3], 2, TRUE, num);
-		}
-
-		if (p[4]) text_out(" ");
 	}
-	else if (!skip_method_more)
+	else if ((details & (DESC_SKIP_METHOD_MORE)) == 0)
 	{
 		if (p[1])
 		{
@@ -1717,31 +1760,38 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 		}
 		else text_out("affects");
 
-		if (p[2])
+		/* Display all effect details */
+		if ((details & (DESC_SKIP_EFFECT)) == 0)
 		{
-			text_out(" ");
-			text_out_blow(p[2], 2, FALSE, num);
-		}
-		if (p[3])
-		{
-			text_out(" ");
-			text_out_blow(p[3], 2, FALSE, num);
+			if (p[2])
+			{
+				text_out(" ");
+				text_out_blow(p[2], 2, FALSE, num);
+			}
+			if (p[3])
+			{
+				text_out(" ");
+				text_out_blow(p[3], 2, FALSE, num);
+			}
 		}
 		if (rng) text_out (format( " of range %d",rng));
 
 		if (rad) text_out (format( " %s radius %d",rng ? "and" : "of", rad));
-
-		if (p[4]) text_out(" ");
+		
+		need_space = TRUE;
 	}
 
-	if (p[4])
+	/* Display all effect details */
+	if (((details & (DESC_SKIP_EFFECT)) == 0) && p[4])
 	{
+		if (need_space) text_out(" ");
 		text_out_blow(p[4], 2, FALSE, num);
+		need_space = TRUE;
 	}
 
 	/* Display the damage */
 	/* Roll out the damage */
-	if (detail)
+	if ((details & (DESC_SKIP_DAMAGE_DETAIL)) == 0)
 	{
 		/* Hack -- feature */
 		if (effect == GF_FEATURE)
@@ -1750,7 +1800,7 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 
 			if (!(f_ptr->flags1 & (FF1_MOVE)))
 			{
-				text_out(" ");
+				if (need_space) text_out(" ");
 				text_out_blow(p[5], 2, FALSE, num);
 				text_out(" 4d8 ");
 				text_out_blow(p[6], 2, FALSE, num);
@@ -1759,7 +1809,7 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 		/* Get the description */
 		else if (damage && strlen(damage))
 		{
-			text_out(" ");
+			if (need_space) text_out(" ");
 			text_out_blow(p[5], 2, FALSE, num);
 			text_out(format(" %s ", damage));
 			text_out_blow(p[6], 2, FALSE, num);
@@ -1814,9 +1864,12 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 		/* Count known attacks */
 		n++;
 	}
+	
+	/* Hack - for introduction */
+	if (introduced) n++;
 
 	/* Examine (and count) the actual attacks */
-	for (r = 0, m = 0; m < 4; m++)
+	for (r = introduced ? 1 : 0, m = 0; m < 4; m++)
 	{
 		const spell_blow *blow_ptr = &s_ptr->blow[m];
 
@@ -1828,8 +1881,11 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 		char buf[40];
 
 		const char *current_intro;
-
-		bool skip_method_more = FALSE;
+		
+		u16b details = 0;
+		
+		/* Add detail */
+		if (!detail) details |= (DESC_SKIP_DAMAGE_DETAIL); 
 
 		/* Skip non-attacks */
 		if (!method) continue;
@@ -1852,6 +1908,19 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 			case SPELL_TARGET_EXPLODE:
 				method = RBM_EXPLODE;
 				break;
+				
+			case SPELL_TARGET_OTHER:
+				details |= (DESC_MONSTER_SELF);
+				break;
+				
+			case SPELL_TARGET_VICTIM:
+				details |= (DESC_TRAP_VICTIM);
+				break;
+
+			case SPELL_TARGET_ATTACKER:
+				details |= (DESC_MONSTER_ATTACKER);
+				break;
+
 		}
 
 		/* Get number of attacks */
@@ -1906,15 +1975,15 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 			int i;
 
 			/* Assume we are the same */
-			skip_method_more = TRUE;
+			details |= (DESC_SKIP_METHOD_MORE);
 
 			/* Check string comparison */
 			for (i = 0; i < 3; i++)
 			{
-				if (strcmp(effect_text + effect1_ptr->info[i], effect_text + effect2_ptr->info[i])) skip_method_more = FALSE;
+				if (strcmp(effect_text + effect1_ptr->info[i], effect_text + effect2_ptr->info[i])) details &= ~(DESC_SKIP_METHOD_MORE);
 			}
 		}
-#if 0
+
 		/* We are describing a region */
 		if ((s_ptr->type == SPELL_REGION) || (s_ptr->type == SPELL_SET_TRAP) || (p_ptr->spell_trap) || (p_ptr->delay_spell))
 		{
@@ -1954,6 +2023,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 			r_ptr->effect = effect;
 			r_ptr->lifespan = 10000;
 			r_ptr->method = method;
+			
+			/* Hack - only used for features */
+			r_ptr->damage = s_ptr->blow[m].d_plus;
 
 			/* Initialise region values from region info type */
 			r_ptr->flags1 = ri_ptr->flags1;
@@ -2010,22 +2082,22 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 				delay += r_ptr->lifespan * r_ptr->delay_reset;
 			}
 
-			/* Hack -- we add to delay if we apply more than once */
-			if (r_ptr->lifespan > 1)
+			/* Describe region creation */
+			if (method != last_method)
 			{
-				r_ptr->delay += delay;
+				/* Describe region basic */
+				describe_region_basic(r_ptr, r ? ".  This also creates" : format("%screates", intro));
 			}
-
-			/* Describe region */
-			describe_region_basic(r_ptr, "creates", buf, buf2);
+			
+			/* Describe region attacks */
+			describe_region_attacks(r_ptr, method != last_method ? ".  It" : ".  It also", buf, buf2);
 
 		}
 		/* We describe the blow */
 		else
-#endif
 		{
 			/* Describe blow */
-			describe_blow(method, effect, level, blow_ptr->d_plus, current_intro, buf, detail, method == last_method, skip_method_more, FALSE, num);
+			describe_blow(method, effect, level, blow_ptr->d_plus, current_intro, buf, details | (method == last_method ? (DESC_SKIP_METHOD) : 0), num);
 		}
 	
 		/* Count blows */
@@ -3896,29 +3968,29 @@ void list_object(const object_type *o_ptr, int mode)
 
 			case TV_SCROLL:
 				vp[vn] = "When read, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_BODY:
 			case TV_BONE:
 				vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
-				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_OTHER;
 				break;
 
 			case TV_MUSHROOM:
 				vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
-				vp[vn] = vp_coat_self; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_coat_self; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_ATTACKER;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 
 				/* Fall through */
 			case TV_FOOD:
 				vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
-				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_monster_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_OTHER;
 				break;
 
 			case TV_ROD:
 				vp[vn] = "When zapped, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				charge = (k_info[o_ptr->k_idx].ever_used > o_ptr->charges) || (o_ptr->ident & (IDENT_MENTAL)) || (spoil);
 				time = o_ptr->charges;
 				randtime = o_ptr->charges;
@@ -3930,31 +4002,31 @@ void list_object(const object_type *o_ptr, int mode)
 				{
 					vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				}
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_WAND:
 				vp[vn] = "When aimed, it "; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_NORMAL;
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_BOLT:
 				vp[vn] = "When fired from a crossbow, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
-				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_VICTIM;
 				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				fired = TRUE;
 				break;
 
 			case TV_ARROW:
 				vp[vn] = "When fired from a bow, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
-				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_VICTIM;
 				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				fired = TRUE;
 				break;
 
 			case TV_SHOT:
 				vp[vn] = "When fired from a sling, it "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
-				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_VICTIM;
 				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				fired = TRUE;
 				break;
@@ -3972,14 +4044,14 @@ void list_object(const object_type *o_ptr, int mode)
 					vp[vn] = vp_player_eat; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_SELF;
 				}
 				vp[vn] = vp_coating; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
-				vp[vn] = vp_coat_self; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_COATED;
+				vp[vn] = vp_coat_self; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_ATTACKER;
 				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_EXPLODE;
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_LITE:
 				vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_SWORD:
@@ -3989,15 +4061,15 @@ void list_object(const object_type *o_ptr, int mode)
 				{
 					vp[vn] = vp_throw; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
 				}
-				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_DRAG_ARMOR:
-				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = FALSE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 
 			case TV_RUNESTONE:
-				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+				vp[vn] = vp_set_trap; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_VICTIM;
 				break;
 		}
 
@@ -4016,7 +4088,7 @@ void list_object(const object_type *o_ptr, int mode)
 		if (trap)
 		{
 			vn = 0;
-			vp[vn] = "It "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_AIMED;
+			vp[vn] = "It "; vd[vn] = TRUE; vt[vn++] = SPELL_TARGET_VICTIM;
 		}
 
 		if (vn)
@@ -4154,7 +4226,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 				if (vp[n] == vp_coat_self)
 				{
-					text_out(" to attacking monsters, if they hit the applied region");
+					text_out(", if they hit the applied region");
 				}
 
 				if ((charge) && (powers))
@@ -8088,7 +8160,7 @@ static void describe_feature_blow(int f_idx)
 	feat_desc_damage(blow_ptr, 0, level, buf, 40);
 
 	/* Describe the blow */
-	describe_blow(method, effect, level, 0, "", buf, TRUE, FALSE, FALSE, FALSE, 1);
+	describe_blow(method, effect, level, blow_ptr->d_dice * blow_ptr->d_side, "", buf, 0, 1);
 }
 
 
@@ -8858,17 +8930,15 @@ void display_feature_roff(int f_idx)
 /*
  * Hack -- display region information.
  */
-void describe_region_basic(region_type *r_ptr, const char *create, const char *damage, const char *lasts)
+void describe_region_basic(region_type *r_ptr, const char *intro)
 {
 	int n, vn;
 	cptr vp[128];
 
-	bool intro = FALSE;
 	bool intro_hack = FALSE;
+	bool nomove_hack = FALSE;
 	
-	region_info_type *ri_ptr = &region_info[r_ptr->type];
-	
-	text_out(format("This %s a", create));
+	text_out(format("%s a", intro));
 
 	/* Collect sight and movement */
 	vn = 0;
@@ -8905,7 +8975,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 			/* Dump */
 			text_out(vp[n]);
 			
-			intro = TRUE;
+			intro_hack = TRUE;
 		}
 	}
 
@@ -8913,7 +8983,8 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 	text_out(" ");
 	text_out(region_name + region_info[r_ptr->type].name);
 	
-	/* TODO: Add description of shape */
+	/* Describe the shape */
+	describe_blow(r_ptr->method, 0, r_ptr->level, r_ptr->damage, "", 0, (DESC_SKIP_METHOD_INTRO) | (DESC_SKIP_EFFECT), 1);
 	
 	/* Collect behaviour */
 	vn = 0;
@@ -8922,8 +8993,8 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 	if (r_ptr->flags1 & (RE1_SHINING)) vp[vn++] = "shines with its own light";
 	if (r_ptr->flags1 & (RE1_SEEKER)) vp[vn++] = "seeks out nearby enemies";
 	if (r_ptr->flags1 & (RE1_WALL)) vp[vn++] = "advances in a straight line";
-	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR)) vp[vn++] = "spreads outwards from a single point";
-	if (r_ptr->flags1 & (RE1_LINGER)) vp[vn++] = "lingers, damaging all who remain or move through it";
+	if (r_ptr->flags1 & (RE1_SCALAR_VECTOR)) vp[vn++] = "explodes outwards from a single point";
+	if (r_ptr->flags1 & (RE1_LINGER)) vp[vn++] = "lingers, damaging all who remain inside or move through it";
 
 	/* Describe innate attacks */
 	if (vn)
@@ -8939,7 +9010,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 			/* Dump */
 			text_out(vp[n]);
 			
-			intro = TRUE;
+			intro_hack = TRUE;
 		}
 	}
 
@@ -8954,7 +9025,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 			((r_ptr->flags1 & (RE1_ACCELERATE)) != 0) && (r_ptr->age < r_ptr->lifespan / 2)) vp[vn++] = "eventually begin to decelerate";
 	else if ((r_ptr->flags1 & (RE1_DECELERATE)) != 0) vp[vn++] = "go slower and slower";
 	if (((r_ptr->flags1 & (RE1_MOVE_SOURCE)) == 0) &&
-			((r_ptr->flags1 & (RE1_CHAIN | RE1_SEEKER | RE1_SCALAR_VECTOR | RE1_SPREAD | RE1_WALL)) == 0)) { vp[vn++] = "remain stationary"; intro_hack = TRUE; }
+			((r_ptr->flags1 & (RE1_CHAIN | RE1_SEEKER | RE1_SCALAR_VECTOR | RE1_SPREAD | RE1_WALL)) == 0)) { vp[vn++] = "remain stationary"; nomove_hack = TRUE; }
 
 	/* Describe innate attacks */
 	if (vn)
@@ -8965,25 +9036,39 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 			/* Intro */
 			if (!n)
 			{
-				text_out(format(" %s will ", intro ? "and" : "which"));
+				text_out(format(" %s will ", intro_hack ? "and" : "which"));
 			}
 			else if (n < vn-1) text_out(", ");
-			else if ((n > 1) && (intro_hack)) text_out(" but otherwise ");
+			else if ((n > 1) && (nomove_hack)) text_out(" but otherwise ");
 			else text_out(" and ");
 
 			/* Dump */
 			text_out(vp[n]);
 			
-			intro = TRUE;
+			intro_hack = TRUE;
 		}
 	}
+}
 
+
+/*
+ * Hack -- display region attacks.
+ */
+void describe_region_attacks(region_type *r_ptr, const char *intro, const char *damage, const char *lasts)
+{
+	int n, vn;
+	cptr vp[128];
+
+	bool intro_hack = FALSE;
+	
+	region_info_type *ri_ptr = &region_info[r_ptr->type];
+		
 	vn = 0;
 
-	/* End this sentence */
-	text_out(".  It ");
+	/* Begin this sentence */
+	text_out(format("%s ", intro));
 	
-	intro = FALSE;
+	intro_hack = FALSE;
 
 	if (r_ptr->flags1 & (RE1_AUTOMATIC)) text_out("automatically ");
 
@@ -9011,8 +9096,11 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 	}
 	else
 	{
+		/* Hack -- basic attack */
+		if (!ri_ptr->method) text_out("attacks ");
+		
 		/* Describe the blow */
-		describe_blow(ri_ptr->method ? ri_ptr->method : r_ptr->method, r_ptr->effect, r_ptr->level, r_ptr->damage, "", damage, TRUE, FALSE, FALSE, FALSE, 1);
+		describe_blow(ri_ptr->method ? ri_ptr->method : 0, r_ptr->effect, r_ptr->level, r_ptr->damage, "", damage, 0, 1);
 	}
 
 	/* Collect methods of triggering */
@@ -9036,7 +9124,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 			text_out(vp[n]);
 		}
 		
-		intro = TRUE;
+		intro_hack = TRUE;
 	}
 
 	vn = 0;
@@ -9052,14 +9140,14 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 		for (n = 0; n < vn; n++)
 		{
 			/* Intro */
-			if (!n) text_out(format(" %sis stopped by ", intro ? "and" : ""));
+			if (!n) text_out(format(" %sis stopped by ", intro_hack ? "and" : ""));
 			else if ((n) && (n < vn-1)) text_out(", ");
 			else text_out(" ");
 
 			/* Dump */
 			text_out(vp[n]);
 			
-			intro = FALSE;
+			intro_hack = FALSE;
 		}
 
 		if (!r_ptr->age) text_out("when triggered");
@@ -9069,7 +9157,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 	if (((r_ptr->flags1 & (RE1_AUTOMATIC)) == 0) && (r_ptr->delay || r_ptr->delay_reset)) text_out(" recharging");
 
 	/* Clear intro again */
-	intro = FALSE;
+	intro_hack = FALSE;
 	
 	/* Time to take effect */
 	if (r_ptr->delay)
@@ -9079,7 +9167,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 		text_out(format(" %s %d game ticks", r_ptr->delay != r_ptr->delay_reset ? "in" : "every", r_ptr->delay * 10));
 		text_out(format(", which is %d.%d turns at your current speed", energy / 100, (energy / 10) % 10));
 
-		intro = TRUE;
+		intro_hack = TRUE;
 	}
 
 	/* Time to take effect */
@@ -9088,7 +9176,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 		int delay_reset = r_ptr->delay_reset;
 		int energy;
 
-		if (intro) text_out(" and then");
+		if (intro_hack) text_out(" and then");
 
 		/* Accelerating */
 		if ((r_ptr->flags1 & (RE1_ACCELERATE)) && (!(r_ptr->flags1 & (RE1_DECELERATE)) || (r_ptr->age < r_ptr->lifespan / 2)))
@@ -9111,7 +9199,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 		text_out(format(" %s %d game ticks", r_ptr->delay_reset != delay_reset ? "in" : "every", delay_reset * 10));
 		text_out(format(", which is %d.%d turns at your current speed", energy / 100, (energy / 10) % 10));
 		
-		intro = TRUE;
+		intro_hack = TRUE;
 	}
 	
 	/* Measure lifespan */
@@ -9143,7 +9231,7 @@ void describe_region_basic(region_type *r_ptr, const char *create, const char *d
 
 		energy = delay * extract_energy[p_ptr->pspeed];
 		
-		text_out(format(" %stakes effect %s%s", intro ? "and " : "", r_ptr->age ? "another " : "", lasts));
+		text_out(format(" %stakes effect %s%s", intro_hack ? "and " : "", r_ptr->age ? "another " : "", lasts));
 		text_out(format(", or %s%d.%d turns at your current speed", strchr(lasts, 'd') ? "around " : "", energy / 100, (energy / 10) % 10));
 	}
 }
@@ -9166,9 +9254,12 @@ void describe_region(region_type *r_ptr)
 	my_strcpy(damage, format("%d", r_ptr->damage), sizeof(damage));
 	my_strcpy(lasts, format("%d time%s", r_ptr->lifespan - r_ptr->age, r_ptr->lifespan - r_ptr->age != 1 ? "s" : ""), sizeof(lasts));
 	
-	/* Describe the movement and level of the monster */
-	describe_region_basic(r_ptr, "is", damage, lasts);
+	/* Describe the movement and shape of the region */
+	describe_region_basic(r_ptr, "This is");
 
+	/* Describe the region attacks */
+	describe_region_attacks(r_ptr, ".  It", damage, lasts);
+	
 	/* End sentence */
 	text_out(".  ");
 
