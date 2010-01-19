@@ -1995,6 +1995,9 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 			/* Build a description of how long we last */
 			char buf2[20];
 
+			/* Wipe the structure */
+			(void)WIPE(r_ptr, region_type);
+
 			/* Start with how long we last */
 			if ((s_ptr->lasts_dice) && (s_ptr->lasts_side) && (s_ptr->lasts_plus))
 			{
