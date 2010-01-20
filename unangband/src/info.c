@@ -879,10 +879,12 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Collect stat gain effects */
 	vn = 0;
 
-	if (s_ptr->flags3 & (SF3_INC_STR)) vp[vn++]="strength and size";
+	if (s_ptr->flags3 & (SF3_INC_STR)) vp[vn++]="strength";
+	if (s_ptr->flags3 & (SF3_INC_STR)) vp[vn++]="size";
 	if (s_ptr->flags3 & (SF3_INC_INT)) vp[vn++]="intelligence";
 	if (s_ptr->flags3 & (SF3_INC_WIS)) vp[vn++]="wisdom";
-	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="dexterity and agility";
+	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="dexterity";
+	if (s_ptr->flags3 & (SF3_INC_DEX)) vp[vn++]="agility";
 	if (s_ptr->flags3 & (SF3_INC_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_INC_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_INC_EXP)) vp[vn++]="experience";
@@ -1031,10 +1033,12 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 
 	/* Collect restore effects */
 	vn = 0;
-	if (s_ptr->flags3 & (SF3_CURE_STR)) vp[vn++]="strength and size";
+	if (s_ptr->flags3 & (SF3_CURE_STR)) vp[vn++]="strength";
+	if (s_ptr->flags3 & (SF3_CURE_STR)) vp[vn++]="size";
 	if (s_ptr->flags3 & (SF3_CURE_INT)) vp[vn++]="intelligence";
 	if (s_ptr->flags3 & (SF3_CURE_WIS)) vp[vn++]="wisdom";
-	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="dexterity and agility";
+	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="dexterity";
+	if (s_ptr->flags3 & (SF3_CURE_DEX)) vp[vn++]="agility";
 	if (s_ptr->flags3 & (SF3_CURE_CON)) vp[vn++]="constitution";
 	if (s_ptr->flags3 & (SF3_CURE_CHR)) vp[vn++]="charisma";
 	if (s_ptr->flags3 & (SF3_CURE_EXP)) vp[vn++]="experience";
@@ -2245,12 +2249,14 @@ typedef struct o_flag_desc
  * affects all stats.  In this case, "All stats" is used instead of
  * listing each stat individually.
  */
-static const o_flag_desc stat_flags_desc[A_MAX - 2 /* disregarding AGI and SIZ */] =
+static const o_flag_desc stat_flags_desc[A_MAX /* disregarding AGI and SIZ */] =
 {
-	{ TR1_STR,	"strength and size" },
+	{ TR1_STR,	"strength" },
+	{ TR1_STR,	"size" },
 	{ TR1_INT,	"intelligence" },
 	{ TR1_WIS,	"wisdom" },
-	{ TR1_DEX,	"dexterity and agility" },
+	{ TR1_DEX,	"dexterity" },
+	{ TR1_DEX,	"agility" },
 	{ TR1_CON,	"constitution" },
 	{ TR1_CHR,	"charisma" }
 };
