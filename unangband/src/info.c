@@ -2510,6 +2510,24 @@ static const o_flag_desc sense_flags3_desc[] =
 	{ TR3_ESP_NATURE,	"natural creatures" }
 };
 
+
+/*
+ * Ability to understand language given by an object's "flags4" field
+ */
+static const o_flag_desc language_flags4_desc[] =
+{
+	{ TR4_ANIMAL,	"natural creatures" },
+	{ TR4_UNDEAD,	"undead" },
+	{ TR4_DEMON,	"demons" },
+	{ TR4_ORC,	"orcs" },
+	{ TR4_TROLL,	"trolls" },
+	{ TR4_GIANT,	"giants" },
+	{ TR4_DRAGON,	"dragons" },
+	{ TR4_DWARF,	"dwarves" },
+	{ TR4_ELF,	"elves" }
+};
+
+
 /*
  * Racial magic given by an object's "flags4" field
  */
@@ -2527,6 +2545,7 @@ static const o_flag_desc racial_flags4_desc[] =
 	{ TR4_DWARF,	"dwarven" },
 	{ TR4_ELF,	"elven" }
 };
+
 
 /*
  * Ignores given by an object's "flags2" field
@@ -3411,6 +3430,39 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				break;
 		}
 	}
+
+	/* Language Abilities */
+	if (f3 || f4)
+	{
+		list_ptr = list;
+
+		/*
+		 * Special flags
+		 */
+		list_ptr = spoiler_flag_aux(f3, sense_flags3_desc, list_ptr,
+					     N_ELEMENTS(sense_flags3_desc));
+		list_ptr = spoiler_flag_aux(f4, language_flags4_desc, list_ptr, N_ELEMENTS(racial_flags4_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It lets you speak with", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It may let you speak with", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It does not let you speak with", list, TERM_SLATE);
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you speaking with", list, TERM_L_PURPLE);
+				break;
+		}
+	}
+
 
 	/* Miscellenious Abilities */
 	if (f2)
