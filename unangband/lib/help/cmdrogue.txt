@@ -30,7 +30,7 @@
  @  (unused)                            ^B  (alter - south west)
  #  Toggle search mode                  ^C  (special - break)
  $  Display current quests              ^D  Destroy item
- %  (unused)                            ^E  Toggle choice window
+ %  Handle an item                      ^E  Toggle choice window
  ^  (special - control key)             ^F  Repeat level feeling
  &  (unused)                            ^G  Engrave a rune
  *  Target monster or location          ^H  (alter - west)

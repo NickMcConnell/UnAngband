@@ -625,7 +625,7 @@ enum
 	COMMAND_ITEM_INSCRIBE, COMMAND_ITEM_FUEL, COMMAND_ITEM_FILL, COMMAND_ITEM_FUEL_TORCH, COMMAND_ITEM_FUEL_LAMP,
 	COMMAND_ITEM_FILL_FIREARM, COMMAND_ITEM_LITE, COMMAND_ITEM_MAGIC_TRAP, COMMAND_ITEM_THROW, COMMAND_ITEM_FIRE_SLING,
 	COMMAND_ITEM_FIRE_BOW, COMMAND_ITEM_FIRE_XBOW, COMMAND_ITEM_FIRE_GUN, COMMAND_ITEM_CAST_SPELL, COMMAND_ITEM_STUDY,
-	COMMAND_ITEM_BROWSE, COMMAND_ITEM_OFFER, COMMAND_ITEM_TRADE, COMMAND_ITEM_STEAL,
+	COMMAND_ITEM_BROWSE, COMMAND_ITEM_OFFER, COMMAND_ITEM_TRADE, COMMAND_ITEM_STEAL, COMMAND_ITEM_HANDLE,
 	
 	MAX_COMMANDS
 };
@@ -647,6 +647,8 @@ enum
 #define CONDITION_HOLD_SONG		0x00000040L	/* Player can choose to change the song they're singing */
 #define CONDITION_NEED_SPELLS	0x00000080L	/* Player must have new spells to learn */
 #define CONDITION_NO_SNEAKING	0x00000100L	/* Player must not be sneaking */
+#define CONDITION_SHOOTING		0x00000200L	/* Player must be using the matching shooting item */
+
 
 
 
@@ -3043,6 +3045,7 @@ enum
 #define USE_RANGE		0x00002000L	/* Allow ranged targets and/or allies */
 #define USE_KNOWN		0x00004000L	/* Allow known targets and/or allies */
 #define USE_GOLD		0x00008000L	/* Allow gold - note this is unsafe for the 'default' way of handling items. See player_drop for changes. */
+#define USE_HANDLE		0x00010000L	/* Allow this command do be displayed as an option for the 'handle' command */
 
 
 /*** Player flags ***/

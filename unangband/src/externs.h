@@ -599,6 +599,7 @@ extern bool player_assemble(int item);
 extern bool player_activate(int item);
 extern bool player_apply_rune_or_coating(int item);
 extern bool player_apply_rune_or_coating2(int item);
+extern bool player_handle(int item);
 
 /* dungeon.c */
 extern void ensure_quest(void);

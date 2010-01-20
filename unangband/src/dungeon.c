@@ -2271,6 +2271,13 @@ static void process_command(void)
 
 		/*** Inventory Commands ***/
 
+		/* Handle something - this is the generic do anything to an object command */
+		case 'h':
+		{
+			do_cmd_item(COMMAND_ITEM_HANDLE);
+			break;
+		}
+		
 		/* Wear/wield equipment */
 		case 'w':
 		{
