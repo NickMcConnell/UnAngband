@@ -817,6 +817,11 @@ void self_knowledge_aux(bool spoil, bool random)
 	{
 		text_out("You are looking around very carefully.  ");
 	}
+	if (p_ptr->sneaking)
+	{
+		text_out(format("You are sneaking to avoid disturbing sleeping monsters%s.  ",
+				p_ptr->not_sneaking ? " but your last action was noisy" : ""));
+	}
 	if (p_ptr->new_spells)
 	{
 		text_out("You can learn some spells/prayers.  ");
@@ -849,7 +854,7 @@ void self_knowledge_aux(bool spoil, bool random)
 
 			intro = TRUE;
 
-			list_object_flags(f1, f2, f3, f4, 1, 1);
+			describe_shape(p_ptr->pshape, random);
 		}
 
 		/* Intro? */

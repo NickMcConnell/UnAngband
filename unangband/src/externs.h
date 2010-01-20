@@ -661,6 +661,7 @@ extern bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int 
 extern void list_object(const object_type *o_ptr, int mode);
 extern void screen_object(object_type *o_ptr);
 extern void screen_self_object(object_type *o_ptr, int slot);
+extern void describe_shape(int shape, bool random);
 extern void print_powers(const s16b *book, int num, int y, int x, int level);
 extern void print_spells(const s16b *book, int num, int y, int x);
 extern bool make_fake_artifact(object_type *o_ptr, byte name1);

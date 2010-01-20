@@ -1266,6 +1266,14 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		text_out("This initiates the attack if successful");
 	}
 
+	/* Descrive advantages of shape change */
+	if (s_ptr->type == SPELL_CHANGE_SHAPE)
+	{
+		text_out(format(".  Being a %s affects you.  ", p_name + p_info[s_ptr->param].name));
+		
+		describe_shape(s_ptr->param, FALSE);
+	}
+	
 	return (introduced);
 }
 
@@ -2636,19 +2644,10 @@ void screen_object(object_type *o_ptr)
 
 
 /*
- * Display an object at the top of the screen that is part of the players shape.
+ * Describe an object which is part of the character. Deprecated.
  */
-void screen_self_object(object_type *o_ptr, int slot)
+void describe_self_object(object_type *o_ptr, int slot)
 {
-	/* Flush messages */
-	message_flush();
-
-	/* Set text_out hook */
-	text_out_hook = text_out_to_screen;
-
-	/* Begin recall */
-	Term_gotoxy(0, 1);
-
 	/* Display item */
 	text_out("This is a part of your current shape.  ");
 	text_out("You cannot take it off, but it will be removed if you change shape.  ");
@@ -2710,6 +2709,90 @@ void screen_self_object(object_type *o_ptr, int slot)
 	/* Display item name */
 	obj_top(o_ptr);
 }
+
+
+/*
+ * Display an object at the top of the screen that is part of the players shape. Deprecated.
+ */
+void screen_self_object(object_type *o_ptr, int slot)
+{
+	/* Flush messages */
+	message_flush();
+
+	/* Set text_out hook */
+	text_out_hook = text_out_to_screen;
+
+	/* Begin recall */
+	Term_gotoxy(0, 1);
+
+}
+
+
+/*
+ * Describes a player race / shape
+ */
+void describe_shape(int shape, bool random)
+{
+	u32b f1 = 0L;
+	u32b f2 = 0L;
+	u32b f3 = 0L;
+	u32b f4 = 0L;
+	
+	int i;
+	
+	object_type object_type_body;
+	object_type *o_ptr = &object_type_body;
+	
+	object_prep(o_ptr, lookup_kind(TV_RACE, shape));
+	
+	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+
+	/* TODO: Describe stat modifiers */
+	
+	/* Hack -- shape flags */
+	if ((!random) && (f1 || f2 || f3 || f4))
+	{
+		list_object_flags(f1, f2, f3, f4, o_ptr->pval, 1);
+	}
+
+	/* Show powers */
+	if (f3 & (TR3_ACTIVATE))
+	{
+		s16b book[26];
+		int num = 0;
+		
+		/* Fill the book with spells */
+		fill_book(o_ptr,book,&num);
+
+		/* Header */
+		text_out("\nYou may activate yourself for the following powers:\n");
+		
+		/* Dump the spells */
+		for (i = 0; i < num; i++)
+		{
+			bool dummy = TRUE;
+			char info[80];
+
+			/* Get the spell info */
+			spell_type* s_ptr = &s_info[book[i]];
+
+			/* Prepare the spell */
+			process_spell_prepare(book[i], 25, &dummy, FALSE, FALSE);
+
+			/* Get extra info */
+			spell_info(info, sizeof(info), book[i], p_ptr->lev);
+
+			/* Dump the spell --(-- */
+			text_out(format("  %c) %-30s %s\n",
+				I2A(i), s_name + s_ptr->name,
+				info));
+
+			/* Paranoia - clear boost */
+			p_ptr->boost_spell_power = 0;
+		}
+	}
+}
+
 
 
 /*
@@ -3134,13 +3217,13 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 		switch (mode)
 		{
 			case LIST_FLAGS_CAN:
-				anything |= outlist("It causes its wielder to", list, TERM_WHITE);
+				anything |= outlist("It causes you to", list, TERM_WHITE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It may cause its wielder to", list, TERM_L_WHITE);
+				anything |= outlist("It may cause you to", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It doesn't cause its wielder to", list, TERM_SLATE);
+				anything |= outlist("It doesn't cause you to", list, TERM_SLATE);
 				break;
 		}
 
