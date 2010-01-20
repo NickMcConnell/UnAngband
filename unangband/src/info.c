@@ -1274,7 +1274,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		
 		describe_shape(s_ptr->param, FALSE);
 		
-		text_out("The shape change lasts until you end the shape change effect");
+		text_out(format("You will remain a %s until you change to another shape or end the shape change effect", p_name + p_info[s_ptr->param].name));
 	}
 	
 	return (introduced);
