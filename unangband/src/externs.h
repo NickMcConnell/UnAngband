@@ -1195,6 +1195,7 @@ extern bool modify_panel(int wy, int wx);
 extern bool adjust_panel(int y, int x);
 extern bool change_panel(int dir);
 extern void verify_panel(void);
+extern void center_panel(void);
 extern void display_room_info(int room);
 extern void describe_room(void);
 extern cptr look_mon_desc(int m_idx);

@@ -3892,6 +3892,34 @@ void verify_panel(void)
 	modify_panel(wy, wx);
 }
 
+/*
+ * This centers the panel on the player
+ */
+void center_panel(void)
+{
+	int py = p_ptr->py;
+	int px = p_ptr->px;
+
+	int wy = p_ptr->wy;
+	int wx = p_ptr->wx;
+
+
+	/* Scroll screen vertically when off-center */
+	if (py != wy + SCREEN_HGT / 2)
+	{
+		wy = py - SCREEN_HGT / 2;
+	}
+
+	/* Scroll screen horizontally when off-center */
+	if (px != wx + SCREEN_WID / 2)
+	{
+		wx = px - SCREEN_WID / 2;
+	}
+
+	/* Scroll if needed */
+	modify_panel(wy, wx);
+}
+
 
 /*
  * Monster health description
@@ -5663,13 +5691,13 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 			/* Allow target */
 			if ((cave_m_idx[y][x] > 0) && target_able(cave_m_idx[y][x]))
 			{
-				my_strcpy(info, "q,t,s,p,m,o,k,a,g,+,-,.,?,<dir>", sizeof (info));
+				my_strcpy(info, "q,t,a,p,o,k,g,+,-,.,@,?,<dir>", sizeof (info));
 			}
 
 			/* Dis-allow target */
 			else
 			{
-				my_strcpy(info, "q,p,m,o,k,a,g,+,-,.,?,<dir>", sizeof (info));
+				my_strcpy(info, "q,a,p,o,k,g,+,-,.,@,?,<dir>", sizeof (info));
 			}
 
 			/* Describe and Prompt */
@@ -5841,8 +5869,15 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 						if (mode & (TARGET_ALLY)) mode &= ~(TARGET_ALLY);
 						else mode |= (TARGET_ALLY);
 						
-						/* Prepare the "temp" array */
+						/* Forget */
+						temp_n = 0;
+
+						/* Re-prepare targets */
 						target_set_interactive_prepare(mode);
+
+						/* Start near the player again and fake movement */
+						m = 0;
+						d = 5;
 					}
 					
 					break;
@@ -5943,7 +5978,7 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 		else
 		{
 			/* Default prompt */
-			my_strcpy(info, "q,t,p,m,+,-,<dir>", sizeof (info));
+			my_strcpy(info, "q,t,a,p,m,+,-,@,?,<dir>", sizeof (info));
 
 			/* Describe and Prompt (enable "TARGET_LOOK") */
 			query = target_set_interactive_aux(y, x, &room, mode | TARGET_LOOK, info);
@@ -6109,8 +6144,15 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 						if (mode & (TARGET_ALLY)) mode &= ~(TARGET_ALLY);
 						else mode |= (TARGET_ALLY);
 						
-						/* Prepare the "temp" array */
+						/* Forget */
+						temp_n = 0;
+
+						/* Re-prepare targets */
 						target_set_interactive_prepare(mode);
+
+						/* Start near the player again and fake movement */
+						m = 0;
+						d = 5;
 					}
 					
 					break;
