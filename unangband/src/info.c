@@ -1273,6 +1273,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		text_out(format(".  Being a %s affects you.  ", p_name + p_info[s_ptr->param].name));
 		
 		describe_shape(s_ptr->param, FALSE);
+		
+		text_out("The shape change lasts until you end the shape change effect");
 	}
 	
 	return (introduced);
