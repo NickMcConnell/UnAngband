@@ -1852,8 +1852,7 @@ struct player_type
 	s16b run_cur_dir;       /* Direction we are running */
 	s16b run_old_dir;       /* Direction we came from */
 	s16b run_cur_feat;		/* Feature we started running on */
-	s16b run_left_feat;		/* Feature to our left when we started */
-	s16b run_right_feat;	/* Feature to our right when we started */
+	s16b run_ignore_feat[9];/* Features we would normally notice which we choose to ignore */
 	bool running_withpathfind;      /* Are we using the pathfinder ? */
 	bool run_open_area;     /* Looking for an open area */
 	bool run_break_right;   /* Looking for a break (right) */

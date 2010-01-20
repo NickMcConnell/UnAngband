@@ -37,7 +37,7 @@
  (  Load screen dump                    ^I  (special - tab)
  )  Dump reloadable screen dump         ^J  (special - linefeed)
  {  Inscribe an object                  ^K  (unused)
- }  Uninscribe an object                ^L  (unused)
+ }  Uninscribe an object                ^L  Center the screen on player
  [  Display visible monster list        ^M  (special - return)
  ]  Dump html screen dump               ^N  (unused)
  -  (unused)                            ^O  (unused)

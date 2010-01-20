@@ -5663,13 +5663,13 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 			/* Allow target */
 			if ((cave_m_idx[y][x] > 0) && target_able(cave_m_idx[y][x]))
 			{
-				my_strcpy(info, "q,t,p,o,a,g,+,-,.,?,<dir>", sizeof (info));
+				my_strcpy(info, "q,t,s,p,m,o,k,a,g,+,-,.,?,<dir>", sizeof (info));
 			}
 
 			/* Dis-allow target */
 			else
 			{
-				my_strcpy(info, "q,p,o,a,g,+,-,.,?,<dir>", sizeof (info));
+				my_strcpy(info, "q,p,m,o,k,a,g,+,-,.,?,<dir>", sizeof (info));
 			}
 
 			/* Describe and Prompt */
@@ -5830,6 +5830,21 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 				{
 					target_set_location(y, x, mode | (TARGET_NEAR));
 					done = TRUE;
+					break;
+				}
+				
+				/* Toggle targetting of allies in kill mode */
+				case 'k':
+				{
+					if (mode & (TARGET_KILL))
+					{
+						if (mode & (TARGET_ALLY)) mode &= ~(TARGET_ALLY);
+						else mode |= (TARGET_ALLY);
+						
+						/* Prepare the "temp" array */
+						target_set_interactive_prepare(mode);
+					}
+					
 					break;
 				}
 
@@ -6083,6 +6098,21 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 				{
 					target_set_location(y, x, mode | (TARGET_NEAR));
 					done = TRUE;
+					break;
+				}
+
+				/* Toggle targetting of allies in kill mode */
+				case 'k':
+				{
+					if (mode & (TARGET_KILL))
+					{
+						if (mode & (TARGET_ALLY)) mode &= ~(TARGET_ALLY);
+						else mode |= (TARGET_ALLY);
+						
+						/* Prepare the "temp" array */
+						target_set_interactive_prepare(mode);
+					}
+					
 					break;
 				}
 

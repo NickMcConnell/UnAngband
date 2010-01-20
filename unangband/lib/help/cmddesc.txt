@@ -821,6 +821,9 @@ Redraw Screen (^R)
         abnormal situations, such as after changing the visual attr/char
         mappings, or enabling "graphics" mode.
 
+Center the screen on player (^L)
+        This comman centers the display on the player.
+
 Load screen dump (left-paren)
         This command loads a "snap-shot" of the current screen from the file
         "dump.txt", and displays it on the screen.

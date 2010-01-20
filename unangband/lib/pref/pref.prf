@@ -225,6 +225,10 @@ C:1:$
 A:^T
 C:1:'
 
+# Center screen on player
+A:^L
+C:1:X
+
 # Message colors
 %:message.prf
 

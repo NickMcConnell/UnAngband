@@ -2611,6 +2611,13 @@ static void process_command(void)
 			break;
 		}
 
+		/* Center map on player */
+		case KTRL('L'):
+		{
+			do_cmd_center_map();
+			break;
+		}
+
 		/* Look around */
 		case 'l':
 		{
