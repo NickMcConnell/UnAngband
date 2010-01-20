@@ -43,9 +43,10 @@
 /*
  * Modes of list_object_flags()
  */
-#define LIST_FLAGS_CAN   1 /* Target selected normally */
-#define LIST_FLAGS_MAY     2 /* Always targets self */
-#define LIST_FLAGS_NOT    3 /* Always targets aimed target */
+#define LIST_FLAGS_CAN		1 /* Listing flags which object can do */
+#define LIST_FLAGS_MAY		2 /* Listing flags which object may not do */
+#define LIST_FLAGS_NOT		3 /* Listing flags which object can not do */
+#define LIST_FLAGS_PREVENT  4 /* Listing flags which object prevents you from doing */
 
 
 /*
@@ -2743,6 +2744,8 @@ void describe_shape(int shape, bool random)
 	object_type object_type_body;
 	object_type *o_ptr = &object_type_body;
 	
+	player_race *shape_ptr = &p_info[shape];
+	
 	object_prep(o_ptr, lookup_kind(TV_RACE, shape));
 	
 	object_flags(o_ptr, &f1, &f2, &f3, &f4);
@@ -2752,7 +2755,13 @@ void describe_shape(int shape, bool random)
 	/* Hack -- shape flags */
 	if ((!random) && (f1 || f2 || f3 || f4))
 	{
-		list_object_flags(f1, f2, f3, f4, o_ptr->pval, 1);
+		list_object_flags(f1, f2, f3, f4, o_ptr->pval, LIST_FLAGS_CAN);
+	}
+
+	/* Hack -- shape flags which prevent actions */
+	if ((!random) && (shape_ptr->cancel_flags1 || shape_ptr->cancel_flags2 || shape_ptr->cancel_flags3 || shape_ptr->cancel_flags4))
+	{
+		list_object_flags(shape_ptr->cancel_flags1, shape_ptr->cancel_flags2, shape_ptr->cancel_flags3, shape_ptr->cancel_flags4, o_ptr->pval, LIST_FLAGS_PREVENT);
 	}
 
 	/* Show powers */
@@ -2890,6 +2899,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not do x5 damage against", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you wielding weapons which execute", list, TERM_L_PURPLE);
+				break;
 		}
 	}
 
@@ -2916,6 +2928,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not do x4 damage against", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you wielding weapons which slay", list, TERM_L_PURPLE);
+				break;
 		}
 	}
 
@@ -2940,6 +2955,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not do x3 damage from", list, TERM_SLATE);
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you wielding weapons which are branded with", list, TERM_L_PURPLE);
 				break;
 		}
 
@@ -2966,9 +2984,52 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not do x3 damage against", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you wielding weapons which slay", list, TERM_L_PURPLE);
+				break;
 		}
 	}
 
+	/* Slays prevent wielding */
+	if (f1 || f4)
+	{
+		list_ptr = list;
+
+		list_ptr = spoiler_flag_aux(f1, slayx5_flags1_desc, list_ptr, N_ELEMENTS(slayx5_flags1_desc));
+		list_ptr = spoiler_flag_aux(f1, slayx4_flags1_desc, list_ptr, N_ELEMENTS(slayx4_flags1_desc));
+		list_ptr = spoiler_flag_aux(f4, slayx4_flags4_desc, list_ptr, N_ELEMENTS(slayx4_flags4_desc));
+		list_ptr = spoiler_flag_aux(f1, slayx3_flags1_desc, list_ptr, N_ELEMENTS(slayx3_flags1_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It cannot be wielded by", list, TERM_WHITE);
+				break;
+		}
+	}
+
+	/* Brands prevent wielding */
+	if (f1 || f4)
+	{
+		list_ptr = list;
+
+		list_ptr = spoiler_flag_aux(f1, brandx3_flags1_desc, list_ptr, N_ELEMENTS(brandx3_flags1_desc));
+		list_ptr = spoiler_flag_aux(f4, brandx3_flags4_desc, list_ptr, N_ELEMENTS(brandx3_flags4_desc));
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It cannot be wielded if you are vulnerable to", list, TERM_WHITE);
+				break;
+		}
+	}
+	
 	/* Vampirism */
 	if (f4)
 	{
@@ -2990,6 +3051,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not feed you stolen", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you feeding on stolen", list, TERM_L_PURPLE);
+				break;
 		}
 	}
 
@@ -3009,6 +3073,7 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				*list_ptr++ = "all stats";
 				break;
 			case LIST_FLAGS_NOT:
+			case LIST_FLAGS_PREVENT:
 				*list_ptr++ = "any stats";
 				break;
 		}
@@ -3048,6 +3113,11 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 					text_out_c(TERM_SLATE,"It does not modify your ");
 					attr = TERM_SLATE;
 					break;
+				case LIST_FLAGS_PREVENT:
+					text_out_c(TERM_SLATE,"It prevents you modifying your ");
+					attr = TERM_L_PURPLE;
+					break;
+
 			}
 			anything |= outlist_pval(NULL, list,attr, mode == LIST_FLAGS_CAN ? pval : 0);
 		}
@@ -3093,6 +3163,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not sustain", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you sustaining", list, TERM_L_PURPLE);
+				break;
 		}
 	}
 
@@ -3119,6 +3192,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not provide resistance to", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you resisting", list, TERM_L_PURPLE);
+				break;
 		}
 	}
 
@@ -3143,6 +3219,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not provide immunity to", list, TERM_SLATE);
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you becoming immune to", list, TERM_L_PURPLE);
 				break;
 		}
 	}
@@ -3169,6 +3248,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not protect you from", list, TERM_SLATE);
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you being protected from", list, TERM_L_PURPLE);
 				break;
 		}
 	}
@@ -3197,6 +3279,29 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not make you vulnerable to", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you becoming vulnerable to", list, TERM_L_PURPLE);
+				break;
+		}
+		
+		/* Hack - note prevention */
+		if (mode == LIST_FLAGS_CAN)
+		{
+			u32b pf1 = 0L;
+			u32b pf2 = 0L;
+			u32b pf3 = 0L;
+			u32b pf4 = 0L;			
+			
+			/* Note opposites */
+			if (f4 & (TR4_HURT_LITE)) pf4 |= (TR4_BRAND_LITE);
+			/* if (f4 & (TR4_HURT_WATER)) pf4 |= (TR4_BRAND_WATER); */
+			if (f4 & (TR4_HURT_POIS)) pf1 |= (TR1_BRAND_POIS);
+			if (f4 & (TR4_HURT_ACID)) pf1 |= (TR1_BRAND_ACID);
+			if (f4 & (TR4_HURT_ELEC)) pf1 |= (TR1_BRAND_ELEC);
+			if (f4 & (TR4_HURT_FIRE)) pf1 |= (TR1_BRAND_FIRE);
+			if (f4 & (TR4_HURT_COLD)) pf1 |= (TR1_BRAND_COLD);
+			
+			list_object_flags(pf1, pf2, pf3, pf4, 0, LIST_FLAGS_PREVENT);
 		}
 	}
 
@@ -3225,6 +3330,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It doesn't cause you to", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you", list, TERM_L_PURPLE);
+				break;
 		}
 
 		/* Note that blessed weapons have special treatment */
@@ -3240,6 +3348,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 					break;
 				case LIST_FLAGS_NOT:
 					text_out_c(TERM_SLATE, "It is not blessed by the gods.  ");
+					break;
+				case LIST_FLAGS_PREVENT:
+					anything |= outlist("It prevents you being blessed by the gods.  ", list, TERM_L_PURPLE);
 					break;
 			}
 			anything = TRUE;
@@ -3258,6 +3369,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 					break;
 				case LIST_FLAGS_NOT:
 					text_out_c(TERM_SLATE, "It has no effect on free movement in the fingers.  ");
+					break;
+				case LIST_FLAGS_PREVENT:
+					anything |= outlist("It prevents you having free momentment in the fingers.  ", list, TERM_L_PURPLE);
 					break;
 			}
 			anything = TRUE;
@@ -3290,8 +3404,10 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not sense", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you sensing", list, TERM_L_PURPLE);
+				break;
 		}
-
 	}
 
 	/* Miscellenious Abilities */
@@ -3318,6 +3434,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It is damaged by", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you protecting it from", list, TERM_L_PURPLE);
+				break;
 		}
 
 		/* Note that blessed weapons have special treatment */
@@ -3333,6 +3452,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				break;
 			case LIST_FLAGS_NOT:
 				text_out_c(TERM_SLATE, "It can be stolen from your inventory.  ");
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you protecting it from being stolen from your inventory.  ", list, TERM_L_PURPLE);
 				break;
 		}
 		anything = TRUE;
@@ -3363,7 +3485,35 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not mark you as", list, TERM_SLATE);
 				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you being marked as", list, TERM_L_PURPLE);
+				break;
 		}
+		
+		/* Hack - note prevention */
+		if (mode == LIST_FLAGS_CAN)
+		{
+			u32b pf1 = 0L;
+			u32b pf2 = 0L;
+			u32b pf3 = 0L;
+			u32b pf4 = 0L;			
+			
+			/* Note opposites */
+			if (f4 & (TR4_ANIMAL)) pf1 |= (TR1_SLAY_NATURAL);
+			if (f4 & (TR4_EVIL)) pf1 |= (TR1_BRAND_HOLY);
+			if (f4 & (TR4_UNDEAD)) pf1 |= (TR1_SLAY_UNDEAD);
+			if (f4 & (TR4_DEMON)) pf1 |= (TR1_SLAY_DEMON);
+			if (f4 & (TR4_ORC)) pf1 |= (TR1_SLAY_ORC);
+			if (f4 & (TR4_TROLL)) pf1 |= (TR1_SLAY_TROLL);
+			if (f4 & (TR4_GIANT)) pf1 |= (TR1_SLAY_GIANT);
+			if (f4 & (TR4_DRAGON)) pf1 |= (TR1_SLAY_DRAGON);
+			if (f4 & (TR4_ELF)) pf4 |= (TR4_SLAY_ELF);
+			if (f4 & (TR4_MAN)) pf4 |= (TR4_SLAY_MAN);
+			if (f4 & (TR4_DWARF)) pf4 |= (TR4_SLAY_DWARF);
+			
+			list_object_flags(pf1, pf2, pf3, pf4, 0, LIST_FLAGS_PREVENT);
+		}
+
 	}
 
 	/* Negative effects */
@@ -3390,6 +3540,9 @@ bool list_object_flags(u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 				break;
 			case LIST_FLAGS_NOT:
 				anything |= outlist("It does not burden you with", list, TERM_SLATE);
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents you being burdened with", list, TERM_L_PURPLE);
 				break;
 		}
 	}
@@ -4384,17 +4537,17 @@ void list_object(const object_type *o_ptr, int mode)
 	{
 		if (f3 & (TR3_PERMA_CURSE))
 		{
-			text_out_c(TERM_RED, "It is permanently cursed.  ");
+			text_out_c(TERM_L_PURPLE, "It is permanently cursed.  ");
 			anything = TRUE;
 		}
 		else if (f3 & (TR3_HEAVY_CURSE))
 		{
-			text_out_c(TERM_RED, "It is heavily cursed.  ");
+			text_out_c(TERM_L_PURPLE, "It is heavily cursed.  ");
 			anything = TRUE;
 		}
 		else if (object_known_p(o_ptr) || (o_ptr->feeling == INSCRIP_CURSED))
 		{
-			text_out_c(TERM_RED, "It is cursed.  ");
+			text_out_c(TERM_L_PURPLE, "It is cursed.  ");
 			anything = TRUE;
 		}
 	}
