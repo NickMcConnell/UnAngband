@@ -2752,6 +2752,8 @@ void screen_self_object(object_type *o_ptr, int slot)
 	/* Begin recall */
 	Term_gotoxy(0, 1);
 
+	/* Describe the object */
+	describe_self_object(o_ptr, slot);
 }
 
 
