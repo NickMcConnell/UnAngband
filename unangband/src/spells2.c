@@ -5817,6 +5817,7 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 		if (region)
 		{
 			region_type *r_ptr = &region_list[region];
+			region_info_type *ri_ptr = &region_info[r_ptr->type];
 
 			/*
 			 * Hack -- Some regions' source is target.
@@ -5825,9 +5826,11 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			 * the map, because the target stops being projectable from the invisible source. We set the source
 			 * for the projection here, and then keep the source in sync with the target if it moves.
 			 */
-			if ((r_ptr->flags1 & (RE1_MOVE_SOURCE)) &&
+			if (((r_ptr->flags1 & (RE1_MOVE_SOURCE)) &&
 					(method_ptr->flags1 & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX | PROJECT_JUMP)) &&
 					((method_ptr->flags1 & (PROJECT_ARC | PROJECT_STAR)) == 0) && (r_ptr->first_piece))
+			/* Hack -- do the same if we are aiming a projection which creates self-targetting blows */
+					|| ((method_info[ri_ptr->method].flags1 & (PROJECT_SELF)) != 0))
 			{
 				/* Set source to first projectable location */
 				r_ptr->y0 = region_piece_list[r_ptr->first_piece].y;
@@ -6743,6 +6746,9 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 	{
 		lasts = s_ptr->lasts_plus;
 	}
+	
+	/* Hack -- for summoning */
+	if (!lasts) lasts = 1;
 
 	/* Has another effect? */
 	if (s_ptr->type)
@@ -6825,7 +6831,18 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_SUMMON:
 			{
-				if (summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, s_ptr->param, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				while (lasts-- && summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, s_ptr->param, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				*cancel = FALSE;
+				break;
+			}
+			case SPELL_AIM_SUMMON:
+			{
+				int y, x;
+				
+				/* Get a destination to summon around */
+				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
+				
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}
@@ -6845,7 +6862,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Summoning a monster */
 				else
 				{
-					if (summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+					while (lasts-- && summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 					*cancel = FALSE;
 				}
 				break;
@@ -6854,7 +6871,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			{
 				summon_group_type = s_ptr->param;
 
-				if (summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, SUMMON_GROUP, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				while (lasts-- && summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, SUMMON_GROUP, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}

@@ -1079,7 +1079,7 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_SLOW_POIS)) vp[vn++] = "delays the onset of poison";
 	if (s_ptr->flags2 & (SF2_SLOW_DIGEST)) vp[vn++] = "digests food more efficiently";
 	if (s_ptr->flags2 & (SF2_AGGRAVATE)) vp[vn++] = "wakes up nearby monsters and hastes those in line of sight";
-	if (s_ptr->type == SPELL_SUMMON)
+	if ((s_ptr->type == SPELL_SUMMON) || (s_ptr->type == SPELL_AIM_SUMMON))
 	{
 		switch(s_ptr->param)
 		{
@@ -1142,7 +1142,6 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags2 & (SF2_TELE_LEVEL)) vp[vn++] = "pushes you through floor or ceiling";
 	if (s_ptr->flags2 & (SF2_RECALL)) vp[vn++]="returns you to the surface, or teleports you into the depths";
 	if (s_ptr->flags2 & (SF2_ALTER_LEVEL)) vp[vn++] = "alters the level you are on";
-	if (s_ptr->type == SPELL_XXX2) vp[vn++] = format("does XXX2 %d",s_ptr->param);
 	if (s_ptr->flags2 & (SF2_BANISHMENT)) vp[vn++] = "allows you to remove a monster type from a level (1d4 damage per monster)";
 	if (s_ptr->flags2 & (SF2_MASS_BANISHMENT)) vp[vn++] = "removes all nearby monsters";
 	if (s_ptr->flags3 & (SF3_PFIX_CURSE)) vp[vn++] = "removes a normal curse from an item";

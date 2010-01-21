@@ -2436,8 +2436,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		/* RF4_AURA */
 		case 96+7:
 		{
-			/* The target is attacked by a ball attack */
-			mon_blow_ranged(who, attack, y, x, RBM_AURA, 2, FLG_MON_CLOUD);
+			/* The target (self) is attacked by a ball attack */
+			mon_blow_ranged(who, attack, m_ptr->fy, m_ptr->fx, RBM_AURA, 2, FLG_MON_CLOUD);
 
 			break;
 		}

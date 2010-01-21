@@ -1213,6 +1213,7 @@ extern key_event target_set_interactive_aux(int y, int x, int *room, int mode, c
 extern bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc, byte diameter_of_source);
 extern bool get_aim_dir(int *dp, int mode, int range, int radius, u32b flg, byte arc, byte diameter_of_source);
 extern int get_monster_by_aim(int mode);
+extern bool get_grid_by_aim(int mode, int *ty, int *tx);
 extern int get_angle_to_dir(int angle);
 extern bool get_rep_dir(int *dp);
 extern bool confuse_dir(int *dp);

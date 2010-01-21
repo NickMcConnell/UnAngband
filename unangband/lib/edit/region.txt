@@ -367,3 +367,10 @@ G:*:b
 I:3
 F:AUTOMATIC | ATTR_EFFECT | PROJECTION
 B:SCATTER
+
+# Flash - used by Freeze
+
+N:47:flash
+G:*:T
+I:3
+F:SCALAR_VECTOR | AUTOMATIC | RANDOM

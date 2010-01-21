@@ -1076,6 +1076,7 @@ enum
 #define GF_HURT_POISON	151
 #define GF_POTS	152
 #define GF_CHARM_PLANT	153
+#define GF_TANGLE_WEAK	154
 
 
 
@@ -1666,7 +1667,7 @@ enum
 #define SPELL_SUMMON_GROUP_IDX     12
 #define SPELL_CREATE_KIND     13
 #define SPELL_RAISE_RACE      14
-#define SPELL_XXX2     15
+#define SPELL_AIM_SUMMON     15
 #define SPELL_CURE_DISEASE	16
 #define SPELL_PFIX_CONF		17
 #define SPELL_PFIX_POIS		18
