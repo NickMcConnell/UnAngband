@@ -13,7 +13,7 @@ for 3rd book druidic cold spells.
 and Lotho, swap the relative depths of the two sets of uniques.
 
 - Improve running algorithm to ignore terrain the player starts near.
-The only oustanding item is for the player to be able to follow the
+The only outstanding item is for the player to be able to follow the
 walls of wide corridors more easily.
 
 ### User Interface ###
