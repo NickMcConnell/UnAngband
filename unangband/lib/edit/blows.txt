@@ -447,9 +447,9 @@ T:0-9999:create~ a cross of *
 W:4:0:0
 R:3
 M:20
-F:4WAY | KILL | PLAY |
+F:4WAY | KILL | PLAY | GRID | ITEM | MAGIC |
 F:RANGED | DIR_STOP |
-D:surround~ & with @ cross#:$ enemies
+D:create~ @ cross#:$ enemies
 
 N:51:STRIKE
 T:0-9999:strike~ at & with *

@@ -14332,7 +14332,19 @@ bool project_method(int who, int what, int method, int effect, int damage, int l
 	if (region)
 	{
 		region_type *r_ptr = &region_list[region];
+		region_info_type *ri_ptr = &region_info[r_ptr->type];
 		int i;
+		
+		/* Hack -- inverse without a sub-projection. Reverse immediately */
+		if ((r_ptr->flags1 & (RE1_INVERSE)) && !(ri_ptr->method))
+		{
+			r_ptr->y1 = y1 = y0;
+			r_ptr->x1 = x1 = x0;
+			r_ptr->y0 = y0 = y;
+			r_ptr->x0 = x0 = x;
+			y = y1;
+			x = x1;
+		}
 
 		/* Overwriting features */
 		if (r_ptr->effect == GF_FEATURE)

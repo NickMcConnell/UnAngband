@@ -5826,11 +5826,11 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			 * the map, because the target stops being projectable from the invisible source. We set the source
 			 * for the projection here, and then keep the source in sync with the target if it moves.
 			 */
-			if (((r_ptr->flags1 & (RE1_MOVE_SOURCE)) &&
+			if (((((r_ptr->flags1 & (RE1_MOVE_SOURCE)) &&
 					(method_ptr->flags1 & (PROJECT_BOOM | PROJECT_4WAY | PROJECT_4WAX | PROJECT_JUMP)) &&
-					((method_ptr->flags1 & (PROJECT_ARC | PROJECT_STAR)) == 0) && (r_ptr->first_piece))
+					((method_ptr->flags1 & (PROJECT_ARC | PROJECT_STAR)) == 0))
 			/* Hack -- do the same if we are aiming a projection which creates self-targetting blows */
-					|| ((method_info[ri_ptr->method].flags1 & (PROJECT_SELF)) != 0))
+					|| ((method_info[ri_ptr->method].flags1 & (PROJECT_SELF)) != 0))) && (r_ptr->first_piece))
 			{
 				/* Set source to first projectable location */
 				r_ptr->y0 = region_piece_list[r_ptr->first_piece].y;

@@ -68,7 +68,7 @@ M:C:13
 M:W:180
 
 # Maximum number of spells
-M:S:627
+M:S:628
 
 # Maximum number of runes
 M:Y:30
@@ -80,7 +80,7 @@ M:B:8
 M:Q:8
 
 # Maximum number of region info
-M:i:48
+M:i:50
 
 # Maximum number of region pieces
 M:p:2048
