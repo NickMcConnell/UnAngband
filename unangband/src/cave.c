@@ -4924,33 +4924,32 @@ bool map_home(int m_idx)
 
 
 /*
- * Map the current panel (plus some) ala "magic mapping"
+ * Map a circle ala "magic mapping"
  *
  * We must never attempt to map the outer dungeon walls, or we
  * might induce illegal cave grid references.
  */
 void map_area(void)
 {
-	int i, x, y, y1, y2, x1, x2;
+	int i, x, y, y1, y2, x1, x2, r;
 
+	/* Radius of detection */
+	r = 2 * MAX_SIGHT;
 
 	/* Pick an area to map */
-	y1 = p_ptr->wy - randint(10);
-	y2 = p_ptr->wy+SCREEN_HGT + randint(10);
-	x1 = p_ptr->wx - randint(20);
-	x2 = p_ptr->wx+SCREEN_WID + randint(20);
-
-	/* Efficiency -- shrink to fit legal bounds */
-	if (y1 < 1) y1 = 1;
-	if (y2 > DUNGEON_HGT-1) y2 = DUNGEON_HGT-1;
-	if (x1 < 1) x1 = 1;
-	if (x2 > DUNGEON_WID-1) x2 = DUNGEON_WID-1;
+	y1 = MAX(p_ptr->py - r, 1);
+	y2 = MIN(p_ptr->py + r, DUNGEON_HGT-1);
+	x1 = MAX(p_ptr->px - r, 1);
+	x2 = MIN(p_ptr->px + r, DUNGEON_WID-1);
 
 	/* Scan that area */
 	for (y = y1; y < y2; y++)
 	{
 		for (x = x1; x < x2; x++)
 		{
+			/* Check distance */
+			if (distance(p_ptr->py, p_ptr->px, y, x) > r) continue;
+
 			/* All non-walls are "checked" */
 			if (!(f_info[cave_feat[y][x]].flags1 & (FF1_WALL)))
 			{
