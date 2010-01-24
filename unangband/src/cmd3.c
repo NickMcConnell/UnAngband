@@ -2836,13 +2836,19 @@ bool player_light_and_douse(int item)
 	/* Light the light source */
 	if (!(o_ptr->timeout))
 	{
-		msg_format("You light %s %s.", own_str, o_name);
-		o_ptr->timeout = o_ptr->charges;
-		o_ptr->charges = 0;
-
-		if (item < 0)
+		if (!(o_ptr->charges))
 		{
-			gain_attribute(p_ptr->py, p_ptr->px, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
+			msg_format("You try to light %s %s but it splutters and goes out!", own_str, o_name);			
+		}
+		else {
+			msg_format("You light %s %s.", own_str, o_name);
+			o_ptr->timeout = o_ptr->charges;
+			o_ptr->charges = 0;
+
+			if (item < 0)
+			{
+				gain_attribute(p_ptr->py, p_ptr->px, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
+			}
 		}
 	}
 
