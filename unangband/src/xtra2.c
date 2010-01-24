@@ -1736,7 +1736,7 @@ void improve_familiar(void)
 		}
 
 		/* Get a choice */
-		if (get_list(print_familiars, table, num, "Ability", "Familiar gains which ability", ", ?=help", 1, 36, familiar_commands, &choice))
+		if (get_list(print_familiars, table, num, "Ability", "Familiar gains which ability", ", ?=help", 1, 26, familiar_commands, &choice))
 		{
 			p_ptr->familiar_attr[slot] = familiar_ability[choice].attr;
 		}
