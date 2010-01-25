@@ -3866,6 +3866,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 			if (cave_m_idx[y][x] > 0)
 			{
 				monster_type *m_ptr = &m_list[cave_m_idx[y][x]];
+				monster_lore *l_ptr = &l_list[cave_m_idx[y][x]];
 				monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
 				int visible = m_ptr->ml;
@@ -3954,6 +3955,9 @@ void player_fire_or_throw_selected(int item, bool fire)
 				genuine_hit = test_hit_fire(chance2,
 						calc_monster_ac(cave_m_idx[y][x], TRUE),
 						m_ptr->ml);
+				
+				/* We are attacking - count attacks */
+				if ((l_ptr->tblows < MAX_SHORT) && (m_ptr->ml)) l_ptr->tblows++;
 
 				/* Missiles bounce off resistant monsters */
 				if (genuine_hit && mon_resist_object(cave_m_idx[y][x], i_ptr))

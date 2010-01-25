@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	4
-#define VERSION_EXTRA	0
+#define VERSION_EXTRA	1
 
 /*
  * Oldest version number that can still be imported
@@ -2909,14 +2909,15 @@ enum
 /*
  * Flags for attack descriptions.
  */
-#define ATK_DESC_PRIMARY	0x01
-#define ATK_DESC_ALTERNATE	0x02
-#define ATK_DESC_HEARD		0x04
-#define ATK_DESC_INDIRECT	0x08
-#define ATK_DESC_SELF		0x10
-#define ATK_DESC_TENSE		0x20
-#define ATK_DESC_LAST		0x40
-#define ATK_DESC_EXCLAIM	0x80
+#define ATK_DESC_PRIMARY	0x0001
+#define ATK_DESC_ALTERNATE	0x0002
+#define ATK_DESC_HEARD		0x0004
+#define ATK_DESC_INDIRECT	0x0008
+#define ATK_DESC_SELF		0x0010
+#define ATK_DESC_TENSE		0x0020
+#define ATK_DESC_LAST		0x0040
+#define ATK_DESC_EXCLAIM	0x0080	/* Finish end of sentence with excalamation mark */
+#define ATK_DESC_NO_STOP	0x0100	/* Don't punctuate end of sentence */
 
 
 

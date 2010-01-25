@@ -2266,7 +2266,17 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 							}
 
 							player = (ny == p_ptr->py) && (nx == p_ptr->px);
+							
+							/* We see the monster being hit by a trap */
+							if (cave_m_idx[ny][nx] > 0)
+							{
+								monster_type *m_ptr = &m_list[cave_m_idx[ny][nx]];
+								monster_lore *l_ptr = &l_list[cave_m_idx[ny][nx]];
 
+								/* We are attacking - count attacks */
+								if ((l_ptr->tblows < MAX_SHORT) && (m_ptr->ml)) l_ptr->tblows++;
+							}
+							
 							/* Hack - Block murder holes here to use up ammunition */
 							if ((player) && (p_ptr->blocking))
 							{
@@ -2681,7 +2691,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 				/* Get damage for regular spells */
 				else if (f_ptr->spell)
 				{
-					dam = get_dam(2 + p_ptr->depth / 2, f_ptr->spell);
+					dam = get_dam(2 + p_ptr->depth / 2, f_ptr->spell, TRUE);
 				}
 				else
 				{
@@ -3139,6 +3149,9 @@ void py_attack(int dir)
 		if (p_ptr->blocking) bonus += 20;
 
 		chance = (p_ptr->skills[SKILL_TO_HIT_MELEE] + (bonus * BTH_PLUS_ADJ));
+		
+		/* We are attacking - count attacks */
+		if ((l_ptr->tblows < MAX_SHORT) && (m_ptr->ml)) l_ptr->tblows++;
 		
 		/* Test for hit */
 		if (!test_hit_norm(chance, calc_monster_ac(cave_m_idx[y][x], FALSE), m_ptr->ml))

@@ -881,6 +881,9 @@ struct monster_lore
 	s16b pkills;  /* Count monsters killed in this life */
 	s16b tkills;  /* Count monsters killed in all lives */
 
+	s16b tblows;  /* Count number of times you have attacked monster with 'missable' attack */
+	s16b tdamage;  /* Count number of times you have damaged monster */
+	
 	byte wake;    /* Number of times woken up (?) */
 	byte ignore;  /* Number of times ignored (?) */
 
@@ -890,7 +893,7 @@ struct monster_lore
 	byte drop_gold;       /* Max number of gold dropped at once */
 	byte drop_item;       /* Max number of item dropped at once */
 
-	byte cast_innate;      /* Max number of inate spells seen */
+	byte cast_innate;      /* Max number of innate spells seen */
 	byte cast_spell;      /* Max number of other spells seen */
 
 	byte blows[4];/* Number of times each blow type was seen */

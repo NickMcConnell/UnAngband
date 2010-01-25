@@ -18,7 +18,7 @@ V:0.6.4
 
 N:0:NOTHING
 I:0
-D:do||es|:::no effect:::
+#D:do||es|:::no effect:::
 T:nothing
 
 N:1:STORM
@@ -488,7 +488,7 @@ T:salt water
 
 N:94:HALLU
 I:10
-D:space~ out::::::
+D:cause~:::to hallucinate:::
 T:hallucination
 
 N:95:FEATURE

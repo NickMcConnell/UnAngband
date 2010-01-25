@@ -3046,6 +3046,12 @@ static bool get_move(int m_idx, int *ty, int *tx, bool *fear,
 			if ((m_ptr->ml) && (randint(20) == 1))
 				l_ptr->flags1 |= (RF1_NEVER_MOVE);
 		}
+		
+		/* Use a target if it is adjacent */
+		if ((*ty) && (*tx) && (distance(m_ptr->fy, m_ptr->fx, *ty, *tx) <= 1))
+		{
+			return (TRUE);
+		}
 
 		/* Look for adjacent enemies */
 		for (i = 0; i < 8; i++)
@@ -5380,6 +5386,8 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 
 					int ac = calc_monster_ac(cave_m_idx[ny][nx], FALSE);
 					
+					monster_lore *nl_ptr = &l_list[cave_m_idx[ny][nx]];
+					
 					int result;
 					
 					/* Hack -- no more attacks */
@@ -5391,8 +5399,14 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 						break;
 					}
 
+					/* We see the monster fighting */
+					if ((l_ptr->blows[ap_cnt] < MAX_UCHAR) && (m_ptr->ml)) l_ptr->blows[ap_cnt]++;
+					
 					/* Hack -- ignore ineffective attacks */
 					if (!effect) continue;
+					
+					/* We are attacking - count attacks */
+					if ((nl_ptr->tblows < MAX_SHORT) && (m_ptr->ml)) nl_ptr->tblows++;
 
 					/* Never display message XXX XXX XXX */
 					if (!n_ptr->csleep && !mon_check_hit(cave_m_idx[ny][nx], effect, r_ptr->level, m_idx , FALSE)) continue;
@@ -7081,7 +7095,7 @@ static void process_monster(int m_idx)
 			}
 
 			/* Never move can only target adjacent monsters. Note we must use real distance here */
-			/*if ((((r_ptr->flags1 & (RF1_NEVER_MOVE)) != 0) || (m_ptr->petrify)) && (distance(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx) > 1)) continue;*/
+			if ((((r_ptr->flags1 & (RF1_NEVER_MOVE)) != 0) || (m_ptr->petrify)) && (distance(m_ptr->fy, m_ptr->fx, n_ptr->fy, n_ptr->fx) > 1)) continue;
 			
 			/* Can't attack the target */
 			if (!(can_target) || ((r_ptr->flags1 & (RF1_NEVER_BLOW)) != 0))

@@ -3027,6 +3027,9 @@ bool mon_take_hit(int m_idx, int dam, bool *fear, cptr note)
 
 	/* Hurt it */
 	m_ptr->hp -= dam;
+	
+	/* We are damaging - count damage */
+	if ((l_ptr->tdamage < 10000) && (m_ptr->ml)) l_ptr->tdamage++;
 
 	/* It is dead now */
 	if (m_ptr->hp < 0)

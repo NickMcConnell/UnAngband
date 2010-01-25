@@ -1613,6 +1613,8 @@ static void text_out_blow(const char *s, int person, bool infinitive, int num)
 #define DESC_MONSTER_SELF		0x40
 #define DESC_TRAP_VICTIM		0x80
 #define DESC_MONSTER_ATTACKER	0x100
+#define DESC_MONSTER_MALE		0x200
+#define DESC_MONSTER_FEMALE		0x400
 
 /*
  * Hack -- Get spell description for effects on target based on blow.
@@ -1667,8 +1669,11 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	/* Hack -- attack affects you */
 	if (details & (DESC_MELEE_ATTACK)) p[3] = "you";
 
-	/* Hack -- attack affects a monster using it on itself*/
-	if (details & (DESC_MONSTER_SELF)) p[3] = "them";
+	/* Hack -- attack affects a monster using it on itself */
+	if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_MALE | DESC_MONSTER_FEMALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_MALE | DESC_MONSTER_FEMALE)) p[3] = "his or herself";
+	else if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_MALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_MALE)) p[3] = "himself";
+	else if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_FEMALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_FEMALE)) p[3] = "herself";
+	else if (details & (DESC_MONSTER_SELF)) p[3] = "itself";
 
 	/* Hack -- attack affects a monster using it on itself*/
 	if (details & (DESC_TRAP_VICTIM)) p[3] = "the victim";
