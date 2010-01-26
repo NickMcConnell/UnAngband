@@ -15529,6 +15529,7 @@ static void build_store(int feat, int yy, int xx)
 static void town_gen_hack(void)
 {
 	int y, x, k, n;
+	bool placed_player = FALSE;
 
 	int rooms[MAX_STORES];
 
@@ -15613,40 +15614,42 @@ static void town_gen_hack(void)
 		}
 	}
 
-	/* Place the dungeon entrance */
-	while (TRUE)
+	/* Place a down stairs if necessary */
+	if (level_flag & (LF1_MORE))
 	{
-		/* Pick a location at least "three" from the outer walls */
-		y = rand_range(3, TOWN_HGT - 4);
-		x = rand_range(3, TOWN_WID - 4);
+		while (TRUE)
+		{
+			/* Pick a location at least "three" from the outer walls */
+			y = rand_range(3, TOWN_HGT - 4);
+			x = rand_range(3, TOWN_WID - 4);
 
-		/* Require a "starting" floor grid */
-		if (cave_start_bold(y, x)) break;
+			/* Require a "starting" floor grid */
+			if (cave_start_bold(y, x)) break;
+		}
+
+		if (level_flag & (LF1_SURFACE))
+		{
+			/* Clear previous contents, add dungeon entrance */
+			place_random_stairs(y, x, FEAT_ENTRANCE);
+		}
+		else
+		{
+			/* No dungeon entrances in underground towns/towers */
+			cave_set_feat(y, x, FEAT_MORE);
+		}
+		
+		/* Place the player on the map, unless coming up the stairs */
+		if (p_ptr->create_stair != FEAT_LESS)
+		{
+			player_place(y, x, TRUE);
+			placed_player = TRUE;
+		}
 	}
 
-	/* Hack -- always have upstairs in surface of tower */
-	if ((level_flag & (LF1_TOWER))
-		&& (level_flag & (LF1_SURFACE)))
+	/* Place an up stairs if necessary */
+	if (level_flag & (LF1_LESS))
 	{
-		cave_set_feat(y, x, FEAT_LESS);
-	}
-	else
-	{
-		/* Clear previous contents, add dungeon entrance */
-		place_random_stairs(y, x, FEAT_ENTRANCE);
-	}
-
-	/* Place the player */
-	player_place(y, x, TRUE);
-
-	/* Sometimes we have to place additional upstairs */
-	if ((level_flag & (LF1_TOWER)
-	     && p_ptr->depth < max_depth(p_ptr->dungeon)
-	     && p_ptr->depth > min_depth(p_ptr->dungeon))
-	    || (!(level_flag & (LF1_TOWER))
-			&& p_ptr->depth > min_depth(p_ptr->dungeon)))
-	{
-		/* Place the up stairs */
+		/* Place the stairs */
 		while (TRUE)
 		{
 			/* Pick a location at least "three" from the outer walls */
@@ -15657,10 +15660,33 @@ static void town_gen_hack(void)
 			if (cave_naked_bold(y, x)) break;
 		}
 
-		/* Clear previous contents, add up stairs */
+		/* Clear previous contents, add the other stairs */
 		cave_set_feat(y, x, FEAT_LESS);
+		
+		/* Place the player if we haven't done so yet */
+		if (!placed_player)
+		{
+			player_place(y, x, TRUE);
+			placed_player = TRUE;
+		}
 	}
 
+	/* Place the player if we haven't done so yet (if there are no stairs) */
+	if (!placed_player)
+	{
+		while (TRUE)
+		{
+			/* Pick a location at least "three" from the outer walls */
+			y = rand_range(3, TOWN_HGT - 4);
+			x = rand_range(3, TOWN_WID - 4);
+			
+			/* Require a "starting" floor grid */
+			if (cave_start_bold(y, x)) break;
+		}
+		
+		player_place(y, x, TRUE);
+	}
+	
 	/* Hack -- use the "complex" RNG */
 	Rand_quick = FALSE;
 }
