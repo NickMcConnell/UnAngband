@@ -278,7 +278,7 @@ W:2:0:0
 M:3
 F:BEAM | GRID | ITEM | KILL | PLAY | MAGIC | THRU |
 F:RANGED |
-D:shoot~:@ beam#
+D:shoot~ @ beam#:$ enemies
 
 N:31:MISSILE
 T:0-9999:shoot~ a * missile at &

@@ -2160,9 +2160,15 @@ static int minus_ac(int ac)
 	/* Nothing to damage */
 	if (!o_ptr->k_idx) return (FALSE);
 
+	/* Hack -- do not damage or destroy non-armour items in off-hand slot */
+	if ((slot == INVEN_ARM) && (o_ptr->tval != TV_SHIELD)) return (FALSE);
+
+	/* Hack -- do not damage or destroy spells */
+	if (o_ptr->tval == TV_SPELL) return (FALSE);
+	
 	/* No damage left to be done */
 	if (o_ptr->ac + o_ptr->to_a - ac <= 0) destroy = TRUE;
-
+	
 	/* Mega Hack -- do not destroy ego items, magic items etc */
 	if ((destroy) && (o_ptr->name2 || o_ptr->xtra1 || o_ptr->xtra2 || (o_ptr->tval == TV_DRAG_ARMOR)))
 	{

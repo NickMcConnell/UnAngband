@@ -1800,8 +1800,8 @@ s16b wield_slot(const object_type *o_ptr)
 	else if (!inventory[INVEN_LEFT].k_idx)
 	  /* Use the right hand second */
 	  return INVEN_LEFT;
-	else if (!inventory[INVEN_ARM].k_idx
-		 && p_ptr->pstyle == WS_RING)
+	else if (/*!inventory[INVEN_ARM].k_idx
+		 && */p_ptr->pstyle == WS_RING)
 	  /* Use the off-hand last */
 	  return INVEN_ARM;
 	else
@@ -1813,8 +1813,8 @@ s16b wield_slot(const object_type *o_ptr)
       {
 	if (!inventory[INVEN_NECK].k_idx)
 	  return INVEN_NECK;
-	else if (!inventory[INVEN_ARM].k_idx
-		 && p_ptr->pstyle == WS_AMULET)
+	else if (/*!inventory[INVEN_ARM].k_idx
+		 &&*/ p_ptr->pstyle == WS_AMULET)
 	  return INVEN_ARM;
 	else
 	  return INVEN_NECK;
