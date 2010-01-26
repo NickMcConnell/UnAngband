@@ -705,7 +705,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, u16b 
 	int div = 1;
 	int mod = 0;
 
-	bool punctuate = flg & (ATK_DESC_NO_STOP) == 0;
+	bool punctuate = (flg & (ATK_DESC_NO_STOP)) == 0;
 	bool uppercase = FALSE;
 
 	int state = 0;
@@ -822,7 +822,7 @@ int attack_desc(char *buf, int target, int method, int effect, int damage, u16b 
 		/* String doesn't end in punctuation */
 		else
 		{
-			punctuate = flg & (ATK_DESC_NO_STOP) == 0;
+			punctuate = (flg & (ATK_DESC_NO_STOP)) == 0;
 		}
 
 		/* Handle the target*/
