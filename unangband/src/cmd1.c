@@ -1416,7 +1416,9 @@ static void py_pickup_aux(int o_idx, bool msg)
 	int slot;
 
 	char o_name[80];
+	char j_name[80];
 	object_type *o_ptr;
+	object_type *j_ptr;
 
 	o_ptr = &o_list[o_idx];
 
@@ -1424,21 +1426,35 @@ static void py_pickup_aux(int o_idx, bool msg)
 	slot = inven_carry(o_ptr);
 
 	/* Get the object again */
-	o_ptr = &inventory[slot];
-
+	j_ptr = &inventory[slot];
+	
 	/* No longer 'stored' */
-	o_ptr->ident &= ~(IDENT_STORE);
+	j_ptr->ident &= ~(IDENT_STORE);
 
 	/* Optionally, display a message */
 	if (msg)
 	{
-		/* Describe the object */
-		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+		if (o_ptr->tval != TV_BAG && j_ptr->tval == TV_BAG)
+		{
+			/* Describe the bag */
+			object_desc(j_name, sizeof(j_name), j_ptr, FALSE, 3);
 
-		/* Message */
-		msg_format("You have %s (%c).", o_name, index_to_label(slot));
+			/* Describe the object */
+			object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
+			
+			/* Message */
+			msg_format("You put %s in your %s (%c).", o_name, j_name, index_to_label(slot));		
+		}
+		else
+		{
+			/* Describe the object */
+			object_desc(j_name, sizeof(j_name), j_ptr, TRUE, 3);
+			
+			/* Message */
+			msg_format("You have %s (%c).", j_name, index_to_label(slot));
+		}
 	}
-
+	
 	/* Delete the object */
 	if (o_idx >= 0) delete_object_idx(o_idx);
 }
