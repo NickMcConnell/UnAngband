@@ -2018,7 +2018,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		rlev = MAX(1, r_ptr->level);
 
 		/* Extract spell power */
-		spower = r_ptr->power;
+		spower = r_ptr->spell_power;
 
 		/* Extract the powerfulness */
 		powerful = (r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE);
