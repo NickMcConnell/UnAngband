@@ -4289,7 +4289,7 @@ errr file_character(cptr name, bool full)
 
 		text_out("  [Familiar]\n\n");
 
-		text_out(format("Your familiar %s a %s.\n\n", alive ? "is" : "was", familiar_race[p_ptr->familiar].name));
+		text_out(format("Your familiar %s %s %s.\n\n", alive ? "is" : "was", is_a_vowel(familiar_race[p_ptr->familiar].name[0]) ? "an" : "a", familiar_race[p_ptr->familiar].name));
 
 		/* Has at least one non-innate ability - 1st and 2nd abilities are innate */
 		if (p_ptr->familiar_attr[2])

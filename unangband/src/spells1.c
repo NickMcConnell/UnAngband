@@ -1407,7 +1407,6 @@ void take_hit(int who, int what, int dam)
 				case SOURCE_PLAYER_EAT_MONSTER:
 				case SOURCE_PLAYER_SPORE:
 				case SOURCE_PLAYER_VAMP_DRAIN:
-				case SOURCE_BLOOD_DEBT:
 				{
 					/* Get the source feature */
 					char m_name[80];
@@ -1418,6 +1417,20 @@ void take_hit(int who, int what, int dam)
 					/* Get the feature name */
 					(void)my_strcat(p_ptr->died_from, m_name, sizeof(p_ptr->died_from));
 
+					break;
+				}
+
+				case SOURCE_BLOOD_DEBT:
+				{
+					/* Get the source feature */
+					char m_name[80];
+					
+					/* Get the name */
+					race_desc(m_name, sizeof(m_name), what, 0x800, 1);
+					
+					/* Get the feature name */
+					(void)my_strcat(p_ptr->died_from, m_name, sizeof(p_ptr->died_from));
+					
 					break;
 				}
 
