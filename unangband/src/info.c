@@ -530,6 +530,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	if (s_ptr->flags1 & (SF1_DETECT_EVIL))	vp[vn++] = "evil monsters";
 	if (s_ptr->flags1 & (SF1_DETECT_LIFE))	vp[vn++] = "living monsters";
 	if (s_ptr->type == SPELL_DETECT_MIND)	vp[vn++] = "minds";
+	if (s_ptr->type == SPELL_DETECT_FIRE)	vp[vn++] = "fire";
+	if (s_ptr->type == SPELL_REVEAL_SECRETS)	vp[vn++] = "secrets, revealing them only if you are aware of the grid";
 
 	/* Describe detection spells */
 	if (vn)

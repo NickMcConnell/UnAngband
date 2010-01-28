@@ -4280,7 +4280,24 @@ F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
 F:HURT_FIRE | HURT_COLD | CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | ATTR_LITE | SPREAD |
 
-#$# 175 - Unused ###
+# Stone well containing gold
+
+N:175:stone well
+G:0:T
+U:56
+#$ granite wall
+O:224
+W:1:8:20:0
+K:DEFAULT:1:10
+#$ open floor
+K:SECRET:814:10
+#$ water-filled well
+K:USE_FEAT:391:10
+#$ stone well
+F:LOS | PROJECT | SECRET | NOTICE | REMEMBER | MORE | HAS_GOLD |
+F:HURT_ROCK | CAN_CLIMB | CAN_FLY | CAN_SWIM | HIDE_SNEAK | HIDE_SWIM |
+F:ALLOC | USE_FEAT | EASY_CLIMB | MUST_CLIMB | ATTR_LITE |
+D:You have found something!
 
 N:176:steam around a stone bridge
 G:x:P
@@ -9893,7 +9910,29 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | TUNNEL |
 F:PATH | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:HURT_WATER | EASY_HIDE | MUST_CLIMB | ATTR_LITE |
 
-#$# 458 - Unused ###
+# clear fountain - equivalent to potion of water - contains gold
+
+N:458:clear fountain
+G:0:b
+U:56
+M:385
+#$ granite wall
+O:224
+W:1:10:20:0
+K:DEFAULT:1:5
+#$ open floor
+K:BASH:383:5
+#$ broken fountain
+K:OPEN:383:5
+#$ broken fountain
+K:USE_FEAT:385:5
+#$ clear fountain
+K:USE_FEAT:385:5
+#$ clear fountain
+F:LOS | PROJECT | MOVE | NOTICE | REMEMBER | BASH |
+F:HURT_ROCK | CAN_CLIMB | CAN_FLY | HAS_GOLD |
+F:ALLOC | USE_FEAT | ATTR_LITE |
+D:You have found something!
 
 N:459:giant spider web over a chasm
 G:x:W
@@ -17712,7 +17751,7 @@ F:REMEMBER | TUNNEL |
 F:PATH | HURT_ROCK | CAN_CLIMB | CAN_PASS | CAN_OOZE |
 F:EASY_CLIMB | ATTR_LITE | ADJACENT |
 
-N:872:locked cupboard
+N:872:locked cupboard containing something
 G:*:U
 O:0
 W:1:3:10:0

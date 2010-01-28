@@ -7676,6 +7676,15 @@ static void recover_monster(int m_idx, bool regen)
 					((f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_FILLED))?"":"the "),
 					f_name+f_info[cave_feat[m_ptr->fy][m_ptr->fx]].name);
 			}
+			
+			/* Disturb on "move" */
+			if ((m_ptr->ml && (disturb_move ||
+				((m_ptr->mflag & (MFLAG_VIEW)) && disturb_near)))
+					&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
+			{
+				/* Disturb */
+				disturb(0, 0);
+			}
 		}
 	}
 

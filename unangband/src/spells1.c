@@ -8584,7 +8584,11 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_TANGLE_WEAK:
 		{
 			/* Must be next to plants/water */
-			if (!teleport_nature_hook(y, x, y, x)) break;
+			if (!teleport_nature_hook(y, x, y, x))
+			{
+				dam = 0;
+				break;
+			}
 
 			/* Obvious */
 			if (seen) obvious = TRUE;

@@ -2999,7 +2999,9 @@ void update_mon(int m_idx, bool full)
 			m_ptr->mflag |= (MFLAG_VIEW);
 
 			/* Disturb on visibility change */
-			if (disturb_near) disturb(1, 0);
+			if ((disturb_near)
+				&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
+					disturb(1, 0);
 		}
 	}
 
@@ -3013,7 +3015,9 @@ void update_mon(int m_idx, bool full)
 			m_ptr->mflag &= ~(MFLAG_VIEW);
 
 			/* Disturb on visibility change */
-			if (disturb_near) disturb(1, 0);
+			if ((disturb_near)
+				&& ((m_ptr->mflag & (MFLAG_ALLY)) == 0))
+					disturb(1, 0);
 		}
 	}
 }

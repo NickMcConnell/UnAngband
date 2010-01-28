@@ -1168,14 +1168,23 @@ retry:
 					cave_alter_feat(y,x,FS_SECRET);
 				}
 
-				/* Hack -- Memorize */
-				play_info[y][x] |= (PLAY_MARK);
-
-				/* Redraw */
-				lite_spot(y, x);
-
-				/* Obvious */
-				detect = TRUE;
+				/* Retest following secrets being found */
+				/* We do this to avoid detecting e.g. empty shelves once the item has been created that
+				 * was on the shelf */
+				if ((f_info[cave_feat[y][x]].flags1 & (f1)) ||
+					(f_info[cave_feat[y][x]].flags2 & (f2)) ||
+					(f_info[cave_feat[y][x]].flags3 & (f3)) ||
+					((play_info[y][x] & (PLAY_SEEN | PLAY_MARK)) != 0))
+				{
+					/* Hack -- Memorize */
+					play_info[y][x] |= (PLAY_MARK);
+	
+					/* Redraw */
+					lite_spot(y, x);
+	
+					/* Obvious */
+					detect = TRUE;
+				}
 			}
 		}
 	}
@@ -6076,6 +6085,9 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	char *s = buf;
 
+	/* Hack to prevent chests being called buried treasure */
+	bool hack_chest = FALSE;
+	
 	/* Roll out the duration */
 	if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 	{
@@ -6217,7 +6229,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		if (detect_monsters(monster_tester_hook_water, known)) vp[vn++] = "watery creatures";	
 	}
 
-	/* Process the flags -- detect water */
+	/* Process the flags -- detect fire */
 	if (s_ptr->type == SPELL_DETECT_FIRE)
 	{
         if (detect_feat_blows(GF_FIRE, 2 * MAX_SIGHT, known)) vp[vn++] = "fire";
@@ -6226,20 +6238,32 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
         if (detect_monsters(monster_tester_hook_fire, known)) vp[vn++] = "fiery creatures";
 	}
 
+	/* Hack to prevent chests being called buried treasure */
+	if (s_ptr->flags1 & (SF1_DETECT_GOLD | SF1_DETECT_OBJECT))
+	{
+        if (detect_feat_flags(0x0L, 0x0L, FF3_CHEST, 2 * MAX_SIGHT, known)) { vp[vn++] = "treasure chests"; hack_chest = TRUE; }
+	}
+	
 	/* Process the flags -- detect gold */
+	/* Important: Because when we detect hidden items, we potentially drop gold, we must detect hidden items
+	 * before detecting objects */
 	if (s_ptr->flags1 & (SF1_DETECT_GOLD))
     {
+		/* We still detect buried treasure if we've found chests, we just don't report it */
+        if ((detect_feat_flags(FF1_HAS_GOLD, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) && !(hack_chest)) vp[vn++] = "buried treasure";
         if (detect_objects_tval(TV_GOLD)) vp[vn++] = "gold";
         if (detect_objects_tval(TV_GEMS)) vp[vn++] = "gems";
-        if (detect_feat_flags(FF1_HAS_GOLD, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "buried treature";
         if (detect_monsters(monster_tester_hook_mineral, known)) vp[vn++] = "mineral creatures";
     }
 
 	/* Process the flags -- detect objects and object monsters */
+	/* Important: Because when we detect hidden items, we potentially drop objects, we must detect hidden items
+	 * before detecting objects */
 	if (s_ptr->flags1 & (SF1_DETECT_OBJECT))
     {
+		/* We still detect hidden items if we've found chests, we just don't report it */
+        if ((detect_feat_flags(FF1_HAS_ITEM, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) && !(hack_chest)) vp[vn++] = "hidden items";
 	    if (detect_objects_normal()) vp[vn++] = "objects";
-		if (detect_feat_flags(FF1_HAS_ITEM, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "hidden items";
         if (detect_monsters(monster_tester_hook_mimic, known)) vp[vn++] = "mimics";
     }
 
@@ -6266,6 +6290,12 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		if (detect_monsters(monster_tester_hook_mental, known)) vp[vn++] = "minds";
 	}
 
+	/* Process the flags -- reveal secrets */
+	if (s_ptr->type == SPELL_REVEAL_SECRETS)
+	{
+		if (detect_feat_flags(FF1_SECRET, 0x0L, 0x0L, 2 * MAX_SIGHT, known)) vp[vn++] = "secrets";
+	}
+	
 	/* Describe detected magic */
 	if (vn)
 	{

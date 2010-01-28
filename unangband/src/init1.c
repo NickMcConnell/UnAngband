@@ -1336,7 +1336,7 @@ static cptr s_info_types[] =
 	"DAMAGING_HURL",
 	"CURSE_WEAPON",
 	"CURSE_ARMOR",
-	"XXX1",
+	"REVEAL_SECRETS",
 	"DETECT_FIRE",
 	"REGION",
 	"SET_TRAP",
