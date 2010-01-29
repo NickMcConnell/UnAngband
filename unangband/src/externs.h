@@ -484,7 +484,7 @@ extern void do_cmd_tunnel(void);
 extern void do_cmd_disarm(void);
 extern void do_cmd_bash(void);
 extern void do_cmd_alter(void);
-extern void do_cmd_set_trap_or_spike(void);
+extern bool player_set_trap_or_spike(int item);
 extern void do_cmd_walk(void);
 extern void do_cmd_pathfind(int y, int x);
 extern void do_cmd_run(void);

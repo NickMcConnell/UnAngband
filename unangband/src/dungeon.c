@@ -2453,7 +2453,7 @@ static void process_command(void)
 		/* Jam a door with spikes */
 		case 'j':
 		{
-			do_cmd_set_trap_or_spike();
+			do_cmd_item(COMMAND_ITEM_SET_TRAP_OR_SPIKE);
 			break;
 		}
 

@@ -2184,7 +2184,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 		feat = f_ptr->mimic;
 		f_ptr = &f_info[feat];
 	}
-
+	
 	/* Object here is used in trap */
 	if ((cave_o_idx[y][x]) && (f_ptr->flags1 & (FF1_HIT_TRAP)))
 	{
@@ -2196,6 +2196,12 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 
 		/* By default, don't apply terrain or show messages */
 		apply_terrain = FALSE;
+		
+		/* Object is a mechanism - get next object */
+		if ((o_ptr->tval == TV_ASSEMBLY) && (o_ptr->next_o_idx))
+		{
+			o_ptr = &o_list[o_ptr->next_o_idx];
+		}
 
 		switch (o_ptr->tval)
 		{
@@ -2590,6 +2596,14 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 
 				break;
 			}
+			
+			case TV_ASSEMBLY:
+			{
+				/* Trap description */
+				if ((y == p_ptr->py) && (x == p_ptr->px)) msg_print("You hear a mechanism whirring uselessly.");
+
+				break;
+			}			
 
 			default:
 			{

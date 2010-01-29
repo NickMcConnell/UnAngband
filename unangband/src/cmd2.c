@@ -2415,26 +2415,21 @@ void do_cmd_alter(void)
  * See pick_trap for how traps are chosen, and hit_trap and mon_hit_trap for what
  * player set traps will do.
  */
-void do_cmd_set_trap_or_spike(void)
+bool player_set_trap_or_spike(int item)
 {
 	int py = p_ptr->py;
 	int px = p_ptr->px;
 
-	int y, x, item, action;
+	int y, x, action;
 	int dir = 0;
 
 	object_type *o_ptr;
 
 	cptr q,s;
 
-	/* Get an item */
-	q = "Spike/Set trap with which item? ";
-	s = "You have nothing to set a trap or spike with.";
-	if (!get_item(&item, q, s, (USE_INVEN | USE_FLOOR))) return;
-
 	/* Get the item (in the pack) */
 	if (item >= 0)
-        {
+	{
 		o_ptr = &inventory[item];
 	}
 
@@ -2442,16 +2437,6 @@ void do_cmd_set_trap_or_spike(void)
 	else
 	{
 		o_ptr = &o_list[0 - item];
-	}
-
-	/* In a bag? */
-	if (o_ptr->tval == TV_BAG)
-	{
-		/* Get item from bag */
-		if (!get_item_from_bag(&item, q, s, o_ptr)) return;
-
-		/* Refer to the item */
-		o_ptr = &inventory[item];
 	}
 
 	/* Spiking or setting trap? */
@@ -2475,7 +2460,7 @@ void do_cmd_set_trap_or_spike(void)
 #endif /* ALLOW_EASY_OPEN */
 
 		/* Get a direction (or abort) */
-		if (!get_rep_dir(&dir)) return;
+		if (!get_rep_dir(&dir)) return (FALSE);
 
 		/* Hack -- Apply stuck */
 		stuck_player(&dir);
@@ -2491,7 +2476,7 @@ void do_cmd_set_trap_or_spike(void)
 	x = px + ddx[dir];
 
 	/* Verify legality */
-	if (!do_cmd_test(y, x, action)) return;
+	if (!do_cmd_test(y, x, action)) return (FALSE);
 
 	/* Take a turn */
 	p_ptr->energy_use = 100;
@@ -2502,7 +2487,6 @@ void do_cmd_set_trap_or_spike(void)
 		/* Get location */
 		y = py + ddy[dir];
 		x = px + ddx[dir];
-
 	}
 
 	/* Monster */
@@ -2528,7 +2512,7 @@ void do_cmd_set_trap_or_spike(void)
 	else
 	{
 		/* Verify legality */
-		if (!do_cmd_test(y, x, action)) return;
+		if (!do_cmd_test(y, x, action)) return (TRUE);
 
 #if 0
 		/* Trapped door */
@@ -2544,7 +2528,7 @@ void do_cmd_set_trap_or_spike(void)
 			/* Stuck */
 			find_secret(y,x);
 
-			return;
+			return (TRUE);
 		}
 
 		/* Spike the door */
@@ -2561,7 +2545,7 @@ void do_cmd_set_trap_or_spike(void)
 				find_secret(y,x);
 
 				/* Sanity check */
-				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))) return;
+				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))) return (TRUE);
 			}
 
 			feat = feat_state(feat, FS_SPIKE);
@@ -2599,7 +2583,7 @@ void do_cmd_set_trap_or_spike(void)
 				}
 				else
 				{
-					return;
+					return (TRUE);
 				}
 			}
 
@@ -2611,6 +2595,26 @@ void do_cmd_set_trap_or_spike(void)
 			/* Update the visuals */
 			p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
+			/* Parania */
+			if (item >= 0)
+			{
+				item = find_item_to_reduce(item);
+
+				/* Item has already been destroyed */
+				if (item < 0) return(TRUE);
+
+				/* Get the object */
+				o_ptr = &inventory[item];
+
+				/* Clear marker */
+				o_ptr->ident &= ~(IDENT_BREAKS);
+			}
+			/* More paranoia */
+			else
+			{
+				if (!o_ptr->k_idx) return(TRUE);
+			}
+			
 			/* Destroy a spike in the pack */
 			if (item >= 0)
 			{
@@ -2661,12 +2665,14 @@ void do_cmd_set_trap_or_spike(void)
                the same tval and sval as the trap being set OR the trap
                being set is TV_BOW and all the objects in the grid can be fired
                by the bow in question OR the object selected is a digger,
-               we substitute the above rules with spikes */
+               we substitute the above rules with spikes OR the object is
+               a fully assembled mechanism */
 		else
 		{
 			int this_o_idx, next_o_idx;
 
 			bool trap_allowed = TRUE;
+			bool hack_assembly = FALSE;
 
 			/* Hack */
 			int tmp = p_ptr->skills[SKILL_DISARM];
@@ -2681,7 +2687,7 @@ void do_cmd_set_trap_or_spike(void)
 				find_secret(y,x);
 
 				/* Sanity check */
-				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR))) return;
+				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_FLOOR))) return (TRUE);
 			}
 
 			/* Get object body */
@@ -2735,12 +2741,29 @@ void do_cmd_set_trap_or_spike(void)
 				{
 					if (i_ptr->tval != TV_SPIKE) trap_allowed = FALSE;
 				}
+				
+				/* Mega Hack -- if the object is a fully assembled mechanism, we get the
+				 * tval and sval of the first item instead */
+				else if ((j_ptr->tval == TV_ASSEMBLY) && (j_ptr->sval == SV_ASSEMBLY_FULL) && (!j_ptr->name3))
+				{
+					/* Get these values temporarily and adjust back using a hack later */
+					j_ptr->tval = i_ptr->tval;
+					j_ptr->sval = i_ptr->sval;
+					hack_assembly = TRUE;
+				}
 
 				else if ((j_ptr->tval != i_ptr->tval) || (j_ptr->sval != i_ptr->sval))
 				{
 					/* Not allowed */
 					trap_allowed = FALSE;
 				}
+			}
+			
+			/* Hack - fix up assembly hack */
+			if (hack_assembly)
+			{
+				j_ptr->tval = TV_ASSEMBLY;
+				j_ptr->sval = SV_ASSEMBLY_FULL;
 			}
 
 			/* Hack -- Dig trap? */
@@ -2773,7 +2796,7 @@ void do_cmd_set_trap_or_spike(void)
 					if (j_ptr->tval == TV_BAG)
 					{
 						/* Get item from bag */
-						if (!get_item_from_bag(&item, q, s, o_ptr)) return;
+						if (!get_item_from_bag(&item, q, s, o_ptr)) return (TRUE);
 
 						/* Refer to the item */
 						o_ptr = &inventory[item];
@@ -2791,7 +2814,7 @@ void do_cmd_set_trap_or_spike(void)
 					/* Hack -- no spikes. Dig a shallow pit instead. */
 					cave_set_feat(y, x, FEAT_SHALLOW_PIT);
 
-					return;
+					return (TRUE);
 				}
 				else
 				{
@@ -2824,6 +2847,26 @@ void do_cmd_set_trap_or_spike(void)
 				/* Check if we can arm it? */
 				do_cmd_disarm_aux(y,x, FALSE);
 
+				/* Parania */
+				if (item >= 0)
+				{
+					item = find_item_to_reduce(item);
+
+					/* Item has already been destroyed */
+					if (item < 0) return(TRUE);
+
+					/* Get the object */
+					o_ptr = &inventory[item];
+
+					/* Clear marker */
+					o_ptr->ident &= ~(IDENT_BREAKS);
+				}
+				/* More paranoia */
+				else
+				{
+					if (!o_ptr->k_idx) return(TRUE);
+				}
+				
 				/* Destroy an item in the pack */
 				if (item >= 0)
 				{
@@ -2850,6 +2893,8 @@ void do_cmd_set_trap_or_spike(void)
 			p_ptr->skills[SKILL_DISARM] = tmp;
 		}
 	}
+	
+	return (TRUE);
 }
 
 

@@ -4045,7 +4045,23 @@ void list_object(const object_type *o_ptr, int mode)
 				anything = TRUE;
 				break;
 			case TV_ASSEMBLY:
-				text_out("You can assemble this together to make something.  ");
+				if (o_ptr->sval == SV_ASSEMBLY_FULL)
+				{
+					if (o_ptr->name3)
+					{
+						text_out("You have assembled something.  ");
+						
+						if (o_ptr->timeout) text_out("It is alive...  ");
+					}
+					else
+					{
+						text_out(format("When set in a trap with other items, this causes the trap to trigger automatically every %s turns.", o_ptr->charges));
+					}
+				}
+				else
+				{
+					text_out("You can assemble this together to make something.  ");
+				}
 				anything = TRUE;
 				break;
 			case TV_MAP:

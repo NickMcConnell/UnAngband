@@ -8012,6 +8012,7 @@ void pick_trap(int y, int x, bool player)
 					pick_attr = TERM_L_BLUE;	/* Magic symbol */
 					break;
 
+				case TV_ASSEMBLY:
 				case TV_ROD:
 					pick_attr = TERM_MUSTARD;	/* Clockwork mechanism */
 					break;
