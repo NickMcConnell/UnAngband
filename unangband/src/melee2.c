@@ -2762,6 +2762,57 @@ static bool find_safety(monster_type *m_ptr, int *ty, int *tx)
 
 
 /*
+ * The monster either surrenders or turns to fight
+ */
+static void monster_surrender_or_fight(int m_idx)
+{
+	char m_name[80];
+	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+	/* Cancel fear */
+	set_monster_fear(m_ptr, 0, FALSE);
+
+	/* Forget target */
+	m_ptr->ty = 0;    m_ptr->tx = 0;
+
+	/* Charge!  XXX XXX */
+	m_ptr->min_range = 1;  m_ptr->best_range = 1;
+
+	/* Visible */
+	if (m_ptr->ml)
+	{
+		/* Get the monster name */
+		monster_desc(m_name, sizeof(m_name), m_idx, 0);
+	
+		/* Chance to surrender */
+		if (!(birth_evil) && ((r_ptr->flags2 & (RF2_STUPID)) == 0)
+			&& (rand_int(adj_chr_stock[p_ptr->stat_ind[A_CHR]]) < (r_ptr->flags2 & (RF2_SNEAKY) ? 20 : 10)))
+		{
+			/* Dump a message */
+			msg_format("%^s surrenders!", m_name);
+			
+			/* Stop attacking player */
+			m_ptr->mflag |= (MFLAG_TOWN);
+			m_ptr->mflag &= ~(MFLAG_AGGR);
+			
+			/* For a while */
+			m_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+			
+			/* Sneaky / evil */
+			if (r_ptr->flags2 & (RF2_SNEAKY)) m_ptr->summoned /= 2;
+			if (r_ptr->flags3 & (RF3_EVIL)) m_ptr->summoned /= 3;					
+		}
+		else
+		{
+			/* Dump a message */
+			msg_format("%^s turns to fight!", m_name);
+		}
+	}
+}
+
+
+/*
  * Helper function for monsters that want to retreat from the character.
  * Used for any monster that is terrified, frightened, is looking for a
  * temporary hiding spot, or just wants to open up some space between it
@@ -2943,30 +2994,13 @@ static bool get_move_retreat(int m_idx, int *ty, int *tx)
 		if ((player_has_los_bold(m_ptr->fy, m_ptr->fx)) &&
 		    (m_ptr->cdis < TURN_RANGE))
 		{
-			/* Turn and fight */
-			set_monster_fear(m_ptr, 0, FALSE);
-
-			/* Forget target */
-			m_ptr->ty = 0;    m_ptr->tx = 0;
-
-			/* Charge!  XXX XXX */
-			m_ptr->min_range = 1;  m_ptr->best_range = 1;
-
-			/* Visible */
-			if (m_ptr->ml)
-			{
-				char m_name[80];
-
-				/* Get the monster name */
-				monster_desc(m_name, sizeof(m_name), m_idx, 0);
-
-				/* Dump a message */
-				msg_format("%^s turns to fight!", m_name);
-			}
-
-			/* Charge! */
+			/* Turn on the player or give up */
+			monster_surrender_or_fight(m_idx);
+			
+			/* Go for the player */
 			*ty = p_ptr->py;
 			*tx = p_ptr->px;
+			
 			return (TRUE);
 		}
 	}
@@ -4514,25 +4548,8 @@ static bool make_move(int m_idx, int *ty, int *tx, bool fear, bool *bash)
 						 */
 						 if ((m_ptr->ml) && (cave_project_bold(oy, ox)))
 						 {
-							char m_name[80];
-
-							/* Cancel fear */
-							set_monster_fear(m_ptr, 0, FALSE);
-
-							/* Turn and fight */
-							fear = FALSE;
-
-							/* Forget target */
-							m_ptr->ty = 0;    m_ptr->tx = 0;
-
-							/* Charge!  XXX XXX */
-							m_ptr->min_range = 1;  m_ptr->best_range = 1;
-
-							/* Get the monster name */
-							monster_desc(m_name, sizeof(m_name), m_idx, 0);
-
-							/* Dump a message */
-							msg_format("%^s turns to fight!", m_name);
+							/* Turn on the player or give up */
+							monster_surrender_or_fight(m_idx);
 
 							/* Hack -- lose some time  XXX XXX */
 							return (FALSE);
