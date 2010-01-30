@@ -5493,8 +5493,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 		/* Never move if petrified or never move monster */
 		else if ((r_ptr->flags1 & (RF1_NEVER_MOVE)) || (m_ptr->petrify))
 		{
-			
-			msg_format("failed to move %d, %d", ny - m_ptr->fy, nx - m_ptr->fx);
 			do_move = FALSE;
 		}
 
