@@ -969,7 +969,7 @@ bool player_steal(int item)
 	
 		/* Always have a small chance of success */
 		if (j < 2) j = 2;
-	
+
 		/* Failure */
 		if (rand_int(100) > j)
 		{
@@ -1007,15 +1007,6 @@ bool player_steal(int item)
 			return (FALSE);
 		}
 	}
-	else
-	{
-		/* Stealing monster first time reveals the rest of its inventory */
-		if (monster_drop(p_ptr->target_who))
-		{
-			/* Message */
-			msg_format("%^s has more to steal.", m_name);
-		}
-	}
 	
 	/* Stealing gold is a straight reward */
 	if (item == INVEN_GOLD)
@@ -1025,10 +1016,14 @@ bool player_steal(int item)
 				&& (r_info[m_ptr->r_idx].flags1 >= RF1_DROP_30))
 		{
 			/* XXX Reward based on monster level - token amount for town */
-			p_ptr->au += randint(r_info[m_ptr->r_idx].level * 30 + 5);
+			int au = randint(r_info[m_ptr->r_idx].level * 30 + 5);
+			
+			p_ptr->au += au;
 			
 			/* Update display */
 			p_ptr->redraw |= (PR_GOLD);
+			
+			msg_format("You steal %d gold pieces.", au);
 		}
 		else
 		{
@@ -1047,6 +1042,13 @@ bool player_steal(int item)
 
 		/* Get the item */
 		inven_takeoff(item, amt);
+	}
+	
+	/* Stealing monster first time reveals the rest of its inventory */
+	if (((m_ptr->mflag & (MFLAG_MADE)) == 0) && (monster_drop(p_ptr->target_who)))
+	{
+		/* Message */
+		msg_format("%^s has more to steal.", m_name);
 	}
 	
 	/* Use up energy */

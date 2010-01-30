@@ -9121,6 +9121,10 @@ s16b inven_takeoff(int item, int amt)
 		
 		/* Get the monster name (or "it") */
 		monster_desc(m_name, sizeof(m_name), o_ptr->held_m_idx, 0);
+		
+		/* Hack - capitalize monster name */
+		if (islower((unsigned char)m_name[0]))
+			m_name[0] = toupper((unsigned char)m_name[0]);
 	}
 
 	/* Paranoia */
