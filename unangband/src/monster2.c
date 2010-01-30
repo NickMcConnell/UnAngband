@@ -4284,12 +4284,20 @@ int find_monster_ammo(int m_idx, int blow, bool created)
 			/* Scale damage dice */
 			if (ammo_tval == TV_ARROW) d_dice = d_dice * 4 / 3;
 			else if (ammo_tval == TV_SHOT) d_dice = d_dice * 2;
+			else if (ammo_tval == TV_FLASK) d_dice /= 3;
 
 			/* Get the ammunition */
-			if (d_dice <= 4)  ammo_sval = SV_AMMO_NORMAL;
+			if (d_dice <= 2) ammo_sval = SV_AMMO_LIGHT;
+			else if (d_dice <= 4)  ammo_sval = SV_AMMO_NORMAL;
 			else if (d_dice <= 16) ammo_sval = SV_AMMO_STEEL;
 			else if (d_dice <= 36) ammo_sval = SV_AMMO_SPECIAL;
 			else ammo_sval = SV_AMMO_HEAVY;
+			
+			/* Hack - arrows and bolts have no light ammo */
+			if ((ammo_sval == SV_AMMO_LIGHT) && ((ammo_tval == TV_ARROW) || (ammo_tval == TV_BOLT))) ammo_sval++;
+			
+			/* Hack - heavy / special flasks become gunpowder */
+			if ((d_dice > 16) && (ammo_tval == TV_FLASK)) ammo_sval = SV_FLASK_GUNPOWDER;
 		}
 		else
 		{

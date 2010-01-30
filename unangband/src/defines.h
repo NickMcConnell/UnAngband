@@ -1990,6 +1990,7 @@ enum
 #define SV_HOLD_CAGE  4
 
 /* The "sval" codes for TV_JUNK */
+#define SV_JUNK_PEBBLE	     0
 #define SV_JUNK_ROCK	     1
 #define SV_JUNK_SHARD 3
 #define SV_JUNK_STICK	     6
@@ -2546,7 +2547,7 @@ enum
 #define SV_FLASK_ACID     2
 #define SV_FLASK_BLOOD	  3
 #define SV_FLASK_SLIME	  4
-#define SV_FLASK_BILE	  5
+#define SV_FLASK_BILE	  7
 #define SV_FLASK_WEB	  15
 
 /* The sval codes for containers */

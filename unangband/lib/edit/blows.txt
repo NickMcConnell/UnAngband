@@ -563,7 +563,7 @@ W:0:77:0
 R:1
 M:6
 F:BOOM | WALL | MISS | GRID | ITEM | KILL | PLAY | STOP |
-F:RANGED |
+F:RANGED | SCALE_AMMO
 D:create~ @ ball#:$ enemies
 
 N:64:TRAIL
