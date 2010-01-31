@@ -2961,50 +2961,35 @@ bool player_ignore_terrain(int f_idx)
 }
 
 
-#define rand_roll(n)	(auto_roll ? (auto_roll == 1 ? 1 : n) : randint(n))
-
 /*
  * Calculate the increase of a stat by one randomized level.
- *
- * The "auto_roll" flag selects maximal changes for use
- * with the auto-roller initialization code
- * or minimal for the point-based character generation.
- * Otherwise, semi-random changes will occur.
  */
-int calc_inc_stat(int value, int auto_roll)
+int calc_inc_stat(int value)
 {
-	int gain;
-
 	/* Gain one point */
 	if (value < 18)
 		value++;
 
-	/* Gain 1/10 to 1/5 of distance to 18/100; at last, 3--5 points */
+	/* Gain 1/10 to 1/5 of distance to 18/100 */
 	else if (value < 18+80)
-	{
-		/* Approximate gain value */
-		gain = ((18+100) - value) / 5 + 1;
+		value += (((18+100) - value) / 5 + 1) * 3 / 4;
 
-		/* Roll the bonus */
-		value += (rand_roll(gain) + gain) / 2;
-	}
-
-	/* Gain 3--5 points at a time */
+	/* Gain 4 points at a time */
 	else if (value < 18+100)
-		value += 2 + rand_roll(3);
+		value += 4;
 
-	/* Gain 3--4 points at a time */
-	else if (value < 18+120)
-		value += 2 + rand_roll(2);
+	/* Gain 3 points at a time */
+	else if (value < 18+130)
+		value += 3;
 
-	/* Gain 2--3 points at a time */
-	else if (value < 18+150)
-		value += 1 + rand_roll(2);
+	/* Gain 2 points at a time */
+	else if (value < 18+160)
+		value += 2;
 
-	/* Gain 1--2 points at a time */
+	/* Gain 1s points at a time */
 	else
 	{
-		value += rand_roll(2);
+		value += 1;
 
 		/* Maximal value */
 		if (value > 18+999) value = 18 + 999;
@@ -3024,7 +3009,7 @@ void inc_stat(int stat)
 	int value = p_ptr->stat_cur[stat];
 
 	/* Calculate the random increase */
-	value = calc_inc_stat(value, 0);
+	value = calc_inc_stat(value);
 
 	/* Save the new value */
 	p_ptr->stat_cur[stat] = value;

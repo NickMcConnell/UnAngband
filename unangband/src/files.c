@@ -1678,7 +1678,7 @@ cptr likert(int x, int y, byte *attr)
 /*
  * Prints some "extra" information on the screen.
  */
-static void display_player_xtra_info(void)
+void display_player_xtra_info(bool hide_extra)
 {
 	int i;
 
@@ -1700,68 +1700,71 @@ static void display_player_xtra_info(void)
 
 	/* Pretty name */
 
+	if (!hide_extra)
+	{
 #ifdef USE_CLASS_PRETTY_NAMES
-	lookup_prettyname(name,sizeof(name), p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,TRUE,TRUE);
-	sprintf(buf,"%s, the %s",op_ptr->full_name,name);
-	c_put_str(TERM_L_BLUE, buf, 1, 8);
+		lookup_prettyname(name,sizeof(name), p_ptr->pclass, p_ptr->pstyle,p_ptr->psval,TRUE,TRUE);
+		sprintf(buf,"%s, the %s",op_ptr->full_name,name);
+		c_put_str(TERM_L_BLUE, buf, 1, 8);
 #else
-	c_put_str(TERM_L_BLUE, op_ptr->full_name, 1, 8);
+		c_put_str(TERM_L_BLUE, op_ptr->full_name, 1, 8);
 #endif
 
-	/* Current Home Town */
-	put_str("Home", 7, 1);
+		/* Current Home Town */
+		put_str("Home", 7, 1);
 
-	/* Has a home defined? */
-	if (total_store_count)
-	{
-	  char str[160];
+		/* Has a home defined? */
+		if (total_store_count)
+		{
+		  char str[160];
 
-	  sprintf(str, "%s in %s", u_name + u_info[store[STORE_HOME]->index].name, t_name + t_info[p_ptr->town].name);
+		  sprintf(str, "%s in %s", u_name + u_info[store[STORE_HOME]->index].name, t_name + t_info[p_ptr->town].name);
 
-	  /* short dungeon name here for lack of space
-	     even though it sometimes lacks 'the' or something else */
-	  if (strlen(str) > 32)
-		c_put_str(TERM_L_BLUE, u_name + u_info[store[STORE_HOME]->index].name, 7, 8);
-	  else
-		c_put_str(TERM_L_BLUE, str, 7, 8);
+		  /* short dungeon name here for lack of space
+			 even though it sometimes lacks 'the' or something else */
+		  if (strlen(str) > 32)
+			c_put_str(TERM_L_BLUE, u_name + u_info[store[STORE_HOME]->index].name, 7, 8);
+		  else
+			c_put_str(TERM_L_BLUE, str, 7, 8);
+		}
+		else
+		{
+			c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->town].name, 7, 8);
+		}
+
+		/* Current Dungeon */
+		{
+		  char str[46];
+
+		  current_long_level_name(str);
+
+		  put_str("Target", 8, 1);
+		  if (strlen(str) > 32)
+			c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->dungeon].name, 8, 8);
+		  else
+			c_put_str(TERM_L_BLUE, str, 8, 8);
+		}
+
+		/* Upper middle */
+		col = 27;
+		row = 2;
+
+		/* Age */
+		Term_putstr(col, row, -1, TERM_WHITE, "Age");
+		Term_putstr(col+7, row, -1, TERM_L_BLUE, format("%5d", (int)p_ptr->age + p_ptr->max_lev / 10));
+
+		/* Pre-calculate height */
+		i = (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20;
+
+		/* Height */
+		Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
+		Term_putstr(col+7, row + 1, -1, TERM_L_BLUE, format("%2d'%2d", i / 12, i % 12));
+
+		/* Status */
+		Term_putstr(col, row + 2, -1, TERM_WHITE, "Status");
+		Term_putstr(col+8, row + 2, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->sc));
 	}
-	else
-	{
-		c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->town].name, 7, 8);
-	}
-
-	/* Current Dungeon */
-	{
-	  char str[46];
-
-	  current_long_level_name(str);
-
-	  put_str("Target", 8, 1);
-	  if (strlen(str) > 32)
-	    c_put_str(TERM_L_BLUE, t_name + t_info[p_ptr->dungeon].name, 8, 8);
-	  else
-	    c_put_str(TERM_L_BLUE, str, 8, 8);
-	}
-
-	/* Upper middle */
-	col = 27;
-	row = 2;
-
-	/* Age */
-	Term_putstr(col, row, -1, TERM_WHITE, "Age");
-	Term_putstr(col+7, row, -1, TERM_L_BLUE, format("%5d", (int)p_ptr->age + p_ptr->max_lev / 10));
-
-	/* Pre-calculate height */
-	i = (int)p_ptr->ht + p_ptr->stat_use[A_SIZ]/20;
-
-	/* Height */
-	Term_putstr(col, row + 1, -1, TERM_WHITE, "Height");
-	Term_putstr(col+7, row + 1, -1, TERM_L_BLUE, format("%2d'%2d", i / 12, i % 12));
-
-	/* Status */
-	Term_putstr(col, row + 2, -1, TERM_WHITE, "Status");
-	Term_putstr(col+8, row + 2, -1, TERM_L_BLUE, format("%4d", (int)p_ptr->sc));
-
+	
 	/* Left */
 	col = 1;
 
@@ -1867,23 +1870,29 @@ static void display_player_xtra_info(void)
 	else
 	{
 		sprintf(buf, "%d/%d", p_ptr->chp, p_ptr->mhp);
-		Term_putstr(col, 10, -1, TERM_WHITE, "Hit-Points");
+		Term_putstr(col, 10, -1, TERM_WHITE, "Hit Points");
 		Term_putstr(col+12, 10, -1, TERM_L_BLUE, format("%5s", buf));
 	}
 
-	/* Spell Points */
-	if (p_ptr->msp > 99)
+	/* Spell Points (with reserve mana) */
+	if (!p_ptr->msp)
 	{
-		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
-		Term_putstr(col, 11, -1, TERM_WHITE, "SP");
-		Term_putstr(col+8, 11, -1, TERM_L_BLUE, format("%9s", buf));
+		sprintf(buf, "       0/0");
+	}
+	else if (p_ptr->reserves)
+	{
+		sprintf(buf, "%d/%d+%d", p_ptr->csp,
+				p_ptr->msp - adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2,
+				adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2);
 	}
 	else
 	{
-		sprintf(buf, "%d/%d", p_ptr->csp, p_ptr->msp);
-		Term_putstr(col, 11, -1, TERM_WHITE, "Spell-Pts");
-		Term_putstr(col+12, 11, -1, TERM_L_BLUE, format("%5s", buf));
+		sprintf(buf, "%d/%d+%d", p_ptr->csp,
+				p_ptr->msp, 
+				adj_con_reserve[p_ptr->stat_ind[A_CON]] / 2);
 	}
+	Term_putstr(col, 11, -1, TERM_WHITE, "SP");
+	Term_putstr(col+7, 11, -1, TERM_L_BLUE, format("%10s", buf));
 
 	/* Hit die (changes with SIZ and CON) */
 	Term_putstr(col, 12, -1, TERM_WHITE, "Hit die");
@@ -2176,9 +2185,12 @@ static void display_player_xtra_info(void)
 		c_put_str(likert_attr, format("%9s", desc), 10 + i, col+11);
 	}
 
-	/* History */
-	Term_gotoxy(1, 20);
-	text_out_to_screen(TERM_WHITE, p_ptr->history);
+	if (!hide_extra)
+	{
+		/* History */
+		Term_gotoxy(1, 20);
+		text_out_to_screen(TERM_WHITE, p_ptr->history);
+	}
 }
 
 
@@ -3536,7 +3548,7 @@ void display_player(int mode)
 		else
 		{
 			/* Extra info */
-			display_player_xtra_info();
+			display_player_xtra_info(0);
 		}
 	}
 
