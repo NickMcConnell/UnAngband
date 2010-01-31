@@ -4927,7 +4927,7 @@ void list_object(const object_type *o_ptr, int mode)
 			if (!(bag_holds[o_ptr->sval][i][0])) continue;
 
 			/* Nothing in slot */
-			if (!(bag_contents[o_ptr->sval][i]) && !spoil) continue;
+			if (!(bag_contents[o_ptr->sval][i])) continue;
 
 			/* Fake the item */
 			fake_bag_item(i_ptr, o_ptr->sval, i);
