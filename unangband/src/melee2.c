@@ -1555,7 +1555,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		}
 
 		/* Important: Don't use healing attacks against enemies */
-		if ((target_m_idx) && ((r_info[target_m_idx].flags3 & (RF3_DEMON)) != 0)) f5 &= ~(RF5_ARC_HFIRE);
+		if ((target_m_idx) && ((r_info[m_list[target_m_idx].r_idx].flags3 & (RF3_DEMON)) != 0)) f5 &= ~(RF5_ARC_HFIRE);
 	}
 
 	/* No valid target or targetting player and friendly/neutral and not aggressive. */
