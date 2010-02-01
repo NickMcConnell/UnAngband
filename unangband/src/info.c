@@ -4830,7 +4830,7 @@ void list_object(const object_type *o_ptr, int mode)
 	}
 
 	/* Abort now if undisplayable origin */
-	if (!(o_ptr->origin == ORIGIN_NONE || o_ptr->origin == ORIGIN_MIXED))
+	if (!random && !(o_ptr->origin == ORIGIN_NONE || o_ptr->origin == ORIGIN_MIXED))
 	{
 
 		if (o_ptr->number > 1)
