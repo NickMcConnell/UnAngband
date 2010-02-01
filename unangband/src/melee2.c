@@ -1553,6 +1553,9 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				}
 			}
 		}
+
+		/* Important: Don't use healing attacks against enemies */
+		if ((target_m_idx) && ((r_info[target_m_idx].flags3 & (RF3_DEMON)) != 0)) f5 &= ~(RF5_ARC_HFIRE);
 	}
 
 	/* No valid target or targetting player and friendly/neutral and not aggressive. */
@@ -5424,6 +5427,10 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					
 					/* We are attacking - count attacks */
 					if ((nl_ptr->tblows < MAX_SHORT) && (m_ptr->ml)) nl_ptr->tblows++;
+
+					/* Important: Don't use healing attacks against enemies */
+					if ((effect == GF_HELLFIRE) && ((r_info[n_ptr->r_idx].flags3 & (RF3_DEMON)) != 0)) continue;
+					if (((effect == GF_DRAIN_LIFE) || (effect == GF_VAMP_DRAIN)) && ((r_info[n_ptr->r_idx].flags3 & (RF3_UNDEAD)) != 0)) continue;
 
 					/* Never display message XXX XXX XXX */
 					if (!n_ptr->csleep && !mon_check_hit(cave_m_idx[ny][nx], effect, r_ptr->level, m_idx , FALSE)) continue;
