@@ -2491,7 +2491,7 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
-D:An arrow hits you.
+D:A bolt hits you.
 
 N:93:murder hole
 G:^:R
@@ -2499,7 +2499,7 @@ M:91
 #$ murder hole
 U:56
 #$ granite wall
-O:79
+O:793
 W:8:1:20:0
 T:ARROW:HURT:5d6
 K:DEFAULT:1:8
@@ -2514,7 +2514,7 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
-D:An arrow hits you.
+D:A steel-tipped arrow hits you.
 
 N:94:murder hole
 G:^:R
@@ -2522,7 +2522,7 @@ M:91
 #$ murder hole
 U:56
 #$ granite wall
-O:81
+O:794
 W:11:1:20:0
 T:ARROW:HURT:7d6
 K:DEFAULT:1:11
@@ -2537,7 +2537,7 @@ F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
 F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
-D:An arrow hits you.
+D:A steel bolt hits you.
 
 # -> visible trap -- loose rock -- no effect
 
@@ -4447,7 +4447,28 @@ F:PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER |
 F:CAN_CLIMB | CAN_FLY | HIDE_DIG |
 F:HURT_WATER | ATTR_LITE | SPREAD |
 
-#$# 183 - Unused ###
+N:183:murder hole
+G:^:R
+M:91
+#$ murder hole
+U:56
+#$ granite wall
+O:79
+W:21:1:20:0
+T:ARROW:PETRIFY:21d6
+K:DEFAULT:1:11
+#$ open floor
+K:CHASM:141:11
+#$ chasm
+K:TREE:541:11
+#$ shady ground
+K:HIT_TRAP:94:5
+#$ murder hole
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:A seeker arrow pins you.
 
 N:184:burning oil
 G:::o
@@ -11047,7 +11068,28 @@ F:LOS | PROJECT | MOVE | PLACE | DROP |
 F:PATH | DEEP | CAN_FLY | CAN_SWIM | HIDE_DIG | KILL_MOVE |
 F:OUTSIDE | ATTR_LITE | INSTANT |
 
-#$# 524 - Unused ###
+N:524:murder hole
+G:^:R
+M:91
+#$ murder hole
+U:56
+#$ granite wall
+O:81
+W:31:1:20:0
+T:ARROW:PETRIFY:36d6
+K:DEFAULT:1:11
+#$ open floor
+K:CHASM:141:11
+#$ chasm
+K:TREE:541:11
+#$ shady ground
+K:HIT_TRAP:94:5
+#$ murder hole
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:A seeker bolt pins you.
 
 N:525:sand dune
 G:<:y
@@ -20152,3 +20194,54 @@ K:DEFAULT:897:50
 F:LOS | PROJECT | MOVE | NOTICE | REMEMBER | ENTER | PERMANENT |
 F:GLOW | CAN_FLY |
 F:OUTSIDE | ATTR_LITE |
+
+# visible trap -- spinning axe -- 
+
+N:996:spring-loaded trap
+G:^:r
+M:24
+#$ spring-loaded trap
+U:56
+#$ granite wall
+O:872
+W:11:1:20:0
+T:DARTS:WOUND:7d4
+K:DEFAULT:1:5
+#$ open floor
+K:CHASM:141:5
+#$ chasm
+K:TREE:541:5
+#$ shady ground
+K:HIT_TRAP:27:5
+#$ spring-loaded trap
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:A spinning axe hits you.
+
+# visible trap -- scything blade -- 
+
+N:997:spring-loaded trap
+G:^:r
+M:24
+#$ spring-loaded trap
+U:56
+#$ granite wall
+O:71
+W:21:1:20:0
+T:DARTS:WOUND:17d4
+K:DEFAULT:1:5
+#$ open floor
+K:CHASM:141:5
+#$ chasm
+K:TREE:541:5
+#$ shady ground
+K:HIT_TRAP:27:5
+#$ spring-loaded trap
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:A slicing blade hits you.
+

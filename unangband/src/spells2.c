@@ -5651,11 +5651,17 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 	int damage = 0;
 	int region_id = 0;
 	int delay = 0;
+	int damage_mult = 1;
 
 	bool initial_delay = FALSE;
 
 	/* Hack -- fix damage divisor */
 	if (!damage_div) damage_div = 1;
+	else if (damage_div < 0)
+	{
+		damage_mult = -damage_div;
+		damage_div = 1;
+	}
 
 	/* Get the region identity */
 	if ((who == SOURCE_PLAYER_CAST) && ((p_ptr->spell_trap) || (p_ptr->delay_spell)))
@@ -5713,13 +5719,13 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 		x1 = tx;
 
 		/* Get initial damage */
-		damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
+		damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) * (damage_mult) / (damage_div);
 
 		/* Special case for some spells which affect a single grid or for damage computations */
 		if (one_grid || !forreal)
 		{
 			/* Roll out the damage */
-			for (i = 1; i < num; i++) damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) / (damage_div);
+			for (i = 1; i < num; i++) damage += spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) * (damage_mult) / (damage_div);
 
 			/* Apply once */
 			if (forreal)
@@ -5819,7 +5825,7 @@ int process_spell_target(int who, int what, int y0, int x0, int y1, int x1, int 
 			obvious |= project_method(who, what, method, effect, damage, level, y0, x0, y1, x1, region, flg);
 
 			/* Revise damage */
-			if (i < num - 1) damage = spell_damage(blow_ptr, level, method_ptr->flags2, damage_div, forreal) / (damage_div);
+			if (i < num - 1) damage = spell_damage(blow_ptr, level, method_ptr->flags2, player, forreal) * (damage_mult) / (damage_div);
 
 			/* Reset damage */
 			else damage = 0;

@@ -7213,13 +7213,26 @@ s32b object_power(const object_type *o_ptr)
 			/* Might helps with traps but not terribly well */
 			if (f1 & TR1_MIGHT)
 			{
-				if (o_ptr->pval > 3 || o_ptr->pval < 0)
+				if (o_ptr->pval > 10 || o_ptr->pval < 0)
 				{
 					p += 20000;	/* inhibit */
 				}
 				else if (o_ptr->pval > 0)
 				{
-					p = sign(p) * ((ABS(p) * (15 + o_ptr->pval)) / 15);
+					p += sign(p) * o_ptr->pval;
+				}
+			}
+
+			/* Shots helps with traps but not terribly well */
+			if (f1 & TR1_SHOTS)
+			{
+				if (o_ptr->pval > 10 || o_ptr->pval < 0)
+				{
+					p += 20000;	/* inhibit */
+				}
+				else if (o_ptr->pval > 0)
+				{
+					p += sign(p) * o_ptr->pval;
 				}
 			}
 

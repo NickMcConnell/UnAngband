@@ -2225,6 +2225,9 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 				/* Apply extra shots and hurls. Note extra shots for weapons other than bows helps for putting weapons in traps only. */
 				if (f1 & (TR1_SHOTS)) shots += j_ptr->pval;
 				if (f3 & (TR3_HURL_NUM)) shots += j_ptr->pval;
+				
+				/* Hack - make more skilled trap setters get a small bonus */
+				shots += f_ptr->level / 10;
 
 				/* Increase range */
 				if (j_ptr->tval == TV_BOW) tdis += bow_multiplier(j_ptr->sval) * 3;
@@ -2323,6 +2326,9 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								k = damroll(o_ptr->dd, o_ptr->ds);
 								k *= mult;
 
+								/* Hack - make more skilled trap setters get a small bonus */
+								shots += f_ptr->level / 10;
+
 								/* Add slay multipliers. TODO: Apply equivalent multipliers for trap affecting player */
 								if (!player)
 								{
@@ -2366,35 +2372,40 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								if (player) msg_format("%^s narrowly misses you.",o_name);
 							}
 
-							/* Get local object */
-							i_ptr = &object_type_body;
-
-							/* Obtain a local object */
-							object_copy(i_ptr, o_ptr);
-
-							/* Modify quantity */
-							i_ptr->number = 1;
-
-							/* Decrease the item */
-							floor_item_increase(ammo, -1);
-
-							/* Nothing left - stop shooting */
-							if (!o_ptr->number)
+							/* Hack -- to make placing player traps worthwhile, and somewhat exploitable, we only use up arrows / bolts / shots,
+							 * and less frequently than if firing these. */
+							if (((o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_ARROW) || (o_ptr->tval == TV_BOLT)) && (rand_int(100) < breakage_chance(o_ptr)))
 							{
-								/* Finished shooting */
-								shots = 0;
-								path_n = 0;
+								/* Get local object */
+								i_ptr = &object_type_body;
+	
+								/* Obtain a local object */
+								object_copy(i_ptr, o_ptr);
+	
+								/* Modify quantity */
+								i_ptr->number = 1;
+	
+								/* Decrease the item */
+								floor_item_increase(ammo, -1);
+	
+								/* Nothing left - stop shooting */
+								if (!o_ptr->number)
+								{
+									/* Finished shooting */
+									shots = 0;
+									path_n = 0;
+								}
+	
+								/* Then optimize the stack */
+								floor_item_optimize(ammo);
+	
+								/* Alter feat if out of ammunition */
+								if (!cave_o_idx[y][x]) cave_alter_source_feat(y,x,FS_DISARM);
+	
+								/* Drop nearby - some chance of breakage */
+								/* XXX Put last for safety in case region triggered or broken */
+								drop_near(i_ptr,ny,nx,breakage_chance(i_ptr), FALSE);
 							}
-
-							/* Then optimize the stack */
-							floor_item_optimize(ammo);
-
-							/* Alter feat if out of ammunition */
-							if (!cave_o_idx[y][x]) cave_alter_source_feat(y,x,FS_DISARM);
-
-							/* Drop nearby - some chance of breakage */
-							/* XXX Put last for safety in case region triggered or broken */
-							drop_near(i_ptr,ny,nx,breakage_chance(i_ptr), FALSE);
 						}
 					}
 					else
@@ -2621,14 +2632,20 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 		if (power > 0)
 		{
 			bool dummy;
-
-			/* Object is used */
-			if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
-			if (k_info[o_ptr->k_idx].ever_used < MAX_SHORT) k_info[o_ptr->k_idx].ever_used++;
-
-			/* Cast the spell */
-			process_spell_target(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, ty, tx, power, p_ptr->depth,
-					1, FALSE, TRUE, FALSE, &dummy, NULL);
+			int shots = 1 + f_ptr->level / 10;
+			int i;
+			
+			/* Hack - we give out free shots to improve trap effectiveness */
+			for (i = 0; i < shots; i++)
+			{
+				/* Object is used */
+				if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
+				if (k_info[o_ptr->k_idx].ever_used < MAX_SHORT) k_info[o_ptr->k_idx].ever_used++;
+	
+				/* Cast the spell - note hacky pass of negative damage divisor (-f_ptr->level/10) to multiple damage as well... */
+				process_spell_target(SOURCE_PLAYER_TRAP, o_ptr->k_idx, y, x, ty, tx, power, MAX(k_info[o_ptr->k_idx].level, f_ptr->level),
+						0 - f_ptr->level / 10, FALSE, TRUE, FALSE, &dummy, NULL);
+			}
 		}
 	}
 
