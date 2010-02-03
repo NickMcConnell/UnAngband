@@ -6327,11 +6327,6 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 		obvious = TRUE;
 	}
-	else if (*known)
-	{
-		/* Print a message if you expect it */
-		msg_print("You don't detect anything.");
-	}
 
 	if (s_ptr->flags1 & (SF1_MAP_AREA))
 	{
