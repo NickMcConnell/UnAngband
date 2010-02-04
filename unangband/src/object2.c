@@ -7869,8 +7869,6 @@ int create_trap_region(int y, int x, int feat, int power, bool player)
 				(!get_aim_dir(&dir, TARGET_KILL, MAX_RANGE, radius, flg, method_ptr->arc, method_ptr->diameter_of_source)))
 						return (0);
 
-		msg_format("%d", dir);
-
 		/* Use the given direction */
 		ty = y + 99 * ddy[dir];
 		tx = x + 99 * ddx[dir];

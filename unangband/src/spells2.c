@@ -9073,6 +9073,9 @@ bool region_project_hook(int y, int x, s16b d, s16b region)
 	int dam = 0;
 	bool notice;
 
+	/* If temporarily marked, skip to prevent double-hitting any occupants */
+	if (play_info[y][x] & (PLAY_TEMP)) return (FALSE);
+	
 	/* Get the feature from the region */
 	if (r_ptr->effect == GF_FEATURE)
 	{
@@ -9102,6 +9105,9 @@ bool region_project_hook(int y, int x, s16b d, s16b region)
 	/* Apply projection effects to the grids */
 	notice = project_one(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect, method_ptr->flags1 | (PROJECT_TEMP | PROJECT_HIDE));
 
+	/* Mark the grid if occupied to prevent double-hits */
+	if (cave_m_idx[y][x]) cave_temp_mark(y, x, FALSE);
+	
 	return (notice);
 }
 
@@ -9591,14 +9597,9 @@ void trigger_region(int y, int x, bool move)
  * Similar to the above region_iterate, but we are going to move each piece as a part of the
  * function and eliminate pieces if we cannot move them because of underlying terrain.
  *
- * XXX Note that ball projections with MOVE_SOURCE which move will jump all over the place.
+ * Note the code that prevents ball projections with MOVE_SOURCE which move will jump all
+ * over the place.
  * This is only because we can't see the source of the ball projection, which itself is moving.
- *
- * We should consider removing the defines which prevent us moving the destination to a grid
- * that can't be projected from the source. However, this will result in moving projections
- * frequently 'locking up' and not moving at all (for no visible reason). We should really
- * do some smarter way of verifying the source and destination that stops jumping while
- * allowing some movement.
  */
 bool region_iterate_movement(s16b region, void region_iterator(int y, int x, s16b d, s16b region, int *y1, int *x1))
 {

@@ -646,7 +646,7 @@ G:^:w
 U:56
 #$ granite wall
 O:0
-W:5:1:20:0
+W:10:1:20:0
 T:TRAP:FALL_MORE:6d6
 K:DEFAULT:1:5
 #$ open floor
@@ -669,7 +669,7 @@ G:^:D
 U:56
 #$ granite wall
 O:0
-W:1:1:20:0
+W:2:1:20:0
 T:TRAP:FALL:2d6
 K:DEFAULT:1:5
 #$ open floor
@@ -700,7 +700,7 @@ M:17
 U:56
 #$ granite wall
 O:345
-W:3:1:20:0
+W:5:1:20:0
 T:TRAP:FALL_SPIKE:4d6
 K:DEFAULT:1:5
 #$ open floor
@@ -731,7 +731,7 @@ M:17
 U:56
 #$ granite wall
 O:345
-W:4:1:20:0
+W:8:1:20:0
 T:TRAP:FALL_POISON:4d6
 K:DEFAULT:1:5
 #$ open floor
@@ -826,7 +826,7 @@ M:22
 U:56
 #$ granite wall
 O:344
-W:4:1:20:0
+W:5:1:20:0
 T:FLASK:ACID:4d6
 K:DEFAULT:1:5
 #$ open floor
@@ -848,7 +848,7 @@ G:^:r
 U:56
 #$ granite wall
 O:434
-W:1:1:20:0
+W:2:1:20:0
 T:DARTS:SLOW:1d4
 K:DEFAULT:1:5
 #$ open floor
@@ -873,7 +873,7 @@ M:24
 U:56
 #$ granite wall
 O:434
-W:2:1:20:0
+W:4:1:20:0
 T:DARTS:LOSE_STR:1d4
 K:DEFAULT:1:5
 #$ open floor
@@ -898,7 +898,7 @@ M:24
 U:56
 #$ granite wall
 O:434
-W:3:1:20:0
+W:6:1:20:0
 T:DARTS:LOSE_DEX:1d4
 K:DEFAULT:1:5
 #$ open floor
@@ -923,7 +923,7 @@ M:24
 U:56
 #$ granite wall
 O:434
-W:4:1:20:0
+W:8:1:20:0
 T:DARTS:LOSE_CON:1d4
 K:DEFAULT:1:5
 #$ open floor
@@ -997,7 +997,7 @@ U:56
 #$ granite wall
 O:0
 W:3:1:20:0
-T:MIST:POISON
+T:MIST:POISON_WEAK:4d6
 K:DEFAULT:1:5
 #$ open floor
 K:CHASM:141:5
@@ -1865,7 +1865,7 @@ M:17
 U:56
 #$ granite wall
 O:345
-W:11:2:20:0
+W:12:2:20:0
 T:TRAP:FALL_SPIKE:12d6
 K:DEFAULT:1:11
 #$ open floor
@@ -1892,7 +1892,7 @@ M:17
 U:56
 #$ granite wall
 O:345
-W:13:2:20:0
+W:16:2:20:0
 T:TRAP:FALL_POISON:12d6
 K:DEFAULT:1:13
 #$ open floor
@@ -2026,7 +2026,7 @@ M:70
 U:56
 #$ granite wall
 O:0
-W:4:2:20:0
+W:6:2:20:0
 T:STARE:LOSE_WIS
 K:DEFAULT:1:5
 #$ open floor
@@ -2049,7 +2049,7 @@ M:70
 U:56
 #$ granite wall
 O:0
-W:5:2:20:0
+W:4:2:20:0
 T:STARE:LOSE_INT
 K:DEFAULT:1:5
 #$ open floor
@@ -2072,7 +2072,7 @@ M:70
 U:56
 #$ granite wall
 O:0
-W:10:2:20:0
+W:20:2:20:0
 T:STARE:EXP_20
 K:DEFAULT:1:10
 #$ open floor
@@ -2095,7 +2095,7 @@ M:70
 U:56
 #$ granite wall
 O:0
-W:15:2:20:0
+W:40:2:20:0
 T:STARE:EXP_40
 K:DEFAULT:1:15
 #$ open floor
@@ -2118,7 +2118,7 @@ M:70
 U:56
 #$ granite wall
 O:0
-W:20:2:20:0
+W:50:2:20:0
 T:STARE:EXP_80
 K:DEFAULT:1:20
 #$ open floor
@@ -2141,7 +2141,7 @@ G:^:y
 U:56
 #$ granite wall
 O:0
-W:2:2:20:0
+W:1:2:20:0
 T:SHRIEK
 K:DEFAULT:1:5
 #$ open floor
@@ -2363,6 +2363,7 @@ U:56
 #$ granite wall
 O:0
 W:2:3:20:0
+T:LINE_LOS
 S:DARKNESS
 K:DEFAULT:1:5
 #$ open floor
@@ -2454,7 +2455,7 @@ G:^:R
 U:56
 #$ granite wall
 O:78
-W:2:1:20:0
+W:1:1:20:0
 T:ARROW:HURT:1d6
 K:DEFAULT:1:5
 #$ open floor
@@ -2477,7 +2478,7 @@ M:91
 U:56
 #$ granite wall
 O:80
-W:5:1:20:0
+W:3:1:20:0
 T:ARROW:HURT:3d6
 K:DEFAULT:1:5
 #$ open floor
@@ -2500,7 +2501,7 @@ M:91
 U:56
 #$ granite wall
 O:793
-W:8:1:20:0
+W:5:1:20:0
 T:ARROW:HURT:5d6
 K:DEFAULT:1:8
 #$ open floor
@@ -2523,7 +2524,7 @@ M:91
 U:56
 #$ granite wall
 O:794
-W:11:1:20:0
+W:7:1:20:0
 T:ARROW:HURT:7d6
 K:DEFAULT:1:11
 #$ open floor
@@ -6639,7 +6640,7 @@ U:56
 #$ granite wall
 O:0
 W:32:3:20:0
-T:BALL:PLASMA:8d6
+T:BALL:PLASMA:16d6
 K:DEFAULT:1:5
 #$ open floor
 K:HIT_TRAP:295:5
@@ -6659,7 +6660,7 @@ U:56
 #$ granite wall
 O:0
 W:33:3:20:0
-T:BALL:GRAVITY:8d6
+T:BALL:GRAVITY:16d6
 K:DEFAULT:1:36
 #$ open floor
 K:HIT_TRAP:296:5
@@ -6679,7 +6680,7 @@ U:56
 #$ granite wall
 O:0
 W:31:3:20:0
-T:BALL:INERTIA:8d6
+T:BALL:INERTIA:16d6
 K:DEFAULT:1:33
 #$ open floor
 K:HIT_TRAP:297:5
@@ -6699,7 +6700,7 @@ U:56
 #$ granite wall
 O:0
 W:30:3:20:0
-T:BALL:FORCE:8d6
+T:BALL:FORCE:16d6
 K:DEFAULT:1:30
 #$ open floor
 K:HIT_TRAP:298:5
@@ -6709,7 +6710,7 @@ F:HIT_TRAP |
 F:GLOW | CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 
-# ---> visible trap -- glowing glyph
+# ---> visible trap -- ancient hex
 
 N:299:ancient hex
 G:^:G
@@ -6719,7 +6720,7 @@ U:56
 #$ granite wall
 O:0
 W:27:3:20:0
-T:ADJACENT:TIME:8d6
+T:ADJACENT:TIME:16d6
 K:DEFAULT:1:27
 #$ open floor
 K:HIT_TRAP:299:5
@@ -6738,8 +6739,8 @@ M:295
 U:56
 #$ granite wall
 O:0
-W:12:3:20:0
-T:BALL:SOUND:8d6
+W:16:3:20:0
+T:BALL:SOUND:16d6
 K:DEFAULT:1:12
 #$ open floor
 K:HIT_TRAP:300:5
@@ -6759,7 +6760,7 @@ U:56
 #$ granite wall
 O:0
 W:28:3:20:0
-T:BALL:SHARD:8d6
+T:BALL:SHARD:16d6
 K:DEFAULT:1:18
 #$ open floor
 K:HIT_TRAP:301:5
@@ -6779,7 +6780,7 @@ U:56
 #$ granite wall
 O:0
 W:15:3:20:0
-T:BALL:NEXUS:8d6
+T:BALL:NEXUS:16d6
 K:DEFAULT:1:15
 #$ open floor
 K:HIT_TRAP:302:5
@@ -6797,7 +6798,7 @@ U:56
 #$ granite wall
 O:0
 W:24:3:20:0
-T:BALL:CHAOS:8d6
+T:BALL:CHAOS:16d6
 K:DEFAULT:1:24
 #$ open floor
 K:HIT_TRAP:303:5
@@ -6817,7 +6818,7 @@ U:56
 #$ granite wall
 O:0
 W:21:3:20:0
-T:ADJACENT:DISENCHANT:8d6
+T:ADJACENT:DISENCHANT:16d6
 K:DEFAULT:1:21
 #$ open floor
 K:HIT_TRAP:304:5
@@ -11075,7 +11076,7 @@ M:91
 U:56
 #$ granite wall
 O:81
-W:31:1:20:0
+W:36:1:20:0
 T:ARROW:PETRIFY:36d6
 K:DEFAULT:1:11
 #$ open floor
@@ -19431,6 +19432,7 @@ U:56
 #$ granite wall
 O:0
 W:20:2:20:0
+T:LINE_LOS
 S:BALL_LITE
 K:DEFAULT:1:70
 #$ open floor
@@ -19446,7 +19448,7 @@ G:^:t
 U:56
 #$ granite wall
 O:0
-W:5:2:20:0
+W:15:2:20:0
 K:DEFAULT:1:70
 #$ open floor
 K:HIT_TRAP:958:5
@@ -19498,7 +19500,7 @@ G:^:m
 U:56
 #$ granite wall
 O:0
-W:8:2:20:0
+W:27:2:20:0
 T:FLASK:HURT:9d6
 K:DEFAULT:1:70
 #$ open floor
@@ -19515,7 +19517,7 @@ M:961
 U:56
 #$ granite wall
 O:0
-W:16:2:20:0
+W:40:2:20:0
 T:FLASK:HURT:27d6
 K:DEFAULT:1:70
 #$ open floor
@@ -19532,7 +19534,7 @@ M:961
 U:56
 #$ granite wall
 O:0
-W:4:2:20:0
+W:9:2:20:0
 T:FLASK:HURT:3d6
 K:DEFAULT:1:70
 #$ open floor
@@ -19549,7 +19551,7 @@ M:961
 U:56
 #$ granite wall
 O:0
-W:2:2:20:0
+W:3:2:20:0
 T:FLASK:HURT:1d6
 K:DEFAULT:1:70
 #$ open floor
@@ -20244,4 +20246,52 @@ F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:A slicing blade hits you.
+
+# visible trap -- gas -- long lasting poison
+
+N:998:gas trap
+G:^:g
+M:28
+#$ gas trap
+U:56
+#$ granite wall
+O:0
+W:11:1:20:0
+T:MIST:POISON_WEAK:40d6
+K:DEFAULT:1:5
+#$ open floor
+K:CHASM:141:5
+#$ chasm
+K:TREE:541:5
+#$ shady ground
+K:HIT_TRAP:30:5
+#$ gas trap
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You are surrounded by a pungent green gas!
+
+N:999:gas trap
+G:^:g
+M:28
+#$ gas trap
+U:56
+#$ granite wall
+O:0
+W:5:1:20:0
+T:MIST:DELAY_POISON:10d6
+K:DEFAULT:1:5
+#$ open floor
+K:CHASM:141:5
+#$ chasm
+K:TREE:541:5
+#$ shady ground
+K:HIT_TRAP:30:5
+#$ gas trap
+F:LOS | PROJECT | MOVE | PLACE | NOTICE | REMEMBER | DISARM | TRAP |
+F:HIT_TRAP |
+F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
+F:ATTR_LITE |
+D:You are surrounded by a bitter-tasting clear gas! It seems to have no effect.
 

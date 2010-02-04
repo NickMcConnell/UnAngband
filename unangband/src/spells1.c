@@ -874,6 +874,24 @@ static byte mh_attr(void)
 	return (TERM_WHITE);
 }
 
+/*
+ * Draw projection using underlying terrain colour
+ */
+static byte clear_color(int y, int x)
+{
+	int feat;
+	
+	if ((!y) || (!x)) return (TERM_WHITE);
+	
+	if (!in_bounds_fully(y, x)) return (TERM_WHITE);
+	
+	/* Get mimiced feat */
+	feat = f_info[cave_feat[y][x]].mimic;
+	
+	/* Always return a 'real' colour */
+	return (f_info[feat].d_char);
+}
+
 static byte acid_color(void)
 {
 	switch (rand_int(3))
@@ -1111,7 +1129,7 @@ static byte chaos_color(void)
 /*
  * Return a color to use for the bolt/ball spells
  */
-byte spell_color(int type)
+byte spell_color(int type, int y, int x)
 {
 	/* Analyze */
 	switch (type)
@@ -1122,7 +1140,7 @@ byte spell_color(int type)
 		case GF_COLD:         return (cold_color());
 		case GF_POIS:         return (pois_color());
 
-		case GF_DELAY_POISON: return (pois_color());
+		case GF_DELAY_POISON: return (clear_color(y, x));
 		case GF_POISON_WEAK:  return (pois_color());
 		case GF_POISON_HALF:  return (pois_color());
 		case GF_HURT_POISON:  return (pois_color());
@@ -1202,7 +1220,7 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	if ((ny == y) && (nx == x))
 	{
 		a = effect_info[typ].attr_ball ?
-		    effect_info[typ].attr_ball : spell_color(typ);
+		    effect_info[typ].attr_ball : spell_color(typ, ny, nx);
 		c = effect_info[typ].char_ball ?
 			effect_info[typ].char_ball : '*';
 	}
@@ -1211,7 +1229,7 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	else if (nx == x)
 	{
 		a = effect_info[typ].attr_vert ?
-		    effect_info[typ].attr_vert : spell_color(typ);
+		    effect_info[typ].attr_vert : spell_color(typ, ny, nx);
 		c = effect_info[typ].char_vert ?
 			effect_info[typ].char_vert : '|';
 	}
@@ -1220,7 +1238,7 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	else if (ny == y)
 	{
 		a = effect_info[typ].attr_horiz ?
-		    effect_info[typ].attr_horiz : spell_color(typ);
+		    effect_info[typ].attr_horiz : spell_color(typ, ny, nx);
 		c = effect_info[typ].char_horiz ?
 			effect_info[typ].char_horiz : '-';
 	}
@@ -1229,7 +1247,7 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	else if ((ny - y) == (x - nx))
 	{
 		a = effect_info[typ].attr_rdiag ?
-		    effect_info[typ].attr_rdiag : spell_color(typ);
+		    effect_info[typ].attr_rdiag : spell_color(typ, ny, nx);
 		c = effect_info[typ].char_rdiag ?
 			effect_info[typ].char_rdiag : '/';
 	}
@@ -1238,7 +1256,7 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	else if ((ny - y) == (nx - x))
 	{
 		a = effect_info[typ].attr_ldiag ?
-		    effect_info[typ].attr_ldiag : spell_color(typ);
+		    effect_info[typ].attr_ldiag : spell_color(typ, ny, nx);
 		c = effect_info[typ].char_ldiag ?
 			effect_info[typ].char_ldiag : '\\';
 	}
@@ -1247,7 +1265,7 @@ u16b bolt_pict(int y, int x, int ny, int nx, int typ)
 	else
 	{
 		a = effect_info[typ].attr_ball ?
-		    effect_info[typ].attr_ball : spell_color(typ);
+		    effect_info[typ].attr_ball : spell_color(typ, ny, nx);
 		c = effect_info[typ].char_horiz ?
 			effect_info[typ].char_horiz : '*';
 	}
@@ -2672,7 +2690,7 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 			if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
 
 			/* Weak does no immediate damage */
-			if (weak) return;
+			if (weak || delay) return;
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2744,7 +2762,7 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	}
 
 	/* Weak does no immediate damage */
-	if (weak) return;
+	if (weak || delay) return;
 
 	/* Take damage */
 	if (!hurt) take_hit(who, what, half ? (dam + 1) / 2 : dam);
@@ -3648,7 +3666,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 		}
 		case GF_POISON_HALF:
 		case GF_POISON_WEAK:
-		case GF_DELAY_POISON:
+		/*case GF_DELAY_POISON: - don't poison features */
 		case GF_POIS:
 		case GF_HURT_POISON:
 		{
@@ -3656,7 +3674,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			       (dam > (f_ptr->power*10)))
 			{
 				/* Check line of sight */
-				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE))
+				if ((player_has_los_bold(y, x)) && (f_ptr->flags1 & FF1_NOTICE) && (typ != GF_DELAY_POISON))
 				{
 					msg_format("The %s is poisoned.",f);
 				}
@@ -6171,7 +6189,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (r_ptr->flags3 & (RF3_IM_POIS))
 			{
 				if (typ != GF_HURT_POISON) dam /= 9;
-				if ((seen) && !(l_ptr->flags3 & (RF3_IM_POIS)))
+				if ((seen) && !(l_ptr->flags3 & (RF3_IM_POIS)) && (typ != GF_DELAY_POISON))
 				{
 					note = " is immune to poison.";
 					l_ptr->flags3 |= (RF3_IM_POIS);
@@ -9446,7 +9464,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_POIS:
 		case GF_SLIME:
 		{
-			if (fuzzy) msg_print("You are hit by poison!");
+			if (fuzzy && (typ != GF_DELAY_POISON)) msg_print("You are hit by poison!");
 			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON, typ == GF_POISON_WEAK, typ == GF_POISON_HALF, typ == GF_HURT_POISON);
 			break;
 		}

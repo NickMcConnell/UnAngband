@@ -74,14 +74,18 @@ bool do_cmd_test(int y, int x, int action)
 		case FS_MORE: act=" to climb down"; break;
 		case FS_RUN: act=" to run on"; break;
 		case FS_KILL_MOVE: act=" to disturb"; break;
-		case FS_FLOOR: act=" to set a trap on"; break;
+		case FS_FLOOR:
+		case FS_GROUND: act=" to set a trap on"; break;
 		default: break;
 	}
 
 	if (action < FS_FLAGS2)
 	{
 		flag = bitzero << (action - FS_FLAGS1);
-		if (!(f_ptr->flags1 & flag))
+		if ((!(f_ptr->flags1 & flag))
+			/* Hack -- allow traps to be set on the ground */
+			&& (((flag & (FF1_FLOOR)) == 0)
+			|| ((f_ptr->flags3 & (FF3_GROUND)) == 0)))
 		{
 		 msg_format("You see nothing %s%s.",here,act);
 		 return (FALSE);
@@ -2468,6 +2472,7 @@ bool player_set_trap_or_spike(int item)
 	else
 	{
 		/* Hack -- only set traps on floors (at this stage) XXX */
+		/* We hackily allow ground as well */
 		action = FS_FLOOR;
 	}
 
@@ -2546,6 +2551,12 @@ bool player_set_trap_or_spike(int item)
 
 				/* Sanity check */
 				if (!(f_info[cave_feat[y][x]].flags1 & (FF1_SPIKE))) return (TRUE);
+			}
+
+			if (item >= 0)
+			{
+				/* Mark item for reduction */
+				o_ptr->ident |= (IDENT_BREAKS);
 			}
 
 			feat = feat_state(feat, FS_SPIKE);
@@ -2835,17 +2846,20 @@ bool player_set_trap_or_spike(int item)
 				/* Hack -- ensure trap is created */
 				object_level = 128;
 
+				if (item >= 0)
+				{
+					/* Mark item for reduction */
+					o_ptr->ident |= (IDENT_BREAKS);
+				}
+
 				/* Set the floor trap */
 				cave_set_feat(y,x,FEAT_INVIS);
 
 				/* Set the trap */
 				pick_trap(y,x, TRUE);
-
+				
 				/* Reset object level */
 				object_level = p_ptr->depth;
-
-				/* Check if we can arm it? */
-				do_cmd_disarm_aux(y,x, FALSE);
 
 				/* Parania */
 				if (item >= 0)
@@ -2861,6 +2875,7 @@ bool player_set_trap_or_spike(int item)
 					/* Clear marker */
 					o_ptr->ident &= ~(IDENT_BREAKS);
 				}
+
 				/* More paranoia */
 				else
 				{
@@ -2882,6 +2897,9 @@ bool player_set_trap_or_spike(int item)
 					floor_item_describe(0 - item);
 					floor_item_optimize(0 - item);
 				}
+				
+				/* Check if we can arm it? */
+				do_cmd_disarm_aux(y,x, FALSE);
 			}
 			/* Message */
 			else
