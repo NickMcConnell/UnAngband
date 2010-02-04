@@ -7090,7 +7090,7 @@ errr parse_t_info(char *buf, header *head)
 		}
 
 		/* Verify that colon */
-		if (!s) {
+		if (!(*s)) {
 		  name = 0;
 		}
 		else {
