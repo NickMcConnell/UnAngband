@@ -745,6 +745,7 @@ static void describe_monster_attack(const monster_race *r_ptr, const monster_lor
 	/* Finish sentence above */
 	else if (r)
 	{
+		if (l_ptr->flags3 & (RF3_HUGE)) text_out(" up to 2 grids away");
 		text_out(".  ");
 	}
 

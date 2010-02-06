@@ -1823,6 +1823,9 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 
 	bool more = FALSE;
 
+	/* Get feature */
+	feature_type *f_ptr = &f_info[cave_feat[y][x]];
+	
 	/* Arm or disarm */
 	if (disarm) act = "disarm";
 	else act = "arm";
@@ -1831,7 +1834,7 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 	if (!do_cmd_test(y, x, (disarm ? FS_DISARM : FS_TRAP))) return (FALSE);
 
 	/* Get the trap name */
-	name = (f_name + f_info[cave_feat[y][x]].name);
+	name = (f_name + f_ptr->name);
 
 	/* Get the "disarm" factor */
 	i = p_ptr->skills[SKILL_DISARM];
@@ -1843,7 +1846,7 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 	/* XXX XXX XXX Variable power? */
 
 	/* Extract trap "power" */
-	power = f_info[cave_feat[y][x]].power;
+	power = f_ptr->power;
 
 	/* Player trap */
 	if (cave_o_idx[y][x])
@@ -1866,7 +1869,9 @@ static bool do_cmd_disarm_aux(int y, int x, bool disarm)
 
 		/* Reward, unless player trap */
 		/* Note that player traps have an object in the trap */
-		if (disarm && !cave_o_idx[y][x])
+		if (disarm && !cave_o_idx[y][x] &&
+			/* Hack to avoid awarding xp for disarming siege engines/clockwork mechanisms */
+			(f_ptr->d_attr != TERM_MAGENTA) && (f_ptr->d_attr != TERM_L_PINK))
 		  gain_exp(power);
 
 		/* Remove the trap */

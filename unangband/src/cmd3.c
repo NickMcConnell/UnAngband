@@ -1216,6 +1216,12 @@ bool player_offer(int item)
 		/* Get the monster name (or "it") */
 		monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
 
+		/* Gollums wake monsters up */
+		if (adult_gollum)
+		{
+			m_ptr->csleep = 0;
+		}
+		
 		/* Sleeping monsters ignore you */
 		if (m_ptr->csleep)
 		{
@@ -1685,7 +1691,7 @@ bool player_trade(int item2)
 	}
 	
 	/* Cheated the player out of money */
-	if ((item2 == INVEN_GOLD) && (item != INVEN_GOLD) && (!value) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
+	if ((!adult_gollum) && (item2 == INVEN_GOLD) && (item != INVEN_GOLD) && (!value) && ((m_ptr->mflag & (MFLAG_TOWN)) != 0))
 	{
 		/* Really ripping the player off */
 		if (level_flag & (LF1_TOWN)) monster_speech(trade_m_idx, comment_2[rand_int(MAX_COMMENT_2)], FALSE);
@@ -1710,6 +1716,9 @@ bool player_trade(int item2)
 			/* Boost a deal */
 			while (!rand_int((m_ptr->mflag & (MFLAG_ALLY)) ? 3 : 4)) deal++;
 		}
+		
+		/* Gollums always make a minimum deal */
+		if ((adult_gollum) && (deal < 2)) deal = 2;
 
 		/* We can offer stuff to business associates to make them allies */
 		if ((deal > 4) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN | MFLAG_MADE | MFLAG_AGGR)) == (MFLAG_TOWN | MFLAG_MADE)))
@@ -1816,7 +1825,7 @@ bool player_trade(int item2)
 
 		/* We can offer stuff to monsters to either slow them down or make them 'neutral'. */
 		/* Gollums are wretched enough to make anything sound moderately attractive */
-		else if (((adult_gollum) || (deal > 0)) && (((m_ptr->mflag & (MFLAG_TOWN)) == 0) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0)))
+		else if ((deal > 0) && (((m_ptr->mflag & (MFLAG_TOWN)) == 0) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0)))
 		{
 			/* Enough to at least make him not attack. */
 			if (deal > 1)

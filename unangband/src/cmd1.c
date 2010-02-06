@@ -2905,6 +2905,9 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 		}
 	}
 
+	/* Hack - backstab always of some benefit */
+	if (style & (WS_BACKSTAB)) *to_crit += (adult_gollum ? 3 : 1);
+	
 	/* Only allow criticals against living opponents */
 	if (r_ptr && (r_ptr->flags3 & (RF3_NONLIVING)
 				  || r_ptr->flags2 & (RF2_STUPID)))

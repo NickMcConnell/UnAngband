@@ -4489,6 +4489,9 @@ void list_object(const object_type *o_ptr, int mode)
 						case TV_MUSHROOM:
 						case TV_FOOD:
 							break;
+						case TV_FLASK:
+							text_out(" if you are undead");
+							break;
 						case TV_EGG:
 							text_out(" to hungry players");
 							break;
@@ -4546,12 +4549,12 @@ void list_object(const object_type *o_ptr, int mode)
 						if (!detail) learn |= tmp;
 					}
 				}
-
-				if (vp[n] == vp_coat_self)
+				
+				if ((powers) && (vp[n] == vp_coat_self))
 				{
 					text_out(", if they hit the applied region");
 				}
-
+				
 				if ((charge) && (powers))
 				{
 					if ((time) && (randtime)) text_out(format(", recharging in d%d+%d turns.  ",randtime, time));

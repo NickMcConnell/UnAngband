@@ -13006,6 +13006,13 @@ bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rn
 			/* Advance */
 			y = ny;
 			x = nx;
+			
+			/* Disturb the player if we project past them */
+			if (cave_m_idx[y][x] < 0)
+			{
+				disturb(1, 0);
+				notice = TRUE;
+			}
 
 			/* Lite up the path if required */
 			if (flg & (PROJECT_LITE))
