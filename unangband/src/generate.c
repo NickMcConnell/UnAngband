@@ -9703,7 +9703,7 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			col1 = col1 - col_dir;
 			
 			/* Increase tunnel length by one */
-			add_tunnel(row1, col1);
+			add_tunnel(row1, col1, ((f_info[cave_feat[row1][col1]].flags2 & (FF2_PATH)) != 0) ? 0 : 1);
 
 			/* Good candidate for stairs */
 			add_stair(row1, col1);
