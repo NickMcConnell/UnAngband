@@ -9887,6 +9887,9 @@ static bool build_tunnel(int row1, int col1, int row2, int col2, bool allow_over
 			/* Fall back to last turn */
 			dun->tunn_n = last_turn;
 			dun->door_n = last_door;
+			
+			/* Have to fall back all the way for stairs */
+			dun->stair_n = first_stair;
 
 			/* Clear decorations up to here */
 			for ( ; dun->decor_n > 0; dun->decor_n--)
