@@ -2171,8 +2171,10 @@ bool place_random_stairs(int y, int x, int feat)
 	}
 
 	/* Random stairs -- bias towards direction player is heading */
-	else if (rand_int(100) < (((f_info[p_ptr->create_stair].flags1 & (FF1_MORE)) != 0) ? 75 :
-					(((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0) ? 25 : 50)) )
+	/* Important: If we are placing downstairs, it is because we headed up from the previous
+	 * level. So downstairs should be less common as the player is climbing. */
+	else if (rand_int(100) < (((f_info[p_ptr->create_stair].flags1 & (FF1_MORE)) != 0) ? 25 :
+					(((f_info[p_ptr->create_stair].flags1 & (FF1_LESS)) != 0) ? 75 : 50)) )
 	{
 		place_down_stairs(y, x);
 	}
