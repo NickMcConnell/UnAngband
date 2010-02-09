@@ -1347,7 +1347,7 @@ static cptr s_info_types[] =
 	"CREATE_RACE",
 	"CREATE_GROUP_IDX",
 	"AIM_CREATE",
-	"AIM_CRREATE_RACE",
+	"AIM_CREATE_RACE",
 	"AIM_CREATE_GROUP_IDX",
 	NULL
 };

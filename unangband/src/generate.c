@@ -16121,7 +16121,7 @@ void generate_cave(void)
 			if ((t_info[i].town_lockup_ifvisited == p_ptr->dungeon) && (r_info[t_info[i].town_lockup_monster].max_num > 0))
 			{
 				/* Get the name */
-				race_desc(m_name, sizeof(m_name), t_info[i].town_lockup_monster, 0x400, 2);
+				race_desc(m_name, sizeof(m_name), t_info[i].town_lockup_monster, 0x400, 1);
 
 			  long_level_name(str, i, 0);
 			  msg_format("%^s now terrorizes %s.", m_name, str);
@@ -16131,7 +16131,7 @@ void generate_cave(void)
 			  if (r_info[t_info[i].replace_guardian].max_num > 0)
 			    {
 					/* Get the name */
-					race_desc(m_name, sizeof(m_name), t_info[i].town_lockup_monster, 0x400, 2);
+					race_desc(m_name, sizeof(m_name), t_info[i].replace_guardian, 0x400, 1);
 
 			      long_level_name(str, i, 0);
 			      msg_format("%^s now guards %s.", m_name, str);
