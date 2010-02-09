@@ -7533,6 +7533,7 @@ static void recover_monster(int m_idx, bool regen)
 			monster_speech(m_idx, (m_ptr->mflag & (MFLAG_ALLY))? comment_1a[rand_int(MAX_COMMENT_1a)] : comment_1b[rand_int(MAX_COMMENT_1b)], FALSE);
 		}
 
+		/* No longer summoned */
 		if (!m_ptr->summoned)
 		{
 			/* Town monsters change their tune */
@@ -7592,19 +7593,44 @@ static void recover_monster(int m_idx, bool regen)
 				m_ptr->summoned = 150 - adj_chr_gold[p_ptr->stat_ind[A_CHR]];
 			}
 
-			/* Delete monster summoned by player */
-			if (m_ptr->mflag & (MFLAG_ALLY))
+			/* Delete monster summoned by player - transform lemures */
+			if ((m_ptr->mflag & (MFLAG_ALLY)) || (r_ptr->grp_idx == 28))
 			{
 				s16b this_o_idx, next_o_idx = 0;
+				
+				object_type *o_ptr, *i_ptr;
+				object_type object_type_body;
+
+				/* Drop a chrysalis */
+				if (r_ptr->grp_idx == 28)
+				{
+					/* Get local object */
+					i_ptr = &object_type_body;
+
+					/* Copy the object */
+					object_prep(i_ptr, lookup_kind(TV_EGG, SV_EGG_CHRYSALIS));
+					
+					/* Set charges */
+					i_ptr->timeout = 66 /* 6 */;
+					
+					/* Set weight */
+					i_ptr->weight *= 15;
+					
+					/* Set race */
+					i_ptr->name3 = poly_r_idx(y, x, m_ptr->r_idx, TRUE, FALSE, FALSE);
+					
+					/* Make friendly if required */
+					if (m_ptr->mflag & (MFLAG_ALLY)) i_ptr->ident |= (IDENT_FORGED);
+					
+					/* Drop it */
+					drop_near(i_ptr, -1, y, x, TRUE);
+				}
 
 				/* Drop objects being carried - unless a mercenary */
 				if ((m_ptr->mflag & (MFLAG_TOWN)) == 0)
 				{
 					for (this_o_idx = m_ptr->hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
 					{
-						object_type *o_ptr, *i_ptr;
-						object_type object_type_body;
-
 						/* Get the object */
 						o_ptr = &o_list[this_o_idx];
 

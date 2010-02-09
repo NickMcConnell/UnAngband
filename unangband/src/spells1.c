@@ -4099,7 +4099,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 
 			if (summon_specific(y, x, who > SOURCE_MONSTER_START ? m_list[who].r_idx : 0,
 					who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, ANIMATE_TREE,
-					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) cave_set_feat(y,x,FEAT_GROUND);
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L))) cave_set_feat(y,x,FEAT_GROUND);
 
 			break;
 		}
@@ -4126,7 +4126,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			{
 				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
 					who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : p_ptr->depth, ANIMATE_ELEMENT,
-					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) cave_set_feat(y,x,FEAT_GROUND_EMPTY);
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L))) cave_set_feat(y,x,FEAT_GROUND_EMPTY);
 			}
 
 			break;
@@ -4173,7 +4173,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			{
 				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
 						who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level-1 : p_ptr->depth, ANIMATE_OBJECT,
-					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) change = TRUE;
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L))) change = TRUE;
 			}
 
 			if (change)
@@ -4200,7 +4200,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			{
 				if (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
 						who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level-1 : p_ptr->depth, SUMMON_KIN,
-					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L))) obvious = TRUE;
+					FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L))) obvious = TRUE;
 			}
 			break;
 		}
@@ -4870,7 +4870,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
 									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), SUMMON_KIN,
-							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
+							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L)));
 
 						if (summons)
 						{
@@ -4919,7 +4919,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					{
 						summon_race_type = o_ptr->name3;
 						for (i = 0; i < o_ptr->number; i++)
-							summons |= (summon_specific(y, x, 0, 99, SUMMON_FRIEND, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L));
+							summons |= (summon_specific(y, x, 0, 99, SUMMON_FRIEND, FALSE, who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L));
 
 						if (summons)
 						{
@@ -4933,7 +4933,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
 									SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), ANIMATE_OBJECT,
-							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
+							FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L)));
 
 						if (summons)
 						{
@@ -5024,7 +5024,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					for (i = 0; i < o_ptr->number; i++)
 							summons |= (summon_specific(y, x, who > SOURCE_MONSTER_START ? who > m_list[who].r_idx : 0,
 									who > SOURCE_MONSTER_START ? r_info[m_list[who].r_idx].level - 1 : MAX(p_ptr->depth, p_ptr->lev), ANIMATE_DEAD,
-						FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)));
+						FALSE, (MFLAG_MADE) |  (who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_MADE) : 0L)));
 
 					if (summons)
 					{
@@ -6648,17 +6648,26 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_CHAOS:
 		{
 			if (seen) obvious = TRUE;
-			do_poly = TRUE;
+			do_poly = dam;
 			do_conf = 5 + randint(11);
 			if (r_ptr->flags9 & (RF9_RES_CHAOS))
 			{
 				dam *= 3; dam /= (randint(6)+6);
-				do_poly = FALSE;
+				do_poly = 0;
 				if ((seen) && !(l_ptr->flags9 & (RF9_RES_CHAOS)))
 				{
 					note = " resists chaos.";
 					l_ptr->flags9 |= (RF9_RES_CHAOS);
 				}
+			}
+			/* Powerful monsters can resist */
+			else if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen))
+				{
+					note = " seems somewhat chaotic.";
+				}
+				do_poly = 0;
 			}
 			break;
 		}
@@ -7045,7 +7054,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (seen) obvious = TRUE;
 
 			/* Attempt to polymorph (see below) */
-			do_poly = TRUE;
+			do_poly = dam;
 
 			/* Only polymorph living or once living monsters */
 			if (r_ptr->flags3 & (RF3_NONLIVING))
@@ -7057,7 +7066,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				}
 
 				obvious = FALSE;
-				do_poly = FALSE;
+				do_poly = 0;
 			}
 
 			/* Powerful monsters can resist */
@@ -7070,10 +7079,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				else
 				{
 					if (seen) note = " is unaffected!";
-
-					do_poly = FALSE;
 					obvious = FALSE;
 				}
+				
+				do_poly = 0;
 			}
 
 			/* No "real" damage */
@@ -8755,7 +8764,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	}
 
 	/* "Unique" monsters cannot be polymorphed */
-	if (r_ptr->flags1 & (RF1_UNIQUE)) do_poly = FALSE;
+	if (r_ptr->flags1 & (RF1_UNIQUE)) do_poly = 0;
 
 	/* "Unique" monsters can only be "killed" by the player */
 	if (r_ptr->flags1 & (RF1_UNIQUE))
@@ -8824,14 +8833,14 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		return(obvious);
 	}
 
-	/* Mega-Hack -- Handle "polymorph" -- monsters get a saving throw */
-	else if (do_poly && (randint(90) > r_ptr->level))
+	/* Mega-Hack -- Handle "polymorph" */
+	else if (do_poly)
 	{
 		/* Default -- assume no polymorph */
 		note = " is unaffected!";
 
 		/* Pick a "new" monster race */
-		tmp = poly_r_idx(y, x, m_ptr->r_idx);
+		tmp = poly_r_idx(y, x, m_ptr->r_idx, FALSE, randint(do_poly) > r_ptr->level, typ == GF_CHAOS);
 
 		/* Handle polymorh */
 		if (tmp != m_ptr->r_idx)

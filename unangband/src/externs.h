@@ -754,7 +754,7 @@ extern void display_monster_look(const int m_idx);
 extern void get_closest_monster(int n, int y0, int x0, int *ty, int *tx, byte parameter, int who);
 
 /* monster2.c */
-extern s16b poly_r_idx(int y, int x, int r_idx);
+extern s16b poly_r_idx(int y, int x, int r_idx, bool require_char, bool harmless, bool chaotic);
 extern void delete_monster_idx(int i);
 extern void delete_monster(int y, int x);
 extern void delete_monster_lite(int i);

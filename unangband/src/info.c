@@ -509,6 +509,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	bool timed_effect = FALSE;
 
 	u32b id_flags = s_ptr->flags1;
+	
+	bool blood_debt = FALSE;
+	bool summons = FALSE;
+	bool aim_summons = FALSE;
 
 	(void)level;
 
@@ -1074,14 +1078,11 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		}
 	}
 
-	/* Collect miscellaneous */
+	/* Collect summoning */
 	vn = 0;
 
-	if (s_ptr->flags3 & (SF3_DEC_FOOD)) vp[vn++] = "makes you weak from hunger";
-	if (s_ptr->flags2 & (SF2_SLOW_POIS)) vp[vn++] = "delays the onset of poison";
-	if (s_ptr->flags2 & (SF2_SLOW_DIGEST)) vp[vn++] = "digests food more efficiently";
-	if (s_ptr->flags2 & (SF2_AGGRAVATE)) vp[vn++] = "wakes up nearby monsters and hastes those in line of sight";
-	if ((s_ptr->type == SPELL_SUMMON) || (s_ptr->type == SPELL_AIM_SUMMON))
+	if ((s_ptr->type == SPELL_SUMMON) || (s_ptr->type == SPELL_AIM_SUMMON) || (s_ptr->type == SPELL_CREATE) ||
+			(s_ptr->type == SPELL_AIM_CREATE))
 	{
 		switch(s_ptr->param)
 		{
@@ -1110,9 +1111,14 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 			case SUMMON_WRAITH: vp[vn++] = "summons wraiths"; break;
 			default: vp[vn++] = "summons monsters"; break;
 		}
+		
+		/* We check this this way to allow flags we might introduce later to define this instead */
+		if ((s_ptr->type == SPELL_SUMMON) || (s_ptr->type == SPELL_AIM_SUMMON)) blood_debt = TRUE;
+		if ((s_ptr->type == SPELL_AIM_SUMMON) || (s_ptr->type == SPELL_AIM_CREATE)) aim_summons = TRUE;
 	}
 	
-	if (s_ptr->type == SPELL_SUMMON_RACE)
+	if ((s_ptr->type == SPELL_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_SUMMON_RACE) || (s_ptr->type == SPELL_CREATE_RACE) ||
+			(s_ptr->type == SPELL_AIM_CREATE_RACE))
 	{
 		char m_name[80];
 		
@@ -1120,6 +1126,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		race_desc(m_name, sizeof(m_name), s_ptr->param, 0x408, 1);
 
 		vp[vn++] = format("summons %s",	m_name);
+		
+		/* We check this this way to allow flags we might introduce later to define this instead */
+		if ((s_ptr->type == SPELL_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_SUMMON_RACE)) blood_debt = TRUE;
+		if ((s_ptr->type == SPELL_AIM_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_CREATE_RACE)) aim_summons = TRUE;
 	}
 	
 	if (s_ptr->type == SPELL_RAISE_RACE)
@@ -1130,9 +1140,58 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		race_desc(m_name, sizeof(m_name), s_ptr->param, 0x408, 1);
 
 		vp[vn++] = format("summons %s from beyond the grave",	m_name);
+		blood_debt = TRUE;
 	}
 
-	if (s_ptr->type == SPELL_SUMMON_GROUP_IDX) vp[vn++] = "summons related monsters";
+	if ((s_ptr->type == SPELL_SUMMON_GROUP_IDX) || (s_ptr->type == SPELL_AIM_SUMMON_GROUP_IDX) || (s_ptr->type == SPELL_CREATE_GROUP_IDX) ||
+			(s_ptr->type == SPELL_AIM_CREATE_GROUP_IDX))
+	{
+		vp[vn++] = "summons related monsters";
+		
+		/* We check this this way to allow flags we might introduce later to define this instead */
+		if ((s_ptr->type == SPELL_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_SUMMON_RACE)) blood_debt = TRUE;
+		if ((s_ptr->type == SPELL_AIM_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_CREATE_RACE)) aim_summons = TRUE;
+	}
+	
+	/* Describe summoning effects */
+	if (vn)
+	{
+		if (!introduced)
+		{
+			/* Intro */
+			text_out(intro);
+
+			introduced = TRUE;
+
+		}
+		else
+		{
+			text_out(" and ");
+		}
+
+		/* Scan */
+		for (n = 0; n < vn; n++)
+		{
+			/* Intro */
+			if (n == 0) { }
+			else if (n < vn-1) text_out(", ");
+			else text_out(" and ");
+
+			/* Dump */
+			text_out(vp[n]);
+		}
+		
+		/* For later */
+		summons = TRUE;
+	}
+
+	/* Collect miscellaneous */
+	vn = 0;
+
+	if (s_ptr->flags3 & (SF3_DEC_FOOD)) vp[vn++] = "makes you weak from hunger";
+	if (s_ptr->flags2 & (SF2_SLOW_POIS)) vp[vn++] = "delays the onset of poison";
+	if (s_ptr->flags2 & (SF2_SLOW_DIGEST)) vp[vn++] = "digests food more efficiently";
+	if (s_ptr->flags2 & (SF2_AGGRAVATE)) vp[vn++] = "wakes up nearby monsters and hastes those in line of sight";
 	if (s_ptr->type == SPELL_CREATE_KIND) vp[vn++] = "creates gold";
 	if (s_ptr->flags2 & (SF2_CREATE_STAIR)) vp[vn++] = "creates a staircase under you";
 	if (s_ptr->type == SPELL_WARD_GLYPH) vp[vn++] = "creates a glyph of warding under you";
@@ -1280,6 +1339,15 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		describe_shape(s_ptr->param, FALSE);
 		
 		text_out(format("You will remain a %s until you change to another shape or end the shape change effect", p_name + p_info[s_ptr->param].name));
+	}
+	
+	/* Provide more detail if summoning something */
+	if (summons)
+	{
+		if (blood_debt) text_out(".  The summoning incurs a mana debt or blood debt which you must pay if the summons are killed before they leave your service");
+		else text_out(".  Monsters summoned this way will not leave your service nor incur a mana or blood debt if they are killed");
+		
+		if (aim_summons) text_out(".  You can target this summons anywhere in line of sight");
 	}
 	
 	return (introduced);

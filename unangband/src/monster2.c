@@ -57,7 +57,7 @@ bool is_quest_race(int r_idx)
  * We know have to ensure that target race can survive on the intended
  * terrain.
  */
-s16b poly_r_idx(int y, int x, int base_idx)
+s16b poly_r_idx(int y, int x, int base_idx, bool require_char, bool harmless, bool chaotic)
 {
 	monster_race *r_ptr = &r_info[base_idx];
 
@@ -78,11 +78,17 @@ s16b poly_r_idx(int y, int x, int base_idx)
 	{
 		return (base_idx);
 	}
+	
+	/* Hack - harmless monsters */
+	if (harmless) r_lev /= 10;
 
 	/* Allowable level of new monster */
 	min_lev = (MAX(        1, r_lev - 1 - r_lev / 5));
 	max_lev = (MIN(MAX_DEPTH, r_lev + 1 + r_lev / 5));
 
+	/* Hack -- harmless monsters */
+	if (harmless) min_lev = 0;
+	
 	/* Reset sum */
 	total = 0L;
 
@@ -117,7 +123,7 @@ s16b poly_r_idx(int y, int x, int base_idx)
 		if ((r_ptr->flags1 & (RF1_QUESTOR)) && (is_quest_race(r_idx))) continue;
 
 		/* Hack -- Ensure monster can survive on intended terrain */
-		if (place_monster_here(y, x, r_idx) <= MM_FAIL) continue;
+		if ((!harmless) && (!require_char) && (place_monster_here(y, x, r_idx) <= MM_FAIL)) continue;
 
 		/* Accept */
 		table[i].prob3 = table[i].prob2;
@@ -125,9 +131,25 @@ s16b poly_r_idx(int y, int x, int base_idx)
 		/* Bias against monsters far from initial monster's depth */
 		if (table[i].level < (min_lev + r_lev) / 2) table[i].prob3 /= 4;
 		if (table[i].level > (max_lev + r_lev) / 2) table[i].prob3 /= 4;
-
+		
+		/* Special checks for harmless */
+		if (harmless)
+		{
+			if ((r_ptr->flags3 & (RF3_ANIMAL)) == 0) table[i].prob3 = 0;
+		}
+		
+		/* Special checks for chaotic */
+		if (chaotic)
+		{
+			if ((r_ptr->flags4 & (RF4_BRTH_CHAOS)) == 0) table[i].prob3 /= 4;
+		}
+		
 		/* Bias against monsters not of the same symbol */
-		if (r_ptr->d_char != d_char) table[i].prob3 /= 4;
+		if (r_ptr->d_char != d_char)
+		{
+			if ((require_char) && !(harmless)) table[i].prob3 = 0;
+			else table[i].prob3 /= 4;
+		}
 
 		/* Sum up probabilities */
 		total += table[i].prob3;
@@ -4599,16 +4621,28 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 		}
 	}
 
-	/* Created allies do not carry treasure */
-	if (flg & (MFLAG_ALLY)) n_ptr->mflag |= (MFLAG_MADE);
+	/* Notice these monsters turn they are created */
+	if (flg & (MFLAG_MARK | MFLAG_SHOW))
+	{
+		/* Parnoia */
+		flg |= (MFLAG_MARK | MFLAG_SHOW);
+		
+		/* Optimize -- Repair flags */
+		repair_mflag_mark = repair_mflag_show = TRUE;
+	}
 
+	/* Created allies do not carry treasure */
+	if (flg & (MFLAG_ALLY))
+	{
+		n_ptr->mflag |= (MFLAG_MADE);
+	}
 	/* Good monsters - note that these do carry treasure */
-	if (((r_ptr->flags9 & (RF9_GOOD)) != 0) && ((adult_evil) == 0))
+	else if (((r_ptr->flags9 & (RF9_GOOD)) != 0) && ((adult_evil) == 0))
 	{
 		n_ptr->mflag |= (MFLAG_ALLY | MFLAG_IGNORE);
 	}
-	/* If in the dungeon, and not a town monster prevent summoning */
-	else if ((character_dungeon) && ((n_ptr->mflag & (MFLAG_TOWN)) == 0))
+	/* If in the dungeon, and not a town monster or created prevent summoning */
+	else if ((character_dungeon) && ((n_ptr->mflag & (MFLAG_TOWN | MFLAG_MADE)) == 0))
 	{
 		/* Monster must wait a while until summoning anything if summoned/wandering */
 		/* Now uses charisma */
@@ -6524,7 +6558,7 @@ bool animate_object(int item)
 	if (o_ptr->name3 <= 0) return (FALSE);
 
 	/* Summon the specific race */
-	result = summon_specific_one(y1, x1, o_ptr->name3, FALSE, (o_ptr->ident & (IDENT_FORGED)) != 0 ? (MFLAG_ALLY) : 0L);
+	result = summon_specific_one(y1, x1, o_ptr->name3, FALSE, (o_ptr->ident & (IDENT_FORGED)) != 0 ? (MFLAG_ALLY | MFLAG_MADE) : 0L);
 
 	/* Hack -- no result */
 	if (!result)

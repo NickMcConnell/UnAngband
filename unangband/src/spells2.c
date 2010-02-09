@@ -6777,6 +6777,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 	int lasts;
 
 	int dir;
+	int y = p_ptr->py;
+	int x = p_ptr->px;
+	
+	u32b flg = who == SOURCE_PLAYER_CAST ? (MFLAG_ALLY | MFLAG_SHOW | MFLAG_MARK) : 0L;
 
 	/* Roll out the duration */
 	if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
@@ -6870,22 +6874,39 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				obvious = TRUE;
 				break;
 			}
-			case SPELL_SUMMON:
-			{
-				while (lasts-- && summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, s_ptr->param, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
-				*cancel = FALSE;
-				break;
-			}
 			case SPELL_AIM_SUMMON:
+			case SPELL_AIM_CREATE:
 			{
-				int y, x;
-				
 				/* Get a destination to summon around */
 				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
 				
-				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				/* Fall through */
+			}
+			case SPELL_CREATE:
+			{
+				if (s_ptr->type != SPELL_AIM_SUMMON) flg |= (MFLAG_MADE);
+				
+				/* Fall through */
+			}
+			case SPELL_SUMMON:
+			{
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, TRUE, flg)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
+			}
+			case SPELL_AIM_SUMMON_RACE:
+			case SPELL_AIM_CREATE_RACE:
+			{
+				/* Get a destination to summon around */
+				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
+				
+				/* Fall through */
+			}
+			case SPELL_CREATE_RACE:
+			{
+				if (s_ptr->type != SPELL_AIM_SUMMON_RACE) flg |= (MFLAG_MADE);
+				
+				/* Fall through */
 			}
 			case SPELL_SUMMON_RACE:
 			{
@@ -6903,16 +6924,30 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Summoning a monster */
 				else
 				{
-					while (lasts-- && summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+					while (lasts-- && summon_specific_one(y, x, s_ptr->param, FALSE, flg)) obvious = TRUE;
 					*cancel = FALSE;
 				}
 				break;
+			}
+			case SPELL_AIM_SUMMON_GROUP_IDX:
+			case SPELL_AIM_CREATE_GROUP_IDX:
+			{
+				/* Get a destination to summon around */
+				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
+				
+				/* Fall through */
+			}
+			case SPELL_CREATE_GROUP_IDX:
+			{
+				if (s_ptr->type != SPELL_AIM_SUMMON_GROUP_IDX) flg |= (MFLAG_MADE);
+				
+				/* Fall through */
 			}
 			case SPELL_SUMMON_GROUP_IDX:
 			{
 				summon_group_type = s_ptr->param;
 
-				while (lasts-- && summon_specific(p_ptr->py, p_ptr->px, 0, p_ptr->depth+5, SUMMON_GROUP, TRUE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L)) obvious = TRUE;
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, SUMMON_GROUP, TRUE, flg)) obvious = TRUE;
 				*cancel = FALSE;
 				break;
 			}
@@ -6940,7 +6975,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Summons unique */
 				msg_format("%^s has been summoned from beyond the grave.", m_name);
 				r_info[s_ptr->param].max_num = 1;
-				summon_specific_one(p_ptr->py, p_ptr->px, s_ptr->param, FALSE, who == SOURCE_PLAYER_CAST ? MFLAG_ALLY : 0L);
+				summon_specific_one(y, x, s_ptr->param, FALSE, flg);
 				obvious = TRUE;
 				*cancel = FALSE;
 				break;
@@ -7332,7 +7367,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			case SPELL_REST_UNTIL_DUSK:
 			case SPELL_REST_UNTIL_DAWN:
 			{
-				feature_type *f_ptr = &f_info[cave_feat[p_ptr->py][p_ptr->px]];
+				feature_type *f_ptr = &f_info[cave_feat[y][x]];
 				bool notice = FALSE;
 				int i;
 

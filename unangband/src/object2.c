@@ -5006,8 +5006,11 @@ static bool name_drop_okay(int r_idx)
 		/* Seed layers are plants but not slimes or spores */
 		else if ((j_ptr->sval == SV_EGG_SEED) && ((r_ptr->flags8 & (RF8_HAS_SPORE | RF8_HAS_SLIME)) || !(r_ptr->flags3 & (RF3_PLANT)))) return (FALSE);
 
+		/* Lemure chrysalises hatch demons */
+		if ((j_ptr->sval == SV_EGG_CHRYSALIS) && !(r_ptr->flags3 & (RF3_DEMON))) return (FALSE);
+
 		/* Undead/demons never have eggs */
-		if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON)) return (FALSE);
+		else if (r_ptr->flags3 & (RF3_UNDEAD | RF3_DEMON)) return (FALSE);
 
 		/* Hack -- dragons only hatch babies */
 		if ((r_ptr->flags3 & (RF3_DRAGON)) && (!strstr(r_name+r_ptr->name, "aby"))) return (FALSE);

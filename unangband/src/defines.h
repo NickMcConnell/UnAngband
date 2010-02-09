@@ -1718,6 +1718,14 @@ enum
 #define SPELL_REGION		62
 #define SPELL_SET_TRAP		63
 #define SPELL_DELAY_SPELL	64
+#define SPELL_AIM_SUMMON_RACE    65
+#define SPELL_AIM_SUMMON_GROUP_IDX    66
+#define SPELL_CREATE     67
+#define SPELL_CREATE_RACE       68
+#define SPELL_CREATE_GROUP_IDX     69
+#define SPELL_AIM_CREATE     70
+#define SPELL_AIM_CREATE_RACE       71
+#define SPELL_AIM_CREATE_GROUP_IDX     72
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/
@@ -2066,6 +2074,7 @@ enum
 #define SV_EGG_EGG    1
 #define SV_EGG_SPORE  2
 #define SV_EGG_SEED  3
+#define SV_EGG_CHRYSALIS	4
 
 /* The "sval" codes for TV_SPELL */
 /*
