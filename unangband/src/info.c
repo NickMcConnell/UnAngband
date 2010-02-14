@@ -1149,8 +1149,8 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 		vp[vn++] = "summons related monsters";
 		
 		/* We check this this way to allow flags we might introduce later to define this instead */
-		if ((s_ptr->type == SPELL_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_SUMMON_RACE)) blood_debt = TRUE;
-		if ((s_ptr->type == SPELL_AIM_SUMMON_RACE) || (s_ptr->type == SPELL_AIM_CREATE_RACE)) aim_summons = TRUE;
+		if ((s_ptr->type == SPELL_SUMMON_GROUP_IDX) || (s_ptr->type == SPELL_AIM_SUMMON_GROUP_IDX)) blood_debt = TRUE;
+		if ((s_ptr->type == SPELL_AIM_SUMMON_GROUP_IDX) || (s_ptr->type == SPELL_AIM_CREATE_GROUP_IDX)) aim_summons = TRUE;
 	}
 	
 	/* Describe summoning effects */
@@ -1344,8 +1344,10 @@ static bool spell_desc_flags(const spell_type *s_ptr, const cptr intro, int leve
 	/* Provide more detail if summoning something */
 	if (summons)
 	{
-		if (blood_debt) text_out(".  The summoning incurs a mana debt or blood debt which you must pay if the summons are killed before they leave your service");
-		else text_out(".  Monsters summoned this way will not leave your service nor incur a mana or blood debt if they are killed");
+		if (blood_debt) text_out(".  The summoning incurs a mana debt or blood debt which you must pay ");
+		else text_out(".  Monsters summoned this way will not leave your service ");
+		if (blood_debt) text_out("if the summons are killed before they leave your service");
+		else text_out("nor incur a mana or blood debt if they are killed");
 		
 		if (aim_summons) text_out(".  You can target this summons anywhere in line of sight");
 	}

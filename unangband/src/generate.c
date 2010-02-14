@@ -13715,7 +13715,6 @@ static void init_ecology(int r_idx)
 	(void)WIPE(&cave_ecology, ecology_type);
 	assert (cave_ecology.ready == FALSE);
 	assert (cave_ecology.valid_hook == FALSE);
-	assert (cave_ecology.num_ecologies < MAX_ECOLOGIES);
 
 	/* Count of different non-unique monsters in ecology */
 	k = MIN_ECOLOGY_RACES + rand_int(MIN_ECOLOGY_RACES);

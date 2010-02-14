@@ -7079,7 +7079,7 @@ void get_monster_ecology(int r_idx, int hack_pit)
 	monster_race *r_ptr;
 
 	/* Ensure we're pointing at a valid ecology number */
-	assert(cave_ecology.num_ecologies < MAX_ECOLOGIES);
+	if (cave_ecology.num_ecologies >= MAX_ECOLOGIES) return;
 
 	/* Pick a monster if one not specified */
 	if (!r_idx)
