@@ -1078,6 +1078,7 @@ enum
 #define GF_POTS	152
 #define GF_CHARM_PLANT	153
 #define GF_TANGLE_WEAK	154
+#define GF_LITE_BODY	155
 
 
 

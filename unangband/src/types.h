@@ -77,6 +77,8 @@ typedef bool (*list_command_func)(char choice, const s16b *sn, int i, bool *redr
 
 typedef bool (*tester_attribute_func)(int y, int x);
 typedef void (*modify_attribute_func)(int y, int x);
+typedef int (*modify_attribute_func_remove)(int y, int x);
+typedef void (*modify_attribute_func_reapply)(int y, int x, int r);
 
 
 /**** Available Structs ****/

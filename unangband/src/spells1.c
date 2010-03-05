@@ -5098,6 +5098,30 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				break;
 			}
 
+			/* Lights up body parts */
+			case GF_LITE_BODY:
+			{
+				switch (k_info[o_ptr->k_idx].tval)
+				{
+					case TV_BONE:
+					case TV_BODY:
+					{
+						/* Hack -- prevent the player re-using the same corpse */
+						if (o_ptr->xtra1 != 10)
+						{
+							lite_room(y, x);
+							obvious = TRUE;
+							
+							/* Apply the 'glowing' brand */
+							o_ptr->xtra1 = 10;
+							o_ptr->xtra2 = (byte)rand_int(object_xtra_size[10]);
+						}
+					}
+				}
+				
+				break;
+			}
+				
 			/* Wood warping -- wooden objects */
 			case GF_HURT_WOOD:
 			{
@@ -5259,6 +5283,12 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 
 			continue;
 		}
+	}
+	
+	/* Note glowing bodies */
+	if ((typ == GF_LITE_BODY) && (obvious))
+	{
+		msg_print("The remnants of flesh glows with unnatural light.");
 	}
 
 	/* Make meat */
@@ -8734,6 +8764,21 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			/* No "real" damage */
 			dam = 0;
+			break;
+		}
+		
+		/* Corpse light */
+		case GF_LITE_BODY:
+		{
+			/* Hack - light up physical undead */
+			if (((r_ptr->flags3 & (RF3_UNDEAD)) != 0) && 
+				((r_ptr->flags2 & (RF2_PASS_WALL)) == 0))
+			{
+				m_ptr->mflag |= (MFLAG_LITE);
+				
+				gain_attribute(m_ptr->fy, m_ptr->fx, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+			}
+			
 			break;
 		}
 
@@ -12597,7 +12642,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Check if monster can move and survive in terrain */
-		if ((affect_monster) && (place_monster_here(y, x, m_ptr->r_idx) <= MM_FAIL))
+		if (affect_monster && (place_monster_here(y, x, m_ptr->r_idx) == MM_FAIL))
 		{
 			/* Entomb monster */
 			entomb(y, x, blocked);

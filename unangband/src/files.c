@@ -3014,7 +3014,7 @@ static void display_player_misc_info(void)
 			break;
 		}
 
-		u = lookup_kind(t, p_ptr->psval);
+		u = lookup_kind(t, p_ptr->psval > SV_BOOK_MAX_GOOD ? p_ptr->psval + SV_BOOK_SCHOOL - 2 : p_ptr->psval);
 		p = k_name + k_info[u].name + 3;
 	}
 	else

@@ -1,3 +1,14 @@
+### Game Play ###
+
+- Add low level spell to allow Masters to light rooms.
+
+
+### Bug Fixes ###
+
+- Prevent monsters being entombed by traps or regions.
+
+- Fix style description on character sheet.
+
 Unangband 0.6.4 pre-release 4
 
 ### Game Play ###

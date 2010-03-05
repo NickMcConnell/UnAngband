@@ -7251,7 +7251,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 
 						/* Hack -- get monster light radius */
 						if (((r_ptr->flags2 & (RF2_HAS_LITE)) != 0) ||
-							((r_ptr->flags1 & (MFLAG_LITE)) != 0))
+							((m_ptr->mflag & (MFLAG_LITE)) != 0))
 						{
 							/* Get maximum light */
 							p_ptr->cur_lite = 2;

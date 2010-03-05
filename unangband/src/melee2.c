@@ -6191,7 +6191,7 @@ static void process_monster(int m_idx)
 			{
 				m_ptr->mflag |= (MFLAG_LITE);
 
-				gain_attribute(m_ptr->fy, m_ptr->fx, 2, CAVE_XLOS, apply_halo, redraw_halo_gain);
+				gain_attribute(m_ptr->fy, m_ptr->fx, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
 			}
 
 			/* Player hasn't attacked the monster */
