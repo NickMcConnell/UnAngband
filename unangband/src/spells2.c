@@ -19,12 +19,12 @@
 
 
 /*
- * Apply a "project()" directly to all monsters.
+ * Apply a "project()" directly to all monsters/objects/grids.
  *
  * Note that affected monsters are NOT auto-tracked by this usage.
  *
- * PROJECT_PANEL limits the monsters to those within 2 * MAX_SIGHT
- * PROJECT_ALL_IN_LOS limits monsters to those within line of fire and/or
+ * PROJECT_PANEL limits the monsters/objects/grids to those within 2 * MAX_SIGHT
+ * PROJECT_ALL_IN_LOS limits monsters/objects/grids to those within line of fire and/or
  *  line of sight if PROJECT_LOS is enabled.
  */
 bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg, u32b flg2)
@@ -34,15 +34,30 @@ bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg,
 	bool notice = FALSE;
 
 	bool player_hack = FALSE;
-
+	
 	/* Projection can also pass through line of sight grids */
 	bool allow_los = (flg & (PROJECT_LOS)) != 0;
+
+	/* Hack - for efficiency we process monsters separately. However, if affecting the
+	 * player's field of view/fire, this is only efficient if the maximum number of monsters
+	 * is smaller than the field of view/fire. */
+	bool m_max_hack = ((allow_los) ? (m_max < view_n) : (m_max < fire_n));
 
 	/* Origin is player */
 	if ((flg2 & (PR2_ALL_IN_LOS)) && (y0 == p_ptr->py) && (x0 == p_ptr->px)) player_hack = TRUE;
 
-	/* Affect all (nearby) monsters */
-	for (i = 1; i < m_max; i++)
+	/* Affect player? */
+	if ((player_hack) || (((flg2 & (PR2_ALL_IN_LOS)) == 0) && (((flg2 & (PR2_PANEL)) == 0) || distance(y0, x0, p_ptr->py, p_ptr->px) < 2 * MAX_SIGHT)) ||
+			(generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOF)) ||
+			((allow_los) && generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOS)))
+	{
+		/* Jump directly to the player */
+		if (project(who, what, 0, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
+	}
+
+	/* Affect all (nearby) monsters. */
+	if ((flg & (PROJECT_KILL)) && ((!player_hack) || (m_max_hack)))
+		for (i = 1; i < m_max; i++)
 	{
 		monster_type *m_ptr = &m_list[i];
 
@@ -72,18 +87,89 @@ bool project_dist(int who, int what, int y0, int x0, int dam, int typ, u32b flg,
 		/* Jump directly to the target monster */
 		if (project(who, what, 0, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
 	}
-
-	/* Affect player? */
-	if ((player_hack) || (generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOF)) ||
-			((allow_los) && generic_los(y0, x0, p_ptr->py, p_ptr->px, CAVE_XLOS)))
+	
+	/* Affect all (nearby) objects & grids */
+	if (flg & (PROJECT_ITEM | PROJECT_GRID))
 	{
-		/* Jump directly to the player */
-		if (project(who, what, 0, 0, p_ptr->py, p_ptr->px, p_ptr->py, p_ptr->px, dam, typ, flg, 0, 10)) notice = TRUE;
+		/* Affect line of sight/line of fire - origin is player and restricting to LOS/LOF */
+		if (player_hack)
+		{
+			if (allow_los) for (i = 0; i < view_n; i++)
+			{
+				/* Get grid */
+				y = GRID_Y(view_g[i]);
+				x = GRID_X(view_g[i]);
+				
+				/* Already affected grids with monsters? */
+				if (((flg & (PROJECT_KILL)) != 0) && (cave_m_idx[y][x] > 0) && (m_max_hack)) continue;
+				
+				/* Already affected grids with player */
+				if (cave_m_idx[y][x] < 0) continue;
+				
+				/* Affect grids with objects, or all grids */
+				if (((flg & (PROJECT_GRID)) != 0) || (cave_o_idx[y][x]))
+				{
+					if (project(who, what, 0, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+				}
+			}
+			
+			for (i = 0; i < fire_n; i++)
+			{
+				/* Get grid */
+				y = GRID_Y(fire_g[i]);
+				x = GRID_X(fire_g[i]);
+				
+				/* Already affected grids in view */
+				if (allow_los && ((play_info[y][x] & (PLAY_VIEW)) != 0)) continue;
+				
+				/* Already affected grids with monsters? */
+				if (((flg & (PROJECT_KILL)) != 0) && (cave_m_idx[y][x] > 0) && (m_max_hack)) continue;
+				
+				/* Already affected grids with player */
+				if (cave_m_idx[y][x] < 0) continue;
+				
+				/* Affect grids with objects, or all grids */
+				if (((flg & (PROJECT_GRID)) != 0) || (cave_o_idx[y][x]))
+				{
+					if (project(who, what, 0, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+				}
+			}
+		}
+		/* Affect panel/level */
+		else
+		{
+			int r = flg2 & (PR2_PANEL) ? MAX_SIGHT * 2 : MAX(DUNGEON_WID, DUNGEON_HGT);
+			
+			for (y = y0 - r; y <= y0 + r; y++)
+			{
+				for (x = x0 - r; x <= x0 + r; x++)
+				{
+					/* Inbounds */
+					if (!in_bounds_fully(y, x)) continue;
+					
+					/* Already affected grids with monsters */
+					if (((flg & (PROJECT_KILL)) != 0) && (cave_m_idx[y][x] > 0)) continue;
+					
+					/* Already affected grids with player */
+					if (cave_m_idx[y][x] < 0) continue;
+					
+					/* Only affect nearby monsters */
+					if ((flg2 & (PR2_PANEL)) && (distance(y0, x0, y, x) > 2 * MAX_SIGHT)) continue;
+
+					/* Affect grids with objects, or all grids */
+					if (((flg & (PROJECT_GRID)) != 0) || (cave_o_idx[y][x]))
+					{
+						if (project(who, what, 0, 0, y, x, y, x, dam, typ, flg, 0, 10)) notice = TRUE;
+					}
+				}
+			}
+		}
 	}
 
 	/* Result */
 	return (notice);
 }
+
 
 /*
  * Generates the familiar attributes

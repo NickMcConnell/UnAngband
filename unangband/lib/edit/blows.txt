@@ -379,7 +379,7 @@ N:42:LOS
 T:0-9999:call~ down *
 W:6:0:0
 M:20
-F:GRID | ITEM | KILL | PLAY | SELF | MAGIC | SAFE |
+F:ITEM | KILL | PLAY | SELF | MAGIC | SAFE |
 F:RANGED | ALL_IN_LOS |
 D::all $ enemies in line of sight
 
@@ -430,7 +430,7 @@ N:48:PANEL
 T:0-9999:call~ down * on all nearby
 W:6:0:0
 M:20
-F:GRID | ITEM | KILL | PLAY | SELF | SAFE |
+F:ITEM | KILL | PLAY | SELF | SAFE |
 F:RANGED | PANEL |
 D::the current panel
 
@@ -438,7 +438,7 @@ N:49:LEVEL
 T:0-9999:call~ down * across this level
 W:8:0:0
 M:20
-F:GRID | ITEM | KILL | PLAY | SELF | SAFE |
+F:ITEM | KILL | PLAY | SELF | SAFE |
 F:RANGED | LEVEL |
 D::the current level
 
