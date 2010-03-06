@@ -1519,7 +1519,8 @@ int value_check_aux4(const object_type *o_ptr)
 	if ((o_ptr->feeling == INSCRIP_GOOD) || (o_ptr->feeling == INSCRIP_VERY_GOOD)
 		|| (o_ptr->feeling == INSCRIP_GREAT) || (o_ptr->feeling == INSCRIP_EXCELLENT)
 		|| (o_ptr->feeling == INSCRIP_SUPERB) || (o_ptr->feeling == INSCRIP_SPECIAL)
-		|| (o_ptr->feeling == INSCRIP_AVERAGE)
+		|| (o_ptr->feeling == INSCRIP_AVERAGE) || (o_ptr->feeling == INSCRIP_BROKEN)
+		|| (o_ptr->feeling == INSCRIP_USELESS) || (o_ptr->feeling == INSCRIP_USEFUL)
 		|| (o_ptr->feeling == INSCRIP_MAGICAL) || (o_ptr->feeling == INSCRIP_UNCURSED)) return (0);
 
 	/* Artifacts */
@@ -1555,19 +1556,11 @@ int value_check_aux4(const object_type *o_ptr)
 	/* Cursed items */
 	if (cursed_p(o_ptr)) return (INSCRIP_CURSED);
 
-	/* Broken items */
-	if (o_ptr->feeling == INSCRIP_BROKEN)
-		return (INSCRIP_BROKEN);
-	else if (broken_p(o_ptr))
-		return (INSCRIP_UNCURSED);
+	/* Known to be magic items */
+	if (o_ptr->feeling == INSCRIP_MAGIC_ITEM) return (INSCRIP_USEFUL);
 
-	/* Known to be unusual */
-	if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
-
-	/* FIXME: I've added the to_* check because it was wrong without it */
-	if (o_ptr->to_h + o_ptr->to_d <= 0
-	    && o_ptr->feeling == INSCRIP_UNCURSED)
-	  return(INSCRIP_AVERAGE);
+	/* Known not to be nonmagical */
+	if (o_ptr->feeling == INSCRIP_NONMAGICAL) return(INSCRIP_USELESS);
 
 	/* Default to uncursed */
 	return (INSCRIP_UNCURSED);
