@@ -506,7 +506,7 @@ static void do_cmd_travel(void)
 		{
 			msg_print("The mice don't want you to leave.");
 		}
-		else if ((p_ptr->timed[TMD_POISONED]) || (p_ptr->timed[TMD_CUT]) || (p_ptr->timed[TMD_STUN]))
+		else if (((p_ptr->timed[TMD_POISONED]) && (p_ptr->timed[TMD_SLOW_POISON] == 0)) || (p_ptr->timed[TMD_CUT]) || (p_ptr->timed[TMD_STUN]))
 		{
 			msg_print("You need to recover from any poison, cuts or stun damage.");
 		}
