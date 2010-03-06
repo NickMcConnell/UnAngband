@@ -228,15 +228,19 @@ void apply_torch_lit(int y, int x)
 	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
 
-void remove_torch_lit(int y, int x)
+int remove_torch_lit(int y, int x)
 {
 	cave_info[y][x] &= ~(CAVE_TLIT);
 
 	if (!(play_info[y][x] & (PLAY_LITE)) && !(cave_info[y][x] & (CAVE_LITE))) play_info[y][x] &= ~(PLAY_SEEN);
+
+	return (0);
 }
 
-void reapply_torch_lit(int y, int x)
+void reapply_torch_lit(int y, int x, int r)
 {
+	(void)r;
+	
 	cave_info[y][x] |= (CAVE_TLIT);
 	if ((play_info[y][x] & (PLAY_VIEW)) && !(p_ptr->timed[TMD_BLIND])) play_info[y][x] |= (PLAY_SEEN);
 }
@@ -6758,6 +6762,16 @@ void message_pain(int m_idx, int dam)
 		return;
 	}
 
+	/* Notice dead */
+	if (m_ptr->hp < 0)
+	{
+#if 0
+		msg_format("%^s is %s.", m_name, r_ptr->flags3 & (RF3_NONLIVING) ? "destoyed" : "dead");
+#endif
+		return;
+	}
+	
+	
 	/* Note -- subtle fix -CFT */
 	newhp = (long)(m_ptr->hp);
 	oldhp = newhp + (long)(dam);
