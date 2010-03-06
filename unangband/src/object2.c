@@ -5985,6 +5985,27 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		j_ptr->ident |= (IDENT_RUNES);
 	}
 
+	/* Sense magic on this kind */
+	if ((k_info[j_ptr->k_idx].flavor) && !(object_aware_p(j_ptr)) && (k_info[j_ptr->k_idx].aware & (AWARE_SENSEX)))
+	{
+		int i, j;
+
+		/* Check bags */
+		for (i = 0; i < SV_BAG_MAX_BAGS; i++)
+
+		/* Find slot */
+		for (j = 0; j < INVEN_BAG_TOTAL; j++)
+		{
+			if ((bag_holds[i][j][0] == j_ptr->tval)
+				&& (bag_holds[i][j][1] == j_ptr->sval))
+			{
+			    j_ptr->feeling = MAX_INSCRIP + i;
+			    
+			    break;
+			}
+		}
+	}
+
 	/* Success */
 	return (TRUE);
 }

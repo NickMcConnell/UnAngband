@@ -3430,6 +3430,7 @@ bool ident_spell_sense(void)
 					}
 				}
 
+				break;
 			  }
 		}
 
