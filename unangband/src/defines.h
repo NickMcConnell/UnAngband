@@ -3451,15 +3451,15 @@ enum
 #define INSCRIP_GOOD	    	6
 #define INSCRIP_EXCELLENT       7
 #define INSCRIP_SPECIAL	 	8
-#define INSCRIP_UNCURSED	9  /* Uncursed, or has been detected to be average or better */
+#define INSCRIP_UNCURSED	9  /* Uncursed, or has been detected to be not cursed */
 #define INSCRIP_VERY_GOOD       10
 #define INSCRIP_GREAT    	11
 #define INSCRIP_SUPERB   	12
 #define INSCRIP_UNBREAKABLE	13 /* Artifact */
 #define INSCRIP_UNGETTABLE	14 /* Has flag preventing player / monster getting it */
-#define INSCRIP_NONMAGICAL	15 /* Has been detected to be average or cursed */
+#define INSCRIP_NONMAGICAL	15 /* Has been detected to be average, broken or cursed (includes cursed artifacts, ego items and magic items)*/
 #define INSCRIP_MAGICAL		16 /* Has been detected to be better than average */
-#define INSCRIP_MAGIC_ITEM	17 /* Unusual, but not ego item or artifact. Used to distinguish items which have been sensed. */
+#define INSCRIP_MAGIC_ITEM	17 /* Unusual, but not ego item or artifact */
 #define INSCRIP_EGO_ITEM	18 /* Has been detected to be ego item */
 #define INSCRIP_HIGH_EGO_ITEM	19 /* Has been detected to be high ego item */
 #define INSCRIP_ARTIFACT	20 /* Has been detected to be artifact */
@@ -3470,6 +3470,10 @@ enum
 #define INSCRIP_UNUSUAL		25 /* Has been detected to be not average */
 #define INSCRIP_COATED		26 /* Has been coated with something */
 #define INSCRIP_MIN_HIDDEN      27 /* Minimum inscription for hidden */
+
+#define INSCRIP_USEFUL		16 /* TBD: Either good, very good or great without being an ego item or artifact */
+#define INSCRIP_USELESS		9 /* TBD: Either average or broken, without being cursed */
+
 
 
 /*

@@ -3836,7 +3836,7 @@ const char *inscrip_info[] =
 		"It is of good quality, but with no additional powers.  ",
 		"It is a useful ego item.  ",
 		"It is a useful artifact.  ",
-		"It is of average quality or better, and not cursed.  It may be an ego item or artifact.  ",
+		"It is not cursed.  It may be an ego item or artifact.  ",
 		"It is of very good quality, but with no additional powers.  ",
 		"It is of great quality, but with no additonal powers.  ",
 		"It is a useful ego item, with a random hidden ability.  ",
@@ -3844,7 +3844,7 @@ const char *inscrip_info[] =
 		"It is an ego item or artifact that resisted being picked up or used.  ",
 		"It is of average quality or worse, and may be cursed.  It may be an cursed ego item or artifact.  ",
 		"It is better than average quality, and not cursed.  It may be an ego item or artifact.  ",
-		"It is an ego item or artifact.  ",
+		"It is either better than average quality or cursed.  It is not an ego item or artifact.  ",
 		"It is an ego item, but may or may not be cursed.  ",
 		"It is an ego item, with a random hidden ability, but may or may not be cursed.  ",
 		"It is an artifact, but may or may not be cursed.  ",
@@ -3852,7 +3852,7 @@ const char *inscrip_info[] =
 		"There are runes on it.  It may be an ego item or artifact.  ",
 		"It is of average quality, but may be damaged by wear and tear.  ",
 		"It is valuable, but may or may not be cursed.  ",
-		"It is better than average quality, but may or may not be cursed.  It may be an ego item or artifact.  ",
+		"It is worth further investigation.  It may be a cursed item, ego item or artifact, or simply broken.  ",
 		"It is coated with a substance.  ",
 		"It has a magically applied enchantment.  "
 };
