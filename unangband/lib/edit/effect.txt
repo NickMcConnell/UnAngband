@@ -48,12 +48,12 @@ T:holiness
 
 N:6:LITE_WEAK
 I:5
-D:light~:up::::damage to monsters vulnerable to light:
+D:light~:::up::damage to monsters vulnerable to light:
 T:light
 
 N:7:DARK_WEAK
 I:5
-D:plunge~:into darkness::::power:pow
+D:plunge~:::into darkness::power:pow
 T:darkness
 
 N:8:WATER_WEAK
@@ -473,7 +473,7 @@ T:lowering water
 
 N:91:PROBE
 I:60
-D:probe~:the weaknesses of:::::
+D:probe~:::for weaknesses:::
 T:probing
 
 N:92:LOCK_DOOR

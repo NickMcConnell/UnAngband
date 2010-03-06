@@ -26443,7 +26443,7 @@ F:DROP_FOOD |
 F:RES_LITE | NEUTRAL | ELF | LEVEL_POWER |
 S:HASTE | ADD_MANA | BLINK | TPORT | INVIS | DARKNESS | ILLUSION | BLIND |
 S:CONF | SLOW | HOLD |
-D:A elven spell caster of some power, weaving illusions and   enchantments
+D:A elven spell caster of some power, weaving illusions and enchantments
 D: to beguile and frustrate you.
 
 N:1276:Wood elf tracker

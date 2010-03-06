@@ -1594,6 +1594,7 @@ static void text_out_blow(const char *s, int person, bool infinitive, int num)
 				case 2: u = "you"; break;
 				case 3: u = "him"; break;
 				case 4: u = "her"; break;
+				case 5: u = "him or her"; break;
 				default: u = "it"; break;
 			}
 
@@ -1611,6 +1612,7 @@ static void text_out_blow(const char *s, int person, bool infinitive, int num)
 				case 2: u = "your"; break;
 				case 3: u = "his"; break;
 				case 4: u = "her"; break;
+				case 5: u = "his or her"; break;
 				default: u = "its"; break;
 			}
 
@@ -1628,6 +1630,7 @@ static void text_out_blow(const char *s, int person, bool infinitive, int num)
 				case 2: u = "yourself"; break;
 				case 3: u = "himself"; break;
 				case 4: u = "herself"; break;
+				case 5: u = "him or herself"; break;
 				default: u = "itself"; break;
 			}
 
@@ -1709,8 +1712,16 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	int arc = method_ptr->arc;
 	int rng = scale_method(method_ptr->max_range, level);
 
+	int person = 2;
+	
 	/* No method - skip method */
 	if (!method) details |= (DESC_SKIP_METHOD);
+	
+	/* MegaHack -- rewrite 'teleports you to it' as 'teleports its enemies to itself' */
+	if ((method == 160+7) || (method == 160+8))
+	{
+		details |= (DESC_MONSTER_SELF);
+	}
 	
 	/* Hack -- quash range details for describing monster attacks */
 	if (details & (DESC_MELEE_ATTACK))
@@ -1742,10 +1753,26 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	if (details & (DESC_MELEE_ATTACK)) p[3] = "you";
 
 	/* Hack -- attack affects a monster using it on itself */
-	if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_MALE | DESC_MONSTER_FEMALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_MALE | DESC_MONSTER_FEMALE)) p[3] = "his or herself";
-	else if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_MALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_MALE)) p[3] = "himself";
-	else if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_FEMALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_FEMALE)) p[3] = "herself";
-	else if (details & (DESC_MONSTER_SELF)) p[3] = "itself";
+	if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_MALE | DESC_MONSTER_FEMALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_MALE | DESC_MONSTER_FEMALE))
+	{
+		if (p[0]) person = 5;
+		else p[3] = "him or herself";
+	}
+	else if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_MALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_MALE))
+	{
+		if (p[0]) person = 3;
+		else p[3] = "himself";
+	}
+	else if ((details & (DESC_MONSTER_SELF | DESC_MONSTER_FEMALE)) ==(DESC_MONSTER_SELF | DESC_MONSTER_FEMALE))
+	{
+		if (p[0]) person = 4;
+		else p[3] = "herself";
+	}
+	else if (details & (DESC_MONSTER_SELF))
+	{
+		if (p[0]) person = 6;
+		else p[3] = "itself";
+	}
 
 	/* Hack -- attack affects a monster using it on itself*/
 	if (details & (DESC_TRAP_VICTIM)) p[3] = "the victim";
@@ -1800,7 +1827,7 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 		{
 			if ((details & (DESC_SKIP_METHOD_INTRO)) == 0)
 			{
-				text_out_blow(p[0], 2, (details & (DESC_MELEE_ATTACK)) != 0, num);
+				text_out_blow(p[0], person, (details & (DESC_MELEE_ATTACK)) != 0, num);
 				need_space = TRUE;
 			}
 			
@@ -1820,34 +1847,42 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 		/* Display all effect details */
 		if ((details & (DESC_SKIP_EFFECT)) == 0)
 		{
-			if (need_space) text_out(" ");
+			if (need_space)
+			{
+				text_out(" ");
+				
+				need_space = FALSE;
+			}
 			
-			text_out("to");
+			if (p[1] || p[2] || p[3])
+			{
+				text_out("to");
+				
+				need_space = TRUE;
+			}
 	
 			if (p[1])
 			{
 				text_out(" ");
-				text_out_blow(p[1], 2, TRUE, num);
+				text_out_blow(p[1], person, TRUE, num);
 			}
 			if (p[2])
 			{
 				text_out(" ");
-				text_out_blow(p[2], 2, TRUE, num);
+				text_out_blow(p[2], person, TRUE, num);
 			}
 			if (p[3])
 			{
 				text_out(" ");
-				text_out_blow(p[3], 2, TRUE, num);
+				text_out_blow(p[3], person, TRUE, num);
 			}
-			
-			need_space = TRUE;
 		}
 	}
 	else if ((details & (DESC_SKIP_METHOD_MORE)) == 0)
 	{
 		if (p[1])
 		{
-			text_out_blow(p[1], 2, FALSE, num);
+			text_out_blow(p[1], person, FALSE, num);
 		}
 		else text_out("affects");
 
@@ -1857,12 +1892,12 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 			if (p[2])
 			{
 				text_out(" ");
-				text_out_blow(p[2], 2, FALSE, num);
+				text_out_blow(p[2], person, FALSE, num);
 			}
 			if (p[3])
 			{
 				text_out(" ");
-				text_out_blow(p[3], 2, FALSE, num);
+				text_out_blow(p[3], person, FALSE, num);
 			}
 		}
 		if (rng) text_out (format( " of range %d",rng));
@@ -1876,7 +1911,7 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 	if (((details & (DESC_SKIP_EFFECT)) == 0) && p[4])
 	{
 		if (need_space) text_out(" ");
-		text_out_blow(p[4], 2, FALSE, num);
+		text_out_blow(p[4], person, FALSE, num);
 		need_space = TRUE;
 	}
 
@@ -1892,18 +1927,18 @@ void describe_blow(int method, int effect, int level, int feat, const char *intr
 			if (!(f_ptr->flags1 & (FF1_MOVE)))
 			{
 				if (need_space) text_out(" ");
-				text_out_blow(p[5], 2, FALSE, num);
+				text_out_blow(p[5], person, FALSE, num);
 				text_out(" 4d8 ");
-				text_out_blow(p[6], 2, FALSE, num);
+				text_out_blow(p[6], person, FALSE, num);
 			}
 		}
 		/* Get the description */
 		else if (damage && strlen(damage))
 		{
 			if (need_space) text_out(" ");
-			text_out_blow(p[5], 2, FALSE, num);
+			text_out_blow(p[5], person, FALSE, num);
 			text_out(format(" %s ", damage));
-			text_out_blow(p[6], 2, FALSE, num);
+			text_out_blow(p[6], person, FALSE, num);
 		}
 	}
 }
