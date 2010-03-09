@@ -6560,8 +6560,7 @@ int project_path_aux(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b
 		 */
 		if (vertical ? y_a == y_b : x_a == x_b) num = 2;
 		else                                    num = 1;
-
-
+		
 		/* Scan one or both grids */
 		for (i = 0; i < num; i++)
 		{
@@ -6587,6 +6586,7 @@ int project_path_aux(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b
 				if ((y == *y2) && (x == *x2))
 				{
 					/* End of projection */
+					
 					full_stop = TRUE;
 				}
 			}
@@ -6623,7 +6623,7 @@ int project_path_aux(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b
 		 * and are at the end of the path. This helps ensure we end on a
 		 * blocked grid. */
 		if ((num == 1) || (blockage[0] <= blockage[1])
-			|| ((require_strict_lof) && (blockage[1] < 1) && (j >= grids - 2)))
+			|| ((require_strict_lof) && (blockage[1] < 1) && (j >= grids - num)))
 		{
 			/* Store the first grid, advance */
 			if (blockage[0] < 3) gp[step++] = tmp_grids[j];
@@ -6664,7 +6664,7 @@ int project_path_aux(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b
 		 * Hack -- If we require orthogonal movement, but are moving
 		 * diagonally, we have to plot an extra grid.  XXX XXX
 		 */
-		if ((flg & (PROJECT_ORTH)) && (step > 1))
+		if (((flg & (PROJECT_ORTH)) != 0) && (step > 1))
 		{
 			/* Get grids for this projection step and the last */
 			y_a = GRID_Y(gp[step-1]);
@@ -6753,6 +6753,8 @@ int project_path_aux(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b
 			if (cheat_xtra) msg_print("Path does not end correctly.");
 		}
 	}
+
+	gp[step++] = GRID(*y2,*x2);
 	
 	/* Accept last grid as the new endpoint */
 	*y2 = GRID_Y(gp[step -1]);

@@ -5288,7 +5288,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 	/* Note glowing bodies */
 	if ((typ == GF_LITE_BODY) && (obvious))
 	{
-		msg_print("The remnants of flesh glows with unnatural light.");
+		msg_print("The remnants of flesh glow with unnatural light.");
 	}
 
 	/* Make meat */

@@ -48,7 +48,7 @@ T:holiness
 
 N:6:LITE_WEAK
 I:5
-D:light~:::up::damage to monsters vulnerable to light:
+D:light~ up:::::damage to monsters vulnerable to light:
 T:light
 
 N:7:DARK_WEAK

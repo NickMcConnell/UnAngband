@@ -5671,6 +5671,9 @@ bool target_set_interactive(int mode, int range, int radius, u32b flg, byte arc,
 	/* Get the real range */
 	if (!range) range = MAX_SIGHT;
 
+	/* Always show beam if just a missile */
+	if ((flg & (PROJECT_4WAY | PROJECT_4WAX | PROJECT_BOOM)) == 0) flg |= (PROJECT_BEAM);
+	
 	/* Cancel target */
 	target_set_monster(0, 0);
 
