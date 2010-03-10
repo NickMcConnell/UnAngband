@@ -6753,13 +6753,13 @@ int project_path_aux(u16b *gp, int range, int y1, int x1, int *y2, int *x2, u32b
 			if (cheat_xtra) msg_print("Path does not end correctly.");
 		}
 	}
-
-	gp[step++] = GRID(*y2,*x2);
-	
+	/* For some bizarre reason, if we modify this the original path gets recomputed
+	 * with the modified destination. Not sure why. */
+#if 0	
 	/* Accept last grid as the new endpoint */
 	*y2 = GRID_Y(gp[step -1]);
 	*x2 = GRID_X(gp[step -1]);
-
+#endif
 	/* Return count of grids in projection path */
 	if (monster_in_way) return (-step);
 	else return (step);
