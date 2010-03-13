@@ -2726,11 +2726,20 @@ bool monster_death(int m_idx)
 	/* Incur summoning debt */
 	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && ((m_ptr->mflag & (MFLAG_TOWN)) == 0) && (m_ptr->summoned))
 	{
+		int debt = r_ptr->level;
+		
+		/* Group monsters incur less debt */
+		if (r_ptr->flags1 & (RF1_FRIENDS)) debt -= 10;
+		else if (r_ptr->flags1 & (RF1_FRIEND)) debt -= 5;
+		
+		/* Weak monsters incur less debt */
+		if (r_ptr->level < p_ptr->depth - 5) debt -= 5;
+		
 		/* Summoning debt requires blood */
-		if (r_ptr->level > p_ptr->csp)
+		if (debt > p_ptr->csp)
 		{
 			/* Incur blood debt */
-			take_hit(SOURCE_BLOOD_DEBT, m_ptr->r_idx, damroll(r_ptr->level - p_ptr->csp, 3));
+			take_hit(SOURCE_BLOOD_DEBT, m_ptr->r_idx, damroll(debt - p_ptr->csp, 3));
 
 			/* No mana left */
 			p_ptr->csp = 0;
@@ -2738,9 +2747,9 @@ bool monster_death(int m_idx)
 		}
 
 		/* Debt can be met by mana */
-		else
+		else if (debt > 0)
 		{
-			p_ptr->csp -= r_ptr->level;
+			p_ptr->csp -= debt;
 		}
 
 		/* Update mana */
