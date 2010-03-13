@@ -2735,6 +2735,9 @@ bool monster_death(int m_idx)
 		/* Weak monsters incur less debt */
 		if (r_ptr->level < p_ptr->depth - 5) debt -= 5;
 		
+		/* Ensure minimum debt */
+		if (debt < 3) debt = 3;
+		
 		/* Summoning debt requires blood */
 		if (debt > p_ptr->csp)
 		{
