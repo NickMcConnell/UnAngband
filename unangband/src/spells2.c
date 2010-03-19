@@ -6848,7 +6848,7 @@ bool process_spell_blow_shot_hurl(int type)
  *
  * Basically a collection of hacks
  */
-bool process_spell_types(int who, int spell, int level, bool *cancel)
+bool process_spell_types(int who, int spell, int level, bool *cancel, bool known)
 {
 	spell_type *s_ptr = &s_info[spell];
 
@@ -6974,6 +6974,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			{
 				bool grp = FALSE;
 				int old_monster_level = monster_level;
+				int k = 0;
 				
 				if ((s_ptr->type == SPELL_SUMMONS) || (s_ptr->type == SPELL_AIM_SUMMONS))
 				{
@@ -6987,7 +6988,10 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 					else monster_level -= 5;
 				}
 				
-				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, grp, flg)) obvious = TRUE;
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, grp, flg)) k++;
+				
+				if (k) obvious = TRUE;
+				else if (known) msg_print("No such monsters exist at this depth.");
 				*cancel = FALSE;
 				
 				monster_level = old_monster_level;
@@ -7025,7 +7029,13 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Summoning a monster */
 				else
 				{
-					while (lasts-- && summon_specific_one(y, x, s_ptr->param, (s_ptr->type == SPELL_SUMMONS_RACE) || (s_ptr->type == SPELL_AIM_SUMMONS_RACE), flg)) obvious = TRUE;
+					int k = 0;
+					
+					while (lasts-- && summon_specific_one(y, x, s_ptr->param, (s_ptr->type == SPELL_SUMMONS_RACE) || (s_ptr->type == SPELL_AIM_SUMMONS_RACE), flg)) k++;
+
+					if (k) obvious = TRUE;
+					else if (known) msg_print("No such monsters exist at this depth.");
+
 					*cancel = FALSE;
 				}
 				break;
@@ -7050,6 +7060,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			{
 				bool grp = FALSE;
 				int old_monster_level = monster_level;
+				int k = 0;
 				
 				if ((s_ptr->type == SPELL_SUMMONS_GROUP_IDX) || (s_ptr->type == SPELL_AIM_SUMMONS_GROUP_IDX))
 				{
@@ -7065,9 +7076,12 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				
 				summon_group_type = s_ptr->param;
 
-				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, SUMMON_GROUP, grp, flg)) obvious = TRUE;
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, SUMMON_GROUP, grp, flg)) k++;
 				*cancel = FALSE;
 				
+				if (k) obvious = TRUE;
+				else if (known) msg_print("No such monsters exist at this depth.");
+
 				monster_level = old_monster_level;
 				break;
 			}
@@ -8031,7 +8045,7 @@ bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *
 	if (process_spell_prepare(spell, level, cancel, TRUE, !eaten)) obvious = TRUE;
 	if (process_spell_blows(who, what, spell, level, cancel, known, eaten)) obvious = TRUE;
 	if (process_spell_flags(who, what, spell, level, cancel, known)) obvious = TRUE;
-	if (process_spell_types(who, spell, level, cancel)) obvious = TRUE;
+	if (process_spell_types(who, spell, level, cancel, *known)) obvious = TRUE;
 
 	/* Paranoia - clear boost */
 	p_ptr->boost_spell_power = 0;

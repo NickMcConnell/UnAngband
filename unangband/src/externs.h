@@ -1029,7 +1029,7 @@ extern bool process_spell_blows(int who, int what, int spell, int level, bool *c
 extern bool item_tester_hook_magic_trap(const object_type *o_ptr);
 extern bool player_set_magic_trap(int item);
 extern bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, bool interact);
-extern bool process_spell_types(int who, int spell, int level, bool *cancel);
+extern bool process_spell_types(int who, int spell, int level, bool *cancel, bool known);
 extern bool process_spell(int who, int what, int spell, int level, bool *cancel, bool *known, bool eaten);
 extern int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool forreal, bool one_grid);
 extern void wipe_region_piece_list(void);

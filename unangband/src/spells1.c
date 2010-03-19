@@ -4878,6 +4878,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 							do_break = FALSE;
 							note_kill = (plural ? " animate!" : " animates!");
 						}
+						else if (who == SOURCE_PLAYER_CAST)
+						{
+							msg_print("No suitable monsters exist at this depth.");
+						}
 					}
 				}
 				break;
@@ -4927,6 +4931,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 							do_break = FALSE;
 							note_kill = (plural ? " animate!" : " animates!");
 						}
+						else if (who == SOURCE_PLAYER_CAST)
+						{
+							msg_print("No suitable monsters exist at this depth.");
+						}
 					}
 					else
 					{
@@ -4940,6 +4948,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 							do_kill = TRUE;
 							do_break = FALSE;
 							note_kill = (plural ? " animate!" : " animates!");
+						}
+						else if (who == SOURCE_PLAYER_CAST)
+						{
+							msg_print("No suitable monsters exist at this depth.");
 						}
 					}
 				}
@@ -5032,6 +5044,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						do_break = FALSE;
 						note_kill = (plural ? " animate!" : " animates!");
 					}
+					else if (who == SOURCE_PLAYER_CAST)
+					{
+						msg_print("No suitable monsters exist at this depth.");
+					}
 				}
 				break;
 			}
@@ -5078,7 +5094,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						do_break = FALSE;
 						note_kill = (plural ? " come back to life!" : " comes back to life!");
 					}
-
+					else if (who == SOURCE_PLAYER_CAST)
+					{
+						msg_print("No suitable monsters exist at this depth.");
+					}
 
 					summon_race_type = 0;
 				}
@@ -5092,6 +5111,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 						do_kill = TRUE;
 						do_break = FALSE;
 						note_kill = (plural ? " come back to life!" : " comes back to life!");
+					}
+					else if (who == SOURCE_PLAYER_CAST)
+					{
+						msg_print("No suitable monsters exist at this depth.");
 					}
 				}
 
