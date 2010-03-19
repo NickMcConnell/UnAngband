@@ -1727,6 +1727,12 @@ enum
 #define SPELL_AIM_CREATE     70
 #define SPELL_AIM_CREATE_RACE       71
 #define SPELL_AIM_CREATE_GROUP_IDX     72
+#define SPELL_SUMMONS     73
+#define SPELL_SUMMONS_RACE       74
+#define SPELL_SUMMONS_GROUP_IDX     75
+#define SPELL_AIM_SUMMONS     76
+#define SPELL_AIM_SUMMONS_RACE       77
+#define SPELL_AIM_SUMMONS_GROUP_IDX     78
 
 
 /*** Important artifact indexes (see "lib/edit/artifact.txt") ***/

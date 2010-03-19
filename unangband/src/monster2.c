@@ -4635,6 +4635,14 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 		repair_mflag_mark = repair_mflag_show = TRUE;
 	}
 
+	/* If in the dungeon, and not a town monster or created prevent summoning */
+	if ((character_dungeon) && ((n_ptr->mflag & (MFLAG_TOWN | MFLAG_MADE)) == 0))
+	{
+		/* Monster must wait a while until summoning anything if summoned/wandering */
+		/* Now uses charisma */
+		n_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+	}
+
 	/* Created allies do not carry treasure */
 	if (flg & (MFLAG_ALLY))
 	{
@@ -4644,13 +4652,7 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 	else if (((r_ptr->flags9 & (RF9_GOOD)) != 0) && ((adult_evil) == 0))
 	{
 		n_ptr->mflag |= (MFLAG_ALLY | MFLAG_IGNORE);
-	}
-	/* If in the dungeon, and not a town monster or created prevent summoning */
-	else if ((character_dungeon) && ((n_ptr->mflag & (MFLAG_TOWN | MFLAG_MADE)) == 0))
-	{
-		/* Monster must wait a while until summoning anything if summoned/wandering */
-		/* Now uses charisma */
-		n_ptr->summoned = 400 - 3 * adj_chr_gold[p_ptr->stat_ind[A_CHR]];
+		n_ptr->summoned = 0;
 	}
 	
 	/* Force monster to wait for player */
@@ -4985,7 +4987,7 @@ s16b player_place(int y, int x, bool escort_allowed)
 		/* Help the player out */
 		monster_level += 5;
 
-		place_monster_escort(y, x, 0, FALSE, (MFLAG_ALLY));
+		place_monster_escort(y, x, 0, FALSE, (MFLAG_ALLY | MFLAG_TOWN));
 
 		msg_print("You are joined by companions in battle.");
 

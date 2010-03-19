@@ -6956,6 +6956,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_AIM_SUMMON:
 			case SPELL_AIM_CREATE:
+			case SPELL_AIM_SUMMONS:
 			{
 				/* Get a destination to summon around */
 				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
@@ -6964,18 +6965,37 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 			}
 			case SPELL_CREATE:
 			{
-				if (s_ptr->type != SPELL_AIM_SUMMON) flg |= (MFLAG_MADE);
+				if ((s_ptr->type != SPELL_AIM_SUMMON) && (s_ptr->type != SPELL_AIM_SUMMONS)) flg |= (MFLAG_MADE);
 				
 				/* Fall through */
 			}
 			case SPELL_SUMMON:
+			case SPELL_SUMMONS:
 			{
-				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, TRUE, flg)) obvious = TRUE;
+				bool grp = FALSE;
+				int old_monster_level = monster_level;
+				
+				if ((s_ptr->type == SPELL_SUMMONS) || (s_ptr->type == SPELL_AIM_SUMMONS))
+				{
+					grp = TRUE;
+					if (monster_level < 20) monster_level /= 2;
+					else monster_level -= 10;
+				}
+				else if ((s_ptr->type == SPELL_CREATE) || (s_ptr->type == SPELL_AIM_CREATE))
+				{
+					if (monster_level < 10) monster_level /= 2;
+					else monster_level -= 5;
+				}
+				
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, s_ptr->param, grp, flg)) obvious = TRUE;
 				*cancel = FALSE;
+				
+				monster_level = old_monster_level;
 				break;
 			}
 			case SPELL_AIM_SUMMON_RACE:
 			case SPELL_AIM_CREATE_RACE:
+			case SPELL_AIM_SUMMONS_RACE:
 			{
 				/* Get a destination to summon around */
 				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
@@ -6989,6 +7009,7 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Fall through */
 			}
 			case SPELL_SUMMON_RACE:
+			case SPELL_SUMMONS_RACE:
 			{
 				/* Cancel if unique is dead */
 				if (!r_info[s_ptr->param].max_num)
@@ -7004,13 +7025,14 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Summoning a monster */
 				else
 				{
-					while (lasts-- && summon_specific_one(y, x, s_ptr->param, FALSE, flg)) obvious = TRUE;
+					while (lasts-- && summon_specific_one(y, x, s_ptr->param, (s_ptr->type == SPELL_SUMMONS_RACE) || (s_ptr->type == SPELL_AIM_SUMMONS_RACE), flg)) obvious = TRUE;
 					*cancel = FALSE;
 				}
 				break;
 			}
 			case SPELL_AIM_SUMMON_GROUP_IDX:
 			case SPELL_AIM_CREATE_GROUP_IDX:
+			case SPELL_AIM_SUMMONS_GROUP_IDX:
 			{
 				/* Get a destination to summon around */
 				if (!get_grid_by_aim(TARGET_KILL, &y, &x)) return (FALSE);
@@ -7024,11 +7046,29 @@ bool process_spell_types(int who, int spell, int level, bool *cancel)
 				/* Fall through */
 			}
 			case SPELL_SUMMON_GROUP_IDX:
+			case SPELL_SUMMONS_GROUP_IDX:
 			{
+				bool grp = FALSE;
+				int old_monster_level = monster_level;
+				
+				if ((s_ptr->type == SPELL_SUMMONS_GROUP_IDX) || (s_ptr->type == SPELL_AIM_SUMMONS_GROUP_IDX))
+				{
+					grp = TRUE;
+					if (monster_level < 20) monster_level /= 2;
+					else monster_level -= 10;
+				}
+				else if ((s_ptr->type == SPELL_CREATE_GROUP_IDX) || (s_ptr->type == SPELL_AIM_CREATE_GROUP_IDX))
+				{
+					if (monster_level < 10) monster_level /= 2;
+					else monster_level -= 5;
+				}
+				
 				summon_group_type = s_ptr->param;
 
-				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, SUMMON_GROUP, TRUE, flg)) obvious = TRUE;
+				while (lasts-- && summon_specific(y, x, 0, p_ptr->depth+5, SUMMON_GROUP, grp, flg)) obvious = TRUE;
 				*cancel = FALSE;
+				
+				monster_level = old_monster_level;
 				break;
 			}
 			case SPELL_CREATE_KIND:

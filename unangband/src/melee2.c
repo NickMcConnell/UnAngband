@@ -7794,7 +7794,7 @@ static void recover_monster(int m_idx, bool regen)
 		if (((m_ptr->mflag & (MFLAG_TOWN)) != 0) && !(m_ptr->csleep) && !(m_ptr->summoned) && !(rand_int(9)))
 		{
 			/* We don't care about the player */
-			if ((m_ptr->mflag & (MFLAG_AGGR)) == 0)
+			if ((m_ptr->mflag & (MFLAG_AGGR | MFLAG_ALLY)) == 0)
 			{
 				/* Get the monster name */
 				monster_desc(m_name, sizeof(m_name), m_idx, 0);
