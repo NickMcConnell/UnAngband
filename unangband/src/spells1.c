@@ -4386,6 +4386,15 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 				cave_set_feat(y, x, feat);
 			}
 
+			/* Fully update the visuals */
+			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
+
+			/* Redraw map */
+			p_ptr->redraw |= (PR_MAP);
+
+			/* Window stuff */
+			p_ptr->window |= (PW_OVERHEAD | PW_MAP | PW_MONLIST);
+
 			break;
 		}
 

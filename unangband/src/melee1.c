@@ -3381,7 +3381,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (!(r_ptr->flags2 & (RF2_EMPTY_MIND)))
 				{
-					if (known) msg_format ("&^s mind is blasted by psionic energy.",t_poss);
+					if (known) msg_format ("%^s mind is blasted by psionic energy.",t_poss);
 
 					/* Hack --- Use GF_CONFUSION */
 					project_one(who, what, y, x, get_dam(spower, attack, TRUE), GF_CONFUSION, (PROJECT_KILL));

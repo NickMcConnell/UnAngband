@@ -9,6 +9,11 @@
 
 - Fix style description on character sheet.
 
+- Fix display not refreshing after a quake.
+
+- Fix psionic blast message.
+
+
 Unangband 0.6.4 pre-release 4
 
 ### Game Play ###
