@@ -1135,8 +1135,8 @@ static errr rd_extra(void)
 	/* Read the old temporary information */
 	if (older_than(0, 6, 3, 4))
 	{
+		for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->timed[i + 32]);
 		for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->timed[i]);
-		for (i = 0; i < a_max; i++) rd_s16b(&p_ptr->timed[i + a_max]);
 	}
 
 	character_quickstart = TRUE;
@@ -1258,7 +1258,15 @@ static errr rd_extra(void)
 		/* Read in the timers */
 		for (i = 0; i < tmp16u; i++)
 		{
-			rd_s16b(&(p_ptr->timed[i]));
+			if (!older_than(0, 6, 4, 2))
+			{
+				rd_s16b(&(p_ptr->timed[i]));
+			}
+			/* Reset the timers because we have changed ordering */
+			else
+			{
+				rd_u16b(&tmp16u);
+			}
 		}
 	}
 	/* Hack - just wipe everything */
@@ -1272,46 +1280,6 @@ static errr rd_extra(void)
 		/* Hack to prevent characters imported from previous version being exhausted */
 		p_ptr->rest = PY_REST_FULL - 1;
 
-#if 0
-		rd_s16b(&p_ptr->msleep);
-		rd_s16b(&p_ptr->petrify);
-		rd_s16b(&p_ptr->stastis);
-		rd_s16b(&p_ptr->sc);
-		rd_s16b(&p_ptr->cursed);
-		rd_s16b(&p_ptr->amnesia);
-		rd_s16b(&p_ptr->blind);
-		rd_s16b(&p_ptr->paralyzed);
-		rd_s16b(&p_ptr->confused);
-		rd_s16b(&p_ptr->food);
-		rd_s16b(&p_ptr->rest);
-		rd_s16b(&p_ptr->psleep);
-		rd_s16b(&p_ptr->energy);
-		rd_s16b(&p_ptr->fast);
-		rd_s16b(&p_ptr->slow);
-		rd_s16b(&p_ptr->afraid);
-		rd_s16b(&p_ptr->cut);
-		rd_s16b(&p_ptr->stun);
-		rd_s16b(&p_ptr->poisoned);
-		rd_s16b(&p_ptr->image);
-		rd_s16b(&p_ptr->protevil);
-		rd_s16b(&p_ptr->invis);
-		rd_s16b(&p_ptr->hero);
-		rd_s16b(&p_ptr->shero);
-		rd_s16b(&p_ptr->shield);
-		rd_s16b(&p_ptr->blessed);
-		rd_s16b(&p_ptr->tim_invis);
-		rd_s16b(&p_ptr->word_recall);
-		rd_s16b(&p_ptr->see_infra);
-		rd_s16b(&p_ptr->tim_infra);
-		rd_s16b(&p_ptr->oppose_fire);
-		rd_s16b(&p_ptr->oppose_cold);
-		rd_s16b(&p_ptr->oppose_acid);
-		rd_s16b(&p_ptr->oppose_elec);
-		rd_s16b(&p_ptr->oppose_pois);
-		rd_s16b(&p_ptr->oppose_water);
-		rd_s16b(&p_ptr->oppose_lava);
-		rd_s16b(&p_ptr->free_act);
-#endif
 	}
 
 	/* Read some other state values */

@@ -390,3 +390,18 @@ I:12
 F:AUTOMATIC | INVERSE | RANDOM | SPREAD
 B:CROSS
 
+# Bloom - used by witch blooms
+
+N:50:bloom
+G:*:V
+I:8
+F:AUTOMATIC | ATTR_EFFECT | RANDOM | PROJECTION
+B:BALL_MINOR
+
+# Illusory lake - used by witch water
+
+N:51:illusory lake
+G:*:w
+I:5
+F:AUTOMATIC | ATTR_EFFECT | LINGER | SHINING
+

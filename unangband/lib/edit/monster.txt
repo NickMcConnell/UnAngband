@@ -1099,7 +1099,7 @@ F:STUPID | EMPTY_MIND | HAS_AURA |
 F:NONVOCAL | HURT_LITE | IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_SLIME |
 F:RES_BLIND | ATTR_METAL | LEVEL_SIZE |
-S:BLOW_3 | AURA |
+S:BLOW_3 |
 S:DRAIN_MANA |
 D:It is a large pile of silver flesh that sucks all light from its
 D: surroundings.
@@ -4826,7 +4826,7 @@ F:NONVOCAL | NONLIVING | IM_FIRE | RES_LAVA | RES_PLAS | NO_FEAR | NO_CONF |
 F:NO_SLEEP |
 F:DROP_ARMOR |
 F:LEVEL_SPEED | RES_BLIND | IM_BLUNT | LEVEL_SIZE |
-S:BLOW_2 | AURA | BRTH_FIRE |
+S:BLOW_2 | BRTH_FIRE |
 D:A whirling maelstrom of fire.
 
 N:253:Water vort|ex|ex|ices|
@@ -4844,7 +4844,7 @@ F:NONVOCAL | NONLIVING | IM_ACID | RES_WATER | HURT_WATER | NO_FEAR |
 F:NO_CONF | NO_SLEEP |
 F:DROP_ARMOR |
 F:LEVEL_SPEED | RES_BLIND | IM_BLUNT | LEVEL_SIZE |
-S:BLOW_2 | AURA |
+S:BLOW_2 |
 S:BALL_WATER |
 D:A spinning whirlpool of water.
 
@@ -4862,7 +4862,7 @@ F:COLD_BLOOD | EMPTY_MIND | POWERFUL | BASH_DOOR | HAS_AURA |
 F:NONVOCAL | NONLIVING | IM_COLD | NO_FEAR | NO_CONF | NO_SLEEP |
 F:DROP_ARMOR |
 F:LEVEL_SPEED | RES_BLIND | IM_BLUNT | LEVEL_SIZE |
-S:BLOW_2 | AURA | BRTH_COLD |
+S:BLOW_2 | BRTH_COLD |
 D:A twisting whirlpool of frost.
 
 N:255:Energy vort|ex|ex|ices|
@@ -4879,7 +4879,7 @@ F:HAS_LITE | EMPTY_MIND | POWERFUL | CAN_FLY | BASH_DOOR | HAS_AURA |
 F:NONVOCAL | NONLIVING | IM_ELEC | RES_PLAS | NO_FEAR | NO_CONF | NO_SLEEP |
 F:DROP_ARMOR |
 F:LEVEL_SPEED | RES_BLIND | IM_BLUNT | LEVEL_SIZE |
-S:BLOW_2 | AURA | BRTH_ELEC |
+S:BLOW_2 | BRTH_ELEC |
 S:BEAM_ELEC |
 D:A shimmering tornado of energy, sparks crackle along its length.
 
@@ -5822,7 +5822,7 @@ F:COLD_BLOOD | EMPTY_MIND | BASH_DOOR |
 F:NONLIVING | IM_ELEC | IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | ASSEMBLE |
 F:LEVEL_SPEED | LEVEL_SIZE | LEVEL_POWER |
-S:BOLT_ELEC | BEAM_ELEC |
+S:BOLT_ELEC | BEAM_ELEC | LEAP |
 D:A man-shaped form of living lightning, sparks and shocks crackle all
 D: over this madly capering figure, as it leaps and whirls around and
 D: about you.
@@ -6956,7 +6956,7 @@ F:COLD_BLOOD | EMPTY_MIND | CAN_SWIM | POWERFUL | BASH_DOOR | HAS_AURA |
 F:NONLIVING | IM_ACID | IM_FIRE | IM_COLD | IM_POIS | RES_WATER | HURT_WATER |
 F:NO_FEAR | NO_CONF | NO_SLEEP |
 F:LEVEL_SPEED | RES_BLIND | RES_BLUNT | LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_4 | AURA |
+S:BLOW_4 |
 S:BALL_STORM | BOLT_COLD | BOLT_WATER |
 S:ADD_MANA |
 D:It is a towering tempest of water.
@@ -7364,7 +7364,7 @@ F:CAN_DIG | COLD_BLOOD | EMPTY_MIND | POWERFUL | BASH_DOOR | HAS_AURA |
 F:OOZE | NONLIVING | IM_ACID | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
 F:NO_CONF | NO_SLEEP |
 F:LEVEL_SPEED | RES_BLIND | LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_2 | AURA |
+S:BLOW_2 |
 S:BALL_ACID | BOLT_ACID |
 S:ADD_MANA |
 D:It is a towering mass of filth, an eyesore of ooze.
@@ -7386,7 +7386,7 @@ F:EMPTY_MIND | POWERFUL | CAN_FLY | BASH_DOOR | HAS_AURA |
 F:NONLIVING | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR | NO_CONF |
 F:NO_SLEEP |
 F:LEVEL_SPEED | RES_BLIND | RES_BLUNT | LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_3 | AURA |
+S:BLOW_3 |
 S:BOLT_FIRE |
 S:ADD_MANA | DARKNESS |
 D:It is a towering blackened form, crackling with heat.
@@ -7800,7 +7800,7 @@ F:COLD_BLOOD | EMPTY_MIND | POWERFUL | BASH_DOOR | HAS_AURA |
 F:NONLIVING | IM_ACID | IM_ELEC | IM_COLD | IM_POIS | NO_FEAR | NO_CONF |
 F:NO_SLEEP |
 F:LEVEL_SPEED | RES_BLIND | LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_3 | AURA |
+S:BLOW_3 |
 S:BALL_COLD | BOLT_ICE |
 S:ADD_MANA |
 D:It is a towering glacier of ice.
@@ -7953,7 +7953,7 @@ F:EMPTY_MIND | POWERFUL | PASS_WALL | HAS_AURA |
 F:NONLIVING | IM_ACID | IM_ELEC | IM_FIRE | IM_POIS | RES_LAVA | RES_PLAS |
 F:NO_FEAR | NO_CONF | NO_SLEEP |
 F:LEVEL_SPEED | RES_BLIND | LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_3 | BLOW_4 | AURA |
+S:BLOW_3 | BLOW_4 |
 S:BALL_FIRE | BOLT_PLAS |
 S:ADD_MANA |
 D:It is a towering glowing form of molten hate.
@@ -8009,7 +8009,7 @@ F:EMPTY_MIND | POWERFUL | BASH_DOOR | HAS_AURA |
 F:NONVOCAL | NONLIVING | RES_NEXUS | NO_FEAR | NO_CONF | NO_SLEEP |
 F:DROP_ARMOR |
 F:LEVEL_SPEED | RES_BLIND | IM_BLUNT | LEVEL_SIZE |
-S:BLOW_2 | AURA | BRTH_NEXUS |
+S:BLOW_2 | BRTH_NEXUS |
 D:A maelstrom of potent magical energy.
 
 N:401:Plasma vort|ex|ex|ices|
@@ -8229,7 +8229,7 @@ F:HAS_LITE | EMPTY_MIND | POWERFUL | BASH_DOOR | HAS_AURA |
 F:NONVOCAL | NONLIVING | NO_FEAR | NO_CONF | NO_SLEEP |
 F:DROP_ARMOR |
 F:LEVEL_SPEED | RES_BLIND | RES_LITE | RES_DARK | LEVEL_SIZE |
-S:BLOW_4 | AURA | BRTH_LITE | BRTH_DARK |
+S:BLOW_4 | BRTH_LITE | BRTH_DARK |
 D:A strange pillar of shining light that hurts your eyes.  Its shape
 D: changes constantly as it cuts through the air towards you.  It is like
 D: a beacon, waking monsters from their slumber.
@@ -9637,7 +9637,7 @@ F:COLD_BLOOD | EMPTY_MIND | POWERFUL | CAN_FLY | BASH_DOOR | HAS_AURA |
 F:HUGE | NONLIVING | IM_ACID | IM_ELEC | IM_COLD | IM_POIS | NO_FEAR |
 F:NO_CONF | NO_SLEEP |
 F:EVASIVE | RES_BLIND | IM_BLUNT | ATTR_METAL |
-S:BLOW_4 | AURA |
+S:BLOW_4 |
 S:BALL_ELEC | BALL_COLD | BALL_WIND | BOLT_ELEC |
 S:ADD_MANA |
 S:S_GROUP |
@@ -10170,7 +10170,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_ELEC |
+S:BLOW_4 | BRTH_ELEC |
 S:SCARE | BLIND | CONF | HOLD |
 D:A vast dragon of power.  Storms and lightning crash around its titanic
 D: form.  Deep blue scales reflect the flashes and highlight the
@@ -10358,7 +10358,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT |
-S:BLOW_4 | AURA | BRTH_COLD |
+S:BLOW_4 | BRTH_COLD |
 S:SCARE | BLIND | CONF |
 D:An immense dragon capable of awesome destruction.  You have never felt
 D: such extreme cold, or witnessed such an icy stare.  Begone quickly or
@@ -10882,7 +10882,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | RES_CHAOS |
-S:BLOW_4 | AURA | BRTH_CHAOS | BRTH_DISEN |
+S:BLOW_4 | BRTH_CHAOS | BRTH_DISEN |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON |
 D:A massive dragon of changing form.  As you watch, it appears first fair
@@ -10908,7 +10908,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | NO_CUTS |
-S:BLOW_4 | AURA | BRTH_SOUND | BRTH_SHARD |
+S:BLOW_4 | BRTH_SOUND | BRTH_SHARD |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON |
 D:A massive dragon of powerful intellect.  It seeks to dominate the
@@ -10935,7 +10935,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | RES_CHAOS |
-S:BLOW_4 | AURA | BRTH_SOUND | BRTH_SHARD | BRTH_CHAOS | BRTH_DISEN |
+S:BLOW_4 | BRTH_SOUND | BRTH_SHARD | BRTH_CHAOS | BRTH_DISEN |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON | S_HI_DRAGON |
 D:A massive dragon, one of the mightiest of dragonkind.  It is thousands
@@ -12125,7 +12125,7 @@ F:DEMON | EVIL | HUGE | NONLIVING | IM_ELEC | IM_FIRE | IM_POIS | RES_LAVA |
 F:RES_PLAS | NO_CONF | NO_SLEEP |
 F:HAS_SKULL | DROP_WEAPON | DROP_ARMOR | DROP_WRITING |
 F:LEVEL_CLASS | RES_DARK | RES_MAGIC |
-S:BLOW_2 | BLOW_3 | AURA | BRTH_FIRE | BRTH_PLAS | BRTH_DARK |
+S:BLOW_2 | BLOW_3 | BRTH_FIRE | BRTH_PLAS | BRTH_DARK |
 S:BALL_FIRE | BALL_CHAOS | BOLT_PLAS | ARC_HFIRE |
 S:SCARE | CONF | HOLD |
 S:S_DEMON | S_HI_DEMON |
@@ -12195,7 +12195,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT |
-S:BLOW_4 | AURA | BRTH_POIS |
+S:BLOW_4 | BRTH_POIS |
 S:SCARE | BLIND | CONF | HOLD |
 D:A truly enormous dragon with great powers.  The foul gases issuing from
 D: the beast nearly make you vomit; and while you may try to hold your
@@ -12220,7 +12220,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT |
-S:BLOW_4 | AURA | BRTH_FIRE | BRTH_CONFU |
+S:BLOW_4 | BRTH_FIRE | BRTH_CONFU |
 S:SCARE | BLIND | CONF |
 D:A dragon of great size and power.  Its polished bronze scales reflect
 D: the light in strange and confusing patterns, and you find it hard to
@@ -12245,7 +12245,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_ACID |
+S:BLOW_4 | BRTH_ACID |
 S:SCARE | BLIND | CONF |
 D:A huge and very powerful dragon.  Great steaming pools of acid drip from
 D: its form onto the ground.  You shudder when you see the acid eating
@@ -12270,7 +12270,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_POIS | BRTH_SOUND |
+S:BLOW_4 | BRTH_POIS | BRTH_SOUND |
 S:SCARE | BLIND | CONF |
 D:A dragon of gigantic proportions, with destructive abilities to match. 
 D: The sheer loudness of its roar leaves you stunned and unable to think
@@ -14960,7 +14960,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_ELEC | BRTH_NEXUS |
+S:BLOW_4 | BRTH_ELEC | BRTH_NEXUS |
 S:SCARE | BLIND | CONF |
 D:A dragon of great size and power. Its polished copper scales reflect the
 D:  light in twisted and shifting shapes, and you find it hard to stay in 
@@ -14985,7 +14985,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_COLD | BRTH_FEAR |
+S:BLOW_4 | BRTH_COLD | BRTH_FEAR |
 S:SCARE | BLIND | CONF |
 D:A dragon of great size and power. Its polished silver scales reflect the
 D:  terror in your eyes, and you find it hard not to throw down your
@@ -15010,7 +15010,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_ACID | BRTH_DISEN |
+S:BLOW_4 | BRTH_ACID | BRTH_DISEN |
 S:SCARE | BLIND | CONF |
 D:A dragon of great size and power. Its polished brass scales drain magic
 D: from the surrounding air, and you find it hard to find anything to
@@ -15035,7 +15035,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | RES_DARK | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_ACID | BRTH_DARK | BRTH_NEXUS | BRTH_TIME |
+S:BLOW_4 | BRTH_ACID | BRTH_DARK | BRTH_NEXUS | BRTH_TIME |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON | S_HI_DRAGON |
 D:A massive dragon, one of the mightiest of dragonkind.  It is thousands
@@ -15061,7 +15061,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | RES_MAGIC | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_COLD | BRTH_DISEN | BRTH_MANA |
+S:BLOW_4 | BRTH_COLD | BRTH_DISEN | BRTH_MANA |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON | S_HI_DRAGON |
 D:A massive dragon, one of the mightiest of dragonkind.  It has undisputed
@@ -15088,7 +15088,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | NO_CUTS | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_FIRE | BRTH_POIS | BRTH_SHARD | BRTH_FORCE |
+S:BLOW_4 | BRTH_FIRE | BRTH_POIS | BRTH_SHARD | BRTH_FORCE |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON | S_HI_DRAGON |
 D:A massive dragon, one of the mightiest of dragonkind.  It has powerful
@@ -15253,23 +15253,24 @@ G:M:v
 #$ Clear available
 #$ Metallics available:dwsorgDWPyRGUpvtmYiTVIMzZ
 #$ Colors available:dsgWPRUpvtmYiTVIZ
-I:150:14000:100:100:0
+I:150:7000:100:100:0
 W:60:31:0:4100000
-C:59:31:0:6200000:6100000
+C:59:31:0:3100000:3050000
 M:45:45:200:225
 B:HIT:VAMP_DRAIN:20d10
-B:HIT:VAMP_DRAIN:20d10
+B:AURA:VAMP_DRAIN:20d10
 B:HIT:HURT_MANA:10d12
 B:TOUCH:LOSE_ALL
 F:UNIQUE | QUESTOR | MALE | ATTR_MULTI | FORCE_DEPTH | FORCE_MAXHP |
 F:FORCE_SLEEP | ESCORTS | ONLY_ITEM | DROP_1D2 | DROP_1D3 | DROP_1D4 |
 F:DROP_GOOD | DROP_GREAT | DROP_CHOSEN |
-F:SMART | REGENERATE | CAN_FLY |
+F:SMART | REGENERATE | CAN_FLY | HAS_AURA |
 F:EVIL | HUGE | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
 F:NO_CONF | NO_SLEEP |
 F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
 F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_WEAPON | DROP_ARMOR | DROP_WRITING |
 F:EVASIVE | RES_BLIND | ELF |
+S:BLOW_2 |
 S:BRTH_SOUND |
 S:BEAM_NETHR | ARC_HFIRE |
 S:BLINK | CURSE |
@@ -15296,23 +15297,24 @@ G:M:D
 #$ Clear available
 #$ Metallics available:dwsorgDWPyRGUpvtmYiTVIMzZ
 #$ Colors available:dsgWPRUpvtmYiTVIZ
-I:140:14000:100:150:0
+I:140:21000:100:150:0
 W:60:21:0:4100000
 C:36:21:0:3000000:1800000
 M:45:45:200:225
-B:HIT:WOUND:20d10
-B:HIT:BATTER:20d10
+B:HIT:WOUND:60d10
+B:HIT:BATTER:60d10
 B:HIT:LOSE_ALL:10d12
 B:AURA:WATER:10d12
 F:UNIQUE | QUESTOR | MALE | FORCE_DEPTH | FORCE_MAXHP | FORCE_SLEEP |
 F:ONLY_ITEM | DROP_1D2 | DROP_1D3 | DROP_1D4 | DROP_GOOD | DROP_GREAT |
 F:DROP_CHOSEN |
-F:SMART | REGENERATE | CAN_SWIM |
+F:SMART | REGENERATE | CAN_SWIM | HAS_AURA |
 F:EVIL | HUGE | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
 F:NO_CONF | NO_SLEEP |
 F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
 F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_WEAPON | DROP_ARMOR | DROP_WRITING |
 F:RES_BLIND | ELF |
+S:BLOW_4 |
 S:BALL_MANA | BALL_WATER | BOLT_MANA |
 S:WRAITHFORM | CURSE | MIND_BLAST |
 S:S_HI_DRAGON | S_WRAITH |
@@ -17400,7 +17402,7 @@ F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | DROP_TOOL |
 F:DROP_WEAPON | DROP_RSW | ASSEMBLE |
 F:LEVEL_SPEED | RES_BLUNT | IM_EDGED | DROP_MINERAL | ATTR_METAL |
 F:LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_2 | AURA |
+S:BLOW_2 |
 S:BEAM_ELEC |
 D:It is a massive copper statue of weird geometric shapes that moves
 D: steadily towards you.  Sparks shoot from coils and wires atop its three
@@ -17424,7 +17426,7 @@ F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | DROP_TOOL |
 F:DROP_WEAPON | DROP_RSW | ASSEMBLE |
 F:LEVEL_SPEED | RES_BLUNT | IM_EDGED | DROP_MINERAL | ATTR_METAL |
 F:LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_2 | AURA |
+S:BLOW_2 |
 S:BALL_ACID | BOLT_ACID |
 D:It is a massive brass statue of a mishapen figure that moves steadily
 D: towards you.  Acid leaks from a multitude of pipes in its body.
@@ -17493,7 +17495,7 @@ F:HUGE | NONLIVING | HURT_ROCK | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS |
 F:NO_FEAR | NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_HEAD | HAS_HAND | HAS_ARM | HAS_LEG | ASSEMBLE |
 F:LEVEL_SPEED | IM_EDGED | ATTR_METAL | LEVEL_SIZE | LEVEL_POWER |
-S:BLOW_3 | AURA |
+S:BLOW_3 |
 S:BOLT_FIRE |
 S:DARKNESS |
 D:It is a massive coal-powered statue that moves steadily towards you.
@@ -25015,7 +25017,7 @@ F:STUPID | EMPTY_MIND | HAS_AURA |
 F:NONVOCAL | PLANT | IM_POIS | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP |
 F:HAS_SPORE |
 F:RES_BLIND | LEVEL_SIZE |
-S:BLOW_3 | AURA |
+S:BLOW_3 |
 D:A pestiferous growth on the dungeon floor; its spores are deadly.
 
 #$# 1206 - Unused ###
@@ -25231,7 +25233,7 @@ F:NONVOCAL | NONLIVING | RES_WATER | NO_FEAR | NO_STUN | NO_CONF | NO_SLEEP |
 F:DROP_JUNK |
 F:LEVEL_SPEED | RES_BLIND | RES_CHAOS | RES_EDGED | RES_BLUNT | NO_CUTS |
 F:LEVEL_SIZE |
-S:BLOW_2 | BLOW_3 | BLOW_4 | AURA | BRTH_SHARD | BRTH_WIND | BRTH_FORCE |
+S:BLOW_2 | BLOW_3 | BLOW_4 | BRTH_SHARD | BRTH_WIND | BRTH_FORCE |
 S:ARC_FORCE |
 S:ADD_MANA |
 D:An intense storm, churning and roiling, powerful enough to pick up trees
@@ -25361,7 +25363,7 @@ F:INVISIBLE | WEIRD_MIND | MULTIPLY | BASH_DOOR | HAS_AURA | HAS_WEB |
 F:HURT_LITE | INSECT | NO_CONF |
 F:HAS_CORPSE | HAS_LEG | HAS_SKIN |
 F:RES_DARK | LEVEL_SIZE |
-S:BLOW_4 | AURA | BRTH_DARK |
+S:BLOW_4 | BRTH_DARK |
 D:The darkness gathers, heaves, and out loom the taloned legs and hairy
 D: face of an enormous Unlit spider.  It craves the darkness, and breeds
 D: everywhere the shadows lie.
@@ -25628,7 +25630,7 @@ F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_CLAW |
 F:HAS_LEG | HAS_WING | HAS_SCALE | HAS_BLOOD | DROP_CHEST | DROP_ARMOR |
 F:DROP_JEWELRY |
 F:SCENT | RES_TPORT | ATTR_METAL |
-S:BLOW_4 | AURA | BRTH_POIS | BRTH_NEXUS | BRTH_DISEA |
+S:BLOW_4 | BRTH_POIS | BRTH_NEXUS | BRTH_DISEA |
 S:SCARE | BLIND | CONF |
 S:S_DRAGON | S_HI_DRAGON |
 D:A massive dragon, one of the mightiest of dragonkind.  It has undisputed
@@ -26085,7 +26087,7 @@ F:STUPID | EMPTY_MIND | CAN_SWIM | MUST_SWIM | HAS_AURA |
 F:NONVOCAL | IM_POIS | NO_FEAR | NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_ARM | HAS_SLIME |
 F:RES_BLIND | ATTR_METAL |
-S:BLOW_3 | AURA |
+S:BLOW_3 |
 S:DRAIN_MANA |
 D:It is a giant silver jellyfish that sucks all light from its
 D: surroundings.
@@ -26341,7 +26343,7 @@ F:INSECT | IM_ACID | IM_POIS | NO_CONF | NO_SLEEP |
 F:HAS_CORPSE | HAS_LEG | HAS_WING | HAS_SKIN | HAS_SPORE |
 F:LEVEL_SIZE |
 S:BLOW_3 | BLOW_4 |
-S:INVIS | TELE_SELF_TO | BERSERK |
+S:INVIS | TELE_SELF_TO | BERSERK | LEAP |
 D:A spined and ferocious insect: its proboscis tastes the air and its head
 D: unerringly turns to you; leaping off walls and ceilings, it runs at you
 D: to implant its children in your still warm flesh.
@@ -28427,12 +28429,13 @@ G:e:V
 #$ Colors available:dry
 I:130:35:12:7:0
 W:1:4:0:6
-M:0:90:3:200
+M:0:15:3:20
 F:NEVER_BLOW | NEVER_MOVE |
 F:INVISIBLE |
 F:NONVOCAL | HURT_LITE | NO_FEAR | NO_CONF |
 F:HAS_CORPSE | HAS_BLOOD |
 F:NEUTRAL | LEVEL_SIZE |
+S:PROBE
 D:A disembodied gazing eye, summoned by a wizard to spy on you.
 
 N:1374:Unseen servant

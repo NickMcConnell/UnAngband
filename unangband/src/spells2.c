@@ -180,6 +180,8 @@ void generate_familiar(void)
 	int blow = 0;
 	int size = 1;
 	monster_race *r_ptr = &r_info[FAMILIAR_IDX];
+	
+	bool ranged_only = TRUE;
 
 	COPY(r_ptr, &r_info[FAMILIAR_BASE_IDX], monster_race);
 
@@ -228,7 +230,7 @@ void generate_familiar(void)
 					r_ptr->speed += 10;
 					break;
 				case FAMILIAR_POWER:
-					r_ptr->spell_power += p_ptr->max_lev;
+					r_ptr->spell_power += p_ptr->max_lev / 3;
 					break;
 				case FAMILIAR_HP:
 					r_ptr->hp += 2;
@@ -262,8 +264,10 @@ void generate_familiar(void)
 						r_ptr->flags4 |= (1 << (blow-1));
 						r_ptr->freq_innate += 25;
 						
-						/* Spikes are ranged only */
-						if (blow == 1) r_ptr->flags1 |= (RF1_NEVER_BLOW);
+						/* Spikes are shorter range, and therefore more powerful at higher level.
+						 * Note that shots get converted into boulders for more damage than this if
+						 * the familiar goes giant size. */
+						if (p_ptr->familiar_attr[i] == FAMILIAR_SPIKE) d_side = p_ptr->max_lev / 2;
 					}
 					break;
 				default:
@@ -280,11 +284,25 @@ void generate_familiar(void)
 	/* Fix up blow damage based on size */
 	for (i = 0; i < blow; i++)
 	{
-		r_ptr->blow[blow].d_dice *= size;
+		/* Increase damage from size */
+		r_ptr->blow[i].d_dice *= size;
+		
+		/* Hack -- supersize shots for huge monsters */
+		if ((r_ptr->blow[i].method == RBM_SHOT) && ((r_ptr->flags3 & (RF3_HUGE)) != 0))
+		{
+			r_ptr->blow[i].method == RBM_BOULDER;
+			r_ptr->blow[i].d_side *= 2;
+		}
+		
+		/* Check if we can do any melee attacks */
+		if ((r_ptr->blow[i].method != RBM_SHOT) && (r_ptr->blow[i].method != RBM_SPIKE))
+		{
+			ranged_only = FALSE;
+		}
 	}
 
 	/* No blows - mark appropriately */
-	if (!blow)
+	if (ranged_only)
 	{
 		r_ptr->flags1 |= (RF1_NEVER_BLOW);
 	}
@@ -294,6 +312,9 @@ void generate_familiar(void)
 
 	/* Increase hit points at every level */
 	r_ptr->hp *= p_ptr->max_lev;
+	
+	/* Increase spell power somewhat */
+	r_ptr->spell_power += p_ptr->max_lev / 3;
 	
 	/* Huge monsters get more hp to compensate for loss of evasion */
 	if (r_ptr->flags3 & (RF3_HUGE)) r_ptr->hp *= 3;
@@ -800,8 +821,39 @@ void self_knowledge_aux(bool spoil, bool random)
 		{
 			text_out(format("%s  ", timed_effects[i].self_knowledge));
 
-			/* Hack - treat everything as bad */
-			healthy = FALSE;
+			/* Collect consequences */
+			vn = 0;
+			
+			/* Hack - only first 32 timed effects can affect the players ability to do things */
+			if (i < 32)
+			{
+				for (n = 0; n < MAX_COMMANDS; n++)
+				{
+					/* Timed effect restricts this */
+					if ((cmd_item_list[n].timed_conditions & (1L << i)) != 0)
+					{
+						vp[vn++] = cmd_item_list[n].item_prevented;
+					}
+				}
+				
+				/* Hack - treat everything as bad */
+				healthy = FALSE;
+			}
+			
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (n == 0) { text_out(format("%^s prevents you from ", timed_effects[i].on_condition)); }
+				else if (n < vn-1) text_out(", ");
+				else text_out(" and ");
+
+				/* Dump */
+				text_out(vp[n]);
+			}
+			
+			/* Finish sentence */
+			if (vn) text_out(".  ");
 		}
 	}
 
@@ -881,9 +933,58 @@ void self_knowledge_aux(bool spoil, bool random)
 		/* Can cure by treating symptoms */
 		if (!(p_ptr->disease & (DISEASE_PERMANENT | (1 << DISEASE_SPECIAL))))
 		{
-			text_out(", or you can treat the symptoms ");
-			if (p_ptr->disease & (DISEASE_HEAVY)) text_out("for a temporary respite");
-			else text_out("to cure the disease");
+			bool all_known = TRUE;
+			
+			text_out(", or you can treat the symptoms");
+
+			/* Collect changes */
+			vn = 0;
+			
+			/* Hack -- we just get the spell names */
+			for (i = 0; i < z_info->s_max; i++)
+			{
+				if (s_info[i].type != SPELL_CURE_DISEASE) continue;
+				if (s_info[i].param >= DISEASE_TYPES_HEAVY) continue;
+
+				/* Needs to be a cure for the symptoms */
+				if ((p_ptr->disease & (1L << s_info[i].param)) == 0) continue;
+				
+				/* Player must be aware of at least one item */
+				for (n = 0; n < MAX_SPELL_APPEARS; n++)
+				{
+					int k;
+					
+					if (!s_info[i].appears[n].tval) continue;
+					
+					k = lookup_kind(s_info[i].appears[n].tval, s_info[i].appears[n].sval);
+					
+					/* Aware the item exists? */
+					if (k_info[k].aware & (AWARE_EXISTS))
+					{
+						vp[vn++] = s_name + s_info[i].name;
+						break;
+					}
+				}
+				
+				/* Not aware of any items */
+				if (n == MAX_SPELL_APPEARS) all_known = FALSE;
+			}
+			
+			/* Scan */
+			for (n = 0; n < vn; n++)
+			{
+				/* Intro */
+				if (n == 0) { text_out(" with "); }
+				else if (n < vn-1) text_out(", ");
+				else if (all_known) text_out(" and ");
+				else text_out(" or ");
+
+				/* Dump */
+				text_out(vp[n]);
+			}
+			
+			if (p_ptr->disease & (DISEASE_HEAVY)) text_out(" for a temporary respite");
+			else if (all_known || !vn) text_out(" to cure the disease");
 		}
 
 		/* Dump */
@@ -898,19 +999,30 @@ void self_knowledge_aux(bool spoil, bool random)
 	if (p_ptr->climbing)
 	{
 		text_out("You are climbing over an obstacle.  ");
+		text_out("Climbing takes an extra move, but allows you to attack huge monsters which can be otherwise hard to reach.  ");
 	}
 	if (p_ptr->searching)
 	{
 		text_out("You are looking around very carefully.  ");
+		text_out("Searching increases the chance of detecting secrets in nearby terrain.  ");
+	}
+	if (p_ptr->blocking)
+	{
+		text_out(format("You are moving with your %s raised defensively.  ",
+				inventory[INVEN_ARM].tval == TV_SHIELD ? "shield" : 
+				(inventory[INVEN_ARM].tval == TV_SHIELD ? "weapons" : "arms")));
+		text_out("Blocking gives you a temporary bonus to hit and defend (+10 plus doubling the defense of your shield or secondary weapon).  ");		
 	}
 	if (p_ptr->sneaking)
 	{
 		text_out(format("You are sneaking to avoid disturbing sleeping monsters%s.  ",
 				p_ptr->not_sneaking ? " but your last action was noisy" : ""));
+		text_out(format("Sneaking reduces the chance to wake nearby monsters you are aware of (up to a range of 4 grids).  "));
 	}
 	if (p_ptr->new_spells)
 	{
-		text_out("You can learn some spells/prayers.  ");
+		text_out("You can learn some spells, prayers or songs.  ");
+		text_out("Use the study command to learn from books, altars, magic circles or instruments.  ");
 	}
 
 	if (p_ptr->word_recall)
@@ -6166,6 +6278,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	int ench_toa = 0;
 
 	int n, vn = 0;
+	int i;
 
 	cptr vp[64];
 
@@ -6457,7 +6570,92 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		acquirement(p_ptr->py,p_ptr->px, rand_int(2)+1, TRUE);
 		obvious = TRUE;
 	}
+	
+	/* Timed abilities */
+	for (i = 0; i < TMD_MAX; i++)
+	{
+		bool do_timed = FALSE;
+		bool ignore_timed = FALSE;
+		
+		if ((i < 32) && ((s_ptr->timed_flags1 & (1L << i)) != 0)) do_timed = TRUE;
+		else if ((i < 64) && ((s_ptr->timed_flags2 & (1L << (i - 32))) != 0)) do_timed = TRUE;
+		
+		/* Effect prevented by player flags? */
+		if ((((p_ptr->cur_flags1 & (timed_effects[i].ignore_flags1)) != 0)) ||
+			(((p_ptr->cur_flags2 & (timed_effects[i].ignore_flags2)) != 0)) ||
+			(((p_ptr->cur_flags3 & (timed_effects[i].ignore_flags3)) != 0)) ||
+			(((p_ptr->cur_flags4 & (timed_effects[i].ignore_flags4)) != 0))) ignore_timed = TRUE;
+		
+		/* We ignore bad effects differently from good effects */
+		if (ignore_timed)
+		{
+			if (i < 32)
+			{
+				do_timed = FALSE;
+				
+				equip_can_flags(p_ptr->cur_flags1 & (timed_effects[i].ignore_flags1),
+					p_ptr->cur_flags2 & (timed_effects[i].ignore_flags2),
+					p_ptr->cur_flags3 & (timed_effects[i].ignore_flags3),
+					p_ptr->cur_flags4 & (timed_effects[i].ignore_flags4));
+			}
+		}
+		
+		if (do_timed)
+		{
+			if (inc_timed(i, lasts, TRUE)) obvious = TRUE;
+			
+			if (i < 32)
+			{
+				equip_not_flags(timed_effects[i].ignore_flags1,
+					timed_effects[i].ignore_flags2,
+					timed_effects[i].ignore_flags3,
+					timed_effects[i].ignore_flags4);
+			}
+		}
+	}
 
+	/* Clear timed abilities */
+	for (i = 0; i < TMD_MAX; i++)
+	{
+		bool do_timed = FALSE;
+		
+		if ((i < 32) && ((s_ptr->clear_timed_flags1 & (1L << i)) != 0)) do_timed = TRUE;
+		/* else if ((i < 64) && ((s_ptr->clear_timed_flags2 & (1L << (i - 32))) != 0)) do_timed = TRUE; */
+		
+		if (do_timed)
+		{
+			if (clear_timed(i, TRUE)) obvious = TRUE;
+			
+			/* Also recover stats */
+			if (i < A_MAX)
+			{
+				if (do_res_stat(i)) obvious = TRUE;
+			}
+		}		
+	}
+
+	/* Partially fix timed abilities */
+	for (i = 0; i < TMD_MAX; i++)
+	{
+		bool do_timed = FALSE;
+		
+		if ((i < 32) && ((s_ptr->pfix_timed_flags1 & (1L << i)) != 0)) do_timed = TRUE;
+		/* else if ((i < 64) && ((s_ptr->pfix_timed_flags2 & (1L << (i - 32))) != 0)) do_timed = TRUE; */
+		
+		if (do_timed)
+		{
+			if (pfix_timed(i, TRUE)) obvious = TRUE;
+			
+			/* TODO: Also recover stat by 1 point */
+			if (i < A_MAX)
+			{
+				if (FALSE) obvious = TRUE;
+			}
+		}		
+	}
+
+	
+#if 0
 	/* SF2 - timed abilities and modifying */
 	/* Note slow poison is silent in its effect */
 	if ((s_ptr->flags2 & (SF2_SLOW_POIS)) && (set_slow_poison(p_ptr->timed[TMD_SLOW_POISON] + lasts))) obvious = TRUE;
@@ -6489,7 +6687,9 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	if ((s_ptr->flags3 & (SF3_INC_CON)) && (inc_timed(TMD_INC_CON, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_INC_CHR)) && (inc_timed(TMD_INC_CHR, lasts, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (inc_timed(TMD_FREE_ACT, lasts, TRUE))) obvious = TRUE;
+#endif
 
+	
 	if (s_ptr->flags2 & (SF2_AGGRAVATE))
 	{
 		aggravate_monsters(0);
@@ -6529,7 +6729,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 		mass_banishment(who, what, p_ptr->py, p_ptr->px);
 		obvious = TRUE;
 	}
-
+#if 0
 	if (s_ptr->flags2 & (SF2_CUT))
 	{
 		if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) == 0)
@@ -6709,7 +6909,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	{
 		if (inc_timed(TMD_FAST, p_ptr->timed[TMD_FAST] ? rand_int(s_ptr->lasts_side/3): lasts + level, TRUE)) obvious = TRUE;
 	}
-
+	
 	/* SF3 - healing self, and untimed improvements */
 	if (s_ptr->flags3 & (SF3_CURE_STR))
 	  {
@@ -6725,22 +6925,33 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 	  }
 	if ((s_ptr->flags3 & (SF3_CURE_CON))  && (do_res_stat(A_CON))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CHR))  && (do_res_stat(A_CHR))) obvious = TRUE;
+
 	if ((s_ptr->flags3 & (SF3_CURE_EXP)) && (restore_level())) obvious = TRUE;
+#endif
+
+#if 0
 	if ((s_ptr->flags3 & (SF3_FREE_ACT)) && (clear_timed(TMD_SLOW, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_MEM)) && (clear_timed(TMD_AMNESIA, TRUE))) obvious = TRUE;
+#endif
 	if ((s_ptr->flags3 & (SF3_PFIX_CURSE)) && (remove_curse())) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CURSE)) && (remove_all_curse())) obvious = TRUE;
+
+#if 0
 	if ((s_ptr->flags3 & (SF3_PFIX_CUTS)) && (pfix_timed(TMD_CUT, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CUTS)) && (clear_timed(TMD_CUT, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_PFIX_STUN)) && (pfix_timed(TMD_STUN, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_STUN)) && (clear_timed(TMD_STUN, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_POIS)) && (clear_timed(TMD_POISONED, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_CONF)) && (clear_timed(TMD_CONFUSED, TRUE))) obvious = TRUE;
+#endif
+
 	if ((s_ptr->flags3 & (SF3_CURE_FOOD)) && (set_food(PY_FOOD_MAX -1))) obvious = TRUE;
+	
+#if 0
 	if ((s_ptr->flags3 & (SF3_CURE_FEAR)) && (clear_timed(TMD_AFRAID, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_BLIND)) && (clear_timed(TMD_BLIND, TRUE))) obvious = TRUE;
 	if ((s_ptr->flags3 & (SF3_CURE_IMAGE)) && (clear_timed(TMD_IMAGE, TRUE))) obvious = TRUE;
-
+#endif
 
 	if (s_ptr->flags3 & (SF3_DEC_EXP))
 	{
@@ -8812,6 +9023,31 @@ void region_insert(u16b *gp, int grid_n, s16b *gd, s16b region)
 		/* Update the region piece with the grid details */
 		region_piece_insert(y, x, gd[i], region);
 	}
+}
+
+
+/*
+ * Iterate through the regions in a particular grid, applying a region_hook function to each region that
+ * occupies the grid.
+ */
+bool region_grid(int y, int x, bool region_iterator(int y, int x, s16b d, s16b region))
+{
+	s16b this_region_piece, next_region_piece = 0;
+	bool seen = FALSE;
+
+	for (this_region_piece = cave_region_piece[y][x]; this_region_piece; this_region_piece = next_region_piece)
+	{
+		/* Get the region piece */
+		region_piece_type *rp_ptr = &region_piece_list[this_region_piece];
+
+		/* Get the next object */
+		next_region_piece = rp_ptr->next_in_grid;
+
+		/* Iterate on region piece */
+		seen |= region_iterator(y, x, rp_ptr->d, rp_ptr->region);
+	}
+
+	return (seen);
 }
 
 

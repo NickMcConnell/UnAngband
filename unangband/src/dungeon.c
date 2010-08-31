@@ -412,13 +412,13 @@ int value_check_aux1(const object_type *o_ptr)
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_EXCELLENT);
 
 	/* Great "armor" bonus */
-	if (o_ptr->to_a > 9) return (INSCRIP_GREAT);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 9) return (INSCRIP_GREAT);
 
 	/* Great to_h bonus */
-	if (o_ptr->to_h > 9) return (INSCRIP_GREAT);
+	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) > 9) return (INSCRIP_GREAT);
 
 	/* Great to_d bonus */
-	if (o_ptr->to_d >
+	if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) >
 	    MAX(7, k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds))
 	  return (INSCRIP_GREAT);
 
@@ -429,16 +429,16 @@ int value_check_aux1(const object_type *o_ptr)
 	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
-	if (o_ptr->to_a > 5) return (INSCRIP_VERY_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 5) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 7) return (INSCRIP_VERY_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 7) return (INSCRIP_VERY_GOOD);
 
 	/* Good "armor" bonus */
-	if (o_ptr->to_a > 0) return (INSCRIP_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) return (INSCRIP_GOOD);
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 0) return (INSCRIP_GOOD);
 
 	/* Default to "average" */
 	return (INSCRIP_AVERAGE);
@@ -503,14 +503,14 @@ int value_check_aux2(const object_type *o_ptr)
 	}
 
 	/* Good armor bonus */
-	if (o_ptr->to_a > 0)
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0)
 	{
 		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 		return (INSCRIP_UNCURSED);
 	}
 
 	/* Good weapon bonuses */
-	if (o_ptr->to_h + o_ptr->to_d > 0)
+	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 0)
 	{
 		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 		return (INSCRIP_UNCURSED);
@@ -530,15 +530,17 @@ int value_check_aux2(const object_type *o_ptr)
  */
 static void sense_inventory(void)
 {
-	int i;
+	int i, j;
 
 	int plev = p_ptr->lev;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1=0x0L;
 	u32b f2=0x0L;
 	u32b f3=0x0L;
 	u32b f4=0x0L;
 
+	u32b af0[ABILITY_ARRAY_SIZE];
 	u32b af1=0x0L;
 	u32b af2=0x0L;
 	u32b af3=0x0L;
@@ -574,6 +576,8 @@ static void sense_inventory(void)
 			return;
 	}
 
+	/* Clear f0 */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = af0[i] = 0L;
 
 	/*** Sense everything ***/
 
@@ -600,24 +604,31 @@ static void sense_inventory(void)
 		/* Sense flags to see if we have ability */
 		if ((i >= INVEN_WIELD) && !(IS_QUIVER_SLOT(i)))
 		{
+			u32b if0[ABILITY_ARRAY_SIZE];
 			u32b if1,if2,if3,if4;
 
-			object_flags(o_ptr,&if1,&if2,&if3,&if4);
+			for (j = 0; j < ABILITY_ARRAY_SIZE; j++) if0[i] = 0L;
+			
+			object_flags(o_ptr,if0, &if1,&if2,&if3,&if4);
 
+			for (j = 0; j < ABILITY_ARRAY_SIZE; j++) af0[i] |= if0[i]; 
 			af1 |= if1;
 			af2 |= if2;
 			af3 |= if3;
 			af4 |= if4;
-
 		}
 
 		/* Sense flags to see if we gain ability */
-		if (!(o_ptr->ident & (IDENT_MENTAL)) && (i >= INVEN_WIELD))
+		if (!(o_ptr->ident & (IDENT_MENTAL)) && (i >= INVEN_WIELD) && !(IS_QUIVER_SLOT(i)))
 		{
+			u32b if0[ABILITY_ARRAY_SIZE];
 			u32b if1,if2,if3,if4;
 
-			object_flags(o_ptr,&if1,&if2,&if3,&if4);
+			for (j = 0; j < ABILITY_ARRAY_SIZE; j++) if0[i] = 0L;
+			
+			object_flags(o_ptr,if0, &if1,&if2,&if3,&if4);
 
+			for (j = 0; j < ABILITY_ARRAY_SIZE; j++) f0[i] |= (if0[i] & ~(o_ptr->may_flags0[i])) & ~(o_ptr->can_flags0[i]);
 			f1 |= (if1 & ~(o_ptr->may_flags1)) & ~(o_ptr->can_flags1);
 			f2 |= (if2 & ~(o_ptr->may_flags2)) & ~(o_ptr->can_flags2);
 			f3 |= (if3 & ~(o_ptr->may_flags3)) & ~(o_ptr->can_flags3);
@@ -625,28 +636,34 @@ static void sense_inventory(void)
 		}
 	}
 
+	/* Silently notice stuff */
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		switch(ability_bonus[i].type)
+		{
+			case BONUS_PASSIVE:
+			case BONUS_ADD_SKILL_PASSIVE:
+			case BONUS_NOT_PASSIVE:
+				if ((f0[i/32] & (1L << (i % 32))) != 0)
+				{
+					if (ability_bonus[i].type != BONUS_NOT_PASSIVE) equip_can_flags(f0[i/32] & (i % 32), 0x0L,0x0L,0x0L,0x0L);
+				}
+				else if ((af0[i/32] & (1L << (i % 32))) == 0)
+				{
+					equip_not_flags(f0[i/32] & (i % 32), 0x0L,0x0L,0x0L,0x0L);
+				}
+			
+				break;
+		}
+	}
+	
 	/* Hack --- silently notice stuff */
-	if (f1 & (TR1_STEALTH)) equip_can_flags(TR1_STEALTH,0x0L,0x0L,0x0L);
-	else if (!(af1 & (TR1_STEALTH)) ) equip_not_flags(TR1_STEALTH,0x0L,0x0L,0x0L);
-
-	if (f1 & (TR1_SEARCH)) equip_can_flags(TR1_SEARCH,0x0L,0x0L,0x0L);
-	else if (!(af1 & (TR1_SEARCH)) ) equip_not_flags(TR1_SEARCH,0x0L,0x0L,0x0L);
-
-	if (f3 & (TR3_SLOW_DIGEST)) equip_can_flags(0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
-	else if (!(af3 & (TR3_SLOW_DIGEST))) equip_not_flags(0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
-
-	if (f3 & (TR3_REGEN_HP)) equip_can_flags(0x0L,0x0L,TR3_REGEN_HP,0x0L);
-	else if (!(af3 & (TR3_REGEN_HP))) equip_not_flags(0x0L,0x0L,TR3_REGEN_HP,0x0L);
-
-	if (f3 & (TR3_REGEN_MANA)) equip_can_flags(0x0L,0x0L,TR3_REGEN_MANA,0x0L);
-	else if (!(af3 & (TR3_REGEN_MANA))) equip_not_flags(0x0L,0x0L,TR3_REGEN_MANA,0x0L);
-
-	if (f3 & (TR3_HUNGER)) equip_can_flags(0x0L,0x0L,TR3_HUNGER,0x0L);
-	else if (!(af3 & (TR3_HUNGER))) equip_not_flags(0x0L,0x0L,TR3_HUNGER,0x0L);
+	if (f3 & (TR3_HUNGER)) equip_can_flags(NULL,0x0L,0x0L,TR3_HUNGER,0x0L);
+	else if (!(af3 & (TR3_HUNGER))) equip_not_flags(NULL,0x0L,0x0L,TR3_HUNGER,0x0L);
 
 	/* Hack -- only notice the absence of this ability */
 	if (f3 & (TR3_UNCONTROLLED)) /* Do nothing */;
-	else if (!(af3 & (TR3_UNCONTROLLED))) equip_not_flags(0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
+	else if (!(af3 & (TR3_UNCONTROLLED))) equip_not_flags(NULL,0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
 }
 
 
@@ -1437,9 +1454,12 @@ static void process_world(void)
 
 			/* Regeneration takes more food */
 			if (p_ptr->regen_mana > 0) i += 15 * p_ptr->regen_mana;
-
+			
 			/* Slow digestion takes less food */
-			if ((p_ptr->timed[TMD_SLOW_DIGEST]) || (p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0) i -= 10;
+			i -= 5 * p_ptr->ability[ABILITY_SLOW_DIGEST];
+			
+			/* Timed slow digestion */
+			if (p_ptr->timed[TMD_SLOW_DIGEST]) i -= 10;
 
 			/* Minimal digestion */
 			if (i < 1) i = 1;
@@ -1564,7 +1584,7 @@ static void process_world(void)
 		if ((rand_int(100) < 10) && (p_ptr->exp > 0))
 		{
 			/* Always notice */
-			if (!(p_ptr->disease & (DISEASE_DRAIN_EXP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_EXP,0x0L);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_EXP))) equip_can_flags(NULL, 0x0L,0x0L,TR3_DRAIN_EXP,0x0L);
 
 			p_ptr->exp--;
 			p_ptr->max_exp--;
@@ -1580,7 +1600,7 @@ static void process_world(void)
 		if ((rand_int(100) < 10) && (p_ptr->chp > 0))
 		{
 			/* Always notice */
-			if (!(p_ptr->disease & (DISEASE_DRAIN_HP))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_HP,0x0L);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_HP))) equip_can_flags(NULL, 0x0L,0x0L,TR3_DRAIN_HP,0x0L);
 
 			if (p_ptr->disease & (DISEASE_DRAIN_HP))
 				take_hit(SOURCE_DISEASE, DISEASE_DRAINING, 1);
@@ -1597,7 +1617,7 @@ static void process_world(void)
 		if ((rand_int(100) < 10) && (p_ptr->csp > 0))
 		{
 			/* Always notice */
-			if (!(p_ptr->disease & (DISEASE_DRAIN_MANA))) equip_can_flags(0x0L,0x0L,TR3_DRAIN_MANA,0x0L);
+			if (!(p_ptr->disease & (DISEASE_DRAIN_MANA))) equip_can_flags(NULL,0x0L,0x0L,TR3_DRAIN_MANA,0x0L);
 
 			p_ptr->csp--;
 			p_ptr->csp_frac = 0;
@@ -1637,7 +1657,7 @@ static void process_world(void)
 				u32b f1, f2, f3, f4;
 
 				/* Get the flags */
-				object_flags(o_ptr,&f1, &f2, &f3, &f4);
+				object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 				/* Get a description */
 				object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
@@ -1648,53 +1668,8 @@ static void process_world(void)
 				/* Hack -- update torch radius */
 				if (i == INVEN_LITE) p_ptr->update |= (PU_TORCH);
 
-				/* Lanterns run dry */
-				if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_LANTERN))
-				{
-					disturb(0, 0);
-					msg_print("Your light has gone out!");
-				}
-
-				/* Torches / Spells run out */
-				else if ((o_ptr->tval == TV_SPELL) || ((o_ptr->tval == TV_LITE) && !(artifact_p(o_ptr))))
-				{
-					/* Disturb */
-					disturb(0, 0);
-
-					/* Notice things */
-					if (i < INVEN_PACK) j++;
-					else k++;
-
-					/* Message */
-					if (o_ptr->timeout) msg_format("One of your %s has run out.",o_name);
-					else msg_format("Your %s %s run out.", o_name,
-					   (o_ptr->number == 1) ? "has" : "have");
-
-					/* Destroy a spell if discharged */
-					if (o_ptr->timeout)
-					{
-						if (o_ptr->number == 1) inven_drop_flags(o_ptr);
-
-						inven_item_increase(i, -1);
-					}
-					else if (o_ptr->stackc)
-					{
-						if (o_ptr->number == o_ptr->stackc) inven_drop_flags(o_ptr);
-
-						inven_item_increase(i, -(o_ptr->stackc));
-					}
-					else
-					{
-						inven_drop_flags(o_ptr);
-						inven_item_increase(i,-(o_ptr->number));
-					}
-
-					inven_item_optimize(i);
-
-				}
-
 				/* Rods and activatible items charge */
-				else if ((o_ptr->tval == TV_ROD) || (f3 & (TR3_ACTIVATE)))
+				if (((k_info[o_ptr->k_idx].flags5 & (TR5_RECHARGE)) != 0) || ((f3 & (TR3_ACTIVATE)) != 0))
 				{
 					/* Notice things */
 					if (i < INVEN_PACK) j++;
@@ -1709,7 +1684,54 @@ static void process_world(void)
 					if ((o_ptr->timeout) && !(o_ptr->stackc)) o_ptr->stackc = o_ptr->number -1;
 					else if (o_ptr->timeout) o_ptr->stackc--;
 					else o_ptr->stackc = 0;
+				}
 
+				/* Torches / Spells run out */
+				else if ((k_info[o_ptr->k_idx].flags5 & (TR5_GLOW | TR5_EXHAUST)) != 0)
+				{
+					/* Disturb */
+					disturb(0, 0);
+
+					/* Notice things */
+					if (i < INVEN_PACK) j++;
+					else k++;
+
+					/* Message */
+					if (o_ptr->timeout) msg_format("One of your %s has %s out.",o_name, (o_ptr->tval == TV_LITE) ? "gone" : "run");
+					else msg_format("Your %s %s %s out!", o_name,
+					   (o_ptr->number == 1) ? "has" : "have",
+						(o_ptr->tval == TV_LITE) ? "gone" : "run");
+
+					/* Destroy a spell if discharged */
+					if (((k_info[o_ptr->k_idx].flags5 & (TR5_EXHAUST)) != 0) && !(artifact_p(o_ptr)))
+					{
+						if (o_ptr->timeout)
+						{
+							if (o_ptr->number == 1) inven_drop_flags(o_ptr);
+	
+							inven_item_increase(i, -1);
+						}
+						else if (o_ptr->stackc)
+						{
+							if (o_ptr->number == o_ptr->stackc) inven_drop_flags(o_ptr);
+	
+							inven_item_increase(i, -(o_ptr->stackc));
+						}
+						else
+						{
+							inven_drop_flags(o_ptr);
+							inven_item_increase(i,-(o_ptr->number));
+						}
+	
+						inven_item_optimize(i);
+					}
+					else
+					{
+						/* Reset stack */
+						if ((o_ptr->timeout) && !(o_ptr->stackc)) o_ptr->stackc = o_ptr->number -1;
+						else if (o_ptr->timeout) o_ptr->stackc--;
+						else o_ptr->stackc = 0;
+					}
 				}
 
 				/* Bodies/mimics become a monster */
@@ -1726,7 +1748,7 @@ static void process_world(void)
 
 			/* The lantern / torch / spell is running low */
 			else if ((o_ptr->timeout < 100) && (!(o_ptr->timeout % 10)) &&
-				((o_ptr->tval == TV_SPELL) || (o_ptr->tval == TV_LITE)) &&
+					((k_info[o_ptr->k_idx].flags5 & (TR5_GLOW | TR5_EXHAUST)) != 0) &&
 				!(artifact_p(o_ptr)))
 			{
 				char o_name[80];
@@ -1799,7 +1821,12 @@ static void process_world(void)
 		{
 			/* Check for light extinguishing */
 			bool extinguish = ((o_ptr->timeout == 1) && check_object_lite(o_ptr));
-
+			
+			u32b f1, f2, f3, f4;
+			
+			/* Get flags */
+			object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
+			
 			/* Recharge */
 			o_ptr->timeout--;
 
@@ -1814,13 +1841,8 @@ static void process_world(void)
 			if (!(o_ptr->timeout) || ((o_ptr->stackc) ? (o_ptr->timeout < o_ptr->stackc) :
 				(o_ptr->timeout < o_ptr->number) ))
 			{
-				u32b f1, f2, f3, f4;
-
-				/* Get the flags */
-				object_flags(o_ptr,&f1, &f2, &f3, &f4);
-
 				/* Spells run out */
-				if (o_ptr->tval == TV_SPELL)
+				if (k_info[o_ptr->k_idx].flags5 & (TR5_EXHAUST))
 				{
 					/* Destroy a spell if discharged */
 					if (o_ptr->timeout) floor_item_increase(i, -1);
@@ -1848,7 +1870,7 @@ static void process_world(void)
 				}
 
 				/* Rods and activatible items charge */
-				else if ((o_ptr->tval == TV_ROD) || (f3 & (TR3_ACTIVATE)))
+				else if (((k_info[o_ptr->k_idx].flags5 & (TR5_RECHARGE | TR5_GLOW)) != 0) || (f3 & (TR3_ACTIVATE)))
 				{
 					/* Reset stack */
 					if ((o_ptr->timeout) && !(o_ptr->stackc)) o_ptr->stackc = o_ptr->number -1;
@@ -1892,7 +1914,7 @@ static void process_world(void)
 			/* Skip non-objects */
 			if (!o_ptr->k_idx) continue;
 
-			object_flags(o_ptr, &f1, &f2, &f3, &f4);
+			object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 			/* Pick item */
 			if (((f3 & (TR3_UNCONTROLLED)) != 0) && (uncontrolled_p(o_ptr)) && !(rand_int(k++)))
@@ -1954,13 +1976,13 @@ static void process_world(void)
 		}
 
 		/* Always notice */
-		equip_can_flags(0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
+		equip_can_flags(NULL, 0x0L,0x0L,TR3_UNCONTROLLED,0x0L);
 	}
 
 
 	/* Mega-Hack -- Portal room */
 	if ((room_has_flag(p_ptr->py, p_ptr->px, ROOM_PORTAL))
-			&& ((p_ptr->cur_flags4 & (TR4_ANCHOR)) == 0) && (rand_int(100)<1))
+			&& ((p_ptr->cur_flags3 & (TR3_ANCHOR)) == 0) && (rand_int(100)<1))
 	{
 		/* Warn the player */
 		msg_print("There is a brilliant flash of light.");

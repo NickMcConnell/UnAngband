@@ -911,14 +911,14 @@ F:BOOM | WALL | GRID | ITEM | KILL | PLAY | MAGIC |
 F:RANGED |
 D:explode~:
 
-N:103:AURA
-I:0:1:0
+N:103:LEAP
+T:0-9999:leap~ * at &
+T:0-9999:leap~
+I:0:3:5
 C:40:0:0:0:0:0:100
-R:2
-F:BOOM | WALL | GRID | ITEM | KILL | PLAY | SELF | MAGIC | HIDE | SAFE |
-D:surround~ & with @ aura#:$ enemies
-
-#R:2 if powerful
+M:3+1/10
+F:KILL | PLAY | STOP |
+D:leap~:$ enemies
 
 N:104:BRTH_ACID
 T:0-9999:breathe~ * at &

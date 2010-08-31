@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	4
-#define VERSION_EXTRA	1
+#define VERSION_EXTRA	2
 
 /*
  * Oldest version number that can still be imported
@@ -338,7 +338,10 @@
 
 #define BREAK_GLYPH		550		/* Rune of protection resistance */
 #define BTH_PLUS_ADJ    2       /* Adjust BTH per plus-to-hit */
+#define BASE_BOW_RANGE	3		/* Base range for bows */
 #define BTH_RANGE_ADJ	3		/* Minus to hit for each range grid */
+#define BTC_PLUS_ADJ	5		/* Bonus to crit per plus-to-hit divided by this */
+#define BTR_MIGHT_ADJ	3		/* Plus to range for each damage multiplier */
 #define MON_MULT_ADJ	8		/* High value slows multiplication */
 #define MON_SUMMON_ADJ	2		/* Adjust level of summoned creatures */
 #define MON_DRAIN_LIFE	2		/* Percent of player exp drained per hit */
@@ -657,20 +660,21 @@ enum
 
 /*
  * Timed effects
- *
- * Only the first 32 timed effects can be used to restrict some commands from
- * being used.
  */
 enum
 {
-	TMD_INC_STR = 0, TMD_INC_INT, TMD_INC_WIS, TMD_INC_DEX, TMD_INC_CON, TMD_INC_CHR, TMD_INC_AGI, TMD_INC_SIZ,
-	TMD_DEC_STR, TMD_DEC_INT, TMD_DEC_WIS, TMD_DEC_DEX, TMD_DEC_CON, TMD_DEC_CHR, TMD_DEC_AGI, TMD_DEC_SIZ,
-	TMD_FAST, TMD_SLOW, TMD_BLIND, TMD_PARALYZED, TMD_CONFUSED,
-	TMD_AFRAID, TMD_IMAGE, TMD_POISONED, TMD_CUT, TMD_STUN, TMD_CURSED, TMD_AMNESIA, TMD_PETRIFY, TMD_STASTIS,
-	TMD_MSLEEP, TMD_PSLEEP, TMD_PROTEVIL, TMD_INVIS, TMD_HERO, TMD_BERSERK, TMD_SHIELD, TMD_BLESSED, TMD_SEE_INVIS,
-	TMD_INFRA, TMD_OPP_ACID, TMD_OPP_ELEC, TMD_OPP_FIRE, TMD_OPP_COLD, TMD_OPP_POIS, TMD_OPP_LAVA, TMD_OPP_WATER, TMD_OPP_CONF,
-	TMD_SLOW_POISON, TMD_SLOW_DIGEST, TMD_WORD_RECALL, TMD_WORD_RETURN, TMD_DELAY_SPELL,
-	TMD_FREE_ACT, TMD_TELEPATHY, TMD_STONESKIN, TMD_TERROR, TMD_SPRINT,
+	/* First 32 timed effects can restrict some commands from being used */
+	TMD_DEC_STR = 0, TMD_DEC_INT, TMD_DEC_WIS, TMD_DEC_DEX, TMD_DEC_CON, TMD_DEC_CHR, TMD_DEC_AGI, TMD_DEC_SIZ, /* 8 */
+	TMD_SLOW, TMD_BLIND, TMD_PARALYZED, TMD_CONFUSED, /* 12 */
+	TMD_AFRAID, TMD_IMAGE, TMD_POISONED, TMD_CUT, TMD_STUN, TMD_CURSED, TMD_AMNESIA, TMD_PETRIFY, TMD_STASTIS, /* 21 */
+	TMD_MSLEEP, TMD_PSLEEP, TMD_BERSERK, TMD_DAZED, TMD_TERROR, TMD_SOAKED, TMD_AGGRAVATE, TMD_STENCH, /* 29 */
+	TMD_WORD_RECALL, TMD_WORD_RETURN, TMD_DELAY_SPELL, /* 32 */
+	
+	/* Useful effects from here on */
+	TMD_INC_STR = 32, TMD_INC_INT, TMD_INC_WIS, TMD_INC_DEX, TMD_INC_CON, TMD_INC_CHR, TMD_INC_AGI, TMD_INC_SIZ, /* 40 */
+	TMD_FAST, TMD_PROTEVIL, TMD_INVIS, TMD_HERO, TMD_SHIELD, TMD_BLESSED, TMD_SEE_INVIS, /* 47 */
+	TMD_INFRA, TMD_OPP_ACID, TMD_OPP_ELEC, TMD_OPP_FIRE, TMD_OPP_COLD, TMD_OPP_POIS, TMD_OPP_LAVA, TMD_OPP_WATER, TMD_OPP_CONFUSE, /* 56 */
+	TMD_SLOW_POISON, TMD_SLOW_DIGEST, TMD_FREE_ACT, TMD_TELEPATHY, TMD_CLEAR_MIND, TMD_REGENERATION, TMD_STONESKIN, TMD_SPRINT, /* 64 */
 
 	TMD_MAX
 };
@@ -1079,6 +1083,14 @@ enum
 #define GF_CHARM_PLANT	153
 #define GF_TANGLE_WEAK	154
 #define GF_LITE_BODY	155
+#define GF_IMAGE_ACID		156
+#define GF_IMAGE_ELEC		157
+#define GF_IMAGE_FIRE		158
+#define GF_IMAGE_COLD		159
+#define GF_IMAGE_POIS		160
+#define GF_ILLUSION		161
+#define GF_VAMP_DRAIN_FAMILIAR	162
+#define GF_MANA_DRAIN_FAMILIAR	163
 
 
 
@@ -3428,22 +3440,26 @@ enum
 /*
  * Special Object Flags
  */
-#define IDENT_SENSE	0x0001	/* Item has been "sensed" */
-#define IDENT_FIXED	0x0002	/* Item has been "haggled" */
-#define IDENT_BONUS	0x0004	/* Item bonuses are known */
-#define IDENT_KNOWN	0x0008	/* Item abilities are known */
-#define IDENT_STORE	0x0010	/* Item is in a store / item is 'stored' in terrain */
-#define IDENT_MENTAL	0x0020	/* Item information is known */
-#define IDENT_CURSED	0x0040	/* Item is temporarily cursed */
-#define IDENT_BROKEN	0x0080	/* Item is permanently worthless */
-#define IDENT_BREAKS	0x0100	/* Item will break next round */
-#define IDENT_CHARGES	0x0200	/* Item charges are known */
-#define IDENT_VALUE	0x0400	/* Item value is known */
-#define IDENT_RUNES	0x0800	/* Item runes are known */
-#define IDENT_NAME	0x1000	/* Item name is known */
-#define IDENT_PVAL	0x2000	/* Item pval is known */
-#define IDENT_MARKED	0x4000	/* Item is visible */
-#define IDENT_FORGED	0x8000	/* Item has been forged by player */
+#define IDENT_SENSE		0x00000001L	/* Item has been "sensed" */
+#define IDENT_FIXED		0x00000002L	/* Item has been "haggled" */
+#define IDENT_BONUS		0x00000004L	/* Item bonuses are known */
+#define IDENT_KNOWN		0x00000008L	/* Item abilities are known */
+#define IDENT_STORE		0x00000010L	/* Item is in a store / item is 'stored' in terrain */
+#define IDENT_MENTAL	0x00000020L	/* Item information is known */
+#define IDENT_CURSED	0x00000040L	/* Item is temporarily cursed */
+#define IDENT_BROKEN	0x00000080L	/* Item is permanently worthless */
+#define IDENT_BREAKS	0x00000100L	/* Item will break next round */
+#define IDENT_CHARGES	0x00000200L	/* Item charges are known */
+#define IDENT_VALUE		0x00000400L	/* Item value is known */
+#define IDENT_RUNES		0x00000800L	/* Item runes are known */
+#define IDENT_NAME		0x00001000L	/* Item name is known */
+#define IDENT_PVAL		0x00002000L	/* Item pval is known */
+#define IDENT_MARKED	0x00004000L	/* Item is visible */
+#define IDENT_FORGED	0x00008000L	/* Item has been forged by player */
+
+#define IDENT_AVAL		0x01000000L	/* Start of object avals being known */
+#define IDENT_AVAL_MASK	0xFF000000L	/* Mask for object avals being known */
+
 
 /*
  * The special inscriptions.
@@ -3528,154 +3544,378 @@ enum
 
 
 /*
+ * The ability bonuses
+ * 
+ * This is used to determine if the ability adds to a stat
+ * or skill, or provides slays (extra damage against monsters
+ * which match a flag) or brands (extra damage against monsters
+ * which don't match a flag).
+ */
+enum
+{
+	BONUS_NONE,
+	BONUS_PASSIVE,			/* We may learn about this when moving around the dungeon */
+	BONUS_NOT_PASSIVE,		/* We may learn about the absence of this when moving around the dungeon */
+	BONUS_MULTIPLIER, 		/* We multiply instead of add */
+	BONUS_SENSE,			/* We may learn about this when wielding for efficiency gains */
+	BONUS_ADD_STAT,
+	BONUS_ADD_SKILL,
+	BONUS_ADD_SKILL_PASSIVE,	/* We may learn about this when moving around the dungeon */
+	BONUS_RESIST,
+	BONUS_WEAPON,			/* Bonuses from here onwards on a weapon only applied when using that weapon */
+	BONUS_ADD_WEAPON_SKILL,
+	BONUS_WEAPON_MULTIPLIER,	/* Weapon multiplier instead of adder */
+	BONUS_WEAPONLIKE,		/* Bonuses from here onwards on a weapon, gloves, boots, rings only applied in specific instances */	
+	BONUS_WEAPONLIKE_MULTIPLIER, /* Weaponlike multiplier instead of adder */	
+	BONUS_SLAY,
+	BONUS_BRAND,
+	BONUS_BRAND_ELEM,		/* Oppose elements resists */
+	BONUS_BRAND_WATER_XTRA,	/* Oppose elements resists, water increases damage */
+	BONUS_BRAND_WATER_WEAK,	/* Oppose elements resists, water reduces damage */
+	BONUS_BRAND_WATER_ARMOR	/* Oppose elements resists, water reduces damage, armour reduces damage */
+};
+
+	
+/*
+ * The ability indexes
+ * 
+ * The order below is for save file compatibility and
+ * should be adjusted at a future date to allow for 
+ * optimisation for e.g. consecutive abilities, skills,
+ * etc.
+ */
+enum
+{
+	ABILITY_STR,     /* STR += "aval" */
+	ABILITY_INT,     /* INT += "aval" */
+	ABILITY_WIS,     /* WIS += "aval" */
+	ABILITY_DEX,     /* DEX += "aval"; AGI += "aval" */
+	ABILITY_CON,     /* CON += "aval" */
+	ABILITY_CHR,     /* CHR += "aval" */
+	ABILITY_SAVE,		/* Save += "aval" */
+	ABILITY_DEVICE,		/* Devices += "aval" */
+	ABILITY_STEALTH,	/* Stealth += "aval" */
+	ABILITY_SEARCH,		/* Search += "aval" */
+	ABILITY_INFRA,     /* Infravision */
+	ABILITY_DIGGING,		/* Digging += "aval" */
+	ABILITY_SPEED_MOVE,		/* Movement speed += "aval" */
+	ABILITY_BLOWS,		/* Blows += "aval" */
+	ABILITY_SHOTS,		/* Shots += "aval" */
+	ABILITY_MIGHT,     /* Shooting damage multiplier += "aval" */
+	ABILITY_SLAY_ANIMAL,     /* Weapon slays animals */
+	ABILITY_BRAND_HOLY,     /* Weapon has holy brand */
+	ABILITY_SLAY_UNDEAD,     /* Weapon slays undead */
+	ABILITY_SLAY_DEMON,     /* Weapon slays demon */
+	ABILITY_SLAY_ORC,     /* Weapon slays orc */
+	ABILITY_SLAY_TROLL,     /* Weapon slays troll */
+	ABILITY_SLAY_GIANT,     /* Weapon slays giant */
+	ABILITY_SLAY_DRAGON,     /* Weapon slays dragon */
+	ABILITY_SIZ,     /* SIZ += "aval" */
+	ABILITY_AGI,     /* AGI += "aval" */
+	ABILITY_DISARM,		/* Disarm += "aval" */
+	ABILITY_BRAND_POIS,	 /* Weapon has poison brand */
+	ABILITY_BRAND_ACID,     /* Weapon has acid brand */
+	ABILITY_BRAND_ELEC,     /* Weapon has elec brand */
+	ABILITY_BRAND_FIRE,     /* Weapon has fire brand */
+	ABILITY_BRAND_COLD,     /* Weapon has cold brand */
+	
+	ABILITY_TO_HIT_ITEM_ONLY,
+	ABILITY_TO_DAM_ITEM_ONLY,
+	ABILITY_DAMAGE_DICE_MOD,
+	ABILITY_DAMAGE_SIDES_MOD,	
+	ABILITY_TO_AC,
+	ABILITY_TO_AC_RANGED,
+	ABILITY_TO_AC_MELEE,
+	ABILITY_WEIGHT_MOD,	/* Weight modifier */
+	ABILITY_TO_HIT_THROW,	/* To hit throwing += "aval" */
+	ABILITY_TO_HIT_MELEE,	/* To hit melee += "aval" */
+	ABILITY_TO_HIT_BOW,		/* To hit bows += "aval" */
+	ABILITY_TO_HIT_UNARM,		/* To hit unarmed += "aval" */
+	ABILITY_TO_DAM_THROW,	/* To dam throwing += "aval" */
+	ABILITY_TO_DAM_MELEE,	/* To dam melee += "aval" */
+	ABILITY_TO_DAM_BOW,		/* To dam bows += "aval" */
+	ABILITY_TO_DAM_UNARM,		/* To dam unarmed += "aval" */
+	ABILITY_RESIST_ACID,     /* Resist acid */
+	ABILITY_RESIST_ELEC,     /* Resist elec */
+	ABILITY_RESIST_FIRE,     /* Resist fire */
+	ABILITY_RESIST_COLD,     /* Resist cold */
+	ABILITY_RESIST_POIS,     /* Resist poison */
+	ABILITY_RESIST_FEAR, 	/* Resist fear */
+	ABILITY_RESIST_LITE,     /* Resist lite */
+	ABILITY_RESIST_DARK,     /* Resist dark */
+	ABILITY_RESIST_BLIND,     /* Resist blind */
+	ABILITY_RESIST_CONFU,     /* Resist confusion */
+	ABILITY_RESIST_SOUND,     /* Resist sound */
+	ABILITY_RESIST_SHARD,     /* Resist shards */
+	ABILITY_RESIST_NEXUS,     /* Resist nexus */
+	ABILITY_RESIST_NETHR,     /* Resist nether */
+	ABILITY_RESIST_CHAOS,     /* Resist chaos */
+	ABILITY_RESIST_DISEN,     /* Resist disenchant */
+
+	ABILITY_SLOW_DIGEST,	/* Slows digestion */
+	ABILITY_STRIKES,		/* Unarmed strikes += "aval" */
+	ABILITY_LITE,	/* Perma-Lite */
+	ABILITY_REGEN_HP,     /* Hp Regeneration */
+	ABILITY_UNARM_MIGHT,     /* Unarmed damage multiplier += "aval" */
+	ABILITY_MELEE_MIGHT,		/* Melee damage multiplier += "aval" */
+	ABILITY_XTRA_CUTS,		/* Item can do extra damage from cuts (cmd1.c) */
+	ABILITY_HOLD_LIFE,
+	ABILITY_XTRA_STUN,		/* Item can do extra damage from stun (cmd1.c) */
+	ABILITY_XTRA_CRIT,		/* Item does extra damage */
+	ABILITY_XTRA_TRIP,		/* Item robs enemy of energy */
+	ABILITY_SLAY_PLANT,     /* Weapon slays plants */
+	ABILITY_SLAY_INSECT,     /* Weapon slays insects */
+	ABILITY_BOW_RANGE,		/* Bow range += "aval" */
+	ABILITY_HURL_RANGE,		/* Hurl range += "aval" */
+	ABILITY_REGEN_MANA,		/* Mana regeneration */
+	ABILITY_TO_HIT_TRAP,	/* To hit traps += "aval" */
+	ABILITY_TO_DAM_TRAP,	/* To dam traps += "aval" */
+	ABILITY_TRAP_MIGHT,		/* Trap damage multiplier += "aval" */
+	ABILITY_TRAPS,			/* Number of shots with traps */
+	ABILITY_TRAP_RANGE,		/* Range of traps */
+	ABILITY_MELEE_CRIT,		/* Critical chance - melee */
+	ABILITY_BOW_CRIT,		/* Critical chance - shooting */
+	ABILITY_UNARM_CRIT,		/* Critical chance - unarmed */
+	ABILITY_TRAP_CRIT,		/* Critical chance - traps */
+	ABILITY_HURL_CRIT,		/* Critical chance - throwing */
+	ABILITY_CHARGE,     /* Charging += "aval" */
+	ABILITY_HURL_NUM,		/* Hurls += "aval" */
+	ABILITY_HURL_DAM,     /* Throwing damage multiplier += "aval" */
+	ABILITY_SPEED_CAST,		/* Casting speed += "aval" */
+	ABILITY_SPEED_FIGHT,		/* Fighting speed += "aval" */
+	ABILITY_SPEED_USE,		/* Using items speed += "aval" */
+
+	ABILITY_BRAND_DARK,		/* Weapon has dark brand */
+	ABILITY_BRAND_LITE,		/* Weapon has lite brand */
+	ABILITY_BRAND_NETHER,     /* Weapon has nether brand */
+	ABILITY_BRAND_NEXUS,     /* Weapon has nexus brand */
+	ABILITY_BRAND_MAGIC,	/* Weapon has magic brand */
+	ABILITY_BRAND_CHAOS,	/* Weapon has chaos brand */	
+	ABILITY_RESIST_PLASMA,     /* Resistance to plasma */
+	ABILITY_RESIST_DISEASE,     /* Resistance to disease  */
+	ABILITY_RESIST_WATER,     /* Resistance to water */
+	ABILITY_SLAY_MAN,     /* Weapon slays humans */
+	ABILITY_SLAY_ELF,     /* Weapon slays elves */
+	ABILITY_SLAY_DWARF,     /* Weapon slays dwarves */
+	ABILITY_SLAY_ARCHER,     /* Weapon slays archers */
+	ABILITY_SLAY_WARRIOR,     /* Weapon slays warriors */
+	ABILITY_SLAY_MAGE,     /* Weapon slays mages */
+	ABILITY_SLAY_PRIEST,     /* Weapon slays priests */
+	ABILITY_SLAY_THIEF,     /* Weapon slays thieves */
+	ABILITY_BRAND_PSYCHIC,	/* Weapon has psychic brand */
+	ABILITY_BRAND_WATER,
+	ABILITY_BRAND_LAVA,
+	ABILITY_RESIST_LAVA,
+	ABILITY_PROTECT_LAVA,	/* Pack protection - lava */
+	ABILITY_PROTECT_ACID,	/* Pack protection - acid */
+	ABILITY_PROTECT_ELEC,	/* Pack protection - elec */
+	ABILITY_PROTECT_FIRE,	/* Pack protection - fire */
+	ABILITY_PROTECT_COLD,	/* Pack protection - cold */
+	ABILITY_PROTECT_WATER,	/* Pack protection - water */
+	ABILITY_NIGHT_SIGHT,     /* Night vision */
+	ABILITY_REVEAL_HIDDEN,
+	ABILITY_REVEAL_MINERALS,
+	ABILITY_MAGIC_MAPPING,
+	ABILITY_HEAR_MONSTERS,
+	ABILITY_MAX
+};
+
+
+/*
+ * Abilities are linked to an 'aval' (formerly pval) which is the
+ * numeric value associated with one or more item ability flags.
+ * 
+ * For instance, we may have a ring of Strength (+5) and Size (+3)
+ * or even Strength (+5) and Size (-3) instead of requiring that the
+ * ring have matching strength and size bonus. The design is an
+ * attempt to transition from legacy item flags, to flexible item
+ * abilities, without having a very big numeric array for each object
+ * describing what bonus it has for every possible allowed ability.
+ * 
+ * Note we include the to-hit, to-dam and to-ac modifiers as abilities
+ * for various 'space efficiency' gains. This may be beneficial at
+ * some point from game engine design point of view as well.
+ * 
+ * It is likely that we'll only need 2 ability modifiers for object kinds
+ * with the exception of quarter staffs and other weapons which also
+ * provide a defensive bonus.
+ * 
+ * This design may appear weird, but it is likely a real person has
+ * a hard time evaluating an item with more than five or so modifiers
+ * with different numeric benefit anyways.
+ */
+#define MAX_AVALS_KIND		3
+#define MAX_AVALS_EGO_ITEM	6
+#define MAX_AVALS_ARTIFACT	8
+#define MAX_AVALS_OBJECT	8
+
+#define ABILITY_ARRAY_SIZE		(ABILITY_MAX + 31) / 32
+
+/*
  * As of 2.7.8, the "object flags" are valid for all objects, and as
  * of 2.7.9, these flags are not actually stored with the object, but
  * rather in the object_kind, ego_item, and artifact structures.
  *
- * Note that "flags1" contains all flags dependant on "pval" (including
- * stat bonuses, but NOT stat sustainers), plus all "extra attack damage"
- * flags (SLAY_XXX and BRAND_XXX).
- *
- * Note that "flags2" contains all "resistances" (including "sustain" flags,
- * immunity flags, and resistance flags).  Note that "free action" and "hold
- * life" are no longer considered to be "immunities".
- *
- * Note that "flags3" contains everything else (including eight good flags,
- * seven unused flags, four bad flags, four damage ignoring flags, six weird
- * flags, and three cursed flags).
+ * The TR1_ flags correspond exactly to the 1st 32 timed effects and
+ * prevent those timed effects occuring in addition to some other abilities.
+ * 
+ * This could be later expanded to include all timed effects by making
+ * flags1 an array.
+ * 
+ * The rest of the flags are ordered for backwards compatibility.
+ * 
+ * The TR5_ and TR6_ flags are only stored in the object_kind structures
+ * and no magical items can get these abilities.
  */
 
-#define TR1_STR    0x00000001L     /* STR += "pval" */
-#define TR1_INT    0x00000002L     /* INT += "pval" */
-#define TR1_WIS    0x00000004L     /* WIS += "pval" */
-#define TR1_DEX    0x00000008L     /* DEX += "pval"; AGI += "pval" */
-#define TR1_CON    0x00000010L     /* CON += "pval" */
-#define TR1_CHR    0x00000020L     /* CHR += "pval" */
-#define TR1_SAVE   0x00000040L     /* Saves += "pval" */
-#define TR1_DEVICE 0x00000080L     /* Devices += "pval" */
-#define TR1_STEALTH  0x00000100L   /* Stealth += "pval" */
-#define TR1_SEARCH 0x00000200L     /* Search += "pval" */
-#define TR1_INFRA  0x00000400L     /* Infra += "pval" */
-#define TR1_TUNNEL 0x00000800L     /* Tunnel += "pval" */
-#define TR1_SPEED    0x00001000L   /* Speed += "pval" */
-#define TR1_BLOWS  0x00002000L     /* Blows += "pval" */
-#define TR1_SHOTS  0x00004000L     /* Shots += "pval" */
-#define TR1_MIGHT  0x00008000L     /* Might += "pval" */
-#define TR1_SLAY_NATURAL  0x00010000L     /* Weapon slays animals, plants, insects */
-#define TR1_BRAND_HOLY    0x00020000L     /* Weapon has holy brand */
-#define TR1_SLAY_UNDEAD  0x00040000L     /* Weapon slays undead */
-#define TR1_SLAY_DEMON   0x00080000L     /* Weapon slays demon */
-#define TR1_SLAY_ORC     0x00100000L     /* Weapon slays orc */
-#define TR1_SLAY_TROLL   0x00200000L     /* Weapon slays troll */
-#define TR1_SLAY_GIANT   0x00400000L     /* Weapon slays giant */
-#define TR1_SLAY_DRAGON  0x00800000L     /* Weapon slays dragon */
-#define TR1_KILL_DRAGON  0x01000000L     /* Weapon kills dragon */
-#define TR1_KILL_DEMON   0x02000000L     /* Weapon kills demon */
-#define TR1_KILL_UNDEAD   0x04000000L     /* Weapon kills undead */
-#define TR1_BRAND_POIS   0x08000000L	 /* Weapon has poison brand */
-#define TR1_BRAND_ACID   0x10000000L     /* Weapon has acid brand */
-#define TR1_BRAND_ELEC   0x20000000L     /* Weapon has elec brand */
-#define TR1_BRAND_FIRE   0x40000000L     /* Weapon has fire brand */
-#define TR1_BRAND_COLD   0x80000000L     /* Weapon has cold brand */
+#define TR1_SUST_STR	0x00000001L		/* Sustain STR */
+#define TR1_SUST_INT	0x00000002L		/* Sustain INT */
+#define TR1_SUST_WIS	0x00000004L		/* Sustain WIS */
+#define TR1_SUST_DEX	0x00000008L		/* Sustain DEX */
+#define TR1_SUST_CON	0x00000010L		/* Sustain CON */
+#define TR1_SUST_CHR	0x00000020L		/* Sustain CHR */
+#define TR1_SUST_SIZ	0x00000040L		/* Sustain SIZ */
+#define TR1_SUST_AGI	0x00000080L		/* Sustain AGI */
+#define TR1_NO_SLOW		0x00000100L		/* Prevents slowing */
+#define TR1_NO_BLIND	0x00000200L     /* Prevents blindness side effects */
+#define TR1_NO_PARALYZE	0x00000400L     /* Prevents timed paralyzation */
+#define TR1_NO_CONFUSE	0x00000800L     /* Prevents confusion side effects  */
+#define TR1_NO_FEAR		0x00001000L     /* Prevents fear side effects */
+#define TR1_NO_IMAGE	0x00002000L     /* Prevents image side effects  */
+#define TR1_NO_POISON	0x00004000L     /* Prevents poison side effects */
+#define TR1_NO_CUTS		0x00008000L     /* Prevents bleeding side effects */
+#define TR1_NO_STUN		0x00010000L     /* Prevents stun side effects */
+#define TR1_NO_CURSE	0x00020000L     /* Prevents stun side effects */
+#define TR1_NO_AMNESIA	0x00040000L     /* Prevents amnesia */
+#define TR1_NO_PETRIFY	0x00080000L     /* Prevents petrification */
+#define TR1_NO_STASTIS	0x00100000L     /* Prevents time side effects */
+#define TR1_NO_MSLEEP	0x00200000L     /* Prevents monster induced sleep */
+#define TR1_NO_PSLEEP	0x00400000L     /* Unable to sleep naturally */
+#define TR1_NO_BERSERK	0x00800000L     /* Unable to go berserk */
+#define TR1_NO_DAZED	0x01000000L		/* Prevents being dazed */
+#define TR1_NO_TERROR	0x0200000L     	/* Prevents terror */
+#define TR1_NO_SOAKED	0x04000000L     /* Prevents getting soaked to the skin */
+#define TR1_NO_AGGRAVATE 0x08000000L	/* Prevents aggravation */
+#define TR1_NO_STENCH	0x10000000L     /* Prevents bad odours */
+#define TR1_NO_RECALL	0x20000000L     /* Prevents recalling */
+#define TR1_NO_RETURN	0x40000000L     /* Prevents returning to a previous location */
+#define TR1_NO_DELAY	0x80000000L     /* Prevents delaying spells */
 
-#define TR2_SUST_STR     0x00000001L     /* Sustain STR */
-#define TR2_SUST_INT     0x00000002L     /* Sustain INT */
-#define TR2_SUST_WIS     0x00000004L     /* Sustain WIS */
-#define TR2_SUST_DEX     0x00000008L     /* Sustain DEX and AGI */
-#define TR2_SUST_CON     0x00000010L     /* Sustain CON */
-#define TR2_SUST_CHR     0x00000020L     /* Sustain CHR */
+#define TR1_OLD_FLAGS (0L)
+
+#define TR2_WALK_ACID	0x00000001L     /* Unaffected by acidic terrain */
+#define TR2_WALK_FIRE	0x00000002L		/* Unaffected by fiery terrain */
+#define TR2_WALK_WATER	0x00000004L		/* Unaffected by watery terrain */
+#define TR2_WALK_LAVA	0x00000008L		/* Unaffected by lava terrain */
+#define TR2_IGNORE_TPORT	0x00000010L	/* Item ignores teleportation */
+#define TR2_IGNORE_LAVA	0x00000020L    /* Item ignores Lava damage */
 #define TR2_IGNORE_ACID   0x00000040L     /* Item ignores Acid damage */
 #define TR2_IGNORE_ELEC   0x00000080L     /* Item ignores Elec damage */
 #define TR2_IGNORE_FIRE   0x00000100L     /* Item ignores Fire damage */
 #define TR2_IGNORE_COLD   0x00000200L     /* Item ignores Cold damage */
 #define TR2_IGNORE_WATER  0x00000400L     /* Item ignores Water damage */
 #define TR2_IGNORE_THEFT  0x00000800L     /* Item ignores Theft */
-#define TR2_IM_ACID       0x00001000L     /* Immunity to acid */
-#define TR2_IM_ELEC       0x00002000L     /* Immunity to elec */
-#define TR2_IM_FIRE       0x00004000L     /* Immunity to fire */
-#define TR2_IM_COLD       0x00008000L     /* Immunity to cold */
-#define TR2_RES_ACID     0x00010000L     /* Resist acid */
-#define TR2_RES_ELEC     0x00020000L     /* Resist elec */
-#define TR2_RES_FIRE     0x00040000L     /* Resist fire */
-#define TR2_RES_COLD     0x00080000L     /* Resist cold */
-#define TR2_RES_POIS     0x00100000L     /* Resist poison */
-#define TR2_RES_FEAR     0x00200000L 	/* Resist fear */
-#define TR2_RES_LITE     0x00400000L     /* Resist lite */
-#define TR2_RES_DARK     0x00800000L     /* Resist dark */
-#define TR2_RES_BLIND    0x01000000L     /* Resist blind */
-#define TR2_RES_CONFU    0x02000000L     /* Resist confusion */
-#define TR2_RES_SOUND    0x04000000L     /* Resist sound */
-#define TR2_RES_SHARD    0x08000000L     /* Resist shards */
-#define TR2_RES_NEXUS    0x10000000L     /* Resist nexus */
-#define TR2_RES_NETHR    0x20000000L     /* Resist nether */
-#define TR2_RES_CHAOS    0x40000000L     /* Resist chaos */
-#define TR2_RES_DISEN    0x80000000L     /* Resist disenchant */
+#define TR2_IM_ACID       0x00001000L     /* Inventory unaffected by acid */
+#define TR2_IM_ELEC       0x00002000L     /* Inventory unaffected by elec */
+#define TR2_IM_FIRE       0x00004000L     /* Inventory unaffected by fire */
+#define TR2_IM_COLD       0x00008000L     /* Inventory unaffected by cold */
+#define TR2_IM_WATER	0x00010000L     /* Inventory unaffected by water damage  */
+#define TR2_IM_LAVA		0x00020000L     /* Inventory unaffected by lava damage  */
+#define TR2_CLIMB		0x00040000L		/* Climbing */
+#define TR2_SWIM		0x00080000L		/* Swimming */
+#define TR2_FLY			0x00100000L		/* Flight */
+#define TR2_OOZE		0x00200000L		/* Oozing */
+#define TR2_PASS_WALL	0x00400000L		/* Pass wall */
+#define TR2_AIR_SUPPLY	0x00800000L		/* Can breath in deep/filled terrain */
+#define TR2_SLOW_POISON	0x01000000L     /* Slows poison */
+#define TR2_INVISIBLE	0x02000000L     /* Item makes you invisible */
+#define TR2_SPEAK_MAN	0x04000000L     /* Speak with humans */
+#define TR2_SPEAK_ELF	0x08000000L     /* Speak with elves */
+#define TR2_SPEAK_DWARF	0x10000000L     /* Speak with dwarves */
+#define TR2_SPEAK_BIRD	0x20000000L     /* Speak with birds */
+#define TR2_SPEAK_PLANT	0x40000000L     /* Speak with plants */
+#define TR2_SPEAK_MAMMAL 0x80000000L     /* Speak with mammals */
 
-#define TR3_SLOW_DIGEST	0x00000001L     /* Resist water */
-#define TR3_FEATHER      0x00000002L     /* Feather Falling */
-#define TR3_LITE	0x00000004L     /* Perma-Lite */
-#define TR3_REGEN_HP 	0x00000008L     /* Hp Regeneration */
-#define TR3_TELEPATHY    0x00000010L     /* Telepathy */
-#define TR3_SEE_INVIS    0x00000020L     /* See Invis */
-#define TR3_FREE_ACT     0x00000040L     /* Free action */
-#define TR3_HOLD_LIFE    0x00000080L     /* Hold life */
-#define TR3_ESP_DEMON  	0x00000100L     /* Sense demons */
+#define TR2_OLD_FLAGS (TR2_IGNORE_ACID | TR2_IGNORE_ELEC | TR2_IGNORE_FIRE | \
+			TR2_IGNORE_COLD | TR2_IGNORE_WATER | TR2_IGNORE_THEFT | TR2_IM_ACID |\
+			TR2_IM_ELEC | TR2_IM_FIRE | TR2_IM_COLD)
+
+#define TR3_ESP_MAN 	0x00000001L     /* Sense humans */
+#define TR3_FEATHER		0x00000002L		/* Feather Falling */
+#define TR3_ESP_ELF  	0x00000004L     /* Sense elves */
+#define TR3_ESP_DWARF 	0x00000008L     /* Sense dwarves */
+#define TR3_TELEPATHY	0x00000010L     /* Telepathy */
+#define TR3_SEE_INVIS	0x00000020L		/* See Invis */
+#define TR3_ANCHOR		0x00000040L     /* Prevents involuntary teleportation */
+#define TR3_PROTECT_THEFT	0x00000080L     /* Pack protection - theft */
+#define TR3_ESP_DEMON   0x00000100L     /* Sense demons */
 #define TR3_ESP_DRAGON  0x00000200L     /* Sense dragons */
-#define TR3_ESP_GIANT  	0x00000400L     /* Sense giants */
-#define TR3_ESP_ORC  	0x00000800L     /* Sense orcs */
-#define TR3_ESP_TROLL    0x00001000L     /* Sense trolls */
-#define TR3_ESP_UNDEAD   0x00002000L     /* Sense undead */
-#define TR3_ESP_NATURE   0x00004000L     /* Sense natural */
-#define TR3_REGEN_MANA   0x00008000L	 /* Mana regeneration */
+#define TR3_ESP_GIANT   0x00000400L     /* Sense giants */
+#define TR3_ESP_ORC     0x00000800L     /* Sense orcs */
+#define TR3_ESP_TROLL	0x00001000L     /* Sense trolls */
+#define TR3_ESP_UNDEAD	0x00002000L     /* Sense undead */
+#define TR3_ESP_NATURE	0x00004000L     /* Sense natural */
+#define TR3_STENCH		0x00008000L     /* Item makes wielder easy to track by smell */
 #define TR3_DRAIN_HP     0x00010000L     /* Hit point drain */
 #define TR3_DRAIN_MANA   0x00020000L     /* Mana drain */
 #define TR3_DRAIN_EXP    0x00040000L     /* Experience drain */
 #define TR3_AGGRAVATE    0x00080000L     /* Aggravate monsters */
 #define TR3_UNCONTROLLED 0x00100000L     /* Item activates spontaneously if cursed */
-#define TR3_ACT_ON_BLOW  0x00200000L 	 /* Item activates on powerful blows */
+#define TR3_ACT_ON_BLOW  0x00200000L     /* Item activates on powerful blows */
 #define TR3_ACTIVATE     0x00400000L     /* Item can be activated */
 #define TR3_BLESSED      0x00800000L     /* Item has been blessed */
 #define TR3_FREE_HANDS   0x01000000L     /* Item does not inhibit hands */
 #define TR3_HUNGER       0x02000000L     /* Item makes the user more hungry */
-#define TR3_CHARGE       0x04000000L     /* Charging += "pval" */
-#define TR3_HURL_NUM	 0x08000000L     /* Hurls += "pval" */
-#define TR3_HURL_DAM	 0x10000000L     /* Throwing damage multiplier += "pval" */
-#define TR3_LIGHT_CURSE  0x20000000L     /* Item has Light Curse */
+#define TR3_SPEAK_REPTILE 0x04000000L     /* Speak with reptiles, fish and amphibians */
+#define TR3_SPEAK_INSECT 0x08000000L     /* Speak with insects */
+#define TR3_TRICK_THROW	0x10000000L     /* Item always does tricks if thrown */
+#define TR3_LIGHT_CURSE	0x20000000L		/* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
 
-#define TR4_BRAND_DARK	0x00000001L	/* Weapon has dark brand */
-#define TR4_BRAND_LITE	0x00000002L	/* Weapon has lite brand */
-#define TR4_HURT_LITE	0x00000004L     /* Item makes wielder vulnerable to lite */
+#define TR3_OLD_FLAGS (TR3_FEATHER | TR3_TELEPATHY | TR3_SEE_INVIS | \
+			TR3_ESP_DEMON | TR3_ESP_DRAGON | TR3_ESP_GIANT | TR3_ESP_ORC | TR3_ESP_TROLL |\
+			TR3_ESP_UNDEAD | TR3_ESP_NATURE | TR3_DRAIN_HP | TR3_DRAIN_MANA | TR3_DRAIN_EXP |\
+			TR3_AGGRAVATE | TR3_UNCONTROLLED | TR3_ACT_ON_BLOW | TR3_ACTIVATE | TR3_BLESSED |\
+			TR3_FREE_HANDS | TR3_HUNGER | TR3_LIGHT_CURSE | TR3_HEAVY_CURSE | TR3_PERMA_CURSE)
+
+#define TR4_SPEAK_DEMON	0x00000001L     /* Speak with demons */
+#define TR4_SPEAK_DRAGON 0x00000002L     /* Speak with dragons */
+#define TR4_HURT_LITE   0x00000004L     /* Item makes wielder vulnerable to lite */
 #define TR4_HURT_WATER	0x00000008L     /* Item makes wielder vulnerable to water */
-#define TR4_VAMP_HP   	0x00000010L     /* Weapon restores user hp when kills a creature with blood  */
-#define TR4_VAMP_MANA  	0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
-#define TR4_IM_POIS   	0x00000040L     /* Immune to poison  */
-#define TR4_RES_DISEASE 0x00000080L     /* Resistance to disease  */
-#define TR4_RES_WATER   0x00000100L     /* Resistance to water */
-#define TR4_SLAY_MAN 	0x00000200L     /* Weapon slays humans */
-#define TR4_SLAY_ELF  	0x00000400L     /* Weapon slays elves */
-#define TR4_SLAY_DWARF 	0x00000800L     /* Weapon slays dwarves */
-#define TR4_ANCHOR  	0x00001000L     /* Item prevents teleportation */
-#define TR4_SILENT  	0x00002000L     /* Item prevents spell casting*/
-#define TR4_STATIC  	0x00004000L     /* Item prevents item activation */
-#define TR4_WINDY  		0x00008000L     /* Item prevents missiles / thrown items */
-#define TR4_ANIMAL  	0x00010000L     /* Item makes wielder animal */
-#define TR4_EVIL    	0x00020000L     /* Item makes wielder evil */
-#define TR4_UNDEAD  	0x00040000L     /* Item makes wielder undead */
-#define TR4_DEMON   	0x00080000L     /* Item makes wielder demon */
-#define TR4_ORC     	0x00100000L     /* Item makes wielder orc */
-#define TR4_TROLL   	0x00200000L     /* Item makes wielder troll */
-#define TR4_GIANT   	0x00400000L     /* Item makes wielder giant */
-#define TR4_DRAGON  	0x00800000L     /* Item makes wielder dragon */
-#define TR4_MAN     	0x01000000L     /* Item makes wielder man */
-#define TR4_DWARF   	0x02000000L	/* Item makes wielder dwarf */
-#define TR4_ELF   	0x04000000L	/* Item makes wielder elf */
+#define TR4_VAMP_HP     0x00000010L     /* Weapon restores user hp when kills a creature with blood  */
+#define TR4_VAMP_MANA   0x00000020L     /* Weapon restores user sp when kills a creature with mana  */
+#define TR4_IM_POIS     0x00000040L     /* Inventory unaffected by poison  */
+#define TR4_SPEAK_GIANT	0x00000080L     /* Speak with giants */
+#define TR4_SPEAK_ORC	0x00000100L     /* Speak with orcs */
+#define TR4_SPEAK_TROLL	0x00000200L     /* Speak with trolls */
+#define TR4_SPEAK_UNDEAD 0x00000400L     /* Speak with undead */
+#define TR4_NEUTRAL		0x00000800L     /* Ignore racial conflicts when wielding items */
+#define TR4_LODESTONE	0x00001000L     /* Item prevents useful teleportation */
+#define TR4_SILENT      0x00002000L     /* Item prevents spell casting*/
+#define TR4_STATIC      0x00004000L     /* Item prevents item activation */
+#define TR4_WINDY		0x00008000L     /* Item prevents missiles / thrown items */
+#define TR4_ANIMAL      0x00010000L     /* Item makes wielder animal */
+#define TR4_EVIL        0x00020000L     /* Item makes wielder evil */
+#define TR4_UNDEAD		0x00040000L		/* Item makes wielder undead */
+#define TR4_DEMON       0x00080000L     /* Item makes wielder demon */
+#define TR4_ORC         0x00100000L     /* Item makes wielder orc */
+#define TR4_TROLL       0x00200000L     /* Item makes wielder troll */
+#define TR4_GIANT       0x00400000L     /* Item makes wielder giant */
+#define TR4_DRAGON      0x00800000L     /* Item makes wielder dragon */
+#define TR4_MAN         0x01000000L     /* Item makes wielder man */
+#define TR4_DWARF       0x02000000L     /* Item makes wielder dwarf */
+#define TR4_ELF         0x04000000L     /* Item makes wielder elf */
 #define TR4_HURT_POIS   0x08000000L     /* Item makes wielder vulnerable to acid */
 #define TR4_HURT_ACID   0x10000000L     /* Item makes wielder vulnerable to acid */
 #define TR4_HURT_ELEC   0x20000000L     /* Item makes wielder vulnerable to elec */
 #define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerable to fire */
 #define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
+
+#define TR4_OLD_FLAGS (TR4_HURT_LITE | TR4_HURT_WATER | TR4_VAMP_HP | TR4_VAMP_MANA | TR4_IM_POIS | TR4_ANCHOR | TR4_SILENT |\
+			TR4_STATIC | TR4_WINDY | TR4_ANIMAL | TR4_EVIL | TR4_UNDEAD | TR4_DEMON | TR4_ORC | TR4_TROLL | TR4_GIANT |\
+			TR4_DRAGON | TR4_MAN | TR4_DWARF | TR4_ELF | TR4_HURT_POIS | TR4_HURT_ACID | TR4_HURT_ELEC | TR4_HURT_FIRE |\
+			TR4_HURT_COLD)
 
 #define TR5_SHOW_DD		0x00000001L	/* Show damage dice */
 #define TR5_SHOW_WEAPON 0x00000002L /* Show "to-hit" and "to-dam" bonus */
@@ -3686,7 +3926,7 @@ enum
 #define TR5_HAS_BONUS	0x00000040L	/* Item has varying to-hit/to-dam/to-ac */
 #define TR5_HAS_CHARGES 0x00000080L	/* Item has varying charges */
 #define TR5_INSTA_ART   0x00000100L /* Item makes an artifact */
-#define TR5_EXTRA_DAM	0x00000200L	/* Item can do extra damage from brands/slays (cmd1.c) */
+#define TR5_PACK		0x00000200L	/* Item applies flags even while in pack */
 #define TR5_EDGED		0x00000400L	/* Item does edged damage */
 #define TR5_BLUNT		0x00000800L	/* Item does blunt damage */
 #define TR5_DO_CUTS		0x00001000L	/* Item can do extra damage from cuts (cmd1.c) */
@@ -3703,12 +3943,12 @@ enum
 #define TR5_GLOW		0x00800000L	/* Item glows if timed */
 #define TR5_EXHAUST		0x01000000L	/* Item is destroyed at timeout */
 #define TR5_RECHARGE	0x02000000L	/* Item recharges at timeout */
-#define TR5_HURT_ACID	0x04000000L	/* Item can be destroyed by acid */
-#define TR5_HURT_COLD	0x08000000L	/* Item can be destroyed by cold */
-#define TR5_HURT_ELEC	0x10000000L	/* Item can be destroyed by electricity */
-#define TR5_HURT_FIRE	0x20000000L	/* Item can be destroyed by fire */
-#define TR5_HURT_WATER	0x40000000L	/* Item can be destroyed by water */
-#define TR5_TRICK_THROW	0x80000000L	/* Item always does tricks if thrown */
+#define TR5_KILL_ACID	0x04000000L	/* Item can be destroyed by acid */
+#define TR5_KILL_COLD	0x08000000L	/* Item can be destroyed by cold */
+#define TR5_KILL_ELEC	0x10000000L	/* Item can be destroyed by electricity */
+#define TR5_KILL_FIRE	0x20000000L	/* Item can be destroyed by fire */
+#define TR5_KILL_WATER	0x40000000L	/* Item can be destroyed by water */
+#define TR5_KILL_LAVA	0x80000000L	/* Item can be destroyed by lava */
 
 #define TR6_WEAPON		0x00000001L	/* Item is a weapon */
 #define TR6_ARMOUR		0x00000002L	/* Item is an armour */
@@ -3731,7 +3971,7 @@ enum
 #define TR6_EAT_HEAL	0x00040000L	/* Monster eats if looking for healing */
 #define TR6_EAT_MANA	0x00080000L	/* Monster eats if looking for mana */
 #define TR6_HAS_ROPE    0x00100000L	/* Item has rope attached (cmd2.c) */
-#define TR6_HAS_CHAIN	0x00200000L	/* Item has randomly picked effect */
+#define TR6_HAS_CHAIN	0x00200000L	/* Item has chain attached (cmd2.c) */
 #define TR6_RANDOM		0x00400000L	/* Item has randomly picked effect */
 #define TR6_BAD_THROW	0x00800000L	/* Item is hard to throw */
 #define TR6_BREAK_THROW	0x01000000L	/* Item breaks when thrown */
@@ -3758,28 +3998,12 @@ enum
 
 
 /*
- * Hack -- flag set 1 -- mask for "pval-dependant" flags.
- * Note that all "pval" dependant flags must be in "flags1".
- */
-#define TR1_PVAL_MASK \
-	(TR1_STR | TR1_INT | TR1_WIS | TR1_DEX | \
-	 TR1_CON | TR1_CHR | TR1_SAVE | TR1_DEVICE | \
-	 TR1_STEALTH | TR1_SEARCH | TR1_INFRA | TR1_TUNNEL | \
-	 TR1_SPEED | TR1_BLOWS | TR1_SHOTS | TR1_MIGHT)
-
-/* Oops. Ended up with some pval dependent flags in TR3_
- * Ah well.  We need to reorganise the pvals anyway.
- */
-#define TR3_PVAL_MASK \
-	(TR3_LITE | TR3_REGEN_HP | TR3_REGEN_MANA)
-
-
-/*
  * Flag set 2 -- mask for "ignore element" flags.
  */
 #define TR2_IGNORE_MASK \
  (TR2_IGNORE_ACID | TR2_IGNORE_ELEC | TR2_IGNORE_FIRE | \
-  TR2_IGNORE_COLD | TR2_IGNORE_WATER | TR2_IGNORE_THEFT)
+  TR2_IGNORE_COLD | TR2_IGNORE_WATER | TR2_IGNORE_THEFT | \
+  TR2_IGNORE_TPORT | TR2_IGNORE_LAVA)
 
 /*
  * Flag set 3 -- mask for "sense" flags.
@@ -3788,27 +4012,22 @@ enum
 #define TR3_SENSE_MASK \
 	(TR3_TELEPATHY | TR3_ESP_DEMON | TR3_ESP_DRAGON | \
 	 TR3_ESP_GIANT | TR3_ESP_ORC | TR3_ESP_TROLL | \
-	 TR3_ESP_UNDEAD | TR3_ESP_NATURE | TR3_SEE_INVIS)
+	 TR3_ESP_UNDEAD | TR3_ESP_NATURE | TR3_SEE_INVIS |\
+	 TR3_ESP_MAN | TR3_ESP_DWARF | TR3_ESP_ELF)
 
 
 
 /*
  *  Hack -- exclude the following flags from equipment self-knowledge except weapons.
  */
-#define TR1_WEAPON_FLAGS (TR1_SLAY_ORC | TR1_SLAY_TROLL | TR1_SLAY_GIANT |\
-			TR1_SLAY_DRAGON | TR1_SLAY_UNDEAD | TR1_SLAY_DEMON |\
-			TR1_SLAY_NATURAL | TR1_BRAND_HOLY | TR1_KILL_DRAGON |\
-			TR1_KILL_UNDEAD | TR1_KILL_DEMON | TR1_BRAND_ACID |\
-			TR1_BRAND_FIRE | TR1_BRAND_POIS | TR1_BRAND_ELEC |\
-			TR1_BRAND_COLD)
+#define TR1_WEAPON_FLAGS 0x0L
 
 #define TR2_WEAPON_FLAGS 0x0L
 
-#define TR3_WEAPON_FLAGS (TR3_ACT_ON_BLOW | TR3_BLESSED | TR3_FREE_HANDS)
+#define TR3_WEAPON_FLAGS (TR3_ACT_ON_BLOW | TR3_BLESSED)
 
-#define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_MANA |\
-			  TR4_BRAND_LITE | TR4_BRAND_DARK | TR4_SLAY_MAN | TR4_SLAY_ELF |\
-			  TR4_SLAY_DWARF)
+#define TR4_WEAPON_FLAGS (TR4_VAMP_HP | TR4_VAMP_MANA)
+
 /*
  *  Hack -- exclude the following flags from equipment self-knowledge as they never apply
  *  directly to the player.
@@ -3817,7 +4036,7 @@ enum
 
 #define TR2_IGNORE_FLAGS (TR2_WEAPON_FLAGS | TR2_IGNORE_MASK)
 
-#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE)
+#define TR3_IGNORE_FLAGS (TR3_WEAPON_FLAGS | TR3_ACTIVATE | TR3_FREE_HANDS)
 
 #define TR4_IGNORE_FLAGS (TR4_WEAPON_FLAGS)
 
@@ -3830,7 +4049,7 @@ enum
 /*
  * Hack -- special "xtra" object flag info (type)
  */
-#define OBJECT_XTRA_MAX_HIDDEN 20
+#define OBJECT_XTRA_MAX_HIDDEN 21
 
 #define OBJECT_XTRA_MIN_RUNES    36
 #define OBJECT_XTRA_MIN_COATS    70
@@ -3988,7 +4207,7 @@ enum
 #define RF2_TRAIL	0x00800000      /* Monster leaves a trail behind it */
 #define RF2_SNEAKY 	0x01000000 	/* Monster hides a lot of actions */
 #define RF2_ARMOR	0x02000000 	/* Monster is fully armoured (Reduces acid damage/stops some arrows) */
-#define RF2_PRIEST 	0x04000000 	/* Monster has access to priest spells ? */
+#define RF2_PRIEST 	0x04000000 	/* Monster can cast healing, cures etc. on allies */
 #define RF2_MAGE   	0x08000000 	/* Monster has access to mage spells ? */
 #define RF2_HAS_AURA  	0x10000000 	/* Monster radiates an aura attack */
 #define RF2_HAS_WEB	0x20000000 	/* Monster created in a web */
@@ -4045,7 +4264,7 @@ enum
 #define RF4_ADD_AMMO       0x00000010  /* Add ammunition */
 #define RF4_QUAKE          0x00000020  /* Earthquake */
 #define RF4_EXPLODE        0x00000040  /* Explode with radius 3 */
-#define RF4_AURA           0x00000080  /* Radiate aura with radius 2 */
+#define RF4_LEAP           0x00000080  /* Jump/swoop at the player */
 #define RF4_BRTH_ACID      0x00000100  /* Breathe Acid */
 #define RF4_BRTH_ELEC      0x00000200  /* Breathe Elec */
 #define RF4_BRTH_FIRE      0x00000400  /* Breathe Fire */
@@ -4112,10 +4331,10 @@ enum
  * Monster racial flags - help self, hinder character, and special magics
  */
 
-#define RF6_HASTE          0x00000001  /* Speed self */
+#define RF6_HASTE          0x00000001  /* Speed self/allies */
 #define RF6_ADD_MANA       0x00000002  /* Regain Mana */
-#define RF6_HEAL           0x00000004  /* Heal self */
-#define RF6_CURE           0x00000008  /* Cure self */
+#define RF6_HEAL           0x00000004  /* Heal self/allies */
+#define RF6_CURE           0x00000008  /* Cure self/allies */
 #define RF6_BLINK          0x00000010  /* Teleport Short */
 #define RF6_TPORT          0x00000020  /* Teleport Long */
 #define RF6_INVIS          0x00000040  /* Turn invisible */
@@ -4244,7 +4463,7 @@ enum
 #define RF9_NO_SLOW        0x00020000      /* Cannot be slowed / paralyzed */
 #define RF9_RES_MAGIC      0x00040000      /* Resists magic */
 #define RF9_GOOD           0x00080000      /* Good - never summon evil / never summoned by evil */
-#define RF9_LEVEL_AGE      0x00100000      /* ??? */
+#define RF9_LEVEL_AGE      0x00100000      /* Levels up age deeper in the dungeon */
 #define RF9_DWARF          0x00200000      /* Hurt by slay dwarf */
 #define RF9_ELF            0x00400000      /* Hurt by slay elf */
 #define RF9_MAN            0x00800000      /* Hurt by slay man */
@@ -4545,19 +4764,38 @@ enum
 	(0L)
 
 
+
 /*
- * Assist spells - monsters only cast these on self or allies
+ * Self targeted spells - monsters can only cast these on self
+ */
+#define RF4_SELF_TARGET_MASK \
+	(RF4_QUAKE)
+
+#define RF5_SELF_TARGET_MASK \
+	(0L)
+
+#define RF6_SELF_TARGET_MASK \
+        (RF6_ADD_MANA | RF6_TELE_SELF_TO | \
+	RF6_BLINK | RF6_TPORT | RF6_TRAPS | RF6_INVIS | RF6_WRAITHFORM | \
+	RF6_BERSERK)
+
+#define RF7_SELF_TARGET_MASK \
+	(0L)
+
+
+/*
+ * Assist spells - monsters only cast these on self;
+ * priests may also cast these on allies
  */
 #define RF4_ASSIST_MASK \
-	(RF4_QUAKE)
+	(0L)
 
 #define RF5_ASSIST_MASK \
 	(0L)
 
 #define RF6_ASSIST_MASK \
-        (RF6_HEAL | RF6_ADD_MANA | RF6_TELE_SELF_TO | RF6_CURE | RF6_HASTE | \
-	RF6_BLINK | RF6_TPORT | RF6_TELE_TO | RF6_TRAPS | RF6_INVIS | RF6_WRAITHFORM | \
-	RF6_BLESS | RF6_BERSERK | RF6_SHIELD | RF6_OPPOSE_ELEM)
+        (RF6_HEAL | RF6_CURE | RF6_BLESS | RF6_TELE_TO | RF6_SHIELD | \
+			RF6_HASTE | RF6_OPPOSE_ELEM)
 
 #define RF7_ASSIST_MASK \
 	(0L)
@@ -4568,23 +4806,22 @@ enum
  * Need special treatment in AI.
  */
 #define RF4_NO_PLAYER_MASK \
-        (RF4_ASSIST_MASK)
+        (RF4_SELF_TARGET_MASK | RF4_ASSIST_MASK)
 
 #define RF5_NO_PLAYER_MASK \
-        (RF5_ASSIST_MASK)
+        (RF5_SELF_TARGET_MASK | RF5_ASSIST_MASK)
 
 #define RF6_NO_PLAYER_MASK \
-        (RF6_ASSIST_MASK)
+        (RF5_SELF_TARGET_MASK | RF6_ASSIST_MASK)
 
 #define RF7_NO_PLAYER_MASK \
-        (RF7_ASSIST_MASK)
-
+        (RF5_SELF_TARGET_MASK | RF7_ASSIST_MASK)
 
 /*
  * Spells that improve the caster's tactical position
  */
 #define RF4_TACTIC_MASK \
-	(0L)
+	(RF4_LEAP)
 
 #define RF5_TACTIC_MASK \
 	(0L)
@@ -4592,6 +4829,8 @@ enum
 #define RF6_TACTIC_MASK \
 	(RF6_BLINK)
 
+#define RF7_TACTIC_MASK \
+	(0L)
 
 /*
  * Annoying spells
@@ -4620,7 +4859,7 @@ enum
 	(0L)
 
 #define RF6_HEAL_MASK \
-	(RF6_HEAL)
+	(RF6_HEAL | RF6_BERSERK)
 
 #define RF7_HEAL_MASK \
 	(0L)
@@ -4734,7 +4973,7 @@ enum
 /*
  * Maximum number of familiar abilities
  */
-#define MAX_FAMILIAR_ABILITIES 131
+#define MAX_FAMILIAR_ABILITIES 161
 
 /*
  * Choices at each 'level' of picks
@@ -4919,6 +5158,21 @@ enum
  */
 #define coated_p(T) \
 	((T)->xtra1 >= OBJECT_XTRA_MIN_COATS)
+
+/*
+ * Runed items.
+ */
+#define runed_p(T) \
+	(((T)->xtra1 >= OBJECT_XTRA_MIN_RUNES) && \
+	((T)->xtra1 < OBJECT_XTRA_MIN_COATS))
+
+
+/*
+ * Hidden power.
+ */
+#define hidden_p(T) \
+	(((T)->xtra1 > 0) && \
+	((T)->xtra1 < OBJECT_XTRA_MAX_HIDDEN))
 
 
 /*

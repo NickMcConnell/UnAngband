@@ -3,16 +3,22 @@
 === Stats ===
 ***** <Str>
           Strength
-               Strength is important in fighting with weapons and in melee
+               Strength is important in fighting with weapons and in ranged
                combat.  A high strength can improve the amount of damage
-               done with each hit.  Characters with low strengths may
-               receive penalties.  Strength is also useful in tunnelling
-               and in carrying heavy items.  You may find some weapons
-               too hard to use if your strength is not equal to or greater
-               than the weapon weight in pounds.  Finally, strength improves
-               the range of thrown weapons and firing from slings and bows.
-               The firing speed from crossbows can be improved with a
-               sufficiently high strength.
+               done with each hit, both in melee and when shooting or throw-
+               ing using ranged weapons, and the range of thrown weapons and
+               slings and bows.  Characters with low strengths may
+               receive penalties to damage instead. Strength also assists in
+               your ability to get multiple blows from heavier weapons.  The
+               firing speed from crossbows can be improved with a sufficiently
+               high strength.
+               Strength is useful in tunnelling and in carrying heavy items
+               which affects how much you can carry before becoming overburd-
+               ened and having your movement slowed.  You may find some
+               weapons too hard to use if your strength is not equal to or
+               greater than the weapon weight in pounds.  Finally, if your
+               size exceeds your strength, your agility will be decreased by
+               one point for every two points of size over strength.
 
 ***** <Int> 
           Intelligence

@@ -693,7 +693,7 @@ T:stealing mana
 
 N:135:MENTAL
 I:60
-D:blast~:::with mental energy:::
+D:blast~:::with mental energy::damage to those with minds, doubled against sleeping monsters:
 T:mental energy
 
 N:136:SNUFF
@@ -794,3 +794,43 @@ T:entangling
 N:155:LITE_BODY
 D:cause~::bodies and body parts:to glow:::
 T:corpse lighting
+
+N:156:IMAGE_ACID
+I:0
+D:dissolve~::weak-willed, sleeping or hallucinating monsters:without waking them up:::
+T:illusory acid
+
+N:157:IMAGE_ELEC
+I:10
+D:electrif|y|ies|::weak-willed, sleeping or hallucinating monsters:without waking them up:::
+T:illusory electricity
+
+N:158:IMAGE_FIRE
+I:10
+D:burn~::weak-willed, sleeping or hallucinating monsters:without waking them up:::
+T:illusory fire
+
+N:159:IMAGE_COLD
+I:10
+D:freeze~::weak-willed, sleeping or hallucinating monsters:without waking them up:::
+T:illusory cold
+
+N:160:IMAGE_POISON
+I:5
+D:poison~::weak-willed, sleeping or hallucinating monsters:without waking them up:::
+T:illusory poison
+
+N:161:ILLUSION
+I:5
+D:appear~ to be safe ground::all but the wary::::
+T:illusion
+
+N:162:VAMP_DRAIN
+I:20
+D:drain~:health from::and give it to you:::
+T:stealing health
+
+N:163:MANA_DRAIN
+I:20
+D:drain~:mana from::and give it to you::spell points:mana
+T:stealing mana

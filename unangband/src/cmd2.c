@@ -3555,6 +3555,8 @@ void player_fire_or_throw_selected(int item, bool fire)
 	bool fumble = FALSE;
 	bool activate = FALSE;
 	int feat;
+	int ability_to_hit;
+	int ability_to_dam;
 
 	byte missile_attr;
 	char missile_char;
@@ -3566,16 +3568,23 @@ void player_fire_or_throw_selected(int item, bool fire)
 
 	int use_old_target_backup = use_old_target;
 
-	/* Get kind flags */
-	u32b f5 = k_info[o_ptr->k_idx].flags5;
-
+	/* Object flags */
+	u32b f1, f2, f3, f4;
+	
 	bool throwing = is_throwing_item(o_ptr);
-	bool trick_throw = !fire && ((item == INVEN_WIELD) || (f5 & (TR5_TRICK_THROW))) && throwing;
-	int num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
+	bool trick_throw;
+	int num_tricks;
 
 	/* Get kind flags */
 	u32b f6 = k_info[o_ptr->k_idx].flags6;
 
+	/* Get object flags */
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
+	
+	/* Get trick throws */
+	trick_throw = !fire && ((item == INVEN_WIELD) || (f3 & (TR3_TRICK_THROW))) && throwing;
+	num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
+	
 	/* Need a rope? (No rope for trick throws) */
 	if ((f6 & (TR6_HAS_ROPE | TR6_HAS_CHAIN)) && !trick_throw)
 	{
@@ -3649,9 +3658,13 @@ void player_fire_or_throw_selected(int item, bool fire)
 	/* The first piece of code dependent on fire/throw */
 	if (fire)
 	{
+		/* Note the abilities to use for later */
+		ability_to_hit = ABILITY_TO_HIT_BOW;
+		ability_to_dam = ABILITY_TO_DAM_BOW;
+		
 		/* Get the bow */
-		bow_to_h = inventory[INVEN_BOW].to_h;
-		bow_to_d = inventory[INVEN_BOW].to_d;
+		bow_to_h = object_aval(&inventory[INVEN_BOW], ABILITY_TO_HIT_BOW);
+		bow_to_d = object_aval(&inventory[INVEN_BOW], ABILITY_TO_DAM_BOW);
 
 		ranged_skill = p_ptr->skills[SKILL_TO_HIT_BOW];
 
@@ -3662,9 +3675,13 @@ void player_fire_or_throw_selected(int item, bool fire)
 	{
 		int mul, div;
 
+		/* Note the abilities to use for later */
+		ability_to_hit = ABILITY_TO_HIT_THROW;
+		ability_to_dam = ABILITY_TO_DAM_THROW;
+		
 		/* Compensating the lack of bow, add item bonuses twice; once here: */
-		bow_to_h = i_ptr->to_h;
-		bow_to_d = i_ptr->to_d;
+		bow_to_h = object_aval(i_ptr, ABILITY_TO_HIT_THROW);
+		bow_to_d = object_aval(i_ptr, ABILITY_TO_DAM_THROW);
 
 		ranged_skill = p_ptr->skills[SKILL_TO_HIT_THROW];
 
@@ -4007,7 +4024,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 				}
 
 				/* Actually "fire" the object */
-				bonus = (p_ptr->to_h + i_ptr->to_h + bow_to_h + style_hit + (p_ptr->blocking ? 15 : 0));
+				bonus = (p_ptr->ability[ability_to_hit] + object_aval(i_ptr, ability_to_hit) + bow_to_h + style_hit + (p_ptr->blocking ? 15 : 0));
 				chance = ranged_skill + bonus * BTH_PLUS_ADJ;
 				chance2 = chance - BTH_RANGE_ADJ * distance(old_y, old_x, y, x);
 
@@ -4104,7 +4121,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 						/* Throwing non-throwing items gives no criticals */
 						tdam += 0;
 					}
-
+#if 0
 					/* Badly balanced weapons have less effective damage bonus
 				 	Various junk (non-weapons) do not use damage for anything else
 				 	so don't penalize a second time. */
@@ -4113,8 +4130,10 @@ void player_fire_or_throw_selected(int item, bool fire)
 						/* Halve damage bonus */
 						tdam += i_ptr->to_d + style_dam;
 					else
-						/* Apply launcher, missile and style bonus */
-						tdam += i_ptr->to_d + bow_to_d + style_dam;
+#endif
+
+					/* Apply launcher, missile and style bonus */
+					tdam += object_aval(i_ptr, fire ? ABILITY_TO_DAM_BOW : ABILITY_TO_DAM_THROW) + bow_to_d + style_dam;
 
 					/* No negative damage */
 					if (tdam < 0) tdam = 0;
@@ -4361,18 +4380,18 @@ void player_fire_or_throw_selected(int item, bool fire)
 			{
 				/* Apply missile critical damage */
 				k += critical_shot(i_ptr->weight,
-								bow_to_h + i_ptr->to_h,
+								bow_to_h + object_aval(i_ptr, ability_to_hit),
 								k);
 			}
 			else if (throwing)
 			{
 				/* Throws (with specialized throwing weapons) hit harder */
 				k += critical_norm(i_ptr->weight,
-								2 * i_ptr->to_h,
+							bow_to_h + object_aval(i_ptr, ability_to_hit),
 						k);
 			}
 
-			k += i_ptr->to_d;
+			k += object_aval(i_ptr, ability_to_dam);
 
 			/* Armour reduces total damage */
 			k -= (k * ((p_ptr->ac < 150) ? p_ptr->ac : 150) / 250);

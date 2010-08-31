@@ -849,13 +849,13 @@ bool player_use_staff(int item)
 		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+			equip_can_flags(NULL, 0x0L,0x0L,0x0L,TR4_STATIC);
 		}
 	}
 	else
 	{
 		/* Always notice */
-		equip_not_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+		equip_not_flags(NULL, 0x0L,0x0L,0x0L,TR4_STATIC);
 	}
 
 	/* Roll for usage */
@@ -1127,13 +1127,13 @@ bool player_aim_wand(int item)
 		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+			equip_can_flags(NULL, 0x0L,0x0L,0x0L,TR4_STATIC);
 		}
 	}
 	else
 	{
 		/* Always notice */
-		equip_not_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+		equip_not_flags(NULL, 0x0L,0x0L,0x0L,TR4_STATIC);
 	}
 
 	/* Roll for usage */
@@ -1393,13 +1393,13 @@ bool player_zap_rod(int item)
 		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_STATIC)))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+			equip_can_flags(NULL, 0x0L,0x0L,0x0L,TR4_STATIC);
 		}
 	}
 	else
 	{
 		/* Always notice */
-		equip_not_flags(0x0L,0x0L,0x0L,TR4_STATIC);
+		equip_not_flags(NULL, 0x0L,0x0L,0x0L,TR4_STATIC);
 	}
 
 	/* Roll for usage */
@@ -1655,7 +1655,7 @@ bool item_tester_hook_assemble(const object_type *o_ptr)
 	if (o_ptr->tval != TV_ASSEMBLY) return (FALSE);
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 	/* Check activation flag */
 	if (f3 & (TR3_ACTIVATE)) return (TRUE);
@@ -1938,7 +1938,7 @@ bool item_tester_hook_activate(const object_type *o_ptr)
 	if (!object_known_p(o_ptr) && !object_named_p(o_ptr)) return (FALSE);
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 	/* Hack -- for spells that can activate. They are always 'charging', so would never activate otherwise. */
 	if ((o_ptr->tval == TV_SPELL) && (p_ptr->rest < PY_REST_FAINT)) return (FALSE);
@@ -2133,7 +2133,7 @@ bool player_activate(int item)
 
 
 	/* We know it activates */
-	object_can_flags(o_ptr,0x0L,0x0L,TR3_ACTIVATE,0x0L, item < 0);
+	object_can_flags(o_ptr,NULL, 0x0L,0x0L,TR3_ACTIVATE,0x0L, item < 0);
 
 	/* Used the object */
 	if (k_info[o_ptr->k_idx].used < MAX_SHORT) k_info[o_ptr->k_idx].used++;
@@ -2683,6 +2683,8 @@ bool player_apply_rune_or_coating2(int item2)
 						/* Hack -- acquire "cursed" flag */
 						if (e_ptr->flags3 & (TR3_LIGHT_CURSE)) j_ptr->ident |= (IDENT_CURSED);
 
+						/* TODO: Fix me to use the new item flag code */
+#if 0
 						/* Hack -- apply extra penalties if needed */
 						if (cursed_p(j_ptr) || broken_p(j_ptr))
 						{
@@ -2719,7 +2721,7 @@ bool player_apply_rune_or_coating2(int item2)
 							if (e_ptr->max_pval > 0) j_ptr->pval = MAX(1,MIN(j_ptr->pval, (s16b)randint(e_ptr->max_pval)));
 							else j_ptr->pval = MIN(j_ptr->pval, 0);
 						}
-
+#endif
 						/* Remove special inscription, if any */
 						j_ptr->feeling = 0;
 

@@ -1157,6 +1157,10 @@ bool make_attack_normal(int m_idx, bool harmless)
 
 		/* Roll out the damage */
 		damage = damroll(d_dice, d_side);
+		
+		/* Berserk monsters do double damage. Note this greatly increases the
+		 * chance of criticals in addition to a straight doubling of damage. */
+		if (m_ptr->berserk) damage *= 2;
 
 		/* Monster hits player */
 		if (!effect || check_hit(effect_ptr->power, rlev, m_idx, FALSE))
@@ -1785,6 +1789,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 	/* Is the player blind */
 	bool blind = (p_ptr->timed[TMD_BLIND] ? TRUE : FALSE);
+	
+	/* Is the monster sneaky? */
+	bool sneaky = FALSE;
 
 	bool seen;	/* Source seen */
 	bool known;	/* Either source or target seen */
@@ -2022,6 +2029,9 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 		/* Extract the powerfulness */
 		powerful = (r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE);
+
+		/* Extract the sneakiness */
+		sneaky = (r_ptr->flags2 & (RF2_SNEAKY) ? TRUE : FALSE);
 
 		/* Extract the summoner */
 		summoner = m_list[who].r_idx;
@@ -2454,7 +2464,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on %s body.", m_name, t_poss);
 			}
 
@@ -2490,7 +2500,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					if (power)
 					{
 						/* Message */
-						if (blind) msg_format("%^s mumbles.", m_name);
+						if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 						else msg_format("%^s absorbs mana from the surrounding water.", m_name);
 
 						/* Big boost to mana */
@@ -2511,7 +2521,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s gathers power for %s.", m_name, t_name);
 			}
 
@@ -2574,7 +2584,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (power)
 				{
 					/* Message */
-					if (blind) msg_format("%^s mumbles.", m_name);
+					if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 					else msg_format("%^s absorbs life from the surrounding plants.", m_name);
 
 					/* Big boost to mana */
@@ -2585,7 +2595,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on %s wounds.", m_name, t_poss);
 			}
 
@@ -2676,7 +2686,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on %s ailments.", m_name, t_poss);
 			}
 
@@ -2741,6 +2751,26 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 					/* Message */
 					if (n_ptr->ml) msg_format("%^s is no longer blind.", t_nref);
+				}
+
+				/* Cancel image */
+				if (n_ptr->image)
+				{
+					/* Cancel image */
+					n_ptr->image = 0;
+
+					/* Message */
+					if (n_ptr->ml) msg_format("%^s is no longer hallucinating.", t_nref);
+				}
+
+				/* Cancel dazed */
+				if (n_ptr->dazed)
+				{
+					/* Cancel dazed */
+					n_ptr->dazed = 0;
+
+					/* Message */
+					if (n_ptr->ml) msg_format("%^s is no longer dazed.", t_nref);
 				}
 
 				/* Redraw (later) if needed */
@@ -2912,7 +2942,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on %s appearance.", m_name, t_poss);
 			}
 
@@ -3060,7 +3090,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				if (!direct) break;
 				disturb(1, 0);
-				if ((blind) && (known)) msg_format("%^s mumbles strangely.", m_name);
+				if ((blind || sneaky) && (known)) msg_format("%^s mumbles strangely.", m_name);
 				else if (known) msg_format("%^s gestures at your feet.", m_name);
 
 				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) || (p_ptr->cur_flags4 & (TR4_ANCHOR)))
@@ -3100,7 +3130,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on %s body.", m_name, m_poss);
 			}
 
@@ -3134,7 +3164,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (who > SOURCE_MONSTER_START)
 			{
-				if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+				if ((blind || sneaky) && (known)) msg_format("%^s mumbles.", m_name);
 				else if (known) msg_format("%^s gestures in shadow.", m_name);
 			}
 
@@ -3164,7 +3194,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			sound(MSG_CREATE_TRAP);
 			if (who > SOURCE_MONSTER_START)
 			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles, and then cackles evilly.", m_name);
+				if (((blind || sneaky) && (known)) && (target < 0)) msg_format("%^s mumbles, and then cackles evilly.", m_name);
 				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a spell and cackles evilly.", m_name);
 				else if (known) msg_format("%^s casts a spell at %s and cackles evilly.",m_name,t_name);
 			}
@@ -3311,7 +3341,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!direct) break;
 			if (target < 0) disturb(1, 0);
 
-			if ((blind) && (known)) msg_format("%^s curses %s.", m_name, t_name);
+			if ((blind || sneaky) && (known)) msg_format("%^s curses %s.", m_name, t_name);
 			else msg_format("%^s points at %s and curses.", m_name, t_name);
 
 			(void)project(who, what, 0, 0, m_ptr->fy, m_ptr->fx, y, x, get_dam(spower, attack, TRUE), GF_CURSE, FLG_MON_DIRECT, 0, 0);
@@ -3403,8 +3433,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (known) sound(MSG_CAST_FEAR);
 			if (who > SOURCE_MONSTER_START)
 			{
-				if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles, and you hear deceptive noises.", m_name);
-				else if ((blind) && (known)) msg_format("%^s mumbles.",m_name);
+				if (((blind || sneaky) && (known)) && (target < 0)) msg_format("%^s mumbles, and you hear deceptive noises.", m_name);
+				else if ((blind || sneaky) && (known)) msg_format("%^s mumbles.",m_name);
 				else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a deceptive illusion.", m_name);
 				else if (known) msg_format("%^s casts a deceptive illusion at %s.",m_name,t_name);
 			}
@@ -3457,31 +3487,31 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (spower < 4)
 			{
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s points at %s and curses.", m_name, t_name);
 				k = 1;
 			}
 			else if (spower < 10)
 			{
-				if (blind) msg_format("%^s mumbles deeply.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles deeply.", m_name);
 				else msg_format("%^s points at %s and curses horribly.", m_name, t_name);
 				k = 2;
 			}
 			else if (spower < 20)
 			{
-				if (blind) msg_format("%^s murmurs loudly.", m_name);
+				if (blind || sneaky) msg_format("%^s murmurs loudly.", m_name);
 				else msg_format("%^s points at %s, incanting terribly.", m_name, t_name);
 				k = 3;
 			}
 			else if (spower < 35)
 			{
-				if (blind) msg_format("%^s cries out wrathfully.", m_name);
+				if (blind || sneaky) msg_format("%^s cries out wrathfully.", m_name);
 				else msg_format("%^s points at %s, screaming words of peril!", m_name, t_name);
 				k = 4;
 			}
 			else
 			{
-				if (blind) msg_format("%^s screams the word 'DIE!'", m_name);
+				if (blind || sneaky) msg_format("%^s screams the word 'DIE!'", m_name);
 				else msg_format("%^s points at %s, screaming the word DIE!", m_name, t_name);
 				k = 5;
 			}
@@ -3554,7 +3584,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind)
+				if (blind || sneaky)
 				{
 					msg_format("%^s mumbles.", m_name);
 				}
@@ -3600,14 +3630,25 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s whips %s up into a frenzy.", m_name, t_name);
-			}
-
+			}			
+			
 			if (target > 0)
 			{
 				/* Paranoia: Prevent overflow */
 				int tmp = n_ptr->berserk + rlev + rand_int(rlev);
+
+				/* Cancel fear */
+				if (n_ptr->monfear)
+				{
+					/* Cancel fear */
+					set_monster_fear(m_ptr, 0, FALSE);
+
+					/* Message */
+					if (n_ptr->ml)
+						msg_format("%^s recovers %s courage.", t_nref, t_poss);
+				}
 
 				/* Notify player */
 				if ((n_ptr->ml) && !(n_ptr->berserk))
@@ -3617,6 +3658,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 				/* Add to the monster berserk counter */
 				n_ptr->berserk += tmp > 255 ? 255 : (byte)tmp;
+				
+				/* Regain 20% of lost hitpoints */
+				n_ptr->hp += (n_ptr->maxhp - n_ptr->hp) / 5;
+
+				/* Redraw (later) if needed */
+				if ((p_ptr->health_who == target) && (n_ptr->ml))
+					p_ptr->redraw |= (PR_HEALTH);
+
+				/* Recalculate combat range later */
+				m_ptr->min_range = 0;
+
 			}
 			else if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
@@ -3636,7 +3688,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on the air around %s.", m_name, t_name);
 			}
 
@@ -3672,7 +3724,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			{
 				disturb(1,0);
 
-				if (blind) msg_format("%^s mumbles.", m_name);
+				if (blind || sneaky) msg_format("%^s mumbles.", m_name);
 				else msg_format("%^s concentrates on %s body.", m_name, t_poss);
 			}
 
@@ -3748,13 +3800,22 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 		case 160+26:
 		{
 			if (!direct) break;
-			if ((who <= 0) || (target >= 0)) break;
 
-			msg_format("%^s probes your weaknesses.", m_name);
-
-			if (who > SOURCE_MONSTER_START)
+			if (target < 0)
 			{
-				update_smart_cheat(who);
+				msg_format("%^s probes your weaknesses.", m_name);
+	
+				if (who > SOURCE_MONSTER_START)
+				{
+					update_smart_cheat(who);
+				}
+			}
+			else if (target > 0)
+			{
+				if (m_ptr->ml) msg_format("%^s probes %s for weaknesses.", m_name, t_name);
+				
+				/* Learn all of the non-spell, non-treasure flags */
+				if (m_ptr->mflag & (MFLAG_ALLY)) lore_do_probe(m_list[target].r_idx);
 			}
 
 			break;
@@ -3768,7 +3829,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if (known) sound(MSG_CAST_FEAR);
 			if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles, and you hear scary noises.", m_name);
-			else if ((blind) && (known)) msg_format("%^s mumbles.",m_name);
+			else if ((blind || sneaky) && (known)) msg_format("%^s mumbles.",m_name);
 			else if ((target < 0) || ((target ==0) && (known))) msg_format("%^s casts a fearful illusion.", m_name);
 			else if (known) msg_format("%^s casts a fearful illusion at %s.",m_name,t_name);
 
@@ -3829,7 +3890,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!direct) break;
 			if (target < 0) disturb(1, 0);
 
-			if ((blind) && (known)) msg_format("%^s mumbles.", m_name);
+			if ((blind || sneaky) && (known)) msg_format("%^s mumbles.", m_name);
 			else if (known) msg_format("%^s casts a spell, burning %s eyes.", m_name, t_poss);
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
@@ -3891,7 +3952,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target < 0) disturb(1, 0);
 
 			if (((blind) && (known)) && (target < 0)) msg_format("%^s mumbles, and you hear puzzling noises.", m_name);
-			else if ((blind) && (known)) msg_format ("%^s mumbles.",m_name);
+			else if ((blind || sneaky) && (known)) msg_format ("%^s mumbles.",m_name);
 			else if ((target < 0) || ((target == 0) && (known))) msg_format("%^s casts a mesmerising illusion.", m_name);
 			else if (known) msg_format("%^s creates a mesmerising illusion for %s.", m_name, t_name);
 
@@ -3953,7 +4014,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (target < 0) disturb(1, 0);
 
 			if (((blind) && (known)) && (target < 0)) msg_format("%^s drains power from your muscles.", m_name);
-			else if ((blind) && (known)) msg_format ("%^s mumbles.",m_name);
+			else if ((blind || sneaky) && (known)) msg_format ("%^s mumbles.",m_name);
 			else if (known) msg_format("%^s drains power from %s muscles.", m_name, t_poss);
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
@@ -4023,7 +4084,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			if (!direct) break;
 			if (target < 0) disturb(1, 0);
 
-			if ((blind) && (known)) msg_format ("%^s mumbles.",m_name);
+			if ((blind || sneaky) && (known)) msg_format ("%^s mumbles.",m_name);
 			else if (known) msg_format("%^s stares deeply into %s muscles.", m_name, t_poss);
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
@@ -4552,7 +4613,7 @@ bool race_avoid_trap(int r_idx, int y, int x, int feat)
 		case TERM_L_YELLOW:
 		{
 			/* Avoid by being unlit */
-			if ((cave_info[y][x] & (CAVE_GLOW)) == 0) return (TRUE);
+			if (((cave_info[y][x] & (CAVE_LITE)) == 0) && ((play_info[y][x] & (PLAY_LITE)) == 0)) return (TRUE);
 			break;
 		}
 		/* Glowing glyph */
@@ -4716,8 +4777,12 @@ void mon_hit_trap(int m_idx, int y, int x)
 	{
 		discharge_trap(y, x, y, x, 0);
 
+		/* Illusions make monster smarter */
+		if (region_grid(y, x, region_illusion_hook)) m_ptr->mflag &= (MFLAG_SMART);
+		
 		/* XXX Monster is no longer stupid */
-		m_ptr->mflag &= ~(MFLAG_STUPID);
+		else if ((m_mflag & (MFLAG_STUPID)) != 0) m_ptr->mflag &= ~(MFLAG_STUPID);
+		
 	}
 }
 

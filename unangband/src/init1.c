@@ -589,7 +589,7 @@ static cptr r_info_flags4[] =
 	"ADD_AMMO",
 	"QUAKE",
 	"EXPLODE",
-	"AURA",
+	"LEAP",
 	"BRTH_ACID",
 	"BRTH_ELEC",
 	"BRTH_FIRE",
@@ -855,43 +855,179 @@ static cptr flow_flags[] =
 #endif
 
 
+
+static cptr k_info_ability[]=
+{
+		"STR",
+		"INT",
+		"WIS",
+		"DEX",
+		"CON",
+		"CHR",
+		"SAVE",
+		"DEVICE",
+		"STEALTH",
+		"SEARCH",
+		"INFRA",
+		"TUNNEL",
+		"SPEED_MOVE",
+		"BLOWS",
+		"SHOTS",
+		"MIGHT",
+		"SLAY_ANIMAL",
+		"BRAND_HOLY",
+		"SLAY_UNDEAD",
+		"SLAY_DEMON",
+		"SLAY_ORC",
+		"SLAY_TROLL",
+		"SLAY_GIANT",
+		"SLAY_DRAGON",
+		"SIZ",
+		"AGI",
+		"DISARM",
+		"BRAND_POIS",
+		"BRAND_ACID",
+		"BRAND_ELEC",
+		"BRAND_FIRE",
+		"BRAND_COLD",
+		
+		"TO_HIT_ITEM_ONLY",
+		"TO_DAM_ITEM_ONLY",
+		"DAMAGE_DICE_MOD",
+		"DAMAGE_SIDES_MOD",
+		"TO_AC",
+		"TO_AC_RANGED",
+		"TO_AC_MELEE",
+		"WEIGHT_MOD",
+		"TO_HIT_THROW",
+		"TO_HIT_MELEE",
+		"TO_HIT_BOW",
+		"TO_HIT_UNARM",
+		"TO_DAM_THROW",
+		"TO_DAM_MELEE",
+		"TO_DAM_BOW",
+		"TO_DAM_UNARM",
+		"RES_ACID",
+		"RES_ELEC",
+		"RES_FIRE",
+		"RES_COLD",
+		"RES_POIS",
+		"RES_FEAR",
+		"RES_LITE",
+		"RES_DARK",
+		"RES_BLIND",
+		"RES_CONFU",
+		"RES_SOUND",
+		"RES_SHARD",
+		"RES_NEXUS",
+		"RES_NETHR",
+		"RES_CHAOS",
+		"RES_DISEN",
+		
+		"SLOW_DIGEST",
+		"STRIKES",
+		"LITE",
+		"REGEN_HP",
+		"UNARM_MIGHT",
+		"MELEE_MIGHT",
+		"XTRA_CUTS",
+		"HOLD_LIFE",
+		"XTRA_STUN",
+		"XTRA_CRIT",
+		"XTRA_TRIP",
+		"SLAY_PLANT",
+		"SLAY_INSECT",
+		"BOW_RANGE",
+		"HURL_RANGE",
+		"REGEN_MANA",
+		"TO_HIT_TRAP",
+		"TO_DAM_TRAP",
+		"TRAP_MIGHT",
+		"TRAPS",
+		"TRAP_RANGE",
+		"MELEE_CRIT",
+		"BOW_CRIT",
+		"UNARM_CRIT",
+		"TRAP_CRIT",
+		"HURL_CRIT",
+		"CHARGE",
+		"HURL_NUM",
+		"HURL_DAM",
+		"SPEED_CAST",
+		"SPEED_FIGHT",
+		"SPEED_USE",
+		
+		"BRAND_DARK",
+		"BRAND_LITE",
+		"BRAND_NETHER",
+		"BRAND_NEXUS",
+		"BRAND_MAGIC",
+		"BRAND_CHAOS",
+		"RES_PLASMA",
+		"RES_DISEASE",
+		"RES_WATER",
+		"SLAY_MAN",
+		"SLAY_ELF",
+		"SLAY_DWARF",
+		"SLAY_ARCHER",
+		"SLAY_WARRIOR",
+		"SLAY_MAGE",
+		"SLAY_PRIEST",
+		"SLAY_THIEF",
+		"BRAND_PSYCHIC",
+		"BRAND_WATER",
+		"BRAND_LAVA",
+		"RES_LAVA",
+		"PROTECT_LAVA",
+		"PROTECT_ACID",
+		"PROTECT_ELEC",
+		"PROTECT_FIRE",
+		"PROTECT_COLD",
+		"PROTECT_WATER",
+		"NIGHT_SIGHT",
+		"HURT_ACID",
+		"HURT_ELEC",
+		"HURT_FIRE",
+		"HURT_COLD"
+};
+
 /*
  * Object flags
  */
 static cptr k_info_flags1[] =
 {
-	"STR",
-	"INT",
-	"WIS",
-	"DEX",
-	"CON",
-	"CHR",
-	"SAVE",
-	"DEVICE",
-	"STEALTH",
-	"SEARCH",
-	"INFRA",
-	"TUNNEL",
-	"SPEED",
-	"BLOWS",
-	"SHOTS",
-	"MIGHT",
-	"SLAY_NATURAL",
-	"BRAND_HOLY",
-	"SLAY_UNDEAD",
-	"SLAY_DEMON",
-	"SLAY_ORC",
-	"SLAY_TROLL",
-	"SLAY_GIANT",
-	"SLAY_DRAGON",
-	"KILL_DRAGON",
-	"KILL_DEMON",
-	"KILL_UNDEAD",
-	"BRAND_POIS",
-	"BRAND_ACID",
-	"BRAND_ELEC",
-	"BRAND_FIRE",
-	"BRAND_COLD"
+		"SUST_STR",
+		"SUST_INT",
+		"SUST_WIS",
+		"SUST_DEX",
+		"SUST_CON",
+		"SUST_CHR",
+		"SUST_SIZ",
+		"SUST_AGI",
+		"FREE_ACT", /*"NO_SLOW",*/
+		"NO_BLIND",
+		"NO_PARALYZE",
+		"NO_CONFUSE",
+		"NO_FEAR",
+		"NO_IMAGE",
+		"NO_POISON",
+		"NO_CUTS",
+		"NO_STUN",
+		"NO_CURSE",
+		"NO_AMNESIA",
+		"NO_PETRIFY",
+		"NO_STASTIS",
+		"NO_MSLEEP",
+		"NO_PSLEEP",
+		"NO_BERSERK",
+		"NO_DAZED",
+		"NO_TERROR",
+		"NO_SOAKED",
+		"NO_AGGRAVATE",
+		"NO_STENCH",
+		"NO_RECALL",
+		"NO_RETURN",
+		"NO_DELAY"
 };
 
 /*
@@ -899,12 +1035,12 @@ static cptr k_info_flags1[] =
  */
 static cptr k_info_flags2[] =
 {
-	"SUST_STR",
-	"SUST_INT",
-	"SUST_WIS",
-	"SUST_DEX",
-	"SUST_CON",
-	"SUST_CHR",
+	"WALK_ACID",
+	"WALK_FIRE",
+	"WALK_WATER",
+	"WALK_LAVA",
+	"IGNORE_TPORT",
+	"IGNORE_LAVA",
 	"IGNORE_ACID",
 	"IGNORE_ELEC",
 	"IGNORE_FIRE",
@@ -915,22 +1051,22 @@ static cptr k_info_flags2[] =
 	"IM_ELEC",
 	"IM_FIRE",
 	"IM_COLD",
-	"RES_ACID",
-	"RES_ELEC",
-	"RES_FIRE",
-	"RES_COLD",
-	"RES_POIS",
-	"RES_FEAR",
-	"RES_LITE",
-	"RES_DARK",
-	"RES_BLIND",
-	"RES_CONFU",
-	"RES_SOUND",
-	"RES_SHARD",
-	"RES_NEXUS",
-	"RES_NETHR",
-	"RES_CHAOS",
-	"RES_DISEN"
+	"IM_WATER",
+	"IM_LAVA",
+	"CLIMB",
+	"SWIM",
+	"FLY",
+	"OOZE",
+	"PASS_WALL",
+	"AIR_SUPPLY",
+	"SLOW_POISON",
+	"INVISIBLE",
+	"SPEAK_MAN",
+	"SPEAK_ELF",
+	"SPEAK_DWARF",
+	"SPEAK_BIRD",
+	"SPEAK_PLANT",
+	"SPEAK_MAMMAL"
 };
 
 /*
@@ -938,14 +1074,14 @@ static cptr k_info_flags2[] =
  */
 static cptr k_info_flags3[] =
 {
-	"SLOW_DIGEST",
+	"ESP_MAN",
 	"FEATHER",
-	"LITE",
-	"REGEN_HP",
+	"ESP_ELF",
+	"ESP_DWARF",
 	"TELEPATHY",
 	"SEE_INVIS",
-	"FREE_ACT",
-	"HOLD_LIFE",
+	"ANCHOR",
+	"PROTECT_THEFT",
 	"ESP_DEMON",
 	"ESP_DRAGON",
 	"ESP_GIANT",
@@ -953,7 +1089,7 @@ static cptr k_info_flags3[] =
 	"ESP_TROLL",
 	"ESP_UNDEAD",
 	"ESP_NATURE",
-	"REGEN_MANA",
+	"STENCH",
 	"DRAIN_HP",
 	"DRAIN_MANA",
 	"DRAIN_EXP",
@@ -964,9 +1100,9 @@ static cptr k_info_flags3[] =
 	"BLESSED",
 	"FREE_HANDS",
 	"HUNGER",
-	"CHARGE",
-	"HURL_NUM",
-	"HURL_DAM",
+	"SPEAK_REPTILE",
+	"SPEAK_INSECT",
+	"TRICK_THROW",
 	"LIGHT_CURSE",
 	"HEAVY_CURSE",
 	"PERMA_CURSE"
@@ -978,19 +1114,19 @@ static cptr k_info_flags3[] =
  */
 static cptr k_info_flags4[] =
 {
-	"BRAND_DARK",
-	"BRAND_LITE",
+	"SPEAK_DEMON",
+	"SPEAK_DRAGON",
 	"HURT_LITE",
 	"HURT_WATER",
 	"VAMP_HP",
 	"VAMP_MANA",
 	"IM_POIS",
-	"RES_DISEASE",
-	"RES_WATER",
-	"SLAY_MAN",
-	"SLAY_ELF",
-	"SLAY_DWARF",
-	"ANCHOR",
+	"SPEAK_GIANT",
+	"SPEAK_ORC",
+	"SPEAK_TROLL",
+	"SPEAK_UNDEAD",
+	"NEUTRAL",
+	"LODESTONE",
 	"SILENT",
 	"STATIC",
 	"WINDY",
@@ -1026,7 +1162,7 @@ static cptr k_info_flags5[] =
 	"HAS_BONUS",
 	"HAS_CHARGES",
 	"INSTA_ART",
-	"EXTRA_DAM",
+	"PACK",
 	"EDGED",
 	"BLUNT",
 	"DO_CUTS",
@@ -1043,12 +1179,12 @@ static cptr k_info_flags5[] =
 	"GLOW",
 	"EXHAUST",
 	"RECHARGE",
-	"HURT_ACID",
-	"HURT_COLD",
-	"HURT_ELEC",
-	"HURT_FIRE",
-	"HURT_WATER",
-	"TRICK_THROW"
+	"KILL_ACID",
+	"KILL_COLD",
+	"KILL_ELEC",
+	"KILL_FIRE",
+	"KILL_WATER",
+	"KILL_LAVA"
 };
 
 /*
@@ -3899,6 +4035,7 @@ errr parse_k_info(char *buf, header *head)
 			case TV_SPELL:
 				if ((k_ptr->dd >= 2) || (k_ptr->ds >= 2)) 				k_ptr->flags5 |= (TR5_SHOW_DD | TR5_SHOW_WEAPON);
 				k_ptr->flags6 |= (TR6_NO_TIMEOUT);
+				k_ptr->flags5 |= (TR5_EXHAUST);
 
 				break;
 
@@ -4000,13 +4137,18 @@ errr parse_k_info(char *buf, header *head)
 
 			case TV_LITE:
 				/* Historically used for candles - now unused */
-				if (k_ptr->sval >= SV_LITE_MAX_LITE) k_ptr->flags6  |= (TR6_FLAVOR | TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				if (k_ptr->sval >= SV_LITE_MAX_LITE)
+				{
+					k_ptr->flags5 |= (TR5_EXHAUST);
+					k_ptr->flags6  |= (TR6_FLAVOR | TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
+				}
 
 				/* HACK - Ordinary lites are "boring" */
 				else k_ptr->flags6 &= ~(TR6_FLAVOR);
 
-				k_ptr->flags5 |= (TR5_SHOW_FUEL);
+				k_ptr->flags5 |= (TR5_SHOW_FUEL | TR5_GLOW);
 				k_ptr->flags6 |= (TR6_NO_TIMEOUT);
+				if (k_ptr->sval == SV_LITE_TORCH) k_ptr->flags5 |= (TR5_EXHAUST);
 				break;
 
 			case TV_RING:
@@ -4042,6 +4184,7 @@ errr parse_k_info(char *buf, header *head)
 
 			case TV_ROD:
 				/* Flavored */
+				k_ptr->flags5 |= (TR5_RECHARGE);
 				k_ptr->flags6 |= (TR6_FLAVOR);
 				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
 
@@ -4090,6 +4233,11 @@ errr parse_k_info(char *buf, header *head)
 				/* Fall through */
 
 			/* Armour */
+			case TV_DRAG_ARMOR:
+			{
+				k_ptr->flags5 |= (TR5_RECHARGE);
+				/* Fall through */
+			}
 			case TV_BOOTS:
 			case TV_CLOAK:
 			case TV_CROWN:
@@ -4097,7 +4245,6 @@ errr parse_k_info(char *buf, header *head)
 			case TV_SHIELD:
 			case TV_SOFT_ARMOR:
 			case TV_HARD_ARMOR:
-			case TV_DRAG_ARMOR:
 			{
 				k_ptr->flags5 |= (TR5_SHOW_AC);
 				break;
@@ -4210,6 +4357,7 @@ errr parse_k_info(char *buf, header *head)
 	else if (buf[0] == 'P')
 	{
 		int ac, hd1, hd2, th, td, ta;
+		int k = 0;
 
 		/* There better be a current k_ptr */
 		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4221,9 +4369,10 @@ errr parse_k_info(char *buf, header *head)
 		k_ptr->ac = ac;
 		k_ptr->dd = hd1;
 		k_ptr->ds = hd2;
-		k_ptr->to_h = th;
-		k_ptr->to_d = td;
-		k_ptr->to_a =  ta;
+		
+		if (th) { k_ptr->aval[k] = th; k_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
+		if (td) {k_ptr->aval[k] = td; k_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
+		if (ta) {k_ptr->aval[k] = ta; k_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
 
 		switch(k_ptr->tval)
 		{
@@ -4433,6 +4582,7 @@ errr parse_a_info(char *buf, header *head)
 	else if (buf[0] == 'P')
 	{
 		int ac, hd1, hd2, th, td, ta;
+		int k=0;
 
 		/* There better be a current a_ptr */
 		if (!a_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4444,9 +4594,9 @@ errr parse_a_info(char *buf, header *head)
 		a_ptr->ac = ac;
 		a_ptr->dd = hd1;
 		a_ptr->ds = hd2;
-		a_ptr->to_h = th;
-		a_ptr->to_d = td;
-		a_ptr->to_a = ta;
+		if (th) { a_ptr->aval[k] = th; a_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
+		if (td) {a_ptr->aval[k] = td; a_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
+		if (ta) {a_ptr->aval[k] = ta; a_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
 	}
 
 	/* Process 'F' for flags */
@@ -4779,6 +4929,7 @@ errr parse_e_info(char *buf, header *head)
 	else if (buf[0] == 'C')
 	{
 		int th, td, ta, pv;
+		int k = 1;
 
 		/* There better be a current e_ptr */
 		if (!e_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4787,10 +4938,11 @@ errr parse_e_info(char *buf, header *head)
 		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
 			    &th, &td, &ta, &pv)) return (PARSE_ERROR_GENERIC);
 
-		e_ptr->max_to_h = th;
-		e_ptr->max_to_d = td;
-		e_ptr->max_to_a = ta;
-		e_ptr->max_pval = pv;
+		
+		if (th) { e_ptr->max_aval[k] = th; e_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
+		if (td) {e_ptr->max_aval[k] = td; e_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
+		if (ta) {e_ptr->max_aval[k] = ta; e_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
+		if (pv) e_ptr->max_aval[0] = pv;
 	}
 
 	/* Process 'Y' for "Rune" (one line only) */
@@ -6232,6 +6384,68 @@ errr parse_h_info(char *buf, header *head)
  */
 static errr grab_one_cast_flag(spell_type *s_ptr, cptr what)
 {
+	int n;
+	
+	/* Timed effects */
+	for (n = 0; n < TMD_MAX; n++)
+	{
+		if (!timed_effects[n].flag_name) continue;
+		
+		if (streq(what, timed_effects[n].flag_name))
+		{
+			if (n < 32) s_ptr->timed_flags1 |= (1L << n);
+			else if (n < 64) s_ptr->timed_flags2 |= (1L << (n - 32));
+			return (0);
+		}
+	}
+	
+	/* Cure timed effects */
+	if ((strlen(what) > 5) && (what[0] == 'C') && (what[1] == 'U') && (what[2] == 'R') && (what[3] == 'E') && (what[4] == '_'))
+	for (n = 0; n < TMD_MAX; n++)
+	{
+		if (!timed_effects[n].flag_name) continue;
+		
+		if (streq(what+5, timed_effects[n].flag_name))
+		{
+			if (n < 32) s_ptr->clear_timed_flags1 |= (1L << n);
+			/* else if (n < 64) s_ptr->clear_timed_flags2 |= (1L << (n - 32)); */
+			return (0);
+		}
+		
+		if ((strlen(timed_effects[n].flag_name) > 4) && (timed_effects[n].flag_name[0] == 'D') &&
+				(timed_effects[n].flag_name[1] == 'E') && (timed_effects[n].flag_name[2] == 'C') && (timed_effects[n].flag_name[3] == '_'))
+		if (streq(what+5, timed_effects[n].flag_name + 4))
+		{
+			if (n < 32) s_ptr->clear_timed_flags1 |= (1L << n);
+			/* else if (n < 64) s_ptr->clear_timed_flags2 |= (1L << (n - 32)); */
+			return (0);
+		}
+
+	}
+	
+	/* Partially cure timed effects */
+	if ((strlen(what) > 5) && (what[0] == 'P') && (what[1] == 'F') && (what[2] == 'I') && (what[3] == 'X') && (what[4] == '_'))
+	for (n = 0; n < TMD_MAX; n++)
+	{
+		if (!timed_effects[n].flag_name) continue;
+
+		if (streq(what+5, timed_effects[n].flag_name))
+		{
+			if (n < 32) s_ptr->pfix_timed_flags1 |= (1L << n);
+			/* else if (n < 64) s_ptr->pfix_timed_flags2 |= (1L << (n - 32)); */
+			return (0);
+		}
+		
+		if ((strlen(timed_effects[n].flag_name) > 4) && (timed_effects[n].flag_name[0] == 'D') &&
+				(timed_effects[n].flag_name[1] == 'E') && (timed_effects[n].flag_name[2] == 'C') && (timed_effects[n].flag_name[3] == '_'))
+		if (streq(what+5, timed_effects[n].flag_name + 4))
+		{
+			if (n < 32) s_ptr->clear_timed_flags1 |= (1L << n);
+			/* else if (n < 64) s_ptr->clear_timed_flags2 |= (1L << (n - 32)); */
+			return (0);
+		}
+	}
+	
 	if (grab_one_flag(&s_ptr->flags1, s_info_flags1, what) == 0)
 		return (0);
 
@@ -8039,7 +8253,6 @@ static int threat_mod(int threat, monster_race *r_ptr, bool ranged)
  * chance of casting spells and of spells failing,
  * chance of hitting in melee, and particularly speed.
  */
-
 static long eval_max_dam(monster_race *r_ptr)
 {
 	int i, x;
@@ -8115,7 +8328,7 @@ static long eval_max_dam(monster_race *r_ptr)
 			this_dam = 0;
 
 			/* We count ranged blows later */
-			if (!(x) && ((flag <= RF4_BLOW_4) || (flag == RF4_EXPLODE) || (flag == RF4_AURA))) continue;
+			if (!(x) && ((flag <= RF4_BLOW_4) || (flag == RF4_EXPLODE) || (flag == RF4_LEAP))) continue;
 
 			/* First make sure monster has the flag*/
 			if (flag & flag_counter)
@@ -9365,7 +9578,7 @@ errr eval_e_power(header *head)
 		/* Point at the "info" */
 		e_ptr = (ego_item_type*)head->info_ptr + i;
 
-		e_ptr->slay_power = slay_power(slay_index(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3, e_ptr->flags4));
+		e_ptr->slay_power = slay_power(slay_index(e_ptr->flags0, e_ptr->flags1, e_ptr->flags2, e_ptr->flags3, e_ptr->flags4));
 	}
 
 	/* Success */

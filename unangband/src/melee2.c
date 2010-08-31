@@ -28,6 +28,7 @@
  */
 
 static u32b rf4_ball_mask;
+static u32b rf4_self_target_mask;
 static u32b rf4_no_player_mask;
 static u32b rf4_beam_mask;
 static u32b rf4_bolt_mask;
@@ -437,6 +438,7 @@ static int find_resist(u32b smart, int effect)
 	{
 		/* Acid Spells */
 		case GF_ACID:
+		case GF_IMAGE_ACID:
 		case GF_VAPOUR:
 		{
 			if (smart & (SM_IMM_ACID)) return (100);
@@ -447,6 +449,7 @@ static int find_resist(u32b smart, int effect)
 
 		/* Lightning Spells */
 		case GF_ELEC:
+		case GF_IMAGE_ELEC:
 		{
 			if (smart & (SM_IMM_ELEC)) return (100);
 			else if ((smart & (SM_OPP_ELEC)) && (smart & (SM_RES_ELEC))) return (70);
@@ -456,6 +459,7 @@ static int find_resist(u32b smart, int effect)
 
 		/* Fire Spells */
 		case GF_FIRE:
+		case GF_IMAGE_FIRE:
 		case GF_SMOKE:
 		{
 			if (smart & (SM_IMM_FIRE)) return (100);
@@ -466,6 +470,7 @@ static int find_resist(u32b smart, int effect)
 
 		/* Cold Spells */
 		case GF_COLD:
+		case GF_IMAGE_COLD:
 		{
 			if (smart & (SM_IMM_COLD)) return (100);
 			else if ((smart & (SM_OPP_COLD)) && (smart & (SM_RES_COLD))) return (70);
@@ -475,8 +480,10 @@ static int find_resist(u32b smart, int effect)
 
 		/* Poison Spells */
 		case GF_POIS:
+		case GF_IMAGE_POIS:
 		case GF_POISON_WEAK:
 		case GF_POISON_HALF:
+		case GF_DELAY_POISON:
 		{
 			if (smart & (SM_IMM_POIS)) return (100);
 			else if ((smart & (SM_OPP_POIS)) && (smart & (SM_RES_POIS))) return (80);
@@ -1035,7 +1042,8 @@ static int choose_attack_spell_fast(int m_idx, int target_m_idx, u32b *f4p, u32b
  *
  * At the moment, we either leave the ty, tx as is, or
  * point it back at the casting monster, for spells that
- * assist them.
+ * must be cast on themselves. We also point back spells which would
+ * normally be cast on an ally, if we are not targetting an ally.
  *
  * Note that this routine chooses the offset from the actual target, not
  * a decision whether to attack the player or an allied monster.
@@ -1043,13 +1051,28 @@ static int choose_attack_spell_fast(int m_idx, int target_m_idx, u32b *f4p, u32b
 static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 {
 	monster_type *m_ptr = &m_list[m_idx];
+	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 
+	/* Mages and priests can assist others */
+	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) &&
+	
+		/* Allow assisting the player if an ally */
+		(((cave_m_idx[*tar_y][*tar_x] < 0) && ((m_ptr->mflag & (MFLAG_ALLY)) != 0)) ||
+	
+		/* Allow assisting those whose allegiance doesn't match your own */
+		(((cave_m_idx[*tar_y][*tar_x] > 0)) &&
+			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[cave_m_idx[*tar_y][*tar_x]] & (MFLAG_ALLY)) != 0)))))
+	{
+		/* Don't redirect assistance spells back to caster */
+		f4 = f5 = f6 = f7 = 0L;
+	}
+	
 	/* Check the spell */
 	if (i < 128)
 	{
 		u32b flag = 1L << (i - 96);
 
-		if ((flag & (RF4_ASSIST_MASK | RF4_SUMMON_MASK)) != 0)
+		if ((flag & (mf4 | pf4 | rf4_self_target_mask | RF4_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1059,7 +1082,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 128);
 
-		if ((flag & (RF5_ASSIST_MASK | RF5_SUMMON_MASK)) != 0)
+		if ((flag & (mf5 | pf5 | RF5_SELF_TARGET_MASK | RF5_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1069,7 +1092,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 160);
 
-		if ((flag & (RF6_ASSIST_MASK | RF6_SUMMON_MASK)) != 0)
+		if ((flag & (mf6 | pf6 | RF6_SELF_TARGET_MASK | RF6_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1079,7 +1102,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 192);
 
-		if ((flag & (RF7_ASSIST_MASK | RF7_SUMMON_MASK)) != 0)
+		if ((flag & (mf7 | pf7 | RF7_SELF_TARGET_MASK | RF7_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1113,8 +1136,9 @@ static void init_ranged_attack(monster_race *r_ptr)
 {
 	int ap_cnt;
 
-	/* Paranoia - clear the fake masks */
+	/* Clear the fake masks */
 	rf4_ball_mask = RF4_BALL_MASK;
+	rf4_self_target_mask = RF4_SELF_TARGET_MASK;
 	rf4_no_player_mask = RF4_NO_PLAYER_MASK;
 	rf4_beam_mask = RF4_BEAM_MASK;
 	rf4_bolt_mask = RF4_BOLT_MASK;
@@ -1155,6 +1179,7 @@ static void init_ranged_attack(monster_race *r_ptr)
 		else
 		{
 			if (method_ptr->flags1 & (PROJECT_BOOM)) rf4_ball_mask |= (RF4_BLOW_1 << ap_cnt);
+			if (method_ptr->flags1 & (PROJECT_SELF)) rf4_self_target_mask |= (RF4_BLOW_1 << ap_cnt);
 			if (method_ptr->flags1 & (PROJECT_SELF)) rf4_no_player_mask |= (RF4_BLOW_1 << ap_cnt);
 			if (method_ptr->flags1 & (PROJECT_BEAM)) rf4_beam_mask |= (RF4_BLOW_1 << ap_cnt);
 			if (method_ptr->flags1 & (PROJECT_STOP)) rf4_bolt_mask |= (RF4_BLOW_1 << ap_cnt);
@@ -1185,6 +1210,9 @@ static void init_ranged_attack(monster_race *r_ptr)
  */
 bool choose_to_attack_player(const monster_type *m_ptr)
 {
+	/* Hallucinating always attacks player */
+	if (m_ptr->do_image) return (TRUE);
+	
 	/* Allies don't attack player */
 	if (m_ptr->mflag & (MFLAG_ALLY)) return (FALSE);
 	
@@ -1208,6 +1236,9 @@ bool choose_to_attack_player(const monster_type *m_ptr)
  */
 bool choose_to_attack_monster(const monster_type *m_ptr, const monster_type *n_ptr)
 {
+	/* Hallucination always results in a fight */
+	if ((m_ptr->do_image) || (n_ptr->do_image)) return (TRUE);
+	
 	/* Allies and enemies of the player don't attack each other */
 	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0)) return (FALSE);
 	
@@ -1261,6 +1292,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	const byte *spell_desire;
 
 	u32b f4, f5, f6, f7;
+	u32b af4, af5, af6, af7;
 
 	byte spell_range;
 
@@ -1284,16 +1316,19 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	int best_spell=0, best_spell_rating=0;
 	int cur_spell_rating;
 
+	bool assist = FALSE;
+
 	/* Extract the racial spell flags */
 	f4 = r_ptr->flags4;
 	f5 = r_ptr->flags5;
 	f6 = r_ptr->flags6;
 	f7 = r_ptr->flags7;
-
-	/* Always permit huge blows */
-	if (r_ptr->flags3 & (RF3_HUGE))
+	
+	/* Priests will assist others if they are not near death */
+	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (m_ptr->hp < m_ptr->maxhp / 5))
 	{
-		for (i = 0; i < 4; i++) if ((method_info[r_ptr->blow[i].method].flags2 & (PR2_RANGED)) == 0) f4 |= (1L << i);
+		assist |= (((f4 & (RF4_ASSIST_MASK)) != 0) || ((f5 & (RF5_ASSIST_MASK)) != 0) ||
+					((f6 & (RF6_ASSIST_MASK)) != 0) || ((f7 & (RF7_ASSIST_MASK)) != 0));
 	}
 
 	/* Eliminate innate spells if not set */
@@ -1398,19 +1433,35 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	*tar_x = p_ptr->px;
 	dist = distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x);
 
+	
+	/*
+	 * Is the monster an ally who can assist the player in
+	 * a time of crisis?
+	 */
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (p_ptr->chp < p_ptr->mhp / 3) && assist 
+
+		/* Hack -- to avoid call to random */
+		&& (m_idx % 6 < 5 - (10 * p_ptr->chp / p_ptr->mhp)))
+	{
+		f4 &= (RF4_ASSIST_MASK);
+		f5 &= (RF5_ASSIST_MASK);
+		f6 &= (RF6_ASSIST_MASK);
+		f7 &= (RF7_ASSIST_MASK);
+	}
+	
 	/*
 	 * Is monster an ally, or fighting an ally of the player?
 	 *
 	 * XXX Blind monsters can only cast spells at enemies if aggravated.
 	 */
-	if (((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0) &&
+	else if (((m_ptr->mflag & (MFLAG_IGNORE | MFLAG_ALLY)) != 0) &&
 		(!(m_ptr->blind) || ((m_ptr->mflag & (MFLAG_AGGR)) != 0)))
 	{
 		/* Attempt at efficiency */
 		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
-		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
+		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0);
 		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
-		bool sneaking = p_ptr->sneaking || dist > MAX_SIGHT;
+		bool sneaking = (p_ptr->sneaking && ally) || dist > MAX_SIGHT;
 
 		/* Note we scale this up, and use a pseudo-random hack to try to get multiple monsters
 		 * to favour different equi-distant enemies */
@@ -1437,10 +1488,12 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 			/* Skip hidden targets */
 			if (n_ptr->mflag & (MFLAG_HIDE)) continue;
 
-			/* Monster has an enemy */
-			if (choose_to_attack_monster(m_ptr, n_ptr))
+			/* Monster has an enemy, or can assist an ally */
+			if ((choose_to_attack_monster(m_ptr, n_ptr)) || ((assist) && 
+				((((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0)))
 			{
 				bool see_target = aggressive;
+				bool assist_ally = (((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0));
 
 				/* XXX Note we prefer closer targets, however, reverse this for range 3 or less
 				 * This discourages the monster hitting itself with ball spells */
@@ -1492,7 +1545,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 				}
 
 				/* Ignore certain targets if sneaking */
-				if (sneaking)
+				if (sneaking && !assist_ally)
 				{
 					/* Target is asleep - ignore */
 					if (m_ptr->csleep) continue;
@@ -1539,7 +1592,80 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 						i = m_max;
 					}
 				}
-
+				
+				/* Determine if we can help ally */
+				if (assist_ally)
+				{
+					int d_base = MAX_SIGHT * 16 + ((m_idx + i) % 16);
+					
+					/* I'd benefit more from ignoring you and healing myself. */
+					if ((f6 & (RF6_HEAL | RF6_TELE_TO)) != 0) d_base += MAX_SIGHT * 8 - MAX_SIGHT * 8 * m_ptr->hp / m_ptr->max_hp;
+					
+					/* Determine if it is worth helping this monster */
+					d = d_base;
+					
+					/* Target would benefit more from healing / buffing / teleporting away from danger as its hit points decrease. */
+					if ((f6 & (RF6_HEAL | RF6_HASTE | RF6_SHIELD | RF6_BLESS | RF6_TELE_TO)) != 0) d -= MAX_SIGHT * 8 * n_ptr->hp / n_ptr->maxhp;
+					
+					/* Don't bother buffing or curing badly hurt targets that we can't heal or teleport away */
+					if (((f6 & (RF6_HEAL | RF6_TELE_TO)) == 0) && (n_ptr->hp < n_ptr->max_hp / 2)) d += MAX_SIGHT * 12 - MAX_SIGHT * 24 * n_ptr->hp / n_ptr->maxhp;
+					
+					/* Benefit from curing */
+					if ((f6 & (RF6_CURE)) != 0)
+					{
+						int d_cure = d_base;
+						d_cure -= n_ptr->stunned / 2;
+						d_cure -= n_ptr->confused / 2;
+						d_cure -= n_ptr->monfear / 2;
+						d_cure -= n_ptr->cut / 2;
+						d_cure -= n_ptr->poisoned / 2;
+						d_cure -= n_ptr->mana ? n_ptr->blind : n_ptr->blind / 2;
+						d_cure -= n_ptr->image;
+						d_cure -= n_ptr->mana ? n_ptr->blind : n_ptr->blind / 2;
+						d = MIN(d, MAX(d_cure, d_base - MAX_SIGHT * 4));
+					}
+					
+					/* Benefit from hasting */
+					if ((f6 & (RF6_HASTE)) != 0)
+					{
+						int d_speed = d;
+						if (m_ptr->hasted) d_speed = MIN(d, d_base / 2);
+						if (n_ptr->hasted) d_speed = 10000;
+						if (n_ptr->slowed) d_speed -= 48;
+						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_HASTE))) != 0) ? MIN(d, d_speed) : d_speed;
+					}
+					
+					/* Benefit from shielding */
+					if ((f6 & (RF6_SHIELD)) != 0)
+					{
+						int d_shield = d;
+						if (m_ptr->shield) d_shield = MIN(d, d_base / 2);
+						if (n_ptr->shield) d_shield = 10000;
+						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_SHIELD))) != 0) ? MIN(d, d_shield) : d_shield;
+					}
+					
+					/* Benefit from elemental protection */
+					if ((f6 & (RF6_OPPOSE_ELEM)) != 0)
+					{
+						int d_oppose_elem = d;
+						if (m_ptr->oppose_elem) d_shield = MIN(d, d_base / 2);
+						if (n_ptr->oppose_elem) d_shield = 10000;
+						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_OPPOSE_ELEM))) != 0) ? MIN(d, d_shield) : d_shield;
+					}
+					
+					/* Benefit from blessing */
+					if ((f6 & (RF6_BLESS)) != 0)
+					{
+						int d_bless = d;
+						if (m_ptr->bless) d_bless = MIN(d, d_base / 2);
+						if (n_ptr->bless) d_bless = 10000;
+						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_BLESS))) != 0) ? MIN(d, d_bless) : d_bless;
+					}
+					
+					/* Not worth helping */
+					if (d >= MAX_SIGHT * 16) continue;
+				}
+				
 				/* Pick a random target. Have checked for LOS already. */
 				if ((see_target) && (d < k))
 				{
@@ -1550,12 +1676,44 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					target_m_idx = i;
 
 					k = d;
+					
+					/* Don't assist allies if we have a valid target */
+					if (!assist_ally) assist = FALSE;
 				}
 			}
 		}
 
 		/* Important: Don't use healing attacks against enemies */
 		if ((target_m_idx) && ((r_info[m_list[target_m_idx].r_idx].flags3 & (RF3_DEMON)) != 0)) f5 &= ~(RF5_ARC_HFIRE);
+	}
+	
+	/* Hack -- helping allies */
+	if ((target_m_idx) && ((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[target_m_idx].mflag & (MFLAG_ALLY)) != 0))
+	{
+		/* Hack - cure hallucinating monsters or kill them */
+		if (m_list[target_m_idx].do_image)
+		{
+			if (f6 & (RF6_CURE))
+			{
+				f4 = f5 = f7 = 0L;
+				f6 = (RF6_CURE);
+			}
+		}			
+		/* Sometimes be selfish */
+		else if ((m_idx + target_m_idx) % 2)
+		{
+			target_m_idx = 0;
+		}
+		/* Only allow spells which assist the target */
+		else
+		{
+			f4 &= (RF4_ASSIST_MASK);
+			f5 &= (RF5_ASSIST_MASK);
+			f6 &= (RF6_ASSIST_MASK);
+			f7 &= (RF7_ASSIST_MASK);
+		
+			/* TODO: Figure out what spells it is worth using to assist this particular ally */
+		}
 	}
 
 	/* No valid target or targetting player and friendly/neutral and not aggressive. */
@@ -1996,6 +2154,19 @@ bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok)
 
 
 /*
+ * Check if an illusion hides danger beneath
+ */
+bool region_illusion_hook(int y, int x, s16b d, s16b region)
+{
+	region_type *r_ptr = region_list[region];
+	
+	(void)x; (void)y; (void)d;
+	
+	return (r_ptr->effect == GF_ILLUSION);
+}
+
+
+/*
  * Can the monster enter this grid?  How easy is it for them to do so?
  *
  * The code that uses this function sometimes assumes that it will never
@@ -2118,7 +2289,6 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	/* Check how we move */
 	mmove = place_monster_here(y,x,m_ptr->r_idx);
 
-
 	/*** Check passability of various features. ***/
 
 	/* The monster is under covered terrain, moving to uncovered terrain. */
@@ -2142,6 +2312,13 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	/* Feature is passable or damaging */
 	else if (mmove != MM_FAIL)
 	{
+		/* Hack -- allow incautious enemies to think they can move safely on illusory terrain */
+		if (((r_ptr->flags2 & (RF2_EMPTY_MIND)) == 0) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_SMART)) == 0)
+				&& (region_grid(y, x, region_illusion_hook)))
+		{
+			if ((mmove == MM_TRAP) || (mmove == MM_DROWN)) mmove = MM_WALK;
+		}
+		
 		/* Do not kill ourselves in terrain unless confused */
 		if (mmove == MM_DROWN && !m_ptr->confused)
 		{
@@ -6414,7 +6591,13 @@ static void process_monster(int m_idx)
 		chance_spell /= 2;
 		chance_innate /= 2;
 	}
-
+#if 0	
+	/* Blind and not smart monsters cannot cast spells, except rarely */
+	if ((m_ptr->blind) && ((m_ptr->mflag & (MFLAG_SMART)) == 0) && (chance_spell))
+	{
+		chance_spell = 1;
+	}
+#endif
 	/* Monster can use ranged attacks */
 	/* Now use a 'save' against the players charisma to avoid this */
 	if ((chance_innate) || (chance_spell)
@@ -6892,7 +7075,7 @@ static void process_monster(int m_idx)
 		bool ally = ((m_ptr->mflag & (MFLAG_ALLY)) != 0);
 		bool aggressive = ((m_ptr->mflag & (MFLAG_AGGR)) != 0) ;
 		bool need_lite = ((r_ptr->flags2 & (RF2_NEED_LITE)) == 0);
-		bool sneaking = (p_ptr->sneaking) || (m_ptr->cdis > MAX_SIGHT);
+		bool sneaking = (p_ptr->sneaking && ally) || (m_ptr->cdis > MAX_SIGHT);
 
 		/* Note: We have to prevent never move monsters from acquiring non-adjacent targets or they will move */
 		bool can_target = (aggressive || !(m_ptr->monfear));

@@ -96,6 +96,7 @@ typedef struct room_info_type room_info_type;
 typedef struct feature_state feature_state;
 typedef struct feature_blow feature_blow;
 typedef struct feature_type feature_type;
+typedef struct ability_type ability_type;
 typedef struct object_kind object_kind;
 typedef struct object_info object_info;
 typedef struct object_lore object_lore;
@@ -532,6 +533,25 @@ struct feature_type
 };
 
 
+
+/*
+ * Information about abilities
+ */
+struct ability_type
+{
+	char *desc;
+	char *name;
+	
+	byte	type;
+	byte	flag_num;
+	u32b	flag_match;
+	
+	/* Used for calculating power where power is ax*x/b + cx/d + e for positive avals and fx/g + h for negative */
+	s16b	a, b, c, d, e, f, g, h;
+};
+
+
+
 /*
  * Information about object "kinds", including player knowledge.
  *
@@ -548,10 +568,8 @@ struct object_kind
 	s16b pval;      /* Object extra info */
 	s16b charges;   /* Object charges info */
 
-	s16b to_h;      /* Bonus to hit */
-	s16b to_d;      /* Bonus to damage */
-	s16b to_a;      /* Bonus to armor */
-
+	s16b aval[MAX_AVALS_KIND];	/* Object ability info */
+	
 	s16b ac;	/* Base armor */
 
 	byte dd, ds;    /* Damage dice/sides */
@@ -560,6 +578,8 @@ struct object_kind
 
 	s32b cost;      /* Object "base cost" */
 
+	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_KIND];	/* Abilities */
+	
 	u32b flags1;    /* Flags, set 1 */
 	u32b flags2;    /* Flags, set 2 */
 	u32b flags3;    /* Flags, set 3 */
@@ -604,11 +624,13 @@ struct object_kind
  */
 struct object_info
 {
+	u32b can_flags0[ABILITY_ARRAY_SIZE];
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;
 	u32b can_flags4;
 
+	u32b not_flags0[ABILITY_ARRAY_SIZE];
 	u32b not_flags1;
 	u32b not_flags2;
 	u32b not_flags3;
@@ -621,16 +643,19 @@ struct object_info
  */
 struct object_lore
 {
+	u32b can_flags0[ABILITY_ARRAY_SIZE];
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;
 	u32b can_flags4;
 
+	u32b may_flags0[ABILITY_ARRAY_SIZE];
 	u32b may_flags1;
 	u32b may_flags2;
 	u32b may_flags3;
 	u32b may_flags4;
 
+	u32b not_flags0[ABILITY_ARRAY_SIZE];
 	u32b not_flags1;
 	u32b not_flags2;
 	u32b not_flags3;
@@ -656,17 +681,17 @@ struct artifact_type
 
 	s16b pval;      /* Artifact extra info */
 
-	s16b to_h;      /* Bonus to hit */
-	s16b to_d;      /* Bonus to damage */
-	s16b to_a;      /* Bonus to armor */
+	s16b aval[MAX_AVALS_ARTIFACT];	/* Artifact ability info */
+	
+	s16b ac;	/* Base armor */
 
-	s16b ac;/* Base armor */
-
-	byte dd, ds;    /* Damage when hits */
+	byte dd, ds;    /* Damage dice/sides */
 
 	s16b weight;    /* Weight */
 
 	s32b cost;      /* Artifact "cost" */
+
+	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_ARTIFACT];	/* Abilities */
 
 	u32b flags1;    /* Artifact Flags, set 1 */
 	u32b flags2;    /* Artifact Flags, set 2 */
@@ -717,19 +742,19 @@ struct ego_item_type
 	byte max_sval[3];       /* Maximum legal tval */
 	byte xtra;      /* Extra Sustain/Resist/Power */
 
-	s16b max_to_h;  /* Maximum to-hit bonus */
-	s16b max_to_d;  /* Maximum to-dam bonus */
-	s16b max_to_a;  /* Maximum to-ac bonus */
-
-	s16b max_pval;  /* Maximum pval */
-
+	s16b max_aval[MAX_AVALS_EGO_ITEM];	/* Ego item ability info */
+	
 	s32b cost;      /* Ego-item "cost" */
+
+	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_EGO_ITEM];	/* Abilities */
 
 	u32b flags1;    /* Ego-Item Flags, set 1 */
 	u32b flags2;    /* Ego-Item Flags, set 2 */
 	u32b flags3;    /* Ego-Item Flags, set 3 */
 	u32b flags4;    /* Ego-Item Flags, set 4 */
 
+	u32b obv_flags0[ABILITY_ARRAY_SIZE];	/* Obvious abilities */
+	
 	u32b obv_flags1;    /* Obvious Ego-Item Flags, set 1 */
 	u32b obv_flags2;    /* Obvious Ego-Item Flags, set 2 */
 	u32b obv_flags3;    /* Obvious Ego-Item Flags, set 3 */
@@ -1080,10 +1105,10 @@ struct object_type
 	byte xtra1;     /* Extra info type */
 	byte xtra2;     /* Extra info index */
 
-	s16b to_h;      /* Plusses to hit */
-	s16b to_d;      /* Plusses to damage */
-	s16b to_a;      /* Plusses to AC */
-
+	s16b aval[MAX_AVALS_OBJECT];	/* Object ability info */
+	
+	byte aval_index[MAX_AVALS_OBJECT]; /* Match for each index */
+	
 	s16b ac;/* Normal AC */
 
 	byte dd, ds;    /* Damage dice/sides */
@@ -1091,7 +1116,7 @@ struct object_type
 	s16b charges;	/* Item charges */
 	s16b timeout;   /* Timeout Counter */
 
-	u16b ident;     /* Identify flags  */
+	u32b ident;     /* Identify flags  */
 	u16b note;      /* Inscription index */
 
 	byte stackc;    /* Stack count */
@@ -1107,16 +1132,19 @@ struct object_type
 	byte origin_depth;  /* What depth the item was found at */
 	u16b origin_xtra;   /* Extra information about origin */
 
+	u32b can_flags0[ABILITY_ARRAY_SIZE];
 	u32b can_flags1;
 	u32b can_flags2;
 	u32b can_flags3;
 	u32b can_flags4;
 
+	u32b may_flags0[ABILITY_ARRAY_SIZE];
 	u32b may_flags1;
 	u32b may_flags2;
 	u32b may_flags3;
 	u32b may_flags4;
 
+	u32b not_flags0[ABILITY_ARRAY_SIZE];
 	u32b not_flags1;
 	u32b not_flags2;
 	u32b not_flags3;
@@ -1167,6 +1195,9 @@ struct monster_type
 	byte bless;	/* Monster is temporarily blessed */
 	byte berserk;	/* Monster is temporarily beserk */
 
+	byte image;	/* Monster is hallucinating */
+	byte dazed;	/* Monster is dazed */
+	
 	byte shield;	/* Monster is temporarily shielded */
 	byte oppose_elem; /* Monster is temporarily resistant to elements */
 	byte petrify;	/* TODO: Monster is petrified / off-balance */
@@ -1387,6 +1418,7 @@ struct player_race
 
 	s16b hist;      /* Starting history index */
 
+	u32b cancel_flags0[ABILITY_ARRAY_SIZE];	    /* Race can never have these flags, set 0 */
 	u32b cancel_flags1;    /* Race can never have these flags, set 1 */
 	u32b cancel_flags2;    /* Race can never have these flags, set 2 */
 	u32b cancel_flags3;    /* Race can never have these flags, set 3 */
@@ -1541,7 +1573,14 @@ struct spell_type
 	u32b flags1;
 	u32b flags2;
 	u32b flags3;
+	
+	u32b timed_flags1; /* Timed effects - negative */
+	u32b timed_flags2; /* Timed effects - positive */
 
+	u32b clear_timed_flags1; /* Clears timed effects - negative */
+	
+	u32b pfix_timed_flags1; /* Partially clears timed effects - negative */
+	
 	s16b type;
 	s16b param;
 
@@ -1923,7 +1962,7 @@ struct player_type
 	u32b cur_flags3;
 	u32b cur_flags4;
 
-	byte incr_resist[MAX_INCR_RESISTS];
+	s16b ability[ABILITY_MAX];
 
 	byte siz_penalty;
 
@@ -2122,6 +2161,7 @@ struct do_cmd_item_type
 	bool (*player_command)(int item);	/* The function to use as the command */
 	char cmd_char;						/* The 'internal' keypress the command corresponds to */
 
+	const char *item_prevented;			/* The present tense description - used to indicate what status effects prevent this action e.g. 'eating food'. */
 	const char *item_command;			/* The name of the command */
 	const char *item_query;				/* The string to display when asking for which item */
 	const char *item_not_found;			/* The string to display if no valid items are found */
@@ -2162,8 +2202,21 @@ struct timed_effect
   const char *on_decrease;
   const char *on_condition;
   const char *self_knowledge;
+  const char *perfect_tense;
+  const char *flag_name;
+  const char *long_description;
+  const char *short_description;
+  
   u32b flag_redraw, flag_update;
   int msg;
+  
+  u32b ignore_flags1;
+  u32b ignore_flags2;
+  u32b ignore_flags3;
+  u32b ignore_flags4;
+  
+  byte oppose;
+  byte suppress;
 };
 
 

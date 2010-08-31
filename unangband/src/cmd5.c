@@ -1227,13 +1227,13 @@ bool player_cast_spell(int spell, int plev, cptr p, cptr t)
 		if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_SILENT)))
 		{
 			/* Always notice */
-			equip_can_flags(0x0L,0x0L,0x0L,TR4_SILENT);
+			equip_can_flags(NULL, 0x0L,0x0L,0x0L,TR4_SILENT);
 		}
 	}
 	else
 	{
 		/* Always notice */
-		equip_not_flags(0x0L,0x0L,0x0L,TR4_SILENT);
+		equip_not_flags(NULL, 0x0L,0x0L,0x0L,TR4_SILENT);
 	}
 
 	/* Failed spell */
@@ -1461,7 +1461,19 @@ bool player_cast(int item)
 			break;
 		}
 	}
+	
+	/* Both dazed and terrified; cannot cast */
+	if ((p_ptr->timed[TMD_DAZED]) && (p_ptr->timed[TMD_TERROR]))
+	{
+		msg_print("You cannot cast any spells while both dazed and terrified.");
+		
+		return (FALSE);
+	}
 
+	/* Warn the player */
+	if (p_ptr->timed[TMD_DAZED]) msg_format("%s", timed_effects[TMD_DAZED].on_condition);
+	if (p_ptr->timed[TMD_TERROR]) msg_format("%s", timed_effects[TMD_TERROR].on_condition);
+	
 	/* Ask for a spell */
 	if (!get_spell(&spell, p, o_ptr, TRUE))
 	{

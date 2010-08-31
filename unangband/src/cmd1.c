@@ -163,493 +163,146 @@ sint critical_norm(int weight, int plus, int dam)
 sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, bool floor)
 {
 	int mult = 1;
+	int bonus;
 
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
 	monster_lore *l_ptr = &l_list[m_ptr->r_idx];
 
-	u32b f1, f2, f3, f4;
-
-	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
-	/* Hack -- apply player branding */
-	if (!p_ptr->branded_blows) /* Nothing */ ;
-	else if (p_ptr->branded_blows < 33) f1 |= 1L << (p_ptr->branded_blows - 1);
-	else if (p_ptr->branded_blows < 65) f2 |= 1L << (p_ptr->branded_blows - 33);
-	else if (p_ptr->branded_blows < 97) f3 |= 1L << (p_ptr->branded_blows - 65);
-	else if (p_ptr->branded_blows < 129) f4 |= 1L << (p_ptr->branded_blows - 97);
-
-	/* Some "weapons" and "ammo" do extra damage */
-	switch (o_ptr->tval)
+	int i;
+	
+	/* Check all abilities */
+	for (i = 0; i < ABILITY_MAX; i++)
 	{
-		case TV_SHOT:
-		case TV_ARROW:
-		case TV_BOLT:
-		case TV_HAFTED:
-		case TV_POLEARM:
-		case TV_SWORD:
-		case TV_DIGGING:
-		case TV_STAFF:
-		case TV_GLOVES:
+		/* Reset bonus */
+		bonus = 0;
+		
+		/* Ability provides an attacking bonus against creature which
+		 * match a certain flag */
+		if (ability_bonus[i].type == BONUS_SLAY)
 		{
-			/* Slay Animal */
-			if ((f1 & (TR1_SLAY_NATURAL)) &&
-			    (r_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT)))
+			/* Matches a monster */
+			if ( ((ability_bonus[i].flag_num == 1) && ((r_ptr->flags1 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 2) && ((r_ptr->flags2 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 3) && ((r_ptr->flags3 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 4) && ((r_ptr->flags4 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 5) && ((r_ptr->flags5 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 6) && ((r_ptr->flags6 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 7) && ((r_ptr->flags7 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 8) && ((r_ptr->flags8 & (ability_bonus[i].flag_match)) != 0)) ||
+					((ability_bonus[i].flag_num == 9) && ((r_ptr->flags9 & (ability_bonus[i].flag_match)) != 0)) )
 			{
-				if (m_ptr->ml)
+				bonus = object_aval(o_ptr, i);
+				
+				/* Weapon has a bonus or penalty */
+				if ((bonus < 1) || (bonus > 1))
 				{
-					if (p_ptr->branded_blows != 17) object_can_flags(o_ptr,TR1_SLAY_NATURAL,0x0L,0x0L,0x0L, floor);
-					if (r_ptr->flags3 & RF3_ANIMAL) l_ptr->flags3 |= (RF3_ANIMAL);
-					if (r_ptr->flags3 & RF3_PLANT) l_ptr->flags3 |= (RF3_PLANT);
-					if (r_ptr->flags3 & RF3_INSECT) l_ptr->flags3 |= (RF3_INSECT);
+					object_can_ability(o_ptr,i, floor);
+					
+					if (ability_bonus[i].flag_num == 1) l_ptr->flags1 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 2) l_ptr->flags2 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 3) l_ptr->flags3 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 4) l_ptr->flags4 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 5) l_ptr->flags5 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 6) l_ptr->flags6 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 7) l_ptr->flags7 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 8) l_ptr->flags8 |= (ability_bonus[i].flag_match);
+					else if (ability_bonus[i].flag_num == 9) l_ptr->flags9 |= (ability_bonus[i].flag_match);
 				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_NATURAL,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Slay Undead */
-			if ((f1 & (TR1_SLAY_UNDEAD)) &&
-			    (r_ptr->flags3 & (RF3_UNDEAD)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 19) object_can_flags(o_ptr,TR1_SLAY_UNDEAD,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_UNDEAD);
-				}
-
-				if (mult < 3) mult = 3;
-			}
-			else if ((r_ptr->flags3 & (RF3_UNDEAD)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_UNDEAD,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Slay Demon */
-			if ((f1 & (TR1_SLAY_DEMON)) &&
-			    (r_ptr->flags3 & (RF3_DEMON)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 20) object_can_flags(o_ptr,TR1_SLAY_DEMON,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_DEMON);
-				}
-				if (mult < 3) mult = 3;
-			}
-			else if ((l_ptr->flags3 & (RF3_DEMON)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_DEMON,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Slay Dragon */
-			if ((f1 & (TR1_SLAY_DRAGON)) &&
-			    (r_ptr->flags3 & (RF3_DRAGON)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 24) object_can_flags(o_ptr,TR1_SLAY_DRAGON,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_DRAGON);
-				}
-
-				if (mult < 3) mult = 3;
-			}
-			else if ((l_ptr->flags3 & (RF3_DRAGON)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_DRAGON,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Slay Orc */
-			if ((f1 & (TR1_SLAY_ORC)) &&
-			    (r_ptr->flags3 & (RF3_ORC)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 21) object_can_flags(o_ptr,TR1_SLAY_ORC,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_ORC);
-				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags3 & (RF3_ORC)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_ORC,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Slay Troll */
-			if ((f1 & (TR1_SLAY_TROLL)) &&
-			    (r_ptr->flags3 & (RF3_TROLL)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 22) object_can_flags(o_ptr,TR1_SLAY_TROLL,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_TROLL);
-				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags3 & (RF3_TROLL)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_TROLL,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Slay Giant */
-			if ((f1 & (TR1_SLAY_GIANT)) &&
-			    (r_ptr->flags3 & (RF3_GIANT)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 23) object_can_flags(o_ptr,TR1_SLAY_GIANT,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_GIANT);
-				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags3 & (RF3_GIANT)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_SLAY_GIANT,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Execute Dragon */
-			if ((f1 & (TR1_KILL_DRAGON)) &&
-			    (r_ptr->flags3 & (RF3_DRAGON)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 25) object_can_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_DRAGON);
-				}
-
-				if (mult < 5) mult = 5;
-			}
-			else if ((l_ptr->flags3 & (RF3_DRAGON)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_KILL_DRAGON,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Execute demon */
-			if ((f1 & (TR1_KILL_DEMON)) &&
-			    (r_ptr->flags3 & (RF3_DEMON)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 26) object_can_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_DEMON);
-				}
-
-				if (mult < 5) mult = 5;
-			}
-			else if ((l_ptr->flags3 & (RF3_DEMON)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_KILL_DEMON,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Execute undead */
-			if ((f1 & (TR1_KILL_UNDEAD)) &&
-			    (r_ptr->flags3 & (RF3_UNDEAD)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 27) object_can_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_UNDEAD);
-				}
-
-				if (mult < 5) mult = 5;
-			}
-			else if ((l_ptr->flags3 & (RF3_UNDEAD)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_KILL_UNDEAD,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Brand (Acid) */
-			if (f1 & (TR1_BRAND_ACID))
-			{
-				/* Notice immunity */
-				if (r_ptr->flags3 & (RF3_IM_ACID))
-				{
-					if (m_ptr->ml)
-					{
-						if (p_ptr->branded_blows != 29) object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
-						l_ptr->flags3 |= (RF3_IM_ACID);
-					}
-				}
-
-				/* Otherwise, take the damage */
 				else
 				{
-					if ((m_ptr->ml) && (p_ptr->branded_blows != 29)) object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
-
-					/* Armour partially protects the monster */
+					object_not_ability(o_ptr,i, floor);
+				}
+				
+				/* Player branding */
+				if (p_ptr->branded_blows == i + 1) bonus = MAX(3, bonus);
+				
+				/* Use bonus if higher than multiplier */
+				if (bonus > mult) mult = bonus;
+			}	
+		}
+		
+		/* Ability provides an attacking bonus against creature which don't
+		 * match a certain flag */
+		else if (ability_bonus[i].type >= BONUS_BRAND)
+		{
+			/* Matches a monster */
+			if ( ((ability_bonus[i].flag_num == 1) && ((r_ptr->flags1 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 2) && ((r_ptr->flags2 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 3) && ((r_ptr->flags3 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 4) && ((r_ptr->flags4 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 5) && ((r_ptr->flags5 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 6) && ((r_ptr->flags6 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 7) && ((r_ptr->flags7 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 8) && ((r_ptr->flags8 & (ability_bonus[i].flag_match)) == 0)) ||
+					((ability_bonus[i].flag_num == 9) && ((r_ptr->flags9 & (ability_bonus[i].flag_match)) == 0)) )
+			{
+				bonus = object_aval(o_ptr, i);
+				
+				/* Weapon has a bonus or penalty */
+				if ((bonus < 1) || (bonus > 1))
+				{
+					object_can_ability(o_ptr,i, floor);
+				}
+				else
+				{
+					object_not_ability(o_ptr,i, floor);
+				}
+				
+				/* Player branding */
+				if (p_ptr->branded_blows == i + 1) bonus = MAX(3, bonus);
+				
+				/* Oppose elements reduces damage */
+				if (ability_bonus[i].type >= BONUS_BRAND_ELEM)
+				{
+					if (m_ptr->oppose_elem) bonus = (bonus + 1) / 2;
+				}
+				
+				/* Armour reduces damage */
+				if (ability_bonus[i].type == BONUS_BRAND_WATER_ARMOR)
+				{
 					if (r_ptr->flags2 & (RF2_ARMOR))
 					{
-						if (m_ptr->ml)
-						{
-							if (p_ptr->branded_blows != 29) object_can_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
-							l_ptr->flags2 |= (RF2_ARMOR);
-						}
-
-						if (m_ptr->oppose_elem)/* Do nothing */;
-						else if (mult < 2) mult = 2;
+						bonus = (m_ptr->oppose_elem) ? (bonus - 1) : (bonus + 1) / 2;
+						l_ptr->flags2 |= (RF2_ARMOR);
 					}
-
-					/* Water decreases damage */
+				}
+				
+				/* Water increases damage */
+				if (ability_bonus[i].type == BONUS_BRAND_WATER_XTRA)
+				{
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if (m_ptr->oppose_elem)/* Do nothing */;
-						else if (mult < 2) mult = 2;
-					}
-					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
-					else if (mult < 3) mult = 3;
-				}
-			}
-			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_ACID)))
-			{
-				object_not_flags(o_ptr,TR1_BRAND_ACID,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Brand (Elec) */
-			if (f1 & (TR1_BRAND_ELEC))
-			{
-				/* Notice immunity */
-				if (r_ptr->flags3 & (RF3_IM_ELEC))
-				{
-					if (m_ptr->ml)
-					{
-						if (p_ptr->branded_blows != 30) object_can_flags(o_ptr,TR1_BRAND_ELEC,0x0L,0x0L,0x0L, floor);
-						l_ptr->flags3 |= (RF3_IM_ELEC);
+						bonus++;
 					}
 				}
-
-				/* Otherwise, take the damage */
-				else
+				/* Water descreases damage */
+				else if (ability_bonus[i].type >= BONUS_BRAND_WATER_WEAK)
 				{
-					if ((m_ptr->ml) && (p_ptr->branded_blows != 30)) object_can_flags(o_ptr,TR1_BRAND_ELEC,0x0L,0x0L,0x0L, floor);
-
-					/* Water increases damage */
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
 					{
-						if ((m_ptr->oppose_elem) && (mult < 3)) mult = 3;
-						else if (mult < 4) mult = 4;
-					}
-					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
-					else if (mult < 3) mult = 3;
-				}
-			}
-			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_ELEC)))
-			{
-				object_not_flags(o_ptr,TR1_BRAND_ELEC,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Brand (Fire) */
-			if (f1 & (TR1_BRAND_FIRE))
-			{
-				/* Notice immunity */
-				if (r_ptr->flags3 & (RF3_IM_FIRE))
-				{
-					if (m_ptr->ml)
-					{
-						if (p_ptr->branded_blows != 31) object_can_flags(o_ptr,TR1_BRAND_FIRE,0x0L,0x0L,0x0L, floor);
-						l_ptr->flags3 |= (RF3_IM_FIRE);
+						bonus--;
 					}
 				}
-
-				/* Otherwise, take the damage */
-				else
-				{
-					if ((m_ptr->ml) && (p_ptr->branded_blows != 31)) object_can_flags(o_ptr,TR1_BRAND_FIRE,0x0L,0x0L,0x0L, floor);
-
-					/* Water decreases damage */
-					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
-					{
-						if (m_ptr->oppose_elem) ;
-						else if (mult < 2) mult = 2;
-					}
-					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
-					else if (mult < 3) mult = 3;
-				}
+				
+				/* Use bonus if higher than multiplier */
+				if (bonus > mult) mult = bonus;
 			}
-			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_FIRE)))
+			else
 			{
-				object_not_flags(o_ptr,TR1_BRAND_FIRE,0x0L,0x0L,0x0L, floor);
+				/* Learn about resistance */
+				if (ability_bonus[i].flag_num == 1) l_ptr->flags1 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 2) l_ptr->flags2 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 3) l_ptr->flags3 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 4) l_ptr->flags4 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 5) l_ptr->flags5 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 6) l_ptr->flags6 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 7) l_ptr->flags7 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 8) l_ptr->flags8 |= (ability_bonus[i].flag_match);
+				else if (ability_bonus[i].flag_num == 9) l_ptr->flags9 |= (ability_bonus[i].flag_match);
 			}
-
-			/* Brand (Cold) */
-			if (f1 & (TR1_BRAND_COLD))
-			{
-				/* Notice immunity */
-				if (r_ptr->flags3 & (RF3_IM_COLD))
-				{
-					if (m_ptr->ml)
-					{
-						if (p_ptr->branded_blows != 32) object_can_flags(o_ptr,TR1_BRAND_COLD,0x0L,0x0L,0x0L, floor);
-						l_ptr->flags3 |= (RF3_IM_COLD);
-					}
-				}
-
-				/* Otherwise, take the damage */
-				else
-				{
-					if ((m_ptr->ml) && (p_ptr->branded_blows != 32)) object_can_flags(o_ptr,TR1_BRAND_COLD,0x0L,0x0L,0x0L, floor);
-
-					/* Water increases damage */
-					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
-					{
-						if ((m_ptr->oppose_elem) && (mult < 3)) mult = 3;
-						else if (mult < 4) mult = 4;
-					}
-					else if ((m_ptr->oppose_elem) && (mult < 2)) mult = 2;
-					else if (mult < 3) mult = 3;
-				}
-			}
-			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_COLD)))
-			{
-				object_not_flags(o_ptr,TR1_BRAND_COLD,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Brand (Poison) */
-			if (f1 & (TR1_BRAND_POIS))
-			{
-				/* Notice immunity */
-				if (r_ptr->flags3 & (RF3_IM_POIS))
-				{
-					if (m_ptr->ml)
-					{
-						if (p_ptr->branded_blows != 28) object_can_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L, floor);
-						l_ptr->flags3 |= (RF3_IM_POIS);
-					}
-				}
-
-				/* Otherwise, take the damage */
-				else
-				{
-					if (m_ptr->ml) if (p_ptr->branded_blows != 28) object_can_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L, floor);
-
-					if (mult < 3) mult = 3;
-				}
-			}
-			else if ((m_ptr->ml) && (l_ptr->flags3 & (RF3_IM_POIS)))
-			{
-				object_not_flags(o_ptr,TR1_BRAND_POIS,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Brand Holy */
-			if ((f1 & (TR1_BRAND_HOLY)) &&
-			    (r_ptr->flags3 & (RF3_EVIL)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 18) object_can_flags(o_ptr,TR1_BRAND_HOLY,0x0L,0x0L,0x0L, floor);
-					l_ptr->flags3 |= (RF3_EVIL);
-				}
-
-				if (mult < 3) mult = 3;
-			}
-			else if ((l_ptr->flags3 & (RF3_EVIL)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,TR1_BRAND_HOLY,0x0L,0x0L,0x0L, floor);
-			}
-
-			/* Brand lite */
-			if ((f4 & (TR4_BRAND_LITE)) &&
-			    (r_ptr->flags3 & (RF3_HURT_LITE)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 98) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_LITE, floor);
-					l_ptr->flags3 |= (RF3_HURT_LITE);
-				}
-
-				if (mult < 3) mult = 3;
-			}
-			else if ((l_ptr->flags3 & (RF3_HURT_LITE)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_LITE, floor);
-			}
-
-			/* Brand (Dark) */
-			if (f4 & (TR4_BRAND_DARK))
-			{
-				/* Notice immunity */
-				if (r_ptr->flags9 & (RF9_RES_DARK))
-				{
-					if (m_ptr->ml)
-					{
-						if (p_ptr->branded_blows != 97) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK, floor);
-						l_ptr->flags9 |= (RF9_RES_DARK);
-					}
-				}
-
-				/* Otherwise, take the damage */
-				else
-				{
-					if ((m_ptr->ml) && (p_ptr->branded_blows != 97)) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK, floor);
-
-					if (mult < 3) mult = 3;
-				}
-			}
-			else if ((m_ptr->ml) && (l_ptr->flags9 & (RF9_RES_DARK)))
-			{
-				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_BRAND_DARK, floor);
-			}
-
-			/* Slay man */
-			if ((f4 & (TR4_SLAY_MAN)) &&
-			    (r_ptr->flags9 & (RF9_MAN)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 106) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_MAN, floor);
-					l_ptr->flags9 |= (RF9_MAN);
-				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags9 & (RF9_MAN)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_MAN, floor);
-			}
-
-			/* Slay elf - includes Maia */
-			if ((f4 & (TR4_SLAY_ELF)) &&
-			    (r_ptr->flags9 & (RF9_ELF)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 107) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_ELF, floor);
-					l_ptr->flags9 |= (RF9_ELF);
-				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags9 & (RF9_ELF)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_ELF, floor);
-			}
-
-			/* Slay dwarf */
-			if ((f4 & (TR4_SLAY_DWARF)) &&
-			    (r_ptr->flags9 & (RF9_DWARF)))
-			{
-				if (m_ptr->ml)
-				{
-					if (p_ptr->branded_blows != 108) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_DWARF, floor);
-					l_ptr->flags9 |= (RF9_DWARF);
-				}
-
-				if (mult < 4) mult = 4;
-			}
-			else if ((l_ptr->flags9 & (RF9_ELF)) && (m_ptr->ml))
-			{
-				object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_SLAY_DWARF, floor);
-			}
-
-			break;
-
 		}
 	}
-
+	
 	return (mult);
 }
 
@@ -1865,7 +1518,7 @@ bool avoid_trap(int y, int x, int feat)
 			if (p_ptr->cur_flags3 & (TR3_FEATHER))
 			{
 				msg_format("You are too light-footed to trigger the %s.", name);
-				equip_can_flags(0L, 0L, TR3_FEATHER, 0L);
+				equip_can_flags(NULL, 0L, 0L, TR3_FEATHER, 0L);
 				return (TRUE);
 			}
 			break;
@@ -1906,7 +1559,7 @@ bool avoid_trap(int y, int x, int feat)
 			if (p_ptr->cur_flags4 & (TR4_DRAGON))
 			{
 				msg_format("The %s ignores your draconic nature.", name);
-				equip_can_flags(0L, 0L, 0L, TR4_DRAGON);
+				equip_can_flags(NULL, 0L, 0L, 0L, TR4_DRAGON);
 				return (TRUE);
 			}
 			break;
@@ -1948,7 +1601,7 @@ bool avoid_trap(int y, int x, int feat)
 			if (p_ptr->cur_flags4 & (TR4_UNDEAD))
 			{
 				msg_format("The %s ignores your undead nature.", name);
-				equip_can_flags(0L, 0L, 0L, TR4_UNDEAD);
+				equip_can_flags(NULL, 0L, 0L, 0L, TR4_UNDEAD);
 				return (TRUE);
 			}
 			break;
@@ -2012,8 +1665,8 @@ bool avoid_trap(int y, int x, int feat)
 		/* Shaft of light */
 		case TERM_L_YELLOW:
 		{
-			/* Avoid by not being perma lit */
-			if ((cave_info[y][x] & (CAVE_GLOW | CAVE_DLIT)) == 0) return (TRUE);
+			/* Avoid by not being lit */
+			if (((cave_info[y][x] & (CAVE_LITE)) == 0) && !(p_ptr->cur_lite)) return (TRUE);
 			break;
 		}
 		/* Glowing glyph */
@@ -2029,7 +1682,7 @@ bool avoid_trap(int y, int x, int feat)
 			if (p_ptr->cur_flags4 & (TR4_DEMON))
 			{
 				msg_format("The %s ignores your demonic nature.", name);
-				equip_can_flags(0L, 0L, 0L, TR4_DEMON);
+				equip_can_flags(NULL, 0L, 0L, 0L, TR4_DEMON);
 				return (TRUE);
 			}
 			break;
@@ -2041,7 +1694,7 @@ bool avoid_trap(int y, int x, int feat)
 			if (p_ptr->cur_flags4 & (TR4_ANIMAL))
 			{
 				msg_format("The %s ignores your animal nature.", name);
-				equip_can_flags(0L, 0L, 0L, TR4_ANIMAL);
+				equip_can_flags(NULL, 0L, 0L, 0L, TR4_ANIMAL);
 				return (TRUE);
 			}
 			break;
@@ -2062,7 +1715,7 @@ bool avoid_trap(int y, int x, int feat)
 			if (p_ptr->cur_flags4 & (TR4_ORC))
 			{
 				msg_format("The %s ignores your orcish nature.", name);
-				equip_can_flags(0L, 0L, 0L, TR4_UNDEAD);
+				equip_can_flags(NULL, 0L, 0L, 0L, TR4_UNDEAD);
 				return (TRUE);
 			}
 			break;
@@ -2071,10 +1724,10 @@ bool avoid_trap(int y, int x, int feat)
 		case TERM_DEEP_L_BLUE:
 		{
 			/* Avoid by being anti-teleport */
-			if (p_ptr->cur_flags4 & (TR4_ANCHOR))
+			if ((p_ptr->cur_flags3 & (TR3_ANCHOR)) != 0)
 			{
 				msg_print("You are magically anchored in place.");
-				equip_can_flags(0L, 0L, 0L, TR4_ANCHOR);
+				equip_can_flags(NULL, 0L, 0L, TR3_ANCHOR, 0L );
 				return (TRUE);
 			}
 			break;
@@ -2211,38 +1864,33 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 			case TV_POLEARM:
 			{
 				object_type *j_ptr;
-				u32b f1, f2, f3, f4;
 
 				int i, j, shots = 1;
-				int tdis = 6;
+				int tdis = BASE_BOW_RANGE;
 
 				/* Get bow */
 				j_ptr = o_ptr;
 
-				/* Get bow flags */
-				object_flags(o_ptr,&f1,&f2,&f3,&f4);
-
 				/* Apply extra shots and hurls. Note extra shots for weapons other than bows helps for putting weapons in traps only. */
-				if (f1 & (TR1_SHOTS)) shots += j_ptr->pval;
-				if (f3 & (TR3_HURL_NUM)) shots += j_ptr->pval;
+				shots += object_aval(j_ptr, ABILITY_TRAPS);
+				shots += p_ptr->ability[ABILITY_TRAPS];
 				
 				/* Hack - make more skilled trap setters get a small bonus */
 				shots += f_ptr->level / 10;
 
 				/* Increase range */
-				if (j_ptr->tval == TV_BOW) tdis += bow_multiplier(j_ptr->sval) * 3;
+				if (j_ptr->tval == TV_BOW) tdis += bow_multiplier(j_ptr->sval) * BTR_MIGHT_ADJ;
 
-				/* Apply extra might -- note extra might increases range of melee weapons */
-				if (f1 & (TR1_MIGHT)) tdis += j_ptr->pval * 3;
+				/* Apply extra range - note as a hack extra might helps */
+				tdis += object_aval(j_ptr, ABILITY_TRAP_MIGHT) * BTR_MIGHT_ADJ;
+				tdis += object_aval(j_ptr, ABILITY_TRAP_RANGE);
+				tdis += p_ptr->ability[ABILITY_TRAP_RANGE];
 
-				/* Test for hit */
-				for (i = 0; i < shots; i++)
+				/* Fire traps */
+				for (i = 0; i < shots + object_aval(o_ptr, ABILITY_TRAPS); i++)
 				{
 					int ny = y;
 					int nx = x;
-
-					/* Calculate the path */
-					path_n = fire_or_throw_path(path_g, tdis, y, x, &ty, &tx, f_ptr->level < 50 ? 5 - (f_ptr->level / 10): 0);
 
 					/* Do we need ammo */
 					if ((j_ptr->next_o_idx) || (o_ptr->tval != TV_BOW))
@@ -2264,10 +1912,14 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 						/* Describe ammo */
 						object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
+						/* Calculate the path */
+						path_n = fire_or_throw_path(path_g, tdis + object_aval(o_ptr, ABILITY_TRAP_RANGE), y, x, &ty, &tx, f_ptr->level < 50 ? 5 - (f_ptr->level / 10): 0);
+
 						/* Continue along path. Note hack to affect zero length path e.g. straight down. */
 						for (j = 0; (j < path_n) || (!path_n && (j < 1)); ++j)
 						{
 							bool player;
+							int to_hit;
 
 							int msec = op_ptr->delay_factor * op_ptr->delay_factor;
 
@@ -2302,6 +1954,11 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								if ((l_ptr->tblows < MAX_SHORT) && (m_ptr->ml)) l_ptr->tblows++;
 							}
 							
+							/* Calcuate hit bonus */
+							to_hit = object_aval(j_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)
+								+ object_aval(j_ptr, ABILITY_TO_HIT_TRAP) + object_aval(o_ptr, ABILITY_TO_HIT_TRAP)
+								+ p_ptr->ability[ABILITY_TO_HIT_TRAP];
+							
 							/* Hack - Block murder holes here to use up ammunition */
 							if ((player) && (p_ptr->blocking))
 							{
@@ -2311,23 +1968,27 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								break;
 							}
 							else if ((ammo) &&
-									player ? (test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power, p_ptr->ac, TRUE)) :
-								(cave_m_idx[ny][nx] > 0 ? test_hit_fire((j_ptr->to_h + o_ptr->to_h)* BTH_PLUS_ADJ + f_ptr->power,  calc_monster_ac(cave_m_idx[ny][nx], TRUE), TRUE)
+									player ? (test_hit_fire(to_hit * BTH_PLUS_ADJ + f_ptr->power, p_ptr->ac, TRUE)) :
+								(cave_m_idx[ny][nx] > 0 ? test_hit_fire(to_hit * BTH_PLUS_ADJ + f_ptr->power,
+										calc_monster_ac(cave_m_idx[ny][nx], TRUE), TRUE)
 										: FALSE))
 							{
 								int k;
+								int to_crit = 0;
 
 								int mult = (j_ptr->tval == TV_BOW) ? bow_multiplier(j_ptr->sval) : 1;
 
 								/* Apply extra might. Note might helps for other weapons to be put in traps only. */
-								if (f1 & (TR1_MIGHT)) mult += j_ptr->pval;
+								mult += object_aval(o_ptr, ABILITY_TRAP_MIGHT) + object_aval(j_ptr, ABILITY_TRAP_MIGHT);								
+								mult += p_ptr->ability[ABILITY_TRAP_MIGHT];
+
+								/* Apply extra crits. */
+								to_crit += object_aval(o_ptr, ABILITY_TRAP_CRIT) + object_aval(j_ptr, ABILITY_TRAP_CRIT);
+								to_crit += p_ptr->ability[ABILITY_TRAP_CRIT];
 
 								/* Add bow multiplier */
 								k = damroll(o_ptr->dd, o_ptr->ds);
 								k *= mult;
-
-								/* Hack - make more skilled trap setters get a small bonus */
-								shots += f_ptr->level / 10;
 
 								/* Add slay multipliers. TODO: Apply equivalent multipliers for trap affecting player */
 								if (!player)
@@ -2337,10 +1998,12 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 
 									k = tot_dam_mult(k, mult);
 								}
-
-								/* Add other damage multipliers */
-								k += critical_shot(o_ptr->weight, o_ptr->to_h + j_ptr->to_h, k);
-								k += o_ptr->to_d + j_ptr->to_d;
+								
+								/* Add other damage bonuses */
+								k += critical_shot(o_ptr->weight, to_hit + to_crit * BTC_PLUS_ADJ, k);
+								k += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(j_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+								k += object_aval(o_ptr, ABILITY_TO_DAM_TRAP) + object_aval(j_ptr, ABILITY_TO_DAM_TRAP);
+								k += p_ptr->ability[ABILITY_TO_DAM_TRAP];
 
 								/* No negative damage */
 								if (k < 0) k = 0;
@@ -2974,7 +2637,7 @@ bool auto_activate(const object_type *o_ptr)
 	if (o_ptr->timeout) return (FALSE);
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 	/* Auto-activate on blow */
 	if ((f3 & (TR3_ACT_ON_BLOW)) != 0) return (TRUE);
@@ -3190,7 +2853,7 @@ void py_attack(int dir)
 		if (mon_evade(cave_m_idx[y][x], (m_ptr->stunned || m_ptr->confused) ? 50 : 80, 100, " your blow")) continue;
 
 		/* Calculate the "attack quality" */
-		if (o_ptr->k_idx) bonus = p_ptr->to_h + o_ptr->to_h + style_hit;
+		if (o_ptr->k_idx) bonus = p_ptr->to_h + object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + style_hit;
 		else bonus = p_ptr->to_h + style_hit;
 
 		/*
@@ -3333,7 +2996,7 @@ void py_attack(int dir)
 				}
 
 				/* Add damage bonus */
-				k += o_ptr->to_d;
+				k += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
 
 				/* Check usage */
 				object_usage(slot);
@@ -3498,19 +3161,19 @@ void py_attack(int dir)
 				u32b f1, f2, f3, f4;
 
 				/* Extract the flags */
-				object_flags(o_ptr, &f1, &f2, &f3, &f4);
+				object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 				/* We've killed it - Suck blood from the corpse */
 				if (((f4 & (TR4_VAMP_HP)) || (p_ptr->branded_blows == 101)) & (r_ptr->flags8 & (RF8_HAS_BLOOD)))
 				{
 					hp_player(r_ptr->level);
 
-					if (p_ptr->branded_blows != 101) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP, FALSE);
+					if (p_ptr->branded_blows != 101) object_can_flags(o_ptr, NULL,0x0L,0x0L,0x0L,TR4_VAMP_HP, FALSE);
 					l_ptr->flags8 |= (RF8_HAS_BLOOD);
 				}
 				else if (l_ptr->flags8 & (RF8_HAS_BLOOD))
 				{
-					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_HP, FALSE);
+					object_not_flags(o_ptr, NULL,0x0L,0x0L,0x0L,TR4_VAMP_HP, FALSE);
 				}
 
 				/* We've killed it - Drain mana from the corpse*/
@@ -3528,11 +3191,11 @@ void py_attack(int dir)
 						p_ptr->window |= (PW_PLAYER_0 | PW_PLAYER_1);
 					}
 
-					if (p_ptr->branded_blows != 102) object_can_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA, FALSE);
+					if (p_ptr->branded_blows != 102) object_can_flags(o_ptr, NULL,0x0L,0x0L,0x0L,TR4_VAMP_MANA, FALSE);
 				}
 				else if (r_ptr->mana > 0)
 				{
-					object_not_flags(o_ptr,0x0L,0x0L,0x0L,TR4_VAMP_MANA, FALSE);
+					object_not_flags(o_ptr, NULL,0x0L,0x0L,0x0L,TR4_VAMP_MANA, FALSE);
 				}
 
 				/* Hack -- cancel wakeup call */
@@ -3603,7 +3266,7 @@ void py_attack(int dir)
 		n3[i] = (o_ptr->can_flags3 & ~(k3[i])) & (TR3_WEAPON_FLAGS);
 		n4[i] = (o_ptr->can_flags4 & ~(k4[i])) & (TR4_WEAPON_FLAGS);
 
-		if (n1[i] || n2[i] || n3[i] || n4[i]) update_slot_flags(slot, n1[i], n2[i], n3[i], n4[i]);
+		if (n1[i] || n2[i] || n3[i] || n4[i]) update_slot_flags(slot,NULL, n1[i], n2[i], n3[i], n4[i]);
 	}
 }
 

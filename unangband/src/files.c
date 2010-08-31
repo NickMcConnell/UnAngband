@@ -2003,9 +2003,9 @@ void display_player_xtra_info(bool hide_extra)
 	hit_real += style_hit;
 
 	/* Apply weapon bonuses */
-	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
-	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
-	hit_real += o_ptr->to_h;
+	if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
+	if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+	hit_real += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
 
 	/* Melee attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -2043,8 +2043,8 @@ void display_player_xtra_info(bool hide_extra)
 		dam += style_dam;
 
 		/* Apply weapon bonuses */
-		if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
-		if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
+		if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
+		if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
 
 		Term_putstr(col, 12, -1, TERM_WHITE, "Off");
 		strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -2061,7 +2061,7 @@ void display_player_xtra_info(bool hide_extra)
 
 		base = o_ptr->ac;
 		plus = 0;
-		if (object_bonus_p(o_ptr)) plus += o_ptr->to_a;
+		if (object_bonus_p(o_ptr)) plus += object_aval(o_ptr, ABILITY_TO_AC);
 
 		Term_putstr(col, 12, -1, TERM_WHITE, "Bash ");
 		strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
@@ -2081,7 +2081,7 @@ void display_player_xtra_info(bool hide_extra)
 			/* Shield stats (if shield bashes are in, display bash value) */
 			base = o_ptr->ac;
 			plus = 0;
-			if (object_bonus_p(o_ptr)) plus += o_ptr->to_a;
+			if (object_bonus_p(o_ptr)) plus += object_aval(o_ptr, ABILITY_TO_AC);
 
 			Term_putstr(col, 12, -1, TERM_WHITE, "Shield");
 			strnfmt(buf, sizeof(buf), "[%d,%+d]", base, plus);
@@ -2123,9 +2123,9 @@ void display_player_xtra_info(bool hide_extra)
 	hit_real += style_hit;
 
 	/* Apply weapon bonuses */
-	if (object_bonus_p(o_ptr)) hit += o_ptr->to_h;
-	if (object_bonus_p(o_ptr)) dam += o_ptr->to_d;
-	hit_real += o_ptr->to_h;
+	if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
+	if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+	hit_real += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
 
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 	Term_putstr(col+5, 14, -1, TERM_L_BLUE, format("%12s", buf));
@@ -2198,18 +2198,20 @@ void display_player_xtra_info(bool hide_extra)
 /*
  * Obtain the "flags" for the player as if he was an item
  */
-void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4)
+void player_flags(u32b f0[ABILITY_ARRAY_SIZE], u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 {
 	int i;
 
 	/* Clear */
 	(*f1) = (*f2) = (*f3) = (*f4) = 0L;
 
+	if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+	
 	/*** Handle racial object */
-	object_flags(&inventory[INVEN_SELF], f1, f2, f3, f4);
+	object_flags(&inventory[INVEN_SELF], f0, f1, f2, f3, f4);
 
 	/*** Handle styles ***/
-	for (i = 0;i< z_info->w_max;i++)
+	if (f0) for (i = 0;i< z_info->w_max;i++)
 	{
 		if (w_info[i].class != p_ptr->pclass) continue;
 
@@ -2221,9 +2223,9 @@ void player_flags(u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 			switch (w_info[i].benefit)
 			{
 				case WB_RES_FEAR:
-                                        (*f2) |= TR2_RES_FEAR;
+					f0[ABILITY_RESIST_FEAR/32] |= (1L << (ABILITY_RESIST_FEAR % 32));
 					break;
-                        }
+			}
 		}
 
 	}
@@ -2307,7 +2309,7 @@ static const byte display_player_flag_set[6] =
 	4,
 	3
 };
-
+#if 0
 /*
  * Hack -- see below
  */
@@ -2946,7 +2948,7 @@ static void display_player_flag_info(int mode)
 		display_player_equippy(row++, col+6);
 	}
 }
-
+#endif
 
 /*
  * Special display, part 2a
@@ -3147,6 +3149,21 @@ void display_player_stat_info(int row, int col, int min, int max, int attr)
 
 
 /*
+ * Returns the ability that modifies this stat or skill
+ */
+int lookup_ability(int type, int flag_num)
+{
+	int i;
+	
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		if ((ability_bonus[i].type == type) && (ability_bonus[i].flag_num == flag_num)) break;
+	}
+	
+	return (i);
+}
+
+/*
  * Special display, part 2c
  *
  * How to print out the modifications and sustains.
@@ -3162,8 +3179,8 @@ static void display_player_sust_info(void)
 	int i, row, col, stat;
 
 	object_type *o_ptr;
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
-	u32b ignore_f2, ignore_f3, ignore_f4;
 
 	byte a;
 	char c;
@@ -3181,61 +3198,64 @@ static void display_player_sust_info(void)
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
 		/* Get the object */
-
 		o_ptr = &inventory[i];
 
 		/* Get the "known" flags */
-		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
-
-		/* Hack -- assume stat modifiers are known */
-		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+		object_flags_known(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stat = 0; stat < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stat++)
+		for (stat = 0; stat < A_MAX; stat++)
 		{
+			int ability, aval = 0;
+			
 			if (col == 27)
 			{
 				/* Assume uppercase stat name */
 				c_put_str(TERM_WHITE, stat_names[stat], row+stat, col);
-				if (stat == A_DEX)
-				  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, col);
-				if (stat == A_STR)
-				  c_put_str(TERM_WHITE, stat_names[A_SIZ], row+A_SIZ, col);
 			}
 
 			/* Default */
 			a = TERM_SLATE;
 			c = '.';
 
+			/* Get ability */
+			ability = lookup_ability(BONUS_ADD_STAT, stat);
+			
+			/* Get aval */
+			if (f0[ability/32] & (1L << (ability % 32)))
+			{
+				aval = object_aval(o_ptr, ability);
+			}
+
 			/* Boost */
-			if (f1 & (1<<stat))
+			if (aval)
 			{
 				/* Default */
 				c = '*';
 
 				/* Good */
-				if (o_ptr->pval > 0)
+				if (aval > 0)
 				{
 					/* Good */
 					a = TERM_L_GREEN;
 
 					/* Label boost */
-					if (o_ptr->pval < 10) c = I2D(o_ptr->pval);
+					if (aval < 10) c = I2D(o_ptr->pval);
 				}
 
 				/* Bad */
-				if (o_ptr->pval < 0)
+				if (aval < 0)
 				{
 					/* Bad */
 					a = TERM_RED;
 
 					/* Label boost */
-					if (o_ptr->pval > -10) c = I2D(-(o_ptr->pval));
+					if (aval > -10) c = I2D(-(o_ptr->pval));
 				}
 			}
 
 			/* Sustain */
-			if (f2 & (1<<stat))
+			if (f1 & (1<<stat))
 			{
 				/* Dark green */
 				a = TERM_GREEN;
@@ -3257,17 +3277,17 @@ static void display_player_sust_info(void)
 	}
 
 	/* Player flags */
-	player_flags(&f1, &f2, &f3, &f4);
+	player_flags(NULL, &f1, &f2, &f3, &f4);
 
 	/* Check stats */
-	for (stat = 0; stat < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; ++stat)
+	for (stat = 0; stat < A_MAX; ++stat)
 	{
 		/* Default */
 		a = TERM_SLATE;
 		c = '.';
 
 		/* Sustain */
-		if (f2 & (1<<stat))
+		if (f1 & (1<<stat))
 		{
 			/* Dark green "s" */
 			a = TERM_GREEN;
@@ -3276,10 +3296,6 @@ static void display_player_sust_info(void)
 
 		/* Dump */
 		Term_putch(col+5, row+stat, a, c);
-		if (stat == A_DEX)
-		  Term_putch(col+5, row+A_AGI, a, c);
-		if (stat == A_STR)
-		  Term_putch(col+5, row+A_SIZ, a, c);
 	}
 }
 
@@ -3308,11 +3324,11 @@ static void display_home_equipment_info(int mode)
 
 	u32b f[5];
 
-	int i, row, col, stats;
+	int i, row, col, stat;
 
 	object_type *o_ptr;
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
-	u32b ignore_f2, ignore_f3, ignore_f4;
 
 	byte a;
 	char c;
@@ -3341,54 +3357,58 @@ static void display_home_equipment_info(int mode)
 		o_ptr = &st_ptr->stock[i];
 
 		/* Get the "known" flags */
-		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
-
-		/* Hack -- assume stat modifiers are known */
-		object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+		object_flags_known(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 		/* Initialize color based of sign of pval. */
-		for (stats = 0; stats < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stats++)
+		for (stat = 0; stat < A_MAX; stat++)
 		{
+			int ability, aval = 0;
+			
 			/* Assume uppercase stat name */
-			c_put_str(TERM_WHITE, stat_names[stats], row+stats, 2);
-			if (stats == A_DEX)
-			  c_put_str(TERM_WHITE, stat_names[A_AGI], row+A_AGI, 2);
-			if (stats == A_STR)
-			  c_put_str(TERM_WHITE, stat_names[A_SIZ], row+A_SIZ, 2);
+			c_put_str(TERM_WHITE, stat_names[stat], row+stat, 2);
 
 			/* Default */
 			a = TERM_SLATE;
 			c = '.';
+			
+			/* Get ability */
+			ability = lookup_ability(BONUS_ADD_STAT, stat);
+			
+			/* Get aval */
+			if (f0[ability/32] & (1L << (ability % 32)))
+			{
+				aval = object_aval(o_ptr, ability);
+			}
 
 			/* Boost */
-			if (f1 & (1<<stats))
+			if (aval)
 			{
 				/* Default */
 				c = '*';
 
 				/* Good */
-				if (o_ptr->pval > 0)
+				if (aval > 0)
 				{
 					/* Good */
 					a = TERM_L_GREEN;
 
 					/* Label boost */
-					if (o_ptr->pval < 10) c = I2D(o_ptr->pval);
+					if (aval < 10) c = I2D(o_ptr->pval);
 				}
 
 				/* Bad */
-				if (o_ptr->pval < 0)
+				if (aval < 0)
 				{
 					/* Bad */
 					a = TERM_RED;
 
 					/* Label boost */
-					if (o_ptr->pval > -10) c = I2D(-(o_ptr->pval));
+					if (aval > -10) c = I2D(-(o_ptr->pval));
 				}
 			}
 
 			/* Sustain */
-			if (f2 & (1<<stats))
+			if (f2 & (1<<stat))
 			{
 				/* Dark green */
 				a = TERM_GREEN;
@@ -3398,11 +3418,7 @@ static void display_home_equipment_info(int mode)
 			}
 
 			/* Dump proper character */
-			Term_putch(col, row+stats, a, c);
-			if (stats == A_DEX)
-			  Term_putch(col, row+A_AGI, a, c);
-			if (stats == A_STR)
-			  Term_putch(col, row+A_SIZ, a, c);
+			Term_putch(col, row+stat, a, c);
 		}
 
 		/* Advance */
@@ -3459,6 +3475,7 @@ static void display_home_equipment_info(int mode)
 		col = 32 * x;
 		row = 11;
 
+#if 0
 		/* Ten rows */
 		for (y = 0; y < 10; y++)
 		{
@@ -3506,6 +3523,7 @@ static void display_home_equipment_info(int mode)
 			/* Advance */
 			row++;
 		}
+#endif
 	}
 }
 
@@ -3574,8 +3592,9 @@ void display_player(int mode)
 
 static void dump_player_plus_minus(FILE *fff)
 {
-	int i, stats, modifier;
+	int i, stat;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	object_type *o_ptr;
@@ -3583,34 +3602,35 @@ static void dump_player_plus_minus(FILE *fff)
 	/* Print it out */
 	for (i = INVEN_WIELD; i < END_EQUIPMENT; ++i)
 	{
+		int ability, aval = 0;
 
 		/* Object */
 		o_ptr = &inventory[i];
 
 		/* Get the "known" flags */
-		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags_known(o_ptr, f0, &f1, &f2, &f3, &f4);
 
-		modifier = FALSE;
-
-		/*check to see if there is an increase or decrease of a stat*/
-		for (stats = 0; stats < A_MAX - 2 /* AGI coupled with DEX and SIZ with STR */; stats++)
+		/* Get ability */
+		ability = lookup_ability(BONUS_ADD_STAT, stat);
+		
+		/* Get aval */
+		if (f0[ability/32] & (1L << (ability % 32)))
 		{
-			/* Boost */
-			if (f1 & (1<<stats)) modifier = TRUE;
+			aval = object_aval(o_ptr, ability);
 		}
-
-		if (modifier)
+		
+		if (aval)
 		{
-			/* positive pval */
-			if (o_ptr->pval > 0)
+			/* positive aval */
+			if (aval > 0)
 			{
 				/*Make it a space*/
 				fprintf(fff,"+");
 
 			}
 
-			/* negative pval */
-			else if (o_ptr->pval < 0)
+			/* negative aval */
+			else if (aval < 0)
 			{
 				/*Make it a space*/
 				fprintf(fff,"-");
@@ -3627,10 +3647,10 @@ static void dump_player_plus_minus(FILE *fff)
 
 static void dump_player_stat_info(FILE *fff)
 {
-	int i, x, y, stats;
+	int i, x, y, stat;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4, fn;
-	u32b ignore_f2, ignore_f3, ignore_f4;
 
 	object_type *o_ptr;
 
@@ -3670,14 +3690,15 @@ static void dump_player_stat_info(FILE *fff)
 
 	fprintf(fff,"      abcdefghijkl@              abcdefghijkl@\n");
 
-	for (stats = 0; stats < A_MAX; stats++)
+	for (stat = 0; stat < A_MAX; stat++)
 	{
-		fprintf(fff, "   %s:", stat_names_reduced_short[stats]);
+		fprintf(fff, "   %s:", stat_names_reduced_short[stat]);
 
 		/* Process equipment, show stat modifiers */
 		for (x = 0, y = INVEN_WIELD; y < END_EQUIPMENT; ++y, ++x)
 		{
 			char c = '.';
+			int ability, aval = 0;
 
 			object_type *o_ptr;
 
@@ -3685,31 +3706,37 @@ static void dump_player_stat_info(FILE *fff)
 			o_ptr = &inventory[y];
 
 			/* Get the "known" flags */
-			object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+			object_flags_known(o_ptr, f0, &f1, &f2, &f3, &f4);
 
-			/* Hack -- assume stat modifiers are known */
-			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+			/* Get ability */
+			ability = lookup_ability(BONUS_ADD_STAT, stat);
+			
+			/* Get aval */
+			if (f0[ability/32] & (1L << (ability % 32)))
+			{
+				aval = object_aval(o_ptr, ability);
+			}
 
 			/* Boost */
-			if (f1 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats))))
+			if (aval)
 			{
 				/* Default */
 				c = '*';
 
 				/* Good */
-				if (o_ptr->pval > 0)
+				if (aval > 0)
 				{
 
 					/* Label boost */
-					if (o_ptr->pval < 10) c = I2D(o_ptr->pval);
+					if (aval < 10) c = I2D(o_ptr->pval);
 
 				}
 
 				/* Bad */
-				if (o_ptr->pval < 0)
+				if (aval < 0)
 				{
 					/* Label boost */
-					if (o_ptr->pval > -10) c = I2D(-(o_ptr->pval));
+					if (aval > -10) c = I2D(-(o_ptr->pval));
 
 				}
 				if (o_ptr->pval == 0) c = '.';
@@ -3721,7 +3748,7 @@ static void dump_player_stat_info(FILE *fff)
 		}
 
 		/*a couple spaces, then do the sustains*/
-		fprintf(fff, ".         s%s:", stat_names_reduced_short[stats]);
+		fprintf(fff, ".         s%s:", stat_names_reduced_short[stat]);
 
 		/* Process equipment, show stat modifiers */
 		for (y = INVEN_WIELD; y < END_EQUIPMENT; ++y)
@@ -3733,13 +3760,10 @@ static void dump_player_stat_info(FILE *fff)
 			o_ptr = &inventory[y];
 
 			/* Get the "known" flags */
-			object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
-
-			/* Hack -- assume stat modifiers are known */
-			object_flags(o_ptr, &f1, &ignore_f2, &ignore_f3, &ignore_f4);
+			object_flags_known(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 			/* Sustain */
-			if (f2 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats))))  c = 's';
+			if (f1 & (1<<stat))  c = 's';
 			else c = '.';
 
 			/*dump the result*/
@@ -3748,13 +3772,13 @@ static void dump_player_stat_info(FILE *fff)
 		}
 
 		/* Player flags */
-		player_flags(&f1, &f2, &f3, &fn);
+		player_flags(f0, &f1, &f2, &f3, &fn);
 
 		/*default*/
 		c = '.';
 
 		/* Sustain */
-		if (f2 & (1<<(stats == A_AGI ? A_DEX : (stats == A_SIZ ? A_STR : stats)))) c = 's';
+		if (f1 & (1<<stat)) c = 's';
 
 		/*dump the result*/
 		fprintf(fff,"%c",c);

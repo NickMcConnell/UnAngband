@@ -3399,6 +3399,270 @@ bool generate_burrows(int y1, int x1, int y2, int x2,
 }
 
 
+/*
+ * Helper functions for bsp dungeon generation
+ */
+typedef struct bsp_params_type bsp_params_type;
+
+struct bsp_params_type
+{
+	int n;
+	int *values;
+	int *types;
+};
+
+enum
+{
+	BSP_SPLIT_TYPE, BSP_PICK_TYPE,
+	BSP_MIN_BORDER, BSP_MIN_VARIATION, BSP_MAX_VARIATION,
+	BSP_X1, BSP_X2, BSP_X, BSP_Y1, BSP_Y2, BSP_Y,
+	
+	BSP_RESERVED_MAX
+};
+
+
+enum
+{
+	BSP_SPLIT_50_50,
+	BSP_SPLIT_LONGEST_AXIS,
+	BSP_SPLIT_RATIO
+};
+
+
+enum
+{
+	BSP_PICK_RANDOM,
+	BSP_PICK_D2
+};
+
+enum
+{
+	BSP_DIR_NORTH = 1,
+	BSP_DIR_SOUTH = 2,
+	BSP_DIR_EAST = 4,
+	BSP_DIR_WEST = 8
+};
+
+
+/*
+ * Checks if a parameter exists
+ */
+bool bsp_check_param(bsp_params_type *p, int param_type)
+{
+	int i;
+	
+	for (i = 0; i < p->n; i++)
+	{
+		if (p->types[i] == param_type)
+		{
+			return (TRUE);
+		}
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Counts number of elements of array
+ */
+int bsp_array_elements(bsp_params_type *p, int param_type)
+{
+	int i;
+	int array = 0;
+	
+	for (i = 0; i < p->n; i++)
+	{
+		if (p->types[i] == param_type)
+		{
+			array++;
+		}
+	}
+	
+	return (array);
+}
+
+
+/*
+ * Gets a parameter value or default if none exists
+ */
+int bsp_get_param(bsp_params_type *p, int param_type, int array, int default_value)
+{
+	int i;
+	
+	for (i = 0; i < p->n; i++)
+	{
+		if (p->types[i] == param_type)
+		{
+			if (!array--) return (p->values[i]);
+		}
+	}
+	
+	return (default_value);
+}
+
+
+/*
+ * Sets a parameter value
+ */
+void bsp_set_param(bsp_params_type *p, int param_type, int array, int value)
+{
+	int i;
+	int *tmpt, *tmpv;
+	
+	for (i = 0; i < p->n; i++)
+	{
+		if ((p->types[i] == param_type) && !array--)
+		{
+			p->values[i] = value;
+			
+			return;
+		}
+	}
+	
+	/* Allocate space for new parameter, increase parameter count and
+	 * add value to parameter list
+	 */
+	tmpt = C_ZNEW(p->n + array + 1, int);
+	tmpv = C_ZNEW(p->n + array + 1, int);
+	
+	for (i = 0; i < p->n; i++)
+	{
+		tmpv[i] = p->values[i];
+		tmpt[i] = p->types[i];		
+	}
+	
+	for ( ; array >= 0; array--)
+	{
+		tmpv[i + array] = value;
+		tmpt[i + array] = param_type;
+	}
+	
+	if (p->values) FREE(p->values);
+	if (p->types) FREE(p->types);
+	
+	p->values = tmpv;
+	p->types = tmpt;
+	p->n++;
+}
+
+
+/*
+ * For each array element, perform a numerical operation
+ */
+void bsp_for_each(bsp_params_type *p, int param_type, int for_each(int value))
+{
+	int i;
+	
+	for (i = 0; i < p->n; i++)
+	{
+		if (p->types[i] == param_type)
+		{
+			p->values[i] = for_each(p->values[i]);
+		}
+	}
+}
+
+
+/*
+ * Builds a classic BSP style dungeon
+ * 
+ * At each step, you subdivide a rectangle either horizontally or vertically at random, and iterate on the
+ * two subdivisions using the draw_bsp function. The join_bsp function is then used to merge the two
+ * sub-divided areas together.
+ * 
+ * This function is based on http://roguebasin.roguelikedevelopment.org/index.php?title=Basic_BSP_Dungeon_generation
+ * but made more generic.
+ */
+bool build_bsp(int y1, int x1, int y2, int x2, int n, bsp_params_type *p, bool draw_bsp(int y1, int x1, int y2, int x2, int n, bsp_params_type *p, bool join_bsp(bsp_params_type *p, bool vertical), int dir), 
+		bool join_bsp(bsp_params_type *p, bool vertical))
+{
+	int d, min_d, max_d;
+	bool join1 = FALSE;
+	bool join2 = FALSE;
+	bool vertical;
+	
+	int b = bsp_get_param(p, BSP_MIN_BORDER, 0, 0);
+	
+	/* No width */
+	if (x2 - 2 * b < x1) return (FALSE);
+	
+	/* No height */
+	if (y2 - 2 * b < y1) return (FALSE);
+	
+	/* 1x1 room */
+	if ((x2 - b == x1 + b) && (y2 - b == y1 + b)) return (FALSE);
+	
+	/* Type of split */
+	if (x2 == x1) vertical = TRUE;
+	else if (y2 == y1) vertical = FALSE;
+	else switch(bsp_get_param(p, BSP_SPLIT_TYPE, 0, BSP_SPLIT_50_50))
+	{
+		case BSP_SPLIT_LONGEST_AXIS:
+			if ((x2 - x1) != (y2 - y1))
+			{
+				vertical = (x2 - x1) > (y2 - y1);
+				break;
+			}
+			/* Fall through */
+		case BSP_SPLIT_50_50:
+			vertical = rand_int(100) < 50;
+			break;
+		case BSP_SPLIT_RATIO:
+			vertical = rand_int((x2 - x1 - 2 * b) + (y2 - y1 - 2 * b)) < (x2 - x1 - 2 * b);
+			break;
+	}
+	
+	/* Distance of split */
+	if (vertical) d = (x2 - x1);
+	else d = (y2 - y1);
+	
+	/* Determine range - note max_d is actually maximum allowed d plus one */
+	min_d = d * bsp_get_param(p, BSP_MIN_VARIATION, 0, 25) / 100;
+	max_d = ((d * bsp_get_param(p, BSP_MAX_VARIATION, 0, 75)) + 99) / 100;
+	
+	/* Ensure we fall betwen borders */
+	if (min_d < b) min_d = b;
+	if (max_d > d - b) max_d = d - b;
+	
+	if (min_d >= max_d - 1) d = min_d;
+	else switch(bsp_get_param(p, BSP_PICK_TYPE, 0, BSP_PICK_RANDOM))
+	{
+		case BSP_PICK_RANDOM:
+			d = min_d + rand_int(max_d - min_d);
+			break;
+		case BSP_PICK_D2:
+			d = min_d + rand_int((max_d - min_d) / 2) + rand_int((max_d - min_d + 1) / 2);
+			break;
+	}
+	
+	/* Split width wise */
+	if (vertical)
+	{
+		/* Draw left hand side */
+		if (draw_bsp(y1, x1, y2, x1+d, n-1, p, join_bsp, BSP_DIR_WEST)) join1 = TRUE;
+		
+		/* Draw right hand side */
+		if (draw_bsp(y1, x1+d+1, y2, x2, n-1, p, join_bsp, BSP_DIR_EAST)) join2 = TRUE;
+		
+		/* Join together */
+		if (join1 && join2) join_bsp(p, TRUE);
+	}
+	else
+	{
+		/* Draw top side */
+		if (draw_bsp(y1, x1, y1+d, x2, n-1, p, join_bsp, BSP_DIR_NORTH)) join1 = TRUE;
+		
+		/* Draw bottom side */
+		if (draw_bsp(y1+d+1, x1, y2, x2, n-1, p, join_bsp, BSP_DIR_SOUTH)) join2 = TRUE;
+		
+		/* Join together */
+		if (join1 && join2) join_bsp(p, FALSE);
+	}
+}
+
+
+
 
 /*
  * Number to place for scattering

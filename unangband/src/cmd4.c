@@ -1439,11 +1439,38 @@ static void desc_ego_fake(int oid)
 {
 	/* Hack: dereference the join */
 	const char *cursed [] = {"permanently cursed", "heavily cursed", "cursed"};
-	int f3, i;
+	int f3, i, j;
 	int e_idx = default_join[oid].oid;
 	object_lore *n_ptr = &e_list[e_idx];
 	ego_item_type *e_ptr = &e_info[e_idx];
-
+	s16b fake_ability[ABILITY_MAX];
+	u32b flags0[ABILITY_ARRAY_SIZE];
+	
+	/* Fake abilities */
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		fake_ability[i] = 0;
+		
+		for (j = 0; j < MAX_AVALS_EGO_ITEM; j++)
+		{
+			if ((i < 32) && ((e_ptr->flags0[i/32][j] & (1L << i)) != 0)) fake_ability[i] += e_ptr->max_aval[j];
+			else if ((i >= 32) && (i < 64) && ((e_ptr->flags0[(i-32)/32][j] & (1L << (i-32))) != 0)) fake_ability[i] += e_ptr->max_aval[j];
+			else if ((i >= 64) && (i < 96) && ((e_ptr->flags0[(i-64)/32][j] & (1L << (i-64))) != 0)) fake_ability[i] += e_ptr->max_aval[j];
+			else if ((i >= 96) && (i < 128) && ((e_ptr->flags0[(i-96)/32][j] & (1L << (i-96))) != 0)) fake_ability[i] += e_ptr->max_aval[j];
+		}
+	}
+	
+	/* Fake ability flags */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+	{
+		flags0[i] = 0L;
+		
+		for (j = 0; j < MAX_AVALS_EGO_ITEM; j++)
+		{
+			flags0[i] |= e_ptr->flags0[i][j];
+		}		
+	}
+	
 	/* Save screen */
 	screen_save();
 
@@ -1454,14 +1481,14 @@ static void desc_ego_fake(int oid)
 	Term_gotoxy(0, 1);
 
 	/* List can flags */
-	if(adult_lore) list_object_flags(e_ptr->flags1, e_ptr->flags2, e_ptr->flags3,
+	if(adult_lore) list_object_flags(fake_ability, flags0, e_ptr->flags1, e_ptr->flags2, e_ptr->flags3,
 									e_ptr->flags4, 0, 1);
 
 	else {
-		list_object_flags(n_ptr->can_flags1, n_ptr->can_flags2, n_ptr->can_flags3,
+		list_object_flags(fake_ability, n_ptr->can_flags0, n_ptr->can_flags1, n_ptr->can_flags2, n_ptr->can_flags3,
 							n_ptr->can_flags4, 0, 1);
 		/* List may flags */
-		list_object_flags(n_ptr->may_flags1,n_ptr->may_flags2,n_ptr->may_flags3,n_ptr->may_flags4,0, 2);
+		list_object_flags(fake_ability, n_ptr->may_flags0, n_ptr->may_flags1,n_ptr->may_flags2,n_ptr->may_flags3,n_ptr->may_flags4,0, 2);
 	}
 
 	for(i = 0, f3 = TR3_PERMA_CURSE; i < 3 ; f3 >>= 1, i++) {

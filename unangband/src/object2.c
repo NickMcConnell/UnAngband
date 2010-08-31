@@ -10276,6 +10276,26 @@ bool spell_okay(int spell, bool known)
 		/* Okay to cast, not to study */
 		return (known);
 	}
+	
+	/* Caster is dazed or terrified and trying to cast */
+	if ((known) && ((p_ptr->timed[TMD_DAZED]) || (p_ptr->timed[TMD_TERROR])))
+	{
+		int ap_cnt;
+		
+		/* Scan through all four blows */
+		for (ap_cnt = 0; ap_cnt < 4; ap_cnt++)
+		{
+			spell_blow *blow_ptr = &s_ptr->blow[ap_cnt];
+			
+			if (!blow_ptr->method) continue;
+			
+			/* Dazed okay to cast if it affects someone other than the player; terrified is not */
+			if (blow_ptr->method != RBM_SELF) return (!p_ptr->timed[TMD_TERROR]);
+		}
+		
+		/* Not okay if dazed */
+		return (!p_ptr->timed[TMD_DAZED]);
+	}
 
 	/* Okay to study, not to cast */
 	return (!known);

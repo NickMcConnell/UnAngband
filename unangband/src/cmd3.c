@@ -225,10 +225,13 @@ bool player_wield(int item)
 
 	char o_name[80];
 
-	u32b f1, f2, f3, f4;
-	u32b n1, n2, n3, n4;
-	u32b k1, k2, k3, k4;
+	u32b f0[ABILITY_ARRAY_SIZE], f1, f2, f3, f4;
+	u32b n0[ABILITY_ARRAY_SIZE], n1, n2, n3, n4;
+	u32b k0[ABILITY_ARRAY_SIZE], k1, k2, k3, k4;
 
+	int i;
+	
+	bool n0_flag = FALSE;
 	bool get_feat = FALSE;
 
 	/* Hack -- Prevent player from wielding conflicting items */
@@ -373,59 +376,56 @@ bool player_wield(int item)
 	}
 
 	/* Get object flags */
-	object_flags(o_ptr,&f1,&f2,&f3,&f4);
+	object_flags(o_ptr, NULL,&f1,&f2,&f3,&f4);
 
 	/* Check for racial conflicts */
-	burn |= (f1 & (TR1_SLAY_NATURAL)) & (p_ptr->cur_flags4 & (TR4_ANIMAL));
-	burn |= (f1 & (TR1_SLAY_ORC)) & (p_ptr->cur_flags4 & (TR4_ORC));
-	burn |= (f1 & (TR1_SLAY_TROLL)) & (p_ptr->cur_flags4 & (TR4_TROLL));
-	burn |= (f1 & (TR1_SLAY_GIANT)) & (p_ptr->cur_flags4 & (TR4_GIANT));
-	burn |= (f4 & (TR4_SLAY_MAN)) & (p_ptr->cur_flags4 & (TR4_MAN));
-	burn |= (f4 & (TR4_SLAY_ELF)) & (p_ptr->cur_flags4 & (TR4_ELF));
-	burn |= (f4 & (TR4_SLAY_DWARF)) & (p_ptr->cur_flags4 & (TR4_DWARF));
-	burn |= (f4 & (TR4_ANIMAL)) & (p_ptr->cur_flags1 & (TR1_SLAY_NATURAL));
-	burn |= (f4 & (TR4_ORC)) & (p_ptr->cur_flags1 & (TR1_SLAY_ORC));
-	burn |= (f4 & (TR4_TROLL)) & (p_ptr->cur_flags1 & (TR1_SLAY_TROLL));
-	burn |= (f4 & (TR4_GIANT)) & (p_ptr->cur_flags1 & (TR1_SLAY_GIANT));
-	burn |= (f4 & (TR4_MAN)) & (p_ptr->cur_flags4 & (TR4_SLAY_MAN));
-	burn |= (f4 & (TR4_DWARF)) & (p_ptr->cur_flags4 & (TR4_SLAY_DWARF));
-	burn |= (f4 & (TR4_ELF)) & (p_ptr->cur_flags4 & (TR4_SLAY_ELF));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_PLANT)) && (p_ptr->cur_flags4 & (TR2_SPEAK_PLANT));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_ANIMAL)) && (p_ptr->cur_flags4 & (TR4_ANIMAL));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_ORC)) && (p_ptr->cur_flags4 & (TR4_ORC));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_TROLL)) && (p_ptr->cur_flags4 & (TR4_TROLL));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_GIANT)) && (p_ptr->cur_flags4 & (TR4_GIANT));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_MAN)) && (p_ptr->cur_flags4 & (TR4_MAN));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_ELF)) && (p_ptr->cur_flags4 & (TR4_ELF));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_DWARF)) && (p_ptr->cur_flags4 & (TR4_DWARF));
+	burn |= (f2 & (TR2_SPEAK_PLANT)) && (p_ptr->ability[ABILITY_SLAY_PLANT]);
+	burn |= (f4 & (TR4_ANIMAL)) && (p_ptr->ability[ABILITY_SLAY_ANIMAL]);
+	burn |= (f4 & (TR4_ORC)) && (p_ptr->ability[ABILITY_SLAY_ORC]);
+	burn |= (f4 & (TR4_TROLL)) && (p_ptr->ability[ABILITY_SLAY_TROLL]);
+	burn |= (f4 & (TR4_GIANT)) && (p_ptr->ability[ABILITY_SLAY_GIANT]);
+	burn |= (f4 & (TR4_MAN)) && (p_ptr->ability[ABILITY_SLAY_MAN]);
+	burn |= (f4 & (TR4_DWARF)) && (p_ptr->ability[ABILITY_SLAY_DWARF]);
+	burn |= (f4 & (TR4_ELF)) && (p_ptr->ability[ABILITY_SLAY_ELF]);
 
-	/* Evil players can wield racial conflict items but get cursed instead of burning */
-	if ((burn != 0) && ((f4 & (TR4_EVIL)) || ((p_ptr->cur_flags4 & (TR4_EVIL)) != 0)))
+	/* Neutral players can wield racial conflict items but get cursed instead of burning */
+	if ((burn != 0) && ((f4 & (TR4_NEUTRAL)) || ((p_ptr->cur_flags4 & (TR4_NEUTRAL)) != 0)))
 	{
 		curse = TRUE;
 		burn = FALSE;
 	}
 
 	/* Check for elemental conflicts and high slays */
-	burn |= (f1 & (TR1_SLAY_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
-	burn |= (f1 & (TR1_SLAY_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
-	burn |= (f1 & (TR1_SLAY_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
-	burn |= (f1 & (TR1_KILL_DEMON)) & (p_ptr->cur_flags4 & (TR4_DEMON));
-	burn |= (f1 & (TR1_KILL_UNDEAD)) & (p_ptr->cur_flags4 & (TR4_UNDEAD));
-	burn |= (f1 & (TR1_KILL_DRAGON)) & (p_ptr->cur_flags4 & (TR4_DRAGON));
-	burn |= (f1 & (TR1_BRAND_HOLY)) & (p_ptr->cur_flags4 & (TR4_EVIL));
-	burn |= (f1 & (TR1_BRAND_POIS)) & (p_ptr->cur_flags4 & (TR4_HURT_POIS));
-	burn |= (f1 & (TR1_BRAND_ACID)) & (p_ptr->cur_flags4 & (TR4_HURT_ACID));
-	burn |= (f1 & (TR1_BRAND_COLD)) & (p_ptr->cur_flags4 & (TR4_HURT_COLD));
-	burn |= (f1 & (TR1_BRAND_ELEC)) & (p_ptr->cur_flags4 & (TR4_HURT_ELEC));
-	burn |= (f1 & (TR1_BRAND_FIRE)) & (p_ptr->cur_flags4 & (TR4_HURT_FIRE));
-	burn |= (f4 & (TR4_BRAND_LITE)) & (p_ptr->cur_flags4 & (TR4_HURT_LITE));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_DRAGON)) && (p_ptr->cur_flags4 & (TR4_DRAGON));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_UNDEAD)) && (p_ptr->cur_flags4 & (TR4_UNDEAD));
+	burn |= (object_aval(o_ptr, ABILITY_SLAY_DEMON)) && (p_ptr->cur_flags4 & (TR4_DEMON));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_HOLY)) && (p_ptr->cur_flags4 & (TR4_EVIL));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_POIS)) && (p_ptr->cur_flags4 & (TR4_HURT_POIS));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_ACID)) && (p_ptr->cur_flags4 & (TR4_HURT_ACID));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_COLD)) && (p_ptr->cur_flags4 & (TR4_HURT_COLD));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_ELEC)) && (p_ptr->cur_flags4 & (TR4_HURT_ELEC));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_FIRE)) && (p_ptr->cur_flags4 & (TR4_HURT_FIRE));
+	burn |= (object_aval(o_ptr, ABILITY_BRAND_LITE)) && (p_ptr->cur_flags4 & (TR4_HURT_LITE));
 
-	burn |= (f4 & (TR4_EVIL)) & (p_ptr->cur_flags1 & (TR1_BRAND_HOLY));
-	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DRAGON));
-	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_SLAY_UNDEAD));
-	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_SLAY_DEMON));
-	burn |= (f4 & (TR4_DRAGON)) & (p_ptr->cur_flags1 & (TR1_KILL_DRAGON));
-	burn |= (f4 & (TR4_UNDEAD)) & (p_ptr->cur_flags1 & (TR1_KILL_UNDEAD));
-	burn |= (f4 & (TR4_DEMON)) & (p_ptr->cur_flags1 & (TR1_KILL_DEMON));
-	burn |= (f4 & (TR4_HURT_POIS)) & (p_ptr->cur_flags1 & (TR1_BRAND_POIS));
-	burn |= (f4 & (TR4_HURT_ACID)) & (p_ptr->cur_flags1 & (TR1_BRAND_ACID));
-	burn |= (f4 & (TR4_HURT_COLD)) & (p_ptr->cur_flags1 & (TR1_BRAND_COLD));
-	burn |= (f4 & (TR4_HURT_ELEC)) & (p_ptr->cur_flags1 & (TR1_BRAND_ELEC));
-	burn |= (f4 & (TR4_HURT_FIRE)) & (p_ptr->cur_flags1 & (TR1_BRAND_FIRE));
-	burn |= (f4 & (TR4_HURT_LITE)) & (p_ptr->cur_flags4 & (TR4_BRAND_LITE));
+	burn |= (f4 & (TR4_EVIL)) && (p_ptr->ability[ABILITY_BRAND_HOLY]);
+	burn |= (f4 & (TR4_DRAGON)) && (p_ptr->ability[ABILITY_SLAY_DRAGON]);
+	burn |= (f4 & (TR4_UNDEAD)) && (p_ptr->ability[ABILITY_SLAY_UNDEAD]);
+	burn |= (f4 & (TR4_DEMON)) && (p_ptr->ability[ABILITY_SLAY_DEMON]);
+	burn |= (f4 & (TR4_EVIL)) && (p_ptr->ability[ABILITY_BRAND_HOLY]);
+	burn |= (f4 & (TR4_HURT_POIS)) && (p_ptr->ability[ABILITY_BRAND_POIS]);
+	burn |= (f4 & (TR4_HURT_ACID)) && (p_ptr->ability[ABILITY_BRAND_ACID]);
+	burn |= (f4 & (TR4_HURT_COLD)) && (p_ptr->ability[ABILITY_BRAND_COLD]);
+	burn |= (f4 & (TR4_HURT_ELEC)) && (p_ptr->ability[ABILITY_BRAND_ELEC]);
+	burn |= (f4 & (TR4_HURT_FIRE)) && (p_ptr->ability[ABILITY_BRAND_FIRE]);
+	burn |= (f4 & (TR4_HURT_LITE)) && (p_ptr->ability[ABILITY_BRAND_LITE]);
 
 	if (burn != 0)
 	{
@@ -657,90 +657,74 @@ bool player_wield(int item)
 	if (IS_QUIVER_SLOT(slot)) return (TRUE);
 
 	/* Get known flags */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) k0[i] = j_ptr->can_flags0[i];
 	k1 = j_ptr->can_flags1;
 	k2 = j_ptr->can_flags2;
 	k3 = j_ptr->can_flags3;
 	k4 = j_ptr->can_flags4;
 
 	/* Some flags are instantly known */
-	object_flags(j_ptr, &f1, &f2, &f3, &f4);
-
-	/* Hack -- identify pval */
-	if (!object_pval_p(j_ptr) &&
-		 f1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
-				 TR1_INT | TR1_DEX | TR1_CON | TR1_CHR))
-		j_ptr->ident |= (IDENT_PVAL);
-
+	object_flags(j_ptr, f0, &f1, &f2, &f3, &f4);
+	
 	/* Hack -- the following are obvious from the displayed combat statistics */
-	if (f1 & (TR1_BLOWS)) object_can_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_BLOWS,0x0L,0x0L,0x0L, FALSE);
-
-	if (f1 & (TR1_SHOTS)) object_can_flags(j_ptr,TR1_SHOTS,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_SHOTS,0x0L,0x0L,0x0L, FALSE);
-
-	/* Hack -- the following are obvious from the displayed combat statistics */
-	if (f1 & (TR1_SPEED)) object_can_flags(j_ptr,TR1_SPEED,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_SPEED,0x0L,0x0L,0x0L, FALSE);
-
-	/* Hack -- the following are obvious from the displayed stats */
-	if (f1 & (TR1_STR)) object_can_flags(j_ptr,TR1_STR,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_STR,0x0L,0x0L,0x0L, FALSE);
-
-	if (f1 & (TR1_INT)) object_can_flags(j_ptr,TR1_INT,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_INT,0x0L,0x0L,0x0L, FALSE);
-
-	if (f1 & (TR1_WIS)) object_can_flags(j_ptr,TR1_WIS,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_WIS,0x0L,0x0L,0x0L, FALSE);
-
-	if (f1 & (TR1_DEX)) object_can_flags(j_ptr,TR1_DEX,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_DEX,0x0L,0x0L,0x0L, FALSE);
-
-	if (f1 & (TR1_CON)) object_can_flags(j_ptr,TR1_CON,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_CON,0x0L,0x0L,0x0L, FALSE);
-
-	if (f1 & (TR1_CHR)) object_can_flags(j_ptr,TR1_CHR,0x0L,0x0L,0x0L, FALSE);
-	else object_not_flags(j_ptr,TR1_CHR,0x0L,0x0L,0x0L, FALSE);
+	object_learn_ability(j_ptr, ABILITY_BLOWS, FALSE);
+	object_learn_ability(j_ptr, ABILITY_SHOTS, FALSE);
+	object_learn_ability(j_ptr, ABILITY_SPEED_MOVE, FALSE);
+	object_learn_ability(j_ptr, ABILITY_SPEED_CAST, FALSE);
+	object_learn_ability(j_ptr, ABILITY_SPEED_FIGHT, FALSE);
+	object_learn_ability(j_ptr, ABILITY_SPEED_USE, FALSE);
+	
+	/* Check other automatically identified abilities */
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		switch (ability_bonus[i].type)
+		{
+			/* Hack -- the following are obvious from the displayed stats */
+			case BONUS_ADD_STAT:
+			case BONUS_ADD_SKILL:
+			case BONUS_ADD_WEAPON_SKILL:
+				object_learn_ability(j_ptr, i, FALSE);
+				break;
+#ifndef ALLOW_OBJECT_INFO_MORE				
+			/* Hack --- we do these here, because they are too computationally expensive in the 'right' place */
+			case BONUS_SENSE:
+				object_learn_ability(j_ptr, i);
+				break;
+#endif
+		}
+	}
 
 #ifndef ALLOW_OBJECT_INFO_MORE
-	/* Hack --- we do these here, because they are too computationally expensive in the 'right' place */
-	if (f1 & (TR1_INFRA))
-	{
-		object_can_flags(j_ptr,TR1_INFRA,0x0L,0x0L,0x0L, FALSE);
-	}
-	else object_not_flags(j_ptr,TR1_INFRA,0x0L,0x0L,0x0L, FALSE);
-
-	if (f3 & (TR3_LITE))
-	{
-		object_can_flags(j_ptr,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
-	}
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
-
 	/* Hack --- also computationally expensive. But note we notice these only if we don't already */
 	/* have these abilities */
-	if ((f3 & (TR3_TELEPATHY)) && !(p_ptr->cur_flags3 & (TR3_TELEPATHY)))) object_can_flags(j_ptr,0x0L,0x0L,TR3_TELEPATHY,0x0L, FALSE);
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_TELEPATHY,0x0L, FALSE);
+	if ((f3 & (TR3_TELEPATHY)) && !(p_ptr->cur_flags3 & (TR3_TELEPATHY)))) object_can_flags(j_ptr, NULL,0x0L,0x0L,TR3_TELEPATHY,0x0L, FALSE);
+	else object_not_flags(j_ptr, NULL,0x0L,0x0L,TR3_TELEPATHY,0x0L, FALSE);
 
-	if ((f3 & (TR3_SEE_INVIS)) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)) && (!p_ptr->tim_invis)) object_can_flags(j_ptr,0x0L,0x0L,TR3_SEE_INVIS,0x0L, FALSE);
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_SEE_INVIS,0x0L, FALSE);
+	if ((f3 & (TR3_SEE_INVIS)) && !(p_ptr->cur_flags3 & (TR3_SEE_INVIS)) && (!p_ptr->tim_invis)) object_can_flags(j_ptr, NULL,0x0L,0x0L,TR3_SEE_INVIS,0x0L, FALSE);
+	else object_not_flags(j_ptr, NULL,0x0L,0x0L,TR3_SEE_INVIS,0x0L, FALSE);
 #endif
 
 	/* Hack --- the following are either obvious or (relatively) unimportant */
 	if (f3 & (TR3_BLESSED))
 	{
-		object_can_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L, FALSE);
+		object_can_flags(j_ptr, NULL,0x0L,0x0L,TR3_BLESSED,0x0L, FALSE);
 	}
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_BLESSED,0x0L, FALSE);
+	else object_not_flags(j_ptr, NULL,0x0L,0x0L,TR3_BLESSED,0x0L, FALSE);
 
-	if (f3 & (TR3_LIGHT_CURSE)) object_can_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L, FALSE);
-	else object_not_flags(j_ptr,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L, FALSE);
+	if (f3 & (TR3_LIGHT_CURSE)) object_can_flags(j_ptr, NULL,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L, FALSE);
+	else object_not_flags(j_ptr, NULL,0x0L,0x0L,TR3_LIGHT_CURSE,0x0L, FALSE);
 
 	/* Check for new flags */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) n0[i] = j_ptr->can_flags0[i] & ~(k0[i]);
 	n1 = j_ptr->can_flags1 & ~(k1);
 	n2 = j_ptr->can_flags2 & ~(k2);
 	n3 = j_ptr->can_flags3 & ~(k3);
 	n4 = j_ptr->can_flags4 & ~(k4);
 
-	if (n1 || n2 || n3 || n4) update_slot_flags(slot, n1, n2, n3, n4);
+	/* Check if any abilities set */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) if (n0) n0_flag |= TRUE;
+	
+	if (n0_flag || n1 || n2 || n3 || n4) update_slot_flags(slot, n0, n1, n2, n3, n4);
 
 	return (TRUE);
 }
@@ -1148,27 +1132,29 @@ bool player_offer(int item)
 	/* Check for allowed flags */
 	if (item != INVEN_GOLD)
 	{
-		u32b f1, f2, f3, f4;
-
 		u32b flg3 = 0L;
+		u32b flg9 = 0L;
 		
 		char o_name[80];
 			
-		/* Extract some flags */
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
 		/* React to objects that hurt the monster */
-		if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
-		if (f1 & (TR1_SLAY_TROLL)) flg3 |= (RF3_TROLL);
-		if (f1 & (TR1_SLAY_GIANT)) flg3 |= (RF3_GIANT);
-		if (f1 & (TR1_SLAY_ORC)) flg3 |= (RF3_ORC);
-		if (f1 & (TR1_SLAY_DEMON)) flg3 |= (RF3_DEMON);
-		if (f1 & (TR1_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
-		if (f1 & (TR1_SLAY_NATURAL)) flg3 |= (RF3_ANIMAL | RF3_PLANT | RF3_INSECT);
-		if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
+		if (object_aval(o_ptr, ABILITY_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
+		if (object_aval(o_ptr, ABILITY_SLAY_TROLL)) flg3 |= (RF3_TROLL);
+		if (object_aval(o_ptr, ABILITY_SLAY_GIANT)) flg3 |= (RF3_GIANT);
+		if (object_aval(o_ptr, ABILITY_SLAY_ORC)) flg3 |= (RF3_ORC);
+		if (object_aval(o_ptr, ABILITY_SLAY_DEMON)) flg3 |= (RF3_DEMON);
+		if (object_aval(o_ptr, ABILITY_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
+		if (object_aval(o_ptr, ABILITY_SLAY_ANIMAL)) flg3 |= (RF3_ANIMAL);
+		if (object_aval(o_ptr, ABILITY_SLAY_PLANT)) flg3 |= (RF3_PLANT);
+		if (object_aval(o_ptr, ABILITY_SLAY_INSECT)) flg3 |= (RF3_INSECT);
+		if (object_aval(o_ptr, ABILITY_BRAND_HOLY)) flg3 |= (RF3_EVIL);
+		if (object_aval(o_ptr, ABILITY_BRAND_LITE)) flg3 |= (RF3_HURT_LITE);
+		if (object_aval(o_ptr, ABILITY_SLAY_DWARF)) flg9 |= (RF9_DWARF);
+		if (object_aval(o_ptr, ABILITY_SLAY_ELF)) flg9 |= (RF9_ELF);
+		if (object_aval(o_ptr, ABILITY_SLAY_MAN)) flg9 |= (RF9_MAN);
 
 		/* The object cannot be picked up by the monster */
-		if (artifact_p(o_ptr) || (r_ptr->flags3 & flg3))
+		if (artifact_p(o_ptr) || ((r_ptr->flags3 & flg3) != 0) || ((r_ptr->flags9 & flg9) != 0))
 		{
 			/* Acquire the object name */
 			object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);

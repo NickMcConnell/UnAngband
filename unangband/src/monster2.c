@@ -2461,7 +2461,7 @@ void lore_do_probe(int r_idx)
 		/* Window stuff */
 		p_ptr->window |= (PW_MONSTER);
 	}
-
+	
 	/* Describe the race */
 	race_desc(race_name, sizeof(race_name), r_idx, 0x400, 1);
 
@@ -3433,6 +3433,9 @@ int mon_resist_effect(int effect, int r_idx)
 		return (-1);
 		break;
 
+		case GF_IMAGE_POIS:
+			if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) break;
+		
 		case GF_DELAY_POISON:
 		case GF_POIS:
 		case GF_POISON_WEAK:
@@ -3440,15 +3443,24 @@ int mon_resist_effect(int effect, int r_idx)
 		if (!(r_ptr->flags3 & (RF3_IM_POIS))) return (0);
 		break;
 
+		case GF_IMAGE_ACID:
+			if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) break;
+		
 		case GF_ACID:
 		case GF_VAPOUR:
 		if (!(r_ptr->flags3 & (RF3_IM_ACID))) return (0);
 		break;
 
+		case GF_IMAGE_ELEC:
+			if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) break;
+		
 		case GF_ELEC:
 		if (!(r_ptr->flags3 & (RF3_IM_ELEC))) return (0);
 		break;
 
+		case GF_IMAGE_FIRE:
+			if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) break;
+		
 		case GF_FIRE:
 		case GF_SMOKE:
 		if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (0);
@@ -3474,7 +3486,7 @@ int mon_resist_effect(int effect, int r_idx)
 		return (1);
 
 		case GF_BMUD:
-		if ((r_ptr->flags3 & (RF3_NONLIVING))&& (r_ptr->flags3 & (RF3_IM_FIRE))) return (TRUE);
+		if ((r_ptr->flags3 & (RF3_NONLIVING))&& (r_ptr->flags3 & (RF3_IM_FIRE))) return (1);
 		if (!(r_ptr->flags3 & (RF3_IM_FIRE))) return (0);
 		return(1);
 
@@ -3538,10 +3550,8 @@ int mon_resist_effect(int effect, int r_idx)
 		break;
 	}
 
-	return (TRUE);
+	return (1);
 }
-
-
 
 
 /* XXX XXX Checking by blow method is broken currently, because we
@@ -3626,6 +3636,17 @@ bool mon_resist_feat(int feat, int r_idx)
 	/* Check trap/feature attack */
 	if (f_ptr->blow.method)
 	{
+		/* Some monsters ignore illusions */
+		switch (f_ptr->effect)
+		{
+			case GF_IMAGE_ACID:
+			case GF_IMAGE_FIRE:
+			case GF_IMAGE_COLD:
+			case GF_IMAGE_ELEC:
+			case GF_IMAGE_POIS:
+				if (m_ptr->mflag & (MFLAG_SMART)) return (TRUE);
+		}
+		
 		switch(mon_resist_effect(f_ptr->blow.effect, r_idx))
 		{
 			case -1:
@@ -3636,9 +3657,8 @@ bool mon_resist_feat(int feat, int r_idx)
 				if ((r_ptr->flags2 & (RF2_CAN_SWIM)) && (f_ptr->flags2 & (FF2_CAN_SWIM))) return (TRUE);
 				if ((r_ptr->flags2 & (RF2_CAN_DIG)) && (f_ptr->flags2 & (FF2_CAN_DIG))) return (TRUE);
 				return (FALSE);
-		}
+		}		
 	}
-
 
 	return(TRUE);
 }
@@ -3715,6 +3735,19 @@ int place_monster_here(int y, int x, int r_idx)
 
 			/* Skip dead regions */
 			if (!re_ptr->type) continue;
+
+			/* Some monsters ignore illusions */
+			switch (r_ptr->effect)
+			{
+				case GF_IMAGE_ACID:
+				case GF_IMAGE_FIRE:
+				case GF_IMAGE_COLD:
+				case GF_IMAGE_ELEC:
+				case GF_IMAGE_POIS:
+					if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) continue;
+					if ((m_ptr->mflag & (MFLAG_SMART | MFLAG_ALLY)) != 0) continue;
+				break;
+			}
 
 			/* Trapped regions */
 			if (re_ptr->flags1 & (RE1_HIT_TRAP))
