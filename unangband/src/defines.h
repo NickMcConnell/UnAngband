@@ -67,7 +67,7 @@
 #define VERSION_MAJOR	0
 #define VERSION_MINOR	6
 #define VERSION_PATCH	4
-#define VERSION_EXTRA	2
+#define VERSION_EXTRA	3
 
 /*
  * Oldest version number that can still be imported
@@ -3912,7 +3912,7 @@ enum
 #define TR4_HURT_FIRE   0x40000000L     /* Item makes wielder vulnerable to fire */
 #define TR4_HURT_COLD   0x80000000L     /* Item makes wielder vulnerable to cold */
 
-#define TR4_OLD_FLAGS (TR4_HURT_LITE | TR4_HURT_WATER | TR4_VAMP_HP | TR4_VAMP_MANA | TR4_IM_POIS | TR4_ANCHOR | TR4_SILENT |\
+#define TR4_OLD_FLAGS (TR4_HURT_LITE | TR4_HURT_WATER | TR4_VAMP_HP | TR4_VAMP_MANA | TR4_IM_POIS | TR4_LODESTONE | TR4_SILENT |\
 			TR4_STATIC | TR4_WINDY | TR4_ANIMAL | TR4_EVIL | TR4_UNDEAD | TR4_DEMON | TR4_ORC | TR4_TROLL | TR4_GIANT |\
 			TR4_DRAGON | TR4_MAN | TR4_DWARF | TR4_ELF | TR4_HURT_POIS | TR4_HURT_ACID | TR4_HURT_ELEC | TR4_HURT_FIRE |\
 			TR4_HURT_COLD)

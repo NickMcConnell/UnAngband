@@ -742,6 +742,7 @@ struct ego_item_type
 	byte max_sval[3];       /* Maximum legal tval */
 	byte xtra;      /* Extra Sustain/Resist/Power */
 
+	s16b pval;
 	s16b max_aval[MAX_AVALS_EGO_ITEM];	/* Ego item ability info */
 	
 	s32b cost;      /* Ego-item "cost" */

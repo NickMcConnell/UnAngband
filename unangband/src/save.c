@@ -158,6 +158,8 @@ static void wr_string(cptr str)
  */
 static void wr_item(const object_type *o_ptr)
 {
+	int i,j;
+	
 	wr_s16b(o_ptr->k_idx);
 
 	/* Location */
@@ -184,9 +186,6 @@ static void wr_item(const object_type *o_ptr)
 	wr_s16b(o_ptr->timeout);
 	wr_s16b(o_ptr->charges);
 
-	wr_s16b(o_ptr->to_h);
-	wr_s16b(o_ptr->to_d);
-	wr_s16b(o_ptr->to_a);
 	wr_s16b(o_ptr->ac);
 	wr_byte(o_ptr->dd);
 	wr_byte(o_ptr->ds);
@@ -197,10 +196,6 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->origin_depth);
 	wr_u16b(o_ptr->origin_xtra);
 
-	/* Old flags */
-	wr_u32b(0L);
-	wr_u32b(0L);
-
 	/* Held by monster index */
 	wr_s16b(o_ptr->held_m_idx);
 
@@ -208,16 +203,27 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->xtra1);
 	wr_byte(o_ptr->xtra2);
 
+	/* Aval information */
+	wr_s16b(MAX_AVALS_OBJECT);
+	for (i = 0; i < MAX_AVALS_OBJECT; i++) wr_s16b(o_ptr->aval[i]);
+	for (i = 0; i < MAX_AVALS_OBJECT; i++) wr_byte(o_ptr->aval_index[i]);
+
+	/* Ability information */
+	wr_s16b(ABILITY_ARRAY_SIZE);
+	
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) wr_u32b(o_ptr->can_flags0[i]);
 	wr_u32b(o_ptr->can_flags1);
 	wr_u32b(o_ptr->can_flags2);
 	wr_u32b(o_ptr->can_flags3);
 	wr_u32b(o_ptr->can_flags4);
 
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) wr_u32b(o_ptr->can_flags0[i]);
 	wr_u32b(o_ptr->may_flags1);
 	wr_u32b(o_ptr->may_flags2);
 	wr_u32b(o_ptr->may_flags3);
 	wr_u32b(o_ptr->may_flags4);
 
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) wr_u32b(o_ptr->can_flags0[i]);
 	wr_u32b(o_ptr->not_flags1);
 	wr_u32b(o_ptr->not_flags2);
 	wr_u32b(o_ptr->not_flags3);

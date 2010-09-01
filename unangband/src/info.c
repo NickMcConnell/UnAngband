@@ -5403,7 +5403,9 @@ bool make_fake_artifact(object_type *o_ptr, byte name1)
 	o_ptr->name1 = name1;
 
 	/* Extract the fields */
+#if 0
 	o_ptr->pval = a_ptr->pval;
+#endif
 	o_ptr->ac = a_ptr->ac;
 	o_ptr->dd = a_ptr->dd;
 	o_ptr->ds = a_ptr->ds;

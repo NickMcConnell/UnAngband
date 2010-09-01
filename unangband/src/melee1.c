@@ -4781,7 +4781,7 @@ void mon_hit_trap(int m_idx, int y, int x)
 		if (region_grid(y, x, region_illusion_hook)) m_ptr->mflag &= (MFLAG_SMART);
 		
 		/* XXX Monster is no longer stupid */
-		else if ((m_mflag & (MFLAG_STUPID)) != 0) m_ptr->mflag &= ~(MFLAG_STUPID);
+		else if ((m_ptr->mflag & (MFLAG_STUPID)) != 0) m_ptr->mflag &= ~(MFLAG_STUPID);
 		
 	}
 }

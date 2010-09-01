@@ -247,6 +247,8 @@ static void strip_bytes(int n)
 }
 
 
+#define TR3_OLD_FREE_ACT	0x00000040L
+
 /*
  * Read an object
  *
@@ -255,7 +257,12 @@ static void strip_bytes(int n)
  */
 static errr rd_item(object_type *o_ptr)
 {
-	u32b f1, f2, f3, f4;
+	int i;
+	s16b aval = 0;
+	s16b ability = 0;
+	s16b to_h = 0;
+	s16b to_d = 0;
+	s16b to_a = 0;
 
 	object_kind *k_ptr;
 
@@ -305,9 +312,13 @@ static errr rd_item(object_type *o_ptr)
 		&& !o_ptr->charges)
 		o_ptr->charges = k_info[o_ptr->k_idx].charges;
 
-	rd_s16b(&o_ptr->to_h);
-	rd_s16b(&o_ptr->to_d);
-	rd_s16b(&o_ptr->to_a);
+	/* Read old to hit/to dam/to ac information */
+	if (older_than(0, 6, 4, 3))
+	{
+		rd_s16b(&to_h);
+		rd_s16b(&to_d);
+		rd_s16b(&to_a);
+	}
 
 	rd_s16b(&o_ptr->ac);
 
@@ -323,8 +334,11 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->origin_depth);
 	rd_u16b(&o_ptr->origin_xtra);
 
-	/* Old flags */
-	strip_bytes(8);
+	if (older_than(0, 6, 4, 3))
+	{
+		/* Old flags */
+		strip_bytes(8);
+	}
 
 	/* Monster holding object */
 	rd_s16b(&o_ptr->held_m_idx);
@@ -333,22 +347,87 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->xtra1);
 	rd_byte(&o_ptr->xtra2);
 
+	/* Read the aval information */
+	if (!older_than(0, 6, 4, 3)) rd_s16b(&aval);
+	for (i = 0; i < aval; i++) rd_s16b(&o_ptr->aval[i]);
+	for (i = 0; i < aval; i++) rd_byte(&o_ptr->aval_index[i]);
+	
+	if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+		
 	/* Flags we have learnt about an item */
+	for (i = 0; i < ability; i++) rd_u32b(&o_ptr->can_flags0[i]);	
 	rd_u32b(&o_ptr->can_flags1);
 	rd_u32b(&o_ptr->can_flags2);
 	rd_u32b(&o_ptr->can_flags3);
 	rd_u32b(&o_ptr->can_flags4);
 
+	for (i = 0; i < ability; i++) rd_u32b(&o_ptr->can_flags0[i]);	
 	rd_u32b(&o_ptr->may_flags1);
 	rd_u32b(&o_ptr->may_flags2);
 	rd_u32b(&o_ptr->may_flags3);
 	rd_u32b(&o_ptr->may_flags4);
 
+	for (i = 0; i < ability; i++) rd_u32b(&o_ptr->can_flags0[i]);	
 	rd_u32b(&o_ptr->not_flags1);
 	rd_u32b(&o_ptr->not_flags2);
 	rd_u32b(&o_ptr->not_flags3);
 	rd_u32b(&o_ptr->not_flags4);
 
+	/* Translate flags to new system */
+	if (older_than(0, 6, 4, 3))
+	{
+		/* Fix up free action */
+		if (o_ptr->can_flags3 & (TR3_OLD_FREE_ACT)) o_ptr->can_flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+		o_ptr->can_flags3 &= ~(TR3_OLD_FREE_ACT);
+		
+		/* Can flags to abilities */
+		o_ptr->can_flags0[0] = o_ptr->can_flags1 & ~(TR1_OLD_FLAGS);
+		o_ptr->can_flags0[1] = o_ptr->can_flags2 & ~(TR2_OLD_FLAGS);
+		o_ptr->can_flags0[2] = o_ptr->can_flags3 & ~(TR3_OLD_FLAGS);
+		o_ptr->can_flags0[3] = o_ptr->can_flags4 & ~(TR4_OLD_FLAGS);
+
+		/* Can flags - fix */
+		o_ptr->can_flags1 &= (TR1_OLD_FLAGS);
+		o_ptr->can_flags2 &= (TR2_OLD_FLAGS);
+		o_ptr->can_flags3 &= (TR3_OLD_FLAGS);
+		o_ptr->can_flags4 &= (TR4_OLD_FLAGS);
+
+		/* Fix up free action */
+		if (o_ptr->may_flags3 & (TR3_OLD_FREE_ACT)) o_ptr->may_flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+		o_ptr->may_flags3 &= ~(TR3_OLD_FREE_ACT);
+		
+		/* may flags to abilities */
+		o_ptr->may_flags0[0] = o_ptr->may_flags1 & ~(TR1_OLD_FLAGS);
+		o_ptr->may_flags0[1] = o_ptr->may_flags2 & ~(TR2_OLD_FLAGS);
+		o_ptr->may_flags0[2] = o_ptr->may_flags3 & ~(TR3_OLD_FLAGS);
+		o_ptr->may_flags0[3] = o_ptr->may_flags4 & ~(TR4_OLD_FLAGS);
+
+		/* may flags - fix */
+		o_ptr->may_flags1 &= (TR1_OLD_FLAGS);
+		o_ptr->may_flags2 &= (TR2_OLD_FLAGS);
+		o_ptr->may_flags3 &= (TR3_OLD_FLAGS);
+		o_ptr->may_flags4 &= (TR4_OLD_FLAGS);
+
+		/* Fix up free action */
+		if (o_ptr->not_flags3 & (TR3_OLD_FREE_ACT)) o_ptr->not_flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+		o_ptr->not_flags3 &= ~(TR3_OLD_FREE_ACT);
+		
+		/* not flags to abilities */
+		o_ptr->not_flags0[0] = o_ptr->not_flags1 & ~(TR1_OLD_FLAGS);
+		o_ptr->not_flags0[1] = o_ptr->not_flags2 & ~(TR2_OLD_FLAGS);
+		o_ptr->not_flags0[2] = o_ptr->not_flags3 & ~(TR3_OLD_FLAGS);
+		o_ptr->not_flags0[3] = o_ptr->not_flags4 & ~(TR4_OLD_FLAGS);
+
+		/* not flags - fix */
+		o_ptr->not_flags1 &= (TR1_OLD_FLAGS);
+		o_ptr->not_flags2 &= (TR2_OLD_FLAGS);
+		o_ptr->not_flags3 &= (TR3_OLD_FLAGS);
+		o_ptr->not_flags4 &= (TR4_OLD_FLAGS);
+		
+		/* Determine aval indexes */
+		
+	}
+	
 	/* Times we have used an item */
 	rd_s16b(&o_ptr->usage);
 
@@ -381,11 +460,6 @@ static errr rd_item(object_type *o_ptr)
 	if (!wearable_p(o_ptr))
 	{
 		/* Get the correct fields */
-		o_ptr->to_h = k_ptr->to_h;
-		o_ptr->to_d = k_ptr->to_d;
-		o_ptr->to_a = k_ptr->to_a;
-
-		/* Get the correct fields */
 		o_ptr->ac = k_ptr->ac;
 		o_ptr->dd = k_ptr->dd;
 		o_ptr->ds = k_ptr->ds;
@@ -399,11 +473,6 @@ static errr rd_item(object_type *o_ptr)
 		/* All done */
 		return (0);
 	}
-
-
-	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
 
 	/* Paranoia */
 	if (o_ptr->name1)
@@ -478,15 +547,6 @@ static errr rd_item(object_type *o_ptr)
 
 		/* Hack -- extract the "broken" flag */
 		if (!e_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
-
-		/* Hack -- enforce legal pval */
-		if ((e_ptr->flags1 & (TR1_PVAL_MASK)) || (e_ptr->flags3 & (TR3_PVAL_MASK)))
-		{
-			/* Force a meaningful pval */
-			if (!o_ptr->pval) o_ptr->pval = 1;
-		}
-
-
 
 		/* Mega-Hack - Enforce the special broken items */
 		if ((o_ptr->name2 == EGO_BLASTED) ||

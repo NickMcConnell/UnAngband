@@ -985,10 +985,15 @@ static cptr k_info_ability[]=
 		"PROTECT_COLD",
 		"PROTECT_WATER",
 		"NIGHT_SIGHT",
-		"HURT_ACID",
-		"HURT_ELEC",
-		"HURT_FIRE",
-		"HURT_COLD"
+		"REVEAL_HIDDEN",
+		"REVEAL_MINERALS",
+		"MAGIC_MAPPING",
+		"HEAR_MONSTERS",
+		
+		/* The following are fake */
+		"KILL_DRAGON",
+		"KILL_DEMON",
+		"KILL_UNDEAD"
 };
 
 /*
@@ -1004,7 +1009,7 @@ static cptr k_info_flags1[] =
 		"SUST_CHR",
 		"SUST_SIZ",
 		"SUST_AGI",
-		"FREE_ACT", /*"NO_SLOW",*/
+		"NO_SLOW",
 		"NO_BLIND",
 		"NO_PARALYZE",
 		"NO_CONFUSE",
@@ -3874,11 +3879,92 @@ errr parse_f_info(char *buf, header *head)
 	return (0);
 }
 
+
 /*
  * Grab one flag in an object_kind from a textual string
  */
 static errr grab_one_kind_flag(object_kind *k_ptr, cptr what)
 {
+	int i;
+	
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		if (streq(what, k_info_ability[i]))
+		{
+			int ability = i;
+			int pval = k_ptr->pval;
+			
+			switch(i)
+			{
+				case ABILITY_MAX + 1:
+					ability = ABILITY_SLAY_DEMON;
+					pval = 5;
+					break;
+				case ABILITY_MAX + 3:
+					ability = ABILITY_SLAY_DRAGON;
+					pval = 5;
+					break;
+				case ABILITY_MAX + 2:
+					ability = ABILITY_SLAY_UNDEAD;
+					pval = 5;
+					break;
+				case ABILITY_SLAY_UNDEAD:
+				case ABILITY_SLAY_DEMON:
+				case ABILITY_SLAY_DRAGON:
+					pval = 3;
+					break;
+				case ABILITY_SLOW_DIGEST:
+					pval = 4;
+					break;
+				default:
+					if (ability_bonus[i].type == BONUS_SLAY)
+					{
+						if (ability == ABILITY_BRAND_LITE) pval = 3;
+						else pval = 4;
+					}
+					else if (ability_bonus[i].type >= BONUS_BRAND)
+					{
+						pval = 3;
+					}
+					else if (ability_bonus[i].type == BONUS_RESIST)
+					{
+						pval = 1;
+					}
+					break;
+			}
+			
+			/* Match if not used */
+			for (i = 0; i < MAX_AVALS_KIND; i++)
+			{
+				if ((k_ptr->aval[i] == 0) && ((k_ptr->flags0[ability/32][i] & (1L << (ability % 32))) == 0)) break;
+			}
+			
+			/* Try again */
+			if (i == MAX_AVALS_KIND)
+			{
+				for (i = 0; i < MAX_AVALS_KIND; i++)
+				{
+					if (k_ptr->aval[i] == pval) break;
+				}
+			}
+			
+			if (i == MAX_AVALS_KIND)
+			{
+				/* Oops */
+				msg_format("Unable to find space for ability '%s'.", what);
+	
+				/* Error */
+				return (PARSE_ERROR_GENERIC);
+			}
+			
+			/* Set the value if required */
+			if (k_ptr->aval[i] == 0) k_ptr->aval[i] = pval;
+			k_ptr->flags0[ability/32][i] |= (1L << (ability %32));
+
+			return (0);
+		}
+	}
+
 	if (grab_one_flag(&k_ptr->flags1, k_info_flags1, what) == 0)
 		return (0);
 
@@ -3897,13 +3983,18 @@ static errr grab_one_kind_flag(object_kind *k_ptr, cptr what)
 	if (grab_one_flag(&k_ptr->flags6, k_info_flags6, what) == 0)
 		return (0);
 
+	if (streq(what, "FREE_ACT"))
+	{
+		k_ptr->flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+		return (0);
+	}
+	
 	/* Oops */
 	msg_format("Unknown object flag '%s'.", what);
 
 	/* Error */
 	return (PARSE_ERROR_GENERIC);
 }
-
 
 
 /*
@@ -4457,6 +4548,86 @@ errr parse_k_info(char *buf, header *head)
  */
 static errr grab_one_artifact_flag(artifact_type *a_ptr, cptr what)
 {
+	int i;
+	
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		if (streq(what, k_info_ability[i]))
+		{
+			int ability = i;
+			int pval = a_ptr->pval;
+			
+			switch(i)
+			{
+				case ABILITY_MAX + 1:
+					ability = ABILITY_SLAY_DEMON;
+					pval = 5;
+					break;
+				case ABILITY_MAX + 3:
+					ability = ABILITY_SLAY_DRAGON;
+					pval = 5;
+					break;
+				case ABILITY_MAX + 2:
+					ability = ABILITY_SLAY_UNDEAD;
+					pval = 5;
+					break;
+				case ABILITY_SLAY_UNDEAD:
+				case ABILITY_SLAY_DEMON:
+				case ABILITY_SLAY_DRAGON:
+					pval = 3;
+					break;
+				case ABILITY_SLOW_DIGEST:
+					pval = 4;
+					break;
+				default:
+					if (ability_bonus[i].type == BONUS_SLAY)
+					{
+						if (ability == ABILITY_BRAND_LITE) pval = 3;
+						else pval = 4;
+					}
+					else if (ability_bonus[i].type >= BONUS_BRAND)
+					{
+						pval = 3;
+					}
+					else if (ability_bonus[i].type == BONUS_RESIST)
+					{
+						pval = 1;
+					}
+					break;
+			}
+			
+			/* Match if not used */
+			for (i = 0; i < MAX_AVALS_ARTIFACT; i++)
+			{
+				if ((a_ptr->aval[i] == 0) && ((a_ptr->flags0[ability/32][i] & (1L << (ability % 32))) == 0)) break;
+			}
+			
+			/* Try again */
+			if (i == MAX_AVALS_ARTIFACT)
+			{
+				for (i = 0; i < MAX_AVALS_ARTIFACT; i++)
+				{
+					if (a_ptr->aval[i] == pval) break;
+				}
+			}
+			
+			if (i == MAX_AVALS_EGO_ITEM)
+			{
+				/* Oops */
+				msg_format("Unable to find space for ability '%s'.", what);
+	
+				/* Error */
+				return (PARSE_ERROR_GENERIC);
+			}
+			
+			/* Set the value if required */
+			if (a_ptr->aval[i] == 0) a_ptr->aval[i] = pval;
+			a_ptr->flags0[ability/32][i] |= (1L << (ability %32));
+
+			return (0);
+		}
+	}
+
 	if (grab_one_flag(&a_ptr->flags1, k_info_flags1, what) == 0)
 		return (0);
 
@@ -4469,6 +4640,12 @@ static errr grab_one_artifact_flag(artifact_type *a_ptr, cptr what)
 	if (grab_one_flag(&a_ptr->flags4, k_info_flags4, what) == 0)
 		return (0);
 
+	if (streq(what, "FREE_ACT"))
+	{
+		a_ptr->flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+		return (0);
+	}
+	
 	/* Oops */
 	msg_format("Unknown artifact flag '%s'.", what);
 
@@ -4738,6 +4915,86 @@ errr parse_n_info(char *buf, header *head)
  */
 static bool grab_one_ego_item_flag(ego_item_type *e_ptr, cptr what)
 {
+	int i;
+	
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		if (streq(what, k_info_ability[i]))
+		{
+			int ability = i;
+			int pval = e_ptr->pval;
+			
+			switch(i)
+			{
+				case ABILITY_MAX + 1:
+					ability = ABILITY_SLAY_DEMON;
+					pval = 5;
+					break;
+				case ABILITY_MAX + 3:
+					ability = ABILITY_SLAY_DRAGON;
+					pval = 5;
+					break;
+				case ABILITY_MAX + 2:
+					ability = ABILITY_SLAY_UNDEAD;
+					pval = 5;
+					break;
+				case ABILITY_SLAY_UNDEAD:
+				case ABILITY_SLAY_DEMON:
+				case ABILITY_SLAY_DRAGON:
+					pval = 3;
+					break;
+				case ABILITY_SLOW_DIGEST:
+					pval = 4;
+					break;
+				default:
+					if (ability_bonus[i].type == BONUS_SLAY)
+					{
+						if (ability == ABILITY_BRAND_LITE) pval = 3;
+						else pval = 4;
+					}
+					else if (ability_bonus[i].type >= BONUS_BRAND)
+					{
+						pval = 3;
+					}
+					else if (ability_bonus[i].type == BONUS_RESIST)
+					{
+						pval = 1;
+					}
+					break;
+			}
+			
+			/* Match if not used */
+			for (i = 0; i < MAX_AVALS_EGO_ITEM; i++)
+			{
+				if ((e_ptr->max_aval[i] == 0) && ((e_ptr->flags0[ability/32][i] & (1L << (ability % 32))) == 0)) break;
+			}
+			
+			/* Try again */
+			if (i == MAX_AVALS_EGO_ITEM)
+			{
+				for (i = 0; i < MAX_AVALS_EGO_ITEM; i++)
+				{
+					if (e_ptr->max_aval[i] == pval) break;
+				}
+			}
+			
+			if (i == MAX_AVALS_EGO_ITEM)
+			{
+				/* Oops */
+				msg_format("Unable to find space for ability '%s'.", what);
+	
+				/* Error */
+				return (PARSE_ERROR_GENERIC);
+			}
+			
+			/* Set the value if required */
+			if (e_ptr->max_aval[i] == 0) e_ptr->max_aval[i] = pval;
+			e_ptr->flags0[ability/32][i] |= (1L << (ability %32));
+
+			return (0);
+		}
+	}
+
 	if (grab_one_flag(&e_ptr->flags1, k_info_flags1, what) == 0)
 		return (0);
 
@@ -4750,6 +5007,12 @@ static bool grab_one_ego_item_flag(ego_item_type *e_ptr, cptr what)
 	if (grab_one_flag(&e_ptr->flags4, k_info_flags4, what) == 0)
 		return (0);
 
+	if (streq(what, "FREE_ACT"))
+	{
+		e_ptr->flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+		return (0);
+	}
+	
 	/* Oops */
 	msg_format("Unknown ego-item flag '%s'.", what);
 
@@ -4929,7 +5192,7 @@ errr parse_e_info(char *buf, header *head)
 	else if (buf[0] == 'C')
 	{
 		int th, td, ta, pv;
-		int k = 1;
+		int k = 0;
 
 		/* There better be a current e_ptr */
 		if (!e_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4942,7 +5205,7 @@ errr parse_e_info(char *buf, header *head)
 		if (th) { e_ptr->max_aval[k] = th; e_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
 		if (td) {e_ptr->max_aval[k] = td; e_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
 		if (ta) {e_ptr->max_aval[k] = ta; e_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
-		if (pv) e_ptr->max_aval[0] = pv;
+		if (pv) e_ptr->pval = pv;
 	}
 
 	/* Process 'Y' for "Rune" (one line only) */
@@ -10523,7 +10786,9 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
  */
 errr emit_k_info_index(FILE *fp, header *head, int i)
 {
+	int j, k;
 	int n;
+	int showc = 0;
 	bool introduced = FALSE;
 
 	/* Current entry */
@@ -10536,7 +10801,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "G:%c:%c\n",k_ptr->d_char,color_attr_to_char(k_ptr->d_attr));
 
 	/* Output 'I' for "Info" (one line only) */
-	fprintf(fp, "I:%d:%d:%d\n",k_ptr->tval,k_ptr->sval,k_ptr->pval);
+	fprintf(fp, "I:%d:%d\n",k_ptr->tval,k_ptr->sval);
 
 	/* Output 'W' for "More Info" (one line only) */
 	fprintf(fp,"W:%d:%d:%d:%ld\n",k_ptr->level, k_ptr->charges, k_ptr->weight, k_ptr->cost);
@@ -10555,12 +10820,32 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	if (introduced) fprintf(fp,"\n");
 
 	/* Output 'P' for "Power" (one line only) */
-	fprintf(fp,"P:%d:%dd%d:%d:%d:%d\n",k_ptr->ac, k_ptr->dd, k_ptr->ds, k_ptr->to_h, k_ptr->to_d, k_ptr->to_a);
+	fprintf(fp,"P:%d:%dd%d\n",k_ptr->ac, k_ptr->dd, k_ptr->ds);
 
 	/* Output 'Y' for "Runes" (up to one line only) */
 	if (k_ptr->runest) fprintf(fp, "Y:%d:%d\n",k_ptr->runest, k_ptr->runesc);
 	else if (k_ptr->flavor) fprintf(fp, "#$ Runes needed\n");
 
+	/* Do we have any avals to show? */
+	for (n = 0; n < MAX_AVALS_KIND; n++) if (k_ptr->aval[n]) showc = n;
+	
+	/* Output 'C' for "Creation" (one line only) */
+	if (showc)
+	{
+		fprintf(fp,"C");
+		for (n = 0; n < showc; n++) fprintf(fp,":%d",k_ptr->aval[n]);
+		fprintf(fp,"\n");
+	}
+	
+	/* Output '0', '1', '2' etc for "Abilities */
+	for (k = 0; k < MAX_AVALS_KIND; k++)
+	{
+		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
+		{
+			emit_flags_32(fp, format("%d:", k), k_ptr->flags0[j][k], k_info_ability + k* 32);
+		}
+	}
+	
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", k_ptr->flags1, k_info_flags1);
 	emit_flags_32(fp, "F:", k_ptr->flags2, k_info_flags2);
@@ -10584,6 +10869,9 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
  */
 errr emit_a_info_index(FILE *fp, header *head, int i)
 {
+	int j, k;
+	int n, showc = 0;
+	
 	/* Current entry */
 	artifact_type *a_ptr = (artifact_type*)head->info_ptr + i;
 
@@ -10591,17 +10879,37 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "N:%d:%s\n", i,head->name_ptr + a_ptr->name);
 
 	/* Output 'I' for "Info" (one line only) */
-	fprintf(fp, "I:%d:%d:%d\n",a_ptr->tval,a_ptr->sval,a_ptr->pval);
+	fprintf(fp, "I:%d:%d\n",a_ptr->tval,a_ptr->sval);
 
 	/* Output 'W' for "More Info" (one line only) */
 	fprintf(fp,"W:%d:%d:%d:%ld\n",a_ptr->level, a_ptr->rarity, a_ptr->weight, a_ptr->cost);
 
 	/* Output 'P' for "Power" (one line only) */
-	fprintf(fp,"P:%d:%dd%d:%d:%d:%d\n",a_ptr->ac, a_ptr->dd, a_ptr->ds, a_ptr->to_h, a_ptr->to_d, a_ptr->to_a);
+	fprintf(fp,"P:%d:%dd%d\n",a_ptr->ac, a_ptr->dd, a_ptr->ds);
 
 	/* Output 'A' for "Activation" (one line only) */
 	if (a_ptr->activation) fprintf(fp, "A:%d:%d:%d\n",a_ptr->activation,a_ptr->time,a_ptr->randtime);
 
+	/* Do we have any avals to show? */
+	for (n = 0; n < MAX_AVALS_ARTIFACT; n++) if (a_ptr->aval[n]) showc = n;
+	
+	/* Output 'C' for "Creation" (one line only) */
+	if (showc)
+	{
+		fprintf(fp,"C");
+		for (n = 0; n < showc; n++) fprintf(fp,":%d",a_ptr->aval[n]);
+		fprintf(fp,"\n");
+	}
+
+	/* Output '0', '1', '2' etc for "Abilities */
+	for (k = 0; k < MAX_AVALS_ARTIFACT; k++)
+	{
+		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
+		{
+			emit_flags_32(fp, format("%d:", k), a_ptr->flags0[j][k], k_info_ability + k * 32);
+		}
+	}
+	
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", a_ptr->flags1, k_info_flags1);
 	emit_flags_32(fp, "F:", a_ptr->flags2, k_info_flags2);
@@ -10623,7 +10931,10 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
  */
 errr emit_e_info_index(FILE *fp, header *head, int i)
 {
+	int j, k;
 	int n;
+	bool showc = 0;	
+	
 	/* Current entry */
 	ego_item_type *e_ptr = (ego_item_type*)head->info_ptr + i;
 
@@ -10644,9 +10955,6 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 		fprintf(fp, "T:%d:%d:%d\n", e_ptr->tval[n], e_ptr->min_sval[n], e_ptr->max_sval[n]);
 	}
 
-	/* Output 'C' for "Creation" (one line only) */
-	fprintf(fp,"C:%d:%d:%d:%d\n",e_ptr->max_to_h, e_ptr->max_to_d, e_ptr->max_to_a, e_ptr->max_pval);
-
 	/* Output 'A' for "Activation" (one line only) */
 	if (e_ptr->activation) fprintf(fp, "A:%d:%d:%d\n",e_ptr->activation,e_ptr->time,e_ptr->randtime);
 
@@ -10654,6 +10962,26 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 	if (e_ptr->runest) fprintf(fp, "Y:%d:%d\n",e_ptr->runest, e_ptr->runesc);
 	else fprintf(fp, "#$ Runes needed\n");
 
+	/* Do we have any avals to show? */
+	for (n = 0; n < MAX_AVALS_EGO_ITEM; n++) if (e_ptr->max_aval[n]) showc = n;
+	
+	/* Output 'C' for "Creation" (one line only) */
+	if (showc)
+	{
+		fprintf(fp,"C");
+		for (n = 0; n < showc; n++) fprintf(fp,":%d",e_ptr->max_aval[n]);
+		fprintf(fp,"\n");
+	}
+	
+	/* Output '0', '1', '2' etc for "Abilities */
+	for (k = 0; k < MAX_AVALS_EGO_ITEM; k++)
+	{
+		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
+		{
+			emit_flags_32(fp, format("%d:", k), e_ptr->flags0[j][k], k_info_ability + k * 32);
+		}
+	}
+	
 	/* Output 'F' for "Flags" */
 	emit_flags_32(fp, "F:", e_ptr->flags1, k_info_flags1);
 	emit_flags_32(fp, "F:", e_ptr->flags2, k_info_flags2);
