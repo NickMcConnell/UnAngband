@@ -2666,7 +2666,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			if (flag) equip_can_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
+			if (flag) equip_can_flags(NULL, 0x0L,0x0L,TR3_TELEPATHY,0x0L);
 #endif
 		}
 
@@ -2678,7 +2678,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_ORC,0x0L);
 #endif
 		}
 
@@ -2690,7 +2690,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_GIANT,0x0L);
 #endif
 		}
 
@@ -2702,7 +2702,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_TROLL,0x0L);
 #endif
 		}
 
@@ -2714,7 +2714,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
 #endif
 		}
 
@@ -2726,7 +2726,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_DEMON,0x0L);
 #endif
 		}
 
@@ -2738,7 +2738,7 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
 #endif
 		}
 
@@ -2752,7 +2752,43 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 			/* Visible */
-			equip_can_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+#endif
+		}
+
+		/* Magical sensing */
+		if (((p_ptr->cur_flags3 & (TR3_ESP_MAN)) != 0) && (r_ptr->flags9 & (RF9_MAN)))
+		{
+			flag = TRUE;
+			l_ptr->flags9 |= (RF9_MAN);
+
+#ifdef ALLOW_OBJECT_INFO_MORE
+			/* Visible */
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_MAN,0x0L);
+#endif
+		}
+
+		/* Magical sensing */
+		if (((p_ptr->cur_flags3 & (TR3_ESP_DWARF)) != 0) && (r_ptr->flags9 & (RF9_DWARF)))
+		{
+			flag = TRUE;
+			l_ptr->flags9 |= (RF9_DWARF);
+
+#ifdef ALLOW_OBJECT_INFO_MORE
+			/* Visible */
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_MAN,0x0L);
+#endif
+		}
+
+		/* Magical sensing */
+		if (((p_ptr->cur_flags3 & (TR3_ESP_ELF)) != 0) && (r_ptr->flags9 & (RF9_ELF)))
+		{
+			flag = TRUE;
+			l_ptr->flags9 |= (RF9_ELF);
+
+#ifdef ALLOW_OBJECT_INFO_MORE
+			/* Visible */
+			equip_can_flags(NULL, 0x0L,0x0L,TR3_ESP_ELF,0x0L);
 #endif
 		}
 
@@ -2863,14 +2899,17 @@ void update_mon(int m_idx, bool full)
 #endif
 
 #ifdef ALLOW_OBJECT_INFO_MORE
-					if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+					if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(NULL, 0x0L,0x0L,TR3_TELEPATHY,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_ORC,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+					if (!flag && (l_ptr->flags9 & (RF9_MAN))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_MAN,0x0L);
+					if (!flag && (l_ptr->flags9 & (RF9_DWARF))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DWARF,0x0L);
+					if (!flag && (l_ptr->flags9 & (RF9_ELF))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_ELF,0x0L);
 #endif
 					/* Easy to see */
 					easy = flag = TRUE;
@@ -2897,15 +2936,18 @@ void update_mon(int m_idx, bool full)
 
 #ifdef ALLOW_OBJECT_INFO_MORE
 						if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND)) &&
-							!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
+							!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(NULL, 0x0L,0x0L,TR3_TELEPATHY,0x0L);
 
-						if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
-						if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
-						if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
-						if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
-						if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
-						if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
-						if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_ORC,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+						if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+						if (!flag && (l_ptr->flags9 & (RF9_MAN))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_MAN,0x0L);
+						if (!flag && (l_ptr->flags9 & (RF9_DWARF))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DWARF,0x0L);
+						if (!flag && (l_ptr->flags9 & (RF9_ELF))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_ELF,0x0L);
 #endif
 						/* Easy to see */
 						easy = flag = TRUE;
@@ -2917,15 +2959,18 @@ void update_mon(int m_idx, bool full)
 				{
 #ifdef ALLOW_OBJECT_INFO_MORE
 					if (!flag && !(r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND)) &&
-						!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(0x0L,0x0L,TR3_TELEPATHY,0x0L);
+						!(l_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND))) equip_not_flags(NULL, 0x0L,0x0L,TR3_TELEPATHY,0x0L);
 
-					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(0x0L,0x0L,TR3_ESP_ORC,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(0x0L,0x0L,TR3_ESP_TROLL,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(0x0L,0x0L,TR3_ESP_GIANT,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(0x0L,0x0L,TR3_ESP_DEMON,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
-					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ORC))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_ORC,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_TROLL))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_TROLL,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_GIANT))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_GIANT,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DRAGON))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DRAGON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_DEMON))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DEMON,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_UNDEAD))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_UNDEAD,0x0L);
+					if (!flag && (l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_NATURE,0x0L);
+					if (!flag && (l_ptr->flags9 & (RF9_MAN))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_MAN,0x0L);
+					if (!flag && (l_ptr->flags9 & (RF9_DWARF))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_DWARF,0x0L);
+					if (!flag && (l_ptr->flags9 & (RF9_ELF))) equip_not_flags(NULL, 0x0L,0x0L,TR3_ESP_ELF,0x0L);
 #endif
 
 					/* Easy to see */
@@ -2941,14 +2986,14 @@ void update_mon(int m_idx, bool full)
 				{
 					if (r_ptr->flags2 & RF2_INVISIBLE) l_ptr->flags2 |= (RF2_INVISIBLE);
 #ifdef ALLOW_OBJECT_INFO_MORE
-					if ((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) equip_can_flags(0x0L,0x0L,TR3_SEE_INVIS,0x0L);
+					if ((p_ptr->cur_flags3 & (TR3_SEE_INVIS)) != 0) equip_can_flags(NULL, 0x0L,0x0L,TR3_SEE_INVIS,0x0L);
 #endif
 				}
 				if (do_cold_blood) l_ptr->flags2 |= (RF2_COLD_BLOOD);
 #ifdef ALLOW_OBJECT_INFO_MORE
 				if (do_warm_blood)
 				{
-					if (rp_ptr->infra < d) equip_can_flags(TR1_INFRA,0x0L,0x0L,0x0L);
+					if (rp_ptr->infra < d) equip_can_flags(NULL, TR1_INFRA,0x0L,0x0L,0x0L);
 				}
 #endif
 				if (r_ptr->flags2 & (RF2_HAS_LITE)) l_ptr->flags2 |= (RF2_HAS_LITE);
@@ -3636,17 +3681,6 @@ bool mon_resist_feat(int feat, int r_idx)
 	/* Check trap/feature attack */
 	if (f_ptr->blow.method)
 	{
-		/* Some monsters ignore illusions */
-		switch (f_ptr->effect)
-		{
-			case GF_IMAGE_ACID:
-			case GF_IMAGE_FIRE:
-			case GF_IMAGE_COLD:
-			case GF_IMAGE_ELEC:
-			case GF_IMAGE_POIS:
-				if (m_ptr->mflag & (MFLAG_SMART)) return (TRUE);
-		}
-		
 		switch(mon_resist_effect(f_ptr->blow.effect, r_idx))
 		{
 			case -1:
@@ -3735,19 +3769,6 @@ int place_monster_here(int y, int x, int r_idx)
 
 			/* Skip dead regions */
 			if (!re_ptr->type) continue;
-
-			/* Some monsters ignore illusions */
-			switch (r_ptr->effect)
-			{
-				case GF_IMAGE_ACID:
-				case GF_IMAGE_FIRE:
-				case GF_IMAGE_COLD:
-				case GF_IMAGE_ELEC:
-				case GF_IMAGE_POIS:
-					if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) continue;
-					if ((m_ptr->mflag & (MFLAG_SMART | MFLAG_ALLY)) != 0) continue;
-				break;
-			}
 
 			/* Trapped regions */
 			if (re_ptr->flags1 & (RE1_HIT_TRAP))

@@ -565,7 +565,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		if (o_ptr->k_idx)
 		{
 			/* Adjust by ac factor */
-			blocking += o_ptr->ac + o_ptr->to_a;
+			blocking += o_ptr->ac + object_aval(o_ptr, ABILITY_TO_AC) + (ranged ? object_aval(o_ptr, ABILITY_TO_AC_RANGED) : object_aval(o_ptr, ABILITY_TO_AC_MELEE));
 		}
 
 		/* Modify by style */
@@ -638,7 +638,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 	if (k < 10) return (k < 5);
 
 	/* Total armor */
-	ac = p_ptr->ac + p_ptr->to_a;
+	ac = p_ptr->ac + p_ptr->to_a + (ranged ? p_ptr->ability[ABILITY_TO_AC_RANGED] : p_ptr->ability[ABILITY_TO_AC_MELEE]);
 
 	/* Modify for blocking */
 	ac += blocking;
@@ -653,7 +653,6 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		{
 			/* Add shield ac again */
 			ac += o_ptr->ac;
-			ac += o_ptr->to_a;
 		}
 
 		/* Shield spell counts for double */
@@ -3035,14 +3034,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 				msg_format("%^s commands you to return.", m_name);
 
-				if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
+				if ((p_ptr->cur_flags3 & (TR3_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
 				{
 					msg_print("You remain anchored in place.");
-					if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
 				}
 				else
 				{
-					player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					player_not_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
 					teleport_player_to(m_ptr->fy, m_ptr->fx);
 				}
 			}
@@ -3058,14 +3057,14 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if (!direct) break;
 				disturb(1, 0);
 
-				if ((p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
+				if ((p_ptr->cur_flags3 & (TR3_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
 				{
 					msg_format("%^s fails to teleport you away.", m_name);
-					if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					if (!(room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR))) player_can_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
 				}
 				else
 				{
-					player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+					player_not_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
 					teleport_hook = NULL;
 					teleport_player(100);
 				}
@@ -3093,13 +3092,12 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				if ((blind || sneaky) && (known)) msg_format("%^s mumbles strangely.", m_name);
 				else if (known) msg_format("%^s gestures at your feet.", m_name);
 
-				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) || (p_ptr->cur_flags4 & (TR4_ANCHOR)))
+				if (p_ptr->cur_flags3 & (TR3_ANCHOR))
 				{
 					msg_print("You are unaffected!");
 
 					/* Always notice */
-					if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS))) player_can_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,0x0L);
-					if ((p_ptr->cur_flags4 & (TR4_ANCHOR))) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_ANCHOR);
+					if ((p_ptr->cur_flags3 & (TR3_ANCHOR))) player_can_flags(who, NULL, 0x0L,0x0L,TR3_ANCHOR,0x0L);
 				}
 				else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 				{
@@ -3112,7 +3110,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					teleport_player_level();
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,TR4_ANCHOR) && who)
+					if (!player_not_flags(who, NULL, 0x0L,0x0L,TR3_ANCHOR,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -3387,17 +3385,17 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else
 				{
 					msg_print("Your mind is blasted by psionic energy.");
-					if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
+					if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) == 0)
 					{
 						inc_timed(TMD_CONFUSED, rand_int(4) + 4, TRUE);
-						if (!player_not_flags(who, 0x0L, TR2_RES_CONFU, 0x0L, 0x0L) && who)
+						if (!player_not_flags(who, NULL, TR1_NO_CONFUSE, 0x0L, 0x0L, 0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
 					}
 					else
 					{
-						if (!player_can_flags(who, 0x0L, TR2_RES_CONFU, 0x0L, 0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_CONFUSE, 0x0L, 0x0L, 0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -3441,7 +3439,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (p_ptr->cur_flags2 & (TR2_RES_CHAOS))
+				if (p_ptr->cur_flags1 & (TR1_NO_IMAGE))
 				{
 					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
@@ -3452,7 +3450,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					else msg_print("You refuse to be deceived.");
 
 					/* Sometimes notice */
-					player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+					player_can_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 				}
 				else if (rand_int(100) < (powerful ? p_ptr->skills[SKILL_SAVE] * 2 / 3 : p_ptr->skills[SKILL_SAVE]))
 				{
@@ -3465,7 +3463,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					inc_timed(TMD_IMAGE, rand_int(4) + 4, TRUE);
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L) && who)
+					if (!player_not_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -3835,7 +3833,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
+				if ((p_ptr->cur_flags1 & (TR1_NO_FEAR)) != 0)
 				{
 					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
@@ -3844,7 +3842,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						(void)set_afraid(p_ptr->timed[TMD_AFRAID] + rand_int(4) + 1);
 
 						/* Always notice */
-						if (!player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -3854,7 +3852,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_print("You refuse to be frightened.");
 
 						/* Always notice */
-						if (!player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -3870,7 +3868,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					(void)set_afraid(p_ptr->timed[TMD_AFRAID] + rand_int(4) + 4);
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L) && who)
+					if (!player_not_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -3895,7 +3893,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0)
+				if ((p_ptr->cur_flags1 & (TR1_NO_BLIND)) != 0)
 				{
 					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
@@ -3904,7 +3902,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						inc_timed(TMD_BLIND, rand_int(6) + 1, TRUE);
 
 						/* Always notice */
-						if (!player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_BLIND,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -3914,7 +3912,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_print("You are unaffected!");
 
 						/* Always notice */
-						if (!player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_BLIND,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -3931,7 +3929,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					inc_timed(TMD_BLIND, 12 + rlev / 4 + rand_int(4), TRUE);
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L) && who)
+					if (!player_not_flags(who, NULL, TR1_NO_BLIND,0x0L,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -3958,7 +3956,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
+				if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) != 0)
 				{
 					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
@@ -3967,7 +3965,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						inc_timed(TMD_CONFUSED, rand_int(5) + 1, 1);
 
 						/* Always notice */
-						if (!player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -3977,7 +3975,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 						msg_print("You disbelieve the feeble spell.");
 
 						/* Always notice */
-						if (!player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
+						if (!player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -3993,7 +3991,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					inc_timed(TMD_CONFUSED, rlev / 8 + 4 + rand_int(4), TRUE);
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L) && who)
+					if (!player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -4019,7 +4017,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
+				if (((p_ptr->cur_flags1 & (TR1_NO_SLOW)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 				{
 					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
@@ -4033,7 +4031,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 							update_smart_save(who, FALSE);
 						}
 						/* Always notice */
-						else if (!player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
+						else if (!player_can_flags(who, NULL, TR1_NO_SLOW, 0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -4048,7 +4046,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 							update_smart_save(who, TRUE);
 						}
 						/* Always notice */
-						else if (!player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
+						else if (!player_can_flags(who, NULL, TR1_NO_SLOW,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -4064,7 +4062,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					inc_timed(TMD_SLOW, rand_int(4) + 4 + rlev / 25, TRUE);
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
+					if (!player_not_flags(who, NULL, TR1_NO_SLOW, 0x0L,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -4089,7 +4087,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 
 			if ((target < 0) && !(p_ptr->timed[TMD_STASTIS]))
 			{
-				if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
+				if (((p_ptr->cur_flags1 & (TR1_NO_PARALYZE)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 				{
 					if (powerful && (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 					{
@@ -4104,7 +4102,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 							update_smart_save(who, FALSE);
 						}
 						/* Always notice */
-						else if (!player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
+						else if (!player_can_flags(who, NULL,TR1_NO_PARALYZE,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, FALSE);
 						}
@@ -4119,7 +4117,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 							update_smart_save(who, TRUE);
 						}
 						/* Always notice */
-						else if (!player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
+						else if (!player_can_flags(who, NULL, TR1_NO_PARALYZE,0x0L,0x0L,0x0L) && who)
 						{
 							update_smart_save(who, TRUE);
 						}
@@ -4135,7 +4133,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 					inc_timed(TMD_PARALYZED, rand_int(4) + 4, TRUE);
 
 					/* Always notice */
-					if (!player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L) && who)
+					if (!player_not_flags(who, NULL, TR1_NO_PARALYZE,0x0L,0x0L,0x0L) && who)
 					{
 						update_smart_save(who, FALSE);
 					}
@@ -4431,7 +4429,7 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 	}
 
 	/* Hack -- more accurate weapons reduce resistance */
-	resist -= o_ptr->to_h;
+	resist -= object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
 
 	/* Try for a miss */
 	if (resist > rand_int(100))

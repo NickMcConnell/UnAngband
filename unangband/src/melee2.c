@@ -786,7 +786,7 @@ static int find_resist(u32b smart, int effect)
 		case GF_PROBE:
 		{
 			/* Hack -- do we still have abilities to learn */
-			if (((player_smart_flags(p_ptr->cur_flags1, p_ptr->cur_flags2, p_ptr->cur_flags3, p_ptr->cur_flags4)) & ~(smart)) != 0) return (0);
+			if (((player_smart_flags(NULL, p_ptr->cur_flags1, p_ptr->cur_flags2, p_ptr->cur_flags3, p_ptr->cur_flags4)) & ~(smart)) != 0) return (0);
 
 			return(100);
 		}
@@ -1052,6 +1052,11 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+	
+	u32b f4 = (RF4_ASSIST_MASK);
+	u32b f5 = (RF5_ASSIST_MASK);
+	u32b f6 = (RF6_ASSIST_MASK);
+	u32b f7 = (RF7_ASSIST_MASK);
 
 	/* Mages and priests can assist others */
 	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) &&
@@ -1061,7 +1066,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	
 		/* Allow assisting those whose allegiance doesn't match your own */
 		(((cave_m_idx[*tar_y][*tar_x] > 0)) &&
-			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[cave_m_idx[*tar_y][*tar_x]] & (MFLAG_ALLY)) != 0)))))
+			(((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[cave_m_idx[*tar_y][*tar_x]].mflag & (MFLAG_ALLY)) != 0)))))
 	{
 		/* Don't redirect assistance spells back to caster */
 		f4 = f5 = f6 = f7 = 0L;
@@ -1072,7 +1077,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 96);
 
-		if ((flag & (mf4 | pf4 | rf4_self_target_mask | RF4_SUMMON_MASK)) != 0)
+		if ((flag & (f4 | rf4_self_target_mask | RF4_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1082,7 +1087,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 128);
 
-		if ((flag & (mf5 | pf5 | RF5_SELF_TARGET_MASK | RF5_SUMMON_MASK)) != 0)
+		if ((flag & (f5 | RF5_SELF_TARGET_MASK | RF5_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1092,7 +1097,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 160);
 
-		if ((flag & (mf6 | pf6 | RF6_SELF_TARGET_MASK | RF6_SUMMON_MASK)) != 0)
+		if ((flag & (f6 | RF6_SELF_TARGET_MASK | RF6_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1102,7 +1107,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	{
 		u32b flag = 1L << (i - 192);
 
-		if ((flag & (mf7 | pf7 | RF7_SELF_TARGET_MASK | RF7_SUMMON_MASK)) != 0)
+		if ((flag & (f7 | RF7_SELF_TARGET_MASK | RF7_SUMMON_MASK)) != 0)
 		{
 			*tar_y = m_ptr->fy;
 			*tar_x = m_ptr->fx;
@@ -1211,7 +1216,7 @@ static void init_ranged_attack(monster_race *r_ptr)
 bool choose_to_attack_player(const monster_type *m_ptr)
 {
 	/* Hallucinating always attacks player */
-	if (m_ptr->do_image) return (TRUE);
+	if (m_ptr->image) return (TRUE);
 	
 	/* Allies don't attack player */
 	if (m_ptr->mflag & (MFLAG_ALLY)) return (FALSE);
@@ -1237,7 +1242,7 @@ bool choose_to_attack_player(const monster_type *m_ptr)
 bool choose_to_attack_monster(const monster_type *m_ptr, const monster_type *n_ptr)
 {
 	/* Hallucination always results in a fight */
-	if ((m_ptr->do_image) || (n_ptr->do_image)) return (TRUE);
+	if ((m_ptr->image) || (n_ptr->image)) return (TRUE);
 	
 	/* Allies and enemies of the player don't attack each other */
 	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0)) return (FALSE);
@@ -1292,7 +1297,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	const byte *spell_desire;
 
 	u32b f4, f5, f6, f7;
-	u32b af4, af5, af6, af7;
 
 	byte spell_range;
 
@@ -1324,13 +1328,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	f6 = r_ptr->flags6;
 	f7 = r_ptr->flags7;
 	
-	/* Priests will assist others if they are not near death */
-	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (m_ptr->hp < m_ptr->maxhp / 5))
-	{
-		assist |= (((f4 & (RF4_ASSIST_MASK)) != 0) || ((f5 & (RF5_ASSIST_MASK)) != 0) ||
-					((f6 & (RF6_ASSIST_MASK)) != 0) || ((f7 & (RF7_ASSIST_MASK)) != 0));
-	}
-
 	/* Eliminate innate spells if not set */
 	if ((choose & 0x01) == 0)
 	{
@@ -1433,13 +1430,22 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	*tar_x = p_ptr->px;
 	dist = distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x);
 
+	/* Priests will assist others if they are not near death */
+	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (m_ptr->hp < m_ptr->maxhp / 5))
+	{
+		assist |= (((f4 & (RF4_ASSIST_MASK)) != 0) || ((f5 & (RF5_ASSIST_MASK)) != 0) ||
+					((f6 & (RF6_ASSIST_MASK)) != 0) || ((f7 & (RF7_ASSIST_MASK)) != 0));
+	}
 	
 	/*
 	 * Is the monster an ally who can assist the player in
 	 * a time of crisis?
 	 */
-	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (p_ptr->chp < p_ptr->mhp / 3) && assist 
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (p_ptr->chp < p_ptr->mhp / 3) && (assist)
 
+		/* Ensure proximity */
+		&& (m_ptr->cdis < MAX_RANGE) && ((m_ptr->mflag & (MFLAG_VIEW)) != 0)
+			
 		/* Hack -- to avoid call to random */
 		&& (m_idx % 6 < 5 - (10 * p_ptr->chp / p_ptr->mhp)))
 	{
@@ -1490,7 +1496,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 			/* Monster has an enemy, or can assist an ally */
 			if ((choose_to_attack_monster(m_ptr, n_ptr)) || ((assist) && 
-				((((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0)))
+				(((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0))))
 			{
 				bool see_target = aggressive;
 				bool assist_ally = (((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((n_ptr->mflag & (MFLAG_ALLY)) != 0));
@@ -1599,7 +1605,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					int d_base = MAX_SIGHT * 16 + ((m_idx + i) % 16);
 					
 					/* I'd benefit more from ignoring you and healing myself. */
-					if ((f6 & (RF6_HEAL | RF6_TELE_TO)) != 0) d_base += MAX_SIGHT * 8 - MAX_SIGHT * 8 * m_ptr->hp / m_ptr->max_hp;
+					if ((f6 & (RF6_HEAL | RF6_TELE_TO)) != 0) d_base += MAX_SIGHT * 8 - MAX_SIGHT * 8 * m_ptr->hp / m_ptr->maxhp;
 					
 					/* Determine if it is worth helping this monster */
 					d = d_base;
@@ -1608,7 +1614,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					if ((f6 & (RF6_HEAL | RF6_HASTE | RF6_SHIELD | RF6_BLESS | RF6_TELE_TO)) != 0) d -= MAX_SIGHT * 8 * n_ptr->hp / n_ptr->maxhp;
 					
 					/* Don't bother buffing or curing badly hurt targets that we can't heal or teleport away */
-					if (((f6 & (RF6_HEAL | RF6_TELE_TO)) == 0) && (n_ptr->hp < n_ptr->max_hp / 2)) d += MAX_SIGHT * 12 - MAX_SIGHT * 24 * n_ptr->hp / n_ptr->maxhp;
+					if (((f6 & (RF6_HEAL | RF6_TELE_TO)) == 0) && (n_ptr->hp < n_ptr->maxhp / 2)) d += MAX_SIGHT * 12 - MAX_SIGHT * 24 * n_ptr->hp / n_ptr->maxhp;
 					
 					/* Benefit from curing */
 					if ((f6 & (RF6_CURE)) != 0)
@@ -1643,16 +1649,16 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 						if (n_ptr->shield) d_shield = 10000;
 						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_SHIELD))) != 0) ? MIN(d, d_shield) : d_shield;
 					}
-					
+#if 0					
 					/* Benefit from elemental protection */
 					if ((f6 & (RF6_OPPOSE_ELEM)) != 0)
 					{
 						int d_oppose_elem = d;
-						if (m_ptr->oppose_elem) d_shield = MIN(d, d_base / 2);
-						if (n_ptr->oppose_elem) d_shield = 10000;
-						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_OPPOSE_ELEM))) != 0) ? MIN(d, d_shield) : d_shield;
+						if (m_ptr->oppose_elem) d_oppose_elem = MIN(d, d_base / 2);
+						if (n_ptr->oppose_elem) d_oppose_elem = 10000;
+						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_OPPOSE_ELEM))) != 0) ? MIN(d, d_oppose_elem) : d_oppose_elem;
 					}
-					
+#endif					
 					/* Benefit from blessing */
 					if ((f6 & (RF6_BLESS)) != 0)
 					{
@@ -1691,7 +1697,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	if ((target_m_idx) && ((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[target_m_idx].mflag & (MFLAG_ALLY)) != 0))
 	{
 		/* Hack - cure hallucinating monsters or kill them */
-		if (m_list[target_m_idx].do_image)
+		if (m_list[target_m_idx].image)
 		{
 			if (f6 & (RF6_CURE))
 			{
@@ -2158,7 +2164,7 @@ bool cave_exist_mon(int r_idx, int y, int x, bool occupied_ok)
  */
 bool region_illusion_hook(int y, int x, s16b d, s16b region)
 {
-	region_type *r_ptr = region_list[region];
+	region_type *r_ptr = &region_list[region];
 	
 	(void)x; (void)y; (void)d;
 	
@@ -6024,15 +6030,11 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				/* Take objects on the floor */
 				if (r_ptr->flags2 & (RF2_TAKE_ITEM | RF2_EAT_BODY))
 				{
-					u32b f1, f2, f3, f4;
-
-					u32b flg3 = 0L;
+					bool pickup = TRUE;
+					int i;
 
 					char m_name[80];
 					char o_name[120];
-
-					/* Extract some flags */
-					object_flags(o_ptr, &f1, &f2, &f3, &f4);
 
 					/* Acquire the object name */
 					object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -6040,18 +6042,30 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 					/* Acquire the monster name */
 					monster_desc(m_name, sizeof(m_name), m_idx, 0x04);
 
-					/* React to objects that hurt the monster */
-					if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
-					if (f1 & (TR1_SLAY_TROLL)) flg3 |= (RF3_TROLL);
-					if (f1 & (TR1_SLAY_GIANT)) flg3 |= (RF3_GIANT);
-					if (f1 & (TR1_SLAY_ORC)) flg3 |= (RF3_ORC);
-					if (f1 & (TR1_SLAY_DEMON)) flg3 |= (RF3_DEMON);
-					if (f1 & (TR1_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
-					if (f1 & (TR1_SLAY_NATURAL)) flg3 |= (RF3_ANIMAL | RF3_PLANT | RF3_INSECT);
-					if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
-
+					/* Check slays */
+					for (i = 0; i < ABILITY_MAX; i++)
+					{
+						if (ability_bonus[i].type != BONUS_SLAY) continue;
+						
+						if ((ability_bonus[i].flag_num == 1) && ((r_ptr->flags1 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 2) && ((r_ptr->flags2 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 3) && ((r_ptr->flags3 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 4) && ((r_ptr->flags4 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 5) && ((r_ptr->flags5 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 6) && ((r_ptr->flags6 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 7) && ((r_ptr->flags7 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 8) && ((r_ptr->flags8 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						else if ((ability_bonus[i].flag_num == 9) && ((r_ptr->flags9 & (ability_bonus[i].flag_match)) != 0)) pickup = FALSE;
+						
+						if (!pickup)
+						{
+							if (object_aval(o_ptr, i) > 0) break;
+							else pickup = TRUE;
+						}
+					}
+					
 					/* The object cannot be picked up by the monster */
-					if (artifact_p(o_ptr) || ((r_ptr->flags3 & flg3) != 0))
+					if (artifact_p(o_ptr) || (!pickup))
 					{
 						/* Only give a message for "take_item" */
 						if (r_ptr->flags2 & (RF2_TAKE_ITEM))
@@ -6081,19 +6095,6 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 									/* The object has been "sensed" */
 									o_ptr->ident |= (IDENT_SENSE);
 								}
-
-								/* Invert the flags */
-								if ((l_ptr->flags3 & (RF3_DRAGON)) == 0) f1 &= ~(TR1_SLAY_DRAGON);
-								if ((l_ptr->flags3 & (RF3_TROLL)) == 0) f1 &= ~(TR1_SLAY_TROLL);
-								if ((l_ptr->flags3 & (RF3_GIANT)) == 0) f1 &= ~(TR1_SLAY_GIANT);
-								if ((l_ptr->flags3 & (RF3_ORC)) == 0) f1 &= ~(TR1_SLAY_ORC);
-								if ((l_ptr->flags3 & (RF3_DEMON)) == 0) f1 &= ~(TR1_SLAY_DEMON);
-								if ((l_ptr->flags3 & (RF3_UNDEAD)) == 0) f1 &= ~(TR1_SLAY_UNDEAD);
-								if ((l_ptr->flags3 & (RF3_ANIMAL | RF3_PLANT | RF3_INSECT)) == 0) f1 &= (TR1_SLAY_NATURAL);
-								if ((l_ptr->flags3 & (RF3_EVIL)) == 0) f1 &= ~(TR1_BRAND_HOLY);
-
-								/* Learn about flags on the object */
-								object_can_flags(o_ptr, f1, 0L, 0L, 0L, TRUE);
 							}
 						}
 					}
@@ -7440,8 +7441,6 @@ static void process_monster(int m_idx)
 
 				for (i = o_max - 1; i >= 1; i--)
 				{
-					u32b f1, f2, f3, f4;
-					u32b flg3 = 0L;
 					int d;
 
 					/* Access the object */
@@ -7471,21 +7470,8 @@ static void process_monster(int m_idx)
 					/* Skip distant objects */
 					if (d > MAX_RANGE / 2) continue;
 
-					/* Extract some flags */
-					object_flags(o_ptr, &f1, &f2, &f3, &f4);
-
-					/* React to objects that hurt the monster */
-					if (f1 & (TR1_SLAY_DRAGON)) flg3 |= (RF3_DRAGON);
-					if (f1 & (TR1_SLAY_TROLL)) flg3 |= (RF3_TROLL);
-					if (f1 & (TR1_SLAY_GIANT)) flg3 |= (RF3_GIANT);
-					if (f1 & (TR1_SLAY_ORC)) flg3 |= (RF3_ORC);
-					if (f1 & (TR1_SLAY_DEMON)) flg3 |= (RF3_DEMON);
-					if (f1 & (TR1_SLAY_UNDEAD)) flg3 |= (RF3_UNDEAD);
-					if (f1 & (TR1_SLAY_NATURAL)) flg3 |= (RF3_ANIMAL | RF3_PLANT | RF3_INSECT);
-					if (f1 & (TR1_BRAND_HOLY)) flg3 |= (RF3_EVIL);
-
 					/* The object cannot be picked up by the monster */
-					if (r_ptr->flags3 & flg3) continue;
+					if (o_ptr->feeling == INSCRIP_UNGETTABLE) continue;
 
 					/* Use value as a proxy for the order to get these */
 					value = object_value(o_ptr) * o_ptr->number;

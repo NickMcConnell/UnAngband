@@ -190,7 +190,7 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->dd);
 	wr_byte(o_ptr->ds);
 
-	wr_u16b(o_ptr->ident);
+	wr_u32b(o_ptr->ident);
 
 	wr_byte(o_ptr->origin);
 	wr_byte(o_ptr->origin_depth);
@@ -817,7 +817,7 @@ static void wr_extra(void)
  */
 static void wr_randarts(void)
 {
-	int i;
+	int i, j, k;
 
 	wr_u16b(z_info->a_max);
 
@@ -827,11 +827,7 @@ static void wr_randarts(void)
 
 		wr_byte(a_ptr->tval);
 		wr_byte(a_ptr->sval);
-		wr_s16b(a_ptr->pval);
 
-		wr_s16b(a_ptr->to_h);
-		wr_s16b(a_ptr->to_d);
-		wr_s16b(a_ptr->to_a);
 		wr_s16b(a_ptr->ac);
 
 		wr_byte(a_ptr->dd);
@@ -841,6 +837,13 @@ static void wr_randarts(void)
 
 		wr_s32b(a_ptr->cost);
 
+		wr_s16b(MAX_AVALS_ARTIFACT);
+		
+		for (j = 0; j < MAX_AVALS_ARTIFACT; j++) wr_s16b(a_ptr->aval[j]);
+		
+		wr_s16b(ABILITY_ARRAY_SIZE);
+		
+		for (k = 0; k < MAX_AVALS_ARTIFACT; k++) for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(a_ptr->flags0[j][k]);
 		wr_u32b(a_ptr->flags1);
 		wr_u32b(a_ptr->flags2);
 		wr_u32b(a_ptr->flags3);

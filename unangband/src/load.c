@@ -325,7 +325,17 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->dd);
 	rd_byte(&o_ptr->ds);
 
-	rd_u16b(&o_ptr->ident);
+	if (older_than(0, 6, 4, 3))
+	{
+		u16b tmp16u;
+		
+		rd_u16b(&tmp16u);
+		o_ptr->ident = tmp16u;
+	}
+	else
+	{
+		rd_u32b(&o_ptr->ident);		
+	}
 
 	/* Hack -- remove chests */
 	if (o_ptr->tval == TV_CHEST) o_ptr->k_idx = 0;
@@ -506,36 +516,6 @@ static errr rd_item(object_type *o_ptr)
 
 	/* Get the standard weight */
 	o_ptr->weight = k_ptr->weight;
-
-	/* Hack -- extract the "broken" flag */
-	/*if (o_ptr->pval < 0) o_ptr->ident |= (IDENT_BROKEN);*/
-
-#if 0
-/* Do not overwrite randarts from old versions! */
-
-	/* Artifacts */
-	if (o_ptr->name1)
-	{
-		artifact_type *a_ptr;
-
-		/* Obtain the artifact info */
-		a_ptr = &a_info[o_ptr->name1];
-
-		/* Get the new artifact "pval" */
-		o_ptr->pval = a_ptr->pval;
-
-		/* Get the new artifact fields */
-		o_ptr->ac = a_ptr->ac;
-		o_ptr->dd = a_ptr->dd;
-		o_ptr->ds = a_ptr->ds;
-
-		/* Get the new artifact weight */
-		o_ptr->weight = a_ptr->weight;
-
-		/* Hack -- extract the "broken" flag */
-		if (!a_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
-	}
-#endif
 
 	/* Ego items */
 	if (o_ptr->name2)
@@ -1472,7 +1452,7 @@ static errr rd_randarts(void)
 
 #ifdef GJW_RANDART
 
-	int i;
+	int i, j, k;
 	u16b artifact_count;
 
 	/* Read the number of artifacts */
@@ -1490,6 +1470,14 @@ static errr rd_randarts(void)
 	{
 		artifact_type *a_ptr = &a_info[i];
 
+		s16b pval = 0;
+		s16b to_h = 0;
+		s16b to_d = 0;
+		s16b to_a = 0;
+		
+		s16b aval = 0;
+		s16b ability = 0;
+		
 		rd_byte(&a_ptr->tval);
 		rd_byte(&a_ptr->sval);
 
@@ -1500,11 +1488,13 @@ static errr rd_randarts(void)
 			a_ptr->sval = 9;
 		}
 
-		rd_s16b(&a_ptr->pval);
-
-		rd_s16b(&a_ptr->to_h);
-		rd_s16b(&a_ptr->to_d);
-		rd_s16b(&a_ptr->to_a);
+		if (older_than(0, 6, 4, 3))
+		{
+			rd_s16b(&pval);
+			rd_s16b(&to_h);
+			rd_s16b(&to_d);
+			rd_s16b(&to_a);
+		}
 		rd_s16b(&a_ptr->ac);
 
 		rd_byte(&a_ptr->dd);
@@ -1513,11 +1503,43 @@ static errr rd_randarts(void)
 		rd_s16b(&a_ptr->weight);
 		rd_s32b(&a_ptr->cost);
 
+		/* Read the aval information */
+		if (!older_than(0, 6, 4, 3)) rd_s16b(&aval);
+		for (j = 0; j < aval; j++) rd_s16b(&a_ptr->aval[j]);
+
+		if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+			
+		/* Flags we have learnt about an item */
+		for (k = 0; k < aval; k++) for (j = 0; j < ability; j++) rd_u32b(&a_ptr->flags0[j][k]);	
 		rd_u32b(&a_ptr->flags1);
 		rd_u32b(&a_ptr->flags2);
 		rd_u32b(&a_ptr->flags3);
 		rd_u32b(&a_ptr->flags4);
 
+		/* Translate flags to new system */
+		if (older_than(0, 6, 4, 3))
+		{
+			/* Fix up free action */
+			if (a_ptr->flags3 & (TR3_OLD_FREE_ACT)) a_ptr->flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
+			a_ptr->flags3 &= ~(TR3_OLD_FREE_ACT);
+			
+			/* Can flags to abilities */
+			a_ptr->flags0[0][0] = a_ptr->flags1 & ~(TR1_OLD_FLAGS);
+			a_ptr->flags0[1][0] = a_ptr->flags2 & ~(TR2_OLD_FLAGS);
+			a_ptr->flags0[2][0] = a_ptr->flags3 & ~(TR3_OLD_FLAGS);
+			a_ptr->flags0[3][0] = a_ptr->flags4 & ~(TR4_OLD_FLAGS);
+
+			/* Can flags - fix */
+			a_ptr->flags1 &= (TR1_OLD_FLAGS);
+			a_ptr->flags2 &= (TR2_OLD_FLAGS);
+			a_ptr->flags3 &= (TR3_OLD_FLAGS);
+			a_ptr->flags4 &= (TR4_OLD_FLAGS);
+			
+			/* Determine avals */
+			
+		}
+
+		
 		rd_byte(&a_ptr->level);
 		rd_byte(&a_ptr->rarity);
 
