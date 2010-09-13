@@ -1091,6 +1091,7 @@ enum
 #define GF_ILLUSION		161
 #define GF_VAMP_DRAIN_FAMILIAR	162
 #define GF_MANA_DRAIN_FAMILIAR	163
+#define GF_DRAIN_LIFE_PERC   164
 
 
 
@@ -2653,8 +2654,8 @@ enum
 /*
  * Special "sval" limit -- maximum number of bags
  */
-#define SV_BAG_MAX_BAGS		24
-#define SV_BAG_HARMFUL_MUSHROOMS 1
+#define SV_BAG_MAX_BAGS		29
+#define SV_BAG_HARMFUL_MUSHROOMS 1		/* Undead players are allowed to eat harmful mushrooms */
 
 /*
  * Special "sval" value -- unknown "sval"

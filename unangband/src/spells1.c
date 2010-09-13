@@ -1187,7 +1187,10 @@ byte spell_color(int type, int y, int x)
 		case GF_CHAOS:        return (chaos_color());
 		case GF_DISENCHANT:   return (TERM_VIOLET);
 		case GF_TIME:         return (TERM_L_BLUE);
+		case GF_GAIN_MANA:
+		case GF_GAIN_MANA_PERC:
 		case GF_MANA:         return (mana_color());
+		case GF_DRAIN_LIFE_PERC:
 		case GF_DRAIN_LIFE:   return (death_color());
 
 		case GF_METEOR:       return (meteor_color());
@@ -7047,6 +7050,18 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			break;
 		}
+		
+		/* Drain life percentage */
+		case GF_DRAIN_LIFE_PERC:
+		{
+			/* Drain from maximum health */
+			dam = m_ptr->maxhp * dam / 100;
+			
+			/* Hack to keep code simple */
+			typ = GF_DRAIN_LIFE;
+			
+			/* Fall through */
+		}
 
 		/* Drain Life and Vampiric Drain */
 		case GF_DRAIN_LIFE:
@@ -7062,7 +7077,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				dam = 0;
 			}
 
-			else if (r_ptr->flags3 & (RF3_DEMON))
+			/* Elves, demons and maia are immortal */
+			else if (r_ptr->flags3 & (RF3_DEMON | (typ == DRAIN_LIFE ? (RF3_ELF) : 0L)))
 			{
 				if ((seen) && !(l_ptr->flags3 & (RF3_DEMON)))
 				{
@@ -7070,10 +7086,17 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_DEMON);
 				}
 
+				if ((seen) && !(l_ptr->flags3 & (RF3_ELF)))
+				{
+					note = " is unaffected.";
+					l_ptr->flags3 |= (RF3_ELF);
+				}
+				
 				obvious = FALSE;
 				dam = 0;
 			}
 
+			/* Nonliving have no life to drain */
 			else if (r_ptr->flags3 & (RF3_NONLIVING))
 			{
 				if ((seen) && !(l_ptr->flags3 & (RF3_NONLIVING)))
@@ -7090,13 +7113,13 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				note = " is drained of health.";
 			}
 
-			if (typ == GF_DRAIN_LIFE) break;
+			if ((typ == GF_DRAIN_LIFE) || (typ == GF_DRAIN_LIFE_PERC)) break;
 
 			/* Do not allow wimpy monsters to yield much profit */
 			if (m_ptr->hp + 1 < dam) dam = m_ptr->hp + 1;
 
 			/* Character has cast the spell, or familiar has drained on their behalf */
-			if ((who < SOURCE_PLAYER_START) || ((who == SOURCE_PLAYER_ALLY) && (typ == GF_VAMP_DRAIN_FAMILIAR)))
+			if ((who < SOURCE_PLAYER_START) || ((who == SOURCE_PLAYER_ALLY) && (typ == GF_VAMP_DRAIN_FAMILIAR) && (p_ptr->chp < p_ptr->mhp)))
 			{
 				/* Spell is damaging, and has hit a warm-blooded creature. */
 				if (dam > 0)
@@ -8228,7 +8251,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (r_ptr->mana)
 			{
 				/* Drain depends on maximum mana */
-				int drain = 2 + rand_int(r_ptr->mana / 10);
+				int drain = typ == GF_LOSE_MANA_PERC ? m_ptr->mana * dam / 100:  2 + rand_int(r_ptr->mana / 10);
 
 				/* Monster still has mana */
 				if (m_ptr->mana > drain)
@@ -8248,7 +8271,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				if ((typ != GF_MANA_DRAIN) && (typ != GF_MANA_DRAIN_FAMILIAR)) break;
 
 				/* Character has cast the spell, or familiar has drained on their behalf */
-				if ((who < SOURCE_PLAYER_START) || ((who == SOURCE_PLAYER_ALLY) && (typ == GF_MANA_DRAIN_FAMILIAR)))
+				if ((who < SOURCE_PLAYER_START) || ((who == SOURCE_PLAYER_ALLY) && (typ == GF_MANA_DRAIN_FAMILIAR) && (p_ptr->csp < p_ptr->msp)))
 				{					
 					/* Convert to player mana */
 					drain = damroll(drain,5);
@@ -12086,6 +12109,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				dam = 0;
 			}
 			break;
+		}
+		
+		/* Percentage drain life */
+		case GF_DRAIN_LIFE_PERC:
+		{
+			dam = p_ptr->mhp * dam / 100;
+			
+			/* Fall through */
 		}
 
 		/* Heal the player if undead, else damage */

@@ -97,7 +97,7 @@ W:10:500:1:50
 A:10/1
 P:0:0d0:0:0:0
 
-N:9:Weakness
+N:9:Intellectual Weakness
 G:,:w
 I:79:6:0
 W:10:500:1:0
@@ -125,14 +125,14 @@ W:20:500:1:1000
 A:20/8:30/4:35/1
 P:0:0d0:0:0:0
 
-N:13:Stupidity
+N:13:Healthy Stupidity
 G:,:w
 I:79:8:0
 W:15:500:1:0
 A:15/1
 P:0:0d0:0:0:0
 
-N:14:Naivety
+N:14:Charming Naivety
 G:,:w
 I:79:9:0
 W:15:500:1:0
@@ -146,7 +146,7 @@ W:5:500:1:0
 A:3/1:5/1
 P:0:0d0:0:0:0
 
-N:16:Sickness
+N:16:Strong Sickness
 G:,:w
 I:79:7:0
 W:10:500:1:0
@@ -1815,8 +1815,8 @@ F:THROWING |
 N:225:Strength and Size
 G:!:w
 I:75:48:0
-W:10:0:4:150
-A:10/3:40/3
+W:20:0:4:150
+A:20/3:40/3
 P:0:1d1:0:0:0
 Y:25:2
 F:THROWING |
@@ -1841,8 +1841,8 @@ F:THROWING |
 N:228:Intelligence and Wisdom
 G:!:w
 I:75:49:0
-W:10:0:4:150
-A:10/3:40/3
+W:20:0:4:150
+A:20/3:40/3
 P:0:1d1:0:0:0
 Y:17:2
 F:THROWING |
@@ -1976,8 +1976,8 @@ F:EAT_HEAL
 N:243:Constitution and Charisma
 G:!:w
 I:75:52:0
-W:10:0:4:150
-A:10/3:40/3
+W:20:0:4:150
+A:20/3:40/3
 P:0:1d1:0:0:0
 Y:24:2
 F:THROWING |
@@ -2048,8 +2048,8 @@ F:THROWING |
 N:251:Dexterity and Agility
 G:!:w
 I:75:51:0
-W:10:0:4:150
-A:10/3:40/3
+W:20:0:4:150
+A:20/3:40/3
 P:0:1d1:0:0:0
 Y:26:2
 F:THROWING |
@@ -5402,7 +5402,7 @@ Y:3:6
 F:THROWING |
 F:EAT_HEAL
 
-N:652:*Cure All Wounds*
+N:652:Restore Health
 G:!:w
 I:75:67:0
 W:45:200:4:1400
@@ -6524,22 +6524,22 @@ P:0:0d0:0:0:0
 N:803:Antidotes
 G:&:o
 I:98:5:0
-W:30:0:100:600
-A:30/5
+W:15:0:100:300
+A:15/5
 P:0:0d0:0:0:0
 
 N:804:Philtres
 G:&:o
 I:98:6:0
-W:45:0:100:2400
-A:45/10
+W:40:0:100:1800
+A:40/8
 P:0:0d0:0:0:0
 
 N:805:Elixirs
 G:&:o
 I:98:7:0
-W:57:0:100:8000
-A:57/40
+W:55:0:100:6000
+A:55/35
 P:0:0d0:0:0:0
 
 N:806:Helpful Mushrooms
@@ -6549,7 +6549,7 @@ W:35:0:100:800
 A:15/5:25/5
 P:0:0d0:0:0:0
 
-N:807:Scrying
+N:807:Divination
 G:&:o
 I:98:9:0
 W:40:0:100:1000
@@ -8249,4 +8249,77 @@ W:50:0:30:45000
 A:50/24
 P:0:1d7:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
+
+#More magic bags
+
+I:1008:Mixed Mushrooms
+G:&:o
+I:98:24:0
+W:20:0:100:350
+A:10/5
+P:0:0d0:0:0:0
+
+N:1009:Reagents
+G:&:o
+I:98:25:0
+W:30:0:100:600
+A:30/5
+P:0:0d0:0:0:0
+
+N:1010:Serums
+G:&:o
+I:98:26:0
+W:45:0:100:2400
+A:45/10
+P:0:0d0:0:0:0
+
+N:1011:Panaceas
+G:&:o
+I:98:27:0
+W:57:0:100:8000
+A:57/40
+P:0:0d0:0:0:0
+
+N:1012:Scrying
+G:&:o
+I:98:28:0
+W:40:0:100:1000
+A:15/5:25/5
+P:0:0d0:0:0:0
+
+N:1013:Wise Fumbling
+G:,:w
+I:79:27:0
+W:15:500:1:0
+A:15/1
+P:0:0d0:0:0:0
+
+N:1014:Growing Clumsiness
+G:,:w
+I:79:28:0
+W:15:500:1:0
+A:15/1
+P:0:0d0:0:0:0
+
+N:1015:Agile Ugliness
+G:,:w
+I:79:29:0
+W:15:500:1:0
+A:15/1
+P:0:0d0:0:0:0
+
+N:1016:Dextrous Shrinking
+G:,:w
+I:79:30:0
+W:15:500:1:0
+A:15/1
+P:0:0d0:0:0:0
+
+N:1017:Death
+G:!:w
+I:75:85:0
+W:55:0:4:0
+A:55/2
+P:0:1d1:0:0:0
+F:THROWING |
 

@@ -834,3 +834,9 @@ N:163:MANA_DRAIN
 I:20
 D:drain~:mana from::and give it to you::spell points:mana
 T:stealing mana
+
+N:164:DRAIN_LIFE_PERC
+I:20
+D:drain~:life from::::percent of hitpoints:% life
+T:life draining
+

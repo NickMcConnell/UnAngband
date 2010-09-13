@@ -2729,11 +2729,11 @@ void show_inven(void)
 	}
 
 	/*
-	 * Add notes about slots used by the quiver, if we have space, want
-	 * to show all slots, and have items in the quiver.
+	 * Add notes about slots used by the quiver or bags, if we have space, want
+	 * to show all slots, and have items in the quiver or bags.
 	 */
-	if ((p_ptr->pack_size_reduce) && (item_tester_full) &&
-		(j <= (INVEN_PACK - p_ptr->pack_size_reduce)))
+	if ((p_ptr->pack_size_reduce_quivers || p_ptr->pack_size_reduce_bags) && (item_tester_full) &&
+		(j <= (INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags)))
 	{
 		int ammo_num = 0, ammo_slot;
 
@@ -2751,14 +2751,14 @@ void show_inven(void)
 		}
 
 		/* Insert a blank dividing line, if we have the space. */
-		if (j <= ((INVEN_PACK - 1) - p_ptr->pack_size_reduce))
+		if (j <= ((INVEN_PACK - 1) - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags))
 		{
 			j++;
 
 			prt("", j, col ? col - 2 : col);
 		}
 
-		for (i = 0; i < p_ptr->pack_size_reduce; i++)
+		for (i = 0; i < p_ptr->pack_size_reduce_quiver + p_ptr->pack_size_reduce_bags ; i++)
 		{
 			/* Go to next line. */
 			j++;
@@ -2783,9 +2783,10 @@ void show_inven(void)
 			}
 
 			/* Hack -- use "(QUIVER)" as a description. */
-			strnfmt(o_name, sizeof(o_name),
+			if (i < p_ptr->pack_size_reduce_quiver) strnfmt(o_name, sizeof(o_name),
 				"(QUIVER - %d missile%s)", ammo_slot,
 				(ammo_slot == 1) ? "": "s");
+			else strnfmt(o_name, sizeof(o_name), "(MAGICAL BAG)");
 
 			c_put_str(TERM_BLUE, o_name, j, col + 3);
 		}

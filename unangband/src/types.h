@@ -1872,8 +1872,11 @@ struct player_type
 
 	s16b inven_cnt; /* Number of items in inventory */
 	s16b equip_cnt; /* Number of items in equipment (except quiver) */
-	s16b pack_size_reduce;		/* Number of inventory slots used by
+	s16b pack_size_reduce_quiver;		/* Number of inventory slots used by
 					   the quiver */
+	s16b pack_size_reduce_bags;		/* Number of inventory slots used by
+					   the bags */
+	
 
 
 	s16b target_set;/* Target flag */
