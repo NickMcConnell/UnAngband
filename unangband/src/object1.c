@@ -552,9 +552,10 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	bool named;
 	bool bonus;
 	bool charges;
-	bool pval;
 	bool known;
+	bool aval = FALSE;
 
+	int i;
 	int flavor;
 
 	bool append_name;
@@ -581,6 +582,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	char tmp_buf[128];
 	char mon_buf[80];
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	object_kind *k_ptr = &k_info[o_ptr->k_idx];
@@ -590,7 +592,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	(void)max;
 
 	/* Extract some flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 
 	/* See if the object is "aware" */
@@ -604,9 +606,6 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 
 	/* See if the object is "aware" */
 	charges = (object_charges_p(o_ptr) ? TRUE : FALSE);
-
-	/* See if the object is "aware" */
-	pval = (object_pval_p(o_ptr) ? TRUE : FALSE);
 
 	/* See if the object is "known" */
 	known = (object_known_p(o_ptr) ? TRUE : FALSE);
@@ -1243,7 +1242,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	if (mode < 1) goto object_desc_done;
 
 	/* Display the item like a weapon */
-	if (o_ptr->to_h && o_ptr->to_d) show_weapon = TRUE;
+	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) && object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)) show_weapon = TRUE;
 
 	/* Display the item like armour */
 	if (o_ptr->ac) show_armour = TRUE;
@@ -1282,27 +1281,27 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, p1);
-			object_desc_int_macro(t, o_ptr->to_h);
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY));
 			object_desc_chr_macro(t, ',');
-			object_desc_int_macro(t, o_ptr->to_d);
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY));
 			object_desc_chr_macro(t, p2);
 		}
 
 		/* Show the tohit if needed */
-		else if (o_ptr->to_h)
+		else if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY))
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, p1);
-			object_desc_int_macro(t, o_ptr->to_h);
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY));
 			object_desc_chr_macro(t, p2);
 		}
 
 		/* Show the todam if needed */
-		else if (o_ptr->to_d)
+		else if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY))
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, p1);
-			object_desc_int_macro(t, o_ptr->to_d);
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY));
 			object_desc_chr_macro(t, p2);
 		}
 	}
@@ -1318,16 +1317,16 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 			object_desc_chr_macro(t, b1);
 			object_desc_num_macro(t, o_ptr->ac);
 			object_desc_chr_macro(t, ',');
-			object_desc_int_macro(t, o_ptr->to_a);
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_AC));
 			object_desc_chr_macro(t, b2);
 		}
 
 		/* No base armor, but does increase armor */
-		else if (o_ptr->to_a)
+		else if (object_aval(o_ptr, ABILITY_TO_AC))
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, b1);
-			object_desc_int_macro(t, o_ptr->to_a);
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_AC));
 			object_desc_chr_macro(t, b2);
 		}
 	}
@@ -1391,19 +1390,33 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		object_desc_chr_macro(t, p2);
 	}
 
-	/* Dump "pval" flags for wearable items */
-	if ((pval) && ((f1 & (TR1_PVAL_MASK)) || (f3 & (TR3_PVAL_MASK))))
+	/* Dump "aval" flags for wearable items */
+	for (i = 0; i < MAX_AVALS_OBJECT; i++)
 	{
-		/* Start the display */
-		object_desc_chr_macro(t, ' ');
-		object_desc_chr_macro(t, p1);
+		/* TODO: Skip to hit, to dam and to ac bonuses if already shown */
+		if (o_ptr->aval[i])
+		{
+			if (!aval)
+			{
+				/* Start the display */
+				object_desc_chr_macro(t, ' ');
+				object_desc_chr_macro(t, p1);
 
-		/* Dump the "pval" itself */
-		object_desc_int_macro(t, o_ptr->pval);
+				aval = TRUE;
+			}
+			else
+			{
+				/* Continue the display */
+				object_desc_chr_macro(t, ',');
+			}
 
-		/* Finish the display */
-		object_desc_chr_macro(t, p2);
+			/* Dump the "aval" itself */
+			object_desc_int_macro(t, o_ptr->aval[i]);
+		}
 	}
+
+	/* Finish the display */
+	if (aval) object_desc_chr_macro(t, p2);
 
 	/* Indicate "charging" artifacts/rods */
 	if (o_ptr->timeout)

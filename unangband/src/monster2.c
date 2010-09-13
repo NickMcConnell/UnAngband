@@ -2993,7 +2993,13 @@ void update_mon(int m_idx, bool full)
 #ifdef ALLOW_OBJECT_INFO_MORE
 				if (do_warm_blood)
 				{
-					if (rp_ptr->infra < d) equip_can_flags(NULL, TR1_INFRA,0x0L,0x0L,0x0L);
+					u32b f0[ABILITY_ARRAY_SIZE];
+					int i;
+
+					for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+					f0[ABILITY_INFRA / 32] = 1L << (ABILITY_INFRA % 32);
+
+					if (rp_ptr->infra < d) equip_can_flags(f0, 0x0L,0x0L,0x0L,0x0L);
 				}
 #endif
 				if (r_ptr->flags2 & (RF2_HAS_LITE)) l_ptr->flags2 |= (RF2_HAS_LITE);
