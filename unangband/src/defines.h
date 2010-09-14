@@ -3555,25 +3555,41 @@ enum
 enum
 {
 	BONUS_NONE,
+	BONUS_EQUIP_ITEM_ONLY,	/* We learn about this bonus when we equip it; the bonus only applies to the item */
+	BONUS_EQUIP,			/* We learn about this bonus when we equip it */
 	BONUS_PASSIVE,			/* We may learn about this when moving around the dungeon */
 	BONUS_NOT_PASSIVE,		/* We may learn about the absence of this when moving around the dungeon */
 	BONUS_MULTIPLIER, 		/* We multiply instead of add */
 	BONUS_SENSE,			/* We may learn about this when wielding for efficiency gains */
+	BONUS_ESP,				/* We may learn about this when wielding for efficiency gains - ESP effect */
+	BONUS_SPEAK,			/* Allows speaking with a particular monster type */
+	BONUS_MARK,				/* Marks the player as if this monster race */
+	BONUS_MISC,				/* Gets a whole new ability */
 	BONUS_ADD_STAT,
 	BONUS_ADD_SKILL,
 	BONUS_ADD_SKILL_PASSIVE,	/* We may learn about this when moving around the dungeon */
+	BONUS_TIMED,			/* Protects against a timed effect */
+	BONUS_SUSTAIN,			/* Sustains a stat and protects against a timed effect */
+	BONUS_BURDEN,			/* Curses of various kinds */
+	BONUS_VULNERABLE,
+	BONUS_IMMUNE,
+	BONUS_PROTECT,
+	BONUS_PROOF,
 	BONUS_RESIST,
+	BONUS_RESIST_LOW,		/* Basic resists - acid/elec/fire/cold */
 	BONUS_WEAPON,			/* Bonuses from here onwards on a weapon only applied when using that weapon */
 	BONUS_ADD_WEAPON_SKILL,
 	BONUS_WEAPON_MULTIPLIER,	/* Weapon multiplier instead of adder */
 	BONUS_WEAPONLIKE,		/* Bonuses from here onwards on a weapon, gloves, boots, rings only applied in specific instances */	
 	BONUS_WEAPONLIKE_MULTIPLIER, /* Weaponlike multiplier instead of adder */	
+	BONUS_VAMP,
 	BONUS_SLAY,
 	BONUS_BRAND,
 	BONUS_BRAND_ELEM,		/* Oppose elements resists */
 	BONUS_BRAND_WATER_XTRA,	/* Oppose elements resists, water increases damage */
 	BONUS_BRAND_WATER_WEAK,	/* Oppose elements resists, water reduces damage */
-	BONUS_BRAND_WATER_ARMOR	/* Oppose elements resists, water reduces damage, armour reduces damage */
+	BONUS_BRAND_WATER_ARMOR,	/* Oppose elements resists, water reduces damage, armour reduces damage */
+	BONUS_MAX
 };
 
 	
@@ -3620,14 +3636,14 @@ enum
 	ABILITY_BRAND_FIRE,     /* Weapon has fire brand */
 	ABILITY_BRAND_COLD,     /* Weapon has cold brand */
 	
-	ABILITY_TO_HIT_ITEM_ONLY,
-	ABILITY_TO_DAM_ITEM_ONLY,
+	ABILITY_WEIGHT,	/* Weight */
 	ABILITY_DAMAGE_DICE,
 	ABILITY_DAMAGE_SIDES,
+	ABILITY_AC,				/* Base AC */
 	ABILITY_TO_AC,
+	ABILITY_TO_AC_BLOCK,
 	ABILITY_TO_AC_RANGED,
 	ABILITY_TO_AC_MELEE,
-	ABILITY_WEIGHT_MOD,	/* Weight modifier */
 	ABILITY_TO_HIT_THROW,	/* To hit throwing += "aval" */
 	ABILITY_TO_HIT_MELEE,	/* To hit melee += "aval" */
 	ABILITY_TO_HIT_BOW,		/* To hit bows += "aval" */
@@ -3714,10 +3730,10 @@ enum
 	ABILITY_PROTECT_COLD,	/* Pack protection - cold */
 	ABILITY_PROTECT_WATER,	/* Pack protection - water */
 	ABILITY_NIGHT_SIGHT,     /* Night vision */
-	ABILITY_AC,				/* Base AC */
-	ABILITY_TO_AC_BLOCK,
 	ABILITY_BRAND_ROCK,		/* Weapon slays hurt rock monsters */
 	ABILITY_TO_HIT_RESIST,	/* Weapon gets bonus against resistant/immune monsters */
+	ABILITY_TO_HIT_ITEM_ONLY,
+	ABILITY_TO_DAM_ITEM_ONLY,
 	ABILITY_MAX
 };
 
@@ -3733,11 +3749,11 @@ enum
  * abilities, without having a very big numeric array for each object
  * describing what bonus it has for every possible allowed ability.
  * 
- * Note we include the to-hit, to-dam and to-ac modifiers as abilities
- * for various 'space efficiency' gains. This may be beneficial at
- * some point from game engine design point of view as well.
+ * Note we include the weight, ac, damage dice, damage sides, to-hit,
+ * to-dam and to-ac modifiers as abilities for consistency and
+ * for various 'space efficiency' gains.
  * 
- * It is likely that we'll only need 2 ability modifiers for object kinds
+ * It is likely that we'll only need 5 ability modifiers for object kinds
  * with the exception of quarter staffs and other weapons which also
  * provide a defensive bonus.
  * 
@@ -3745,10 +3761,10 @@ enum
  * a hard time evaluating an item with more than five or so modifiers
  * with different numeric benefit anyways.
  */
-#define MAX_AVALS_KIND		3
-#define MAX_AVALS_EGO_ITEM	6
-#define MAX_AVALS_ARTIFACT	8
-#define MAX_AVALS_OBJECT	8
+#define MAX_AVALS_KIND		7
+#define MAX_AVALS_EGO_ITEM	10
+#define MAX_AVALS_ARTIFACT	12
+#define MAX_AVALS_OBJECT	12
 
 #define ABILITY_ARRAY_SIZE		(ABILITY_MAX + 31) / 32
 

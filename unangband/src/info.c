@@ -2581,247 +2581,6 @@ typedef struct o_flag_desc
 
 
 /*
- * Vampirism for weapons
- */
-static const o_flag_desc vamp_flags4_desc[] =
-{
-	{ TR4_VAMP_HP,		"blood" },
-	{ TR4_VAMP_MANA,	"mana" }
-};
-
-
-/*
- * Sustains
- */
-static const o_flag_desc sustain_flags1_desc[] =
-{
-	{ TR1_SUST_STR,		"strength" },
-	{ TR1_SUST_INT,		"intelligence" },
-	{ TR1_SUST_WIS,		"wisdom" },
-	{ TR1_SUST_DEX,		"dexteriy" },
-	{ TR1_SUST_CON,		"constitution" },
-	{ TR1_SUST_CHR,		"charisma" },
-	{ TR1_SUST_SIZ,		"size" },
-	{ TR1_SUST_AGI,		"agility" }
-};
-
-
-
-/*
- * Immunities
- */
-static const o_flag_desc immune_flags2_desc[] =
-{
-	{ TR2_IM_ACID,  "acid" },
-	{ TR2_IM_ELEC,  "electricity" },
-	{ TR2_IM_FIRE,  "fire" },
-	{ TR2_IM_COLD,  "cold" }
-};
-
-
-/*
- * Immunities
- */
-static const o_flag_desc immune_flags4_desc[] =
-{
-	{ TR4_IM_POIS,  "poison" }
-};
-
-
-/*
- * Protections
- */
-static const o_flag_desc protect_flags2_desc[] =
-{
-	{ TR2_WALK_ACID,	"acidic terrain" },
-	{ TR2_WALK_FIRE,	"burning terrain" },
-	{ TR2_WALK_WATER,	"waves and deep water" },
-	{ TR2_WALK_LAVA,	"lava terrain, unless it erupts" },
-	{ TR2_SLOW_POISON,	"poison already in your veins, but does not cure it"}
-};
-
-static const o_flag_desc protect_flags3_desc[] =
-{
-	{ TR3_ANCHOR,	 	"involuntary teleporation" }
-};
-
-
-/*
- * Vulnerability
- */
-static const o_flag_desc vulner_flags4_desc[] =
-{
-	{ TR4_HURT_LITE,  	"light" },
-	{ TR4_HURT_WATER,  	"water" },
-	{ TR4_HURT_POIS,  	"poison" },
-	{ TR4_HURT_ACID,  	"acid" },
-	{ TR4_HURT_ELEC,	"elec" },
-	{ TR4_HURT_FIRE,	"fire" },
-	{ TR4_HURT_COLD,	"cold" }
-};
-
-
-/*
- * Miscellaneous magic given by an object's "flags2" field
- */
-static const o_flag_desc misc_flags2_desc[] =
-{
-	{ TR2_AIR_SUPPLY,"breath while under water or phasing through walls" },
-	{ TR2_CLIMB,	"climb walls like a spider" },
-	{ TR2_SWIM,		"swim like a fish" },
-	{ TR2_FLY,		"fly" },
-	{ TR2_OOZE,		"ooze through the tiniest of cracks" },
-	{ TR2_PASS_WALL,"pass through walls like a ghost" },
-	{ TR2_INVISIBLE,"not be seen by monsters which need light to see by" }
-};
-
-/*
- * Miscellaneous magic given by an object's "flags3" field
- */
-static const o_flag_desc misc_flags3_desc[] =
-{
-	{ TR3_FEATHER,		"fall like a feather" },
-	{ TR3_TELEPATHY,	"detect monsters by telepathy" },
-	{ TR3_SEE_INVIS,	"see invisible monsters" }
-};
-
-/*
- * Miscellaneous magic given by an object's "flags3" field
- */
-static const o_flag_desc misc_flags4_desc[] =
-{
-	{ TR4_NEUTRAL,		"wield weapons which slay your own race" }
-};
-
-
-
-
-
-/*
- * Sensing magic given by an object's "flags3" field
- */
-static const o_flag_desc sense_flags3_desc[] =
-{
-	{ TR3_ESP_DEMON,	"demons" },
-	{ TR3_ESP_DRAGON,	"dragons" },
-	{ TR3_ESP_GIANT,	"giants" },
-	{ TR3_ESP_ORC,		"orcs" },
-	{ TR3_ESP_TROLL,	"trolls" },
-	{ TR3_ESP_UNDEAD,	"undead" },
-	{ TR3_ESP_NATURE,	"natural creatures" },
-	{ TR3_ESP_MAN,	"men" },
-	{ TR3_ESP_ELF,	"elves" },
-	{ TR3_ESP_DWARF,	"dwarves" }	
-};
-
-
-/*
- * Ability to understand language given by an object's "flags2" field
- */
-static const o_flag_desc language_flags2_desc[] =
-{
-	{ TR2_SPEAK_MAN,	"men" },	
-	{ TR2_SPEAK_DWARF,	"dwarves" },
-	{ TR2_SPEAK_ELF,	"elves" },
-	{ TR2_SPEAK_BIRD,	"birds" },
-	{ TR2_SPEAK_PLANT,	"plants" },	
-	{ TR2_SPEAK_MAMMAL,	"mammals" }
-};
-
-/*
- * Ability to understand language given by an object's "flags3" field
- */
-static const o_flag_desc language_flags3_desc[] =
-{
-	{ TR3_SPEAK_REPTILE,	"reptiles" },
-	{ TR3_SPEAK_REPTILE,	"fish" },
-	{ TR3_SPEAK_REPTILE,	"amphibians" },
-	{ TR3_SPEAK_INSECT,		"insects" }
-};
-		
-/*
- * Ability to understand language given by an object's "flags4" field
- */
-static const o_flag_desc language_flags4_desc[] =
-{
-	{ TR4_SPEAK_DEMON,	"demons" },
-	{ TR4_SPEAK_DRAGON,	"dragons" },
-	{ TR4_SPEAK_UNDEAD,	"undead" },
-	{ TR4_SPEAK_ORC,	"orcs" },
-	{ TR4_SPEAK_TROLL,	"trolls" },
-	{ TR4_SPEAK_GIANT,	"giants" },
-};
-
-
-/*
- * Racial magic given by an object's "flags4" field
- */
-static const o_flag_desc racial_flags4_desc[] =
-{
-	{ TR4_ANIMAL,	"an animal" },
-	{ TR4_EVIL,	"evil" },
-	{ TR4_UNDEAD,	"undead" },
-	{ TR4_DEMON,	"demonic" },
-	{ TR4_ORC,	"orcish" },
-	{ TR4_TROLL,	"a troll" },
-	{ TR4_GIANT,	"gigantic" },
-	{ TR4_DRAGON,	"draconic" },
-	{ TR4_MAN,	"a man" },
-	{ TR4_DWARF,	"dwarven" },
-	{ TR4_ELF,	"elven" }
-};
-
-
-/*
- * Ignores given by an object's "flags2" field
- *
- * Note that cursed artifacts and objects with permanent light
- * are handled "directly" -- see analyze_misc_magic()
- */
-static const o_flag_desc ignore_flags2_desc[] =
-{
-	{ TR2_IGNORE_ACID,	"acid" },
-	{ TR2_IGNORE_ELEC,      "electricity" },
-	{ TR2_IGNORE_FIRE,      "fire" },
-	{ TR2_IGNORE_COLD,      "cold" },
-	{ TR2_IGNORE_WATER,     "water" },
-	{ TR2_IGNORE_LAVA,     "lava" },
-	{ TR2_IGNORE_THEFT,	"theft" },
-	{ TR2_IGNORE_TPORT,     "teleportation" }
-};
-
-
-/*
- * "Bad" magic given by an object's "flags3" field
- *
- * Note that cursed artifacts and objects with permanent light
- * are handled "directly" -- see analyze_misc_magic()
- */
-static const o_flag_desc bad_flags3_desc[] =
-{
-	{ TR3_HUNGER,		"hunger" },
-	{ TR3_UNCONTROLLED,		"random and uncontrolled activation" },
-	{ TR3_AGGRAVATE,	"aggravation" },
-	{ TR3_DRAIN_HP,		"health drain" },
-	{ TR3_DRAIN_MANA,       "mana drain" },
-	{ TR3_DRAIN_EXP,	"experience drain" }
-};
-
-/*
- * "Bad" magic given by an object's "flags4" field
- *
- */
-static const o_flag_desc bad_flags4_desc[] =
-{
-	{ TR4_LODESTONE,		"inability to teleport" },
-	{ TR4_SILENT,		"inability to cast spells" },
-	{ TR4_STATIC,       	"inability to use magical devices" },
-	{ TR4_WINDY,		"inability to use ranged weapons" }
-};
-
-
-
-/*
  * This function does most of the actual "analysis". Given a set of bit flags
  * (which will be from one of the flags fields from the object in question),
  * a "flag description structure", a "description list", and the number of
@@ -2847,6 +2606,31 @@ static cptr *spoiler_flag_aux(const u32b art_flags, const o_flag_desc *flag_x_pt
 
 	return desc_x_ptr;
 }
+
+
+
+static cptr *spoiler_flag(u32b f1, u32b f2, u32b f3, u32b f4, int bonus, cptr *desc_x_ptr)
+{
+	int i, j;
+	
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < 32; j++)
+		{
+			if (item_flag_bonus[i][j].type == bonus)
+			{
+				if ((i == 0) && ((f1 & (1L << j)) != 0)) *desc_x_ptr++ = item_flag_bonus[i][j].desc;
+				else if ((i == 1) && ((f1 & (1L << j)) != 0)) *desc_x_ptr++ = item_flag_bonus[i][j].desc;
+				else if ((i == 2) && ((f1 & (1L << j)) != 0)) *desc_x_ptr++ = item_flag_bonus[i][j].desc;
+				else if ((i == 3) && ((f1 & (1L << j)) != 0)) *desc_x_ptr++ = item_flag_bonus[i][j].desc;
+			}
+		}
+	}
+	
+	return desc_x_ptr;
+}
+
+
 
 /*
  * Hack -- Display the "name" and "attr/chars" of a monster race
@@ -3333,12 +3117,13 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}	
 	
 	/* Vampirism */
-	if (f4)
+	if (TRUE)
 	{
 		/* Restart the list */
 		list_ptr = list;
 
-		list_ptr = spoiler_flag_aux(f4, vamp_flags4_desc, list_ptr, N_ELEMENTS(vamp_flags4_desc));
+		/* Get the vampiric abilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_VAMP, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3364,13 +3149,13 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Sustains */
-	if (f1 & all_sustains)
+	if (TRUE)
 	{
 		/* Restart the list */
 		list_ptr = list;
 
 		/* Simplify things if an item sustains all stats */
-		if ((f2 & all_sustains) == all_sustains)
+		if ((f1 & all_sustains) == all_sustains)
 		{
 			switch (mode)
 			{
@@ -3385,9 +3170,9 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 		}
 
 		/* Should we bother? */
-		else if ((f1 & all_sustains))
+		else if (f1 & all_sustains)
 		{
-			list_ptr = spoiler_flag_aux(f1, sustain_flags1_desc, list_ptr, N_ELEMENTS(sustain_flags1_desc));
+			list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_SUSTAIN, list_ptr);
 		}
 
 		/* Terminate the description list */
@@ -3411,12 +3196,12 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Immunity flags */
-	if ((f2) || (f4))
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		list_ptr = spoiler_flag_aux(f2, immune_flags2_desc, list_ptr, N_ELEMENTS(immune_flags2_desc));
-		list_ptr = spoiler_flag_aux(f4, immune_flags4_desc, list_ptr, N_ELEMENTS(immune_flags4_desc));
+		/* Get the immunities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_IMMUNE, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3439,7 +3224,7 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Protects flags */
-	if ((f1) || (f2) || (f3))
+	if (TRUE)
 	{
 		list_ptr = list;
 
@@ -3451,9 +3236,9 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 			
 			*list_ptr++ = timed_effects[i].short_description;
 		}
-		
-		list_ptr = spoiler_flag_aux(f2, protect_flags2_desc, list_ptr, N_ELEMENTS(protect_flags2_desc));
-		list_ptr = spoiler_flag_aux(f3, protect_flags3_desc, list_ptr, N_ELEMENTS(protect_flags3_desc));
+
+		/* Get the protections */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_PROTECT, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3476,14 +3261,12 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Vulnerability flags */
-	if (f4)
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f4, vulner_flags4_desc, list_ptr, N_ELEMENTS(vulner_flags4_desc));
+		/* Get the vulnerabilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_VULNERABLE, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3525,19 +3308,13 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Miscellenious Abilities */
-	if ((f2) || (f3) || (f4))
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f2, misc_flags2_desc, list_ptr,
-					     N_ELEMENTS(misc_flags2_desc));
-		list_ptr = spoiler_flag_aux(f3, misc_flags3_desc, list_ptr,
-					     N_ELEMENTS(misc_flags3_desc));
-		list_ptr = spoiler_flag_aux(f4, misc_flags4_desc, list_ptr,
-					     N_ELEMENTS(misc_flags4_desc));
+		/* Get the miscellaneous abilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_MISC, list_ptr);
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_SENSE, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3557,81 +3334,43 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 				anything |= outlist("It prevents you", list, TERM_L_PURPLE);
 				break;
 		}
-
-		/* Note that trick throw weapons have special treatment */
-		if (f3 & TR3_TRICK_THROW)
-		{
-			switch (mode)
-			{
-				case LIST_FLAGS_CAN:
-					text_out_c(TERM_WHITE, "It is balanced to allow tricky throws.  ");
-					break;
-				case LIST_FLAGS_MAY:
-					text_out_c(TERM_L_WHITE, "It might be balanced to allow tricky throws.  ");
-					break;
-				case LIST_FLAGS_NOT:
-					text_out_c(TERM_SLATE, "It is not balanced to allow tricky throws.  ");
-					break;
-				case LIST_FLAGS_PREVENT:
-					anything |= outlist("It prevents you making tricky throws.  ", list, TERM_L_PURPLE);
-					break;
-			}
-			anything = TRUE;
-		}
-		
-		/* Note that blessed weapons have special treatment */
-		if (f3 & TR3_BLESSED)
-		{
-			switch (mode)
-			{
-				case LIST_FLAGS_CAN:
-					text_out_c(TERM_WHITE, "It is blessed by the gods, allowing priests to wield it.  ");
-					break;
-				case LIST_FLAGS_MAY:
-					text_out_c(TERM_L_WHITE, "It might be blessed by the gods.  ");
-					break;
-				case LIST_FLAGS_NOT:
-					text_out_c(TERM_SLATE, "It is not blessed by the gods.  ");
-					break;
-				case LIST_FLAGS_PREVENT:
-					anything |= outlist("It prevents you being blessed by the gods.  ", list, TERM_L_PURPLE);
-					break;
-			}
-			anything = TRUE;
-		}
-		
-		/* Note that free hands items have special treatment */
-		if (f3 & TR3_FREE_HANDS)
-		{
-			switch (mode)
-			{
-				case LIST_FLAGS_CAN:
-					text_out_c(TERM_WHITE, "It allows free movement in the fingers, allowing mages to wear it.  ");
-					break;
-				case LIST_FLAGS_MAY:
-					text_out_c(TERM_L_WHITE, "It might allow free movement in the fingers.  ");
-					break;
-				case LIST_FLAGS_NOT:
-					text_out_c(TERM_SLATE, "It has no effect on free movement in the fingers.  ");
-					break;
-				case LIST_FLAGS_PREVENT:
-					anything |= outlist("It prevents you having free movement in the fingers.  ", list, TERM_L_PURPLE);
-					break;
-			}
-			anything = TRUE;
-		}
 	}
 
-	/* Miscellenious Abilities */
-	if (f3)
+	/* Equipment only abilities */
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f3, sense_flags3_desc, list_ptr,
-					     N_ELEMENTS(sense_flags3_desc));
+		/* Get the miscellaneous abilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_EQUIP_ITEM_ONLY, list_ptr);
+
+		/* Terminate the description list */
+		*list_ptr = NULL;
+
+		switch (mode)
+		{
+			case LIST_FLAGS_CAN:
+				anything |= outlist("It is", list, TERM_WHITE);
+				break;
+			case LIST_FLAGS_MAY:
+				anything |= outlist("It might be", list, TERM_L_WHITE);
+				break;
+			case LIST_FLAGS_NOT:
+				anything |= outlist("It is not", list, TERM_SLATE);
+				break;
+			case LIST_FLAGS_PREVENT:
+				anything |= outlist("It prevents being", list, TERM_L_PURPLE);
+				break;
+		}
+	}
+
+	/* Extra sensory abilities */
+	if (TRUE)
+	{
+		list_ptr = list;
+
+		/* Extra sensory abilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_ESP, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3654,16 +3393,12 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Language Abilities */
-	if (f2 || f3 || f4)
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f2, language_flags2_desc, list_ptr, N_ELEMENTS(language_flags2_desc));
-		list_ptr = spoiler_flag_aux(f3, language_flags3_desc, list_ptr, N_ELEMENTS(language_flags3_desc));
-		list_ptr = spoiler_flag_aux(f4, language_flags4_desc, list_ptr, N_ELEMENTS(language_flags4_desc));
+		/* Language abilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_SPEAK, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3686,15 +3421,13 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 
-	/* Miscellenious Abilities */
-	if (f2)
+	/* Proof Abilities */
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f2, ignore_flags2_desc, list_ptr, N_ELEMENTS(ignore_flags2_desc));
+		/* Proof abilities */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_PROOF, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3702,50 +3435,27 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 		switch (mode)
 		{
 			case LIST_FLAGS_CAN:
-				anything |= outlist("It is not damaged by", list, TERM_WHITE);
+				anything |= outlist("It is impervious to", list, TERM_WHITE);
 				break;
 			case LIST_FLAGS_MAY:
-				anything |= outlist("It might be damaged by", list, TERM_L_WHITE);
+				anything |= outlist("It might be impervious to", list, TERM_L_WHITE);
 				break;
 			case LIST_FLAGS_NOT:
-				anything |= outlist("It is damaged by", list, TERM_SLATE);
+				anything |= outlist("It can be lost through", list, TERM_SLATE);
 				break;
 			case LIST_FLAGS_PREVENT:
-				anything |= outlist("It prevents you protecting it from", list, TERM_L_PURPLE);
+				anything |= outlist("It prevents you makint it impervious to", list, TERM_L_PURPLE);
 				break;
-		}
-
-		/* Note that blessed weapons have special treatment */
-		if (f2 & TR2_IGNORE_THEFT)
-		{
-		switch (mode)
-		{
-			case LIST_FLAGS_CAN:
-				text_out_c(TERM_WHITE, "It cannot be stolen from your inventory.  ");
-				break;
-			case LIST_FLAGS_MAY:
-				text_out_c(TERM_L_WHITE, "It might be stolen from your inventory.  ");
-				break;
-			case LIST_FLAGS_NOT:
-				text_out_c(TERM_SLATE, "It can be stolen from your inventory.  ");
-				break;
-			case LIST_FLAGS_PREVENT:
-				anything |= outlist("It prevents you protecting it from being stolen from your inventory.  ", list, TERM_L_PURPLE);
-				break;
-		}
-		anything = TRUE;
 		}
 	}
 
-	/* Racial effects */
-	if (f4)
+	/* Racial marking */
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f4, racial_flags4_desc, list_ptr, N_ELEMENTS(racial_flags4_desc));
+		/* Racial marking */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_MARK, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -3792,15 +3502,14 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 	}
 
 	/* Negative effects */
-	if (f3 || f4)
+	if (TRUE)
 	{
 		list_ptr = list;
 
-		/*
-		 * Special flags
-		 */
-		list_ptr = spoiler_flag_aux(f3, bad_flags3_desc, list_ptr, N_ELEMENTS(bad_flags3_desc));
-		list_ptr = spoiler_flag_aux(f4, bad_flags4_desc, list_ptr, N_ELEMENTS(bad_flags4_desc));
+		/* Negative effects */
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_BURDEN, list_ptr);
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_PASSIVE, list_ptr);
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_EQUIP, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -4111,7 +3820,7 @@ void list_object(const object_type *o_ptr, int mode)
 			else text_out(" weigh ");
 
 			/* Weight */
-			text_out(format("%d.%d lbs",o_ptr->weight/10,o_ptr->weight%10));
+			text_out(format("%d.%d lbs",object_aval(o_ptr, ABILITY_WEIGHT)/10,object_aval(o_ptr, ABILITY_WEIGHT)%10));
 
 			if (o_ptr->number == 1) text_out(".  ");
 			else text_out(" each.  ");
@@ -4136,17 +3845,17 @@ void list_object(const object_type *o_ptr, int mode)
 			case TV_POLEARM:
 				if (cp_ptr)
 				{
-					if (o_ptr->weight >= 2 * cp_ptr->chg_weight)
+					if (object_aval(o_ptr, ABILITY_WEIGHT) >= 2 * cp_ptr->chg_weight)
 					{
-						text_out(format("It does x%d damage when charging.  ", o_ptr->weight / cp_ptr->chg_weight));
+						text_out(format("It does x%d damage when charging.  ", object_aval(o_ptr, ABILITY_WEIGHT) / cp_ptr->chg_weight));
 						anything = TRUE;
 					}
 		        }
 		        else
 				{
-					if (o_ptr->weight >= 66)
+					if (object_aval(o_ptr, ABILITY_WEIGHT) >= 66)
 					{
-						text_out(format("It does x%d damage when charging.  ", o_ptr->weight / 33));
+						text_out(format("It does x%d damage when charging.  ", object_aval(o_ptr, ABILITY_WEIGHT) / 33));
 						anything = TRUE;
 					}
 				}
@@ -4696,7 +4405,7 @@ void list_object(const object_type *o_ptr, int mode)
 				if ((vp[n] == vp_player_eat) && (o_ptr->charges))
 				{
 					text_out(vp[n]);
-					text_out(detail ? format("provides %d units of nourishment", o_ptr->charges * o_ptr->weight) : "provides nourishment");
+					text_out(detail ? format("provides %d units of nourishment", o_ptr->charges * object_aval(o_ptr, ABILITY_WEIGHT)) : "provides nourishment");
 					switch (o_ptr->tval)
 					{
 						case TV_MUSHROOM:
@@ -5402,15 +5111,7 @@ bool make_fake_artifact(object_type *o_ptr, byte name1)
 	/* Save the name */
 	o_ptr->name1 = name1;
 
-	/* Extract the fields */
-#if 0
-	o_ptr->pval = a_ptr->pval;
-#endif
-	o_ptr->ac = a_ptr->ac;
-	o_ptr->dd = a_ptr->dd;
-	o_ptr->ds = a_ptr->ds;
-	o_ptr->weight = a_ptr->weight;
-
+	/* Ensure curse is known */
 	if (a_ptr->flags3 & (TR3_LIGHT_CURSE)) o_ptr->ident |= (IDENT_CURSED);
 
 	/* Success */
@@ -7502,13 +7203,17 @@ s32b object_power(const object_type *o_ptr)
 				
 				/* + e */
 				p+= ability_bonus[i].e;
+				
+				/* Various accumulators */
+				if (ability_bonus[i].type == BONUS_RESIST_LOW) low_resists++;
+				if (ability_bonus[i].type == BONUS_RESIST) high_resists++;
 			}
 		}
 		/* Bad abilities decrease the power rating */
 		/* Hack: don't give large negatives.
 		   Also, don't penalize for aval less than k_ptr->aval,
 		   so that default avals are no lowered to decrease power
-		   and we may end with the boring 0 pval */
+		   and we may end with the boring 0 aval */
 		else if (ability[i] < 0)
 		{
 			if ((ability_bonus[i].f) && (ability_bonus[i].g))
@@ -7525,6 +7230,63 @@ s32b object_power(const object_type *o_ptr)
 		}
 	}
 	
+	/* Add bonus for low resists getting 'low_resists-lock' */
+	if (low_resists > 1) p += low_resists * low_resists;
+
+	/* Add bonus for high resists getting 'high_resists-lock' */
+	if (high_resists > 1) p += high_resists * high_resists / 2;
+
+	/* The general power function for flags */
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < 32; j++)
+		{
+			bool boost = FALSE;
+			
+			/* Add power */
+			if ((i == 0) && ((f1 & (1L << j)) != 0)) boost = TRUE;
+			else if ((i == 1) && ((f2 & (1L << j)) != 0)) boost = TRUE;
+			else if ((i == 2) && ((f3 & (1L << j)) != 0)) boost = TRUE;
+			else if ((i == 3) && ((f4 & (1L << j)) != 0)) boost = TRUE;
+			
+			/* Boosting */
+			if (boost)
+			{
+				int q = item_flag_bonus[i][j].power;
+				
+				/* Don't give bonus for proofing if item cannot be damaged/stolen */
+				if ((q > 0) && (item_flag_bonus[i][j].type == BONUS_PROOF) && 
+						(item_flag_bonus[i][j].flag_match == 5) && ((f5 & (item_flag_bonus[i][j].flag_match)) == 0))
+				{
+					/* Don't modify power */
+					q = 0;
+				}
+				
+				/* Various accumulators */
+				if (ability_bonus[i].type == BONUS_SUSTAIN) sustains++;
+				if (ability_bonus[i].type == BONUS_IMMUNE) immunities++;
+			}
+		}
+	}
+
+	/* Add bonus for sustains getting 'sustain-lock' */
+	if (sustains > 2) p += sustains * sustains / 3;
+
+	/* Apply bonus for multiple immunities */
+	if (immunities > 1)
+	{
+		p += 15;
+	}
+	if (immunities > 2)
+	{
+		p += 45;
+	}
+	if (immunities > 3)
+	{
+		p += 20000;		/* inhibit */
+	}
+
+	
 	/* Evaluate certain abilities based on type of object. */
 	switch (o_ptr->tval)
 	{
@@ -7535,9 +7297,7 @@ s32b object_power(const object_type *o_ptr)
 			/*
 			 * Damage multiplier for bows should be weighted less than that
 			 * for melee weapons, since players typically get fewer shots
-			 * than hits (note, however, that the multipliers are applied
-			 * afterwards in the bow calculation, not before as for melee
-			 * weapons, which tends to bring these numbers back into line).
+			 * than hits.
 			 */
 
 			/*
@@ -7680,7 +7440,7 @@ s32b object_power(const object_type *o_ptr)
 				p = sign(p) * (ABS(p) / 4);
 			}
 
-			if (o_ptr->weight < k_ptr->weight)
+			if (object_aval(o_ptr, ABILITY_WEIGHT) < k_ptr->weight)
 			{
 				p++;
 			}
@@ -7846,9 +7606,9 @@ s32b object_power(const object_type *o_ptr)
 			}
 
 			/* Remember, weight is in 0.1 lb. units. */
-			if (o_ptr->weight != k_ptr->weight)
+			if (object_aval(o_ptr, ABILITY_WEIGHT) != k_ptr->weight)
 			{
-				p += (k_ptr->weight - o_ptr->weight) / 20;
+				p += (k_ptr->weight - object_aval(o_ptr, ABILITY_WEIGHT)) / 20;
 			}
 
 			/* Bonus as we may use a staff or hafted weapon as swap weapon */
@@ -7973,7 +7733,7 @@ s32b object_power(const object_type *o_ptr)
 					p = 0;
 			}
 
-			if (o_ptr->weight < k_ptr->weight)
+			if (object_aval(o_ptr, ABILITY_WEIGHT) < k_ptr->weight)
 			{
 				p++;
 			}
@@ -8061,9 +7821,9 @@ s32b object_power(const object_type *o_ptr)
 				p += (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) - 5) * 2;
 			}
 
-			if (o_ptr->weight < k_ptr->weight)
+			if (object_aval(o_ptr, ABILITY_WEIGHT) < k_ptr->weight)
 			{
-				p += (k_ptr->weight - o_ptr->weight) / 10;
+				p += (k_ptr->weight - object_aval(o_ptr, ABILITY_WEIGHT)) / 10;
 			}
 
 			/* Big bonus as it protects against acid damage */
@@ -8258,112 +8018,6 @@ s32b object_power(const object_type *o_ptr)
 	}
 
 
-	ADD_POWER("sustain STR",	 2, TR1_SUST_STR, 2, sustains++);
-	ADD_POWER("sustain INT",	 2, TR1_SUST_INT, 2, sustains++);
-	ADD_POWER("sustain WIS",	 2, TR1_SUST_WIS, 2, sustains++);
-	ADD_POWER("sustain DEX",	 2, TR1_SUST_DEX, 2, sustains++);
-	ADD_POWER("sustain CON",	 3, TR1_SUST_CON, 2, sustains++);
-	ADD_POWER("sustain CHR",	 1, TR1_SUST_CHR, 2, sustains++);
-	ADD_POWER("sustain SIZ",	 3, TR1_SUST_CHR, 2, sustains++);
-	ADD_POWER("sustain AGI",	 2, TR1_SUST_CHR, 2, sustains++);
-
-	/* Add bonus for sustains getting 'sustain-lock' */
-	if (sustains > 2) p += sustains * sustains / 3;
-
-	ADD_POWER("acid immunity",	17, TR2_IM_ACID, 2, immunities++);
-	ADD_POWER("elec immunity",	22, TR2_IM_ELEC, 2, immunities++);
-	ADD_POWER("fire immunity",	22, TR2_IM_FIRE, 2, immunities++);
-	ADD_POWER("cold immunity",	17, TR2_IM_COLD, 2, immunities++);
-	ADD_POWER("poison immunity",	22, TR4_IM_POIS, 4, immunities++);
-
-	if (immunities > 1)
-	{
-		p += 15;
-	}
-	if (immunities > 2)
-	{
-		p += 45;
-	}
-	if (immunities > 3)
-	{
-		p += 20000;		/* inhibit */
-	}
-#if 0
-	ADD_POWER("free action",	 7, TR3_FREE_ACT, 3, high_resists++);
-	ADD_POWER("hold life",		 6, TR3_HOLD_LIFE, 3, high_resists++);
-#endif
-	ADD_POWER("feather fall",	 2, TR3_FEATHER, 3,); /* was 2 */
-
-	ADD_POWER("see invisible",	 4, TR3_SEE_INVIS, 3,);
-	ADD_POWER("sense orcs",	  	3, TR3_ESP_ORC, 3,);
-	ADD_POWER("sense trolls",	3, TR3_ESP_TROLL, 3,);
-	ADD_POWER("sense giants",	3, TR3_ESP_GIANT, 3,);
-	ADD_POWER("sense demons",	4, TR3_ESP_DEMON, 3,);
-	ADD_POWER("sense undead",	5, TR3_ESP_UNDEAD, 3,);
-	ADD_POWER("sense dragons",       5, TR3_ESP_DRAGON, 3,);
-	ADD_POWER("sense nature",	4, TR3_ESP_NATURE, 3,);
-	ADD_POWER("telepathy",	  18, TR3_TELEPATHY, 3,);
-#if 0
-	ADD_POWER("slow digestion",	 2, TR3_SLOW_DIGEST, 3,);
-
-	ADD_POWER("resist acid",	 2, TR2_RES_ACID, 2, low_resists++);
-	ADD_POWER("resist elec",	 3, TR2_RES_ELEC, 2, low_resists++);
-	ADD_POWER("resist fire",	 3, TR2_RES_FIRE, 2, low_resists++);
-	ADD_POWER("resist cold",	 3, TR2_RES_COLD, 2, low_resists++);
-
-	/* Add bonus for sustains getting 'low_resists-lock' */
-	if (low_resists > 1) p += low_resists * low_resists;
-
-	ADD_POWER("resist poison",	14, TR2_RES_POIS, 2, high_resists++);
-	ADD_POWER("resist light",	 3, TR2_RES_LITE, 2, high_resists++);
-	ADD_POWER("resist dark",	 8, TR2_RES_DARK, 2, high_resists++);
-	ADD_POWER("resist blindness",	 8, TR2_RES_BLIND, 2, high_resists++);
-	ADD_POWER("resist confusion",	12, TR2_RES_CONFU, 2, high_resists++);
-	ADD_POWER("resist sound",	 7, TR2_RES_SOUND, 2, high_resists++);
-	ADD_POWER("resist shards",	 4, TR2_RES_SHARD, 2, high_resists++);
-	ADD_POWER("resist nexus",	 5, TR2_RES_NEXUS, 2, high_resists++);
-	ADD_POWER("resist nether",	10, TR2_RES_NETHR, 2, high_resists++);
-	ADD_POWER("resist chaos",	10, TR2_RES_CHAOS, 2, high_resists++);
-	ADD_POWER("resist disenchantment", 10, TR2_RES_DISEN, 2, high_resists++);
-	ADD_POWER("resist disease", 10, TR4_RES_DISEASE, 4, high_resists++);
-	ADD_POWER("resist water",	5, TR4_RES_WATER, 4, high_resists++);
-
-	/* Add bonus for sustains getting 'high_resists-lock' */
-	if (high_resists > 1) p += high_resists * high_resists / 2;
-#endif
-	ADD_POWER("random and uncontrolled activation",	 -40, TR3_UNCONTROLLED, 3,);
-	ADD_POWER("drain experience",	 -20, TR3_DRAIN_EXP, 3,);
-
-	ADD_POWER("drain health",	 -20, TR3_DRAIN_HP, 3,);
-	ADD_POWER("drain mana",	 	 -10, TR3_DRAIN_MANA, 3,);
-	ADD_POWER("aggravation",	 -15, TR3_AGGRAVATE, 3,);
-	ADD_POWER("light curse",	 -1,  TR3_LIGHT_CURSE, 3,);
-	ADD_POWER("heavy curse",	 -4, TR3_HEAVY_CURSE, 3,);
-/*	ADD_POWER("permanent curse",	 -40, TR3_PERMA_CURSE, 3,);*/
-	ADD_POWER("light vulnerability", -30, TR4_HURT_LITE, 4,);
-	ADD_POWER("water vulnerability", -30, TR4_HURT_WATER, 4,);
-	ADD_POWER("hunger",	 	 -15, TR3_HUNGER, 3,);
-	ADD_POWER("lodestone",	 	 -16, TR4_LODESTONE, 4,);
-	ADD_POWER("silent",	 	 -20, TR4_SILENT, 4,);
-	ADD_POWER("static",	 	 -15, TR4_STATIC, 4,);
-	ADD_POWER("windy",	 	 -15, TR4_WINDY, 4,);
-	ADD_POWER("animal",	 	 -5, TR4_ANIMAL, 4,);
-	ADD_POWER("evil",	 	 -5, TR4_EVIL, 4,);
-	ADD_POWER("undead",	 	 -10, TR4_UNDEAD, 4,);
-	ADD_POWER("demon",	 	 -10, TR4_DEMON, 4,);
-	ADD_POWER("orc",	 	 -3, TR4_ORC, 4,);
-	ADD_POWER("troll",	 	 -3, TR4_TROLL, 4,);
-	ADD_POWER("giant",	 	 -5, TR4_GIANT, 4,);
-	ADD_POWER("dragon",	 	 -10, TR4_DRAGON, 4,);
-	ADD_POWER("man",	 	 -3, TR4_MAN, 4,);
-	ADD_POWER("dwarf",	 	 -3, TR4_DWARF, 4,);
-	ADD_POWER("elf",	 	 -3, TR4_ELF, 4,);
-	ADD_POWER("poison vulnerability", -50, TR4_HURT_POIS, 4,);
-	ADD_POWER("acid vulnerability",	  -30, TR4_HURT_ACID, 4,);
-	ADD_POWER("lightning vulnerability", -40, TR4_HURT_ELEC, 4,);
-	ADD_POWER("fire vulnerability",	 -40, TR4_HURT_FIRE, 4,);
-	ADD_POWER("cold vulnerability",	 -40, TR4_HURT_COLD, 4,);
-
 
 	/* Evaluate weight discount. */
 	switch (o_ptr->tval)
@@ -8383,10 +8037,10 @@ s32b object_power(const object_type *o_ptr)
 	 *
 	 * This figure is from 30 lb weight limit for mages divided by 6 slots.
 	 */
-			if (o_ptr->weight >= 50)
+			if (object_aval(o_ptr, ABILITY_WEIGHT) >= 50)
 			{
-				if (p > o_ptr->weight / 25)
-					p -= o_ptr->weight / 50;
+				if (p > object_aval(o_ptr, ABILITY_WEIGHT) / 25)
+					p -= object_aval(o_ptr, ABILITY_WEIGHT) / 50;
 				else if (p > 0)
 					p = (p + 1) / 2;
 			}
@@ -8403,22 +8057,22 @@ s32b object_power(const object_type *o_ptr)
 				and max 3 blows for others */
 			if (p > 0)
 			{
-				if ((o_ptr->weight > 960) && (p > 7))
+				if ((object_aval(o_ptr, ABILITY_WEIGHT) > 960) && (p > 7))
 				{
 					p -= 1;
 				}
 
-				if ((o_ptr->weight > 240) && (p > 5))
+				if ((object_aval(o_ptr, ABILITY_WEIGHT) > 240) && (p > 5))
 				{
 					p -= 1;
 				}
 
-				if ((o_ptr->weight >= 200) && (p > 3))
+				if ((object_aval(o_ptr, ABILITY_WEIGHT) >= 200) && (p > 3))
 				{
 					p -= 1;
 				}
 
-				if ((o_ptr->weight >= 150) && (p > 1))
+				if ((object_aval(o_ptr, ABILITY_WEIGHT) >= 150) && (p > 1))
 				{
 					p -= 1;
 				}
@@ -8438,10 +8092,10 @@ s32b object_power(const object_type *o_ptr)
 	 * discount than other super heavy swap items, because of the increased criticals
 	 * and charge bonus.
 	 */
-			if (o_ptr->weight >= 150)
+			if (object_aval(o_ptr, ABILITY_WEIGHT) >= 150)
 			{
-				if (p > o_ptr->weight / 75)
-					p -= o_ptr->weight / 150;
+				if (p > object_aval(o_ptr, ABILITY_WEIGHT) / 75)
+					p -= object_aval(o_ptr, ABILITY_WEIGHT) / 150;
 				else if (p > 0)
 					p = (p + 1) / 2;
 			}

@@ -1283,8 +1283,8 @@ s32b object_value_real(const object_type *o_ptr)
 		value += power * (power > 0 ? (power + 2) / 3 : (-power + 2) / 3) * 100L;
 	}
 
-	/* Hack -- object power assumes (+11,+9) on weapons and ammo so we need to include some smaller bonuses,
-		and ac bonus on armour equal to its base armour class so we need to include some bonuses. */
+	/* Hack -- object power assumes (+11,+dd * ds) on weapons and ammo, and ac bonus on armour
+	 * equal to its base armour class so we need to include some bonuses. */
 	switch (o_ptr->tval)
 	{
 		/* Armour */
@@ -1299,7 +1299,7 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_DRAG_ARMOR:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_a <= o_ptr->ac ? o_ptr->to_a * 100L : o_ptr->ac * 100L;
+			value += object_aval(o_ptr, ABILITY_TO_AC) <= o_ptr->ac ? object_aval(o_ptr, ABILITY_TO_AC) * 100L : o_ptr->ac * 100L;
 
 			break;
 		}
@@ -1318,6 +1318,12 @@ s32b object_value_real(const object_type *o_ptr)
 
 		/* Bows/Weapons/Ammo */
 		case TV_BOW:
+		{
+			/* Factor in the bonuses not considered by power equation */
+			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_RANGED)) * 100L, 1200L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_RANGED)) * 100L, 1000L);
+			break;
+		}
 		case TV_DIGGING:
 		case TV_HAFTED:
 		case TV_SWORD:
@@ -1325,11 +1331,8 @@ s32b object_value_real(const object_type *o_ptr)
 
 		{
 			/* Factor in the bonuses not considered by power equation */
-		  /* TODO: change now that to_d is bound by weapon dice? */
-			value += o_ptr->to_h < 12 ? o_ptr->to_h * 100L : 1200L;
-			value += o_ptr->to_d < 10 ? o_ptr->to_d * 100L : 1000L;
-
-			/* Done */
+			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_RANGED)) * 100L, 1200L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_RANGED)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
 			break;
 		}
 
@@ -1339,8 +1342,8 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_BOLT:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += o_ptr->to_h < 12 ? o_ptr->to_h * 5L : 60L;
-			value += o_ptr->to_d < 10 ? o_ptr->to_d * 5L : 50L;
+			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_RANGED)) * 100L, 1200L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_RANGED)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
 
 			/* Done */
 			break;

@@ -97,6 +97,7 @@ typedef struct feature_state feature_state;
 typedef struct feature_blow feature_blow;
 typedef struct feature_type feature_type;
 typedef struct ability_type ability_type;
+typedef struct item_flag_type item_flag_type;
 typedef struct object_kind object_kind;
 typedef struct object_info object_info;
 typedef struct object_lore object_lore;
@@ -551,6 +552,22 @@ struct ability_type
 };
 
 
+/*
+ * Information about abilities
+ */
+struct item_flag_type
+{
+	char *desc;
+	char *name;
+	
+	byte	type;
+	byte	flag_num;
+	u32b	flag_match;
+	
+	s16b	power;
+};
+
+
 
 /*
  * Information about object "kinds", including player knowledge.
@@ -569,12 +586,6 @@ struct object_kind
 	s16b charges;   /* Object charges info */
 
 	s16b aval[MAX_AVALS_KIND];	/* Object ability info */
-	
-	s16b ac;	/* Base armor */
-
-	byte dd, ds;    /* Damage dice/sides */
-
-	s16b weight;    /* Weight */
 
 	s32b cost;      /* Object "base cost" */
 
@@ -683,12 +694,6 @@ struct artifact_type
 
 	s16b aval[MAX_AVALS_ARTIFACT];	/* Artifact ability info */
 	
-	s16b ac;	/* Base armor */
-
-	byte dd, ds;    /* Damage dice/sides */
-
-	s16b weight;    /* Weight */
-
 	s32b cost;      /* Artifact "cost" */
 
 	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_ARTIFACT];	/* Abilities */
@@ -777,6 +782,10 @@ struct ego_item_type
     s32b slay_power;	/* Pre-computed power from brands/slays */
 };
 
+
+/*
+ * Information about "flavors"
+ */
 struct flavor_type
 {
 	u32b name;      /* Name (offset) */
@@ -791,6 +800,8 @@ struct flavor_type
 	byte x_attr;    /* Desired flavor attribute */
 	char x_char;    /* Desired flavor character */
 };
+
+
 
 /*
  * Monster blow structure

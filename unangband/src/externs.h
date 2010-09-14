@@ -79,6 +79,7 @@ extern const int object_xtra_what[OBJECT_XTRA_MAX_HIDDEN];
 extern const int object_xtra_size[OBJECT_XTRA_MAX_HIDDEN];
 extern const object_grouper object_group[];
 extern const ability_type ability_bonus[ABILITY_MAX];
+extern const item_flag_type item_flag_bonus[4][32];
 extern const cptr magic_name[4][32];
 extern const cptr disease_name[33];
 extern byte spell_info_RF4[32][5];
