@@ -1242,7 +1242,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	if (mode < 1) goto object_desc_done;
 
 	/* Display the item like a weapon */
-	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) && object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)) show_weapon = TRUE;
+	if (object_aval(o_ptr, ABILITY_TO_HIT) && object_aval(o_ptr, ABILITY_TO_DAM)) show_weapon = TRUE;
 
 	/* Display the item like armour */
 	if (o_ptr->ac) show_armour = TRUE;
@@ -1281,27 +1281,27 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, p1);
-			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY));
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_HIT));
 			object_desc_chr_macro(t, ',');
-			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY));
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_DAM));
 			object_desc_chr_macro(t, p2);
 		}
 
 		/* Show the tohit if needed */
-		else if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY))
+		else if (object_aval(o_ptr, ABILITY_TO_HIT))
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, p1);
-			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY));
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_HIT));
 			object_desc_chr_macro(t, p2);
 		}
 
 		/* Show the todam if needed */
-		else if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY))
+		else if (object_aval(o_ptr, ABILITY_TO_DAM))
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, p1);
-			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY));
+			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_DAM));
 			object_desc_chr_macro(t, p2);
 		}
 	}
@@ -2745,8 +2745,8 @@ void show_inven(void)
 	 * Add notes about slots used by the quiver or bags, if we have space, want
 	 * to show all slots, and have items in the quiver or bags.
 	 */
-	if ((p_ptr->pack_size_reduce_quiver || p_ptr->pack_size_reduce_bags) && (item_tester_full) &&
-		(j <= (INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags)))
+	if ((p_ptr->pack_size_reduce_quiver || p_ptr->pack_size_reduce_bags || p_ptr->pack_size_reduce_study) && (item_tester_full) &&
+		(j <= (INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags - p_ptr->pack_size_reduce_study)))
 	{
 		int ammo_num = 0, ammo_slot;
 
@@ -2764,15 +2764,17 @@ void show_inven(void)
 		}
 
 		/* Insert a blank dividing line, if we have the space. */
-		if (j <= ((INVEN_PACK - 1) - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags))
+		if (j <= ((INVEN_PACK - 1) - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags - p_ptr->pack_size_reduce_study))
 		{
 			j++;
 
 			prt("", j, col ? col - 2 : col);
 		}
 
-		for (i = 0; i < p_ptr->pack_size_reduce_quiver + p_ptr->pack_size_reduce_bags ; i++)
+		for (i = 0; i < p_ptr->pack_size_reduce_quiver + p_ptr->pack_size_reduce_bags + p_ptr->pack_size_reduce_study; i++)
 		{
+			int attr;
+			
 			/* Go to next line. */
 			j++;
 
@@ -2796,12 +2798,25 @@ void show_inven(void)
 			}
 
 			/* Hack -- use "(QUIVER)" as a description. */
-			if (i < p_ptr->pack_size_reduce_quiver) strnfmt(o_name, sizeof(o_name),
-				"(QUIVER - %d missile%s)", ammo_slot,
-				(ammo_slot == 1) ? "": "s");
-			else strnfmt(o_name, sizeof(o_name), "(MAGICAL BAG)");
-
-			c_put_str(TERM_BLUE, o_name, j, col + 3);
+			if (i < p_ptr->pack_size_reduce_quiver)
+			{
+				strnfmt(o_name, sizeof(o_name), "(QUIVER - %d missile%s)", ammo_slot, (ammo_slot == 1) ? "": "s");
+				attr = TERM_BLUE;
+			}
+			/* Hack -- use "(BAG CONTENTS)" as a description. */
+			else if (i < p_ptr->pack_size_reduce_quiver + p_ptr->pack_size_reduce_bags)
+			{
+				strnfmt(o_name, sizeof(o_name), "(BAG CONTENTS)");
+				attr = TERM_BLUE_SLATE;
+			}
+			/* Hack -- use "(STUDIED - Book name)" as a description. Show these back to front. */
+			else
+			{
+				attr = TERM_DEEP_L_BLUE;
+				strnfmt(o_name, sizeof(o_name), "(STUDIED - %s)", k_name + k_info[p_ptr->study_slot[p_ptr->pack_size_reduce_quiver + p_ptr->pack_size_reduce_bags + p_ptr->pack_size_reduce_study - i]].name + 3);
+			}
+			
+			c_put_str(attr, o_name, j, col + 3);
 		}
 	}
 

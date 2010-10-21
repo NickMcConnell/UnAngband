@@ -2003,9 +2003,9 @@ void display_player_xtra_info(bool hide_extra)
 	hit_real += style_hit;
 
 	/* Apply weapon bonuses */
-	if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
-	if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
-	hit_real += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
+	if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT);
+	if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM);
+	hit_real += object_aval(o_ptr, ABILITY_TO_HIT);
 
 	/* Melee attacks */
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -2043,8 +2043,8 @@ void display_player_xtra_info(bool hide_extra)
 		dam += style_dam;
 
 		/* Apply weapon bonuses */
-		if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
-		if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+		if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT);
+		if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM);
 
 		Term_putstr(col, 12, -1, TERM_WHITE, "Off");
 		strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
@@ -2123,9 +2123,9 @@ void display_player_xtra_info(bool hide_extra)
 	hit_real += style_hit;
 
 	/* Apply weapon bonuses */
-	if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
-	if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
-	hit_real += object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
+	if (object_bonus_p(o_ptr)) hit += object_aval(o_ptr, ABILITY_TO_HIT);
+	if (object_bonus_p(o_ptr)) dam += object_aval(o_ptr, ABILITY_TO_DAM);
+	hit_real += object_aval(o_ptr, ABILITY_TO_HIT);
 
 	strnfmt(buf, sizeof(buf), "(%+d,%+d)", hit, dam);
 	Term_putstr(col+5, 14, -1, TERM_L_BLUE, format("%12s", buf));

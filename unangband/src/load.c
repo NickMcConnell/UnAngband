@@ -469,14 +469,6 @@ static errr rd_item(object_type *o_ptr)
 	/* Repair non "wearable" items */
 	if (!wearable_p(o_ptr))
 	{
-		/* Get the correct fields */
-		o_ptr->ac = k_ptr->ac;
-		o_ptr->dd = k_ptr->dd;
-		o_ptr->ds = k_ptr->ds;
-
-		/* Get the correct weight */
-		o_ptr->weight = k_ptr->weight;
-
 		/* Paranoia */
 		o_ptr->name1 = o_ptr->name2 = 0;
 
@@ -513,9 +505,6 @@ static errr rd_item(object_type *o_ptr)
 		/* Verify that ego-item */
 		if (!e_ptr->name) o_ptr->name2 = 0;
 	}
-
-	/* Get the standard weight */
-	o_ptr->weight = k_ptr->weight;
 
 	/* Ego items */
 	if (o_ptr->name2)
@@ -1364,7 +1353,10 @@ static errr rd_extra(void)
 
 
 	/* Returning */
-	rd_s16b(&p_ptr->word_return);
+	if (!older_than(0,6,4,3))
+	{
+		rd_s16b(&p_ptr->timed[TMD_WORD_RETURN]);
+	}
 	rd_s16b(&p_ptr->return_y);
 	rd_s16b(&p_ptr->return_x);
 
@@ -1420,6 +1412,17 @@ static errr rd_extra(void)
 		rd_s16b(&p_ptr->player_hp[i]);
 	}
 
+	/* Read study info */
+	if (!older_than(0, 6, 4, 3))
+	{
+		rd_s16b(&p_ptr->pack_size_reduce_study);
+		
+		for (i = 0; i < p_ptr->pack_size_reduce_study; i++)
+		{
+			rd_s16b(&p_ptr->study_slot[i]);
+		}
+	}	
+	
 	/* Read spell info */
 	rd_u32b(&p_ptr->spell_learned1);
 	rd_u32b(&p_ptr->spell_learned2);
@@ -1433,6 +1436,15 @@ static errr rd_extra(void)
 	rd_u32b(&p_ptr->spell_forgotten2);
 	rd_u32b(&p_ptr->spell_forgotten3);
 	rd_u32b(&p_ptr->spell_forgotten4);
+	
+	/* Read spell memorisation */
+	if (!older_than(0, 6, 4, 3))
+	{
+		rd_u32b(&p_ptr->spell_memorised1);
+		rd_u32b(&p_ptr->spell_memorised2);
+		rd_u32b(&p_ptr->spell_memorised3);
+		rd_u32b(&p_ptr->spell_memorised4);
+	}
 
 	/* Read in the spells */
 	for (i = 0; i < PY_MAX_SPELLS; i++)
@@ -1475,6 +1487,11 @@ static errr rd_randarts(void)
 		s16b to_d = 0;
 		s16b to_a = 0;
 		
+		s16b ac = 0;
+		byte dd = 0;
+		byte ds = 0;
+		s16b weight = 0;
+		
 		s16b aval = 0;
 		s16b ability = 0;
 		
@@ -1494,13 +1511,14 @@ static errr rd_randarts(void)
 			rd_s16b(&to_h);
 			rd_s16b(&to_d);
 			rd_s16b(&to_a);
+			
+			rd_s16b(&ac);
+
+			rd_byte(&dd);
+			rd_byte(&ds);
+
+			rd_s16b(&weight);
 		}
-		rd_s16b(&a_ptr->ac);
-
-		rd_byte(&a_ptr->dd);
-		rd_byte(&a_ptr->ds);
-
-		rd_s16b(&a_ptr->weight);
 		rd_s32b(&a_ptr->cost);
 
 		/* Read the aval information */

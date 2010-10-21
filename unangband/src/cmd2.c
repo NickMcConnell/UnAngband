@@ -3576,13 +3576,14 @@ void player_fire_or_throw_selected(int item, bool fire)
 	int num_tricks;
 
 	/* Get kind flags */
+	u32b f5 = k_info[o_ptr->k_idx].flags5;
 	u32b f6 = k_info[o_ptr->k_idx].flags6;
 
 	/* Get object flags */
 	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 	
 	/* Get trick throws */
-	trick_throw = !fire && ((item == INVEN_WIELD) || (f3 & (TR3_TRICK_THROW))) && throwing;
+	trick_throw = !fire && ((item == INVEN_WIELD) || (f5 & (TR5_TRICK_THROW))) && throwing;
 	num_tricks = trick_throw ? p_ptr->num_blow + 1 : 1;
 	
 	/* Need a rope? (No rope for trick throws) */
@@ -3669,7 +3670,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 		ranged_skill = p_ptr->skills[SKILL_TO_HIT_BOW];
 
 		/* Base range XXX XXX */
-		tdis = 6 + 3 * p_ptr->ammo_mult;
+		tdis = 6;
 	}
 	else
 	{
@@ -3702,8 +3703,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 		tdis = (adj_str_blow[p_ptr->stat_ind[A_STR]] + 20) * mul / div;
 
 		/* Max distance of 10 */
-		if (tdis > 10)
-		tdis = 10;
+		if (tdis > 10) tdis = 10;
 	}
 
 	/* Coordinates of the fired/thrown object; start at the player */

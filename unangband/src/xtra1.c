@@ -3790,7 +3790,11 @@ static void calc_bonuses(void)
 		/* Throwing weapons */
 
 		/* Enforce a fixed divisor and multiplier for throwing
-		   (the same as for warrior's blows) */
+		   (the same as for warrior's blows). Note we can't
+		   use the weapon weight here to determine number of
+		   throws, but consider in future making number of
+		   throws dependent on the weight of the thrown
+		   weapon. */
 		div = 30;
 		mul = 5;
 

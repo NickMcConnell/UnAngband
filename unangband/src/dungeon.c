@@ -42,7 +42,7 @@ void ensure_quest(void)
 		if (q_ptr->stage == QUEST_PAYOUT)
 		{
 			/* Hack -- Don't pay out while recalling */
-			if (p_ptr->word_recall || p_ptr->word_return) continue;
+			if (p_ptr->timed[TMD_WORD_RECALL] || p_ptr->timed[TMD_WORD_RETURN]) continue;
 		}
 
 		/* Hack: Quest occurs anywhere - don't force quest items on the level. */
@@ -415,30 +415,28 @@ int value_check_aux1(const object_type *o_ptr)
 	if (object_aval(o_ptr, ABILITY_TO_AC) > 9) return (INSCRIP_GREAT);
 
 	/* Great to_h bonus */
-	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) > 9) return (INSCRIP_GREAT);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) > 9) return (INSCRIP_GREAT);
 
 	/* Great to_d bonus */
-	if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) >
-	    MAX(7, k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds))
+	if (object_aval(o_ptr, ABILITY_TO_DAM) >
+	    MAX(7, kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_DICE) * kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_SIDES)))
 	  return (INSCRIP_GREAT);
 
 	/* Great "weapon" dice */
-	if (o_ptr->dd > k_info[o_ptr->k_idx].dd) return (INSCRIP_GREAT);
-
-	/* Great "weapon" sides */
-	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
+	if ((object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES)) >
+		(kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_DICE)) * kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_SIDES)) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
 	if (object_aval(o_ptr, ABILITY_TO_AC) > 5) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
-	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 7) return (INSCRIP_VERY_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 7) return (INSCRIP_VERY_GOOD);
 
 	/* Good "armor" bonus */
 	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) return (INSCRIP_GOOD);
 
 	/* Good "weapon" bonus */
-	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 0) return (INSCRIP_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0) return (INSCRIP_GOOD);
 
 	/* Default to "average" */
 	return (INSCRIP_AVERAGE);
@@ -510,7 +508,7 @@ int value_check_aux2(const object_type *o_ptr)
 	}
 
 	/* Good weapon bonuses */
-	if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 0)
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0)
 	{
 		if (o_ptr->feeling == INSCRIP_UNUSUAL) return (INSCRIP_MAGICAL);
 		return (INSCRIP_UNCURSED);
@@ -1992,13 +1990,13 @@ static void process_world(void)
 	}
 
 	/* Delayed Word-of-Return */
-	if (p_ptr->word_return)
+	if (p_ptr->timed[TMD_WORD_RETURN])
 	{
 		/* Count down towards return */
-		p_ptr->word_return--;
+		p_ptr->timed[TMD_WORD_RETURN]--;
 
 		/* Activate the return */
-		if (!p_ptr->word_return)
+		if (!p_ptr->timed[TMD_WORD_RETURN])
 		{
 			/* Disturbing! */
 			disturb(0, 0);
@@ -2015,13 +2013,13 @@ static void process_world(void)
 	}
 
 	/* Delayed Word-of-Recall */
-	if (p_ptr->word_recall)
+	if (p_ptr->timed[TMD_WORD_RECALL])
 	{
 		/* Count down towards recall */
-		p_ptr->word_recall--;
+		p_ptr->timed[TMD_WORD_RECALL]--;
 
 		/* Activate the recall */
-		if (!p_ptr->word_recall)
+		if (!p_ptr->timed[TMD_WORD_RECALL])
 		{
 			/* Disturbing! */
 			disturb(0, 0);
@@ -3088,7 +3086,7 @@ static void process_player(void)
 			    !p_ptr->timed[TMD_POISONED] && !p_ptr->timed[TMD_AFRAID] &&
 			    !p_ptr->timed[TMD_STUN] && !p_ptr->timed[TMD_CUT] &&
 			    !p_ptr->timed[TMD_SLOW] && !p_ptr->timed[TMD_PARALYZED] &&
-			    !p_ptr->timed[TMD_IMAGE] && !p_ptr->word_recall &&
+			    !p_ptr->timed[TMD_IMAGE] && !p_ptr->timed[TMD_WORD_RECALL] &&
 			    (p_ptr->rest > PY_REST_FULL))
 			{
 				disturb(0, 0);
@@ -4169,14 +4167,14 @@ void play_game(bool new_game)
 				(void)set_food(PY_FOOD_MAX - 1);
 
 				/* Hack -- cancel recall */
-				if (p_ptr->word_recall)
+				if (p_ptr->timed[TMD_WORD_RECALL])
 				{
 					/* Message */
 					msg_print("A tension leaves the air around you...");
 					msg_print(NULL);
 
 					/* Hack -- Prevent recall */
-					p_ptr->word_recall = 0;
+					p_ptr->timed[TMD_WORD_RECALL] = 0;
 				}
 
 				/* Note cause of death XXX XXX XXX */

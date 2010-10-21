@@ -1320,8 +1320,8 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_BOW:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_RANGED)) * 100L, 1200L);
-			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_RANGED)) * 100L, 1000L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_HIT_BOW)) * 100L, 1200L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, 1000L);
 			break;
 		}
 		case TV_DIGGING:
@@ -1331,8 +1331,8 @@ s32b object_value_real(const object_type *o_ptr)
 
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_RANGED)) * 100L, 1200L);
-			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_RANGED)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_HIT_BOW)) * 100L, 1200L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
 			break;
 		}
 
@@ -1342,8 +1342,8 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_BOLT:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_RANGED)) * 100L, 1200L);
-			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_DAM_RANGED)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_HIT_BOW)) * 100L, 1200L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
 
 			/* Done */
 			break;
@@ -8837,7 +8837,7 @@ bool inven_carry_okay(const object_type *o_ptr)
 	int j;
 
 	/* Empty slot? - note hack for bags taking up two slots */
-	if (p_ptr->inven_cnt < INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags - (o_ptr->tval == TV_BAG ? 1 : 0)) return (TRUE);
+	if (p_ptr->inven_cnt < INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_study - p_ptr->pack_size_reduce_bags - (o_ptr->tval == TV_BAG ? 1 : 0)) return (TRUE);
 
 	/* Similar slot? */
 	for (j = 0; j < INVEN_PACK; j++)
@@ -8932,7 +8932,7 @@ s16b inven_carry(object_type *o_ptr)
 		 * Hack -- Force pack overflow if we reached the slots of the
 		 * inventory reserved for the quiver or bags. -DG-
 		 */
-		if (j >= INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags - (o_ptr->tval == TV_BAG ? 1 : 0))
+		if (j >= INVEN_PACK - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_study - p_ptr->pack_size_reduce_bags - (o_ptr->tval == TV_BAG ? 1 : 0))
 		{
 			/* Jump to INVEN_PACK to not mess up pack reordering */
 			j = INVEN_PACK;
@@ -10758,13 +10758,13 @@ int reorder_quiver(int slot)
  */
 bool is_throwing_item(const object_type *o_ptr)
 {
-  u32b f1, f2, f3, f4;
+	u32b f1, f2, f3, f4;
 
-  object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
-  if (f3 & (TR3_HURL_NUM | TR3_HURL_DAM)) return (TRUE);
+	if (f3 & (TR3_THROWING)) return (TRUE);
 
-  return (k_info[o_ptr->k_idx].flags5 & (TR5_THROWING) ? TRUE : FALSE);
+	return (k_info[o_ptr->k_idx].flags5 & (TR5_TRICK_THROW) ? TRUE : FALSE);
 }
 
 

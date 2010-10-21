@@ -524,10 +524,20 @@ enum
 
 
 /*
+ * Maximum number of books the player can study from
+ * 
+ * This is artificially limited so the player cannot consume more than half
+ * their inventory with study slots. The actual limit is INVEN_PACK.
+ */
+#define MAX_STUDY_BOOK	(INVEN_PACK / 2)
+
+
+
+/*
  * Maximum number of "bag" slots. This is limited by the fact the screen can
  * only show 23 items plus a one-line prompt.
  */
-#define INVEN_BAG_TOTAL		23
+#define INVEN_BAG_TOTAL		INVEN_PACK
 
 
 /*
@@ -3580,8 +3590,6 @@ enum
 	BONUS_WEAPON,			/* Bonuses from here onwards on a weapon only applied when using that weapon */
 	BONUS_ADD_WEAPON_SKILL,
 	BONUS_WEAPON_MULTIPLIER,	/* Weapon multiplier instead of adder */
-	BONUS_WEAPONLIKE,		/* Bonuses from here onwards on a weapon, gloves, boots, rings only applied in specific instances */	
-	BONUS_WEAPONLIKE_MULTIPLIER, /* Weaponlike multiplier instead of adder */	
 	BONUS_VAMP,
 	BONUS_SLAY,
 	BONUS_BRAND,
@@ -3732,8 +3740,8 @@ enum
 	ABILITY_NIGHT_SIGHT,     /* Night vision */
 	ABILITY_BRAND_ROCK,		/* Weapon slays hurt rock monsters */
 	ABILITY_TO_HIT_RESIST,	/* Weapon gets bonus against resistant/immune monsters */
-	ABILITY_TO_HIT_ITEM_ONLY,
-	ABILITY_TO_DAM_ITEM_ONLY,
+	ABILITY_TO_HIT,
+	ABILITY_TO_DAM,
 	ABILITY_MAX
 };
 
@@ -3885,7 +3893,7 @@ enum
 #define TR3_HUNGER       0x02000000L     /* Item makes the user more hungry */
 #define TR3_SPEAK_REPTILE 0x04000000L     /* Speak with reptiles, fish and amphibians */
 #define TR3_SPEAK_INSECT 0x08000000L     /* Speak with insects */
-#define TR3_TRICK_THROW	0x10000000L     /* Item always does tricks if thrown */
+#define TR3_THROWING    0x10000000L	/* Item is hurl-able (gets throwing bonuses) */
 #define TR3_LIGHT_CURSE	0x20000000L		/* Item has Light Curse */
 #define TR3_HEAVY_CURSE  0x40000000L     /* Item has Heavy Curse */
 #define TR3_PERMA_CURSE  0x80000000L     /* Item has Perma Curse */
@@ -3955,7 +3963,7 @@ enum
 #define TR5_BREAK_25	0x00040000L	/* Breakage change 25% (cmd2.c) */
 #define TR5_BREAK_10	0x00080000L	/* Breakage change 10% (cmd2.c) */
 #define TR5_IS_JUNK		0x00100000L	/* Item is junk (cmd1.c) */
-#define TR5_THROWING    0x00200000L	/* Item is hurl-able (gets throwing bonuses) */
+#define TR5_TRICK_THROW	0x00200000L /* Item always does tricks if thrown */
 #define TR5_AMMO    	0x00400000L	/* Item is branded in stacks */
 #define TR5_GLOW		0x00800000L	/* Item glows if timed */
 #define TR5_EXHAUST		0x01000000L	/* Item is destroyed at timeout */
@@ -3968,7 +3976,7 @@ enum
 #define TR5_KILL_LAVA	0x80000000L	/* Item can be destroyed by lava */
 
 #define TR6_WEAPON		0x00000001L	/* Item is a weapon */
-#define TR6_ARMOUR		0x00000002L	/* Item is an armour */
+#define TR6_WEARABLE	0x00000002L	/* Item is wearable */
 #define TR6_FLAVOR		0x00000004L	/* Item is "flavoured" */
 #define TR6_NAMED		0x00000008L	/* Item is "named" after monster */
 #define TR6_SIMPLE		0x00000010L	/* Item has a 'simple' description */

@@ -4429,7 +4429,7 @@ bool mon_resist_object(int m_idx, const object_type *o_ptr)
 	}
 
 	/* Hack -- more accurate weapons reduce resistance */
-	resist -= object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY);
+	resist -= object_aval(o_ptr, ABILITY_TO_HIT);
 
 	/* Try for a miss */
 	if (resist > rand_int(100))

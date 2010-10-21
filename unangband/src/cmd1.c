@@ -1881,8 +1881,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 				/* Increase range */
 				if (j_ptr->tval == TV_BOW) tdis += bow_multiplier(j_ptr->sval) * BTR_MIGHT_ADJ;
 
-				/* Apply extra range - note as a hack extra might helps */
-				tdis += object_aval(j_ptr, ABILITY_TRAP_MIGHT) * BTR_MIGHT_ADJ;
+				/* Apply extra range */
 				tdis += object_aval(j_ptr, ABILITY_TRAP_RANGE);
 				tdis += p_ptr->ability[ABILITY_TRAP_RANGE];
 
@@ -1955,9 +1954,9 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 							}
 							
 							/* Calcuate hit bonus */
-							to_hit = object_aval(j_ptr, ABILITY_TO_HIT_ITEM_ONLY) + object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)
+							to_hit = object_aval(j_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_HIT)
 								+ object_aval(j_ptr, ABILITY_TO_HIT_TRAP) + object_aval(o_ptr, ABILITY_TO_HIT_TRAP)
-								+ p_ptr->ability[ABILITY_TO_HIT_TRAP];
+								+ p_ptr->ability[ABILITY_TO_HIT] + p_ptr->ability[ABILITY_TO_HIT_TRAP];
 							
 							/* Hack - Block murder holes here to use up ammunition */
 							if ((player) && (p_ptr->blocking))
@@ -2001,7 +2000,8 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								
 								/* Add other damage bonuses */
 								k += critical_shot(o_ptr->weight, to_hit + to_crit * BTC_PLUS_ADJ, k);
-								k += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + object_aval(j_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+								k += object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(j_ptr, ABILITY_TO_DAM);
+								k += p_ptr->ability[ABILITY_TO_DAM];
 								k += object_aval(o_ptr, ABILITY_TO_DAM_TRAP) + object_aval(j_ptr, ABILITY_TO_DAM_TRAP);
 								k += p_ptr->ability[ABILITY_TO_DAM_TRAP];
 
@@ -2853,7 +2853,7 @@ void py_attack(int dir)
 		if (mon_evade(cave_m_idx[y][x], (m_ptr->stunned || m_ptr->confused) ? 50 : 80, 100, " your blow")) continue;
 
 		/* Calculate the "attack quality" */
-		if (o_ptr->k_idx) bonus = p_ptr->to_h + object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) + style_hit;
+		if (o_ptr->k_idx) bonus = p_ptr->to_h + object_aval(o_ptr, ABILITY_TO_HIT) + style_hit;
 		else bonus = p_ptr->to_h + style_hit;
 
 		/*
@@ -2996,7 +2996,8 @@ void py_attack(int dir)
 				}
 
 				/* Add damage bonus */
-				k += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+				k += object_aval(o_ptr, ABILITY_TO_DAM);
+				k += p_ptr->ability[ABILITY_TO_DAM];
 
 				/* Check usage */
 				object_usage(slot);

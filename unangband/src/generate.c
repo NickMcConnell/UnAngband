@@ -16111,7 +16111,7 @@ void generate_cave(void)
 	character_dungeon = FALSE;
 
 	/* Important - prevent getting stuck in rock */
-	p_ptr->word_return = 0;
+	p_ptr->timed[TMD_WORD_RETURN] = 0;
 	p_ptr->return_y = 0;
 	p_ptr->return_x = 0;
 

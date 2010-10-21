@@ -446,6 +446,26 @@ void object_flags(const object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b *f
 
 
 /*
+ * Obtain the "aval" for a particular ability on an item kind
+ */
+int kind_aval(int k_idx, int ability)
+{
+	const object_kind *k_ptr = &k_info[k_idx];
+
+	int i;
+	int k = 0;
+	
+	for (i = 0; i < MAX_AVALS_KIND; i++)
+	{
+		if ((k_ptr->flags0[ability/32][i] & (1L << (ability % 32))) != 0) k+= k_ptr->aval[i];
+	}
+	
+	return (k);
+}
+
+
+
+/*
  * Obtain the "aval" for a particular ability on an item
  */
 int object_aval(const object_type *o_ptr, int ability)
@@ -2730,8 +2750,8 @@ void describe_self_object(object_type *o_ptr, int slot)
 			else if (attack) text_out(" unless charging");
 			if (unarmed) text_out(" unarmed");
 			text_out(format(", it does %dd%d", o_ptr->dd, o_ptr->ds));
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)));
-			else if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) < 0) text_out(format("%d", object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)));
+			if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM)));
+			else if (object_aval(o_ptr, ABILITY_TO_DAM) < 0) text_out(format("%d", object_aval(o_ptr, ABILITY_TO_DAM)));
 			text_out(" ");
 			text_out((o_ptr->tval == TV_SPELL) ? "magical" : ((o_ptr->tval == TV_SWORD || o_ptr->tval == TV_POLEARM ||
 				o_ptr->tval == TV_ARROW || o_ptr->tval == TV_BOLT)
@@ -2902,7 +2922,7 @@ static bool outlist(cptr header, const cptr *list, byte attr)
  * Create a spoiler file entry for an artifact.
  * We use this to list the flags.
  */
-bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
+bool list_object_flags(const s16b ability[ABILITY_MAX], const u32b f0[ABILITY_ARRAY_SIZE], u32b f1, u32b f2, u32b f3, u32b f4, int pval, int mode)
 {
 #if 0
 	const u32b all_stats = (0x0300003FL);
@@ -2935,8 +2955,8 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 		for (j = 0; j < ABILITY_MAX; j++)
 		{
 			/* Skip unless a multiplier/divisor */
-			if ((ability_bonus[j].type != BONUS_MULTIPLIER) && (ability_bonus[j].type != BONUS_WEAPON_MULTIPLIER)
-				&& (ability_bonus[j].type >= BONUS_WEAPONLIKE_MULTIPLIER)) continue;
+			if ((ability_bonus[j].type != BONUS_MULTIPLIER)
+				&& (ability_bonus[j].type >= BONUS_WEAPON_MULTIPLIER)) continue;
 			
 			/* Skip weapons which do x1 multiplier or divisor */
 			if ((i == 1) || (i == -1)) continue;
@@ -3005,8 +3025,8 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 			if ((f0) && (((f0[j/32]) & (1L << (j % 32))) == 0)) continue;
 			
 			/* Skip if a multiplier/divisor */
-			if ((ability_bonus[j].type == BONUS_MULTIPLIER) || (ability_bonus[j].type == BONUS_WEAPON_MULTIPLIER)
-				|| (ability_bonus[j].type >= BONUS_WEAPONLIKE_MULTIPLIER)) continue;
+			if ((ability_bonus[j].type == BONUS_MULTIPLIER)
+				|| (ability_bonus[j].type >= BONUS_WEAPON_MULTIPLIER)) continue;
 			
 			/* We have done the first pass */
 			if (i)
@@ -3342,7 +3362,7 @@ bool list_object_flags(s16b ability[ABILITY_MAX], u32b f0[ABILITY_ARRAY_SIZE], u
 		list_ptr = list;
 
 		/* Get the miscellaneous abilities */
-		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_EQUIP_ITEM_ONLY, list_ptr);
+		list_ptr = spoiler_flag(f1, f2, f3, f4, BONUS_EQUIP, list_ptr);
 
 		/* Terminate the description list */
 		*list_ptr = NULL;
@@ -4016,7 +4036,7 @@ void list_object(const object_type *o_ptr, int mode)
 	if (!random && o_ptr->dd && o_ptr->ds)
 	{
 		bool throw_it = TRUE;
-		bool throw_it_good = ((f0[2] & ((1L << (ABILITY_HURL_DAM % 32)) | (1L << (ABILITY_HURL_NUM % 32)))) != 0) || ((f5 & TR5_THROWING) != 0);
+		bool throw_it_good = ((f0[2] & ((1L << (ABILITY_HURL_DAM % 32)) | (1L << (ABILITY_HURL_NUM % 32)))) != 0) || ((f3 & TR3_THROWING) != 0);
 
 		/* Handle melee & throwing weapon damage. Ammunition handled later. */
 		switch (o_ptr->tval)
@@ -4055,8 +4075,8 @@ void list_object(const object_type *o_ptr, int mode)
 			text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
 			if (object_bonus_p(o_ptr) || spoil)
 			{
-				if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)));
-				else if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) < 0) text_out(format("%d", object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)));
+				if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM)));
+				else if (object_aval(o_ptr, ABILITY_TO_DAM) < 0) text_out(format("%d", object_aval(o_ptr, ABILITY_TO_DAM)));
 			}
 			text_out(" ");
 			text_out((o_ptr->tval == TV_SPELL) ? "magical" : ((o_ptr->tval == TV_SWORD || o_ptr->tval == TV_POLEARM ||
@@ -4166,7 +4186,7 @@ void list_object(const object_type *o_ptr, int mode)
 		cptr vp_player_eat = "When eaten, it ";
 		cptr vp_monster_eat = "When eaten by monsters, it ";
 
-		bool throw_it_good = ((f0[2] & ((1L << (ABILITY_HURL_DAM % 32)) | (1L << (ABILITY_HURL_NUM % 32)))) != 0) || ((f5 & TR5_THROWING) != 0);
+		bool throw_it_good = ((f0[2] & ((1L << (ABILITY_HURL_DAM % 32)) | (1L << (ABILITY_HURL_NUM % 32)))) != 0) || ((f3 & TR3_THROWING) != 0);
 		
 		vn = 0;
 
@@ -4345,7 +4365,7 @@ void list_object(const object_type *o_ptr, int mode)
 				/* Display damage if required */
 				if (vd[n])
 				{
-					int to_d = object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
+					int to_d = object_aval(o_ptr, ABILITY_TO_DAM);
 
 					text_out(vp[n]);
 					/* Badly balanced weapons do minimum damage */
@@ -6888,15 +6908,6 @@ void inven_drop_flags(object_type *o_ptr)
 
 #define sign(x)	((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
-/*
- * Average damage for good ego ammo of various types, used for balance
- * The current values assume normal (non-seeker) ammo enchanted to +9
- */
-
-#define AVG_SLING_AMMO_DAMAGE 11
-#define AVG_BOW_AMMO_DAMAGE 12
-#define AVG_XBOW_AMMO_DAMAGE 12
-
 
 /*
  * Calculate the rating for a given slay combination.
@@ -7093,13 +7104,65 @@ u32b slay_index(const u32b f0[ABILITY_ARRAY_SIZE], const u32b f1, const u32b f2,
 	return s_index;
 }
 
+enum
+{
+	POWER_MELEE,
+	POWER_CHARGE,
+	POWER_SLING,
+	POWER_BOW,
+	POWER_XBOW,
+	POWER_GUN,
+	POWER_THROW,
+	POWER_TRAP,
+	POWER_UNARMED,
+	POWER_AMMO,
+	POWER_MAX
+};
 
 
-#define ADD_POWER(string, val, flag, flgnum, extra) \
-	if (((f##flgnum & flag) != 0) && ((kf##flgnum & flag) == 0)) { \
-		p += (val); \
-		extra; \
-	}
+enum
+{
+	POWER2_DD,
+	POWER2_DS,
+	POWER2_ATTACKS,
+	POWER2_MAX_ATTACKS,
+	POWER2_TO_HIT,
+	POWER2_MAX_TO_HIT,
+	POWER2_TO_DAM,
+	POWER2_MAX_TO_DAM,
+	POWER2_MIGHT,
+	POWER2_MAX_MIGHT,
+	POWER2_CRIT,
+	POWER2_RANGE,
+	POWER2_MIN_RANGE,
+	POWER2_MAX
+};
+
+
+/*
+ * This table lists the individual collection of abilities for weapons and is used to calculate their effectiveness.
+ * Trap abilities only apply when the weapon is used in a trap, hurling is only for the weapon when hurled, and so
+ * on. We don't add power for e.g. unarmed combat from a bow, which means that bows with an unarmed combat bonus
+ * "shouldn't" be generated.
+ */
+static const s16b power_table[POWER_MAX][POWER2_MAX] =
+{
+		{ 0, 0, ABILITY_BLOWS, 3, ABILITY_TO_HIT_MELEE, 9, ABILITY_TO_DAM_MELEE, 0, ABILITY_MELEE_MIGHT, 3, ABILITY_MELEE_CRIT, 0, 0},
+		{ 0, 0, ABILITY_CHARGE, 3, ABILITY_TO_HIT_MELEE, 9, ABILITY_TO_DAM_MELEE, 0, 0, 0, ABILITY_MELEE_CRIT, 0, 0},
+		{ 3, 5, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
+		{ 4, 6, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
+		{ 4, 7, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
+		{ 3, 5, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
+		{ 0, 0, ABILITY_HURL_NUM, 4, ABILITY_TO_HIT_THROW, 9, ABILITY_TO_DAM_THROW, 0, ABILITY_HURL_DAM, 4, ABILITY_HURL_CRIT, ABILITY_HURL_RANGE, 1},
+		{ 0, 0, ABILITY_TRAPS, 4, ABILITY_TO_HIT_TRAP, 9, ABILITY_TO_DAM_TRAP, 0, ABILITY_TRAP_MIGHT, 4, ABILITY_TRAP_CRIT, ABILITY_TRAP_RANGE, 1},
+		{ 0, 0, ABILITY_STRIKES, 4, ABILITY_TO_HIT_UNARM, 9, ABILITY_TO_DAM_UNARM, 0, ABILITY_UNARM_MIGHT, 4, ABILITY_UNARM_CRIT, 0, 0},
+		{ 0, 0, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 0, ABILITY_MIGHT, 4, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1}
+};
+
+#define AVG_DAM_UNCORRECTED(x,y) ((x) * (((y) > 1) ? ((y) + 1) : (y)) * (((y) > 1) ? 1 : 2))
+
+#define AVG_DAM(x,y) ((x) * (((y) > 1) ? ((y) + 1) : (y)) / (((y) > 1) ? 2 : 1))
+
 
 /*
  * Evaluate the objects's overall power level.
@@ -7124,7 +7187,7 @@ s32b object_power(const object_type *o_ptr)
 	u32b f1, f2, f3, f4, f5, f6;
 
 	s16b ability[ABILITY_MAX];
-	s16b ability_difference[ABILITY_MAX];
+	s16b ability_base[ABILITY_MAX];
 	
 	/* If artifact, already computed */
 	if (o_ptr->name1) return (a_info[o_ptr->name1].power);
@@ -7140,7 +7203,7 @@ s32b object_power(const object_type *o_ptr)
 	object_eval(o_ptr, ability);
 	
 	/* Get difference between item and base kind */
-	for (i = 0; i < ABILITY_MAX; i++) ability_difference[i] = ability[i];
+	for (i = 0; i < ABILITY_MAX; i++) ability_base[i] = 0;
 	
 	/* Lookup the item if not yet cached */
 	k_idx = o_ptr->k_idx;
@@ -7157,294 +7220,374 @@ s32b object_power(const object_type *o_ptr)
 	kf3 = k_ptr->flags3;
 	kf4 = k_ptr->flags4;
 	
+	/* Set base ability */
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		ability_base[i] = 0;
+	}
+	
 	/* Subtract the kind bonuses from the object */
 	for (i = 0; i < ABILITY_MAX; i++)
 	{
 		for (j = 0; j < MAX_AVALS_KIND; j++)
 		{
-			if ((i < 32) && ((k_ptr->flags0[i/32][j] & (1L << i)) != 0)) ability_difference[i] -= k_ptr->aval[j];
-			else if ((i >= 32) && (i < 64) && ((k_ptr->flags0[(i-32)/32][j] & (1L << (i-32))) != 0)) ability_difference[i] -= o_ptr->aval[j];
-			else if ((i >= 64) && (i < 96) && ((k_ptr->flags0[(i-64)/32][j] & (1L << (i-64))) != 0)) ability_difference[i] -= o_ptr->aval[j];
-			else if ((i >= 96) && (i < 128) && ((k_ptr->flags0[(i-96)/32][j] & (1L << (i-96))) != 0)) ability_difference[i] -= o_ptr->aval[j];
+			if ((i < 32) && ((k_ptr->flags0[i/32][j] & (1L << i)) != 0)) ability_base[i] += k_ptr->aval[j];
+			else if ((i >= 32) && (i < 64) && ((k_ptr->flags0[(i-32)/32][j] & (1L << (i-32))) != 0)) ability_base[i] += o_ptr->aval[j];
+			else if ((i >= 64) && (i < 96) && ((k_ptr->flags0[(i-64)/32][j] & (1L << (i-64))) != 0)) ability_base[i] += o_ptr->aval[j];
+			else if ((i >= 96) && (i < 128) && ((k_ptr->flags0[(i-96)/32][j] & (1L << (i-96))) != 0)) ability_base[i] += o_ptr->aval[j];
 		}
 	}
 	
-	/* The general power function for abilities */
-	for (i = 0; i < ABILITY_MAX; i++)
+	/*
+	 * Evaluate abilities on weapons based on the damage that
+	 * weapon causes; skip evaluating some abilities based
+	 * on the type of weapon.
+	 * 
+	 * We determine q which is twice the average damage inflicted
+	 * per round of combat by the item, and subtract r which is
+	 * twice the average damage per round of combat for the base
+	 * item type (object kind). Because objects can be used in
+	 * multiple ways, the power p is the maximum difference between
+	 * the q & r, checked for all possible ways the item can be
+	 * used to cause damage.
+	 */
+	for (i = 0; i < POWER_MAX; i++)
 	{
-		/* Good abilities increase item power rating */
-		if (ability[i] > 0)
+		s32b q = 0;
+		s32b r = 0;
+		int mult = 1;
+		
+		/* Ignore abilities on some items */
+		switch (i)
 		{
-			/* Item has the ability at a level greater than its base kind allows for */
-			/* Note that there is no need to subtract k_ptr->aval from o_ptr->aval,
-				because we want to penalize non-standard aval, even just 1 higher,
-				especially if it's atop already high standard aval */
-			if (((f0[i/32] & (1L << (i % 32))) != 0) && (((kf0[i/32] & (1L << (i % 32))) == 0) || (ability_difference[i] > 0)))
-			{
-				/* a * x^2 / b */
-				if ((ability_bonus[i].a) && (ability_bonus[i].b))
-				{
-					p += ability_bonus[i].a * ability[i] * ability[i] / ability_bonus[i].b;
-				}
-				else if (ability_bonus[i].a)
-				{
-					p += ability_bonus[i].a * ability[i] * ability[i];
-				}
-
-				/* + c * x / d */
-				if ((ability_bonus[i].c) && (ability_bonus[i].d))
-				{
-					p += ability_bonus[i].c * ability[i] / ability_bonus[i].d;
-				}
-				else if (ability_bonus[i].c)
-				{
-					p += ability_bonus[i].c * ability[i];
-				}
+			case POWER_MELEE:
+			case POWER_CHARGE:
+				if ((f6 & (TR6_WEAPON)) == 0) continue;
+				if (o_ptr->tval == TV_BOW) continue;
+				break;
+			case POWER_SLING:
+			case POWER_BOW:
+			case POWER_XBOW:
+			case POWER_GUN:
+				if (o_ptr->tval != TV_BOW) continue;
+				if ((o_ptr->sval / 10) != (i - POWER_SLING)) continue;
+				break;
+			case POWER_THROW:
+				if ((f3 & (TR3_THROWING)) == 0) continue;
+				break;
+			case POWER_UNARMED:
+				if ((f6 & (TR6_WEARABLE)) == 0) continue;
+				if (o_ptr->tval != TV_AMULET) continue;
+				if (o_ptr->tval != TV_BODY) continue;
+				if (o_ptr->tval != TV_CLOAK) continue;
+				break;
+			case POWER_AMMO:
+				if ((f5 & (TR5_AMMO)) == 0) continue;
+				break;
 				
-				/* + e */
-				p+= ability_bonus[i].e;
-				
-				/* Various accumulators */
-				if (ability_bonus[i].type == BONUS_RESIST_LOW) low_resists++;
-				if (ability_bonus[i].type == BONUS_RESIST) high_resists++;
-			}
+			/* All items count trap abilities */
 		}
-		/* Bad abilities decrease the power rating */
-		/* Hack: don't give large negatives.
-		   Also, don't penalize for aval less than k_ptr->aval,
-		   so that default avals are no lowered to decrease power
-		   and we may end with the boring 0 aval */
-		else if (ability[i] < 0)
+		
+		/* Get average damage - missile weapons*/
+		if ((power_table[i][POWER2_DD]) && (power_table[i][POWER2_DS]))
 		{
-			if ((ability_bonus[i].f) && (ability_bonus[i].g))
+			q = AVG_DAM_UNCORRECTED(power_table[i][POWER2_DD], power_table[i][POWER2_DS]);
+			r = q;
+		}
+		/* Get average damage - other weapons*/
+		else
+		{
+			q = AVG_DAM_UNCORRECTED(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES));
+			r = q;
+		}
+
+		/* Increased to hit chance? */
+		if (power_table[i][POWER2_TO_HIT])
+		{
+			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
+			if (object_aval(o_ptr, power_table[i][POWER2_TO_HIT]) > power_table[i][POWER2_TO_HIT])
 			{
-				p += ability_bonus[i].f * ability[i] / ability_bonus[i].g;
+				q += 4 * object_aval(o_ptr, power_table[i][POWER2_TO_HIT]) / 3;
 			}
-			else if (ability_bonus[i].g)
+			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+			else if ((f0[power_table[i][POWER2_TO_HIT]/32] & (1L << (power_table[i][POWER2_TO_HIT]%32))) != 0)
 			{
-				p += ability_bonus[i].g * ability[i];
+				q += 4 * power_table[i][POWER2_MAX_TO_HIT] / 3;
 			}
 			
-			/* - h */
-			p -= ability_bonus[i].h;
+			/*** Base item ***/
+			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
+			if ((ability_base[power_table[i][POWER2_TO_HIT]]) > power_table[i][POWER2_TO_HIT])
+			{
+				r += 4 * ability_base[power_table[i][POWER2_TO_HIT]] / 3;
+			}
+			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+			else if ((kf0[power_table[i][POWER2_TO_HIT]/32] & (1L << (power_table[i][POWER2_TO_HIT]%32))) != 0)
+			{
+				r += 4 * power_table[i][POWER2_MAX_TO_HIT] / 3;
+			}
+		}
+		
+		/* Increase power for to-hit - general to-hit bonus - if we exceed the maximum allowed */
+		if (object_aval(o_ptr, ABILITY_TO_HIT) > power_table[i][POWER2_MAX_TO_HIT])
+		{
+			q += 4 * object_aval(o_ptr, ABILITY_TO_HIT) / 3;
+		}
+		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+		else if ((f0[ABILITY_TO_HIT/32] & (1L << (ABILITY_TO_HIT%32))) != 0)
+		{
+			q += 4 * (power_table[i][POWER2_MAX_TO_HIT]) / 3;
+		}
+		
+		/*** Base item ***/
+		/* Increase power for to-hit - general to-hit bonus - if we exceed the maximum allowed */
+		if (ability_base[ABILITY_TO_HIT] > power_table[i][POWER2_MAX_TO_HIT])
+		{
+			q += 4 * ability_base[ABILITY_TO_HIT] / 3;
+		}
+		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+		else if ((kf0[ABILITY_TO_HIT/32] & (1L << (ABILITY_TO_HIT%32))) != 0)
+		{
+			q += 4 * (power_table[i][POWER2_MAX_TO_HIT]) / 3;
+		}
+		
+		
+		/* Multiply average damage? */
+		if (power_table[i][POWER2_MIGHT])
+		{
+			/* Hack - for the moment include bow multiplier */
+			if (o_ptr->tval == TV_BOW) mult = bow_multiplier(o_ptr->sval);
+	
+			/* Get damage multiplier */
+			if ((object_aval(o_ptr, power_table[i][POWER2_MIGHT]) > power_table[i][POWER2_MAX_MIGHT]) || (object_aval(o_ptr, power_table[i][POWER2_MIGHT]) < 0))
+			{
+				p += 20000;	/* inhibit */
+				break;	/* don't overflow */
+			}
+			else
+			{
+				mult += object_aval(o_ptr, power_table[i][POWER2_MIGHT]);
+			}
+			
+			q *= mult;
+
+			/*** Base item ***/
+			mult = 1;
+			
+			/* Get damage multiplier */
+			if ((ability_base[power_table[i][POWER2_MIGHT]] > power_table[i][POWER2_MAX_MIGHT]) || (ability_base[power_table[i][POWER2_MIGHT]] < 0))
+			{
+				p += 20000;	/* inhibit */
+				break;	/* don't overflow */
+			}
+			else
+			{
+				mult += ability_base[power_table[i][POWER2_MIGHT]];
+			}
+			
+			r *= mult;
+		}
+		
+		/* Apply the correct ego slay multiplier */
+		if (o_ptr->name2)
+		{
+			q = (q * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+		}
+
+		/* Hack -- For efficiency, compute for first slay or brand flag only */
+		else
+		{
+			int k;
+			u32b j, s_index;
+
+			s_index = slay_index(f0, f1, f2, f3, f4);
+
+			for (k = 0, j = 0x00000001L;(k < 32) && (j != s_index); k++, j<<=1);
+
+			if (k < 32) q = (q * magic_slay_power[i]) / tot_mon_power;
+			
+			/*** Base item ***/
+			s_index = slay_index(kf0, kf1, kf2, kf3, kf4);
+
+			for (k = 0, j = 0x00000001L;(k < 32) && (j != s_index); k++, j<<=1);
+
+			if (k < 32) r = (r * magic_slay_power[i]) / tot_mon_power;
+		}
+
+		/* Increase average damage? */
+		if (power_table[i][POWER2_TO_DAM])
+		{
+			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
+			if (object_aval(o_ptr, power_table[i][POWER2_TO_DAM]) > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+				AVG_DAM_UNCORRECTED(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES))))
+			{
+				q += 2 * object_aval(o_ptr, power_table[i][POWER2_TO_DAM]);
+			}
+			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+			else if ((f0[power_table[i][POWER2_TO_DAM]/32] & (1L << (power_table[i][POWER2_TO_DAM]%32))) != 0)
+			{
+				q += 2 * (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+					AVG_DAM_UNCORRECTED(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)));
+			}
+
+			/*** Base item ***/
+			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
+			if (ability_base[power_table[i][POWER2_TO_DAM]] > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+				AVG_DAM_UNCORRECTED(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES])))
+			{
+				r += 2 * ability_base[power_table[i][POWER2_TO_DAM]];
+			}
+			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+			else if ((kf0[power_table[i][POWER2_TO_DAM]/32] & (1L << (power_table[i][POWER2_TO_DAM]%32))) != 0)
+			{
+				r += 2 * (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+					AVG_DAM_UNCORRECTED(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES]));
+			}
+		}
+		
+		/* Increase power for to-dam - general to-dam bonus - if we exceed the maximum allowed */
+		if (object_aval(o_ptr, ABILITY_TO_DAM) > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+			AVG_DAM(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES))))
+		{
+			q += 2 * object_aval(o_ptr, ABILITY_TO_DAM);
+		}
+		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+		else if ((f0[ABILITY_TO_DAM/32] & (1L << (ABILITY_TO_DAM%32))) != 0)
+		{
+			q += 2 * (power_table[i][POWER2_TO_DAM] ? power_table[i][POWER2_TO_DAM] :
+				AVG_DAM(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)));
+		}
+		
+		/*** Base item ***/
+		/* Increase power for to-dam - general to-dam bonus - if we exceed the maximum allowed */
+		if (ability_base[ABILITY_TO_DAM] > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+			AVG_DAM(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES])))
+		{
+			r += 2 * object_aval(o_ptr, ABILITY_TO_DAM);
+		}
+		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
+		else if ((kf0[ABILITY_TO_DAM/32] & (1L << (ABILITY_TO_DAM%32))) != 0)
+		{
+			r += 2 * (power_table[i][POWER2_TO_DAM] ? power_table[i][POWER2_TO_DAM] : AVG_DAM(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES]));
+		}
+
+		/* Increase average crits? */
+		if (power_table[i][POWER2_CRIT])
+		{
+			/* TODO: Need to check the relative 'value' of crits */
+			q += object_aval(o_ptr, power_table[i][POWER2_CRIT]);
+			
+			r += ability_base[power_table[i][POWER2_CRIT]];
+		}
+		
+		/* Increase average damage? */
+		if (power_table[i][POWER2_RANGE])
+		{
+			int range = 6, div;
+			
+			/* Calculate throwing range instead */
+			if (i == POWER_THROW)
+			{
+				/* Extract a "distance multiplier" */
+				mult = is_throwing_item(o_ptr) ? 10 : 3;
+
+				/* Enforce a minimum "weight" of one pound */
+				div = object_aval(o_ptr, ABILITY_WEIGHT) > 10 ? object_aval(o_ptr, ABILITY_WEIGHT) : 10;
+
+				/* Hack -- Distance -- Reward strength, penalize weight */
+				range = 120 * mult / div;
+
+				/* Max distance of 10 */
+				if (range > 10) range = 10;
+			}
+			
+			/* TODO: Need to check the relative 'value' of range */
+			q += (range + object_aval(o_ptr, power_table[i][POWER2_RANGE])) * q / 10;
+			
+			/*** Base item ***/
+			/* Calculate throwing range instead */
+			if (i == POWER_THROW)
+			{
+				/* Extract a "distance multiplier" */
+				mult = is_throwing_item(o_ptr) ? 10 : 3;
+
+				/* Enforce a minimum "weight" of one pound */
+				div = ability_base[ABILITY_WEIGHT] > 10 ? ability_base[ABILITY_WEIGHT] : 10;
+
+				/* Hack -- Distance -- Reward strength, penalize weight */
+				range = 120 * mult / div;
+
+				/* Max distance of 10 */
+				if (range > 10) range = 10;
+			}			
+
+			/*** Base item ***/
+			r += (range + ability_base[power_table[i][POWER2_RANGE]]) * r / ((kf3 & TR3_THROWING) ? 10 : 3);
+		}
+
+		/* Multiply total damage? */
+		if ((power_table[i][POWER2_ATTACKS]) || (i == POWER_MELEE) || (i == POWER_THROW))
+		{
+			if (i == POWER_MELEE)
+			{
+				/* These values are calculated from the maximum possible blows from
+				 * a warrior for the weapon weight. It's much easier to hard code this. */
+				if (object_aval(o_ptr, ABILITY_WEIGHT) > 500) mult = 3;
+				else if (object_aval(o_ptr, ABILITY_WEIGHT) > 250) mult = 4;
+				else mult = 5;
+			}
+			else if (i == POWER_THROW) mult = 5;
+			else mult = 1;
+			
+			/* Get damage multiplier */
+			if ((object_aval(o_ptr, power_table[i][POWER2_ATTACKS]) > power_table[i][POWER2_MAX_ATTACKS]) || object_aval(o_ptr, power_table[i][POWER2_ATTACKS]) < 0)
+			{
+				p += 20000;	/* inhibit */
+				break;
+			}
+			else
+			{
+				mult += object_aval(o_ptr, power_table[i][POWER2_ATTACKS]);
+			}
+			
+			q *= mult;
+			
+			if (i == POWER_MELEE)
+			{
+				/* These values are calculated from the maximum possible blows from
+				 * a warrior for the weapon weight. It's much easier to hard code this. */
+				if (ability_base[ABILITY_WEIGHT] > 500) mult = 3;
+				else if (ability_base[ABILITY_WEIGHT] > 250) mult = 4;
+				else mult = 5;
+			}
+			else if (i == POWER_THROW) mult = 5;
+			else mult = 1;
+			
+			/* Get damage multiplier */
+			mult += ability[power_table[i][POWER2_ATTACKS]];
+			
+			r *= mult;
+		}
+		
+		/*** Figure out the difference between the 'base object' and the object ***/
+		if (q > r)
+		{
+			/* Use the highest power level for combat abilities */
+			if (p < (q - r)) p = (q - r);
+		}
+		else if (q < r)
+		{
+			/* Only use this if we don't have a useful ability - pick the 'least bad' ability */
+			if ((p <= 0) && (p < (q - r))) p = (q - r);
 		}
 	}
 	
-	/* Add bonus for low resists getting 'low_resists-lock' */
-	if (low_resists > 1) p += low_resists * low_resists;
-
-	/* Add bonus for high resists getting 'high_resists-lock' */
-	if (high_resists > 1) p += high_resists * high_resists / 2;
-
-	/* The general power function for flags */
-	for (i = 0; i < 4; i++)
-	{
-		for (j = 0; j < 32; j++)
-		{
-			bool boost = FALSE;
-			
-			/* Add power */
-			if ((i == 0) && ((f1 & (1L << j)) != 0)) boost = TRUE;
-			else if ((i == 1) && ((f2 & (1L << j)) != 0)) boost = TRUE;
-			else if ((i == 2) && ((f3 & (1L << j)) != 0)) boost = TRUE;
-			else if ((i == 3) && ((f4 & (1L << j)) != 0)) boost = TRUE;
-			
-			/* Boosting */
-			if (boost)
-			{
-				int q = item_flag_bonus[i][j].power;
-				
-				/* Don't give bonus for proofing if item cannot be damaged/stolen */
-				if ((q > 0) && (item_flag_bonus[i][j].type == BONUS_PROOF) && 
-						(item_flag_bonus[i][j].flag_match == 5) && ((f5 & (item_flag_bonus[i][j].flag_match)) == 0))
-				{
-					/* Don't modify power */
-					q = 0;
-				}
-				
-				/* Various accumulators */
-				if (ability_bonus[i].type == BONUS_SUSTAIN) sustains++;
-				if (ability_bonus[i].type == BONUS_IMMUNE) immunities++;
-			}
-		}
-	}
-
-	/* Add bonus for sustains getting 'sustain-lock' */
-	if (sustains > 2) p += sustains * sustains / 3;
-
-	/* Apply bonus for multiple immunities */
-	if (immunities > 1)
-	{
-		p += 15;
-	}
-	if (immunities > 2)
-	{
-		p += 45;
-	}
-	if (immunities > 3)
-	{
-		p += 20000;		/* inhibit */
-	}
-
-	
+#if 0
 	/* Evaluate certain abilities based on type of object. */
 	switch (o_ptr->tval)
 	{
 		case TV_BOW:
 		{
-			int mult;
-
-			/*
-			 * Damage multiplier for bows should be weighted less than that
-			 * for melee weapons, since players typically get fewer shots
-			 * than hits.
-			 */
-
-			/*
-			 * Add the average damage of fully enchanted (good) ammo for this
-			 * weapon.  Could make this dynamic based on k_info if desired.
-			 */
-
-			if (o_ptr->sval / 10 == 1)
-			{
-				p += AVG_BOW_AMMO_DAMAGE;
-			}
-			else if (o_ptr->sval / 10 == 2)
-			{
-				p += AVG_XBOW_AMMO_DAMAGE;
-			}
-			else
-			{
-				p += AVG_SLING_AMMO_DAMAGE;
-			}
-
-			mult = bow_multiplier(o_ptr->sval);
-#if 0
-			if (f1 & TR1_MIGHT)
-			{
-				if (o_ptr->pval > 3 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-					mult = 1;	/* don't overflow */
-				}
-				else
-				{
-					mult += o_ptr->pval;
-				}
-			}
-			p *= mult;
-#endif
-			/* Apply the correct ego slay multiplier */
-			if (o_ptr->name2)
-			{
-				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
-			}
-
-			/* Hack -- For efficiency, compute for first slay or brand flag only */
-			else
-			{
-				int i;
-				u32b j, s_index;
-
-				s_index = slay_index(f0, f1, f2, f3, f4);
-
-				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
-
-				if (i < 32) p = (p * magic_slay_power[i]) / tot_mon_power;
-			}
-
-			/* Increase power for to-dam */
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 9)
-			{
-				p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
-			}
-			else p += 9;
-#if 0
-			if (f1 & TR1_SHOTS)
-			{
-				/*
-				 * Extra shots are calculated differently for bows than for
-				 * slings or crossbows, because of rangers ... not any more CC 13/8/01
-				 */
-
-				if (o_ptr->pval > 3 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-				}
-				else if (o_ptr->pval > 0)
-				{
-					if (o_ptr->sval == SV_SHORT_BOW ||
-						o_ptr->sval == SV_LONG_BOW)
-					{
-						p = (p * (1 + o_ptr->pval));
-					}
-					else
-					{
-						p = (p * (1 + o_ptr->pval));
-					}
-				}
-
-			}
-#endif
-			if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) > 9)
-			{
-				p+= (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * 2 / 3;
-			}
-			else p += 6;
-
-			/* Normalise power back */
-			/* We now only count power as 'above' having the basic weapon at the same level */
-			if (o_ptr->sval < 10)
-			{
-				int q = AVG_SLING_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
-
-				if (ABS(p) > q)
-					p -= sign(p) * q;
-				else
-					p = 0;
-			}
-			else if (o_ptr->sval < 20)
-			{
-				int q = AVG_BOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
-
-				if (ABS(p) > q)
-					p -= sign(p) * q;
-				else
-					p = 0;
-			}
-			else if (o_ptr->sval < 30)
-			{
-				int q = AVG_XBOW_AMMO_DAMAGE * bow_multiplier(k_ptr->sval) + 15;
-
-				if (ABS(p) > q)
-					p -= sign(p) * q;
-				else
-					p = 0;
-			}
-
-			/*
-			 * Correction to match ratings to melee damage ratings.
-			 * We multiply all missile weapons by 1.5 in order to compare damage.
-			 * (CR 11/20/01 - changed this to 1.25).
-			 * Melee weapons assume 5 attacks per turn, so we must also divide
-			 * by 5 to get equal ratings.
-			 */
-
-			if (o_ptr->sval == SV_SHORT_BOW ||
-				o_ptr->sval == SV_LONG_BOW)
-			{
-				p = sign(p) * (ABS(p) / 4);
-			}
-			else
-			{
-				p = sign(p) * (ABS(p) / 4);
-			}
-
-			if (object_aval(o_ptr, ABILITY_WEIGHT) < k_ptr->weight)
-			{
-				p++;
-			}
-
 			/* Slight bonus as we may choose to use a swap bow */
 			/* Hack -- only if it has other flags though */
 			if (((f2 & (TR2_IGNORE_ACID)) != 0) && ((kf2 & (TR2_IGNORE_ACID)) == 0)
@@ -7464,138 +7607,6 @@ s32b object_power(const object_type *o_ptr)
 		case TV_POLEARM:
 		case TV_SWORD:
 		{
-			/* Note this is 'uncorrected' */
-			p += o_ptr->dd * (o_ptr->ds + 1);
-
-			/* Apply the correct ego slay multiplier */
-			if (o_ptr->name2)
-			{
-				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
-
-				/* Hack -- we may use as a swap weapon */
-				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 5 / 4 + 1;
-			}
-
-			/* Hack -- For efficiency, compute for first slay or brand flag only */
-			else
-			{
-				int i;
-				u32b j, s_index;
-
-				s_index = slay_index(f0, f1, f2, f3, f4);
-
-				for (i = 0, j = 0x00000001L; (i < 32) && (j != s_index); i++, j<<=1);
-
-				if (i < 32)
-				{
-					p = (p * magic_slay_power[i]) / tot_mon_power;
-
-					/* Hack -- we may use as a swap weapon */
-					if (magic_slay_power[i] > tot_mon_power) p = p * 5 / 4 + 1;
-				}
-			}
-
-			/* Correction factor for damage */
-			p /= 2;
-
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > o_ptr->dd * o_ptr->ds)
-			{
-				p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
-			}
-			else p += o_ptr->dd * o_ptr->ds;
-#if 0
-			if (f1 & TR1_BLOWS)
-			{
-				if (o_ptr->pval > 3 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-				}
-				else if (o_ptr->pval > 0)
-				{
-					p = sign(p) * ((ABS(p) * (5 + o_ptr->pval)) / 5);
-					/* Add an extra +5 per blow to account for damage rings */
-					/* (The +5 figure is a compromise here - could be adjusted) */
-					p += 5 * o_ptr->pval;
-				}
-			}
-
-			/* Not as good as blows because we throw the weapon away */
-			if (f3 & TR3_HURL_NUM)
-			{
-				if (o_ptr->pval > 3 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-				}
-				else if (o_ptr->pval > 0)
-				{
-					p = sign(p) * ((ABS(p) * (10 + o_ptr->pval)) / 10);
-					/* Add an extra +2 per blow to account for damage rings */
-					/* (The +2 figure is a compromise here - could be adjusted) */
-					p += 2 * o_ptr->pval;
-				}
-			}
-
-			/* Not as good as blows because we throw the weapon away */
-			if (f3 & TR3_HURL_DAM)
-			{
-				if (o_ptr->pval > 3 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-				}
-				else if (o_ptr->pval > 0)
-				{
-					p = sign(p) * ((ABS(p) * (10 + o_ptr->pval)) / 10);
-				}
-			}
-
-			/* Big boost for non-throwing weapons */
-			if (((f3 & (TR3_HURL_NUM | TR3_HURL_DAM)) != 0) && ((f5 & (TR5_THROWING)) == 0))
-			{
-				/* Base damage dice used */
-				p += o_ptr->dd * (o_ptr->ds + 1) / 3;
-			}
-
-			/* Might helps with traps but not terribly well */
-			if (f1 & TR1_MIGHT)
-			{
-				if (o_ptr->pval > 10 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-				}
-				else if (o_ptr->pval > 0)
-				{
-					p += sign(p) * o_ptr->pval;
-				}
-			}
-
-			/* Shots helps with traps but not terribly well */
-			if (f1 & TR1_SHOTS)
-			{
-				if (o_ptr->pval > 10 || o_ptr->pval < 0)
-				{
-					p += 20000;	/* inhibit */
-				}
-				else if (o_ptr->pval > 0)
-				{
-					p += sign(p) * o_ptr->pval;
-				}
-			}
-#endif
-			if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) > 9)
-			{
-				p += (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * 2 / 3;
-			}
-			else p += 6;
-
-			/* Normalise power back */
-			/* We remove the weapon base damage to get 'true' power */
-			/* This makes e.g. a sword that provides fire immunity
-			   the same value as a ring that provides fire immunity */
-			if (ABS(p) > k_ptr->dd * (k_ptr->ds + 1) / 2 + 6 + o_ptr->dd * o_ptr->ds)
-				p -= sign(p) * (k_ptr->dd * (k_ptr->ds + 1) / 2 + 6 + k_ptr->dd * k_ptr->ds);
-			else
-				p = 0;
-
 			/* Hack -- secondary weapons are more useful */
 			if (p > 0 && (f6 & (TR6_OFF_HAND)))
 				p++;
@@ -7630,109 +7641,6 @@ s32b object_power(const object_type *o_ptr)
 		case TV_SHOT:
 		case TV_BOLT:
 		{
-			/* Note this is 'uncorrected' */
-			p += o_ptr->dd * (o_ptr->ds + 1);
-
-			/* Apply the correct ego slay multiplier */
-			if (o_ptr->name2)
-			{
-				p = (p * e_info[o_ptr->name2].slay_power) / tot_mon_power;
-
-				/* Hack -- we usually have multiple stacks of ammo */
-				if (e_info[o_ptr->name2].slay_power > tot_mon_power) p = p * 5 / 4 + 1;
-			}
-
-			/* Hack -- For efficiency, compute for first slay or brand flag only */
-			else
-			{
-				int i;
-				u32b j, s_index;
-
-				s_index = slay_index(f0, f1, f2, f3, f4);
-
-				for (i = 0, j = 0x00000001L;(i < 32) && (j != s_index); i++, j<<=1);
-
-				if (i < 32)
-				{
-					p = (p * magic_slay_power[i]) / tot_mon_power;
-
-					/* Hack -- we usually have multiple stacks of ammo */
-					if (magic_slay_power[i] > tot_mon_power) p = p * 5 / 4 + 1;
-				}
-			}
-
-			/* Correct damage */
-			p /= 2;
-
-			if (o_ptr->tval == TV_SHOT)
-			{
-				p *= 2;
-			}
-			else if (o_ptr->tval == TV_ARROW)
-			{
-				p *= 5 / 2;
-			}
-			else if (o_ptr->tval == TV_BOLT)
-			{
-				p *= 7 / 2;
-			}
-
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 9)
-			{
-				p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY);
-			}
-			else if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > -10)
-			{
-				p += 9;
-			}
-			else
-			{
-				p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) + 9;
-			}
-
-			if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) > 9)
-			{
-				p+= (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * 2 / 3;
-			}
-			else if (object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY) > -12)
-			{
-				p += 6;
-			}
-			else
-			{
-				p += (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY)) * 2 / 3 + 6;
-			}
-
-			/* Normalise power back */
-			/* We remove the ammo base damage to get 'true' power */
-			if (o_ptr->tval == TV_SHOT)
-			{
-				int q = (k_ptr->dd * (k_ptr->ds + 1) / 2) * 2 + 15;
-
-				if (ABS(p) > q)
-					p -= sign(p) * q;
-				else
-					p = 0;
-			}
-			else if (o_ptr->tval == TV_ARROW)
-			{
-				int q = (k_ptr->dd * (k_ptr->ds + 1) / 2) * 5 / 2 + 15;
-
-				if (ABS(p) > q)
-					p -= sign(p) * q;
-				else
-					p = 0;
-			}
-			else if (o_ptr->tval == TV_BOLT)
-			{
-				int q = (k_ptr->dd * (k_ptr->ds + 1) / 2) * 7 / 2 + 15;
-
-				if (ABS(p) > q)
-					p -= sign(p) * q;
-				else
-					p = 0;
-			}
-
 			if (object_aval(o_ptr, ABILITY_WEIGHT) < k_ptr->weight)
 			{
 				p++;
@@ -7811,14 +7719,14 @@ s32b object_power(const object_type *o_ptr)
 				p += o_ptr->ac - k_ptr->ac;
 			}
 
-			p += sign(ability_difference[ABILITY_TO_HIT_ITEM_ONLY]) * ((ABS(ability_difference[ABILITY_TO_HIT_ITEM_ONLY]) * 2) / 3);
+			p += sign(ability_difference[ABILITY_TO_HIT]) * ((ABS(ability_difference[ABILITY_TO_HIT]) * 2) / 3);
 
-			p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) * 2;
+			p += object_aval(o_ptr, ABILITY_TO_DAM) * 2;
 
 			/* We assume rings of damage +5 */
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 5)
+			if (object_aval(o_ptr, ABILITY_TO_DAM) > 5)
 			{
-				p += (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) - 5) * 2;
+				p += (object_aval(o_ptr, ABILITY_TO_DAM) - 5) * 2;
 			}
 
 			if (object_aval(o_ptr, ABILITY_WEIGHT) < k_ptr->weight)
@@ -7839,14 +7747,14 @@ s32b object_power(const object_type *o_ptr)
 
 		case TV_LITE:
 		{
-			p += sign(object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * ((ABS(object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * 2) / 3);
+			p += sign(object_aval(o_ptr, ABILITY_TO_HIT)) * ((ABS(object_aval(o_ptr, ABILITY_TO_HIT)) * 2) / 3);
 
-			p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) * 2;
+			p += object_aval(o_ptr, ABILITY_TO_DAM) * 2;
 
 			/* We assume rings of damage +5 */
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 5)
+			if (object_aval(o_ptr, ABILITY_TO_DAM) > 5)
 			{
-				p += (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) - 5) * 2;
+				p += (object_aval(o_ptr, ABILITY_TO_DAM) - 5) * 2;
 			}
 
 			/* Bonuses as we may choose to use a swap light */
@@ -7890,14 +7798,14 @@ s32b object_power(const object_type *o_ptr)
 		case TV_AMULET:
 		{
 
-			p += sign(object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * ((ABS(object_aval(o_ptr, ABILITY_TO_HIT_ITEM_ONLY)) * 2) / 3);
+			p += sign(object_aval(o_ptr, ABILITY_TO_HIT)) * ((ABS(object_aval(o_ptr, ABILITY_TO_HIT)) * 2) / 3);
 
-			p += object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) * 2;
+			p += object_aval(o_ptr, ABILITY_TO_DAM) * 2;
 
 			/* We assume rings of damage +5 */
-			if (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) > 5)
+			if (object_aval(o_ptr, ABILITY_TO_DAM) > 5)
 			{
-				p += (object_aval(o_ptr, ABILITY_TO_DAM_ITEM_ONLY) - 5) * 2;
+				p += (object_aval(o_ptr, ABILITY_TO_DAM) - 5) * 2;
 			}
 
 			/* Bonus as we may choose to use a swap armour */
@@ -8017,7 +7925,131 @@ s32b object_power(const object_type *o_ptr)
 			return(p);
 	}
 
+#endif
+	
+	/* The general power function for abilities */
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		/* Skip calculation of abilities which only apply when the item is being used. We calculate these later. */
+		if ((ability_bonus[i].type >= BONUS_WEAPON) && (((f5 & (TR5_AMMO)) != 0) || ((f6 & (TR6_WEAPON)) != 0))) continue;
+		
+		/* Skip everything except weapon abilities for items we cannot wield/equip */
+		if ((ability_bonus[i].type < BONUS_WEAPON) && (ability_bonus[i].type != BONUS_PROOF) &&
+				((f5 & (TR5_PACK)) != 0) && ((f6 & (TR6_WEAPON | TR6_WEARABLE)) == 0)) continue;
+		
+		/* Good abilities increase item power rating */
+		if (ability[i] > 0)
+		{
+			/* Item has the ability at a level greater than its base kind allows for */
+			/* Note that there is no need to subtract k_ptr->aval from o_ptr->aval,
+				because we want to penalize non-standard aval, even just 1 higher,
+				especially if it's atop already high standard aval */
+			if (((f0[i/32] & (1L << (i % 32))) != 0) && (((kf0[i/32] & (1L << (i % 32))) == 0) || (ability[i] > ability_base[i])))
+			{
+				/* a * x^2 / b */
+				if ((ability_bonus[i].a) && (ability_bonus[i].b))
+				{
+					p += ability_bonus[i].a * ability[i] * ability[i] / ability_bonus[i].b;
+				}
+				else if (ability_bonus[i].a)
+				{
+					p += ability_bonus[i].a * ability[i] * ability[i];
+				}
 
+				/* + c * x / d */
+				if ((ability_bonus[i].c) && (ability_bonus[i].d))
+				{
+					p += ability_bonus[i].c * ability[i] / ability_bonus[i].d;
+				}
+				else if (ability_bonus[i].c)
+				{
+					p += ability_bonus[i].c * ability[i];
+				}
+				
+				/* + e */
+				p+= ability_bonus[i].e;
+				
+				/* Various accumulators */
+				if (ability_bonus[i].type == BONUS_RESIST_LOW) low_resists++;
+				if (ability_bonus[i].type == BONUS_RESIST) high_resists++;
+			}
+		}
+		/* Bad abilities decrease the power rating */
+		/* Hack: don't give large negatives.
+		   Also, don't penalize for aval less than k_ptr->aval,
+		   so that default avals are no lowered to decrease power
+		   and we may end with the boring 0 aval */
+		else if (ability[i] < 0)
+		{
+			if ((ability_bonus[i].f) && (ability_bonus[i].g))
+			{
+				p += ability_bonus[i].f * ability[i] / ability_bonus[i].g;
+			}
+			else if (ability_bonus[i].g)
+			{
+				p += ability_bonus[i].g * ability[i];
+			}
+			
+			/* - h */
+			p -= ability_bonus[i].h;
+		}
+	}
+	
+	/* Add bonus for low resists getting 'low_resists-lock' */
+	if (low_resists > 1) p += low_resists * low_resists;
+
+	/* Add bonus for high resists getting 'high_resists-lock' */
+	if (high_resists > 1) p += high_resists * high_resists / 2;
+
+	/* The general power function for flags */
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < 32; j++)
+		{
+			/* Skip calculation of abilities which only apply when the item is being used. We calculate these later. */
+			if ((item_flag_bonus[i][j].type >= BONUS_WEAPON) && (((f5 & (TR5_AMMO)) != 0) || ((f6 & (TR6_WEAPON)) != 0))) continue;
+			
+			/* Skip everything except weapon abilities for items we cannot wield/equip */
+			if ((item_flag_bonus[i][j].type < BONUS_WEAPON) && (ability_bonus[i].type != BONUS_PROOF) &&
+					((f5 & (TR5_PACK)) != 0) && ((f6 & (TR6_WEAPON | TR6_WEARABLE)) == 0)) continue;
+
+			/* Add power */
+			if ((i == 0) && ((f1 & (1L << j)) == 0)) continue;
+			else if ((i == 1) && ((f2 & (1L << j)) == 0)) continue;
+			else if ((i == 2) && ((f3 & (1L << j)) == 0)) continue;
+			else if ((i == 3) && ((f4 & (1L << j)) == 0)) continue;
+			
+			/* Don't give bonus for proofing if item cannot be damaged/stolen */
+			if ((item_flag_bonus[i][j].power > 0) && (item_flag_bonus[i][j].type == BONUS_PROOF) && 
+					(item_flag_bonus[i][j].flag_match == 5) && ((f5 & (item_flag_bonus[i][j].flag_match)) == 0)) continue;
+
+			/* Increase power */
+			p+= item_flag_bonus[i][j].power;
+
+			/* Various accumulators */
+			if (ability_bonus[i].type == BONUS_SUSTAIN) sustains++;
+			if (ability_bonus[i].type == BONUS_IMMUNE) immunities++;
+		}
+	}
+
+	/* Add bonus for sustains getting 'sustain-lock' */
+	if (sustains > 2) p += sustains * sustains / 3;
+
+	/* Apply bonus for multiple immunities */
+	if (immunities > 1)
+	{
+		p += 15;
+	}
+	if (immunities > 2)
+	{
+		p += 45;
+	}
+	if (immunities > 3)
+	{
+		p += 20000;		/* inhibit */
+	}
+
+	
 
 	/* Evaluate weight discount. */
 	switch (o_ptr->tval)

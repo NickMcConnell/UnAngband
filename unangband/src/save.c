@@ -752,7 +752,6 @@ static void wr_extra(void)
 	wr_s16b(p_ptr->delay_spell);
 
 	/* Returning */
-	wr_s16b(p_ptr->word_return);
 	wr_s16b(p_ptr->return_y);
 	wr_s16b(p_ptr->return_x);
 
@@ -788,6 +787,13 @@ static void wr_extra(void)
 	{
 		wr_s16b(p_ptr->player_hp[i]);
 	}
+	
+	/* Write study data */
+	wr_s16b(p_ptr->pack_size_reduce_study);
+	for (i = 0; i <p_ptr->pack_size_reduce_study; i++)
+	{
+		wr_s16b(p_ptr->study_slot[i]);
+	}
 
 	/* Write spell data */
 	wr_u32b(p_ptr->spell_learned1);
@@ -802,6 +808,10 @@ static void wr_extra(void)
 	wr_u32b(p_ptr->spell_forgotten2);
 	wr_u32b(p_ptr->spell_forgotten3);
 	wr_u32b(p_ptr->spell_forgotten4);
+	wr_u32b(p_ptr->spell_memorised1);
+	wr_u32b(p_ptr->spell_memorised2);
+	wr_u32b(p_ptr->spell_memorised3);
+	wr_u32b(p_ptr->spell_memorised4);
 
 	/* Dump the ordered spells */
 	for (i = 0; i < PY_MAX_SPELLS; i++)

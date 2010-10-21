@@ -1603,14 +1603,16 @@ const byte adj_charge_siz[] =
  * This table is used to help calculate the number of blows the player can
  * make in a single round of attacks (one player turn) with a normal weapon.
  *
- * This number ranges from a single blow/round for weak players to up to six
- * blows/round for powerful warriors.
+ * This number ranges from a single blow/round for weak players to up to five
+ * blows/round for most classes. Note warriors used to get six blows, but
+ * now we give them a bonus blow per round instead regardless of which
+ * weapon they use (see style.txt).
  *
  * Note that certain artifacts and ego-items give "bonus" blows/round.
  *
- * First, from the player class, we extract some values:
+ * First, from the p_class.txt, we extract some values:
  *
- *    Warrior --> num = 6; mul = 5; div = MAX(30, weapon_weight);
+ *    Warrior --> num = 5; mul = 5; div = MAX(30, weapon_weight);
  *    Mage    --> num = 4; mul = 2; div = MAX(40, weapon_weight);
  *    Priest  --> num = 5; mul = 3; div = MAX(35, weapon_weight);
  *    Rogue   --> num = 5; mul = 3; div = MAX(30, weapon_weight);
@@ -2143,8 +2145,8 @@ const ability_type ability_bonus[ABILITY_MAX] =
 	
 	/* Description, Item Name, Bonus, Sub Bonus, Flags, Max Aval, A, B, C, D, E, F, G, H where power is ax*x/b + cx/d + e for positive avals and fx/g - h for negative */
 	{ "weight", "(Heavy)", 0, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ "damage dice", "of Velocity", BONUS_WEAPON, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ "damage dice sides", "of Impact", BONUS_WEAPON, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ "damage dice", "of Velocity", BONUS_EQUIP_ITEM_ONLY, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ "damage dice sides", "of Impact", BONUS_EQUIP_ITEM_ONLY, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ "base armor class", " (Armored)", 0, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ "armor class against all attacks", "of Protection", 0, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ "armor class while blocking", "of Blocking", 0, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -2240,8 +2242,8 @@ const ability_type ability_bonus[ABILITY_MAX] =
 	{ "night vision", "of Night Vision", BONUS_SENSE, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ "against creatures made of rock", "of Tunnelling", BONUS_SLAY, 3, (RF3_HURT_ROCK), 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ "to hit creatures resistant to this weapon", "of Penetration", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-	{ "accuracy", "of Accuracy", BONUS_WEAPON, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ "damage", "of Damage", BONUS_WEAPON, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ "accuracy", "of Accuracy", 0, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ "damage", "of Damage", 0, 0, 0L, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 };
 
 

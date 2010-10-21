@@ -987,8 +987,8 @@ static cptr k_info_ability[]=
 		"NIGHT_SIGHT",
 		"BRAND_ROCK",
 		"TO_HIT_RESIST",
-		"TO_HIT_ITEM_ONLY",
-		"TO_DAM_ITEM_ONLY",
+		"TO_HIT",
+		"TO_DAM",
 		
 		/* The following are fake */
 		"KILL_DRAGON",
@@ -1107,7 +1107,7 @@ static cptr k_info_flags3[] =
 	"HUNGER",
 	"SPEAK_REPTILE",
 	"SPEAK_INSECT",
-	"TRICK_THROW",
+	"THROWING",
 	"LIGHT_CURSE",
 	"HEAVY_CURSE",
 	"PERMA_CURSE"
@@ -1179,7 +1179,7 @@ static cptr k_info_flags5[] =
 	"BREAK_25",
 	"BREAK_10",
 	"IS_JUNK",
-	"THROWING",
+	"TRICK_THROW",
 	"AMMO",
 	"GLOW",
 	"EXHAUST",
@@ -4124,7 +4124,6 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_SPELL:
-				if ((k_ptr->dd >= 2) || (k_ptr->ds >= 2)) 				k_ptr->flags5 |= (TR5_SHOW_DD | TR5_SHOW_WEAPON);
 				k_ptr->flags6 |= (TR6_NO_TIMEOUT);
 				k_ptr->flags5 |= (TR5_EXHAUST);
 
@@ -4138,6 +4137,7 @@ errr parse_k_info(char *buf, header *head)
 					break;
 
 			case TV_ARROW:
+				k_ptr->flags5 |= (TR5_AMMO);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_DO_CRIT);
@@ -4145,6 +4145,7 @@ errr parse_k_info(char *buf, header *head)
 				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_ROPE);
 				break;
 			case TV_SHOT:
+				k_ptr->flags5 |= (TR5_AMMO);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_DO_STUN);
@@ -4152,6 +4153,7 @@ errr parse_k_info(char *buf, header *head)
 				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_CHAIN);
 			break;
 			case TV_BOLT:
+				k_ptr->flags5 |= (TR5_AMMO);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_DO_CRIT);
@@ -4160,25 +4162,28 @@ errr parse_k_info(char *buf, header *head)
 			break;
 
 			case TV_BOW:
+				k_ptr->flags6 |= (TR6_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags6 |= (TR6_BAD_THROW | TR6_SHOW_MULT);
 			break;
 
 			case TV_DIGGING:
+				k_ptr->flags6 |= (TR6_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
 			break;
 
 			case TV_SWORD:
+				k_ptr->flags6 |= (TR6_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_DO_CUTS);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
-				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 				break;
 
 			case TV_HAFTED:
+				k_ptr->flags6 |= (TR6_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 
@@ -4192,16 +4197,15 @@ errr parse_k_info(char *buf, header *head)
 					k_ptr->flags5 |= (TR5_DO_TRIP);
 				}*/
 				k_ptr->flags6 |= (TR6_BAD_THROW);
-				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 				break;
 
 			case TV_POLEARM:
+				k_ptr->flags6 |= (TR6_WEAPON);
 				if (sval == SV_AMMO_GRAPPLE) k_ptr->flags6 |= (TR6_HAS_CHAIN);
 
 				k_ptr->flags5 |= (TR5_SHOW_WEAPON);
 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				k_ptr->flags6 |= (TR6_BAD_THROW);
-				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
 
 				/* Hack -- spears do damaging criticals, axes stun or cut */
 				/*if (!(strstr(k_name + k_ptr->name, "xe"))
@@ -4227,6 +4231,8 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_LITE:
+				k_ptr->flags6 |= (TR6_WEARABLE);
+				
 				/* Historically used for candles - now unused */
 				if (k_ptr->sval >= SV_LITE_MAX_LITE)
 				{
@@ -4243,6 +4249,7 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_RING:
+				k_ptr->flags6 |= (TR6_WEARABLE);
 				/* Flavored */
 				k_ptr->flags6 |= (TR6_FLAVOR);
 
@@ -4250,6 +4257,7 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_AMULET:
+				k_ptr->flags6 |= (TR6_WEARABLE);
 				/* Flavored */
 				k_ptr->flags6 |= (TR6_FLAVOR);
 				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
@@ -4257,6 +4265,7 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_STAFF:
+				k_ptr->flags6 |= (TR6_WEAPON);
 				/* Flavored */
 				k_ptr->flags6 |= (TR6_FLAVOR);
 				k_ptr->flags6 |= (TR6_PREPEND | TR6_ADD_NAME | TR6_MOD_NAME);
@@ -4319,11 +4328,6 @@ errr parse_k_info(char *buf, header *head)
 				break;
 
 			case TV_GLOVES:
-				if ((k_ptr->ds) && (k_ptr->dd)) k_ptr->flags5 |= (TR5_SHOW_DD);
-
-				/* Fall through */
-
-			/* Armour */
 			case TV_DRAG_ARMOR:
 			{
 				k_ptr->flags5 |= (TR5_RECHARGE);
@@ -4338,6 +4342,8 @@ errr parse_k_info(char *buf, header *head)
 			case TV_HARD_ARMOR:
 			{
 				k_ptr->flags5 |= (TR5_SHOW_AC);
+				k_ptr->flags6 |= (TR6_WEARABLE);
+
 				break;
 			}
 
@@ -4394,6 +4400,7 @@ errr parse_k_info(char *buf, header *head)
 	{
 		int level, charges, wgt;
 		long cost;
+		int k=0;
 
 		/* There better be a current k_ptr */
 		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4402,10 +4409,13 @@ errr parse_k_info(char *buf, header *head)
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
 			    &level, &charges, &wgt, &cost)) return (PARSE_ERROR_GENERIC);
 
+		/* Get k */
+		for (k = 0; k++; k_ptr->aval[k]);
+		
 		/* Save the values */
 		k_ptr->level = level;
 		k_ptr->charges = charges;
-		k_ptr->weight = wgt;
+		if (wgt) { k_ptr->aval[k] = wgt; k_ptr->flags0[ABILITY_WEIGHT/32][k++] = 1L << (ABILITY_WEIGHT %32);}
 		k_ptr->cost = cost;
 	}
 
@@ -4457,12 +4467,15 @@ errr parse_k_info(char *buf, header *head)
 		if (6 != sscanf(buf+2, "%d:%dd%d:%d:%d:%d",
 			    &ac, &hd1, &hd2, &th, &td, &ta)) return (PARSE_ERROR_GENERIC);
 
-		k_ptr->ac = ac;
-		k_ptr->dd = hd1;
-		k_ptr->ds = hd2;
+		/* Get k */
+		for (k = 0; k++; k_ptr->aval[k]);
 		
-		if (th) { k_ptr->aval[k] = th; k_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
-		if (td) {k_ptr->aval[k] = td; k_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
+		if (ac) { k_ptr->aval[k] = ac; k_ptr->flags0[ABILITY_AC/32][k++] = 1L << (ABILITY_AC %32);}
+		if (hd1) { k_ptr->aval[k] = hd1; k_ptr->flags0[ABILITY_DAMAGE_DICE/32][k++] = 1L << (ABILITY_DAMAGE_DICE %32);}
+		if (hd2) { k_ptr->aval[k] = hd2; k_ptr->flags0[ABILITY_DAMAGE_SIDES/32][k++] = 1L << (ABILITY_DAMAGE_SIDES %32);}
+		
+		if (th) { k_ptr->aval[k] = th; k_ptr->flags0[ABILITY_TO_HIT/32][k++] = 1L << (ABILITY_TO_HIT %32);}
+		if (td) {k_ptr->aval[k] = td; k_ptr->flags0[ABILITY_TO_DAM/32][k++] = 1L << (ABILITY_TO_DAM %32);}
 		if (ta) {k_ptr->aval[k] = ta; k_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
 
 		switch(k_ptr->tval)
@@ -4470,7 +4483,15 @@ errr parse_k_info(char *buf, header *head)
 			case TV_SWORD:
 			case TV_HAFTED:
 			case TV_POLEARM:
-				if (k_ptr->ac) k_ptr->flags5 |= (TR5_SHOW_AC);
+				if (ac) k_ptr->flags5 |= (TR5_SHOW_AC);
+				break;
+				
+			case TV_SPELL:
+				if ((hd1 >= 2) || (hd2 >= 2)) 				k_ptr->flags5 |= (TR5_SHOW_DD | TR5_SHOW_WEAPON);
+				break;
+				
+			case TV_GLOVES:
+				if ((hd1) || (hd2)) 				k_ptr->flags5 |= (TR5_SHOW_DD);
 				break;
 		}
 	}
@@ -4740,6 +4761,7 @@ errr parse_a_info(char *buf, header *head)
 	{
 		int level, rarity, wgt;
 		long cost;
+		int k;
 
 		/* There better be a current a_ptr */
 		if (!a_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4748,10 +4770,13 @@ errr parse_a_info(char *buf, header *head)
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
 			    &level, &rarity, &wgt, &cost)) return (PARSE_ERROR_GENERIC);
 
+		/* Get k */
+		for (k = 0; k++; a_ptr->aval[k]);
+		
 		/* Save the values */
 		a_ptr->level = level;
 		a_ptr->rarity = rarity;
-		a_ptr->weight = wgt;
+		if (wgt) { a_ptr->aval[k] = wgt; a_ptr->flags0[ABILITY_WEIGHT/32][k++] = 1L << (ABILITY_WEIGHT %32);}
 		a_ptr->cost = cost;
 	}
 
@@ -4768,11 +4793,15 @@ errr parse_a_info(char *buf, header *head)
 		if (6 != sscanf(buf+2, "%d:%dd%d:%d:%d:%d",
 			    &ac, &hd1, &hd2, &th, &td, &ta)) return (PARSE_ERROR_GENERIC);
 
-		a_ptr->ac = ac;
-		a_ptr->dd = hd1;
-		a_ptr->ds = hd2;
-		if (th) { a_ptr->aval[k] = th; a_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
-		if (td) {a_ptr->aval[k] = td; a_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
+		/* Get k */
+		for (k = 0; k++; a_ptr->aval[k]);
+		
+		if (ac) { a_ptr->aval[k] = ac; a_ptr->flags0[ABILITY_AC/32][k++] = 1L << (ABILITY_AC %32);}
+		if (hd1) { a_ptr->aval[k] = hd1; a_ptr->flags0[ABILITY_DAMAGE_DICE/32][k++] = 1L << (ABILITY_DAMAGE_DICE %32);}
+		if (hd2) { a_ptr->aval[k] = hd2; a_ptr->flags0[ABILITY_DAMAGE_SIDES/32][k++] = 1L << (ABILITY_DAMAGE_SIDES %32);}
+
+		if (th) { a_ptr->aval[k] = th; a_ptr->flags0[ABILITY_TO_HIT/32][k++] = 1L << (ABILITY_TO_HIT %32);}
+		if (td) {a_ptr->aval[k] = td; a_ptr->flags0[ABILITY_TO_DAM/32][k++] = 1L << (ABILITY_TO_DAM %32);}
 		if (ta) {a_ptr->aval[k] = ta; a_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
 	}
 
@@ -5202,8 +5231,8 @@ errr parse_e_info(char *buf, header *head)
 			    &th, &td, &ta, &pv)) return (PARSE_ERROR_GENERIC);
 
 		
-		if (th) { e_ptr->max_aval[k] = th; e_ptr->flags0[ABILITY_TO_HIT_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_HIT_ITEM_ONLY %32);}
-		if (td) {e_ptr->max_aval[k] = td; e_ptr->flags0[ABILITY_TO_DAM_ITEM_ONLY/32][k++] = 1L << (ABILITY_TO_DAM_ITEM_ONLY %32);}
+		if (th) { e_ptr->max_aval[k] = th; e_ptr->flags0[ABILITY_TO_HIT/32][k++] = 1L << (ABILITY_TO_HIT %32);}
+		if (td) {e_ptr->max_aval[k] = td; e_ptr->flags0[ABILITY_TO_DAM/32][k++] = 1L << (ABILITY_TO_DAM %32);}
 		if (ta) {e_ptr->max_aval[k] = ta; e_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
 		if (pv) e_ptr->pval = pv;
 	}
@@ -10804,7 +10833,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "I:%d:%d\n",k_ptr->tval,k_ptr->sval);
 
 	/* Output 'W' for "More Info" (one line only) */
-	fprintf(fp,"W:%d:%d:%d:%ld\n",k_ptr->level, k_ptr->charges, k_ptr->weight, k_ptr->cost);
+	fprintf(fp,"W:%d:%d:%d:%ld\n",k_ptr->level, k_ptr->charges, 0, k_ptr->cost);
 
 	/* Output allocation */
 	for (n = 0; n < 4; n++)
@@ -10818,9 +10847,6 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 
 	/* Terminate */
 	if (introduced) fprintf(fp,"\n");
-
-	/* Output 'P' for "Power" (one line only) */
-	fprintf(fp,"P:%d:%dd%d\n",k_ptr->ac, k_ptr->dd, k_ptr->ds);
 
 	/* Output 'Y' for "Runes" (up to one line only) */
 	if (k_ptr->runest) fprintf(fp, "Y:%d:%d\n",k_ptr->runest, k_ptr->runesc);
@@ -10882,10 +10908,7 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 	fprintf(fp, "I:%d:%d\n",a_ptr->tval,a_ptr->sval);
 
 	/* Output 'W' for "More Info" (one line only) */
-	fprintf(fp,"W:%d:%d:%d:%ld\n",a_ptr->level, a_ptr->rarity, a_ptr->weight, a_ptr->cost);
-
-	/* Output 'P' for "Power" (one line only) */
-	fprintf(fp,"P:%d:%dd%d\n",a_ptr->ac, a_ptr->dd, a_ptr->ds);
+	fprintf(fp,"W:%d:%d:%d:%ld\n",a_ptr->level, a_ptr->rarity, 0, a_ptr->cost);
 
 	/* Output 'A' for "Activation" (one line only) */
 	if (a_ptr->activation) fprintf(fp, "A:%d:%d:%d\n",a_ptr->activation,a_ptr->time,a_ptr->randtime);

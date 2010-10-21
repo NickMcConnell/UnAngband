@@ -1761,51 +1761,6 @@ struct player_type
 	s16b stat_birth[A_MAX];	/* Birth "maximal" stat values */
 
 	s16b timed[TMD_MAX];
-#if 0
-	s16b stat_inc_tim[A_MAX];      /* Timed -- Stat increase */
-	s16b stat_dec_tim[A_MAX];      /* Timed -- Stat decrease */
-
-	s16b fast;      /* Timed -- Fast */
-	s16b slow;      /* Timed -- Slow */
-	s16b blind;     /* Timed -- Blindness */
-	s16b paralyzed; /* Timed -- Paralysis */
-	s16b confused;  /* Timed -- Confusion */
-	s16b afraid;    /* Timed -- Fear */
-	s16b image;     /* Timed -- Hallucination */
-	s16b poisoned;  /* Timed -- Poisoned */
-	s16b cut;       /* Timed -- Cut */
-	s16b stun;      /* Timed -- Stun */
-	s16b cursed;    /* Timed -- Curse */
-	s16b amnesia;	/* Timed -- Amnesia */
-	s16b petrify;	/* Timed -- Petrification */
-	s16b stastis;	/* Timed -- Stastis */
-
-	s16b msleep;	/* Timed -- monster induced sleep */
-	s16b psleep;	/* Timed -- player induced sleep */
-
-	s16b protevil;  /* Timed -- Protection */
-	s16b invis;	    /* Timed -- Invisbility */
-	s16b free_act;  /* Timed -- Free action */
-	s16b hero;      /* Timed -- Heroism */
-	s16b shero;     /* Timed -- Super Heroism */
-	s16b shield;    /* Timed -- Shield Spell */
-	s16b blessed;   /* Timed -- Blessed */
-	s16b tim_invis; /* Timed -- See Invisible */
-	s16b tim_infra; /* Timed -- Infra Vision */
-
-	s16b oppose_acid;       /* Timed -- oppose acid */
-	s16b oppose_elec;       /* Timed -- oppose lightning */
-	s16b oppose_fire;       /* Timed -- oppose heat */
-	s16b oppose_cold;       /* Timed -- oppose cold */
-	s16b oppose_pois;       /* Timed -- oppose poison */
-	s16b slow_poison;       /* Timed -- slow poison */
-	s16b slow_digest;       /* Timed -- slow digestion */
-
-	s16b oppose_water;       /* Timed -- oppose water */
-	s16b oppose_lava;       /* Timed -- oppose lava */
-#endif
-	s16b word_recall;       /* Word of recall counter */
-	s16b word_return;		/* Word of return counter */
 	s16b return_y;			/* Player return location */
 	s16b return_x;			/* Player return location */
 
@@ -1837,6 +1792,8 @@ struct player_type
 
 	u32b disease;	/* Disease types */
 
+	s16b study_slot[MAX_STUDY_BOOK];	/* The inventory slots used to study books */
+	
 	u32b spell_learned1;    /* Spell flags */
 	u32b spell_learned2;    /* Spell flags */
 	u32b spell_learned3;    /* Spell flags */
@@ -1849,6 +1806,10 @@ struct player_type
 	u32b spell_forgotten2;  /* Spell flags */
 	u32b spell_forgotten3;  /* Spell flags */
 	u32b spell_forgotten4;  /* Spell flags */
+	u32b spell_memorised1;  /* Spell flags */
+	u32b spell_memorised2;  /* Spell flags */
+	u32b spell_memorised3;  /* Spell flags */
+	u32b spell_memorised4;  /* Spell flags */
 
 	s16b spell_order[PY_MAX_SPELLS];   /* Spell order */
 
@@ -1887,9 +1848,9 @@ struct player_type
 					   the quiver */
 	s16b pack_size_reduce_bags;		/* Number of inventory slots used by
 					   the bags */
+	s16b pack_size_reduce_study;		/* Number of inventory slots used by
+					   study slots */
 	
-
-
 	s16b target_set;/* Target flag */
 	s16b target_who;/* Target identity */
 	s16b target_row;/* Target location */
@@ -1996,17 +1957,6 @@ struct player_type
 	s16b see_infra; /* Infravision range */
 
 	s16b skills[SKILL_MAX];
-#if 0
-	s16b skill_dis; /* Skill: Disarming */
-	s16b skill_dev; /* Skill: Magic Devices */
-	s16b skill_sav; /* Skill: Saving throw */
-	s16b skill_stl; /* Skill: Stealth factor */
-	s16b skill_dig; /* Skill: Digging */
-	s16b skill_srh; /* Skill: Searching ability */
-	s16b skill_thn; /* Skill: To hit (normal) */
-	s16b skill_thb; /* Skill: To hit (shooting) */
-	s16b skill_tht; /* Skill: To hit (throwing) */
-#endif
 	s16b regen_hp;	/* Hitpoint regeneration rate */
 	s16b regen_mana;/* Mana regeneration rate */
 	s16b glowing;	/* Light radius bonus from items */
