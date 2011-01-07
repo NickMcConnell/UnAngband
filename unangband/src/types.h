@@ -585,12 +585,14 @@ struct object_kind
 	s16b pval;      /* Object extra info */
 	s16b charges;   /* Object charges info */
 
+	s16b ability_count;	
 	s16b aval[MAX_AVALS_KIND];	/* Object ability info */
+	s16b ability[MAX_AVALS_KIND];	/*Object ability info */
 
 	s32b cost;      /* Object "base cost" */
-
+#if 0
 	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_KIND];	/* Abilities */
-	
+#endif	
 	u32b flags1;    /* Flags, set 1 */
 	u32b flags2;    /* Flags, set 2 */
 	u32b flags3;    /* Flags, set 3 */
@@ -692,12 +694,14 @@ struct artifact_type
 
 	s16b pval;      /* Artifact extra info */
 
+	s16b ability_count;
 	s16b aval[MAX_AVALS_ARTIFACT];	/* Artifact ability info */
+	s16b ability[MAX_AVALS_ARTIFACT];
 	
 	s32b cost;      /* Artifact "cost" */
-
+#if 0
 	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_ARTIFACT];	/* Abilities */
-
+#endif
 	u32b flags1;    /* Artifact Flags, set 1 */
 	u32b flags2;    /* Artifact Flags, set 2 */
 	u32b flags3;    /* Artifact Flags, set 3 */
@@ -748,12 +752,14 @@ struct ego_item_type
 	byte xtra;      /* Extra Sustain/Resist/Power */
 
 	s16b pval;
+	s16b ability_count;
 	s16b max_aval[MAX_AVALS_EGO_ITEM];	/* Ego item ability info */
+	s16b ability[MAX_AVALS_EGO_ITEM];
 	
 	s32b cost;      /* Ego-item "cost" */
-
+#if 0
 	u32b flags0[ABILITY_ARRAY_SIZE][MAX_AVALS_EGO_ITEM];	/* Abilities */
-
+#endif
 	u32b flags1;    /* Ego-Item Flags, set 1 */
 	u32b flags2;    /* Ego-Item Flags, set 2 */
 	u32b flags3;    /* Ego-Item Flags, set 3 */
@@ -1109,22 +1115,16 @@ struct object_type
 	byte number;    /* Number of items */
 	byte spare;	/* Spare */
 
-	s16b weight;    /* Item weight */
-
 	byte name1;     /* Artifact type, if any */
 	byte name2;     /* Ego-Item type, if any */
 
 	byte xtra1;     /* Extra info type */
 	byte xtra2;     /* Extra info index */
 
+	s16b ability_count;
 	s16b aval[MAX_AVALS_OBJECT];	/* Object ability info */
+	s16b ability[MAX_AVALS_OBJECT];
 	
-	byte aval_index[MAX_AVALS_OBJECT]; /* Match for each index */
-	
-	s16b ac;/* Normal AC */
-
-	byte dd, ds;    /* Damage dice/sides */
-
 	s16b charges;	/* Item charges */
 	s16b timeout;   /* Timeout Counter */
 

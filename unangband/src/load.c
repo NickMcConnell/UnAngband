@@ -257,12 +257,16 @@ static void strip_bytes(int n)
  */
 static errr rd_item(object_type *o_ptr)
 {
-	int i;
-	s16b aval = 0;
+	int i, j, k;
+	s16b weight;
+	s16b ac;
+	byte dd;
+	byte ds;
 	s16b ability = 0;
 	s16b to_h = 0;
 	s16b to_d = 0;
 	s16b to_a = 0;
+	s16b pval = 0;
 
 	object_kind *k_ptr;
 
@@ -284,7 +288,8 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->sval);
 
 	/* Special pval */
-	rd_s16b(&o_ptr->pval);
+	rd_s16b(&pval);
+	o_ptr->pval = pval;
 
 	/* Special stack counter */
 	rd_byte(&o_ptr->stackc);
@@ -296,7 +301,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->spare);
 
 	rd_byte(&o_ptr->number);
-	rd_s16b(&o_ptr->weight);
+	if (older_than(0, 6, 4, 3))	rd_s16b(&weight);
 
 	rd_byte(&o_ptr->name1);
 	rd_byte(&o_ptr->name2);
@@ -318,12 +323,10 @@ static errr rd_item(object_type *o_ptr)
 		rd_s16b(&to_h);
 		rd_s16b(&to_d);
 		rd_s16b(&to_a);
+		rd_s16b(&ac);
+		rd_byte(&dd);
+		rd_byte(&ds);
 	}
-
-	rd_s16b(&o_ptr->ac);
-
-	rd_byte(&o_ptr->dd);
-	rd_byte(&o_ptr->ds);
 
 	if (older_than(0, 6, 4, 3))
 	{
@@ -358,12 +361,12 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->xtra2);
 
 	/* Read the aval information */
-	if (!older_than(0, 6, 4, 3)) rd_s16b(&aval);
-	for (i = 0; i < aval; i++) rd_s16b(&o_ptr->aval[i]);
-	for (i = 0; i < aval; i++) rd_byte(&o_ptr->aval_index[i]);
+	if (!older_than(0, 6, 4, 3)) rd_s16b(&o_ptr->ability_count);
+	for (i = 0; i < o_ptr->ability_count; i++) rd_s16b(&o_ptr->aval[i]);
+	for (i = 0; i < o_ptr->ability_count; i++) rd_s16b(&o_ptr->ability[i]);
 	
 	if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
-		
+	
 	/* Flags we have learnt about an item */
 	for (i = 0; i < ability; i++) rd_u32b(&o_ptr->can_flags0[i]);	
 	rd_u32b(&o_ptr->can_flags1);
@@ -389,6 +392,163 @@ static errr rd_item(object_type *o_ptr)
 		/* Fix up free action */
 		if (o_ptr->can_flags3 & (TR3_OLD_FREE_ACT)) o_ptr->can_flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
 		o_ptr->can_flags3 &= ~(TR3_OLD_FREE_ACT);
+
+		/* Get abilities - artifact */
+		if (o_ptr->name1)
+		{
+			artifact_type *a_ptr = &a_info[o_ptr->name1];
+			
+			for (i = 0; i < a_ptr->ability_count; i++)
+			{
+				switch(a_ptr->ability[i])
+				{
+					case ABILITY_WEIGHT:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], weight);
+						break;
+					case ABILITY_DAMAGE_DICE:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], dd);
+						break;
+					case ABILITY_DAMAGE_SIDES:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], ds);
+						break;
+					case ABILITY_AC:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], ac);
+						break;
+					case ABILITY_TO_AC:
+					case ABILITY_TO_AC_MELEE:
+					case ABILITY_TO_AC_RANGED:
+					case ABILITY_TO_AC_BLOCK:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], to_a);
+						break;
+					case ABILITY_TO_HIT:
+					case ABILITY_TO_HIT_THROW:
+					case ABILITY_TO_HIT_MELEE:
+					case ABILITY_TO_HIT_BOW:
+					case ABILITY_TO_HIT_UNARM:
+					case ABILITY_TO_HIT_TRAP:
+					case ABILITY_TO_HIT_RESIST:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], to_h);
+						break;
+					case ABILITY_TO_DAM:
+					case ABILITY_TO_DAM_THROW:
+					case ABILITY_TO_DAM_MELEE:
+					case ABILITY_TO_DAM_BOW:
+					case ABILITY_TO_DAM_UNARM:
+					case ABILITY_TO_DAM_TRAP:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], to_d);
+						break;
+/*
+					case ABILITY_BRAND_HOLY:
+					case ABILITY_BRAND_FIRE:
+					case ABILITY_BRAND_COLD:
+					case ABILITY_BRAND_ACID:
+					case ABILITY_BRAND_ELEC:
+					case ABILITY_BRAND_POIS:
+					case ABILITY_BRAND_LITE:
+					case ABILITY_BRAND_DARK:
+					case ABILITY_SLAY_DRAGON:
+					case ABILITY_SLAY_UNDEAD:
+					case ABILITY_SLAY_DEMON:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], 3);
+						break;
+						
+					case ABILITY_SLAY_ANIMAL:
+					case ABILITY_SLAY_ORC:
+					case ABILITY_SLAY_TROLL:
+					case ABILITY_SLAY_GIANT:
+					case ABILITY_SLAY_DWARF:
+					case ABILITY_SLAY_ELF:
+					case ABILITY_SLAY_MAN:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], 4);
+*/
+					default:
+						object_ability_add_one(o_ptr, a_ptr->ability[i], a_ptr->aval[i]);
+				}				
+			}
+		}
+		
+		/* Get abilities - ego item */
+		if (o_ptr->name2)
+		{
+			ego_item_type *e_ptr = &e_info[o_ptr->name2];
+			
+			for (i = 0; i < e_ptr->ability_count; i++)
+			{
+				switch(e_ptr->ability[i])
+				{
+					case ABILITY_WEIGHT:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], weight);
+						break;
+					case ABILITY_DAMAGE_DICE:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], dd);
+						break;
+					case ABILITY_DAMAGE_SIDES:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], ds);
+						break;
+					case ABILITY_AC:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], ac);
+						break;
+					case ABILITY_TO_AC:
+					case ABILITY_TO_AC_MELEE:
+					case ABILITY_TO_AC_RANGED:
+					case ABILITY_TO_AC_BLOCK:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], to_a);
+						break;
+					case ABILITY_TO_HIT:
+					case ABILITY_TO_HIT_THROW:
+					case ABILITY_TO_HIT_MELEE:
+					case ABILITY_TO_HIT_BOW:
+					case ABILITY_TO_HIT_UNARM:
+					case ABILITY_TO_HIT_TRAP:
+					case ABILITY_TO_HIT_RESIST:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], to_h);
+						break;
+					case ABILITY_TO_DAM:
+					case ABILITY_TO_DAM_THROW:
+					case ABILITY_TO_DAM_MELEE:
+					case ABILITY_TO_DAM_BOW:
+					case ABILITY_TO_DAM_UNARM:
+					case ABILITY_TO_DAM_TRAP:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], to_d);
+						break;
+					case ABILITY_SLAY_DRAGON:
+					case ABILITY_SLAY_UNDEAD:
+					case ABILITY_SLAY_DEMON:
+						if (e_ptr->max_aval[i] >= 4)
+						{
+							object_ability_add_one(o_ptr, e_ptr->ability[i], 5);
+						}
+						else
+						{
+							object_ability_add_one(o_ptr, e_ptr->ability[i], 3);
+						}
+						break;
+					case ABILITY_BRAND_HOLY:
+					case ABILITY_BRAND_FIRE:
+					case ABILITY_BRAND_COLD:
+					case ABILITY_BRAND_ACID:
+					case ABILITY_BRAND_ELEC:
+					case ABILITY_BRAND_POIS:
+					case ABILITY_BRAND_LITE:
+					case ABILITY_BRAND_DARK:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], 3);
+						break;
+						
+					case ABILITY_SLAY_ANIMAL:
+					case ABILITY_SLAY_ORC:
+					case ABILITY_SLAY_TROLL:
+					case ABILITY_SLAY_GIANT:
+					case ABILITY_SLAY_DWARF:
+					case ABILITY_SLAY_ELF:
+					case ABILITY_SLAY_MAN:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], 4);
+			
+					default:
+						object_ability_add_one(o_ptr, e_ptr->ability[i], pval);
+				}				
+			}
+		}
+		
 		
 		/* Can flags to abilities */
 		o_ptr->can_flags0[0] = o_ptr->can_flags1 & ~(TR1_OLD_FLAGS);
@@ -516,16 +676,6 @@ static errr rd_item(object_type *o_ptr)
 
 		/* Hack -- extract the "broken" flag */
 		if (!e_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
-
-		/* Mega-Hack - Enforce the special broken items */
-		if ((o_ptr->name2 == EGO_BLASTED) ||
-			(o_ptr->name2 == EGO_SHATTERED))
-		{
-			/* These were set to k_info values by preceding code */
-			o_ptr->ac = 0;
-			o_ptr->dd = 0;
-			o_ptr->ds = 0;
-		}
 	}
 
 	/* Hack -- clear empty slots */
@@ -1492,9 +1642,6 @@ static errr rd_randarts(void)
 		byte ds = 0;
 		s16b weight = 0;
 		
-		s16b aval = 0;
-		s16b ability = 0;
-		
 		rd_byte(&a_ptr->tval);
 		rd_byte(&a_ptr->sval);
 
@@ -1508,27 +1655,28 @@ static errr rd_randarts(void)
 		if (older_than(0, 6, 4, 3))
 		{
 			rd_s16b(&pval);
-			rd_s16b(&to_h);
-			rd_s16b(&to_d);
-			rd_s16b(&to_a);
+			rd_s16b(&to_h);  if (to_h) {a_ptr->aval[a_ptr->ability_count] = to_h; a_ptr->aval[a_ptr->ability_count++] = ABILITY_TO_HIT;}
+			rd_s16b(&to_d);  if (to_d) {a_ptr->aval[a_ptr->ability_count] = to_d; a_ptr->aval[a_ptr->ability_count++] = ABILITY_TO_DAM;}
+			rd_s16b(&to_a);  if (to_a) {a_ptr->aval[a_ptr->ability_count] = to_a; a_ptr->aval[a_ptr->ability_count++] = ABILITY_TO_AC;}
 			
-			rd_s16b(&ac);
+			rd_s16b(&ac);  if (ac) {a_ptr->aval[a_ptr->ability_count] = ac; a_ptr->aval[a_ptr->ability_count++] = ABILITY_AC;}
 
-			rd_byte(&dd);
-			rd_byte(&ds);
+			rd_byte(&dd);  if (dd) {a_ptr->aval[a_ptr->ability_count] = dd; a_ptr->aval[a_ptr->ability_count++] = ABILITY_DAMAGE_DICE;}
+			rd_byte(&ds);  if (ds) {a_ptr->aval[a_ptr->ability_count] = ds; a_ptr->aval[a_ptr->ability_count++] = ABILITY_DAMAGE_SIDES;}
 
 			rd_s16b(&weight);
 		}
 		rd_s32b(&a_ptr->cost);
 
 		/* Read the aval information */
-		if (!older_than(0, 6, 4, 3)) rd_s16b(&aval);
-		for (j = 0; j < aval; j++) rd_s16b(&a_ptr->aval[j]);
+		if (!older_than(0, 6, 4, 3))
+		{
+			rd_s16b(&a_ptr->ability_count);
+			for (j = 0; j < a_ptr->ability_count; j++) rd_s16b(&a_ptr->aval[j]);
+			for (j = 0; j < a_ptr->ability_count; j++) rd_s16b(&a_ptr->ability[j]);
+		}
 
-		if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
-			
 		/* Flags we have learnt about an item */
-		for (k = 0; k < aval; k++) for (j = 0; j < ability; j++) rd_u32b(&a_ptr->flags0[j][k]);	
 		rd_u32b(&a_ptr->flags1);
 		rd_u32b(&a_ptr->flags2);
 		rd_u32b(&a_ptr->flags3);
@@ -1541,12 +1689,105 @@ static errr rd_randarts(void)
 			if (a_ptr->flags3 & (TR3_OLD_FREE_ACT)) a_ptr->flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
 			a_ptr->flags3 &= ~(TR3_OLD_FREE_ACT);
 			
-			/* Can flags to abilities */
-			a_ptr->flags0[0][0] = a_ptr->flags1 & ~(TR1_OLD_FLAGS);
-			a_ptr->flags0[1][0] = a_ptr->flags2 & ~(TR2_OLD_FLAGS);
-			a_ptr->flags0[2][0] = a_ptr->flags3 & ~(TR3_OLD_FLAGS);
-			a_ptr->flags0[3][0] = a_ptr->flags4 & ~(TR4_OLD_FLAGS);
+			/* Flags to abilities */
+			for (j = 0, k = 1L; j < 32; j++, k <<= 1)
+			{
+				if (((a_ptr->flags1 & (k)) != 0) && (((TR1_OLD_FLAGS) & (k)) == 0))
+				{
+					a_ptr->aval[a_ptr->ability_count] = pval;
+					
+					/* Hack -- override some pvals */
+					switch (j)
+					{
+						case ABILITY_BRAND_HOLY:
+						case ABILITY_BRAND_FIRE:
+						case ABILITY_BRAND_COLD:
+						case ABILITY_BRAND_ACID:
+						case ABILITY_BRAND_ELEC:
+						case ABILITY_BRAND_POIS:
+						case ABILITY_SLAY_DRAGON:
+						case ABILITY_SLAY_UNDEAD:
+						case ABILITY_SLAY_DEMON:
+							a_ptr->aval[a_ptr->ability_count] = 3;
+							break;
+							
+						case ABILITY_SLAY_ANIMAL:
+						case ABILITY_SLAY_ORC:
+						case ABILITY_SLAY_TROLL:
+						case ABILITY_SLAY_GIANT:
+							a_ptr->aval[a_ptr->ability_count] = 4;
+					}
+					
+					a_ptr->aval[a_ptr->ability_count++] = j;
+					
+					/* Hack -- old high slays/stat bonuses */
+					switch (j)
+					{
+					/* Stat bonuses */
+					case ABILITY_STR:
+						a_ptr->aval[a_ptr->ability_count] = pval;
+						a_ptr->ability[a_ptr->ability_count] = ABILITY_SIZ;
+						break;
+					case ABILITY_DEX:
+						a_ptr->aval[a_ptr->ability_count] = pval;
+						a_ptr->ability[a_ptr->ability_count] = ABILITY_AGI;
+						break;
+						
+					/* Old high slays */
+					case ABILITY_SIZ: /* Old slay xxx */
+						a_ptr->aval[--a_ptr->ability_count] = 5;
+						a_ptr->ability[a_ptr->ability_count++] = ABILITY_SLAY_DRAGON;
+						break;
+					case ABILITY_AGI: /* Old slay xxx */
+						a_ptr->aval[--a_ptr->ability_count] = 5;
+						a_ptr->ability[a_ptr->ability_count++] = ABILITY_SLAY_DEMON;
+						break;
+					case ABILITY_DISARM: /* Old slay xxx */
+						a_ptr->aval[--a_ptr->ability_count] = 5;
+						a_ptr->ability[a_ptr->ability_count++] = ABILITY_SLAY_UNDEAD;
+						break;
+						
+					}
+				}
+				
+				if (((a_ptr->flags2 & (k)) != 0) && (((TR2_OLD_FLAGS) & (k)) == 0))
+				{
+					a_ptr->aval[a_ptr->ability_count] = pval;
+					
+					/* Hack -- override some pvals */
+					if (j >= ABILITY_RESIST_ACID -32) a_ptr->aval[a_ptr->ability_count] = 1;
+					
+					a_ptr->aval[a_ptr->ability_count++] = j + 32;
+				}
 
+				if (((a_ptr->flags3 & (k)) != 0) && (((TR3_OLD_FLAGS) & (k)) == 0))
+				{
+					a_ptr->aval[a_ptr->ability_count] = pval;
+					a_ptr->aval[a_ptr->ability_count++] = j + 64;
+				}
+
+				if (((a_ptr->flags4 & (k)) != 0) && (((TR4_OLD_FLAGS) & (k)) == 0))
+				{
+					a_ptr->aval[a_ptr->ability_count] = pval;
+					
+					/* Hack -- override some pvals */
+					switch (j + 96)
+					{
+						case ABILITY_BRAND_LITE:
+						case ABILITY_BRAND_DARK:
+							a_ptr->aval[a_ptr->ability_count] = 3;
+							break;
+							
+						case ABILITY_SLAY_DWARF:
+						case ABILITY_SLAY_ELF:
+						case ABILITY_SLAY_MAN:
+							a_ptr->aval[a_ptr->ability_count] = 4;
+					}
+					
+					a_ptr->aval[a_ptr->ability_count++] = j + 96;
+				}
+			}
+			
 			/* Can flags - fix */
 			a_ptr->flags1 &= (TR1_OLD_FLAGS);
 			a_ptr->flags2 &= (TR2_OLD_FLAGS);
@@ -1632,7 +1873,7 @@ static errr rd_inventory(void)
 			object_copy(&inventory[n], i_ptr);
 
 			/* Add the weight */
-			p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
+			p_ptr->total_weight += (i_ptr->number * object_aval(i_ptr, ABILITY_WEIGHT));
 
 			/* One more item */
 			if (!IS_QUIVER_SLOT(n)) p_ptr->equip_cnt++;
@@ -1664,7 +1905,7 @@ static errr rd_inventory(void)
 			if (!k_info[i_ptr->k_idx].flavor) k_info[i_ptr->k_idx].aware |= (AWARE_EXISTS);
 
 			/* Add the weight */
-			p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
+			p_ptr->total_weight += (i_ptr->number * object_aval(i_ptr, ABILITY_WEIGHT));
 
 			/* One more item */
 			p_ptr->inven_cnt++;

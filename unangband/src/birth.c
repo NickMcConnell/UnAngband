@@ -787,7 +787,7 @@ static void player_outfit(void)
 					}
 
 					/* Increase the weight by hand */
-					p_ptr->total_weight += (i_ptr->weight * i_ptr->number);
+					p_ptr->total_weight += (object_aval(i_ptr, ABILITY_WEIGHT) * i_ptr->number);
 
 					/* Compute quiver size */
 					find_quiver_size();
@@ -818,7 +818,7 @@ static void player_outfit(void)
 				p_ptr->equip_cnt++;
 
 				/* Increase the weight */
-				p_ptr->total_weight += o_ptr->weight;
+				p_ptr->total_weight += object_aval(i_ptr, ABILITY_WEIGHT);
 
 				/* Hack -- Set a unique show_idx */
 				o_ptr->show_idx = show_idx++;

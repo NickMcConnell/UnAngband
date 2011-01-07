@@ -1299,7 +1299,7 @@ s32b object_value_real(const object_type *o_ptr)
 		case TV_DRAG_ARMOR:
 		{
 			/* Factor in the bonuses not considered by power equation */
-			value += object_aval(o_ptr, ABILITY_TO_AC) <= o_ptr->ac ? object_aval(o_ptr, ABILITY_TO_AC) * 100L : o_ptr->ac * 100L;
+			value += object_aval(o_ptr, ABILITY_TO_AC) <= object_aval(o_ptr, ABILITY_AC) ? object_aval(o_ptr, ABILITY_TO_AC) * 100L : object_aval(o_ptr, ABILITY_AC) * 100L;
 
 			break;
 		}
@@ -1332,7 +1332,7 @@ s32b object_value_real(const object_type *o_ptr)
 		{
 			/* Factor in the bonuses not considered by power equation */
 			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_HIT_BOW)) * 100L, 1200L);
-			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + object_aval(o_ptr, ABILITY_DAMAGE_DICE)) * 100L);
 			break;
 		}
 
@@ -1343,7 +1343,7 @@ s32b object_value_real(const object_type *o_ptr)
 		{
 			/* Factor in the bonuses not considered by power equation */
 			value += MIN((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_HIT_BOW)) * 100L, 1200L);
-			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, (o_ptr->ds + o_ptr->dd) * 100L);
+			value += MIN((object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_DAM_BOW)) * 100L, (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + object_aval(o_ptr, ABILITY_DAMAGE_DICE)) * 100L);
 
 			/* Done */
 			break;
@@ -1899,9 +1899,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			if (o_ptr->name2 != j_ptr->name2) return (FALSE);
 
 			/* Require identical "values" */
-			if (o_ptr->ac != j_ptr->ac) return (FALSE);
-			if (o_ptr->dd != j_ptr->dd) return (FALSE);
-			if (o_ptr->ds != j_ptr->ds) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_AC) != j_ptr->ac) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_DAMAGE_DICE) != j_ptr->dd) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) != j_ptr->ds) return (FALSE);
 
 			/* Probably okay */
 			break;
@@ -2330,18 +2330,26 @@ void object_prep(object_type *o_ptr, int k_idx)
 	/* Default stack count */
 	o_ptr->stackc = 0;
 
-	/* Default weight */
-	o_ptr->weight = k_ptr->weight;
-
-	/* Default magic */
-	o_ptr->to_h = k_ptr->to_h;
-	o_ptr->to_d = k_ptr->to_d;
-	o_ptr->to_a = k_ptr->to_a;
-
-	/* Default power */
-	o_ptr->ac = k_ptr->ac;
-	o_ptr->dd = k_ptr->dd;
-	o_ptr->ds = k_ptr->ds;
+	/* Initialize the object ability values */
+	for (i = 0; i < MAX_AVALS_KIND; i++)
+	{
+		o_ptr->aval[i] = k_ptr->aval[i];
+		o_ptr->aval_index[i] = (AVAL_IDX_KIND);
+	}
+	
+	/* Clear out the 'tail' of empty values */
+	for (i = MAX_AVALS_KIND; i >= 0; i--)
+	{
+		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
+		{
+			if (k_ptr->flags0[i][j]) break;
+		}
+		
+		if (j != ABILITY_ARRAY_SIZE) break;
+		
+		o_ptr->aval[i] = 0;
+		o_ptr->aval_index[i] = 0;
+	}
 
 	/* Hack -- worthless items are always "broken" */
 	/*if (k_ptr->cost <= 0) o_ptr->ident |= (IDENT_BROKEN);*/
@@ -2561,7 +2569,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 				/* Increase to_d; not above weapon dice */
 				if (((o_ptr->to_d) && (sign > 0 ? o_ptr->to_d > 0 : o_ptr->to_d < 0))
-				    && o_ptr->to_d + sign < (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5))
+				    && o_ptr->to_d + sign < (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5))
 				  o_ptr->to_d += sign;
 				else tryagain = TRUE;
 
@@ -2571,7 +2579,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 
 				/* Increase to_a */
 				if (((o_ptr->to_a) && (sign > 0 ? o_ptr->to_a > 0 : o_ptr->to_a < 0))
-				    && ((o_ptr->to_a + sign < o_ptr->ac + 5) || o_ptr->tval == TV_CROWN))
+				    && ((o_ptr->to_a + sign < object_aval(o_ptr, ABILITY_AC) + 5) || o_ptr->tval == TV_CROWN))
 				  o_ptr->to_a += sign;
 				else tryagain = TRUE;
 
@@ -2606,7 +2614,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 				if ((power > 0) && ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
 				|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
 				|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF)))
-					 o_ptr->dd++;
+					 object_aval(o_ptr, ABILITY_DAMAGE_DICE)++;
 				else tryagain = TRUE;
 
 				break;
@@ -2617,7 +2625,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 				if ((power > 0) && ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
 				|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
 				|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF)))
-					 o_ptr->ds++;
+					 object_aval(o_ptr, ABILITY_DAMAGE_SIDES)++;
 				else tryagain = TRUE;
 
 				break;
@@ -2640,13 +2648,13 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 				}
 				case 3: case 4: case 5:
 				{
-					if ((sign > 0) && (o_ptr->to_d > 0) && (o_ptr->to_d < 10)) o_ptr->to_d = MIN(o_ptr->dd * o_ptr->ds + 5, 10);
+					if ((sign > 0) && (o_ptr->to_d > 0) && (o_ptr->to_d < 10)) o_ptr->to_d = MIN(object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5, 10);
 					else if ((sign < 0) && (o_ptr->to_d < 0) && (o_ptr->to_d > -10)) o_ptr->to_d = -10;
 					break;
 				}
 				case 6: case 7: case 8:
 				{
-					if ((sign > 0) && (o_ptr->to_a > 0) && (o_ptr->to_a < 10)) o_ptr->to_a = MIN(o_ptr->ac + 5, 10);
+					if ((sign > 0) && (o_ptr->to_a > 0) && (o_ptr->to_a < 10)) o_ptr->to_a = MIN(object_aval(o_ptr, ABILITY_AC) + 5, 10);
 					else if ((sign < 0) && (o_ptr->to_a < 0) && (o_ptr->to_a > -10)) o_ptr->to_a = -10;
 					break;
 				}
@@ -2666,8 +2674,8 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 3: case 4: case 5: o_ptr->to_d -= sign; break;
 			case 6: case 7: case 8: o_ptr->to_a -= sign; break;
 			case 9: o_ptr->pval -= sign; break;
-			case 10: o_ptr->dd--; break;
-			case 11: o_ptr->ds--; break;
+			case 10: object_aval(o_ptr, ABILITY_DAMAGE_DICE)--; break;
+			case 11: object_aval(o_ptr, ABILITY_DAMAGE_SIDES)--; break;
 		}
 	}
 }
@@ -3296,7 +3304,7 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 		/* Enchant */
 		o_ptr->to_h += tohit1;
 		o_ptr->to_d = MIN(o_ptr->to_d + todam1,
-				  (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5));
+				  (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5));
 
 		/* Very good */
 		if (power > 1)
@@ -3304,7 +3312,7 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 			/* Enchant again */
 			o_ptr->to_h += tohit2;
 			o_ptr->to_d = MIN(o_ptr->to_d + todam2,
-					  (o_ptr->tval == TV_BOW ? 15 : o_ptr->dd * o_ptr->ds + 5));
+					  (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5));
 		}
 	}
 
@@ -3365,24 +3373,24 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 			if (power > 1)
 			{
 				/* Hack -- Super-charge the damage dice */
-				while ((o_ptr->dd * o_ptr->ds > 0) &&
+				while ((object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) > 0) &&
 				       (rand_int(15) == 0))
 				{
-					o_ptr->dd++;
+					object_aval(o_ptr, ABILITY_DAMAGE_DICE)++;
 				}
 
 				/* Hack -- Limit the damage dice to max of 9*/
-				if (o_ptr->dd > 9) o_ptr->dd = 9;
+				if (object_aval(o_ptr, ABILITY_DAMAGE_DICE) > 9) object_aval(o_ptr, ABILITY_DAMAGE_DICE) = 9;
 
 				/* Hack -- Super-charge the damage sides */
-				while ((o_ptr->dd * o_ptr->ds > 0) &&
+				while ((object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) > 0) &&
 				       (rand_int(15) == 0))
 				{
-					o_ptr->ds++;
+					object_aval(o_ptr, ABILITY_DAMAGE_SIDES)++;
 				}
 
 				/* Hack -- Limit the damage dice to max of 9*/
-				if (o_ptr->ds > 9) o_ptr->ds = 9;
+				if (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) > 9) object_aval(o_ptr, ABILITY_DAMAGE_SIDES) = 9;
 			}
 
 			break;
@@ -3397,14 +3405,14 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 			if (power > 1)
 			{
 				/* Hack -- super-charge the damage side */
-				while ((o_ptr->dd * o_ptr->ds > 0) &&
+				while ((object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) > 0) &&
 				       (rand_int(25) == 0))
 				{
-					o_ptr->ds++;
+					object_aval(o_ptr, ABILITY_DAMAGE_SIDES)++;
 				}
 
 				/* Hack -- restrict the damage side */
-				if (o_ptr->ds > 9) o_ptr->ds = 9;
+				if (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) > 9) object_aval(o_ptr, ABILITY_DAMAGE_SIDES) = 9;
 			}
 
 			break;
@@ -3430,13 +3438,13 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 	if (power > 0)
 	{
 		/* Enchant */
-		o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : o_ptr->ac + toac1, o_ptr->to_a + 5 + toac1);
+		o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : object_aval(o_ptr, ABILITY_AC) + toac1, o_ptr->to_a + 5 + toac1);
 
 		/* Very good */
 		if (power > 1)
 		{
 			/* Enchant again */
-			o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : o_ptr->ac + toac2, o_ptr->to_a + 5 + toac2);
+			o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : object_aval(o_ptr, ABILITY_AC) + toac2, o_ptr->to_a + 5 + toac2);
 		}
 	}
 
@@ -3887,7 +3895,7 @@ static void a_m_aux_4(object_type *o_ptr, int level, int power)
 		case TV_EGG:
 		{
 			/* Hack -- eggs/spores will hatch */
-			if (o_ptr->name3 > 0) o_ptr->timeout = o_ptr->weight * damroll(2,6) * 10;
+			if (o_ptr->name3 > 0) o_ptr->timeout = object_aval(o_ptr, ABILITY_WEIGHT) * damroll(2,6) * 10;
 		}
 	}
 }
@@ -4608,15 +4616,19 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 
 		/* Extract the other fields */
 		o_ptr->pval = a_ptr->pval;
-		o_ptr->ac = a_ptr->ac;
-		o_ptr->dd = a_ptr->dd;
-		o_ptr->ds = a_ptr->ds;
-		o_ptr->to_a = MIN(a_ptr->to_a,
-				  a_ptr->ac + 5);
-		o_ptr->to_h = a_ptr->to_h;
-		o_ptr->to_d = MIN(a_ptr->to_d,
-				  (a_ptr->tval == TV_BOW ? 15 : a_ptr->dd * a_ptr->ds + 5));
-		o_ptr->weight = a_ptr->weight;
+		
+		/* Set first object flag */
+		k = 0;
+		
+		/* Extract artifact ability values */
+		for (i = 0; i < MAX_AVALS_ARTIFACT; i++)
+		{
+			u32b f0[ABILITY_ARRAY_SIZE];
+			
+			for (j = 0; j < ABILITY_ARRAY_SIZE; j++) f0[j] = a_ptr->flags0[j]
+			
+			object_ability_add(o_ptr, f0, a_ptr->aval[i], AVAL_IDX_ARTIFACT, &k);
+		}			
 
 		/* Hack -- extract the "broken" flag */
 		if (!a_ptr->cost) o_ptr->ident |= (IDENT_BROKEN);
@@ -4772,12 +4784,12 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		if (e_ptr->max_to_d > 0)
 			o_ptr->to_d = MIN(MAX(o_ptr->to_d, (s16b)randint(e_ptr->max_to_d)),
 									(o_ptr->tval == TV_BOW
-									 ? 15 : o_ptr->dd * o_ptr->ds + 5));
+									 ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5));
 		else if (e_ptr->max_to_d < 0) o_ptr->to_d -= (s16b)randint(-e_ptr->max_to_d);
 
 		if (e_ptr->max_to_a > 0)
 			o_ptr->to_a = MIN(MAX(o_ptr->to_a, (s16b)randint(e_ptr->max_to_a)),
-									o_ptr->ac + 5);
+									object_aval(o_ptr, ABILITY_AC) + 5);
 		else if (e_ptr->max_to_a < 0) o_ptr->to_a -= (s16b)randint(-e_ptr->max_to_a);
 
 		if (e_ptr->max_pval > 0)
@@ -8636,7 +8648,7 @@ void inven_item_increase(int item, int num)
 		}
 
 		/* Add the weight */
-		p_ptr->total_weight += (num * o_ptr->weight);
+		p_ptr->total_weight += (num * object_aval(o_ptr, ABILITY_WEIGHT));
 
 		/* Update "p_ptr->pack_size_reduce" */
 		if (IS_QUIVER_SLOT(item)) find_quiver_size();
@@ -8908,7 +8920,7 @@ s16b inven_carry(object_type *o_ptr)
 			object_absorb(j_ptr, o_ptr, FALSE);
 
 			/* Increase the weight */
-			p_ptr->total_weight += (o_ptr->number * o_ptr->weight);
+			p_ptr->total_weight += (o_ptr->number * object_aval(o_ptr, ABILITY_WEIGHT));
 
 			/* Recalculate bonuses */
 			p_ptr->update |= (PU_BONUS);

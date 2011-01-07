@@ -6007,7 +6007,7 @@ static void process_move(int m_idx, int ty, int tx, bool bash)
 				if ((o_ptr->tval >= TV_GOLD) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_TOWN)) != 0)) continue;
 
 				/* Sneaky monsters hide behind big objects */
-				if ((o_ptr->weight > 1500)
+				if ((object_aval(o_ptr, ABILITY_WEIGHT) > 1500)
 					&& (r_ptr->flags2 & (RF2_SNEAKY))
 					&& !(m_ptr->mflag & (MFLAG_HIDE)))
 				{
@@ -6830,7 +6830,7 @@ static void process_monster(int m_idx)
 				object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 0);
 
 				/* Dump a message */
-				if ((o_ptr->tval == TV_BONE) || ((o_ptr->tval == TV_BODY) && (o_ptr->weight > r_ptr->level))) msg_format("%^s chews on %s.", m_name, o_name);
+				if ((o_ptr->tval == TV_BONE) || ((o_ptr->tval == TV_BODY) && (object_aval(o_ptr, ABILITY_WEIGHT) > r_ptr->level))) msg_format("%^s chews on %s.", m_name, o_name);
 
 				/* Dump a message */
 				else msg_format("%^s swallows %s.", m_name, o_name);
@@ -6851,9 +6851,9 @@ static void process_monster(int m_idx)
 			/* Break up skeletons */
 			if ((o_ptr->tval == TV_BONE) && (o_ptr->sval == SV_BONE_SKELETON))
 			{
-				part = rand_int(5) + 3;
+				part = rand_int(5) + 4;
 				o_ptr->sval = SV_BONE_BONE;
-				o_ptr->weight /= part + 1;
+				object_ability_div_one(o_ptr, ABILITY_WEIGHT, part);
 
 				for (i = 0; i < part; i++)
 				{
@@ -6862,10 +6862,10 @@ static void process_monster(int m_idx)
 			}
 
 			/* Partially eat bodies */
-			else if ((o_ptr->tval == TV_BODY) && (o_ptr->weight > amount))
+			else if ((o_ptr->tval == TV_BODY) && (object_aval(o_ptr, ABILITY_WEIGHT) > amount))
 			{
-				part = (o_ptr->weight - amount) * 100 / o_ptr->weight;
-				o_ptr->weight -= amount;
+				part = (object_aval(o_ptr, ABILITY_WEIGHT) - amount) * 100 / object_aval(o_ptr, ABILITY_WEIGHT);
+				object_ability_add_one(o_ptr, ABILITY_WEIGHT, -amount);
 
 				switch (o_ptr->sval)
 				{
@@ -7783,7 +7783,7 @@ static void recover_monster(int m_idx, bool regen)
 					i_ptr->timeout = 66 /* 6 */;
 					
 					/* Set weight */
-					i_ptr->weight *= 15;
+					object_ability_add_one(i_ptr, ABILITY_WEIGHT, object_aval(i_ptr, ABILITY_WEIGHT) * 14);
 					
 					/* Set race */
 					i_ptr->name3 = poly_r_idx(y, x, m_ptr->r_idx, TRUE, FALSE, FALSE);

@@ -479,7 +479,7 @@ bool player_eat_food(int item)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP);
 
 	/* Food can feed the player */
-	(void)set_food(p_ptr->food + o_ptr->charges * o_ptr->weight);
+	(void)set_food(p_ptr->food + o_ptr->charges * object_aval(o_ptr, ABILITY_WEIGHT));
 
 	/* Destroy a food in the pack */
 	if (item >= 0)
@@ -990,7 +990,7 @@ bool player_use_staff(int item)
 		/* Adjust the weight and carry */
 		if (item >= 0)
 		{
-			p_ptr->total_weight -= i_ptr->weight;
+			p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 			item = inven_carry(i_ptr);
 		}
 		else
@@ -1269,7 +1269,7 @@ bool player_aim_wand(int item)
 		/* Adjust the weight and carry */
 		if (item >= 0)
 		{
-			p_ptr->total_weight -= i_ptr->weight;
+			p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 			item = inven_carry(i_ptr);
 		}
 		else
@@ -1543,7 +1543,7 @@ bool player_zap_rod(int item)
 		/* Adjust the weight and carry */
 		if (item >= 0)
 		{
-			p_ptr->total_weight -= i_ptr->weight;
+			p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 			item = inven_carry(i_ptr);
 		}
 		else
@@ -1818,8 +1818,8 @@ bool player_assembly(int item2)
 		/* Modify the target item */
 		i_ptr->k_idx = lookup_kind(i_ptr->tval, tgt_sval);
 		i_ptr->sval = tgt_sval;
-		if (src_sval != k_ptr->sval) i_ptr->weight += k_ptr->weight /2;
-		else i_ptr->weight += k_ptr->weight;
+		if (src_sval != k_ptr->sval) object_ability_add_one(i_ptr, ABILITY_WEIGHT, object_aval(k_ptr, ABILITY_WEIGHT) /2);
+		else object_ability_add_one(i_ptr, ABILITY_WEIGHT, object_aval(k_ptr, ABILITY_WEIGHT));
 		if (k_info[i_ptr->k_idx].charges) i_ptr->timeout = (s16b)randint(k_info[i_ptr->k_idx].charges) + k_info[i_ptr->k_idx].charges;
 
 		/* Hack - mark as made by the player */
@@ -1828,7 +1828,7 @@ bool player_assembly(int item2)
 		/* Adjust the weight and carry */
 		if (item2 >= 0)
 		{
-			p_ptr->total_weight -= i_ptr->weight;
+			p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 			item2 = inven_carry(i_ptr);
 			inven_item_describe(item2);
 		}
@@ -1843,12 +1843,14 @@ bool player_assembly(int item2)
 			/* Modify the source item */
 			k_ptr->k_idx = lookup_kind(k_ptr->tval, src_sval);
 			k_ptr->sval = src_sval;
-			k_ptr->weight /= 2;
+			
+			/* Halve the weight */
+			object_ability_add_one(k_ptr, ABILITY_WEIGHT, -(object_aval(k_ptr, ABILITY_WEIGHT)/2));
 
 			/* Adjust the weight and carry */
 			if (item >= 0)
 			{
-				p_ptr->total_weight -= k_ptr->weight;
+				p_ptr->total_weight -= object_aval(k_ptr, ABILITY_WEIGHT);
 				item = inven_carry(k_ptr);
 				inven_item_describe(item);
 			}
@@ -2242,7 +2244,7 @@ bool player_activate(int item)
 		/* Adjust the weight and carry */
 		if (item >= 0)
 		{
-			p_ptr->total_weight -= i_ptr->weight;
+			p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 			item = inven_carry(i_ptr);
 		}
 		else
@@ -2299,7 +2301,7 @@ bool item_tester_hook_coating(const object_type *o_ptr)
 		case TV_SHIELD:
 		case TV_SKIN:
 		case TV_SPELL:
-			if (o_ptr->weight < 1000) return (TRUE);
+			if (object_aval(o_ptr, ABILITY_WEIGHT) < 1000) return (TRUE);
 	}
 
 	/* Assume not */
@@ -2762,8 +2764,8 @@ bool player_apply_rune_or_coating2(int item2)
 		if (!aware) j_ptr->feeling = INSCRIP_COATED;
 
 		/* Based on the weight, determine charges */
-		j_ptr->charges = (charges + 1000 / (j_ptr->weight > cp_ptr->min_weight ? j_ptr->weight : cp_ptr->min_weight)) / j_ptr->number;
-		j_ptr->stackc = (charges + 1000 / (j_ptr->weight > cp_ptr->min_weight ? j_ptr->weight : cp_ptr->min_weight)) % j_ptr->number;
+		j_ptr->charges = (charges + 1000 / (object_aval(j_ptr, ABILITY_WEIGHT) > cp_ptr->min_weight ? object_aval(j_ptr, ABILITY_WEIGHT) : cp_ptr->min_weight)) / j_ptr->number;
+		j_ptr->stackc = (charges + 1000 / (object_aval(j_ptr, ABILITY_WEIGHT) > cp_ptr->min_weight ? object_aval(j_ptr, ABILITY_WEIGHT) : cp_ptr->min_weight)) % j_ptr->number;
 
 		if (j_ptr->stackc) j_ptr->charges++;
 	}

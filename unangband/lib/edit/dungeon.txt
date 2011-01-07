@@ -932,7 +932,6 @@ D:You can choose to confront Sauron here, high in a tower lit by a flaming
 D: eye.
 
 # Sunken/outer plane dungeons
-# TODO: add guardian or remove
 
 N:64:Numenor
 X:17:0:0:0
@@ -940,7 +939,7 @@ G:G
 R:CAN_SWIM
 L:35:407:403:400:49:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNELS | MORE | ISLANDS:the sunken cities of
 L:36:56:399:56:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:
-L:48:56:399:56:0:0:0:0:ROOMS | TUNNELS | LESS:
+L:48:56:399:56:0:1377:0:0:ROOMS | TUNNELS | LESS:
 
 # TODO: add guardian or remove
 
@@ -950,7 +949,7 @@ G:E
 R:PRIEST
 L:21:407:425:141:141:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNELS | MORE:the Temple of
 L:22:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:depths of the Temple of
-L:40:56:56:0:0:0:0:0:ROOMS | TUNNELS | LESS:bottom of the Temple of
+L:40:56:56:0:0:1376:0:0:ROOMS | TUNNELS | LESS:bottom of the Temple of
 
 # TODO: add guardian or remove
 
@@ -960,7 +959,7 @@ G:g
 R:MAGE
 L:30:407:56:144:145:0:0:0:DESTROYED | SURFACE | DAYLIGHT | WILD | ROOMS | TUNNELS | MORE:the
 L:31:56:148:145:0:0:0:0:ROOMS | TUNNELS | LESS | MORE:the
-L:45:56:148:145:0:0:0:0:ROOMS | TUNNELS | LESS:the
+L:45:56:148:145:0:1375:0:0:ROOMS | TUNNELS | LESS:the
 
 N:67:Black-Gate
 X:54:59:69:0

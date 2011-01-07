@@ -3933,33 +3933,23 @@ static errr grab_one_kind_flag(object_kind *k_ptr, cptr what)
 					break;
 			}
 			
-			/* Match if not used */
-			for (i = 0; i < MAX_AVALS_KIND; i++)
+			/* Add to existing aval */
+			for (i = 0; i < k_ptr->ability_count; i++)
 			{
-				if ((k_ptr->aval[i] == 0) && ((k_ptr->flags0[ability/32][i] & (1L << (ability % 32))) == 0)) break;
-			}
-			
-			/* Try again */
-			if (i == MAX_AVALS_KIND)
-			{
-				for (i = 0; i < MAX_AVALS_KIND; i++)
+				if (k_ptr->ability[i] == ability)
 				{
-					if (k_ptr->aval[i] == pval) break;
+					k_ptr->aval[i] += pval;
+					break;
 				}
 			}
 			
-			if (i == MAX_AVALS_KIND)
+			/* Add new ability */
+			if (i == k_ptr->ability_count)
 			{
-				/* Oops */
-				msg_format("Unable to find space for ability '%s'.", what);
-	
-				/* Error */
-				return (PARSE_ERROR_GENERIC);
+				k_ptr->ability[i] = ability;
+				k_ptr->aval[i] = pval;
+				k_ptr->ability_count++;
 			}
-			
-			/* Set the value if required */
-			if (k_ptr->aval[i] == 0) k_ptr->aval[i] = pval;
-			k_ptr->flags0[ability/32][i] |= (1L << (ability %32));
 
 			return (0);
 		}
@@ -4400,7 +4390,6 @@ errr parse_k_info(char *buf, header *head)
 	{
 		int level, charges, wgt;
 		long cost;
-		int k=0;
 
 		/* There better be a current k_ptr */
 		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4410,12 +4399,11 @@ errr parse_k_info(char *buf, header *head)
 			    &level, &charges, &wgt, &cost)) return (PARSE_ERROR_GENERIC);
 
 		/* Get k */
-		for (k = 0; k++; k_ptr->aval[k]);
 		
 		/* Save the values */
 		k_ptr->level = level;
 		k_ptr->charges = charges;
-		if (wgt) { k_ptr->aval[k] = wgt; k_ptr->flags0[ABILITY_WEIGHT/32][k++] = 1L << (ABILITY_WEIGHT %32);}
+		if (wgt)  { k_ptr->ability[k_ptr->ability_count] = ABILITY_WEIGHT; k_ptr->aval[k_ptr->ability_count++] = wgt; }
 		k_ptr->cost = cost;
 	}
 
@@ -4458,7 +4446,6 @@ errr parse_k_info(char *buf, header *head)
 	else if (buf[0] == 'P')
 	{
 		int ac, hd1, hd2, th, td, ta;
-		int k = 0;
 
 		/* There better be a current k_ptr */
 		if (!k_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4467,16 +4454,13 @@ errr parse_k_info(char *buf, header *head)
 		if (6 != sscanf(buf+2, "%d:%dd%d:%d:%d:%d",
 			    &ac, &hd1, &hd2, &th, &td, &ta)) return (PARSE_ERROR_GENERIC);
 
-		/* Get k */
-		for (k = 0; k++; k_ptr->aval[k]);
+		if (ac) { k_ptr->ability[k_ptr->ability_count] = ABILITY_AC; k_ptr->aval[k_ptr->ability_count++] = ac; }
+		if (hd1)  { k_ptr->ability[k_ptr->ability_count] = ABILITY_DAMAGE_DICE; k_ptr->aval[k_ptr->ability_count++] = hd1; }
+		if (hd2) { k_ptr->ability[k_ptr->ability_count] = ABILITY_DAMAGE_SIDES; k_ptr->aval[k_ptr->ability_count++] = hd2; }
 		
-		if (ac) { k_ptr->aval[k] = ac; k_ptr->flags0[ABILITY_AC/32][k++] = 1L << (ABILITY_AC %32);}
-		if (hd1) { k_ptr->aval[k] = hd1; k_ptr->flags0[ABILITY_DAMAGE_DICE/32][k++] = 1L << (ABILITY_DAMAGE_DICE %32);}
-		if (hd2) { k_ptr->aval[k] = hd2; k_ptr->flags0[ABILITY_DAMAGE_SIDES/32][k++] = 1L << (ABILITY_DAMAGE_SIDES %32);}
-		
-		if (th) { k_ptr->aval[k] = th; k_ptr->flags0[ABILITY_TO_HIT/32][k++] = 1L << (ABILITY_TO_HIT %32);}
-		if (td) {k_ptr->aval[k] = td; k_ptr->flags0[ABILITY_TO_DAM/32][k++] = 1L << (ABILITY_TO_DAM %32);}
-		if (ta) {k_ptr->aval[k] = ta; k_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
+		if (th) { k_ptr->ability[k_ptr->ability_count] = ABILITY_TO_HIT; k_ptr->aval[k_ptr->ability_count++] = th; }
+		if (td) { k_ptr->ability[k_ptr->ability_count] = ABILITY_TO_DAM; k_ptr->aval[k_ptr->ability_count++] = td; }
+		if (ta) { k_ptr->ability[k_ptr->ability_count] = ABILITY_TO_AC; k_ptr->aval[k_ptr->ability_count++] = ta; }
 
 		switch(k_ptr->tval)
 		{
@@ -4617,33 +4601,23 @@ static errr grab_one_artifact_flag(artifact_type *a_ptr, cptr what)
 					break;
 			}
 			
-			/* Match if not used */
-			for (i = 0; i < MAX_AVALS_ARTIFACT; i++)
+			/* Add to existing aval */
+			for (i = 0; i < a_ptr->ability_count; i++)
 			{
-				if ((a_ptr->aval[i] == 0) && ((a_ptr->flags0[ability/32][i] & (1L << (ability % 32))) == 0)) break;
-			}
-			
-			/* Try again */
-			if (i == MAX_AVALS_ARTIFACT)
-			{
-				for (i = 0; i < MAX_AVALS_ARTIFACT; i++)
+				if (a_ptr->ability[i] == ability)
 				{
-					if (a_ptr->aval[i] == pval) break;
+					a_ptr->aval[i] += pval;
+					break;
 				}
 			}
 			
-			if (i == MAX_AVALS_EGO_ITEM)
+			/* Add new ability */
+			if (i == a_ptr->ability_count)
 			{
-				/* Oops */
-				msg_format("Unable to find space for ability '%s'.", what);
-	
-				/* Error */
-				return (PARSE_ERROR_GENERIC);
+				a_ptr->ability[i] = ability;
+				a_ptr->aval[i] = pval;
+				a_ptr->ability_count++;
 			}
-			
-			/* Set the value if required */
-			if (a_ptr->aval[i] == 0) a_ptr->aval[i] = pval;
-			a_ptr->flags0[ability/32][i] |= (1L << (ability %32));
 
 			return (0);
 		}
@@ -4761,7 +4735,6 @@ errr parse_a_info(char *buf, header *head)
 	{
 		int level, rarity, wgt;
 		long cost;
-		int k;
 
 		/* There better be a current a_ptr */
 		if (!a_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4770,13 +4743,10 @@ errr parse_a_info(char *buf, header *head)
 		if (4 != sscanf(buf+2, "%d:%d:%d:%ld",
 			    &level, &rarity, &wgt, &cost)) return (PARSE_ERROR_GENERIC);
 
-		/* Get k */
-		for (k = 0; k++; a_ptr->aval[k]);
-		
 		/* Save the values */
 		a_ptr->level = level;
 		a_ptr->rarity = rarity;
-		if (wgt) { a_ptr->aval[k] = wgt; a_ptr->flags0[ABILITY_WEIGHT/32][k++] = 1L << (ABILITY_WEIGHT %32);}
+		if (wgt) { a_ptr->ability[a_ptr->ability_count] = ABILITY_WEIGHT; a_ptr->aval[a_ptr->ability_count++] = wgt; }
 		a_ptr->cost = cost;
 	}
 
@@ -4784,7 +4754,6 @@ errr parse_a_info(char *buf, header *head)
 	else if (buf[0] == 'P')
 	{
 		int ac, hd1, hd2, th, td, ta;
-		int k=0;
 
 		/* There better be a current a_ptr */
 		if (!a_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -4792,17 +4761,14 @@ errr parse_a_info(char *buf, header *head)
 		/* Scan for the values */
 		if (6 != sscanf(buf+2, "%d:%dd%d:%d:%d:%d",
 			    &ac, &hd1, &hd2, &th, &td, &ta)) return (PARSE_ERROR_GENERIC);
-
-		/* Get k */
-		for (k = 0; k++; a_ptr->aval[k]);
 		
-		if (ac) { a_ptr->aval[k] = ac; a_ptr->flags0[ABILITY_AC/32][k++] = 1L << (ABILITY_AC %32);}
-		if (hd1) { a_ptr->aval[k] = hd1; a_ptr->flags0[ABILITY_DAMAGE_DICE/32][k++] = 1L << (ABILITY_DAMAGE_DICE %32);}
-		if (hd2) { a_ptr->aval[k] = hd2; a_ptr->flags0[ABILITY_DAMAGE_SIDES/32][k++] = 1L << (ABILITY_DAMAGE_SIDES %32);}
+		if (ac) { a_ptr->ability[a_ptr->ability_count] = ABILITY_AC; a_ptr->aval[a_ptr->ability_count++] = ac; }
+		if (hd1) { a_ptr->ability[a_ptr->ability_count] = ABILITY_DAMAGE_DICE; a_ptr->aval[a_ptr->ability_count++] = hd1; }
+		if (hd2) { a_ptr->ability[a_ptr->ability_count] = ABILITY_DAMAGE_SIDES; a_ptr->aval[a_ptr->ability_count++] = hd2; }
 
-		if (th) { a_ptr->aval[k] = th; a_ptr->flags0[ABILITY_TO_HIT/32][k++] = 1L << (ABILITY_TO_HIT %32);}
-		if (td) {a_ptr->aval[k] = td; a_ptr->flags0[ABILITY_TO_DAM/32][k++] = 1L << (ABILITY_TO_DAM %32);}
-		if (ta) {a_ptr->aval[k] = ta; a_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
+		if (th) { a_ptr->ability[a_ptr->ability_count] = ABILITY_TO_HIT; a_ptr->aval[a_ptr->ability_count++] = th; }
+		if (td) { a_ptr->ability[a_ptr->ability_count] = ABILITY_TO_DAM; a_ptr->aval[a_ptr->ability_count++] = td; }
+		if (ta) { a_ptr->ability[a_ptr->ability_count] = ABILITY_TO_AC; a_ptr->aval[a_ptr->ability_count++] = ta; }
 	}
 
 	/* Process 'F' for flags */
@@ -4992,33 +4958,23 @@ static bool grab_one_ego_item_flag(ego_item_type *e_ptr, cptr what)
 					break;
 			}
 			
-			/* Match if not used */
-			for (i = 0; i < MAX_AVALS_EGO_ITEM; i++)
+			/* Add to existing aval */
+			for (i = 0; i < e_ptr->ability_count; i++)
 			{
-				if ((e_ptr->max_aval[i] == 0) && ((e_ptr->flags0[ability/32][i] & (1L << (ability % 32))) == 0)) break;
-			}
-			
-			/* Try again */
-			if (i == MAX_AVALS_EGO_ITEM)
-			{
-				for (i = 0; i < MAX_AVALS_EGO_ITEM; i++)
+				if (e_ptr->ability[i] == ability)
 				{
-					if (e_ptr->max_aval[i] == pval) break;
+					e_ptr->max_aval[i] += pval;
+					break;
 				}
 			}
 			
-			if (i == MAX_AVALS_EGO_ITEM)
+			/* Add new ability */
+			if (i == e_ptr->ability_count)
 			{
-				/* Oops */
-				msg_format("Unable to find space for ability '%s'.", what);
-	
-				/* Error */
-				return (PARSE_ERROR_GENERIC);
+				e_ptr->ability[i] = ability;
+				e_ptr->max_aval[i] = pval;
+				e_ptr->ability_count++;
 			}
-			
-			/* Set the value if required */
-			if (e_ptr->max_aval[i] == 0) e_ptr->max_aval[i] = pval;
-			e_ptr->flags0[ability/32][i] |= (1L << (ability %32));
 
 			return (0);
 		}
@@ -5221,7 +5177,6 @@ errr parse_e_info(char *buf, header *head)
 	else if (buf[0] == 'C')
 	{
 		int th, td, ta, pv;
-		int k = 0;
 
 		/* There better be a current e_ptr */
 		if (!e_ptr) return (PARSE_ERROR_MISSING_RECORD_HEADER);
@@ -5230,10 +5185,9 @@ errr parse_e_info(char *buf, header *head)
 		if (4 != sscanf(buf+2, "%d:%d:%d:%d",
 			    &th, &td, &ta, &pv)) return (PARSE_ERROR_GENERIC);
 
-		
-		if (th) { e_ptr->max_aval[k] = th; e_ptr->flags0[ABILITY_TO_HIT/32][k++] = 1L << (ABILITY_TO_HIT %32);}
-		if (td) {e_ptr->max_aval[k] = td; e_ptr->flags0[ABILITY_TO_DAM/32][k++] = 1L << (ABILITY_TO_DAM %32);}
-		if (ta) {e_ptr->max_aval[k] = ta; e_ptr->flags0[ABILITY_TO_AC/32][k++] = 1L << (ABILITY_TO_AC %32);}
+		if (th) { e_ptr->ability[e_ptr->ability_count] = ABILITY_TO_HIT; e_ptr->max_aval[e_ptr->ability_count++] = th; }
+		if (td) { e_ptr->ability[e_ptr->ability_count] = ABILITY_TO_DAM; e_ptr->max_aval[e_ptr->ability_count++] = td; }
+		if (ta) { e_ptr->ability[e_ptr->ability_count] = ABILITY_TO_AC; e_ptr->max_aval[e_ptr->ability_count++] = ta; }
 		if (pv) e_ptr->pval = pv;
 	}
 
@@ -9869,10 +9823,10 @@ errr eval_e_power(header *head)
 	{
 		/* Point at the "info" */
 		e_ptr = (ego_item_type*)head->info_ptr + i;
-
-		e_ptr->slay_power = slay_power(slay_index(e_ptr->flags0, e_ptr->flags1, e_ptr->flags2, e_ptr->flags3, e_ptr->flags4));
+#if 0
+		e_ptr->slay_power = slay_power(slay_index(e_ptr->ability, e_ptr->flags1, e_ptr->flags2, e_ptr->flags3, e_ptr->flags4));
+#endif
 	}
-
 	/* Success */
 	return(0);
 }
@@ -10815,7 +10769,7 @@ errr emit_f_info_index(FILE *fp, header *head, int i)
  */
 errr emit_k_info_index(FILE *fp, header *head, int i)
 {
-	int j, k;
+	int k;
 	int n;
 	int showc = 0;
 	bool introduced = FALSE;
@@ -10864,12 +10818,9 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
 	}
 	
 	/* Output '0', '1', '2' etc for "Abilities */
-	for (k = 0; k < MAX_AVALS_KIND; k++)
+	for (k = 0; k < k_ptr->ability_count; k++)
 	{
-		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
-		{
-			emit_flags_32(fp, format("%d:", k), k_ptr->flags0[j][k], k_info_ability + k* 32);
-		}
+		fprintf(fp, "%d:%d:%s", k, k_ptr->aval[k], k_info_ability[k_ptr->ability[k]]);
 	}
 	
 	/* Output 'F' for "Flags" */
@@ -10895,7 +10846,7 @@ errr emit_k_info_index(FILE *fp, header *head, int i)
  */
 errr emit_a_info_index(FILE *fp, header *head, int i)
 {
-	int j, k;
+	int k;
 	int n, showc = 0;
 	
 	/* Current entry */
@@ -10925,12 +10876,9 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
 	}
 
 	/* Output '0', '1', '2' etc for "Abilities */
-	for (k = 0; k < MAX_AVALS_ARTIFACT; k++)
+	for (k = 0; k < a_ptr->ability_count; k++)
 	{
-		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
-		{
-			emit_flags_32(fp, format("%d:", k), a_ptr->flags0[j][k], k_info_ability + k * 32);
-		}
+		fprintf(fp, "%d:%d:%s", k, a_ptr->aval[k], k_info_ability[a_ptr->ability[k]]);
 	}
 	
 	/* Output 'F' for "Flags" */
@@ -10954,7 +10902,7 @@ errr emit_a_info_index(FILE *fp, header *head, int i)
  */
 errr emit_e_info_index(FILE *fp, header *head, int i)
 {
-	int j, k;
+	int k;
 	int n;
 	bool showc = 0;	
 	
@@ -10997,12 +10945,9 @@ errr emit_e_info_index(FILE *fp, header *head, int i)
 	}
 	
 	/* Output '0', '1', '2' etc for "Abilities */
-	for (k = 0; k < MAX_AVALS_EGO_ITEM; k++)
+	for (k = 0; k < e_ptr->ability_count; k++)
 	{
-		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
-		{
-			emit_flags_32(fp, format("%d:", k), e_ptr->flags0[j][k], k_info_ability + k * 32);
-		}
+		fprintf(fp, "%d:%d:%s", k, e_ptr->max_aval[k], k_info_ability[e_ptr->ability[k]]);
 	}
 	
 	/* Output 'F' for "Flags" */

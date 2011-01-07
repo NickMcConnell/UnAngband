@@ -15275,7 +15275,7 @@ S:BRTH_SOUND |
 S:BEAM_NETHR | ARC_HFIRE |
 S:BLINK | CURSE |
 S:S_KIN | S_HI_DEMON | R_UNIQUE | S_WRAITH |
-D:He is Melkor of the original song.  His figure is like a many colour
+D:He is Melkor of the original song.  His figure is like a many coloured
 D: harp vibrating with thunder.  He sings with unending temptation, his
 D: soul corrupting all around him.  He can never turn from his purpose,
 D: but seeks forever to draw to him all that is light and good in the
@@ -15283,7 +15283,7 @@ D: world, like moths to a candle.  He is the origin of all that is
 D: imperfect twisting the natural creatures of the world to demonic and
 D: unnatural forms. The fallen Maia are his most tragic companions,
 D: causing inadvertent anguish and trembling to forgotten dreams.  His
-D: beautiful visage,  smiling and simple, is crowned with silver, the
+D: beautiful visage, smiling and simple, is crowned with silver, the
 D: socket where the third Silmaril would be forever haunting him. Grond,
 D: the mighty Hammer of the Underworld, sings defiance as he strides
 D: towards you to tear you apart!
@@ -15325,7 +15325,7 @@ D: never forgive or forget, but seeks forver to destroy all that is light
 D: and good in the world. He is the final solution to man's hopes and
 D: aspirations and has taken much that was good and true and ground it to
 D: blood and dust.  He will use anything in his grasp to unmake the world
-D: and let him rest. His unspeakable expression, rigid in hatred, is
+D: and let him rest. His unspeakable expression, rigid with malice, is
 D: crowned with steel, the two remaining Silmarils forever tormenting him.
 D:  Grond, the mighty Hammer of the Underworld, weeps defiance as he
 D: strides towards you to crush you to a pulp!
@@ -28454,3 +28454,104 @@ F:NO_SLEEP |
 F:NEVER_MISS | LEVEL_SPEED | LEVEL_POWER |
 D:It is impossible to define its form but it serves someone.
 
+# The 3 echos of Morgoth. These are 3 lesser Morgoths - one for each
+#'planar' dungeon (Numenor, Elemental Evil, Crystal Castle).
+
+# Earth aspect.
+
+N:1375:Shadow of Morgoth, Lord of Darkness
+G:M:D
+#$ Matches Morgoth, Lord of Darkness
+#$ Matches Morgoth, Despair of Arda
+#$ Clear available
+#$ Metallics available:dwsorgDWPyRGUpvtmYiTVIMzZ
+#$ Colors available:dsgWPRUpvtmYiTVIZ
+I:130:2800:100:150:0
+W:50:25:0:41000
+M:45:45:75:125
+B:HIT:SHATTER:8d10
+B:HIT:SHATTER:8d10
+B:HIT:LOSE_ALL:5d12
+B:TOUCH:UN_POWER
+F:UNIQUE | FORCE_DEPTH | FORCE_MAXHP | FORCE_SLEEP | ATTR_METAL |
+F:ONLY_ITEM | DROP_1D2 | DROP_1D3 | DROP_1D4 | DROP_GOOD | DROP_GREAT |
+F:DROP_CHOSEN |
+F:SMART | REGENERATE | KILL_WALL |
+F:EVIL | HUGE | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
+F:NO_CONF | NO_SLEEP |
+F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
+F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_WEAPON | DROP_ARMOR | DROP_WRITING |
+F:RES_BLIND | ELF |
+S:QUAKE |
+S:BALL_NETHR | BALL_MANA | BOLT_MANA |
+S:MIND_BLAST |
+S:S_MONSTERS | S_HI_UNDEAD |
+D:This is a shadow of the Master of the Pits of Angband, an impression left
+D: behind by the Silmaril of Earth. It is like a black mountain crowned with
+D: lightning and raging with everlasting anger.
+
+# Wind aspect.
+
+N:1376:Echo of Melkor, Song of Ruin
+G:M:v
+#$ Matches Saruman of Many Colours
+#$ Clear available
+#$ Metallics available:dwsorgDWPyRGUpvtmYiTVIMzZ
+#$ Colors available:dsgWPRUpvtmYiTVIZ
+I:140:1400:100:100:0
+W:50:31:0:41000
+M:45:45:75:125
+B:HIT:VAMP_DRAIN:8d10
+B:AURA:VAMP_DRAIN:8d10
+B:HIT:HURT_MANA:5d12
+B:TOUCH:LOSE_ALL
+F:UNIQUE | ATTR_MULTI | FORCE_DEPTH | FORCE_MAXHP |
+F:FORCE_SLEEP | ESCORTS | ONLY_ITEM | DROP_1D2 | DROP_1D3 | DROP_1D4 |
+F:DROP_GOOD | DROP_GREAT | DROP_CHOSEN |
+F:SMART | REGENERATE | CAN_FLY | HAS_AURA |
+F:EVIL | HUGE | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
+F:NO_CONF | NO_SLEEP |
+F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
+F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_WEAPON | DROP_ARMOR | DROP_WRITING |
+F:EVASIVE | RES_BLIND | ELF |
+S:BLOW_2 |
+S:BRTH_SOUND |
+S:BEAM_NETHR | ARC_HFIRE |
+S:BLINK | CURSE |
+S:S_KIN | S_HI_DEMON
+D:This is an echo of Melkor of the original song, left resonating by
+D: the Silmaril of Sky and Wind. It is like a many coloured
+D: harp vibrating with thunder and singing with unending temptation.
+
+# Sea aspect.
+
+N:1377:Memory of Morgoth, Despair of Arda
+G:M:D
+#$ Matches Morgoth, Lord of Darkness
+#$ Matches Morgoth, Lord of Darkness
+#$ Clear available
+#$ Metallics available:dwsorgDWPyRGUpvtmYiTVIMzZ
+#$ Colors available:dsgWPRUpvtmYiTVIZ
+I:130:4200:100:150:0
+W:50:21:0:41000
+M:45:45:75:125
+B:HIT:WOUND:24d10
+B:HIT:BATTER:24d10
+B:HIT:LOSE_ALL:5d12
+B:AURA:WATER:5d12
+F:UNIQUE | FORCE_DEPTH | FORCE_MAXHP | FORCE_SLEEP | ATTR_METAL |
+F:ONLY_ITEM | DROP_1D2 | DROP_1D3 | DROP_1D4 | DROP_GOOD | DROP_GREAT |
+F:DROP_CHOSEN |
+F:SMART | REGENERATE | CAN_SWIM | HAS_AURA |
+F:EVIL | HUGE | IM_ACID | IM_ELEC | IM_FIRE | IM_COLD | IM_POIS | NO_FEAR |
+F:NO_CONF | NO_SLEEP |
+F:HAS_SKULL | HAS_SKELETON | HAS_TEETH | HAS_CORPSE | HAS_HEAD | HAS_HAND |
+F:HAS_ARM | HAS_LEG | HAS_BLOOD | DROP_WEAPON | DROP_ARMOR | DROP_WRITING |
+F:RES_BLIND | ELF |
+S:BLOW_4 |
+S:BALL_MANA | BALL_WATER | BOLT_MANA |
+S:WRAITHFORM | CURSE | MIND_BLAST |
+S:S_HI_DRAGON
+D:This is a memory of the Despair of the world of Arda, left forgotten by
+D: the Silmaril of the Sea. It is like a swirling
+D: vortex twisting into nothing and hating life with everlasting malice.

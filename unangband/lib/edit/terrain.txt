@@ -15157,11 +15157,11 @@ K:INNER:862:0
 #$ open lever on a granite wall
 K:DOOR:850:0
 #$ open gate
+K:TUNNEL:1:40
+#$ open floor
 F:NOTICE | REMEMBER | CLOSE | TUNNEL | WALL | OUTER |
 F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
-
-#F:POWER_40
 
 N:739:closed lever on a granite wall
 G:+:U
@@ -15183,11 +15183,11 @@ K:INNER:862:0
 #$ open lever on a granite wall
 K:DOOR:726:0
 #$ locked gate
+K:TUNNEL:1:40
+#$ open floor
 F:NOTICE | REMEMBER | OPEN | TUNNEL | WALL | OUTER |
 F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE |
-
-#F:POWER_40
 
 N:740:weapon rack
 G:*:s
@@ -15521,12 +15521,13 @@ K:PATH:1:0
 #$ open floor
 K:INSTANT:739:0
 #$ closed lever on a granite wall
+K:TUNNEL:1:40
+#$ open floor
 F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
 F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 #M:738
-#F:POWER_40
 
 N:753:opening lever on a granite wall
 G:+:u
@@ -15544,13 +15545,14 @@ K:ADJACENT:738:0
 K:PATH:1:0
 #$ open floor
 K:INSTANT:738:0
-#$ opening lever on a granite wall
+#$ open lever on a granite wall
+K:TUNNEL:1:40
+#$ open floor
 F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
 F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
 F:ATTR_LITE | INSTANT | ADJACENT |
 
 #M:739
-#F:POWER_40
 
 N:754:blood-stained wall
 G:#:r
@@ -17899,6 +17901,8 @@ F:CAN_CLIMB | CAN_FLY |
 F:ATTR_LITE | INSTANT |
 D:You fall through a crack in the floor!
 
+# Winding chain - first step
+
 N:877:winding chain
 G:~:s
 U:56
@@ -17907,13 +17911,13 @@ O:845
 W:1:7:15:0
 K:DEFAULT:1:15
 #$ open floor
-K:INSTANT:879:15
+K:INSTANT:1000:15
 #$ linked chain
 F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN | FLOOR |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:ALLOC | GET_FEAT | ATTR_LITE | INSTANT |
 
-N:878:mechanism in a granite wall
+N:878:winding mechanism in a granite wall
 G:#:w
 M:56
 #$ granite wall
@@ -17953,7 +17957,7 @@ F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN | FLOOR |
 F:HURT_ACID | CAN_CLIMB | CAN_FLY |
 F:ALLOC | GET_FEAT | ATTR_LITE | INSTANT |
 
-N:880:mechanism in a granite wall
+N:880:winding mechanism in a granite wall
 G:#:w
 M:56
 #$ granite wall
@@ -18250,11 +18254,13 @@ K:CHASM:780:0
 #$ chain bridge
 K:TREE:780:0
 #$ chain bridge
-K:ADJACENT:780:0
-#$ chain bridge
+K:ADJACENT:1009:0
+#$ winding chain bridge
+K:INSTANT:1009:0
+#$ winding chain bridge
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
-F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT |
+F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | INSTANT | ADJACENT |
 
 N:894:closing chain bridge
 G:x:y
@@ -18269,11 +18275,13 @@ K:CHASM:780:0
 #$ chain bridge
 K:TREE:780:0
 #$ chain bridge
-K:ADJACENT:780:0
-#$ chain bridge
+K:ADJACENT:1009:0
+#$ winding chain bridge
+K:INSTANT:1009:0
+#$ winding chain bridge
 F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
 F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
-F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | ADJACENT |
+F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | INSTANT | ADJACENT |
 
 N:895:rapidly growing shoot
 G:.:G
@@ -20294,4 +20302,242 @@ F:HIT_TRAP |
 F:CAN_CLIMB | CAN_FLY | HIDE_ITEM |
 F:ATTR_LITE |
 D:You are surrounded by a bitter-tasting clear gas! It seems to have no effect.
+
+# Winding chain - second step
+
+N:1000:winding chain
+G:~:s
+U:56
+#$ granite wall
+O:845
+W:1:7:15:0
+K:DEFAULT:1:15
+#$ open floor
+K:INSTANT:879:15
+#$ linked chain
+F:LOS | PROJECT | MOVE | PLACE | DROP | NOTICE | REMEMBER | RUN | FLOOR |
+F:HURT_ACID | CAN_CLIMB | CAN_FLY |
+F:ALLOC | GET_FEAT | ATTR_LITE | INSTANT |
+
+# Switches. These are reverse levers: they open around them if they close, and vice versa.
+# They are also much harder to open or close than levers.
+
+N:1001:open switch on a granite wall
+G:+:D
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:CLOSE:1003:15
+#$ closing switch on a granite wall
+K:SOLID:1003:0
+#$ closing switch on a granite wall
+K:INNER:1001:0
+#$ open switch on a granite wall
+K:DOOR:850:0
+#$ open gate
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | CLOSE | TUNNEL | WALL | OUTER |
+F:FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE |
+
+N:1002:closed switch on a granite wall
+G:+:U
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:OPEN:1004:15
+#$ opening switch on a granite wall
+K:PATH:1:0
+#$ open floor
+K:SOLID:1004:0
+#$ opening switch on a granite wall
+K:INNER:1002:0
+#$ open switch on a granite wall
+K:DOOR:726:0
+#$ locked gate
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | OPEN | TUNNEL | WALL | OUTER |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE |
+
+N:1003:closing switch on a granite wall
+G:+:u
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+T:TRAP:KILL_TRAP
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:ADJACENT:1005:0
+#$ closed switch on a granite wall (rearming)
+K:PATH:1:0
+#$ open floor
+K:INSTANT:1005:0
+#$ closed switch on a granite wall (rearming)
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE | INSTANT | ADJACENT |
+
+#M:738
+
+N:1004:opening switch on a granite wall
+G:+:u
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+T:TRAP:LOCK_DOOR
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:ADJACENT:1006:0
+#$ open switch on a granite wall (rearming)
+K:PATH:1:0
+#$ open floor
+K:INSTANT:1006:0
+#$ open switch on a granite wall (rearming)
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE | INSTANT | ADJACENT |
+
+N:1005:closed switch on a granite wall (rearming)
+G:+:u
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:PATH:1:0
+#$ open floor
+K:INSTANT:1007:0
+#$ closed switch on a granite wall (rearming)
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE | INSTANT |
+
+#M:738
+
+N:1006:open switch on a granite wall (rearming)
+G:+:u
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:PATH:1:0
+#$ open floor
+K:INSTANT:1008:0
+#$ opening switch on a granite wall (rearming)
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE | INSTANT |
+
+N:1007:closed switch on a granite wall (rearming)
+G:+:u
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:PATH:1:0
+#$ open floor
+K:INSTANT:1001:0
+#$ closed switch on a granite wall
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE | INSTANT |
+
+#M:738
+
+N:1008:open switch on a granite wall (rearming)
+G:+:u
+U:56
+#$ granite wall
+O:0
+W:1:1:10:0
+K:DEFAULT:56:0
+#$ granite wall
+K:CHASM:141:0
+#$ chasm
+K:PATH:1:0
+#$ open floor
+K:INSTANT:1002:0
+#$ opening switch on a granite wall
+K:TUNNEL:1:40
+#$ open floor
+F:NOTICE | REMEMBER | TUNNEL | WALL | SOLID |
+F:PATH | FILLED | HURT_ROCK | CAN_CLIMB | CAN_PASS |
+F:ATTR_LITE | INSTANT |
+
+N:1009:winding chain bridge
+G:x:y
+O:345
+W:48:1:8:0
+K:DEFAULT:787:0
+#$ chain hanging over a chasm
+K:PATH:780:0
+#$ chain bridge
+K:CHASM:780:0
+#$ chain bridge
+K:TREE:780:0
+#$ chain bridge
+K:INSTANT:1010:0
+#$ chain bridge
+F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
+F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | INSTANT |
+
+N:1010:winding chain bridge
+G:x:y
+O:345
+W:48:1:8:0
+T:TRAP:KILL_TRAP
+K:DEFAULT:787:0
+#$ chain hanging over a chasm
+K:PATH:780:0
+#$ chain bridge
+K:CHASM:780:0
+#$ chain bridge
+K:TREE:780:0
+#$ chain bridge
+K:INSTANT:780:0
+#$ chain bridge
+F:LOS | PROJECT | PLACE | DROP | REMEMBER | RUN |
+F:PATH | LAKE | COVERED | HURT_ACID | CAN_CLIMB | CAN_FLY | KILL_HUGE |
+F:GET_FEAT | OUTSIDE | EASY_CLIMB | ATTR_LITE | INSTANT |
 

@@ -1452,12 +1452,15 @@ static void desc_ego_fake(int oid)
 	{
 		fake_ability[i] = 0;
 		
-		for (j = 0; j < MAX_AVALS_EGO_ITEM; j++)
+		for (j = 0; j < e_ptr->ability_count; j++)
 		{
+			fake_ability[e_ptr->ability[j]] = e_ptr->max_aval[j];
+#if 0
 			if ((i < 32) && ((e_ptr->flags0[i/32][j] & (1L << i)) != 0)) fake_ability[i] += e_ptr->max_aval[j];
 			else if ((i >= 32) && (i < 64) && ((e_ptr->flags0[(i-32)/32][j] & (1L << (i-32))) != 0)) fake_ability[i] += e_ptr->max_aval[j];
 			else if ((i >= 64) && (i < 96) && ((e_ptr->flags0[(i-64)/32][j] & (1L << (i-64))) != 0)) fake_ability[i] += e_ptr->max_aval[j];
 			else if ((i >= 96) && (i < 128) && ((e_ptr->flags0[(i-96)/32][j] & (1L << (i-96))) != 0)) fake_ability[i] += e_ptr->max_aval[j];
+#endif
 		}
 	}
 	
@@ -1466,9 +1469,12 @@ static void desc_ego_fake(int oid)
 	{
 		flags0[i] = 0L;
 		
-		for (j = 0; j < MAX_AVALS_EGO_ITEM; j++)
+		for (j = 0; j < e_ptr->ability_count; j++)
 		{
+			flags0[e_ptr->ability[j]/32] |= (1L << (e_ptr->ability[j]%32));
+#if 0
 			flags0[i] |= e_ptr->flags0[i][j];
+#endif
 		}		
 	}
 	

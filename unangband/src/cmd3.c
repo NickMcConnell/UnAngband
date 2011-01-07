@@ -358,7 +358,7 @@ bool player_wield(int item)
 		case TV_POLEARM:
 		case TV_DIGGING:
 		{
-			if (o_ptr->weight >= 200) p_ptr->energy_use = 100;
+			if (object_aval(o_ptr, ABILITY_WEIGHT) >= 200) p_ptr->energy_use = 100;
 			else p_ptr->energy_use = 50;
 			break;
 		}
@@ -561,7 +561,7 @@ bool player_wield(int item)
 	  }
 
 	/* Increase the weight */
-	p_ptr->total_weight += i_ptr->weight * amt;
+	p_ptr->total_weight += object_aval(i_ptr, ABILITY_WEIGHT) * amt;
 
 	/* Important - clear this flag */
 	j_ptr->ident &= ~(IDENT_STORE | IDENT_MARKED);
@@ -2572,7 +2572,7 @@ bool player_refill2(int item2)
 		o_ptr->number--;
 
 		/* Adjust the weight */
-		p_ptr->total_weight -= i_ptr->weight;
+		p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 
 		o_ptr = i_ptr;
 
@@ -2670,7 +2670,7 @@ bool player_refill2(int item2)
 		o_ptr->ident &= ~(IDENT_STORE);
 
 		/* Adjust the weight */
-		p_ptr->total_weight += o_ptr->weight;
+		p_ptr->total_weight += object_aval(o_ptr, ABILITY_WEIGHT);
 	}
 
 	if (unstack)
@@ -2738,7 +2738,7 @@ bool player_refill2(int item2)
 			j_ptr->number--;
 
 			/* Adjust the weight and carry */
-			p_ptr->total_weight -= i_ptr->weight;
+			p_ptr->total_weight -= object_aval(i_ptr, ABILITY_WEIGHT);
 			item = inven_carry(i_ptr);
 		}
 		else

@@ -3769,12 +3769,23 @@ enum
  * a hard time evaluating an item with more than five or so modifiers
  * with different numeric benefit anyways.
  */
-#define MAX_AVALS_KIND		7
-#define MAX_AVALS_EGO_ITEM	10
-#define MAX_AVALS_ARTIFACT	12
-#define MAX_AVALS_OBJECT	12
+#define MAX_AVALS_KIND		8
+#define MAX_AVALS_EGO_ITEM	12
+#define MAX_AVALS_ARTIFACT	16
+#define MAX_AVALS_OBJECT	MAX(MAX_AVALS_KIND + MAX_AVALS_EGO_ITEM, MAX_AVALS_ARTIFACT)
 
 #define ABILITY_ARRAY_SIZE		(ABILITY_MAX + 31) / 32
+
+/*
+ * Indexes used to get kinds, egos, artifacts and object flags to contribute
+ * towards object ability values.
+ */
+#define AVAL_IDX_KIND		0x01
+#define AVAL_IDX_EGO_ITEM	0x02
+#define AVAL_IDX_ARTIFACT	0x04
+#define AVAL_IDX_MAGIC		0x08
+#define AVAL_IDX_FORGED		0x10
+
 
 /*
  * As of 2.7.8, the "object flags" are valid for all objects, and as

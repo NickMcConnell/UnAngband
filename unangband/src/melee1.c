@@ -565,7 +565,7 @@ static bool check_hit(int power, int level, int who, bool ranged)
 		if (o_ptr->k_idx)
 		{
 			/* Adjust by ac factor */
-			blocking += o_ptr->ac + object_aval(o_ptr, ABILITY_TO_AC) + (ranged ? object_aval(o_ptr, ABILITY_TO_AC_RANGED) : object_aval(o_ptr, ABILITY_TO_AC_MELEE));
+			blocking += object_aval(o_ptr, ABILITY_TO_AC_BLOCK) + object_aval(o_ptr, ABILITY_TO_AC) + (ranged ? object_aval(o_ptr, ABILITY_TO_AC_RANGED) : object_aval(o_ptr, ABILITY_TO_AC_MELEE));
 		}
 
 		/* Modify by style */
@@ -638,30 +638,15 @@ static bool check_hit(int power, int level, int who, bool ranged)
 	if (k < 10) return (k < 5);
 
 	/* Total armor */
-	ac = p_ptr->ac + p_ptr->to_a + (ranged ? p_ptr->ability[ABILITY_TO_AC_RANGED] : p_ptr->ability[ABILITY_TO_AC_MELEE]);
+	ac = p_ptr->ac + p_ptr->to_a +
+		+ (ranged ? p_ptr->ability[ABILITY_TO_AC_RANGED] : p_ptr->ability[ABILITY_TO_AC_MELEE]);
 
 	/* Modify for blocking */
 	ac += blocking;
 
-	/* Some items and effects count for more at range */
-	if (ranged)
-	{
-		object_type *o_ptr = &inventory[INVEN_ARM];
-
-		/* Shields count for double */
-		if ((o_ptr->k_idx) && (o_ptr->tval == TV_SHIELD))
-		{
-			/* Add shield ac again */
-			ac += o_ptr->ac;
-		}
-
-		/* Shield spell counts for double */
-		if (p_ptr->timed[TMD_SHIELD]) ac += 50;
-
-		/* Ill winds help a lot */
-		if ((p_ptr->cur_flags4 & (TR4_WINDY)) ||
-				room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY)) ac += 100;
-	}
+	/* Ill winds help a lot against ranged weapons */
+	if ((ranged) && ((p_ptr->cur_flags4 & (TR4_WINDY)) ||
+			room_has_flag(p_ptr->py, p_ptr->px, ROOM_WINDY))) ac += 100;
 
 	/* Some rooms make the player vulnerable */
 	if (room_has_flag(p_ptr->py, p_ptr->px, ROOM_CURSED)) ac /= 2;

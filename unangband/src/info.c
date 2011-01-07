@@ -64,7 +64,7 @@ int bow_multiplier(int sval)
 static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b *f1, u32b *f2, u32b *f3, u32b *f4)
 {
 	object_kind *k_ptr;
-	int i, j;
+	int i;
 
 	if (mode != OBJECT_FLAGS_FULL)
 	{
@@ -105,18 +105,12 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY
 		/* Base object */
 		if ((f0) && (mode != OBJECT_FLAGS_FULL))
 		{
-			/* Note that the actual object may not have the abilities the kind suggests it has
-			 * because the ego or artifact ability avals may add up to 0 when combined with the kind aval.
-			 * In practice, this shouldn't ever happen.
-			 */
-			for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+			for (i = 0; i < k_ptr->ability_count; i++)
 			{
-				for (j = 0; j < MAX_AVALS_KIND; j++)
-				{
-					f0[i] |= k_ptr->flags0[i][j];
-				}
+				f0[k_ptr->ability[i]/32] |= (1L << (k_ptr->ability[i]%32));
 			}
 		}
+		
 		(*f1) = k_ptr->flags1;
 		(*f2) = k_ptr->flags2;
 		(*f3) = k_ptr->flags3;
@@ -129,9 +123,11 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY
 			{
 				artifact_type *a_ptr = &a_info[o_ptr->name1];
 
-#if 0
-				if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] |= a_ptr->flags0[i];
-#endif
+				if (f0) for (i = 0; i < a_ptr->ability_count; i++)
+				{
+					f0[a_ptr->ability[i]/32] |= (1L << (a_ptr->ability[i]%32));
+				}
+				
 				(*f1) = a_ptr->flags1;
 				(*f2) = a_ptr->flags2;
 				(*f3) = a_ptr->flags3;
@@ -143,9 +139,11 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY
 			{
 				ego_item_type *e_ptr = &e_info[o_ptr->name2];
 
-#if 0
-				if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] |= e_ptr->flags0[i];
-#endif
+				if (f0) for (i = 0; i < e_ptr->ability_count; i++)
+				{
+					f0[e_ptr->ability[i]/32] |= (1L << (e_ptr->ability[i]%32));
+				}
+
 				(*f1) |= e_ptr->flags1;
 				(*f2) |= e_ptr->flags2;
 				(*f3) |= e_ptr->flags3;
@@ -197,13 +195,11 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY
 		{
 			artifact_type *a_ptr = &a_info[o_ptr->name1];
 
-			for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+			for (i = 0; i < a_ptr->ability_count; i++)
 			{
-				for (j = 0; j < MAX_AVALS_ARTIFACT; j++)
-				{
-					f0[i] |= a_ptr->flags0[i][j];
-				}
+				f0[a_ptr->ability[i]/32] |= (1L << (a_ptr->ability[i]%32));
 			}
+
 			(*f1) = a_ptr->flags1;
 			(*f2) = a_ptr->flags2;
 			(*f3) = a_ptr->flags3;
@@ -221,13 +217,11 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY
 		{
 			ego_item_type *e_ptr = &e_info[o_ptr->name2];
 
-			for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+			for (i = 0; i < e_ptr->ability_count; i++)
 			{
-				for (j = 0; j < MAX_AVALS_EGO_ITEM; j++)
-				{
-					f0[i] |= e_ptr->flags0[i][j];
-				}
+				f0[e_ptr->ability[i]/32] |= (1L << (e_ptr->ability[i]%32));
 			}
+
 			(*f1) = e_ptr->flags1;
 			(*f2) = e_ptr->flags2;
 			(*f3) = e_ptr->flags3;
@@ -444,7 +438,6 @@ void object_flags(const object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b *f
 	object_flags_aux(OBJECT_FLAGS_FULL, o_ptr, f0, f1, f2, f3, f4);
 }
 
-
 /*
  * Obtain the "aval" for a particular ability on an item kind
  */
@@ -453,14 +446,13 @@ int kind_aval(int k_idx, int ability)
 	const object_kind *k_ptr = &k_info[k_idx];
 
 	int i;
-	int k = 0;
 	
 	for (i = 0; i < MAX_AVALS_KIND; i++)
 	{
-		if ((k_ptr->flags0[ability/32][i] & (1L << (ability % 32))) != 0) k+= k_ptr->aval[i];
+		if (k_ptr->ability[i]==ability) return(k_ptr->aval[i]);
 	}
 	
-	return (k);
+	return (0);
 }
 
 
@@ -471,62 +463,13 @@ int kind_aval(int k_idx, int ability)
 int object_aval(const object_type *o_ptr, int ability)
 {
 	int i;
-	int k = 0;
-	int n = 0;
-	int o = 0;
-	int p = 0;
-	
-	for (i = 0; i < MAX_AVALS_OBJECT; i++)
-	{
-		/* Kind of item */
-		if (o_ptr->aval_index[i] & (0x01))
-		{
-			object_kind *k_ptr = &k_info[o_ptr->k_idx];
-			
-			if ((k_ptr->flags0[ability/32][n] & (1L << (ability % 32))) != 0) k+= o_ptr->aval[i];
-			
-			if (n < MAX_AVALS_KIND) n++;
-		}
-		
-		/* Ego items */
-		if (o_ptr->aval_index[i] & (0x02))
-		{
-			ego_item_type *e_ptr = &e_info[o_ptr->name2];
 
-			if ((e_ptr->flags0[ability/32][o] & (1L << (ability % 32))) != 0) k+= o_ptr->aval[i];
-			
-			if (n < MAX_AVALS_EGO_ITEM) o++;
-		}
-		
-		/* Artifacts */
-		if (o_ptr->aval_index[i] & (0x04))
-		{
-			artifact_type *a_ptr = &a_info[o_ptr->name1];
-			
-			if ((a_ptr->flags0[ability/32][p] & (1L << (ability % 32))) != 0) k+= o_ptr->aval[i];
-			
-			if (n < MAX_AVALS_ARTIFACT) p++;
-		}
-		
-		/* Magic items */
-		if ((o_ptr->aval_index[i] & (0x08)) && (hidden_p(o_ptr)))
-		{
-			/* Magic item modifies an ability */
-			if (((object_xtra_what[o_ptr->xtra1]) == 0)
-					&& (ability == object_xtra_base[o_ptr->xtra1] + o_ptr->xtra2))
-			{
-				k+= o_ptr->aval[i];
-			}
-		}
-		
-		/* Forged items */
-		if (o_ptr->aval_index[i] & (0x10))
-		{
-			if ((o_ptr->can_flags0[ability/32] & (1L << (ability % 32))) != 0) k+= o_ptr->aval[i];
-		}
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		if (o_ptr->ability[i]==ability) return(o_ptr->aval[i]);
 	}
 	
-	return (k);
+	return (0);
 }
 
 
@@ -536,12 +479,91 @@ int object_aval(const object_type *o_ptr, int ability)
 void object_eval(const object_type *o_ptr, s16b ability[ABILITY_MAX])
 {
 	int i;
-
+	
 	for (i = 0; i < ABILITY_MAX; i++)
 	{
-		ability[i] = object_aval(o_ptr, i);
-	}			
+		ability[i] = 0;
+	}
+
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		ability[o_ptr->ability[i]] = o_ptr->aval[i];
+	}
 }
+
+/*
+ * Adds an ability to an existing item. Returns true iff we can add this ability.
+ */
+bool object_ability_add_one(object_type *o_ptr, int ability, int value)
+{
+	int i;
+	
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		if (o_ptr->ability[i] == ability)
+		{
+			o_ptr->aval[i] += value;
+			return(TRUE);
+		}
+	}
+	
+	if (/*(i == o_ptr->ability_count) && */(o_ptr->ability_count < MAX_AVALS_OBJECT))
+	{
+		o_ptr->ability[i] = ability;
+		o_ptr->aval[i] = value;
+		o_ptr->ability_count++;
+		
+		return (TRUE);
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Divides an ability on an existing item by a value. Returns true iff item has this ability.
+ */
+bool object_ability_div_one(object_type *o_ptr, int ability, int value)
+{
+	int i;
+	
+	/* Paranoia */
+	if (!value) return (FALSE);
+	
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		if (o_ptr->ability[i] == ability)
+		{
+			o_ptr->aval[i] /= value;
+			return(TRUE);
+		}
+	}
+	
+	return (FALSE);
+}
+
+
+/*
+ * Removes an ability from an existing item.
+ */
+bool object_ability_clear_one(object_type *o_ptr, int ability)
+{
+	int i;
+	bool removed = FALSE;
+	
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		if (o_ptr->ability[i] == ability)
+		{
+			o_ptr->aval[i] = o_ptr->aval[--o_ptr->ability_count];
+			o_ptr->ability[i] = o_ptr->ability[o_ptr->ability_count];
+			removed = TRUE;
+		}
+	}
+	
+	return (removed);
+}
+
 
 
 /*
@@ -572,8 +594,10 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
 	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b not_f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
-	int i, j;
+	int i;
 
+	object_kind *k_ptr = &k_info[o_ptr->k_idx];
+	
 	/* Spoil the object */
 	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
@@ -595,32 +619,39 @@ void object_obvious_flags(object_type *o_ptr, bool floor)
 	/* Abilities of base item are always known if aware */
 	if (object_aware_p(o_ptr) || ((o_ptr->ident & (IDENT_STORE)) != 0))
 	{
+		for (i = 0; i < k_ptr->ability_count; i++)
+		{
+			o_ptr->can_flags0[k_ptr->ability[i]/32] |= (1L << (k_ptr->ability[i]%32));
+		}
+
+#if 0
 		for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
 		{
 			for (j = 0; j < MAX_AVALS_KIND; j++)
 			{
-				o_ptr->can_flags0[i] |= k_info[o_ptr->k_idx].flags0[i][j];
+				o_ptr->can_flags0[i] |= k_ptr->flags0[i][j];
 			}
 		}
-		o_ptr->can_flags1 |= k_info[o_ptr->k_idx].flags1;
-		o_ptr->can_flags2 |= k_info[o_ptr->k_idx].flags2;
-		o_ptr->can_flags3 |= k_info[o_ptr->k_idx].flags3;
-		o_ptr->can_flags4 |= k_info[o_ptr->k_idx].flags4;
+#endif
+		o_ptr->can_flags1 |= k_ptr->flags1;
+		o_ptr->can_flags2 |= k_ptr->flags2;
+		o_ptr->can_flags3 |= k_ptr->flags3;
+		o_ptr->can_flags4 |= k_ptr->flags4;
 	}
 	/* Learnt abilities of flavored items are added if not aware */
-	else if (k_info[o_ptr->k_idx].flavor)
+	else if (k_ptr->flavor)
 	{
-		object_can_flags(o_ptr,x_list[k_info[o_ptr->k_idx].flavor].can_flags0,
-							  x_list[k_info[o_ptr->k_idx].flavor].can_flags1,
-							  x_list[k_info[o_ptr->k_idx].flavor].can_flags2,
-							  x_list[k_info[o_ptr->k_idx].flavor].can_flags3,
-							  x_list[k_info[o_ptr->k_idx].flavor].can_flags4, floor);
+		object_can_flags(o_ptr,x_list[k_ptr->flavor].can_flags0,
+							  x_list[k_ptr->flavor].can_flags1,
+							  x_list[k_ptr->flavor].can_flags2,
+							  x_list[k_ptr->flavor].can_flags3,
+							  x_list[k_ptr->flavor].can_flags4, floor);
 
-		object_not_flags(o_ptr,x_list[k_info[o_ptr->k_idx].flavor].not_flags0,
-							  x_list[k_info[o_ptr->k_idx].flavor].not_flags1,
-							  x_list[k_info[o_ptr->k_idx].flavor].not_flags2,
-							  x_list[k_info[o_ptr->k_idx].flavor].not_flags3,
-							  x_list[k_info[o_ptr->k_idx].flavor].not_flags4, floor);
+		object_not_flags(o_ptr,x_list[k_ptr->flavor].not_flags0,
+							  x_list[k_ptr->flavor].not_flags1,
+							  x_list[k_ptr->flavor].not_flags2,
+							  x_list[k_ptr->flavor].not_flags3,
+							  x_list[k_ptr->flavor].not_flags4, floor);
 	}
 
 	/* Identified name */
@@ -2749,7 +2780,7 @@ void describe_self_object(object_type *o_ptr, int slot)
 			if (attack && charging) text_out(" or charging");
 			else if (attack) text_out(" unless charging");
 			if (unarmed) text_out(" unarmed");
-			text_out(format(", it does %dd%d", o_ptr->dd, o_ptr->ds));
+			text_out(format(", it does %dd%d", object_ability(o_ptr, ABILITY_DAMAGE_DICE), object_ability(o_ptr, ABILITY_DAMAGE_SIDES)));
 			if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM)));
 			else if (object_aval(o_ptr, ABILITY_TO_DAM) < 0) text_out(format("%d", object_aval(o_ptr, ABILITY_TO_DAM)));
 			text_out(" ");
@@ -2948,12 +2979,12 @@ bool list_object_flags(const s16b ability[ABILITY_MAX], const u32b f0[ABILITY_AR
 		/* Restart the list */
 		list_ptr = list;
 
-		/* Skip if not known */
-		if ((f0) && (((f0[j/32]) & (1L << (j % 32))) == 0)) continue;
-		
 		/* Check each ability */
 		for (j = 0; j < ABILITY_MAX; j++)
 		{
+			/* Skip if not known */
+			if ((f0) && (((f0[j/32]) & (1L << (j % 32))) == 0)) continue;
+			
 			/* Skip unless a multiplier/divisor */
 			if ((ability_bonus[j].type != BONUS_MULTIPLIER)
 				&& (ability_bonus[j].type >= BONUS_WEAPON_MULTIPLIER)) continue;
@@ -4033,7 +4064,7 @@ void list_object(const object_type *o_ptr, int mode)
 	f6 = k_info[o_ptr->k_idx].flags6;
 
 	/* Basic abilities -- damage/ damage multiplier */
-	if (!random && o_ptr->dd && o_ptr->ds)
+	if (!random && object_ability(o_ptr, ABILITY_DAMAGE_DICE) && object_ability(o_ptr, ABILITY_DAMAGE_SIDES))
 	{
 		bool throw_it = TRUE;
 		bool throw_it_good = ((f0[2] & ((1L << (ABILITY_HURL_DAM % 32)) | (1L << (ABILITY_HURL_NUM % 32)))) != 0) || ((f3 & TR3_THROWING) != 0);
@@ -4072,7 +4103,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 		if (throw_it)
 		{
-			text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
+			text_out(format("does %dd%d", object_ability(o_ptr, ABILITY_DAMAGE_DICE), object_ability(o_ptr, ABILITY_DAMAGE_SIDES)));
 			if (object_bonus_p(o_ptr) || spoil)
 			{
 				if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM)));
@@ -4371,11 +4402,11 @@ void list_object(const object_type *o_ptr, int mode)
 					/* Badly balanced weapons do minimum damage */
 					if ((vp[n] == vp_throw) && (!throw_it_good) && ((f6 & (TR6_BAD_THROW)) != 0))
 					{
-						text_out(format("does %d", o_ptr->dd));
+						text_out(format("does %d", object_ability(o_ptr, ABILITY_DAMAGE_DICE)));
 					}
 					else
 					{
-						text_out(format("does %dd%d", o_ptr->dd, o_ptr->ds));
+						text_out(format("does %dd%d", object_ability(o_ptr, ABILITY_DAMAGE_DICE), object_ability(o_ptr, ABILITY_DAMAGE_SIDES)));
 
 						if (vp[n] == vp_throw) to_d *= 2;
 					}
@@ -4514,7 +4545,7 @@ void list_object(const object_type *o_ptr, int mode)
 	/* Basic abilities -- armor class */
 	if (!random)
 	{
-		int armor = o_ptr->ac;
+		int armor = object_aval(o_ptr, ABILITY_AC);
 
 		if (object_bonus_p(o_ptr) || spoil) armor += object_aval(o_ptr, ABILITY_TO_AC);
 
@@ -5254,7 +5285,7 @@ void object_guess_name(object_type *o_ptr)
 	/* Remove flags on aware objects */
 	if (object_aware_p(o_ptr))
 	{
-		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) for (ii = 0; ii < MAX_AVALS_KIND; ii++) f0[i] &= ~(k_info[o_ptr->k_idx].flags0[i][ii]);
+		for (i = 0; i < k_info[o_ptr->k_idx].ability_count; i++) f0[k_info[o_ptr->k_idx].ability[i]/32] &= ~(1L << (k_info[o_ptr->k_idx].ability[i]%32));
 		f1 &= ~(k_info[o_ptr->k_idx].flags1);
 		f2 &= ~(k_info[o_ptr->k_idx].flags2);
 		f3 &= ~(k_info[o_ptr->k_idx].flags3);
@@ -5335,8 +5366,9 @@ void object_guess_name(object_type *o_ptr)
 		{
 			if ((adult_lore) || !(e_ptr->xtra))
 			{
-				for (iii = 0; iii < MAX_AVALS_EGO_ITEM; iii++) if ((f0[ii/32] & (1L<<(ii % 32))) && (e_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=3;
-				for (iii = 0; iii < MAX_AVALS_EGO_ITEM; iii++) if ((o_ptr->may_flags0[ii/32] & (1L<<(ii%32))) && (e_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=1;
+				for (iii = 0; iii < MAX_AVALS_EGO_ITEM; iii++) if ((f0[ii/32] & (1L<<(ii % 32))) && (e_ptr->ability[iii] == ii)) score +=3;
+				for (iii = 0; iii < MAX_AVALS_EGO_ITEM; iii++) if ((o_ptr->may_flags0[ii/32] & (1L<<(ii%32))) && (e_ptr->ability[iii] == ii)) score +=1;
+
 			}
 			else
 			{
@@ -5435,6 +5467,7 @@ void object_guess_name(object_type *o_ptr)
 	for (i = 1; i < z_info->k_max; i++)
 	{
 		object_kind *k_ptr = &k_info[i];
+		u32b kf0[ABILITY_ARRAY_SIZE];
 
 		bool legal = TRUE;
 		
@@ -5451,9 +5484,9 @@ void object_guess_name(object_type *o_ptr)
 		if (k_ptr->tval != o_ptr->tval) continue;
 
 		/* Must possess powers */
-		for (ii = 0; ii < ABILITY_ARRAY_SIZE; ii++)
+		for (ii = 0; ii < k_ptr->ability_count; ii++)
 		{
-			for (iii = 0; iii < MAX_AVALS_KIND; iii++) if (o_ptr->not_flags0[ii] & k_ptr->flags0[ii][iii]) legal = FALSE;
+			if ((o_ptr->not_flags0[k_ptr->ability[ii]/32] & (1L << (k_ptr->ability[ii]%32))) != 0) legal = FALSE;
 		}
 		if (!legal) continue;
 		if (o_ptr->not_flags1 & k_ptr->flags1) continue;
@@ -5461,10 +5494,19 @@ void object_guess_name(object_type *o_ptr)
 		if (o_ptr->not_flags3 & k_ptr->flags3) continue;
 		if (o_ptr->not_flags4 & k_ptr->flags4) continue;
 
+		/* Initialize test */
+		for (ii = 0; ii < ABILITY_ARRAY_SIZE; ii++) kf0[ii] = 0L;
+		
+		/* Initialize excepted powers */
+		for (ii = 0; ii < k_ptr->ability_count; ii++)
+		{
+			kf0[k_ptr->ability[ii]/32] |= (1L << (k_ptr->ability[ii]%32));
+		}
+		
 		/* Must not have excepted powers */
 		for (ii = 0; ii < ABILITY_ARRAY_SIZE; ii++)
 		{
-			for (iii = 0; iii < MAX_AVALS_KIND; iii++) if (f0[ii] & ~(k_ptr->flags0[ii][iii])) legal = FALSE;
+			if (f0[ii] & ~(kf0[ii])) legal = FALSE;
 		}
 		if (!legal) continue;
 		if (f1 & ~(k_ptr->flags1)) continue;
@@ -5475,13 +5517,13 @@ void object_guess_name(object_type *o_ptr)
 		/* Reset score */
 		score = 0;
 
-		/* Aware points on matching abilities: 3 for have, 1 for may */
-		for (ii = 0; ii < ABILITY_MAX; ii++)
+		/* Award points on matching abilities: 3 for have, 1 for may */
+		for (ii = 0; ii < k_ptr->ability_count; ii++)
 		{
-			for (iii = 0; iii < MAX_AVALS_KIND; iii++) if ((f0[ii/32] & (1L<<(ii % 32))) && (k_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=3;
-			for (iii = 0; iii < MAX_AVALS_KIND; iii++) if ((o_ptr->may_flags0[ii/32] & (1L<<(ii%32))) && (k_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=1;
+			if (f0[k_ptr->ability[ii]/32] & (1L<<k_ptr->ability[ii]%32)) score +=3;
+			if (o_ptr->may_flags0[k_ptr->ability[ii]/32] & (1L<<k_ptr->ability[ii]%32)) score +=1;
 		}
-
+		
 		/* Award points on matching powers: 3 for have, 1 for may */
 		for (ii=0;ii<32;ii++)
 		{
@@ -5586,8 +5628,13 @@ void object_guess_name(object_type *o_ptr)
 		{
 			if (adult_lore)
 			{
-				for (iii = 0; iii < MAX_AVALS_ARTIFACT; iii++) if ((f0[ii/32] & (1L<<(ii % 32))) && (a_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=3;
-				for (iii = 0; iii < MAX_AVALS_ARTIFACT; iii++) if ((o_ptr->may_flags0[ii/32] & (1L<<(ii%32))) && (a_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=1;
+				for (iii = 0; iii < a_ptr->ability_count; iii++) if ((f0[ii/32] & (1L<<(ii % 32))) && (a_ptr->ability[iii] == ii)) score +=3;
+				for (iii = 0; iii < a_ptr->ability_count; iii++) if ((o_ptr->may_flags0[ii/32] & (1L<<(ii%32))) && (a_ptr->ability[iii] == ii)) score +=1;
+				
+#if 0
+				for (iii = 0; iii < a_ptr->ability_count; iii++) if ((f0[ii/32] & (1L<<(ii % 32))) && (a_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=3;
+				for (iii = 0; iii < a_ptr->ability_count; iii++) if ((o_ptr->may_flags0[ii/32] & (1L<<(ii%32))) && (a_ptr->flags0[ii/32][iii] & (1L<<(ii%32)))) score +=1;
+#endif
 			}
 			else
 			{
@@ -5767,6 +5814,8 @@ void object_can_flags(object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, 
 	u32b if3 = o_ptr->may_flags3 & (f3);
 	u32b if4 = o_ptr->may_flags4 & (f4);
 
+	object_kind *k_ptr = &k_info[o_ptr->k_idx];
+	
 	/* Prevent tainting array */
 	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) tmpf0[i] = (f0) ? f0[i] : 0L;
 
@@ -5805,14 +5854,14 @@ void object_can_flags(object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, 
 	o_ptr->can_flags4 |= (f4);
 
 	/* If object flavored, learn flags about that flavor */
-	if (!object_aware_p(o_ptr) && !(o_ptr->ident & IDENT_STORE) && (k_info[o_ptr->k_idx].flavor))
+	if (!object_aware_p(o_ptr) && !(o_ptr->ident & IDENT_STORE) && (k_ptr->flavor))
 	{
 		/* Learn for base flavor */
-		if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) x_list[k_info[o_ptr->k_idx].flavor].can_flags0[i] |= (f0[i]);
-		x_list[k_info[o_ptr->k_idx].flavor].can_flags1 |= (f1);
-		x_list[k_info[o_ptr->k_idx].flavor].can_flags2 |= (f2);
-		x_list[k_info[o_ptr->k_idx].flavor].can_flags3 |= (f3);
-		x_list[k_info[o_ptr->k_idx].flavor].can_flags4 |= (f4);
+		if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) x_list[k_ptr->flavor].can_flags0[i] |= (f0[i]);
+		x_list[k_ptr->flavor].can_flags1 |= (f1);
+		x_list[k_ptr->flavor].can_flags2 |= (f2);
+		x_list[k_ptr->flavor].can_flags3 |= (f3);
+		x_list[k_ptr->flavor].can_flags4 |= (f4);
 
 		/* Process inventory */
 		for (i = 0; i < INVEN_TOTAL; i++)
@@ -5886,11 +5935,11 @@ void object_can_flags(object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, 
 
 	/* Hack -- Remove kind flags */
 	/* This prevents Blades of Chaos 'tainting' ego items etc. */
-	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) for (i = 0; j < MAX_AVALS_KIND; j++) tmpf0[i] &= ~(k_info[o_ptr->k_idx].flags0[i][j]);
-	f1 &= ~(k_info[o_ptr->k_idx].flags1);
-	f2 &= ~(k_info[o_ptr->k_idx].flags2);
-	f3 &= ~(k_info[o_ptr->k_idx].flags3);
-	f4 &= ~(k_info[o_ptr->k_idx].flags4);
+	for (i = 0; i < k_ptr->ability_count; i++) tmpf0[k_ptr->ability[i]/32] &= ~(k_ptr->ability[i]%32);
+	f1 &= ~(k_ptr->flags1);
+	f2 &= ~(k_ptr->flags2);
+	f3 &= ~(k_ptr->flags3);
+	f4 &= ~(k_ptr->flags4);
 
 	/* Hack -- Remove 'user' enchanted hidden flags */
 	/* This prevents runes and enchantment spells 'tainting' ego items */
@@ -6245,6 +6294,8 @@ void object_not_flags(object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, 
 	bool oops = FALSE;
 	u32b tmpf0[ABILITY_ARRAY_SIZE];
 
+	object_kind *k_ptr = &k_info[o_ptr->k_idx];
+	
 	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) tmpf0[i] = 0L;
 	
 	/* No change */
@@ -6318,13 +6369,13 @@ void object_not_flags(object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, 
 	o_ptr->can_flags4 &= ~(f4);
 
 	/* If object flavored, learn flags about that flavor */
-	if (!object_aware_p(o_ptr) && !(o_ptr->ident & (IDENT_STORE)) && (k_info[o_ptr->k_idx].flavor))
+	if (!object_aware_p(o_ptr) && !(o_ptr->ident & (IDENT_STORE)) && (k_ptr->flavor))
 	{
-		if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) x_list[k_info[o_ptr->k_idx].flavor].not_flags0[i] |= (f0[i]);		
-		x_list[k_info[o_ptr->k_idx].flavor].not_flags1 |= (f1);
-		x_list[k_info[o_ptr->k_idx].flavor].not_flags2 |= (f2);
-		x_list[k_info[o_ptr->k_idx].flavor].not_flags3 |= (f3);
-		x_list[k_info[o_ptr->k_idx].flavor].not_flags4 |= (f4);
+		if (f0) for (i = 0; i < ABILITY_ARRAY_SIZE; i++) x_list[k_ptr->flavor].not_flags0[i] |= (f0[i]);		
+		x_list[k_ptr->flavor].not_flags1 |= (f1);
+		x_list[k_ptr->flavor].not_flags2 |= (f2);
+		x_list[k_ptr->flavor].not_flags3 |= (f3);
+		x_list[k_ptr->flavor].not_flags4 |= (f4);
 
 		/* Process inventory */
 		for (i = 0; i < INVEN_TOTAL; i++)
@@ -6573,13 +6624,13 @@ void object_usage(int slot)
 		{
 			/* Suggested calculation for weapons is 1 + (dd * ds ^ 1.5) / 4 from
 			 * http://angband.oook.cz/forum/showthread.php?t=1135&highlight=weapon+calculation&page=2 */
-			if (!object_bonus_p(o_ptr) && (o_ptr->usage >= (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4))) bonus = TRUE;
+			if (!object_bonus_p(o_ptr) && (o_ptr->usage >= (1 + (object_ability(o_ptr, ABILITY_DAMAGE_DICE) * object_ability(o_ptr, ABILITY_DAMAGE_SIDES) * (object_ability(o_ptr, ABILITY_DAMAGE_SIDES) / 2)) / 4))) bonus = TRUE;
 
 			/* Heavy sense if half-way there */
-			else if (o_ptr->usage > (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4) / 2) heavy = TRUE;
+			else if (o_ptr->usage > (1 + (object_ability(o_ptr, ABILITY_DAMAGE_DICE) * object_ability(o_ptr, ABILITY_DAMAGE_SIDES) * (object_ability(o_ptr, ABILITY_DAMAGE_SIDES) / 2)) / 4) / 2) heavy = TRUE;
 
 			/* Sense if one third of way there */
-			else if (o_ptr->usage == (1 + (o_ptr->dd * o_ptr->ds * (o_ptr->ds / 2)) / 4) / 3) sense = TRUE;
+			else if (o_ptr->usage == (1 + (object_ability(o_ptr, ABILITY_DAMAGE_DICE) * object_ability(o_ptr, ABILITY_DAMAGE_SIDES) * (object_ability(o_ptr, ABILITY_DAMAGE_SIDES) / 2)) / 4) / 3) sense = TRUE;
 
 			break;
 		}
@@ -6609,13 +6660,13 @@ void object_usage(int slot)
 		case TV_DRAG_ARMOR:
 		{
 			/* Calculation is based on the fact that base armour outweighs bonus */
-			if (!object_bonus_p(o_ptr) && (o_ptr->usage >= o_ptr->ac /2)) bonus = TRUE;
+			if (!object_bonus_p(o_ptr) && (o_ptr->usage >= object_aval(o_ptr, ABILITY_AC) /2)) bonus = TRUE;
 
 			/* Heavy sense if half-way there */
-			else if (o_ptr->usage > o_ptr->ac / 4) heavy = TRUE;
+			else if (o_ptr->usage > object_aval(o_ptr, ABILITY_AC) / 4) heavy = TRUE;
 
 			/* Sense if one-third of way there */
-			else if (o_ptr->usage == 1 + o_ptr->ac / 6) sense = TRUE;
+			else if (o_ptr->usage == 1 + object_aval(o_ptr, ABILITY_AC) / 6) sense = TRUE;
 
 			break;
 		}
@@ -7080,24 +7131,21 @@ s32b slay_power(u32b s_index)
 /*
  * Convert all slay and brand flags into a single index value. This is used in randart.c.
  */
-u32b slay_index(const u32b f0[ABILITY_ARRAY_SIZE], const u32b f1, const u32b f2, const u32b f3, const u32b f4)
+u32b slay_index(const s16b *ability, int ability_count, s16b *aval)
 {
 	u32b s_index = 0x00000000L;
-	int i, k = 0;
+	int i, j , k = 0;
 
-	(void)f1; (void)f2; (void)f3; (void)f4;
+	(void)aval;
 	
 	for (i = 0; i < ABILITY_MAX; i++)
 	{
 		if ((k < 32) && (ability_bonus[i].type >= BONUS_SLAY))
 		{
-			if ((f0[i/32] & (1L << (i % 32))) != 0)
+			for (j = 0; j < ability_count; j++)
 			{
-				s_index |= (1L << k);
-			}
-			
-			/* Increase counter */
-			k++;
+				if (ability[j] == i) s_index |= (1L << k);
+			}			
 		}
 	}
 
@@ -7227,15 +7275,9 @@ s32b object_power(const object_type *o_ptr)
 	}
 	
 	/* Subtract the kind bonuses from the object */
-	for (i = 0; i < ABILITY_MAX; i++)
+	for (i = 0; i < k_ptr->ability_count; i++)
 	{
-		for (j = 0; j < MAX_AVALS_KIND; j++)
-		{
-			if ((i < 32) && ((k_ptr->flags0[i/32][j] & (1L << i)) != 0)) ability_base[i] += k_ptr->aval[j];
-			else if ((i >= 32) && (i < 64) && ((k_ptr->flags0[(i-32)/32][j] & (1L << (i-32))) != 0)) ability_base[i] += o_ptr->aval[j];
-			else if ((i >= 64) && (i < 96) && ((k_ptr->flags0[(i-64)/32][j] & (1L << (i-64))) != 0)) ability_base[i] += o_ptr->aval[j];
-			else if ((i >= 96) && (i < 128) && ((k_ptr->flags0[(i-96)/32][j] & (1L << (i-96))) != 0)) ability_base[i] += o_ptr->aval[j];
-		}
+		ability_base[k_ptr->ability[i]] -= k_ptr->aval[i];
 	}
 	
 	/*
@@ -7397,10 +7439,11 @@ s32b object_power(const object_type *o_ptr)
 		/* Hack -- For efficiency, compute for first slay or brand flag only */
 		else
 		{
+#if 0
 			int k;
 			u32b j, s_index;
 
-			s_index = slay_index(f0, f1, f2, f3, f4);
+			s_index = slay_index(ability, );
 
 			for (k = 0, j = 0x00000001L;(k < 32) && (j != s_index); k++, j<<=1);
 
@@ -7412,6 +7455,7 @@ s32b object_power(const object_type *o_ptr)
 			for (k = 0, j = 0x00000001L;(k < 32) && (j != s_index); k++, j<<=1);
 
 			if (k < 32) r = (r * magic_slay_power[i]) / tot_mon_power;
+#endif
 		}
 
 		/* Increase average damage? */
@@ -7611,9 +7655,9 @@ s32b object_power(const object_type *o_ptr)
 			if (p > 0 && (f6 & (TR6_OFF_HAND)))
 				p++;
 
-			if (o_ptr->ac != k_ptr->ac)
+			if (object_aval(o_ptr, ABILITY_AC) != k_ptr->ac)
 			{
-				p += o_ptr->ac - k_ptr->ac;
+				p += object_aval(o_ptr, ABILITY_AC) - k_ptr->ac;
 			}
 
 			/* Remember, weight is in 0.1 lb. units. */
@@ -7660,7 +7704,7 @@ s32b object_power(const object_type *o_ptr)
 		case TV_GLOVES:
 		{
 			/* Note this is 'uncorrected' */
-			p += o_ptr->dd * (o_ptr->ds + 1);
+			p += object_ability(o_ptr, ABILITY_DAMAGE_DICE) * (object_ability(o_ptr, ABILITY_DAMAGE_SIDES) + 1);
 
 			/* Apply the correct ego slay multiplier */
 			if (o_ptr->name2)
@@ -7714,9 +7758,9 @@ s32b object_power(const object_type *o_ptr)
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
 		{
-			if (o_ptr->ac != k_ptr->ac)
+			if (object_aval(o_ptr, ABILITY_AC) != k_ptr->ac)
 			{
-				p += o_ptr->ac - k_ptr->ac;
+				p += object_aval(o_ptr, ABILITY_AC) - k_ptr->ac;
 			}
 
 			p += sign(ability_difference[ABILITY_TO_HIT]) * ((ABS(ability_difference[ABILITY_TO_HIT]) * 2) / 3);
@@ -7870,19 +7914,19 @@ s32b object_power(const object_type *o_ptr)
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
 		{
-			if (object_aval(o_ptr, ABILITY_TO_AC) > o_ptr->ac)
+			if (object_aval(o_ptr, ABILITY_TO_AC) > object_aval(o_ptr, ABILITY_AC))
 			{
-				p+= (object_aval(o_ptr, ABILITY_TO_AC) - o_ptr->ac);
+				p+= (object_aval(o_ptr, ABILITY_TO_AC) - object_aval(o_ptr, ABILITY_AC));
 			}
 
-			if (object_aval(o_ptr, ABILITY_TO_AC) > o_ptr->ac + 10)
+			if (object_aval(o_ptr, ABILITY_TO_AC) > object_aval(o_ptr, ABILITY_AC) + 10)
 			{
-				p += (object_aval(o_ptr, ABILITY_TO_AC) - o_ptr->ac - 10);
+				p += (object_aval(o_ptr, ABILITY_TO_AC) - object_aval(o_ptr, ABILITY_AC) - 10);
 			}
 
-			if (object_aval(o_ptr, ABILITY_TO_AC) > o_ptr->ac + 20)
+			if (object_aval(o_ptr, ABILITY_TO_AC) > object_aval(o_ptr, ABILITY_AC) + 20)
 			{
-				p += (object_aval(o_ptr, ABILITY_TO_AC) - o_ptr->ac - 20);
+				p += (object_aval(o_ptr, ABILITY_TO_AC) - object_aval(o_ptr, ABILITY_AC) - 20);
 			}
 
 			if (object_aval(o_ptr, ABILITY_TO_AC) > 39)

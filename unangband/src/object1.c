@@ -1245,7 +1245,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	if (object_aval(o_ptr, ABILITY_TO_HIT) && object_aval(o_ptr, ABILITY_TO_DAM)) show_weapon = TRUE;
 
 	/* Display the item like armour */
-	if (o_ptr->ac) show_armour = TRUE;
+	if (object_aval(o_ptr, ABILITY_AC)) show_armour = TRUE;
 
 	/* Dump base weapon info */
 	if (k_ptr->flags5 & (TR5_SHOW_DD))
@@ -1253,9 +1253,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		/* Append a "damage" string */
 		object_desc_chr_macro(t, ' ');
 		object_desc_chr_macro(t, p1);
-		object_desc_num_macro(t, o_ptr->dd);
+		object_desc_num_macro(t, object_aval(o_ptr, ABILITY_DAMAGE_DICE));
 		object_desc_chr_macro(t, 'd');
-		object_desc_num_macro(t, o_ptr->ds);
+		object_desc_num_macro(t, object_aval(o_ptr, ABILITY_DAMAGE_SIDES));
 		object_desc_chr_macro(t, p2);
 	}
 
@@ -1315,7 +1315,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			object_desc_chr_macro(t, ' ');
 			object_desc_chr_macro(t, b1);
-			object_desc_num_macro(t, o_ptr->ac);
+			object_desc_num_macro(t, object_aval(o_ptr, ABILITY_AC));
 			object_desc_chr_macro(t, ',');
 			object_desc_int_macro(t, object_aval(o_ptr, ABILITY_TO_AC));
 			object_desc_chr_macro(t, b2);
@@ -1336,7 +1336,7 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 	{
 		object_desc_chr_macro(t, ' ');
 		object_desc_chr_macro(t, b1);
-		object_desc_num_macro(t, o_ptr->ac);
+		object_desc_num_macro(t, object_aval(o_ptr, ABILITY_AC));
 		object_desc_chr_macro(t, b2);
 	}
 
@@ -1716,17 +1716,17 @@ bool two_weapons_balanced(const object_type *o_ptr, const object_type *i_ptr)
     return TRUE;
   /* ...or i_ptr is throwing... */
   else if (is_known_throwing_item(i_ptr)
-      && o_ptr->weight < 200)
+      && object_aval(o_ptr, ABILITY_WEIGHT) < 200)
     return TRUE;
   /* ...or o_ptr is throwing... */
   else if (is_known_throwing_item(o_ptr)
-	   && i_ptr->weight < 200)
+	   && object_aval(i_ptr, ABILITY_WEIGHT) < 200)
     return TRUE;
   /* ...or both are identical. */
   else if (i_ptr->tval == o_ptr->tval
 	   && ((i_ptr->sval == o_ptr->sval
-		&& (i_ptr->weight < 150)
-		&& (o_ptr->weight < 150))
+		&& (object_aval(i_ptr, ABILITY_WEIGHT) < 150)
+		&& (object_aval(o_ptr, ABILITY_WEIGHT) < 150))
 	       /* (All staffs are "identical".) */
 	       || i_ptr->tval == TV_STAFF))
     return TRUE;
@@ -2459,9 +2459,9 @@ void display_inven(void)
 		Term_erase(3+n, k, 255);
 
 		/* Display the weight if needed */
-		if (o_ptr->weight)
+		if (object_aval(o_ptr, ABILITY_WEIGHT))
 		{
-			int wgt = o_ptr->weight * o_ptr->number;
+			int wgt = object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 			sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
 			Term_putstr(71, k, -1, TERM_WHITE, tmp_val);
 		}
@@ -2613,9 +2613,9 @@ void display_equip(void)
 		}
 
 		/* Display the weight (if needed) */
-		if (o_ptr->k_idx && o_ptr->weight)
+		if (o_ptr->k_idx && object_aval(o_ptr, ABILITY_WEIGHT))
 		{
-			int wgt = o_ptr->weight * o_ptr->number;
+			int wgt = object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 			int col = (show_labels ? 52 : 71);
 			sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
 			Term_putstr(col, i - INVEN_WIELD, -1, TERM_WHITE, tmp_val);
@@ -2736,7 +2736,7 @@ void show_inven(void)
 		c_put_str(out_color[j], out_desc[j], j + 1, col + 3);
 
 		/* Display the weight if needed */
-		wgt = o_ptr->weight * o_ptr->number;
+		wgt = object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 		sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
 		put_str(tmp_val, j + 1, 71);
 	}
@@ -3019,7 +3019,7 @@ void show_equip(void)
 		}
 
 		/* Display the weight if needed */
-		wgt = o_ptr->weight * o_ptr->number;
+		wgt = object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 		sprintf(tmp_val, "%3d.%d lb", wgt / 10, wgt % 10);
 		put_str(tmp_val, j+1, 71);
 	}
@@ -3127,7 +3127,7 @@ void show_floor(const int *floor_list, int floor_num, bool gold)
 		c_put_str(out_color[j], out_desc[j], j + 1, col + 3);
 
 		/* Display the weight */
-		wgt = o_ptr->weight * o_ptr->number;
+		wgt = object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 		sprintf(tmp_val, "%3d.%1d lb", wgt / 10, wgt % 10);
 		put_str(tmp_val, j + 1, 71);
 	}
@@ -3683,7 +3683,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				object_prep(o_ptr, k);
 
 				/* And remove weight */
-				o_ptr->weight = 0;
+				object_ability_clear_one(o_ptr, ABILITY_WEIGHT);
 
 				/* And belong to the player */
 				o_ptr->name3 = -1;
@@ -5091,7 +5091,7 @@ bool get_item_from_bag(int *cp, cptr pmt, cptr str, object_type *o_ptr)
 	else i_ptr->show_idx = 0;
 
 	/* Increase the weight */
-	p_ptr->total_weight += (i_ptr->number * i_ptr->weight);
+	p_ptr->total_weight += (i_ptr->number * object_aval(i_ptr, ABILITY_WEIGHT));
 
 	/* Count the items */
 	p_ptr->inven_cnt++;

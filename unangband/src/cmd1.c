@@ -504,7 +504,7 @@ bool quiver_combine(object_type *o_ptr, int o_idx)
 	 * Increase carried weight.
 	 * Note that o_ptr has the right number of missiles to add.
 	 */
-	p_ptr->total_weight += o_ptr->weight * o_ptr->number;
+	p_ptr->total_weight += object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 
 	/* Reorder the quiver, track the index */
 	i = reorder_quiver(j_ptr - inventory);
@@ -618,7 +618,7 @@ bool quiver_carry(object_type *o_ptr, int o_idx)
 	 * Increase carried weight.
 	 * Note that o_ptr has the right number of missiles to add.
 	 */
-	p_ptr->total_weight += o_ptr->weight * o_ptr->number;
+	p_ptr->total_weight += object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 
 	/* Reorder the quiver, track the index */
 	i = reorder_quiver(j_ptr - inventory);
@@ -1986,7 +1986,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								to_crit += p_ptr->ability[ABILITY_TRAP_CRIT];
 
 								/* Add bow multiplier */
-								k = damroll(o_ptr->dd, o_ptr->ds);
+								k = damroll(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES));
 								k *= mult;
 
 								/* Add slay multipliers. TODO: Apply equivalent multipliers for trap affecting player */
@@ -1999,7 +1999,7 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								}
 								
 								/* Add other damage bonuses */
-								k += critical_shot(o_ptr->weight, to_hit + to_crit * BTC_PLUS_ADJ, k);
+								k += critical_shot(object_aval(o_ptr, ABILITY_WEIGHT), to_hit + to_crit * BTC_PLUS_ADJ, k);
 								k += object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(j_ptr, ABILITY_TO_DAM);
 								k += p_ptr->ability[ABILITY_TO_DAM];
 								k += object_aval(o_ptr, ABILITY_TO_DAM_TRAP) + object_aval(j_ptr, ABILITY_TO_DAM_TRAP);
@@ -2513,7 +2513,7 @@ void mon_style_benefits(const monster_type *m_ptr, u32b style, int *to_hit, int 
 	/* Check backstab if monster sleeping or fleeing */
 	if ( (m_ptr->csleep || m_ptr->monfear)
 		 && style & (1L<<WS_SWORD) /* works only for melee */
-		 && inventory[INVEN_WIELD].weight < 100 )
+		 && object_aval(&inventory[INVEN_WIELD], ABILITY_WEIGHT) < 100 )
 		style |= (1L <<WS_BACKSTAB);
 
 	/* Check slay orc if monster is an orc; works also for ranged attacks */
@@ -2918,7 +2918,7 @@ void py_attack(int dir)
 			{
 				int mult = object_damage_multiplier(o_ptr, m_ptr, FALSE);
 
-				k = damroll(o_ptr->dd, o_ptr->ds);
+				k = damroll(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES));
 
 				/* Allow other items on hands to assist with melee blow multipliers */
 				if (slot != INVEN_FEET)
@@ -2959,7 +2959,7 @@ void py_attack(int dir)
 				}
 
 				/* Get critical effect */
-				i = critical_norm(o_ptr->weight, bonus + (style_crit * 30), k);
+				i = critical_norm(object_aval(o_ptr, ABILITY_WEIGHT), bonus + (style_crit * 30), k);
 
 				/* Apply critical */
 				switch (crit)
@@ -3004,7 +3004,7 @@ void py_attack(int dir)
 
 				/* Adjust for equipment/stats to_d bounded by dice */
 				k += MIN(p_ptr->to_d,
-							o_ptr->dd * o_ptr->ds + 5);
+							object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5);
 			}
 			/* Handle bare-hand/bare-foot attack */
 			else

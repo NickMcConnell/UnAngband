@@ -3697,7 +3697,7 @@ void player_fire_or_throw_selected(int item, bool fire)
 		mul = throwing ? 10 : 3;
 
 		/* Enforce a minimum "weight" of one pound */
-		div = i_ptr->weight > 10 ? i_ptr->weight : 10;
+		div = object_aval(i_ptr, ABILITY_WEIGHT) > 10 ? object_aval(i_ptr, ABILITY_WEIGHT) : 10;
 
 		/* Hack -- Distance -- Reward strength, penalize weight */
 		tdis = (adj_str_blow[p_ptr->stat_ind[A_STR]] + 20) * mul / div;
@@ -3978,10 +3978,10 @@ void player_fire_or_throw_selected(int item, bool fire)
 				if (!fire && !throwing
 					&& (f6 & (TR6_BAD_THROW)))
 					/* Minimum damage from the object */
-					tdam = i_ptr->dd;
+					tdam = object_aval(i_ptr, ABILITY_DAMAGE_DICE);
 				else
 					/* Base damage from the object */
-					tdam = damroll(i_ptr->dd, i_ptr->ds);
+					tdam = damroll(object_aval(i_ptr, ABILITY_DAMAGE_DICE), object_aval(i_ptr, ABILITY_DAMAGE_SIDES));
 
 				/* The second fire/throw dependent code piece */
 				if (fire)
@@ -4105,14 +4105,14 @@ void player_fire_or_throw_selected(int item, bool fire)
 					if (fire)
 					{
 						/* Apply missile critical damage */
-						tdam += critical_shot(i_ptr->weight,
+						tdam += critical_shot(object_aval(i_ptr, ABILITY_WEIGHT),
 										bonus + style_crit * 30,
 										tdam);
 					}
 					else if (throwing)
 					{
 						/* Throws (with specialized throwing weapons) hit harder */
-						tdam += critical_norm(i_ptr->weight,
+						tdam += critical_norm(object_aval(i_ptr, ABILITY_WEIGHT),
 										bonus + style_crit * 30,
 								tdam);
 					}
@@ -4373,20 +4373,20 @@ void player_fire_or_throw_selected(int item, bool fire)
 			/* Describe */
 			object_desc(o_name, sizeof(o_name), i_ptr, FALSE, 0);
 
-			k = damroll(i_ptr->dd, i_ptr->ds);
+			k = damroll(object_aval(i_ptr, ABILITY_DAMAGE_DICE), object_aval(i_ptr, ABILITY_DAMAGE_SIDES));
 
 			/* The third piece of fire/throw dependent code */
 			if (fire)
 			{
 				/* Apply missile critical damage */
-				k += critical_shot(i_ptr->weight,
+				k += critical_shot(object_aval(i_ptr, ABILITY_WEIGHT),
 								bow_to_h + object_aval(i_ptr, ability_to_hit),
 								k);
 			}
 			else if (throwing)
 			{
 				/* Throws (with specialized throwing weapons) hit harder */
-				k += critical_norm(i_ptr->weight,
+				k += critical_norm(object_aval(i_ptr, ABILITY_WEIGHT),
 							bow_to_h + object_aval(i_ptr, ability_to_hit),
 						k);
 			}

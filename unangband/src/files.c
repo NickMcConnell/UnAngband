@@ -1990,7 +1990,7 @@ void display_player_xtra_info(bool hide_extra)
 	/* Base skill; damage from equipment bound by weapon dice */
 	hit = p_ptr->dis_to_h;
 	dam = MIN(p_ptr->dis_to_d,
-		  o_ptr->dd * o_ptr->ds + 5);
+		  object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5);
 	hit_real = p_ptr->to_h;
 
 	/* Check melee styles only */
@@ -2032,7 +2032,7 @@ void display_player_xtra_info(bool hide_extra)
 		/* Base skill; damage from equipment bound by weapon dice */
 		hit = p_ptr->dis_to_h;
 		dam = MIN(p_ptr->dis_to_d,
-			  o_ptr->dd * o_ptr->ds + 5);
+			  object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5);
 
 		/* Check melee styles only */
 		style = p_ptr->cur_style & (WS_WIELD_FLAGS);
@@ -2059,7 +2059,7 @@ void display_player_xtra_info(bool hide_extra)
 
 		o_ptr = &inventory[INVEN_ARM];
 
-		base = o_ptr->ac;
+		base = object_aval(o_ptr, ABILITY_AC);
 		plus = 0;
 		if (object_bonus_p(o_ptr)) plus += object_aval(o_ptr, ABILITY_TO_AC);
 
@@ -2079,7 +2079,7 @@ void display_player_xtra_info(bool hide_extra)
 		    && !(p_ptr->cur_style & (1L << WS_WEAPON_SHIELD)))
 		{
 			/* Shield stats (if shield bashes are in, display bash value) */
-			base = o_ptr->ac;
+			base = object_aval(o_ptr, ABILITY_AC);
 			plus = 0;
 			if (object_bonus_p(o_ptr)) plus += object_aval(o_ptr, ABILITY_TO_AC);
 
