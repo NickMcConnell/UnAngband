@@ -414,12 +414,17 @@ bool inven_study_okay(const object_type *o_ptr)
 		return (spell_okay(o_ptr->pval, FALSE));
 	}
 
+	/* Illegible book */
+	else if (disdain_book(o_ptr))
+	{
+		return (FALSE);
+	}
+
 	/* Book */
 	else
 	{
-		if (disdain_book(o_ptr)) return FALSE;
-
 		s16b book[26];
+
 		int num;
 		int i;
 

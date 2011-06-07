@@ -644,11 +644,11 @@ static void sense_inventory(void)
 			case BONUS_NOT_PASSIVE:
 				if ((f0[i/32] & (1L << (i % 32))) != 0)
 				{
-					if (ability_bonus[i].type != BONUS_NOT_PASSIVE) equip_can_flags(f0[i/32] & (i % 32), 0x0L,0x0L,0x0L,0x0L);
+					if (ability_bonus[i].type != BONUS_NOT_PASSIVE) equip_can_flags(f0[i/32 & (i % 32)], 0x0L,0x0L,0x0L,0x0L);
 				}
 				else if ((af0[i/32] & (1L << (i % 32))) == 0)
 				{
-					equip_not_flags(f0[i/32] & (i % 32), 0x0L,0x0L,0x0L,0x0L);
+					equip_not_flags(f0[i/32 & (i % 32)], 0x0L,0x0L,0x0L,0x0L);
 				}
 			
 				break;
