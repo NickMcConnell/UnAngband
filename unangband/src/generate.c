@@ -3659,8 +3659,9 @@ bool build_bsp(int y1, int x1, int y2, int x2, int n, bsp_params_type *p, bool d
 		/* Join together */
 		if (join1 && join2) join_bsp(p, FALSE);
 	}
+	
+	return (TRUE);
 }
-
 
 
 

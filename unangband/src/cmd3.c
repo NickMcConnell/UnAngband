@@ -669,6 +669,8 @@ bool player_wield(int item)
 	/* Hack -- the following are obvious from the displayed combat statistics */
 	object_learn_ability(j_ptr, ABILITY_BLOWS, FALSE);
 	object_learn_ability(j_ptr, ABILITY_SHOTS, FALSE);
+	object_learn_ability(j_ptr, ABILITY_HURL_NUM, FALSE);
+	object_learn_ability(j_ptr, ABILITY_STRIKES, FALSE);
 	object_learn_ability(j_ptr, ABILITY_SPEED_MOVE, FALSE);
 	object_learn_ability(j_ptr, ABILITY_SPEED_CAST, FALSE);
 	object_learn_ability(j_ptr, ABILITY_SPEED_FIGHT, FALSE);

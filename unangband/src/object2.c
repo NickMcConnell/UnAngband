@@ -1050,7 +1050,7 @@ void object_aware(object_type *o_ptr, bool floor)
 	else if ((o_ptr->tval == TV_RING || o_ptr->tval == TV_AMULET)
 			  || (o_ptr->tval >= TV_SHOT && o_ptr->tval <= TV_DRAG_ARMOR))
 	{
-		if (((!(o_ptr->to_h) && !(o_ptr->to_d) && !(o_ptr->to_a))
+		if (((!(object_aval(o_ptr, ABILITY_TO_HIT)) && !(object_aval(o_ptr, ABILITY_TO_DAM)) && !(object_aval(o_ptr, ABILITY_TO_AC)))
 				|| (o_ptr->ident & (IDENT_BONUS)))
 				&& (!(o_ptr->pval) || (o_ptr->ident & (IDENT_PVAL))))
 			object_known(o_ptr);
@@ -1412,48 +1412,60 @@ s32b object_value(const object_type *o_ptr)
 		object_type object_type_body;
 		object_type *j_ptr = &object_type_body;
 
+		int i;
+		
 		/* Copy object */
 		object_copy(j_ptr, o_ptr);
 
 		/* Remove unknown information */
 		if (!object_bonus_p(o_ptr))
 		{
+			object_ability_clear_one(j_ptr, ABILITY_TO_HIT);
+			object_ability_clear_one(j_ptr, ABILITY_TO_DAM);
+			object_ability_clear_one(j_ptr, ABILITY_TO_AC);
+
 			if (o_ptr->name1)
 			{
-				j_ptr->to_h = a_info[o_ptr->name1].to_h;
-				j_ptr->to_d = a_info[o_ptr->name2].to_d;
-				j_ptr->to_a = a_info[o_ptr->name3].to_a;
-			}
+				for (i = 0; i < a_info[o_ptr->name1].ability_count; i++)
+				{
+					switch (a_info[o_ptr->name1].ability[i])
+					{
+					case ABILITY_TO_HIT:
+					case ABILITY_TO_DAM:
+					case ABILITY_TO_AC:
+						object_add_one(j_ptr, a_info[o_ptr->name1].ability[i], a_info[o_ptr->name1].aval[i]);
+						break;
+					}
+				}
+			}			
 			else if (o_ptr->name2)
 			{
-				j_ptr->to_h = e_info[o_ptr->name2].max_to_h / 2;
-				j_ptr->to_d = e_info[o_ptr->name2].max_to_d / 2;
-				j_ptr->to_a = e_info[o_ptr->name2].max_to_a / 2;
+				for (i = 0; i < e_info[o_ptr->name2].ability_count; i++)
+				{
+					switch (e_info[o_ptr->name2].ability[i])
+					{
+					case ABILITY_TO_HIT:
+					case ABILITY_TO_DAM:
+					case ABILITY_TO_AC:
+						object_add_one(j_ptr, e_info[o_ptr->name1].ability[i], e_info[o_ptr->name1].max_aval[i] / 2);
+						break;
+					}
+				}
 			}
-			else
+
+			for (i = 0; i < k_info[o_ptr->k_idx].ability_count; i++)
 			{
-				j_ptr->to_h = k_info[o_ptr->to_h].to_h;
-				j_ptr->to_d = k_info[o_ptr->to_d].to_d;
-				j_ptr->to_a = k_info[o_ptr->to_a].to_a;
-			}
+				switch (k_info[o_ptr->k_idx].ability[i])
+				{
+				case ABILITY_TO_HIT:
+				case ABILITY_TO_DAM:
+				case ABILITY_TO_AC:
+					object_add_one(j_ptr, k_info[o_ptr->k_idx].ability[i], k_info[o_ptr->k_idx].aval[i]);
+					break;
+				}
+			}			
 		}
 		if (!object_charges_p(o_ptr)) j_ptr->charges = 0;
-		if (!object_pval_p(o_ptr))
-		{
-			if (o_ptr->name1)
-			{
-				j_ptr->pval = a_info[o_ptr->name1].pval;
-			}
-			else if (o_ptr->name2)
-			{
-				j_ptr->pval = e_info[o_ptr->name2].max_pval / 2;
-			}
-			else
-			{
-				j_ptr->pval = k_info[o_ptr->to_h].pval;
-			}
-		}
-
 		/* Try curse analysis */
 		if (o_ptr->name1)
 		{
@@ -1472,6 +1484,24 @@ s32b object_value(const object_type *o_ptr)
 			else
 				j_ptr->ident &= ~(IDENT_CURSED | IDENT_BROKEN);
 		}
+		if (!object_pval_p(o_ptr))
+		{
+			for (i = 0; i < j_ptr->ability_count; i++)
+			{
+				switch(j_ptr->ability[i])
+				{
+					case ABILITY_TO_HIT:
+					case ABILITY_TO_DAM:
+					case ABILITY_TO_AC:
+						break;
+					default:
+						if (cursed_p(j_ptr)) j_ptr->aval[i] = -1;
+						else j_ptr->aval[i] = 1;
+						break;
+				}
+			}
+		}
+
 
 		/* Hack -- get 'real' value */
 		value = object_value_real(j_ptr);
@@ -1509,12 +1539,12 @@ s32b object_value(const object_type *o_ptr)
 				case TV_AMULET:
 				{
 					/* Hack -- negative bonuses are bad */
-					if (o_ptr->to_a < 0) return (0L);
-					if (o_ptr->to_h < 0) return (0L);
-					if (o_ptr->to_d < 0) return (0L);
+					if (object_aval(o_ptr, ABILITY_TO_AC) < 0) return (0L);
+					if (object_aval(o_ptr, ABILITY_TO_HIT) < 0) return (0L);
+					if (object_aval(o_ptr, ABILITY_TO_DAM) < 0) return (0L);
 
 					/* Give credit for bonuses */
-					value += ((o_ptr->to_h + o_ptr->to_d + o_ptr->to_a) * 100L) + pval;
+					value += ((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_AC)) * 100L) + pval;
 
 					/* Done */
 					break;
@@ -1533,13 +1563,13 @@ s32b object_value(const object_type *o_ptr)
 				case TV_INSTRUMENT:
 				{
 					/* Give credit for hit bonus */
-					value += ((o_ptr->to_h) * 100L);
+					value += ((object_aval(o_ptr, ABILITY_TO_HIT)) * 100L);
 
 					/* Give credit for damage bonus */
-					value += ((o_ptr->to_d) * 100L);
+					value += ((object_aval(o_ptr, ABILITY_TO_DAM)) * 100L);
 
 					/* Give credit for armor bonus */
-					value += (o_ptr->to_a * 100L);
+					value += (object_aval(o_ptr, ABILITY_TO_AC) * 100L);
 
 					/* Give credit for known pval */
 					value += pval;
@@ -1557,10 +1587,10 @@ s32b object_value(const object_type *o_ptr)
 				case TV_STAFF:
 				{
 					/* Hack -- negative hit/damage bonuses */
-					if (o_ptr->to_h + o_ptr->to_d < 0) return (0L);
+					if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) < 0) return (0L);
 
 					/* Factor in the bonuses */
-					value += ((o_ptr->to_h + o_ptr->to_d + o_ptr->to_a) * 100L);
+					value += ((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) + object_aval(o_ptr, ABILITY_TO_AC)) * 100L);
 
 					/* Give credit for known pval */
 					value += pval;
@@ -1572,10 +1602,10 @@ s32b object_value(const object_type *o_ptr)
 				case TV_BOLT:
 				{
 					/* Hack -- negative hit/damage bonuses */
-					if (o_ptr->to_h + o_ptr->to_d < 0) return (0L);
+					if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) < 0) return (0L);
 
 					/* Factor in the bonuses */
-					value += ((o_ptr->to_h + o_ptr->to_d) * 5L);
+					value += ((object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM)) * 5L);
 
 					/* Done */
 					break;
@@ -1886,9 +1916,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			}
 
 			/* Require identical "bonuses" */
-			if (o_ptr->to_h != j_ptr->to_h) return (FALSE);
-			if (o_ptr->to_d != j_ptr->to_d) return (FALSE);
-			if (o_ptr->to_a != j_ptr->to_a) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_TO_HIT) != object_aval(j_ptr, ABILITY_TO_HIT)) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_TO_DAM) != object_aval(j_ptr, ABILITY_TO_DAM)) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_TO_AC) != object_aval(j_ptr, ABILITY_TO_AC)) return (FALSE);
 			if (o_ptr->pval != j_ptr->pval) return (FALSE);
 
 			/* XXX Just merge coating "charges" */
@@ -1899,9 +1929,9 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 			if (o_ptr->name2 != j_ptr->name2) return (FALSE);
 
 			/* Require identical "values" */
-			if (object_aval(o_ptr, ABILITY_AC) != j_ptr->ac) return (FALSE);
-			if (object_aval(o_ptr, ABILITY_DAMAGE_DICE) != j_ptr->dd) return (FALSE);
-			if (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) != j_ptr->ds) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_AC) != object_aval(j_ptr, ABILITY_AC)) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_DAMAGE_DICE) != object_aval(j_ptr, ABILITY_DAMAGE_DICE)) return (FALSE);
+			if (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) != object_aval(j_ptr, ABILITY_DAMAGE_SIDES)) return (FALSE);
 
 			/* Probably okay */
 			break;
@@ -2308,6 +2338,8 @@ void object_prep(object_type *o_ptr, int k_idx)
 {
 	object_kind *k_ptr = &k_info[k_idx];
 
+	int i;
+	
 	/* Clear the record */
 	object_wipe(o_ptr);
 
@@ -2329,28 +2361,13 @@ void object_prep(object_type *o_ptr, int k_idx)
 
 	/* Default stack count */
 	o_ptr->stackc = 0;
-
+	
 	/* Initialize the object ability values */
-	for (i = 0; i < MAX_AVALS_KIND; i++)
+	for (i = 0; i < k_ptr->ability_count; i++)
 	{
-		o_ptr->aval[i] = k_ptr->aval[i];
-		o_ptr->aval_index[i] = (AVAL_IDX_KIND);
+		object_ability_add_one(o_ptr, k_ptr->ability[i], k_ptr->aval[i]);
 	}
 	
-	/* Clear out the 'tail' of empty values */
-	for (i = MAX_AVALS_KIND; i >= 0; i--)
-	{
-		for (j = 0; j < ABILITY_ARRAY_SIZE; j++)
-		{
-			if (k_ptr->flags0[i][j]) break;
-		}
-		
-		if (j != ABILITY_ARRAY_SIZE) break;
-		
-		o_ptr->aval[i] = 0;
-		o_ptr->aval_index[i] = 0;
-	}
-
 	/* Hack -- worthless items are always "broken" */
 	/*if (k_ptr->cost <= 0) o_ptr->ident |= (IDENT_BROKEN);*/
 
@@ -2359,22 +2376,43 @@ void object_prep(object_type *o_ptr, int k_idx)
 	else if (k_ptr->flags3 & (TR3_LIGHT_CURSE))
 	{
 		/* Some 'easily noticeable' attributes always result in cursing an item.
-		 * See do_cmd_wield(). */
-		if (k_ptr->flags1 & (TR1_BLOWS | TR1_SHOTS | TR1_SPEED | TR1_STR |
-				TR1_INT | TR1_WIS | TR1_DEX | TR1_CON | TR1_CHR))
+		 * See player_wield(). */
+		
+		/* Hack -- the following are obvious from the displayed combat statistics */
+		if (object_aval(o_ptr, ABILITY_BLOWS)) o_ptr->ident |= (IDENT_CURSED);
+		if (object_aval(o_ptr, ABILITY_SHOTS)) o_ptr->ident |= (IDENT_CURSED);
+		if (object_aval(o_ptr, ABILITY_HURL_NUM)) o_ptr->ident |= (IDENT_CURSED);
+		if (object_aval(o_ptr, ABILITY_STRIKES)) o_ptr->ident |= (IDENT_CURSED);		
+		if (object_aval(o_ptr, ABILITY_SPEED_MOVE)) o_ptr->ident |= (IDENT_CURSED);
+		if (object_aval(o_ptr, ABILITY_SPEED_CAST)) o_ptr->ident |= (IDENT_CURSED);
+		if (object_aval(o_ptr, ABILITY_SPEED_FIGHT)) o_ptr->ident |= (IDENT_CURSED);
+		if (object_aval(o_ptr, ABILITY_SPEED_USE)) o_ptr->ident |= (IDENT_CURSED);
+		
+		/* Check other automatically identified abilities */
+		for (i = 0; i < ABILITY_MAX; i++)
 		{
-			o_ptr->ident |= (IDENT_CURSED);
+			switch (ability_bonus[i].type)
+			{
+				/* Hack -- the following are obvious from the displayed stats */
+				case BONUS_ADD_STAT:
+				case BONUS_ADD_SKILL:
+				case BONUS_ADD_WEAPON_SKILL:
+					if (object_aval(o_ptr, i)) o_ptr->ident |= (IDENT_CURSED);
+					break;
+	#ifndef ALLOW_OBJECT_INFO_MORE				
+				/* Hack --- we do these here, because they are too computationally expensive in the 'right' place */
+				case BONUS_SENSE:
+					if (object_aval(o_ptr, j)) o_ptr->ident |= (IDENT_CURSED);
+					break;
+	#endif
+			}
 		}
-#ifndef ALLOW_OBJECT_INFO_MORE
-		else if ((k_ptr->flags1 & (TR1_INFRA)) || (k_ptr->flags3 & (TR3_LITE | TR3_TELEPATHY | TR3_SEE_INVIS)))
-		{
-			o_ptr->ident |= (IDENT_CURSED);
-		}
-#endif
+		
 		/* Generate cursed items deeper in the dungeon */
-		else if (rand_int(75) < p_ptr->depth) o_ptr->ident |= (IDENT_CURSED);
+		if (rand_int(75) < p_ptr->depth) o_ptr->ident |= (IDENT_CURSED);
+		
 		/* Otherwise item is easily removable */
-		else o_ptr->ident |= (IDENT_BROKEN);
+		else if ((o_ptr->ident & (IDENT_CURSED)) == 0) o_ptr->ident |= (IDENT_BROKEN);
 	}
 	else if (k_ptr->flags3 & (TR3_UNCONTROLLED))
 	  /* always start cursed so that uncontrolled effects can occur */
@@ -2533,7 +2571,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 	if (!power) return;
 
 	/* Nothing to boost */
-	if (!(o_ptr->to_h) && !(o_ptr->to_d) && !(o_ptr->to_a) && !(o_ptr->pval)) return;
+	if (!(object_aval(o_ptr, ABILITY_TO_HIT)) && !(object_aval(o_ptr, ABILITY_TO_DAM)) && !(object_aval(o_ptr, ABILITY_TO_AC)) && !(o_ptr->pval)) return;
 
 	/* Evaluate power */
 	boost_power = object_power(o_ptr);
@@ -2560,7 +2598,7 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 0: case 1: case 2:
 
 				/* Increase to_h */
-				if ((o_ptr->to_h) && (sign > 0 ? o_ptr->to_h > 0 : o_ptr->to_h < 0)) o_ptr->to_h += sign;
+				if ((object_aval(o_ptr, ABILITY_TO_HIT)) && (sign > 0 ? object_aval(o_ptr, ABILITY_TO_HIT) > 0 : object_aval(o_ptr, ABILITY_TO_HIT) < 0)) object_aval(o_ptr, ABILITY_TO_HIT) += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2568,9 +2606,9 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 3: case 4: case 5:
 
 				/* Increase to_d; not above weapon dice */
-				if (((o_ptr->to_d) && (sign > 0 ? o_ptr->to_d > 0 : o_ptr->to_d < 0))
-				    && o_ptr->to_d + sign < (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5))
-				  o_ptr->to_d += sign;
+				if (((object_aval(o_ptr, ABILITY_TO_DAM)) && (sign > 0 ? object_aval(o_ptr, ABILITY_TO_DAM) > 0 : object_aval(o_ptr, ABILITY_TO_DAM) < 0))
+				    && object_aval(o_ptr, ABILITY_TO_DAM) + sign < (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5))
+				  object_aval(o_ptr, ABILITY_TO_DAM) += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2578,9 +2616,9 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			case 6: case 7: case 8:
 
 				/* Increase to_a */
-				if (((o_ptr->to_a) && (sign > 0 ? o_ptr->to_a > 0 : o_ptr->to_a < 0))
-				    && ((o_ptr->to_a + sign < object_aval(o_ptr, ABILITY_AC) + 5) || o_ptr->tval == TV_CROWN))
-				  o_ptr->to_a += sign;
+				if (((object_aval(o_ptr, ABILITY_TO_AC)) && (sign > 0 ? object_aval(o_ptr, ABILITY_TO_AC) > 0 : object_aval(o_ptr, ABILITY_TO_AC) < 0))
+				    && ((object_aval(o_ptr, ABILITY_TO_AC) + sign < object_aval(o_ptr, ABILITY_AC) + 5) || o_ptr->tval == TV_CROWN))
+				  object_aval(o_ptr, ABILITY_TO_AC) += sign;
 				else tryagain = TRUE;
 
 				break;
@@ -2642,20 +2680,20 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 			{
 				case 0: case 1: case 2:
 				{
-					if ((sign > 0) && (o_ptr->to_h > 0) && (o_ptr->to_h < 12)) o_ptr->to_h = 12;
-					else if ((sign < 0) && (o_ptr->to_h < 0) && (o_ptr->to_h > -12)) o_ptr->to_h = -12;
+					if ((sign > 0) && (object_aval(o_ptr, ABILITY_TO_HIT) > 0) && (object_aval(o_ptr, ABILITY_TO_HIT) < 12)) object_aval(o_ptr, ABILITY_TO_HIT) = 12;
+					else if ((sign < 0) && (object_aval(o_ptr, ABILITY_TO_HIT) < 0) && (object_aval(o_ptr, ABILITY_TO_HIT) > -12)) object_aval(o_ptr, ABILITY_TO_HIT) = -12;
 					break;
 				}
 				case 3: case 4: case 5:
 				{
-					if ((sign > 0) && (o_ptr->to_d > 0) && (o_ptr->to_d < 10)) o_ptr->to_d = MIN(object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5, 10);
-					else if ((sign < 0) && (o_ptr->to_d < 0) && (o_ptr->to_d > -10)) o_ptr->to_d = -10;
+					if ((sign > 0) && (object_aval(o_ptr, ABILITY_TO_DAM) > 0) && (object_aval(o_ptr, ABILITY_TO_DAM) < 10)) object_aval(o_ptr, ABILITY_TO_DAM) = MIN(object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5, 10);
+					else if ((sign < 0) && (object_aval(o_ptr, ABILITY_TO_DAM) < 0) && (object_aval(o_ptr, ABILITY_TO_DAM) > -10)) object_aval(o_ptr, ABILITY_TO_DAM) = -10;
 					break;
 				}
 				case 6: case 7: case 8:
 				{
-					if ((sign > 0) && (o_ptr->to_a > 0) && (o_ptr->to_a < 10)) o_ptr->to_a = MIN(object_aval(o_ptr, ABILITY_AC) + 5, 10);
-					else if ((sign < 0) && (o_ptr->to_a < 0) && (o_ptr->to_a > -10)) o_ptr->to_a = -10;
+					if ((sign > 0) && (object_aval(o_ptr, ABILITY_TO_AC) > 0) && (object_aval(o_ptr, ABILITY_TO_AC) < 10)) object_aval(o_ptr, ABILITY_TO_AC) = MIN(object_aval(o_ptr, ABILITY_AC) + 5, 10);
+					else if ((sign < 0) && (object_aval(o_ptr, ABILITY_TO_AC) < 0) && (object_aval(o_ptr, ABILITY_TO_AC) > -10)) object_aval(o_ptr, ABILITY_TO_AC) = -10;
 					break;
 				}
 			}
@@ -2670,9 +2708,9 @@ static void boost_item(object_type *o_ptr, int lev, int power)
 	{
 		switch(choice)
 		{
-			case 0: case 1: case 2:o_ptr->to_h -= sign; break;
-			case 3: case 4: case 5: o_ptr->to_d -= sign; break;
-			case 6: case 7: case 8: o_ptr->to_a -= sign; break;
+			case 0: case 1: case 2:object_aval(o_ptr, ABILITY_TO_HIT) -= sign; break;
+			case 3: case 4: case 5: object_aval(o_ptr, ABILITY_TO_DAM) -= sign; break;
+			case 6: case 7: case 8: object_aval(o_ptr, ABILITY_TO_AC) -= sign; break;
 			case 9: o_ptr->pval -= sign; break;
 			case 10: object_aval(o_ptr, ABILITY_DAMAGE_DICE)--; break;
 			case 11: object_aval(o_ptr, ABILITY_DAMAGE_SIDES)--; break;
@@ -3302,16 +3340,16 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 	if (power > 0)
 	{
 		/* Enchant */
-		o_ptr->to_h += tohit1;
-		o_ptr->to_d = MIN(o_ptr->to_d + todam1,
+		object_aval(o_ptr, ABILITY_TO_HIT) += tohit1;
+		object_aval(o_ptr, ABILITY_TO_DAM) = MIN(object_aval(o_ptr, ABILITY_TO_DAM) + todam1,
 				  (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5));
 
 		/* Very good */
 		if (power > 1)
 		{
 			/* Enchant again */
-			o_ptr->to_h += tohit2;
-			o_ptr->to_d = MIN(o_ptr->to_d + todam2,
+			object_aval(o_ptr, ABILITY_TO_HIT) += tohit2;
+			object_aval(o_ptr, ABILITY_TO_DAM) = MIN(object_aval(o_ptr, ABILITY_TO_DAM) + todam2,
 					  (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5));
 		}
 	}
@@ -3320,19 +3358,19 @@ static void a_m_aux_1(object_type *o_ptr, int level, int power)
 	else if (power < 0)
 	{
 		/* Penalize */
-		o_ptr->to_h -= tohit1;
-		o_ptr->to_d -= todam1;
+		object_aval(o_ptr, ABILITY_TO_HIT) -= tohit1;
+		object_aval(o_ptr, ABILITY_TO_DAM) -= todam1;
 
 		/* Very cursed */
 		if (power < -1)
 		{
 			/* Penalize again */
-			o_ptr->to_h -= tohit2;
-			o_ptr->to_d -= todam2;
+			object_aval(o_ptr, ABILITY_TO_HIT) -= tohit2;
+			object_aval(o_ptr, ABILITY_TO_DAM) -= todam2;
 		}
 
 		/* Cursed (if "bad") */
-		if (o_ptr->to_h + o_ptr->to_d < 0)
+		if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) < 0)
 		{
 			if (rand_int(100) < 30) o_ptr->ident |= (IDENT_CURSED);
 			else o_ptr->ident |= (IDENT_BROKEN);
@@ -3438,13 +3476,13 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 	if (power > 0)
 	{
 		/* Enchant */
-		o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : object_aval(o_ptr, ABILITY_AC) + toac1, o_ptr->to_a + 5 + toac1);
+		object_aval(o_ptr, ABILITY_TO_AC) = MIN(o_ptr->tval == TV_CROWN ? 30 : object_aval(o_ptr, ABILITY_AC) + toac1, object_aval(o_ptr, ABILITY_TO_AC) + 5 + toac1);
 
 		/* Very good */
 		if (power > 1)
 		{
 			/* Enchant again */
-			o_ptr->to_a = MIN(o_ptr->tval == TV_CROWN ? 30 : object_aval(o_ptr, ABILITY_AC) + toac2, o_ptr->to_a + 5 + toac2);
+			object_aval(o_ptr, ABILITY_TO_AC) = MIN(o_ptr->tval == TV_CROWN ? 30 : object_aval(o_ptr, ABILITY_AC) + toac2, object_aval(o_ptr, ABILITY_TO_AC) + 5 + toac2);
 		}
 	}
 
@@ -3452,17 +3490,17 @@ static void a_m_aux_2(object_type *o_ptr, int level, int power)
 	else if (power < 0)
 	{
 		/* Penalize */
-		o_ptr->to_a -= toac1;
+		object_aval(o_ptr, ABILITY_TO_AC) -= toac1;
 
 		/* Very cursed */
 		if (power < -1)
 		{
 			/* Penalize again */
-			o_ptr->to_a -= toac2;
+			object_aval(o_ptr, ABILITY_TO_AC) -= toac2;
 		}
 
 		/* Cursed (if "bad") */
-		if (o_ptr->to_a < 0)
+		if (object_aval(o_ptr, ABILITY_TO_AC) < 0)
 		{
 			if (rand_int(100) < 30) o_ptr->ident |= (IDENT_CURSED);
 			else o_ptr->ident |= (IDENT_BROKEN);
@@ -3572,7 +3610,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_ICE:
 				{
 					/* Bonus to armor class */
-					o_ptr->to_a = 5 + randint(5) + m_bonus(10, level);
+					object_aval(o_ptr, ABILITY_TO_AC) = 5 + randint(5) + m_bonus(10, level);
 					break;
 				}
 #endif
@@ -3590,7 +3628,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_WOE:
 				{
 					/* Penalize */
-					o_ptr->to_a = 0 - (5 + m_bonus(10, level));
+					object_aval(o_ptr, ABILITY_TO_AC) = 0 - (5 + m_bonus(10, level));
 					o_ptr->pval = 0 - (1 + m_bonus(5, level));
 
 					break;
@@ -3601,13 +3639,13 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_DAMAGE:
 				{
 					/* Bonus to damage */
-					o_ptr->to_d = 5 + (s16b)randint(5) + m_bonus(10, level);
+					object_aval(o_ptr, ABILITY_TO_DAM) = 5 + (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
 					{
 						/* Reverse bonus */
-						o_ptr->to_d = 0 - (o_ptr->to_d);
+						object_aval(o_ptr, ABILITY_TO_DAM) = 0 - (object_aval(o_ptr, ABILITY_TO_DAM));
 					}
 
 					break;
@@ -3617,13 +3655,13 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_ACCURACY:
 				{
 					/* Bonus to hit */
-					o_ptr->to_h = 5 + (s16b)randint(5) + m_bonus(10, level);
+					object_aval(o_ptr, ABILITY_TO_HIT) = 5 + (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
 					{
 						/* Reverse tohit */
-						o_ptr->to_h = 0 - (o_ptr->to_h);
+						object_aval(o_ptr, ABILITY_TO_HIT) = 0 - (object_aval(o_ptr, ABILITY_TO_HIT));
 					}
 
 					break;
@@ -3633,13 +3671,13 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_PROTECTION:
 				{
 					/* Bonus to armor class */
-					o_ptr->to_a = 5 + (s16b)randint(5) + m_bonus(10, level);
+					object_aval(o_ptr, ABILITY_TO_AC) = 5 + (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
 					{
 						/* Reverse toac */
-						o_ptr->to_a = 0 - (o_ptr->to_a);
+						object_aval(o_ptr, ABILITY_TO_AC) = 0 - (object_aval(o_ptr, ABILITY_TO_AC));
 					}
 
 					break;
@@ -3649,15 +3687,15 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_RING_SLAYING:
 				{
 					/* Bonus to damage and to hit */
-					o_ptr->to_d = (s16b)randint(5) + m_bonus(10, level);
-					o_ptr->to_h = (s16b)randint(5) + m_bonus(10, level);
+					object_aval(o_ptr, ABILITY_TO_DAM) = (s16b)randint(5) + m_bonus(10, level);
+					object_aval(o_ptr, ABILITY_TO_HIT) = (s16b)randint(5) + m_bonus(10, level);
 
 					/* Cursed */
 					if (power < 0)
 					{
 						/* Reverse bonuses */
-						o_ptr->to_h = 0 - (o_ptr->to_h);
-						o_ptr->to_d = 0 - (o_ptr->to_d);
+						object_aval(o_ptr, ABILITY_TO_HIT) = 0 - (object_aval(o_ptr, ABILITY_TO_HIT));
+						object_aval(o_ptr, ABILITY_TO_DAM) = 0 - (object_aval(o_ptr, ABILITY_TO_DAM));
 					}
 
 					break;
@@ -3732,7 +3770,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				case SV_AMULET_THE_MAGI:
 				{
 					o_ptr->pval = 1 + m_bonus(3, level);
-					o_ptr->to_a = (s16b)randint(5) + m_bonus(5, level);
+					object_aval(o_ptr, ABILITY_TO_AC) = (s16b)randint(5) + m_bonus(5, level);
 
 					/* Mention the item */
 					if (cheat_peek) object_mention(o_ptr);
@@ -3754,8 +3792,8 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				/* Amulet of Weaponmastery -- never cursed */
 				case SV_AMULET_WEAPONMASTERY:
 				{
-					o_ptr->to_h = 1 + m_bonus(4, level);
-					o_ptr->to_d = 1 + m_bonus(4, level);
+					object_aval(o_ptr, ABILITY_TO_HIT) = 1 + m_bonus(4, level);
+					object_aval(o_ptr, ABILITY_TO_DAM) = 1 + m_bonus(4, level);
 					o_ptr->pval = 1 + m_bonus(1, level);
 
 					/* Mention the item */
@@ -3789,7 +3827,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 				{
 					/* Penalize */
 					o_ptr->pval = 0 - ((s16b)randint(5) + m_bonus(5, level));
-					o_ptr->to_a = 0 - ((s16b)randint(5) + m_bonus(5, level));
+					object_aval(o_ptr, ABILITY_TO_AC) = 0 - ((s16b)randint(5) + m_bonus(5, level));
 
 					break;
 				}
@@ -3820,7 +3858,7 @@ static void a_m_aux_3(object_type *o_ptr, int level, int power)
 	}
 
 	/* Check if has negatives */
-	if ((o_ptr->to_h < 0) || (o_ptr->to_d < 0) || (o_ptr->to_a < 0) || (o_ptr->pval < 0))
+	if ((object_aval(o_ptr, ABILITY_TO_HIT) < 0) || (object_aval(o_ptr, ABILITY_TO_DAM) < 0) || (object_aval(o_ptr, ABILITY_TO_AC) < 0) || (o_ptr->pval < 0))
 	{
 		if ((power < -1) || (rand_int(100) < 30))
 		{
@@ -4014,7 +4052,7 @@ int value_check_aux7(object_type *o_ptr)
 
 	/* Hack -- mark object as average and don't value if it is average */
 	if (!(o_ptr->name1) && !(o_ptr->name2) && !(o_ptr->xtra1)
-		&& !(o_ptr->to_a > 0) && !(o_ptr->to_h + o_ptr->to_d > 0)) return (INSCRIP_AVERAGE);
+		&& !(object_aval(o_ptr, ABILITY_TO_AC) > 0) && !(object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0)) return (INSCRIP_AVERAGE);
 
 	/* Value the item */
 	o_ptr->ident |= (IDENT_VALUE);
@@ -4196,10 +4234,10 @@ int value_check_aux11(object_type *o_ptr)
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_UNUSUAL);
 
 	/* Good "armor" bonus */
-	if (o_ptr->to_a > 0) return (INSCRIP_UNUSUAL);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) return (INSCRIP_UNUSUAL);
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_UNUSUAL);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0) return (INSCRIP_UNUSUAL);
 
 	/* Kind */
 	if (k_info[o_ptr->k_idx].flavor) return (INSCRIP_UNUSUAL);
@@ -4280,10 +4318,10 @@ int value_check_aux12(object_type *o_ptr)
 	if ((o_ptr->xtra1) && (object_power(o_ptr) > 0)) return (INSCRIP_MAGICAL);
 
 	/* Good "armor" bonus */
-	if (o_ptr->to_a > 0) return (INSCRIP_MAGICAL);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) return (INSCRIP_MAGICAL);
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_MAGICAL);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0) return (INSCRIP_MAGICAL);
 
 	/* Kind */
 	if (k_info[o_ptr->k_idx].flavor) return (INSCRIP_MAGICAL);
@@ -4542,7 +4580,7 @@ bool sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
  */
 void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 {
-	int i, rolls, f1, f2, power;
+	int i, j, k, rolls, f1, f2, power;
 
 
 	/* Maximum "level" for various things */
@@ -4621,13 +4659,9 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		k = 0;
 		
 		/* Extract artifact ability values */
-		for (i = 0; i < MAX_AVALS_ARTIFACT; i++)
-		{
-			u32b f0[ABILITY_ARRAY_SIZE];
-			
-			for (j = 0; j < ABILITY_ARRAY_SIZE; j++) f0[j] = a_ptr->flags0[j]
-			
-			object_ability_add(o_ptr, f0, a_ptr->aval[i], AVAL_IDX_ARTIFACT, &k);
+		for (i = 0; i < a_ptr->ability_count; i++)
+		{			
+			object_ability_add_one(o_ptr, a_ptr->ability[i], a_ptr->aval[i]);
 		}			
 
 		/* Hack -- extract the "broken" flag */
@@ -4777,35 +4811,25 @@ void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 		}
 
 		/* Apply bonuses or penalties */
-		if (e_ptr->max_to_h > 0)
-			o_ptr->to_h = MAX(o_ptr->to_h, (s16b)randint(e_ptr->max_to_h));
-		else if (e_ptr->max_to_h < 0) o_ptr->to_h -= (s16b)randint(-e_ptr->max_to_h);
-
-		if (e_ptr->max_to_d > 0)
-			o_ptr->to_d = MIN(MAX(o_ptr->to_d, (s16b)randint(e_ptr->max_to_d)),
-									(o_ptr->tval == TV_BOW
-									 ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5));
-		else if (e_ptr->max_to_d < 0) o_ptr->to_d -= (s16b)randint(-e_ptr->max_to_d);
-
-		if (e_ptr->max_to_a > 0)
-			o_ptr->to_a = MIN(MAX(o_ptr->to_a, (s16b)randint(e_ptr->max_to_a)),
-									object_aval(o_ptr, ABILITY_AC) + 5);
-		else if (e_ptr->max_to_a < 0) o_ptr->to_a -= (s16b)randint(-e_ptr->max_to_a);
-
-		if (e_ptr->max_pval > 0)
-			o_ptr->pval = MAX(1, MIN(o_ptr->pval, (s16b)randint(e_ptr->max_pval)));
-		else if (e_ptr->max_pval < 0) o_ptr->pval -= (s16b)randint(-e_ptr->max_pval);
-
-		/* Hack -- ensure negatives for broken or cursed items */
-		if (cursed_p(o_ptr) || broken_p(o_ptr))
+		for (i = 0; i < e_ptr->ability_count; i++)
 		{
-			/* Hack -- obtain bonuses */
-			if (o_ptr->to_h > 0) o_ptr->to_h = -o_ptr->to_h;
-			if (o_ptr->to_d > 0) o_ptr->to_d = -o_ptr->to_d;
-			if (o_ptr->to_a > 0) o_ptr->to_a = -o_ptr->to_a;
-
-			/* Hack -- obtain pval */
-			if (o_ptr->pval > 0) o_ptr->pval = -o_ptr->pval;
+			/* Paranoia - Skip 0 values */
+			if (e_ptr->max_aval[i] == 0) continue;
+			
+			/* Negative abilities */
+			if (e_ptr->max_aval[i] < 0)
+			{
+				object_ability_add_one(o_ptr, e_ptr->ability[i], -randint(-e_ptr->max_aval[i]));
+			}
+			/* Hack -- ensure negatives for broken or cursed items */			
+			else if (cursed_p(o_ptr) || broken_p(o_ptr))
+			{
+				object_ability_add_one(o_ptr, e_ptr->ability[i], -randint(e_ptr->max_aval[i]));
+			}
+			else
+			{
+				object_ability_add_one(o_ptr, e_ptr->ability[i], randint(e_ptr->max_aval[i]));
+			}
 		}
 
 		/* Get ego power */
@@ -5254,11 +5278,12 @@ static bool kind_is_shroom(int k_idx)
 static bool kind_is_great(int k_idx)
 {
 	object_kind *k_ptr = &k_info[k_idx];
-
+	int i;
+	
 	/* Analyze the item type */
 	switch (k_ptr->tval)
 	{
-		/* Armor -- Good unless damaged */
+		/* Armor -- Great unless damaged */
 		case TV_HARD_ARMOR:
 		case TV_SOFT_ARMOR:
 		case TV_DRAG_ARMOR:
@@ -5269,30 +5294,37 @@ static bool kind_is_great(int k_idx)
 		case TV_HELM:
 		case TV_CROWN:
 		{
-			if (k_ptr->to_a < 0) return (FALSE);
+			for (i = 0; i < k_ptr->ability_count; i++)
+			{
+				if (k_ptr->ability[i] != ABILITY_TO_AC) continue;
+				if (k_ptr->aval[i] < 0) return (FALSE);
+			}
 			return (TRUE);
 		}
 
-		/* Weapons -- Good unless damaged */
+		/* Weapons -- Great unless damaged */
 		case TV_BOW:
 		case TV_SWORD:
 		case TV_HAFTED:
 		case TV_POLEARM:
 		case TV_DIGGING:
 		{
-			if (k_ptr->to_h < 0) return (FALSE);
-			if (k_ptr->to_d < 0) return (FALSE);
+			for (i = 0; i < k_ptr->ability_count; i++)
+			{
+				if ((k_ptr->ability[i] != ABILITY_TO_HIT) && (k_ptr->ability[i] != ABILITY_TO_DAM)) continue;
+				if (k_ptr->aval[i] < 0) return (FALSE);
+			}
 			return (TRUE);
 		}
 
-		/* Rune stones and magical bags are good if not seen previously */
+		/* Rune stones and magical bags are great if not seen previously */
 		case TV_BAG:
 		{
 			if (!(k_ptr->aware & (AWARE_SEEN))) return (TRUE);
 			return (FALSE);
 		}
 
-		/* Rods/Scrolls/Potions/Amulets/Wands/Rings -- Deep is good */
+		/* Rods/Scrolls/Potions/Amulets/Wands/Rings -- Deep is great */
 		case TV_RING:
 		case TV_AMULET:
 		{
@@ -5318,7 +5350,8 @@ static bool kind_is_great(int k_idx)
 static bool kind_is_good(int k_idx)
 {
 	object_kind *k_ptr = &k_info[k_idx];
-
+	int i;
+	
 	/* Analyze the item type */
 	switch (k_ptr->tval)
 	{
@@ -5333,7 +5366,11 @@ static bool kind_is_good(int k_idx)
 		case TV_HELM:
 		case TV_CROWN:
 		{
-			if (k_ptr->to_a < 0) return (FALSE);
+			for (i = 0; i < k_ptr->ability_count; i++)
+			{
+				if (k_ptr->ability[i] != ABILITY_TO_AC) continue;
+				if (k_ptr->aval[i] < 0) return (FALSE);
+			}
 			return (TRUE);
 		}
 
@@ -5345,8 +5382,11 @@ static bool kind_is_good(int k_idx)
 		case TV_POLEARM:
 		case TV_DIGGING:
 		{
-			if (k_ptr->to_h < 0) return (FALSE);
-			if (k_ptr->to_d < 0) return (FALSE);
+			for (i = 0; i < k_ptr->ability_count; i++)
+			{
+				if ((k_ptr->ability[i] != ABILITY_TO_HIT) && (k_ptr->ability[i] != ABILITY_TO_DAM)) continue;
+				if (k_ptr->aval[i] < 0) return (FALSE);
+			}
 
 			/* Special case for staves */
 			if (k_ptr->tval == TV_STAFF
@@ -5426,6 +5466,7 @@ static bool kind_is_race(int k_idx)
 {
 	monster_race *r_ptr = &r_info[race_drop_idx];
 	object_kind *k_ptr = &k_info[k_idx];
+	int i;
 
 	/* Handle good items */
 	if ((r_ptr->flags1 & (RF1_DROP_GREAT)) && (!kind_is_great(k_idx))) return (FALSE);
@@ -5533,10 +5574,24 @@ static bool kind_is_race(int k_idx)
 		case TV_HAFTED:
 		{
 			/* Hack -- mages/priests/thieves/archers only carry weapons < 20 lbs */
-			if ((r_ptr->flags2 & (RF2_PRIEST | RF2_MAGE | RF2_SNEAKY | RF2_ARCHER)) && (k_ptr->weight >= 200)) return (FALSE);
+			if ((r_ptr->flags2 & (RF2_PRIEST | RF2_MAGE | RF2_SNEAKY | RF2_ARCHER)) != 0)
+			{
+				for (i = 0; i < k_ptr->ability_count; i++)
+				{
+					if (k_ptr->ability[i] != ABILITY_WEIGHT) continue;
+					if (k_ptr->aval[i] >= 200) return (FALSE);
+				}
+			}
 
 			/* Hack -- warriors only carry weapons >= 7 lbs */
-			if ((r_ptr->flags2 & (RF2_ARMOR)) && (k_ptr->weight < 70)) return (FALSE);
+			if (r_ptr->flags2 & (RF2_ARMOR))
+			{
+				for (i = 0; i < k_ptr->ability_count; i++)
+				{
+					if (k_ptr->ability[i] != ABILITY_WEIGHT) continue;
+					if (k_ptr->aval[i] < 70) return (FALSE);
+				}
+			}
 
 			/* Hack -- monster equipment only has one weapon */
 			if (hack_monster_equip & (RF8_DROP_WEAPON)) return (FALSE);
@@ -6827,18 +6882,18 @@ bool break_near(object_type *j_ptr, int y, int x)
 		{
 		  return (FALSE);
 		}
-	      else if (j_ptr->to_h > 0 && j_ptr->to_h >= j_ptr->to_d)
+	      else if (object_aval(j_ptr, ABILITY_TO_HIT) > 0 && object_aval(j_ptr, ABILITY_TO_HIT) >= object_aval(j_ptr, ABILITY_TO_DAM))
 		{
-		  j_ptr->to_h--;
+		  object_aval(j_ptr, ABILITY_TO_HIT)--;
 
 		  /* Message */
 		  if (!(j_ptr->ident & (IDENT_BREAKS))) msg_format("Your %s bends!", o_name);
 
 		  return (FALSE);
 		}
-	      else if (j_ptr->to_d > 0)
+	      else if (object_aval(j_ptr, ABILITY_TO_DAM) > 0)
 		{
-		  j_ptr->to_d--;
+		  object_aval(j_ptr, ABILITY_TO_DAM)--;
 
 		  /* Message */
 		  if (!(j_ptr->ident & (IDENT_BREAKS))) msg_format("Your %s chips!", o_name);

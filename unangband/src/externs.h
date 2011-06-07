@@ -673,7 +673,6 @@ extern void object_flags(const object_type *o_ptr, u32b f0[ABILITY_ARRAY_SIZE], 
 extern int object_aval(const object_type *o_ptr, int ability);
 extern void object_eval(const object_type *o_ptr, s16b ability[ABILITY_MAX]);
 extern int kind_aval(int k_idx, int ability);
-extern bool object_ability_add(object_type *o_ptr, int af0[ABILITY_ARRAY_SIZE], int value, byte source, int *k);
 extern bool object_ability_add_one(object_type *o_ptr, int ability, int value);
 extern bool object_ability_div_one(object_type *o_ptr, int ability, int value);
 extern bool object_ability_clear_one(object_type *o_ptr, int ability);
