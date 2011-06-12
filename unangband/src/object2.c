@@ -759,7 +759,10 @@ s16b get_obj_num(int level)
  */
 void object_mental(object_type *o_ptr, bool floor)
 {
+	u32b f0[ABILITY_ARRAY_SIZE];
+	u32b not_f0[ABILITY_ARRAY_SIZE];
 	u32b f1,f2,f3,f4;
+	int i;
 
 	/* Now we know about the item */
 	o_ptr->ident |= (IDENT_MENTAL);
@@ -771,11 +774,16 @@ void object_mental(object_type *o_ptr, bool floor)
 	if (o_ptr->name2) e_info[o_ptr->name2].aware |= (AWARE_RUNES);
 
 	/* Spoil the object */
-	object_flags(o_ptr,&f1,&f2,&f3,&f4);
+	object_flags(o_ptr,f0, &f1,&f2,&f3,&f4);
 
-	object_can_flags(o_ptr,f1,f2,f3,f4, floor);
+	object_can_flags(o_ptr,f0, f1,f2,f3,f4, floor);
 
-	object_not_flags(o_ptr,~(f1),~(f2),~(f3),~(f4), floor);
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+	{
+		not_f0[i] = ~(f0[i]);
+	}
+
+	object_not_flags(o_ptr,not_f0, ~(f1),~(f2),~(f3),~(f4), floor);
 }
 
 
@@ -960,10 +968,11 @@ void object_aware(object_type *o_ptr, bool floor)
 
 	int i;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	/* Get the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 	/* No longer guessing */
 	k_ptr->guess = 0;
@@ -1092,17 +1101,20 @@ void object_aware(object_type *o_ptr, bool floor)
 	object_obvious_flags(o_ptr, floor);
 
 	/* Now we know what it is, update what we know about it */
-	object_can_flags(o_ptr,o_ptr->can_flags1,
+	object_can_flags(o_ptr,o_ptr->can_flags0,
+			o_ptr->can_flags1,
 			o_ptr->can_flags2,
 			o_ptr->can_flags3,
 			o_ptr->can_flags4, floor);
 
-	object_not_flags(o_ptr,o_ptr->not_flags1,
+	object_not_flags(o_ptr,o_ptr->not_flags0,
+			o_ptr->not_flags1,
 			o_ptr->not_flags2,
 			o_ptr->not_flags3,
 			o_ptr->not_flags4, floor);
 
-	object_may_flags(o_ptr,o_ptr->may_flags1,
+	object_may_flags(o_ptr,o_ptr->may_flags0,
+			o_ptr->may_flags1,
 			o_ptr->may_flags2,
 			o_ptr->may_flags3,
 			o_ptr->may_flags4, floor);
@@ -1433,7 +1445,7 @@ s32b object_value(const object_type *o_ptr)
 					case ABILITY_TO_HIT:
 					case ABILITY_TO_DAM:
 					case ABILITY_TO_AC:
-						object_add_one(j_ptr, a_info[o_ptr->name1].ability[i], a_info[o_ptr->name1].aval[i]);
+						object_ability_add_one(j_ptr, a_info[o_ptr->name1].ability[i], a_info[o_ptr->name1].aval[i]);
 						break;
 					}
 				}
@@ -1447,7 +1459,7 @@ s32b object_value(const object_type *o_ptr)
 					case ABILITY_TO_HIT:
 					case ABILITY_TO_DAM:
 					case ABILITY_TO_AC:
-						object_add_one(j_ptr, e_info[o_ptr->name1].ability[i], e_info[o_ptr->name1].max_aval[i] / 2);
+						object_ability_add_one(j_ptr, e_info[o_ptr->name1].ability[i], e_info[o_ptr->name1].max_aval[i] / 2);
 						break;
 					}
 				}
@@ -1460,7 +1472,7 @@ s32b object_value(const object_type *o_ptr)
 				case ABILITY_TO_HIT:
 				case ABILITY_TO_DAM:
 				case ABILITY_TO_AC:
-					object_add_one(j_ptr, k_info[o_ptr->k_idx].ability[i], k_info[o_ptr->k_idx].aval[i]);
+					object_ability_add_one(j_ptr, k_info[o_ptr->k_idx].ability[i], k_info[o_ptr->k_idx].aval[i]);
 					break;
 				}
 			}			
@@ -2111,7 +2123,7 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr, bool floor)
 			}
 
 			/* Hack -- Decrease the weight -- will be increased later */
-			p_ptr->total_weight -= (j_ptr->number * j_ptr->weight);
+			p_ptr->total_weight -= (j_ptr->number * object_aval(j_ptr, ABILITY_WEIGHT));
 		}
 
 		/* Aware of object? */
@@ -2230,9 +2242,9 @@ void object_absorb(object_type *o_ptr, const object_type *j_ptr, bool floor)
 	if (j_ptr->note != 0) o_ptr->note = j_ptr->note;
 
 	/* Hack -- Blend flags */
-	object_can_flags(o_ptr,j_ptr->can_flags1,j_ptr->can_flags2,j_ptr->can_flags3,j_ptr->can_flags4, floor);
-	object_not_flags(o_ptr,j_ptr->not_flags1,j_ptr->not_flags2,j_ptr->not_flags3,j_ptr->not_flags4, floor);
-	object_may_flags(o_ptr,j_ptr->may_flags1,j_ptr->may_flags2,j_ptr->may_flags3,j_ptr->may_flags4, floor);
+	object_can_flags(o_ptr,j_ptr->can_flags0,j_ptr->can_flags1,j_ptr->can_flags2,j_ptr->can_flags3,j_ptr->can_flags4, floor);
+	object_not_flags(o_ptr,j_ptr->not_flags0,j_ptr->not_flags1,j_ptr->not_flags2,j_ptr->not_flags3,j_ptr->not_flags4, floor);
+	object_may_flags(o_ptr,j_ptr->may_flags0,j_ptr->may_flags1,j_ptr->may_flags2,j_ptr->may_flags3,j_ptr->may_flags4, floor);
 
 	/* Mega-Hack -- Blend "discounts" */
 	if (o_ptr->discount < j_ptr->discount) o_ptr->discount = j_ptr->discount;
@@ -3963,10 +3975,11 @@ static void value_check_race_flag(object_type *o_ptr, u32b object_flag, u32b fla
  */
 int value_check_aux0(object_type *o_ptr, bool floor)
 {
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr,f0, &f1, &f2, &f3, &f4);
 
 	value_check_race_flag(o_ptr, f4, TR4_UNDEAD, floor);
 	value_check_race_flag(o_ptr, f4, TR4_ORC, floor);
@@ -4134,6 +4147,7 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 {
 	int feel = 0;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	int i, count = 0;
@@ -4141,13 +4155,22 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 
 	int flag1 = 0;
 
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 	/* Remove known flags */
 	f1 &= ~(o_ptr->can_flags1);
 	f2 &= ~(o_ptr->can_flags2);
 	f3 &= ~(o_ptr->can_flags3);
 	f4 &= ~(o_ptr->can_flags4);
+
+	/* Check flags 1 */
+	for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
+	{
+		if (limit && !weapon && (j > TR1_SPEED)) continue;
+		else if (limit && weapon && (j <= TR1_SPEED)) continue;
+
+		if ( ((f1) & (j)) && !rand_int(++count) ) { flag1 = 1; flag2 = j;}
+	}
 
 	/* Check flags 1 */
 	for (i = 0, j = 0x00000001L; (i< 32);i++, j <<= 1)
@@ -4181,17 +4204,20 @@ int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor)
 
 	switch(flag1)
 	{
+		case 0:
+			object_can_flags(o_ptr, flag2, 0x0L, 0x0L, 0x0L, 0x0L, floor);
+			break;
 		case 1:
-			object_can_flags(o_ptr, flag2, 0x0L, 0x0L, 0x0L, floor);
+			object_can_flags(o_ptr, NULL, flag2, 0x0L, 0x0L, 0x0L, floor);
 			break;
 		case 2:
-			object_can_flags(o_ptr, 0x0L, flag2, 0x0L, 0x0L, floor);
+			object_can_flags(o_ptr, NULL, 0x0L, flag2, 0x0L, 0x0L, floor);
 			break;
 		case 3:
-			object_can_flags(o_ptr, 0x0L, 0x0L, flag2, 0x0L, floor);
+			object_can_flags(o_ptr, NULL, 0x0L, 0x0L, flag2, 0x0L, floor);
 			break;
 		case 4:
-			object_can_flags(o_ptr, 0x0L, 0x0L, 0x0L, flag2, floor);
+			object_can_flags(o_ptr, NULL, 0x0L, 0x0L, 0x0L, flag2, floor);
 			break;
 	}
 
@@ -4994,17 +5020,17 @@ static void modify_weight(object_type *j_ptr, int r_idx)
 	/* Hack -- Increase weight */
 	if ((r_ptr->d_char >='A') && (r_ptr->d_char <='Z'))
 	{
-		j_ptr->weight = j_ptr->weight * hack_body_weight[r_ptr->d_char-'A'] / 10;
+		object_aval(j_ptr, ABILITY_WEIGHT) = object_aval(j_ptr, ABILITY_WEIGHT) * hack_body_weight[r_ptr->d_char-'A'] / 10;
 	}
 
 	/* Hack -- Increase weight */
 	else if ((r_ptr->d_char >='a') && (r_ptr->d_char <='z'))
 	{
-		j_ptr->weight = j_ptr->weight * hack_body_weight[r_ptr->d_char-'a'+ 26] / 10;
+		object_aval(j_ptr, ABILITY_WEIGHT) = object_aval(j_ptr, ABILITY_WEIGHT) * hack_body_weight[r_ptr->d_char-'a'+ 26] / 10;
 	}
 
 	/* Minimum weight */
-	if (j_ptr->weight < 1) j_ptr->weight = 1;
+	if (object_aval(j_ptr, ABILITY_WEIGHT) < 1) object_aval(j_ptr, ABILITY_WEIGHT) = 1;
 }
 
 
@@ -7104,9 +7130,10 @@ bool check_object_lite(object_type *j_ptr)
 	/* Is timing out, and a lite source */
 	else if (j_ptr->timeout)
 	{
+		u32b f0[ABILITY_ARRAY_SIZE];
 		u32b f1, f2, f3, f4;
 
-		object_flags(j_ptr, &f1, &f2, &f3, &f4);
+		object_flags(j_ptr, f0, &f1, &f2, &f3, &f4);
 
 		if (f3 & (TR3_LITE)) return (TRUE);
 	}
@@ -9150,7 +9177,7 @@ s16b inven_carry(object_type *o_ptr)
 	j_ptr->ident &= ~(IDENT_MARKED);
 
 	/* Increase the weight */
-	p_ptr->total_weight += (j_ptr->number * j_ptr->weight);
+	p_ptr->total_weight += (j_ptr->number * object_aval(j_ptr, ABILITY_WEIGHT));
 
 	/* Count the items */
 	p_ptr->inven_cnt++;
@@ -10840,9 +10867,10 @@ bool is_throwing_item(const object_type *o_ptr)
  */
 bool is_known_throwing_item(const object_type *o_ptr)
 {
-  u32b f1, f2, f3, f4;
+	u32b f0[ABILITY_ARRAY_SIZE];
+	u32b f1, f2, f3, f4;
 
-  object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+  object_flags_known(o_ptr, f0, &f1, &f2, &f3, &f4);
 
   if (f3 & (TR3_HURL_NUM | TR3_HURL_DAM)) return (TRUE);
 
