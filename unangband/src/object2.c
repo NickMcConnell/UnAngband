@@ -2568,167 +2568,257 @@ static void object_mention(object_type *o_ptr)
 /*
  *  Try to boost an item up to the appropriate power for the level.
  *
- *  We increase to_hit, to_dam, to_ac, pval, damage dice and/or sides
+ *  We increase any abilities, but favour ac, to-hit and damage.
+ *
+ *  We pick how to boost by generating a number from 0 to 9:
+ *  0 - keep boosting the same ability until it maxes out
+ *  odd - boost all abilities of the same 'type' at once
  */
 static void boost_item(object_type *o_ptr, int lev, int power)
 {
 	int boost_power, old_boost_power;
 	int sign = (power >= 0 ? 1 : -1);
-	bool tryagain = TRUE;
-	bool supercharge = FALSE;
-	int tries = 0;
-	int choice = 0;
+	int i, k = 0;
+	int boosting = -1;
+	int how_boost = -1;
+
+	/* Increase odds of some abilities occuring */
+	int to_hit = 0;
+	int to_dam = 0;
+	int to_ac = 0;
+
+	/* Mark as not possible to boost */
+	bool dont_boost[MAX_AVALS_OBJECT];
 
 	/* Paranoia */
 	if (!power) return;
 
-	/* Nothing to boost */
-	if (!(object_aval(o_ptr, ABILITY_TO_HIT)) && !(object_aval(o_ptr, ABILITY_TO_DAM)) && !(object_aval(o_ptr, ABILITY_TO_AC)) && !(o_ptr->pval)) return;
+	for (i = 0; i < MAX_AVALS_OBJECT; i++) dont_boost[i] = FALSE;
 
 	/* Evaluate power */
 	boost_power = object_power(o_ptr);
+
 	/* Reverse sign so that the same code applied to cursed items */
 	if (power < 0) boost_power = -boost_power;
 
 	/* Too powerful already */
 	if (boost_power >= lev) return;
 
-	/* Prefer to supercharge up 1 ability */
-	if (rand_int(5)) supercharge = TRUE;
-
+	/* Keep boosting */
 	do
 	{
+		/* What was the power we had? Used to ensure we boost abilities which actually benefit the item. */
 		old_boost_power = boost_power;
 
-		if ((tryagain) || !(supercharge)) choice = rand_int(12);
+		/* Pick new ability to boost unless supercharging */
+		if (how_boost) boosting = -1;
 
-		tryagain = FALSE;
-		tries++;
-
-		switch(choice)
+		/* Anything to boost? This should really be replaced with a frequency table. Maybe. */
+		if (boosting == -1) for (i = 0; i < o_ptr->ability_count; i++)
 		{
-			case 0: case 1: case 2:
+			/* Don't boost this */
+			if (dont_boost[i]) continue;
 
-				/* Increase to_h */
-				if ((object_aval(o_ptr, ABILITY_TO_HIT)) && (sign > 0 ? object_aval(o_ptr, ABILITY_TO_HIT) > 0 : object_aval(o_ptr, ABILITY_TO_HIT) < 0)) object_aval(o_ptr, ABILITY_TO_HIT) += sign;
-				else tryagain = TRUE;
+			/* TODO: Vary weight in useful ways on some items */
+			if (o_ptr->ability[i] == ABILITY_WEIGHT) continue;
 
-				break;
+			/* TODO: Modify base AC on some items */
+			if (o_ptr->ability[i] == ABILITY_AC) continue;
 
-			case 3: case 4: case 5:
+			switch (ability_bonus[o_ptr->ability[i]].type)
+			{
+				/* Some abilities have increased chance of occurring */
+				case BONUS_TO_HIT:
+				case BONUS_ADD_SKILL_PASSIVE: /* Stealth/searching */
+				case BONUS_ADD_WEAPON_SKILL:	/* Note: 'Also to hit' */
+					/* Don't boost to hit/stealth bonus on cloaks/body armour, unless signs match */
+					/* XXX This makes boosts to stealth/searching on body armour too common, but this may not be that important */
+					if ((o_ptr->tval == TV_CLOAK) || (o_ptr->tval == TV_SOFT_ARMOR) || (o_ptr->tval == TV_HARD_ARMOR) || (o_ptr->tval == TV_DRAG_ARMOR))
+					{
+						if ((sign < 0) && (o_ptr->aval[i] > 0)) continue;
+						if ((sign > 0) && (o_ptr->aval[i] < 0)) continue;
+					}
+					if ((++to_hit < 3) && (!rand_int(++k))) boosting = i;
+					if ((to_hit < 2) && (!rand_int(++k))) boosting = i;
+					if (!rand_int(++k)) boosting = i;
+					break;
 
-				/* Increase to_d; not above weapon dice */
-				if (((object_aval(o_ptr, ABILITY_TO_DAM)) && (sign > 0 ? object_aval(o_ptr, ABILITY_TO_DAM) > 0 : object_aval(o_ptr, ABILITY_TO_DAM) < 0))
-				    && object_aval(o_ptr, ABILITY_TO_DAM) + sign < (o_ptr->tval == TV_BOW ? 15 : object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5))
-				  object_aval(o_ptr, ABILITY_TO_DAM) += sign;
-				else tryagain = TRUE;
+				case BONUS_TO_DAM:
+					if ((++to_dam < 3) && (!rand_int(++k))) boosting = i;
+					if ((to_dam < 2) && (!rand_int(++k))) boosting = i;
+					if (!rand_int(++k)) boosting = i;
+					break;
 
-				break;
+				case BONUS_TO_AC:
+					if ((++to_ac < 3) && (!rand_int(++k))) boosting = i;
+					if ((to_ac < 2) && (!rand_int(++k))) boosting = i;
+					if (!rand_int(++k)) boosting = i;
+					break;
 
-			case 6: case 7: case 8:
+				/* Some abilities are less likely to be boosted */
+				case BONUS_ATTACKS:
+				case BONUS_MULTIPLIER:
+				case BONUS_WEAPON_MULTIPLIER:
+				case BONUS_SPEED:
+					/* Only 25% likely */
+					if (rand_int(100) >= 25) continue;
 
-				/* Increase to_a */
-				if (((object_aval(o_ptr, ABILITY_TO_AC)) && (sign > 0 ? object_aval(o_ptr, ABILITY_TO_AC) > 0 : object_aval(o_ptr, ABILITY_TO_AC) < 0))
-				    && ((object_aval(o_ptr, ABILITY_TO_AC) + sign < object_aval(o_ptr, ABILITY_AC) + 5) || o_ptr->tval == TV_CROWN))
-				  object_aval(o_ptr, ABILITY_TO_AC) += sign;
-				else tryagain = TRUE;
+				/* Don't boost damage dice/sides on non-weapons */
+				case BONUS_EQUIP_ITEM_ONLY:
+					if ((o_ptr->ability[i] == ABILITY_DAMAGE_DICE) || (o_ptr->ability[i] == ABILITY_DAMAGE_SIDES))
+					{
+						/* Skip non-weapons */
+						if ((o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
+							&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
+							&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
+					}
 
-				break;
-
-			case 9:
-
-			  /* Is this an ego item? */
-			  if (o_ptr->name2)
-				{
-				ego_item_type *e_ptr = &e_info[o_ptr->name2];
-
-				/* Increase pval; only rarely if SPEED */
-				if (o_ptr->pval
-					&& (!(e_ptr->flags1 & (TR1_SPEED))
-					    || rand_int(100) < 33))
-				  o_ptr->pval += sign;
-				else tryagain = TRUE;
-				}
-			  else
-				{
-				/* Increase pval */
-				if ((o_ptr->pval) && (sign > 0 ? o_ptr->pval > 0 : o_ptr->pval < 0))
-				  o_ptr->pval += sign;
-				else tryagain = TRUE;
-				}
-				break;
-
-			case 10:
-
-				/* Increase damage dice */
-				if ((power > 0) && ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
-				|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
-				|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF)))
-					 object_aval(o_ptr, ABILITY_DAMAGE_DICE)++;
-				else tryagain = TRUE;
-
-				break;
-
-			case 11:
-
-				/* Increase damage dice */
-				if ((power > 0) && ((o_ptr->tval == TV_DIGGING) || (o_ptr->tval == TV_HAFTED)
-				|| (o_ptr->tval == TV_SWORD) || (o_ptr->tval == TV_POLEARM) || (o_ptr->tval == TV_ARROW)
-				|| (o_ptr->tval == TV_SHOT) || (o_ptr->tval == TV_BOLT) || (o_ptr->tval == TV_STAFF)))
-					 object_aval(o_ptr, ABILITY_DAMAGE_SIDES)++;
-				else tryagain = TRUE;
-
-				break;
+				/* Usual frequency */
+				default:
+					if (!rand_int(++k)) boosting = i;
+					break;
+			}
 		}
 
-		/* Evaluate power */
+		/* Nothing to boost */
+		if (boosting < 0) break;
+
+		/* How do we boost? Supercharge only the first time through */
+		if (how_boost == -1) how_boost = rand_int(10);
+
+		/* Boost */
+		o_ptr->aval[boosting] += sign;
+
+		/* Reevaluate */
 		boost_power = object_power(o_ptr);
 		if (power < 0) boost_power = -boost_power;
 
-		/* Hack -- boost to-hit, to-dam, to-ac to 10 if required to increase power */
-		if ((boost_power <= old_boost_power) && !(tryagain) && (choice < 10))
+		/* Cancel boost if it takes us over */
+		if (boost_power > lev)
 		{
-			switch(choice)
+			o_ptr->aval[boosting] -= sign;
+
+			/* Reevaluate */
+			boost_power = object_power(o_ptr);
+			if (power < 0) boost_power = -boost_power;
+
+			/* Cancel supercharge */
+			boosting = -1;
+			how_boost = rand_int(10);
+
+			/* Don't boost */
+			dont_boost[boosting] = TRUE;
+
+			/* Reevaluate */
+			boost_power = object_power(o_ptr);
+			if (power < 0) boost_power = -boost_power;
+
+			continue;
+		}
+
+		/* Power hasn't changed with a small increase */
+		if (boost_power <= old_boost_power)
+		{
+			/* Are we worth trying to boost at all? */
+			o_ptr->aval[boosting] += 99 * sign;
+
+			/* Evaluate again */
+			boost_power = object_power(o_ptr);
+			if (power < 0) boost_power = -boost_power;
+
+			/* Roll back */
+			o_ptr->aval[boosting] -= 99 * sign;
+
+			/* Not worth boosting at all */
+			if (boost_power <= old_boost_power)
 			{
-				case 0: case 1: case 2:
+				/* Try going in 'opposite' direction */
+				o_ptr->aval[boosting] -= 99 * sign;
+
+				/* Evaluate again */
+				boost_power = object_power(o_ptr);
+				if (power < 0) boost_power = -boost_power;
+
+				/* Roll back */
+				o_ptr->aval[boosting] += 99 * sign;
+
+				/* Opposite direction didn't change things */
+				if (boost_power <= old_boost_power)
 				{
-					if ((sign > 0) && (object_aval(o_ptr, ABILITY_TO_HIT) > 0) && (object_aval(o_ptr, ABILITY_TO_HIT) < 12)) object_aval(o_ptr, ABILITY_TO_HIT) = 12;
-					else if ((sign < 0) && (object_aval(o_ptr, ABILITY_TO_HIT) < 0) && (object_aval(o_ptr, ABILITY_TO_HIT) > -12)) object_aval(o_ptr, ABILITY_TO_HIT) = -12;
-					break;
+					/* Pick how to boost again - don't supercharge */
+					how_boost = rand_int(9) +1;
+
+					/* Mark as don't boost */
+					dont_boost[boosting] = TRUE;
+
+					/* Roll back original increase */
+					o_ptr->aval[boosting] -= sign;
 				}
-				case 3: case 4: case 5:
+				/* Go some way in the opposite direction */
+				else do
 				{
-					if ((sign > 0) && (object_aval(o_ptr, ABILITY_TO_DAM) > 0) && (object_aval(o_ptr, ABILITY_TO_DAM) < 10)) object_aval(o_ptr, ABILITY_TO_DAM) = MIN(object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5, 10);
-					else if ((sign < 0) && (object_aval(o_ptr, ABILITY_TO_DAM) < 0) && (object_aval(o_ptr, ABILITY_TO_DAM) > -10)) object_aval(o_ptr, ABILITY_TO_DAM) = -10;
-					break;
-				}
-				case 6: case 7: case 8:
-				{
-					if ((sign > 0) && (object_aval(o_ptr, ABILITY_TO_AC) > 0) && (object_aval(o_ptr, ABILITY_TO_AC) < 10)) object_aval(o_ptr, ABILITY_TO_AC) = MIN(object_aval(o_ptr, ABILITY_AC) + 5, 10);
-					else if ((sign < 0) && (object_aval(o_ptr, ABILITY_TO_AC) < 0) && (object_aval(o_ptr, ABILITY_TO_AC) > -10)) object_aval(o_ptr, ABILITY_TO_AC) = -10;
-					break;
-				}
+					/* Try going in 'opposite' direction */
+					o_ptr->aval[boosting] -= sign;
+
+					/* Evaluate again */
+					boost_power = object_power(o_ptr);
+					if (power < 0) boost_power = -boost_power;
+				} while (boost_power <= old_boost_power);
 			}
 
+			/* Evaluate again */
 			boost_power = object_power(o_ptr);
 			if (power < 0) boost_power = -boost_power;
 		}
-	} while ((!(boost_power <= old_boost_power) && (boost_power < lev)) || (tryagain && (tries < 40)));
 
-	/* Hack -- undo the change that took us over the maximum power */
-	if (!tryagain)
-	{
-		switch(choice)
+		/* Matched boost - we increase all types which match this */
+		if (how_boost > 3)
 		{
-			case 0: case 1: case 2:object_aval(o_ptr, ABILITY_TO_HIT) -= sign; break;
-			case 3: case 4: case 5: object_aval(o_ptr, ABILITY_TO_DAM) -= sign; break;
-			case 6: case 7: case 8: object_aval(o_ptr, ABILITY_TO_AC) -= sign; break;
-			case 9: o_ptr->pval -= sign; break;
-			case 10: object_aval(o_ptr, ABILITY_DAMAGE_DICE)--; break;
-			case 11: object_aval(o_ptr, ABILITY_DAMAGE_SIDES)--; break;
+			for (i = 0; i < o_ptr->ability_count; i++)
+			{
+				/* Don't boost itself */
+				if (i == boosting) continue;
+
+				/* Don't boost for a reason */
+				if (dont_boost[i]) continue;
+
+				/* Don't boost abilities which don't match */
+				if (ability_bonus[o_ptr->ability[i]].type != ability_bonus[o_ptr->ability[boosting]].type) continue;
+
+				/* Boost */
+				o_ptr->aval[i] += sign;
+			}
+
+			/* Reevaluate */
+			boost_power = object_power(o_ptr);
+			if (power < 0) boost_power = -boost_power;
+
+			/* Cancel boost if it takes us over */
+			if (boost_power > lev)
+			{
+				for (i = 0; i < o_ptr->ability_count; i++)
+				{
+					/* Don't boost for a reason */
+					if (dont_boost[i]) continue;
+
+					/* Don't boost abilities which don't match */
+					if (ability_bonus[o_ptr->ability[i]].type != ability_bonus[o_ptr->ability[boosting]].type) continue;
+
+					/* Remove boost */
+					o_ptr->aval[i] -= sign;
+
+					/* Most of the time we don't boost abilities individually. This keeps items 'tidy' */
+					if (how_boost > 1) dont_boost[i] = TRUE;
+				}
+			}
+
+			/* Reevaluate */
+			boost_power = object_power(o_ptr);
+			if (power < 0) boost_power = -boost_power;
 		}
-	}
+	} while (boost_power < lev);
 }
+
 
 
 /*
@@ -2745,11 +2835,11 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 
 	int x1 = 0;
 	int x2 = 0;
+	int pval = 0;
+	int pval2 = 0;
 
 	int obj_pow1;
 	int obj_pow2 = 0;
-
-	int max_pval = 0;
 
 	bool great = ABS(power) > 1;
 
@@ -2796,25 +2886,150 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	/* Hack -- Done boosting racial items */
 	if (!(o_ptr->name2) && (o_ptr->xtra1)) return (TRUE);
 
+	/* Iterate through abilities */
+	if (o_ptr->ability_count < MAX_AVALS_OBJECT) for (i = 0; i < ABILITY_MAX; i++)
+	{
+		int min_pval = power > 0 ? 0 : -99;
+		int max_pval = power < 0 ? 0 : 99;
+
+		o_ptr->xtra1 = 20;
+		o_ptr->xtra2 = i;
+
+		/* Skip non-weapons if branded -- we have to do this because brands grant ignore flags XXX */
+		if ((ability_bonus[i].type == BONUS_BRAND) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
+			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
+			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)
+			/* Allow branded gloves/boots for Martial Artists */
+			&& (o_ptr->tval != TV_GLOVES) && (o_ptr->tval != TV_BOOTS)) continue;
+
+		/* Hack -- don't allow tunnelling on missile weapons -- people seem to object to this somehow */
+		if ((i == ABILITY_DIGGING) && (o_ptr->tval == TV_BOW)) continue;
+
+		/* Hack -- brand lite has a second pval. Ensure we have space for it */
+		if ((i == ABILITY_BRAND_LITE) && (o_ptr->ability_count >= MAX_AVALS_OBJECT -1)) continue;
+
+		/* Try various 'obvious' pvals */
+		/* We consider looking at pvals that have been already allocated, trying on average
+		 * half of them. To avoid ordering issues, we randomly pick one with each attempt.
+		 * Once this is exhausted, we try a random pval within the boundaries we've already tried.
+		 * This is done so that the player doesn't have to memorise 'lots of different numbers'
+		 */
+		for (j = o_ptr->ability_count > 0 ? rand_int(o_ptr->ability_count) : 0; j < 99; j++)
+		{
+			/* No possible pvals */
+			if (min_pval > max_pval) break;
+
+			/* Trying existing pvals */
+			if (j < o_ptr->ability_count)
+			{
+				pval = o_ptr->aval[rand_int(o_ptr->ability_count)];
+			}
+			/* Trying new pvals */
+			else
+			{
+				/* Picking a good pval */
+				if (power > 0)
+				{
+					if (max_pval <= 0) break;
+					if ((min_pval > 0) && (max_pval >= min_pval)) pval = rand_int(max_pval - min_pval + 1) + min_pval;
+					else pval = randint(max_pval);
+				}
+
+				/* Picking a bad pval */
+				if (power < 0)
+				{
+					if (min_pval >= 0) break;
+					if ((max_pval < 0) && (min_pval <= max_pval)) pval = -rand_int(-(min_pval - max_pval - 1)) + max_pval;
+					else pval = -randint(-min_pval);
+				}
+			}
+
+			/* Fake add pval */
+			o_ptr->ability[o_ptr->ability_count] = i;
+			o_ptr->aval[o_ptr->ability_count++] = pval;
+
+			/* Hack -- boost weight modifier */
+			if (i == ABILITY_WEIGHT) o_ptr->aval[o_ptr->ability_count-1] *= 5;
+
+			/* Hack - brand lite */
+			if (i == ABILITY_BRAND_LITE)
+			{
+				o_ptr->ability[o_ptr->ability_count] = ABILITY_LITE;
+				o_ptr->aval[o_ptr->ability_count++] = pval;
+			}
+
+			/* Evaluate power */
+			obj_pow2 = object_power(o_ptr);
+			if (power < 0) obj_pow2 = -obj_pow2;
+
+			/* Remove pval */
+			o_ptr->ability_count--;
+			if (i == ABILITY_BRAND_LITE) o_ptr->ability_count--;
+
+			/* Done? - Reached maximum/minimum pval */
+			if ((power > 0) && (pval >= max_pval) && (j >= o_ptr->ability_count)) break;
+			if ((power < 0) && (pval <= min_pval) && (j >= o_ptr->ability_count)) break;
+
+			/* Done? - Pval not improving */
+			if ((obj_pow2 <= obj_pow1) && (j >= o_ptr->ability_count)) break;
+
+			/* Outside range - we include the min and max because we've already tested it. */
+			if (pval >= max_pval) continue;
+			if (pval <= min_pval) continue;
+
+			/* Evaluate power */
+			obj_pow2 = object_power(o_ptr);
+			if (power < 0) obj_pow2 = -obj_pow2;
+
+			/* Reject - pval provides no improvement */
+			if (obj_pow2 <= obj_pow1)
+			{
+				if ((power > 0) && (min_pval < pval)) min_pval = pval;
+				if ((power < 0) && (max_pval > pval)) max_pval = pval;
+				continue;
+			}
+
+			/* Reject - pval too high/low */
+			if (obj_pow2 > lev)
+			{
+				if ((power > 0) && (max_pval > pval)) max_pval = pval;
+				if ((power < 0) && (min_pval < pval)) min_pval = pval;
+				continue;
+			}
+
+			/* Reject - pval not good enough for greatness */
+			if ((great) && (obj_pow2 <= ((lev * 18) / 20)))
+			{
+				if ((power > 0) && (min_pval < pval)) min_pval = pval;
+				if ((power < 0) && (max_pval > pval)) max_pval = pval;
+				continue;
+			}
+
+			/* Pick this flag? */
+			if (!rand_int(++count))
+			{
+				x1 = 20;
+				x2 = i;
+
+				/* Hack - brand lite */
+				if ((pval > 0) && (i == ABILITY_BRAND_LITE)) pval2 = pval;
+			}
+
+			break;
+		}
+	}
+
 	/* Iterate through flags 1 */
 	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 	{
 		o_ptr->xtra1 = 16;
 		o_ptr->xtra2 = i;
 
-		/* Skip non-weapons -- we have to do this because brands grant ignore flags XXX */
-		if ((j >= TR1_BRAND_ACID) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
-			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
-			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
-
-		/* Hack -- don't allow tunnelling on missile weapons -- people seem to object to this somehow */
-		if ((j == TR1_TUNNEL) && (o_ptr->tval == TV_BOW)) continue;
-
 		/* Evaluate power */
 		obj_pow2 = object_power(o_ptr);
 		if (power < 0) obj_pow2 = -obj_pow2;
 
-		/* Pick this flag with default pval? */
+		/* Pick this flag? */
 		if ((obj_pow2 > obj_pow1) &&			/* Flag has any effect? */
 			((!great) || (obj_pow2 >= ((lev * 18) / 20))) && 	/* Great forces at least 90% */
 			obj_pow2 <= lev &&			/* No more than 100% */
@@ -2822,51 +3037,6 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		{
 			x1 = 16;
 			x2 = i;
-			max_pval = 0;
-		}
-
-		/* Try increasing pval in addition to the flag */
-		else
-		{
-			int old_pval = o_ptr->pval;
-			int old_pow2;
-
-			do
-			{
-				old_pow2 = obj_pow2;
-
-				if (power > 0)
-				{
-					/* Increase pval */
-					o_ptr->pval++;
-
-					/* Evaluate power */
-					obj_pow2 = object_power(o_ptr);
-				}
-				else
-				{
-					/* Decrease pval */
-					o_ptr->pval--;
-
-					/* Evaluate power - sign reversed */
-					obj_pow2 = -object_power(o_ptr);
-				}
-
-			} while (obj_pow2 > old_pow2 && obj_pow2 < lev * 19 / 20);
-
-			/* Can find valid pval? */
-			if (obj_pow2 > obj_pow1 && obj_pow2 < lev && !rand_int(++count))
-			{
-				x1 = 16;
-				x2 = i;
-				if (o_ptr->pval > 0)
-					max_pval = o_ptr->pval - old_pval;
-				else
-					max_pval = o_ptr->pval + old_pval;
-			}
-
-			/* Reset pval */
-			o_ptr->pval = old_pval;
 		}
 	}
 
@@ -2898,7 +3068,6 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		{
 			x1 = 17;
 			x2 = i;
-			max_pval = 0;
 		}
 	}
 
@@ -2920,7 +3089,6 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		{
 			x1 = 18;
 			x2 = i;
-			max_pval = 0;
 		}
 	}
 
@@ -2929,11 +3097,6 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 	{
 		o_ptr->xtra1 = 19;
 		o_ptr->xtra2 = i;
-
-		/* Skip non-weapons -- we have to do this because of the secondary lite flag on brand lite XXX */
-		if ((j == TR4_BRAND_LITE) && (o_ptr->tval != TV_DIGGING) && (o_ptr->tval != TV_HAFTED)
-			&& (o_ptr->tval != TV_SWORD) && (o_ptr->tval != TV_POLEARM) && (o_ptr->tval != TV_ARROW)
-			&& (o_ptr->tval != TV_SHOT) && (o_ptr->tval != TV_BOLT) && (o_ptr->tval != TV_STAFF)) continue;
 
 		/* Hack -- play balance. Only allow immunities on armour, shields and cloaks XXX */
 		if ((j == TR4_IM_POIS) && (o_ptr->tval != TV_HARD_ARMOR) && (o_ptr->tval != TV_SOFT_ARMOR)
@@ -2951,7 +3114,6 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		{
 			x1 = 19;
 			x2 = i;
-			max_pval = 0;
 		}
 	}
 
@@ -2962,12 +3124,24 @@ static bool make_magic_item(object_type *o_ptr, int lev, int power)
 		o_ptr->xtra2 = x2;
 
 		/* Set new pval */
-		if (max_pval)
+		if (o_ptr->xtra1 == 20)
 		{
-			if (max_pval > 0)
-				o_ptr->pval += great ? (s16b)max_pval : (s16b)rand_range(1, max_pval);
-			else
-				o_ptr->pval += great ? (s16b)max_pval : -(s16b)rand_range(1, -max_pval);
+			/* Hack -- Weight modifier */
+			if (x2 == ABILITY_WEIGHT)
+			{
+				pval *= 5;
+			}
+
+			/* Hack -- BRAND_LITE has a second pval */
+			if (x2 == ABILITY_BRAND_LITE)
+			{
+				object_ability_add_one(o_ptr, ABILITY_BRAND_LITE, pval);
+				x2 = ABILITY_LITE;
+				pval = pval2;
+			}
+
+			/* Really add the ability. This should always succeed. */
+			return(object_ability_add_one(o_ptr, x2, pval));
 		}
 
 		return(TRUE);

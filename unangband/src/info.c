@@ -8014,7 +8014,7 @@ s32b object_power(const object_type *o_ptr)
 				p+= ability_bonus[i].e;
 				
 				/* Various accumulators */
-				if (ability_bonus[i].type == BONUS_RESIST_LOW) low_resists++;
+				if (ability_bonus[i].type == BONUS_LOW_RESIST) low_resists++;
 				if (ability_bonus[i].type == BONUS_RESIST) high_resists++;
 			}
 		}

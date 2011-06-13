@@ -3575,6 +3575,11 @@ enum
 	BONUS_SPEAK,			/* Allows speaking with a particular monster type */
 	BONUS_MARK,				/* Marks the player as if this monster race */
 	BONUS_MISC,				/* Gets a whole new ability */
+	BONUS_TO_HIT,			/* Increased chance of boosting this ability */
+	BONUS_TO_DAM,			/* Increased chance of boosting this ability */
+	BONUS_TO_AC,			/* Increased chance of boosting this ability */
+	BONUS_ATTACKS,			/* Rarely give out this ability */
+	BONUS_SPEED,			/* Rarely give out this ability */
 	BONUS_ADD_STAT,
 	BONUS_ADD_SKILL,
 	BONUS_ADD_SKILL_PASSIVE,	/* We may learn about this when moving around the dungeon */
@@ -3586,7 +3591,7 @@ enum
 	BONUS_PROTECT,
 	BONUS_PROOF,
 	BONUS_RESIST,
-	BONUS_RESIST_LOW,		/* Basic resists - acid/elec/fire/cold */
+	BONUS_LOW_RESIST,		/* Basic resists - acid/elec/fire/cold */
 	BONUS_WEAPON,			/* Bonuses from here onwards on a weapon only applied when using that weapon */
 	BONUS_ADD_WEAPON_SKILL,
 	BONUS_WEAPON_MULTIPLIER,	/* Weapon multiplier instead of adder */
