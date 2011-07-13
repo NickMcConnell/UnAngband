@@ -6853,7 +6853,7 @@ static void process_monster(int m_idx)
 			{
 				part = rand_int(5) + 4;
 				o_ptr->sval = SV_BONE_BONE;
-				object_ability_div_one(o_ptr, ABILITY_WEIGHT, part);
+				object_ability_div(o_ptr, ABILITY_WEIGHT, part);
 
 				for (i = 0; i < part; i++)
 				{
@@ -6865,7 +6865,7 @@ static void process_monster(int m_idx)
 			else if ((o_ptr->tval == TV_BODY) && (object_aval(o_ptr, ABILITY_WEIGHT) > amount))
 			{
 				part = (object_aval(o_ptr, ABILITY_WEIGHT) - amount) * 100 / object_aval(o_ptr, ABILITY_WEIGHT);
-				object_ability_add_one(o_ptr, ABILITY_WEIGHT, -amount);
+				object_ability_add(o_ptr, ABILITY_WEIGHT, -amount);
 
 				switch (o_ptr->sval)
 				{
@@ -7783,7 +7783,7 @@ static void recover_monster(int m_idx, bool regen)
 					i_ptr->timeout = 66 /* 6 */;
 					
 					/* Set weight */
-					object_ability_add_one(i_ptr, ABILITY_WEIGHT, object_aval(i_ptr, ABILITY_WEIGHT) * 14);
+					object_ability_add(i_ptr, ABILITY_WEIGHT, object_aval(i_ptr, ABILITY_WEIGHT) * 14);
 					
 					/* Set race */
 					i_ptr->name3 = poly_r_idx(y, x, m_ptr->r_idx, TRUE, FALSE, FALSE);

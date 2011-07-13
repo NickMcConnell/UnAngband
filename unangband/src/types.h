@@ -784,8 +784,6 @@ struct ego_item_type
     u16b randtime;  /* Activation time dice */
 
     s16b activated; /* Count of times activated */
-
-    s32b slay_power;	/* Pre-computed power from brands/slays */
 };
 
 
@@ -1933,6 +1931,9 @@ struct player_type
 	s16b stat_add[A_MAX];   /* Equipment stat bonuses */
 	s16b stat_ind[A_MAX];   /* Indexes into stat tables */
 
+	u32b cur_flags0[ABILITY_ARRAY_SIZE]; /* We need to note this because it is possible that
+											the ability (below) may be zero because positives
+											and negatives cancel each other out. */
 	u32b cur_flags1;
 	u32b cur_flags2;
 	u32b cur_flags3;

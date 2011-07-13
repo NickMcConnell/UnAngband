@@ -1383,7 +1383,7 @@ W:40:0:3:30000
 A:40/4
 P:0:0d0:0:0:3
 Y:17:2
-F:SEARCH |
+F:REGEN_MANA |
 F:SUST_INT | SUST_WIS | IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE |
 F:IGNORE_COLD | IGNORE_WATER |
 F:SEE_INVIS | FREE_ACT |
@@ -5204,13 +5204,25 @@ A:15/2
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 
-### 625 - Unused ###
+N:625:Size
+G:=:w
+I:45:41:1
+W:30:0:2:500
+A:30/1
+P:0:0d0:0:0:0
+Y:25:2
+F:SIZ |
+F:SUST_SIZ |
 
-### 626 - Unused ###
-
-#$# 625 - Unused ###
-
-#$# 626 - Unused ###
+N:626:Agility
+G:":w
+I:40:24:1
+W:30:0:3:500
+A:30/1
+P:0:0d0:0:0:0
+Y:5:2
+F:AGI |
+F:SUST_AGI |
 
 N:627:Wave
 G:?:g

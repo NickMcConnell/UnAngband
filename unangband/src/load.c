@@ -257,7 +257,7 @@ static void strip_bytes(int n)
  */
 static errr rd_item(object_type *o_ptr)
 {
-	int i, j, k;
+	int i, j;
 	s16b weight;
 	s16b ac;
 	byte dd;
@@ -362,11 +362,14 @@ static errr rd_item(object_type *o_ptr)
 
 	/* Read the aval information */
 	if (!older_than(0, 6, 4, 3)) rd_s16b(&o_ptr->ability_count);
-	for (i = 0; i < o_ptr->ability_count; i++) rd_s16b(&o_ptr->aval[i]);
-	for (i = 0; i < o_ptr->ability_count; i++) rd_s16b(&o_ptr->ability[i]);
+	for (j = 0; j < o_ptr->ability_count; j++)
+	{
+		rd_s16b(&o_ptr->ability[j]);
+		rd_s16b(&o_ptr->aval[j]);
+	}
 	
 	if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
-	
+
 	/* Flags we have learnt about an item */
 	for (i = 0; i < ability; i++) rd_u32b(&o_ptr->can_flags0[i]);	
 	rd_u32b(&o_ptr->can_flags1);
@@ -403,22 +406,22 @@ static errr rd_item(object_type *o_ptr)
 				switch(a_ptr->ability[i])
 				{
 					case ABILITY_WEIGHT:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], weight);
+						object_ability_add(o_ptr, a_ptr->ability[i], weight);
 						break;
 					case ABILITY_DAMAGE_DICE:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], dd);
+						object_ability_add(o_ptr, a_ptr->ability[i], dd);
 						break;
 					case ABILITY_DAMAGE_SIDES:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], ds);
+						object_ability_add(o_ptr, a_ptr->ability[i], ds);
 						break;
 					case ABILITY_AC:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], ac);
+						object_ability_add(o_ptr, a_ptr->ability[i], ac);
 						break;
 					case ABILITY_TO_AC:
 					case ABILITY_TO_AC_MELEE:
 					case ABILITY_TO_AC_RANGED:
 					case ABILITY_TO_AC_BLOCK:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], to_a);
+						object_ability_add(o_ptr, a_ptr->ability[i], to_a);
 						break;
 					case ABILITY_TO_HIT:
 					case ABILITY_TO_HIT_THROW:
@@ -427,7 +430,7 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_TO_HIT_UNARM:
 					case ABILITY_TO_HIT_TRAP:
 					case ABILITY_TO_HIT_RESIST:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], to_h);
+						object_ability_add(o_ptr, a_ptr->ability[i], to_h);
 						break;
 					case ABILITY_TO_DAM:
 					case ABILITY_TO_DAM_THROW:
@@ -435,7 +438,7 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_TO_DAM_BOW:
 					case ABILITY_TO_DAM_UNARM:
 					case ABILITY_TO_DAM_TRAP:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], to_d);
+						object_ability_add(o_ptr, a_ptr->ability[i], to_d);
 						break;
 /*
 					case ABILITY_BRAND_HOLY:
@@ -449,7 +452,7 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_SLAY_DRAGON:
 					case ABILITY_SLAY_UNDEAD:
 					case ABILITY_SLAY_DEMON:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], 3);
+						object_ability_add(o_ptr, a_ptr->ability[i], 3);
 						break;
 						
 					case ABILITY_SLAY_ANIMAL:
@@ -459,10 +462,10 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_SLAY_DWARF:
 					case ABILITY_SLAY_ELF:
 					case ABILITY_SLAY_MAN:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], 4);
+						object_ability_add(o_ptr, a_ptr->ability[i], 4);
 */
 					default:
-						object_ability_add_one(o_ptr, a_ptr->ability[i], a_ptr->aval[i]);
+						object_ability_add(o_ptr, a_ptr->ability[i], a_ptr->aval[i]);
 				}				
 			}
 		}
@@ -477,22 +480,22 @@ static errr rd_item(object_type *o_ptr)
 				switch(e_ptr->ability[i])
 				{
 					case ABILITY_WEIGHT:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], weight);
+						object_ability_add(o_ptr, e_ptr->ability[i], weight);
 						break;
 					case ABILITY_DAMAGE_DICE:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], dd);
+						object_ability_add(o_ptr, e_ptr->ability[i], dd);
 						break;
 					case ABILITY_DAMAGE_SIDES:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], ds);
+						object_ability_add(o_ptr, e_ptr->ability[i], ds);
 						break;
 					case ABILITY_AC:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], ac);
+						object_ability_add(o_ptr, e_ptr->ability[i], ac);
 						break;
 					case ABILITY_TO_AC:
 					case ABILITY_TO_AC_MELEE:
 					case ABILITY_TO_AC_RANGED:
 					case ABILITY_TO_AC_BLOCK:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], to_a);
+						object_ability_add(o_ptr, e_ptr->ability[i], to_a);
 						break;
 					case ABILITY_TO_HIT:
 					case ABILITY_TO_HIT_THROW:
@@ -501,7 +504,7 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_TO_HIT_UNARM:
 					case ABILITY_TO_HIT_TRAP:
 					case ABILITY_TO_HIT_RESIST:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], to_h);
+						object_ability_add(o_ptr, e_ptr->ability[i], to_h);
 						break;
 					case ABILITY_TO_DAM:
 					case ABILITY_TO_DAM_THROW:
@@ -509,18 +512,18 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_TO_DAM_BOW:
 					case ABILITY_TO_DAM_UNARM:
 					case ABILITY_TO_DAM_TRAP:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], to_d);
+						object_ability_add(o_ptr, e_ptr->ability[i], to_d);
 						break;
 					case ABILITY_SLAY_DRAGON:
 					case ABILITY_SLAY_UNDEAD:
 					case ABILITY_SLAY_DEMON:
 						if (e_ptr->max_aval[i] >= 4)
 						{
-							object_ability_add_one(o_ptr, e_ptr->ability[i], 5);
+							object_ability_add(o_ptr, e_ptr->ability[i], 5);
 						}
 						else
 						{
-							object_ability_add_one(o_ptr, e_ptr->ability[i], 3);
+							object_ability_add(o_ptr, e_ptr->ability[i], 3);
 						}
 						break;
 					case ABILITY_BRAND_HOLY:
@@ -531,7 +534,7 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_BRAND_POIS:
 					case ABILITY_BRAND_LITE:
 					case ABILITY_BRAND_DARK:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], 3);
+						object_ability_add(o_ptr, e_ptr->ability[i], 3);
 						break;
 						
 					case ABILITY_SLAY_ANIMAL:
@@ -541,10 +544,10 @@ static errr rd_item(object_type *o_ptr)
 					case ABILITY_SLAY_DWARF:
 					case ABILITY_SLAY_ELF:
 					case ABILITY_SLAY_MAN:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], 4);
+						object_ability_add(o_ptr, e_ptr->ability[i], 4);
 			
 					default:
-						object_ability_add_one(o_ptr, e_ptr->ability[i], pval);
+						object_ability_add(o_ptr, e_ptr->ability[i], pval);
 				}				
 			}
 		}
@@ -1672,11 +1675,15 @@ static errr rd_randarts(void)
 		if (!older_than(0, 6, 4, 3))
 		{
 			rd_s16b(&a_ptr->ability_count);
-			for (j = 0; j < a_ptr->ability_count; j++) rd_s16b(&a_ptr->aval[j]);
-			for (j = 0; j < a_ptr->ability_count; j++) rd_s16b(&a_ptr->ability[j]);
+			for (j = 0; j < a_ptr->ability_count; j++)
+			{
+				rd_s16b(&a_ptr->ability[j]);
+				rd_s16b(&a_ptr->aval[j]);
+				a_ptr->flags0[a_ptr->ability[j]/32] |= 1L << (a_ptr->ability[j] % 32);
+			}
 		}
 
-		/* Flags we have learnt about an item */
+		/* Flags the item has item */
 		rd_u32b(&a_ptr->flags1);
 		rd_u32b(&a_ptr->flags2);
 		rd_u32b(&a_ptr->flags3);
@@ -2975,8 +2982,6 @@ static errr rd_savefile_new_aux(void)
 	/* Load the Quests */
 	for (i = 0; i < tmp16u; i++)
 	{
-		int j;
-
 		rd_byte(&tmp8u);
 
 		if (tmp8u > MAX_QUEST_EVENTS)
@@ -3017,19 +3022,21 @@ static errr rd_savefile_new_aux(void)
 	for (i = 0; i < tmp16u; i++)
 	{
 		object_info *n_ptr = &a_list[i];
+		s16b ability = 0;
 
 		rd_byte(&tmp8u);
 		a_info[i].cur_num = (tmp8u != 0);
 		rd_byte(&tmp8u);
-		rd_byte(&tmp8u);
-		rd_byte(&tmp8u);
+		rd_s16b(&ability);
 
 		/* Knowledge */
+		for (j = 0; j < ability; j++) rd_u32b(&n_ptr->can_flags0[j]);
 		rd_u32b(&n_ptr->can_flags1);
 		rd_u32b(&n_ptr->can_flags2);
 		rd_u32b(&n_ptr->can_flags3);
 		rd_u32b(&n_ptr->can_flags4);
 
+		for (j = 0; j < ability; j++) rd_u32b(&n_ptr->not_flags0[j]);
 		rd_u32b(&n_ptr->not_flags1);
 		rd_u32b(&n_ptr->not_flags2);
 		rd_u32b(&n_ptr->not_flags3);
@@ -3059,17 +3066,23 @@ static errr rd_savefile_new_aux(void)
 	for (i = 0; i < tmp16u; i++)
 	{
 		object_lore *n_ptr = &e_list[i];
+		s16b ability = 0;
 
+		if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+
+		for (j = 0; j < ability; j++) rd_u32b(&n_ptr->can_flags0[j]);
 		rd_u32b(&n_ptr->can_flags1);
 		rd_u32b(&n_ptr->can_flags2);
 		rd_u32b(&n_ptr->can_flags3);
 		rd_u32b(&n_ptr->can_flags4);
 
+		for (j = 0; j < ability; j++) rd_u32b(&n_ptr->may_flags0[j]);
 		rd_u32b(&n_ptr->may_flags1);
 		rd_u32b(&n_ptr->may_flags2);
 		rd_u32b(&n_ptr->may_flags3);
 		rd_u32b(&n_ptr->may_flags4);
 
+		for (j = 0; j < ability; j++) rd_u32b(&n_ptr->not_flags0[j]);
 		rd_u32b(&n_ptr->not_flags1);
 		rd_u32b(&n_ptr->not_flags2);
 		rd_u32b(&n_ptr->not_flags3);
@@ -3105,7 +3118,11 @@ static errr rd_savefile_new_aux(void)
 		for (i = 0; i < tmp16u; i++)
 		{
 			object_info *n_ptr = &x_list[i];
+			s16b ability = 0;
 
+			if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+
+			for (j = 0; j < ability; j++) rd_u32b(&n_ptr->can_flags0[j]);
 			rd_u32b(&n_ptr->can_flags1);
 			rd_u32b(&n_ptr->can_flags2);
 			rd_u32b(&n_ptr->can_flags3);
@@ -3124,11 +3141,13 @@ static errr rd_savefile_new_aux(void)
 	if (rd_randarts()) return (-1);
 	if (arg_fiddle) note("Loaded Random Artifacts");
 
+#ifdef GJW_RANDART
 	/* Generate artifact names (only, hence FALSE) according to the seed.
 	   They are not stored in savefile but regenerated every time.
 	   The rest of artifact info (except field 'text', which is empty)
 	   is read from savefile later. */
 	do_randart(seed_randart, FALSE);
+#endif /* GJW_RANDART */
 
 	/* Important -- Initialize the sex */
 	sp_ptr = &sex_info[p_ptr->psex];

@@ -21,11 +21,11 @@
 /*
  * Translate player racial or equipment flags into monster smart flags
  */
-u32b player_smart_flags(u32b f1, u32b f2, u32b f3, u32b f4)
+u32b player_smart_flags(u32b f0[ABILITY_ARRAY_SIZE], u32b f1, u32b f2, u32b f3, u32b f4)
 {
 	u32b tmp = 0L;
 
-	(void)f1;
+	(void)f3;
 
 	/* Know immunities */
 	if (f2 & (TR2_IM_ACID)) tmp |= (SM_IMM_ACID);
@@ -35,25 +35,29 @@ u32b player_smart_flags(u32b f1, u32b f2, u32b f3, u32b f4)
 	if (f4 & (TR4_IM_POIS)) tmp |= (SM_IMM_POIS);
 
 	/* Know protections */
-	if (f3 & (TR3_FREE_ACT)) tmp |= (SM_FREE_ACT);
+	if (f1 & (TR1_NO_SLOW)) tmp |= (SM_FREE_ACT);
+	if (f1 & (TR1_NO_PARALYZE)) tmp |= (SM_FREE_ACT);
 
-	/* Know resistances */
-	if (f2 & (TR2_RES_ACID)) tmp |= (SM_RES_ACID);
-	if (f2 & (TR2_RES_ELEC)) tmp |= (SM_RES_ELEC);
-	if (f2 & (TR2_RES_FIRE)) tmp |= (SM_RES_FIRE);
-	if (f2 & (TR2_RES_COLD)) tmp |= (SM_RES_COLD);
-	if (f2 & (TR2_RES_POIS)) tmp |= (SM_RES_POIS);
-	if (f2 & (TR2_RES_FEAR)) tmp |= (SM_RES_FEAR);
-	if (f2 & (TR2_RES_LITE)) tmp |= (SM_RES_LITE);
-	if (f2 & (TR2_RES_DARK)) tmp |= (SM_RES_DARK);
-	if (f2 & (TR2_RES_BLIND)) tmp |= (SM_RES_BLIND);
-	if (f2 & (TR2_RES_CONFU)) tmp |= (SM_RES_CONFU);
-	if (f2 & (TR2_RES_SOUND)) tmp |= (SM_RES_SOUND);
-	if (f2 & (TR2_RES_SHARD)) tmp |= (SM_RES_SHARD);
-	if (f2 & (TR2_RES_NEXUS)) tmp |= (SM_RES_NEXUS);
-	if (f2 & (TR2_RES_NETHR)) tmp |= (SM_RES_NETHR);
-	if (f2 & (TR2_RES_CHAOS)) tmp |= (SM_RES_CHAOS);
-	if (f2 & (TR2_RES_DISEN)) tmp |= (SM_RES_DISEN);
+	/* Known resistances */
+	if (f0)
+	{
+		if (f0[ABILITY_RESIST_ACID/32] & (1L << (ABILITY_RESIST_ACID % 32))) tmp |= (SM_RES_ACID);
+		if (f0[ABILITY_RESIST_ELEC/32] & (1L << (ABILITY_RESIST_ELEC % 32))) tmp |= (SM_RES_ELEC);
+		if (f0[ABILITY_RESIST_FIRE/32] & (1L << (ABILITY_RESIST_FIRE % 32))) tmp |= (SM_RES_FIRE);
+		if (f0[ABILITY_RESIST_COLD/32] & (1L << (ABILITY_RESIST_COLD % 32))) tmp |= (SM_RES_COLD);
+		if (f0[ABILITY_RESIST_POISON/32] & (1L << (ABILITY_RESIST_POISON % 32))) tmp |= (SM_RES_POIS);
+		if (f0[ABILITY_RESIST_FEAR/32] & (1L << (ABILITY_RESIST_FEAR % 32))) tmp |= (SM_RES_FEAR);
+		if (f0[ABILITY_RESIST_LITE/32] & (1L << (ABILITY_RESIST_LITE % 32))) tmp |= (SM_RES_LITE);
+		if (f0[ABILITY_RESIST_DARK/32] & (1L << (ABILITY_RESIST_DARK % 32))) tmp |= (SM_RES_DARK);
+		if (f0[ABILITY_RESIST_BLIND/32] & (1L << (ABILITY_RESIST_BLIND % 32))) tmp |= (SM_RES_BLIND);
+		if (f0[ABILITY_RESIST_CONFU/32] & (1L << (ABILITY_RESIST_CONFU % 32))) tmp |= (SM_RES_CONFU);
+		if (f0[ABILITY_RESIST_SOUND/32] & (1L << (ABILITY_RESIST_SOUND % 32))) tmp |= (SM_RES_SOUND);
+		if (f0[ABILITY_RESIST_SHARD/32] & (1L << (ABILITY_RESIST_SHARD % 32))) tmp |= (SM_RES_SHARD);
+		if (f0[ABILITY_RESIST_NEXUS/32] & (1L << (ABILITY_RESIST_NEXUS % 32))) tmp |= (SM_RES_NEXUS);
+		if (f0[ABILITY_RESIST_NETHR/32] & (1L << (ABILITY_RESIST_NETHR % 32))) tmp |= (SM_RES_NETHR);
+		if (f0[ABILITY_RESIST_CHAOS/32] & (1L << (ABILITY_RESIST_CHAOS % 32))) tmp |= (SM_RES_CHAOS);
+		if (f0[ABILITY_RESIST_DISEN/32] & (1L << (ABILITY_RESIST_DISEN % 32))) tmp |= (SM_RES_DISEN);
+	}
 
 	return(tmp);
 }
@@ -104,10 +108,10 @@ u32b monster_smart_flags(int m_idx)
  * This is similar to equip_can_flags except we allow the casting
  * monster to also notice this ability.
  */
-bool player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
+bool player_can_flags(int who, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, u32b f2, u32b f3, u32b f4)
 {
 	/* Player notices ability */
-	equip_can_flags(f1, f2, f3, f4);
+	equip_can_flags(f0, f1, f2, f3, f4);
 
 	/* Monster notices ability */
 	if (who > SOURCE_MONSTER_START)
@@ -124,7 +128,7 @@ bool player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
  		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Get the flags */
-		smart = player_smart_flags(f1, f2, f3, f4);
+		smart = player_smart_flags(f0, f1, f2, f3, f4);
 
 		/* Learn the flags */
 		m_ptr->smart |= smart;
@@ -142,10 +146,10 @@ bool player_can_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
  * This is similar to equip_not_flags except we allow the casting
  * monster to also notice this ability.
  */
-bool player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
+bool player_not_flags(int who, u32b f0[ABILITY_ARRAY_SIZE], u32b f1, u32b f2, u32b f3, u32b f4)
 {
 	/* Player notices ability */
-	equip_not_flags(f1, f2, f3, f4);
+	equip_not_flags(f0, f1, f2, f3, f4);
 
 	/* Monster notices ability */
 	if (who > SOURCE_MONSTER_START)
@@ -162,13 +166,113 @@ bool player_not_flags(int who, u32b f1, u32b f2, u32b f3, u32b f4)
  		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
 
 		/* Learn the flags */
-		smart = player_smart_flags(f1, f2, f3, f4);
+		smart = player_smart_flags(f0, f1, f2, f3, f4);
 
 		/* Learn the flags */
 		m_ptr->smart &= ~(smart);
 
 		/* Tell the allies */
 		return (tell_allies_player_not(m_ptr->fy, m_ptr->fx, smart));
+	}
+
+	return (FALSE);
+}
+
+
+/* As above, but for abilities. We only check for positive abilities */
+bool player_can_ability(int who, int ability)
+{
+	int i;
+	u32b f0[ABILITY_ARRAY_SIZE];
+
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+
+	f0[ability/32] |= 1L << (ability % 32);
+
+	/* Ensure player has ability */
+	if (p_ptr->ability[ability] > 0)
+	{
+		return(player_can_flags(who, f0, 0x0L, 0x0L, 0x0L, 0x0L));
+	}
+	/* If the player has 'negative' ability or no ability because positives and negatives cancel out, we have to be trickier */
+	else if ((p_ptr->ability[ability] < 0) || (p_ptr->cur_flags0[ability/32] & (1L << (ability % 32))))
+	{
+		/* Player notices ability */
+		equip_can_flags(f0, 0x0L, 0x0L, 0x0L, 0x0L);
+
+		/* Monster notices 'lack' of ability */
+		if (who > SOURCE_MONSTER_START)
+		{
+		 	monster_type *m_ptr = &m_list[who];
+		 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+			u32b smart;
+
+		 	/* Too stupid to learn anything */
+	 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
+
+		 	/* Not intelligent, only learn sometimes */
+	 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
+
+			/* Learn the flags */
+			smart = player_smart_flags(f0, 0x0L, 0x0L, 0x0L, 0x0L);
+
+			/* Learn the flags */
+			m_ptr->smart &= ~(smart);
+
+			/* Tell the allies */
+			return (tell_allies_player_not(m_ptr->fy, m_ptr->fx, smart));
+		}
+	}
+
+	return (FALSE);
+}
+
+
+/* As above, but for abilities. */
+bool player_not_ability(int who, int ability)
+{
+	int i;
+	u32b f0[ABILITY_ARRAY_SIZE];
+
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+
+	f0[ability/32] |= 1L << (ability % 32);
+
+	/* Ensure player does not have ability, and not as a result of positives and negatives cancelling out */
+	if ((p_ptr->ability[ability] == 0) && ((p_ptr->cur_flags0[ability/32] & (1L << (ability % 32))) == 0))
+	{
+		return(player_not_flags(who, f0, 0x0L, 0x0L, 0x0L, 0x0L));
+	}
+	/* If the player has 'negative' ability or no ability because positives and negatives cancel out, we have to be trickier */
+	else if ((p_ptr->ability[ability] < 0) || (p_ptr->cur_flags0[ability/32] & (1L << (ability % 32))))
+	{
+		/* Player notices ability */
+		equip_can_flags(f0, 0x0L, 0x0L, 0x0L, 0x0L);
+
+		/* Monster notices 'lack' of ability */
+		if (who > SOURCE_MONSTER_START)
+		{
+		 	monster_type *m_ptr = &m_list[who];
+		 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
+
+			u32b smart;
+
+		 	/* Too stupid to learn anything */
+	 		if (r_ptr->flags2 & (RF2_STUPID)) return (FALSE);
+
+		 	/* Not intelligent, only learn sometimes */
+	 		if (!(r_ptr->flags2 & (RF2_SMART)) && (rand_int(100) < 50)) return (FALSE);
+
+			/* Learn the flags */
+			smart = player_smart_flags(f0, 0x0L, 0x0L, 0x0L, 0x0L);
+
+			/* Learn the flags */
+			m_ptr->smart &= ~(smart);
+
+			/* Tell the allies */
+			return (tell_allies_player_not(m_ptr->fy, m_ptr->fx, smart));
+		}
 	}
 
 	return (FALSE);
@@ -291,6 +395,17 @@ bool update_smart_forget(int who, u32b flag)
 void update_smart_cheat(int m_idx)
 {
 	monster_type *m_ptr = &m_list[m_idx];
+	int i;
+	u32b f0[ABILITY_ARRAY_SIZE];
+
+	/* Clear ability flags */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+
+	/* Set up abilities */
+	for (i = 0; i < ABILITY_MAX; i++)
+	{
+		if (p_ptr->ability[i] > 0) f0[i/32] |= 1L << (i %32);
+	}
 
 	/* Know weirdness */
 	if (!p_ptr->msp) m_ptr->smart |= (SM_IMM_MANA);
@@ -308,7 +423,7 @@ void update_smart_cheat(int m_idx)
 	if (p_ptr->timed[TMD_BERSERK]) m_ptr->smart |= (SM_OPP_FEAR);
 
 	/* Get other flags */
-	m_ptr->smart |= player_smart_flags(p_ptr->cur_flags1, p_ptr->cur_flags2, p_ptr->cur_flags3, p_ptr->cur_flags4);
+	m_ptr->smart |= player_smart_flags(f0, p_ptr->cur_flags1, p_ptr->cur_flags2, p_ptr->cur_flags3, p_ptr->cur_flags4);
 
 	return;
 }
@@ -321,16 +436,20 @@ void update_smart_cheat(int m_idx)
 void update_smart_racial(int m_idx)
 {
 	monster_type *m_ptr = &m_list[m_idx];
+	int i;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1 = 0;
 	u32b f2 = 0;
 	u32b f3 = 0;
 	u32b f4 = 0;
 
-	object_flags(&inventory[INVEN_SELF], &f1, &f2, &f3, &f4);
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+
+	object_flags(&inventory[INVEN_SELF], f0, &f1, &f2, &f3, &f4);
 
 	/* Get race flags */
-	m_ptr->smart |= player_smart_flags(f1, f2, f3, f4);
+	m_ptr->smart |= player_smart_flags(f0, f1, f2, f3, f4);
 
 	return;
 }
@@ -1963,8 +2082,8 @@ static int inven_damage(inven_func typ, int perc)
 				if (rand_int(100) < perc)
 				{
 					/* Damage the item */
-					o_ptr->to_h--;
-					o_ptr->to_d--;
+					object_aval(o_ptr, ABILITY_TO_HIT)--;
+					object_aval(o_ptr, ABILITY_TO_DAM)--;
 
 					/* Damaged! */
 					damage = TRUE;
@@ -1989,7 +2108,7 @@ static int inven_damage(inven_func typ, int perc)
 				if (rand_int(100) < perc)
 				{
 					/* Damage the item */
-					o_ptr->to_a--;
+					object_aval(o_ptr, ABILITY_TO_AC)--;
 
 					/* Damaged! */
 					damage = TRUE;
@@ -2213,7 +2332,7 @@ static int minus_ac(int ac)
 	if (o_ptr->tval == TV_SPELL) return (FALSE);
 	
 	/* No damage left to be done */
-	if (o_ptr->ac + o_ptr->to_a - ac <= 0) destroy = TRUE;
+	if (object_aval(o_ptr, ABILITY_AC) + object_aval(o_ptr, ABILITY_TO_AC) - ac <= 0) destroy = TRUE;
 	
 	/* Mega Hack -- do not destroy ego items, magic items etc */
 	if ((destroy) && (o_ptr->name2 || o_ptr->xtra1 || o_ptr->xtra2 || (o_ptr->tval == TV_DRAG_ARMOR)))
@@ -2222,23 +2341,23 @@ static int minus_ac(int ac)
 		destroy = FALSE;
 
 		/* Already completely damaged? */
-		if (o_ptr->ac + o_ptr->to_a <= 0) return (FALSE);
+		if (object_aval(o_ptr, ABILITY_AC) + object_aval(o_ptr, ABILITY_TO_AC) <= 0) return (FALSE);
 
 		/* Damage completely */
-		ac = o_ptr->ac + o_ptr->to_a;
+		ac = object_aval(o_ptr, ABILITY_AC) + object_aval(o_ptr, ABILITY_TO_AC);
 	}
 
 	/* Describe */
 	object_desc(o_name, sizeof(o_name), o_ptr, FALSE, 0);
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 	/* Object resists */
 	if (f2 & (TR2_IGNORE_ACID))
 	{
 		/* Always notice */
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
+		object_can_flags(o_ptr,NULL, 0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
 
 		msg_format("Your %s is unaffected!", o_name);
 
@@ -2246,7 +2365,7 @@ static int minus_ac(int ac)
 	}
 
 	/* Always notice */
-	object_not_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
+	object_not_flags(o_ptr,NULL, 0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
 
 	/* Message */
 	msg_format("Your %s is %s!", o_name, destroy ? "destroyed" : "damaged");
@@ -2255,7 +2374,7 @@ static int minus_ac(int ac)
 	if (destroy)
 	{
 		/* Adjust total weight */
-		p_ptr->total_weight -= o_ptr->weight * o_ptr->number;
+		p_ptr->total_weight -= object_aval(o_ptr, ABILITY_WEIGHT) * o_ptr->number;
 
 		/* Clear slot */
 		object_wipe(&inventory[slot]);
@@ -2264,7 +2383,7 @@ static int minus_ac(int ac)
 	else
 	{
 		/* Damage the item */
-		o_ptr->to_a -= ac;
+		object_ability_add(o_ptr, ABILITY_TO_AC, 0-ac);
 
 		/* Hack --- unsense the item */
 		o_ptr->ident &= ~(IDENT_SENSE);
@@ -2291,19 +2410,19 @@ static void acid_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
-	int res = p_ptr->incr_resist[INCR_RES_ACID];
+	int res = p_ptr->ability[ABILITY_RESIST_ACID];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ACID)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
+		(void)player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 		{
 			/* Always notice */
-			(void)player_can_flags(who, 0x0L,TR2_IM_ACID,0x0L,0x0L);
+			(void)player_can_flags(who, NULL, 0x0L,TR2_IM_ACID,0x0L,0x0L);
 
 			/* Hack -- always assume 'armor hit' */
 			dam = (dam + 5) / 6;
@@ -2322,8 +2441,8 @@ static void acid_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,TR2_IM_ACID,0x0L,0x0L);
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
+		(void)player_can_flags(who, NULL, 0x0L,TR2_IM_ACID,0x0L,0x0L);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 
 		return;
 	}
@@ -2332,21 +2451,34 @@ static void acid_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ACID)) != 0)
 	{
 		/* Always notice */
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_ACID);
 	}
 
-	/* Resist the damage */
-	if ((p_ptr->cur_flags2 & (TR2_RES_ACID)) != 0)
+	/* Protect inventory */
+	if (p_ptr->ability[ABILITY_PROTECT_ACID] != 0)
 	{
 		/* Sometimes notice */
-	(void)	player_can_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
+		(void)player_can_ability(who, ABILITY_PROTECT_ACID);
 
-		inv /= res;
+		if (p_ptr->ability[ABILITY_PROTECT_ACID] < 0) inv *= (0 - p_ptr->ability[ABILITY_PROTECT_ACID]) + 1;
+		else inv /= (p_ptr->ability[ABILITY_PROTECT_ACID] + 1);
 	}
 	else
 	{
 		/* Sometimes notice */
-		(void)player_not_flags(who, 0x0L,TR2_RES_ACID,0x0L,0x0L);
+		(void)player_not_ability(who, p_ptr->ability[ABILITY_PROTECT_ACID]);
+	}
+
+	/* Resist the damage */
+	if (p_ptr->ability[ABILITY_RESIST_ACID] != 0)
+	{
+		/* Sometimes notice */
+		(void)player_can_ability(who, ABILITY_RESIST_ACID);
+	}
+	else
+	{
+		/* Sometimes notice */
+		(void)player_not_ability(who, ABILITY_RESIST_ACID);
 	}
 
 	/* Resist the damage */
@@ -2372,7 +2504,8 @@ static void acid_dam(int who, int what, int dam, bool inven)
 		(void)inven_damage(set_acid_destroy, inv);
 
 	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
+	if (res < 0) dam *= (0 - res) + 1;
+	else if (res > 0) dam = (dam - res - 1) / (res + 1);
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -2389,19 +2522,19 @@ static void elec_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
-	int res = p_ptr->incr_resist[INCR_RES_ELEC];
+	int res = p_ptr->ability[ABILITY_RESIST_ELEC];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_ELEC)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+		(void)player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 		{
 			/* Always notice */
-			(void)player_can_flags(who, 0x0L,TR2_IM_ELEC,0x0L,0x0L);
+			(void)player_can_flags(who, NULL, 0x0L,TR2_IM_ELEC,0x0L,0x0L);
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2420,8 +2553,8 @@ static void elec_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,TR2_IM_ELEC,0x0L,0x0L);
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+		(void)player_can_flags(who, NULL, 0x0L,TR2_IM_ELEC,0x0L,0x0L);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 
 		return;
 	}
@@ -2430,21 +2563,34 @@ static void elec_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_ELEC)) != 0)
 	{
 		/* Always notice */
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_ELEC);
 	}
 
-	/* Resist the damage */
-	if ((p_ptr->cur_flags2 & (TR2_RES_ELEC)) != 0)
+	/* Protect inventory */
+	if (p_ptr->ability[ABILITY_PROTECT_ELEC] != 0)
 	{
 		/* Sometimes notice */
-		(void)player_can_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
+		(void)player_can_ability(who, ABILITY_PROTECT_ELEC);
 
-		inv /= res;
+		if (p_ptr->ability[ABILITY_PROTECT_ELEC] < 0) inv *= (0 - p_ptr->ability[ABILITY_PROTECT_ELEC]) + 1;
+		else inv /= (p_ptr->ability[ABILITY_PROTECT_ELEC] + 1);
 	}
 	else
 	{
 		/* Sometimes notice */
-		(void)player_not_flags(who, 0x0L,TR2_RES_ELEC,0x0L,0x0L);
+		(void)player_not_ability(who, p_ptr->ability[ABILITY_PROTECT_ELEC]);
+	}
+
+	/* Resist the damage */
+	if ((p_ptr->ability[ABILITY_RESIST_ELEC]) != 0)
+	{
+		/* Sometimes notice */
+		(void)player_can_ability(who, ABILITY_RESIST_ELEC);
+	}
+	else
+	{
+		/* Sometimes notice */
+		(void)player_not_ability(who, ABILITY_RESIST_ELEC);
 	}
 
 	/* Resist the damage */
@@ -2467,7 +2613,8 @@ static void elec_dam(int who, int what, int dam, bool inven)
 		(void)inven_damage(set_elec_destroy, inv);
 
 	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
+	if (res < 0) dam *= (0 - res) + 1;
+	else if (res > 0) dam = (dam - res - 1) / (res + 1);
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -2486,19 +2633,19 @@ static void fire_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
-	int res = p_ptr->incr_resist[INCR_RES_FIRE];
+	int res = p_ptr->ability[ABILITY_RESIST_FIRE];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_FIRE)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+		(void)player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 		{
 			/* Always notice */
-			(void)player_can_flags(who, 0x0L,TR2_IM_FIRE,0x0L,0x0L);
+			(void)player_can_flags(who, NULL, 0x0L,TR2_IM_FIRE,0x0L,0x0L);
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2517,8 +2664,8 @@ static void fire_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,TR2_IM_FIRE,0x0L,0x0L);
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+		(void)player_can_flags(who, NULL, 0x0L,TR2_IM_FIRE,0x0L,0x0L);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 
 		return;
 	}
@@ -2527,21 +2674,34 @@ static void fire_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_FIRE)) != 0)
 	{
 		/* Always notice */
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_FIRE);
 	}
 
-	/* Resist the damage */
-	if ((p_ptr->cur_flags2 & (TR2_RES_FIRE)) != 0)
+	/* Protect inventory */
+	if (p_ptr->ability[ABILITY_PROTECT_FIRE] != 0)
 	{
 		/* Sometimes notice */
-		(void)player_can_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
+		(void)player_can_ability(who, ABILITY_PROTECT_FIRE);
 
-		inv /= res;
+		if (p_ptr->ability[ABILITY_PROTECT_FIRE] < 0) inv *= (0 - p_ptr->ability[ABILITY_PROTECT_FIRE]) + 1;
+		else inv /= (p_ptr->ability[ABILITY_PROTECT_FIRE] + 1);
 	}
 	else
 	{
 		/* Sometimes notice */
-		(void)player_not_flags(who, 0x0L,TR2_RES_FIRE,0x0L,0x0L);
+		(void)player_not_ability(who, p_ptr->ability[ABILITY_PROTECT_FIRE]);
+	}
+
+	/* Resist the damage */
+	if (p_ptr->ability[ABILITY_RESIST_FIRE] != 0)
+	{
+		/* Sometimes notice */
+		(void)player_can_ability(who, ABILITY_RESIST_FIRE);
+	}
+	else
+	{
+		/* Sometimes notice */
+		(void)player_not_ability(who, ABILITY_RESIST_FIRE);
 	}
 
 	/* Resist the damage */
@@ -2563,7 +2723,8 @@ static void fire_dam(int who, int what, int dam, bool inven)
 		(void)inven_damage(set_fire_destroy, inv);
 
 	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
+	if (res < 0) dam *= (0 - res) + 1;
+	else if (res > 0) dam = (dam - res - 1) / (res + 1);
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -2580,19 +2741,19 @@ static void cold_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) + 1;
 
-	int res = p_ptr->incr_resist[INCR_RES_COLD];
+	int res = p_ptr->ability[ABILITY_RESIST_COLD];
 
 	/* Vulnerability */
 	if ((p_ptr->cur_flags4 & (TR4_HURT_COLD)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+		(void)player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 		{
 			/* Always notice */
-			(void)player_can_flags(who, 0x0L,TR2_IM_COLD,0x0L,0x0L);
+			(void)player_can_flags(who, NULL, 0x0L,TR2_IM_COLD,0x0L,0x0L);
 
 			/* Reduce effect to basic resistance */
 			dam = (dam + 2) / 3;
@@ -2611,8 +2772,8 @@ static void cold_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 	{
 		/* Always notice */
-		(void)player_can_flags(who, 0x0L,TR2_IM_COLD,0x0L,0x0L);
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+		(void)player_can_flags(who, NULL, 0x0L,TR2_IM_COLD,0x0L,0x0L);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 
 		return;
 	}
@@ -2621,21 +2782,34 @@ static void cold_dam(int who, int what, int dam, bool inven)
 	else if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
 	{
 		/* Always notice */
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
 	}
 
-	/* Resist the damage */
-	if ((p_ptr->cur_flags2 & (TR2_RES_COLD)) != 0)
+	/* Protect inventory */
+	if (p_ptr->ability[ABILITY_PROTECT_COLD] != 0)
 	{
 		/* Sometimes notice */
-		(void)player_can_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
+		(void)player_can_ability(who, ABILITY_PROTECT_COLD);
 
-		inv /= res;
+		if (p_ptr->ability[ABILITY_PROTECT_COLD] < 0) inv *= (0 - p_ptr->ability[ABILITY_PROTECT_COLD]) + 1;
+		else inv /= (p_ptr->ability[ABILITY_PROTECT_COLD] + 1);
 	}
 	else
 	{
 		/* Sometimes notice */
-		(void)player_not_flags(who, 0x0L,TR2_RES_COLD,0x0L,0x0L);
+		(void)player_not_ability(who, p_ptr->ability[ABILITY_PROTECT_COLD]);
+	}
+
+	/* Resist the damage */
+	if (p_ptr->ability[ABILITY_RESIST_COLD] != 0)
+	{
+		/* Sometimes notice */
+		(void)player_can_ability(who, ABILITY_RESIST_COLD);
+	}
+	else
+	{
+		/* Sometimes notice */
+		(void)player_not_ability(who, ABILITY_RESIST_COLD);
 	}
 
 	/* Resist the damage */
@@ -2657,7 +2831,8 @@ static void cold_dam(int who, int what, int dam, bool inven)
 		(void)inven_damage(set_cold_destroy, inv);
 
 	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
+	if (res < 0) dam *= (0 - res) + 1;
+	else if (res > 0) dam = (dam - res - 1) / (res + 1);
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -2671,7 +2846,7 @@ static void cold_dam(int who, int what, int dam, bool inven)
  */
 static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool weak, bool half, bool hurt)
 {
-	int res = p_ptr->incr_resist[INCR_RES_POIS];
+	int res = p_ptr->ability[ABILITY_RESIST_POISON];
 
 	(void)inven;
 
@@ -2683,7 +2858,7 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	{
 		set_slow_poison(MAX(p_ptr->timed[TMD_SLOW_POISON], 100));
 	}
-	else if (p_ptr->timed[TMD_SLOW_POISON])
+	else if ((p_ptr->timed[TMD_SLOW_POISON]) || ((p_ptr->flags2 & (TR2_SLOW_POISON)) != 0))
 	{
 		delay = TRUE;
 	}
@@ -2696,13 +2871,13 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	if ((p_ptr->cur_flags4 & (TR4_HURT_POIS)) != 0)
 	{
 		/* Notice unless delayed */
-		if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		if (!delay) player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 
 		/* Immunity reduced to partial protection */
 		if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 		{
 			/* Notice unless delayed */
-			if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
+			if (!delay) player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_IM_POIS);
 
 			/* Weak does no immediate damage */
 			if (weak || delay) return;
@@ -2724,8 +2899,8 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
 		/* Notice unless delayed */
-		if (!delay) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_IM_POIS);
-		if (!delay) player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		if (!delay) player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_IM_POIS);
+		if (!delay) player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 
 		return;
 	}
@@ -2734,19 +2909,32 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	else if ((p_ptr->cur_flags4 & (TR4_IM_POIS)) != 0)
 	{
 		/* Notice unless delayed */
-		if (!delay) player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
+		if (!delay) player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_POIS);
 	}
 
 	/* Resist the damage */
-	if ((p_ptr->cur_flags2 & (TR2_RES_POIS)) != 0)
+	if (p_ptr->ability[ABILITY_RESIST_POISON] != 0)
 	{
 		/* Notice unless delayed */
-		if (!delay) player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+		if (!delay) player_can_ability(who, ABILITY_RESIST_POISON);
 	}
 	else
 	{
 		/* Notice unless delayed */
-		if (!delay) player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+		if (!delay) player_not_ability(who, ABILITY_RESIST_POISON);
+	}
+
+	/* Unaffected by poison timer */
+	if ((p_ptr->cur_flags1 & (TR1_NO_POISON)) != 0)
+	{
+		/* Notice unless delayed */
+		if (!delay) player_can_flags(who, NULL, TR1_NO_POISON,0x0L,0x0L,0x0L);
+	}
+	/* Affected */
+	else
+	{
+		/* Notice unless delayed */
+		if (!delay) player_not_flags(who, NULL, TR1_NO_POISON,0x0L,0x0L,0x0L);
 	}
 
 	/* Resist the damage */
@@ -2764,13 +2952,14 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	}
 
 	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
+	if (res < 0) dam *= (0 - res) + 1;
+	else if (res > 0) dam = (dam - res - 1) / (res + 1);
 
 	/* No damage */
 	if (dam <= 0) return;
 
 	/* Increase poison counter */
-	if (!(p_ptr->timed[TMD_OPP_POIS]) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
+	if (!(p_ptr->timed[TMD_OPP_POIS]) && !(p_ptr->cur_flags1 & (TR1_NO_POISON)))
 	{
 		/* Set poison counter */
 		(void)set_poisoned(p_ptr->timed[TMD_POISONED] + rand_int(dam) + rand_int(dam + 1) + (weak ? 0 : 10));
@@ -2792,19 +2981,90 @@ static void water_dam(int who, int what, int dam, bool inven)
 {
 	int inv = (dam / 15) /* + 1 */;
 
-	int res = p_ptr->incr_resist[INCR_RES_WATER];
+	int res = p_ptr->ability[ABILITY_RESIST_WATER];
 
 	/* Check for light being wielded */
 	object_type *o_ptr = &inventory[INVEN_LITE];
 
 	(void)who;
 
+	/* Vulnerability */
+	if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
+	{
+		/* Always notice */
+		(void)player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+
+		/* Immunity reduced to partial protection */
+		if ((p_ptr->cur_flags2 & (TR2_IM_WATER)) != 0)
+		{
+			/* Always notice */
+			(void)player_can_flags(who, NULL, 0x0L,TR2_IM_WATER,0x0L,0x0L);
+
+			/* Reduce effect to basic resistance */
+			dam = (dam + 2) / 3;
+
+			/* Take damage */
+			take_hit(who, what, dam);
+
+			return;
+		}
+
+		/* Increase damage */
+		else dam *= 3;
+	}
+
+	/* Total Immunity */
+	else if ((p_ptr->cur_flags2 & (TR2_IM_WATER)) != 0)
+	{
+		/* Always notice */
+		(void)player_can_flags(who, NULL, 0x0L,TR2_IM_WATER,0x0L,0x0L);
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+
+		return;
+	}
+
+	/* Not vulnerable */
+	else if ((p_ptr->cur_flags2 & (TR2_IM_COLD)) != 0)
+	{
+		/* Always notice */
+		(void)player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_COLD);
+	}
+
+	/* Resist the damage */
+	if (p_ptr->ability[ABILITY_RESIST_WATER] != 0)
+	{
+		/* Sometimes notice */
+		(void)player_can_ability(who, ABILITY_RESIST_WATER);
+
+		if (res < 0) inv *= (0 - res) + 1;
+		else inv /= (res + 1);
+	}
+	else
+	{
+		/* Sometimes notice */
+		(void)player_not_flags(who, ABILITY_RESIST_WATER);
+	}
+
+	/* Resist the damage */
+	if (p_ptr->timed[TMD_OPP_WATER])
+	{
+		res += 3;
+	}
+
+	/* Inventory damage */
+	if (inven)
+		(void)inven_damage(set_water_destroy, inv);
+
+	/* Reduce the damage */
+	if (res < 0) dam *= (0 - res) + 1;
+	else if (res > 0) dam = (dam - res - 1) / (res + 1);
+
 	/* Burn some fuel in the current lite */
 	if ((inven) && (o_ptr->tval == TV_LITE))
 	{
 		u32b f1, f2, f3, f4;
 
-		object_flags(o_ptr,&f1,&f2,&f3,&f4);
+		object_flags(o_ptr,NULL,&f1,&f2,&f3,&f4);
 
 		/* Hack -- Douse light (except on artifacts and lites unaffected by water)
 		 * We no longer reduce the fuel as players found this annoying.
@@ -2827,33 +3087,6 @@ static void water_dam(int who, int what, int dam, bool inven)
 			p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
 		}
 	}
-
-	/* Resist the damage */
-	if ((p_ptr->cur_flags4 & (TR4_RES_WATER)) != 0)
-	{
-		/* Sometimes notice */
-		(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
-
-		inv /= res;
-	}
-	else
-	{
-		/* Sometimes notice */
-		(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_WATER);
-	}
-
-	/* Resist the damage */
-	if (p_ptr->timed[TMD_OPP_WATER])
-	{
-		res += 3;
-	}
-
-	/* Inventory damage */
-	if (inven)
-		(void)inven_damage(set_water_destroy, inv);
-
-	/* Reduce the damage */
-	dam = (dam - res - 1) / res;
 
 	/* No damage */
 	if (dam <= 0) return;
@@ -3220,7 +3453,7 @@ bool apply_disenchant(int mode)
 
 
 	/* Nothing to disenchant */
-	if ((o_ptr->to_h <= 0) && (o_ptr->to_d <= 0) && (o_ptr->to_a <= 0))
+	if ((object_aval(o_ptr, ABILITY_TO_HIT) <= 0) && (object_aval(o_ptr, ABILITY_TO_DAM) <= 0) && (object_aval(o_ptr, ABILITY_TO_AC) <= 0))
 	{
 		/* Nothing to notice */
 		return (FALSE);
@@ -3246,16 +3479,16 @@ bool apply_disenchant(int mode)
 	}
 
 	/* Disenchant tohit */
-	if (o_ptr->to_h > 0) o_ptr->to_h--;
-	if ((o_ptr->to_h > 5) && (rand_int(100) < 20)) o_ptr->to_h--;
+	if (object_aval(o_ptr, ABILITY_TO_HIT) > 0) object_aval(o_ptr, ABILITY_TO_HIT)--;
+	if ((object_aval(o_ptr, ABILITY_TO_HIT) > 5) && (rand_int(100) < 20)) object_aval(o_ptr, ABILITY_TO_HIT)--;
 
 	/* Disenchant todam */
-	if (o_ptr->to_d > 0) o_ptr->to_d--;
-	if ((o_ptr->to_d > 5) && (rand_int(100) < 20)) o_ptr->to_d--;
+	if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) object_aval(o_ptr, ABILITY_TO_DAM)--;
+	if ((object_aval(o_ptr, ABILITY_TO_DAM) > 5) && (rand_int(100) < 20)) object_aval(o_ptr, ABILITY_TO_DAM)--;
 
 	/* Disenchant toac */
-	if (o_ptr->to_a > 0) o_ptr->to_a--;
-	if ((o_ptr->to_a > 5) && (rand_int(100) < 20)) o_ptr->to_a--;
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) object_aval(o_ptr, ABILITY_TO_AC)--;
+	if ((object_aval(o_ptr, ABILITY_TO_AC) > 5) && (rand_int(100) < 20)) object_aval(o_ptr, ABILITY_TO_AC)--;
 
 	/* Message */
 	msg_format("Your %s (%c) %s disenchanted!",
@@ -4667,7 +4900,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 				{
 					do_kill = TRUE;
 					note_kill = (plural ? " salt!" : " salts!");
-					make_meat += o_ptr->weight;
+					make_meat += object_aval(o_ptr, ABILITY_WEIGHT);
 					break;
 				}
 
@@ -4821,9 +5054,9 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			/* Force is magnetic */
 			case GF_FORCE:
 			{
-				if ((hates_acid(o_ptr)) && (o_ptr->weight <= dam))
+				if ((hates_acid(o_ptr)) && (object_aval(o_ptr, ABILITY_WEIGHT) <= dam))
 				{
-					int dist = 1 + (dam - o_ptr->weight) / 33;
+					int dist = 1 + (dam - object_aval(o_ptr, ABILITY_WEIGHT)) / 33;
 
 					if (who <= SOURCE_PLAYER_START)
 					{
@@ -4863,12 +5096,12 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			/* Wind blows things around */
 			case GF_WIND:
 			{
-				if (o_ptr->weight <= dam)
+				if (object_aval(o_ptr, ABILITY_WEIGHT) <= dam)
 				{
 					nx = 0;
 					ny = 0;
 
-					scatter(&ny, &nx, y, x, 1 + (dam - o_ptr->weight) / 33, CAVE_XLOF);
+					scatter(&ny, &nx, y, x, 1 + (dam - object_aval(o_ptr, ABILITY_WEIGHT)) / 33, CAVE_XLOF);
 					if (ny != y || nx != x) do_move = TRUE;
 				}
 				break;
@@ -5186,7 +5419,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		{
 			note_kill = (plural ? " cook!" : " cooks!");
 
-			make_meat += o_ptr->weight;
+			make_meat += object_aval(o_ptr, ABILITY_WEIGHT);
 		}
 
 		/* Attempt to destroy the object */
@@ -5282,10 +5515,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					o_ptr->ident |= (IDENT_BREAKS);
 
 					/* Splash damage on terrain */
-					(void)project_f(SOURCE_OBJECT, what, y, x, damroll(1, o_ptr->weight), typ);
+					(void)project_f(SOURCE_OBJECT, what, y, x, damroll(1, object_aval(o_ptr, ABILITY_WEIGHT)), typ);
 
 					/* And apply effects */
-					(void)project_t(SOURCE_OBJECT, what, y, x, damroll(1, o_ptr->weight), typ);
+					(void)project_t(SOURCE_OBJECT, what, y, x, damroll(1, object_aval(o_ptr, ABILITY_WEIGHT)), typ);
 				}
 				else
 				{
@@ -5354,7 +5587,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		object_prep(i_ptr, 981);
 
 		/* Hack -- ensure we don't violate conservation of mass */
-		if (make_meat < i_ptr->weight) i_ptr->weight = make_meat;
+		if (make_meat < object_aval(i_ptr, ABILITY_WEIGHT)) object_aval(i_ptr, ABILITY_WEIGHT) = make_meat;
 
 		/* Drop it near the new location */
 		drop_near(i_ptr, -1, y, x, FALSE);
@@ -5363,7 +5596,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		lite_spot(y, x);
 
 		/* Reduce meat */
-		make_meat -= i_ptr->weight;
+		make_meat -= object_aval(i_ptr, ABILITY_WEIGHT);
 	}
 
 	/* Return "Anything seen?" */
@@ -7078,7 +7311,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			/* Elves, demons and maia are immortal */
-			else if (r_ptr->flags3 & (RF3_DEMON | (typ == DRAIN_LIFE ? (RF3_ELF) : 0L)))
+			else if (((r_ptr->flags3 & (RF3_DEMON)) != 0) || ((typ == GF_DRAIN_LIFE) && ((r_ptr->flags9 & (RF9_ELF)) != 0)))
 			{
 				if ((seen) && !(l_ptr->flags3 & (RF3_DEMON)))
 				{
@@ -7086,10 +7319,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					l_ptr->flags3 |= (RF3_DEMON);
 				}
 
-				if ((seen) && !(l_ptr->flags3 & (RF3_ELF)))
+				if ((seen) && !(l_ptr->flags9 & (RF9_ELF)))
 				{
 					note = " is unaffected.";
-					l_ptr->flags3 |= (RF3_ELF);
+					l_ptr->flags9 |= (RF9_ELF);
 				}
 				
 				obvious = FALSE;
@@ -8541,7 +8774,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 			
 			/* Hack -- Never blow monsters don't know how to get angry */
-			if ((do_rage) && (r_ptr->flags1 & (RF1_NEVER_BLOW)) != 0))
+			if ((do_rage) && ((r_ptr->flags1 & (RF1_NEVER_BLOW)) != 0))
 			{
 				do_conf += do_rage;
 				do_rage = 0;
@@ -8663,7 +8896,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				else
 				{
 					do_sleep = m_ptr->csleep;
-					was_awake = FALSE;
+					was_asleep = FALSE;
 				}
 			}
 
@@ -8928,6 +9161,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			do_pois = 0;
 			was_asleep = FALSE;
 			note = " is unaffected by illusions.";
+			l_ptr->flags2 |= (RF2_EMPTY_MIND | RF2_WEIRD_MIND);
 		}
 		/* Ignores illusions */
 		else if (!(m_ptr->csleep) && !(m_ptr->image)
@@ -8937,7 +9171,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			dam = 0;
 			do_pois = 0;
-			if ((source <= SOURCE_PLAYER_START) && ((m_flag & (MFLAG_SMART)) == 0) && (!rand_int(++do_tell_illusion_count))) do_tell_illusion = m_idx;
+			if ((who <= SOURCE_PLAYER_START) && ((m_ptr->mflag & (MFLAG_SMART)) == 0) && (!rand_int(++do_tell_illusion_count))) do_tell_illusion = cave_m_idx[y][x];
 			m_ptr->mflag |= (MFLAG_SMART);
 			note = " ignores the illusion.";
 		}
@@ -8946,7 +9180,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		{
 			dam = 0;
 			do_pois = 0;
-			if ((source <= SOURCE_PLAYER_START) && ((m_flag & (MFLAG_SMART)) == 0) && (!rand_int(++do_tell_illusion_count))) do_tell_illusion = m_idx;
+			if ((who <= SOURCE_PLAYER_START) && ((m_ptr->mflag & (MFLAG_SMART)) == 0) && (!rand_int(++do_tell_illusion_count))) do_tell_illusion = cave_m_idx[y][x];
 			m_ptr->mflag |= (MFLAG_SMART);
 			if (m_ptr->csleep)
 				note = " notices the illusion and wakes up.";
@@ -8964,7 +9198,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Powerful monsters can resist */
 			if (monster_save(m_ptr, dam / 30, &near))
 			{
-				if ((near) && (seen))
+				if (near)
 				{
 					if (m_ptr->csleep) 
 					{
@@ -8974,7 +9208,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					/* Awake monsters notice illusion if they save */
 					else if (!m_ptr->image)
 					{
-						if ((source <= SOURCE_PLAYER_START) && ((m_flag & (MFLAG_SMART)) == 0) && (!rand_int(++do_tell_illusion_count))) do_tell_illusion = m_idx;
+						if ((who <= SOURCE_PLAYER_START) && ((m_ptr->mflag & (MFLAG_SMART)) == 0) && (!rand_int(++do_tell_illusion_count))) do_tell_illusion = cave_m_idx[y][x];
 						m_ptr->mflag |= (MFLAG_SMART);
 					}
 				}
@@ -9465,7 +9699,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				if (!note) note = " looks dazed.";
-				tmp = do_dazed;
+				tmp = do_daze;
 			}
 
 			/* Apply daze */
@@ -9542,7 +9776,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			else if (dam > 0) message_pain(cave_m_idx[y][x], dam);
 
 			/* Take note */
-			if ((fear || do_fear) && (m_ptr->ml))
+			if ((fear || do_fear) && (m_ptr->ml) && !(do_sleep))
 			{
 				/* Message */
 				message_format(MSG_FLEE, m_ptr->r_idx,
@@ -9555,18 +9789,48 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- handle inventory damage */
 			if (do_inven_destroy)
 				(void)mon_inven_damage(cave_m_idx[y][x], do_inven_destroy, (dam / 15) + 1);
-		}
 
-		/* Hack -- wake up nearby allies */
-		if (was_asleep)
-		{
-			m_ptr->mflag |= (MFLAG_AGGR);
+			/* Assassination or murder attempt goes badly. */
+			if ((was_asleep) || (fear))
+			{
+				/* Rudely awoken */
+				if (was_asleep) m_ptr->mflag |= (MFLAG_AGGR);
 
-			(void)tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has attacked me!");
-		}
-		else if (fear)
-		{
-			(void)tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has hurt me badly!");
+				/* Assassins prefer knives */
+				if (m_ptr->cut >= 25)
+				{
+					if (player_understands(monster_language(m_ptr->r_idx))) message_format(MSG_FLEE, m_ptr->r_idx,
+						       "%^s is bleeding too badly to make a noise!", m_name);
+				}
+				/* Or perhaps a cudgel */
+				else if (m_ptr->stunned >= 25)
+				{
+					if (player_understands(monster_language(m_ptr->r_idx))) message_format(MSG_FLEE, m_ptr->r_idx,
+						       "%^s is reeling from being stunned!", m_name);
+				}
+				/* And should poison where possible */
+				else if (m_ptr->poisoned >= 25)
+				{
+					if (player_understands(monster_language(m_ptr->r_idx))) message_format(MSG_FLEE, m_ptr->r_idx,
+						       "%^s is too poisoned for words!", m_name);
+				}
+				/* Or daze their foes */
+				else if (m_ptr->dazed >= 25)
+				{
+					if (player_understands(monster_language(m_ptr->r_idx))) message_format(MSG_FLEE, m_ptr->r_idx,
+						       "%^s is too dazed to talk!", m_name);
+				}
+				/* Was asleep */
+				else if (was_asleep)
+				{
+					(void)tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has attacked me!");
+				}
+				/* Afraid */
+				else if (fear)
+				{
+					(void)tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has hurt me badly!");
+				}
+			}
 		}
 	}
 
@@ -14678,7 +14942,12 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 	if (p_ptr->update) update_stuff();
 
 	/* Hack - notice use of illusions */
-	if (do_tell_illusion) tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_SMART), "& is attempting to use illusions.");
+	if (do_tell_illusion)
+	{
+	 	monster_type *m_ptr = &m_list[do_tell_illusion];
+
+		tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_SMART), "& is attempting to use illusions.");
+	}
 	
 	/* Return "something was noticed" */
 	return (notice);

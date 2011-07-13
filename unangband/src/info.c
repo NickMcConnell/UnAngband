@@ -494,7 +494,7 @@ void object_eval(const object_type *o_ptr, s16b ability[ABILITY_MAX])
 /*
  * Adds an ability to an existing item. Returns true iff we can add this ability.
  */
-bool object_ability_add_one(object_type *o_ptr, int ability, int value)
+bool object_ability_add(object_type *o_ptr, int ability, int value)
 {
 	int i;
 	
@@ -521,9 +521,38 @@ bool object_ability_add_one(object_type *o_ptr, int ability, int value)
 
 
 /*
+ * Sets an ability on an existing item. Returns true iff we can add this ability.
+ */
+bool object_ability_set(object_type *o_ptr, int ability, int value)
+{
+	int i;
+
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		if (o_ptr->ability[i] == ability)
+		{
+			o_ptr->aval[i] = value;
+			return(TRUE);
+		}
+	}
+
+	if (/*(i == o_ptr->ability_count) && */(o_ptr->ability_count < MAX_AVALS_OBJECT))
+	{
+		o_ptr->ability[i] = ability;
+		o_ptr->aval[i] = value;
+		o_ptr->ability_count++;
+
+		return (TRUE);
+	}
+
+	return (FALSE);
+}
+
+
+/*
  * Divides an ability on an existing item by a value. Returns true iff item has this ability.
  */
-bool object_ability_div_one(object_type *o_ptr, int ability, int value)
+bool object_ability_div(object_type *o_ptr, int ability, int value)
 {
 	int i;
 	
@@ -546,7 +575,7 @@ bool object_ability_div_one(object_type *o_ptr, int ability, int value)
 /*
  * Removes an ability from an existing item.
  */
-bool object_ability_clear_one(object_type *o_ptr, int ability)
+bool object_ability_clear(object_type *o_ptr, int ability)
 {
 	int i;
 	bool removed = FALSE;
@@ -2780,7 +2809,7 @@ void describe_self_object(object_type *o_ptr, int slot)
 			if (attack && charging) text_out(" or charging");
 			else if (attack) text_out(" unless charging");
 			if (unarmed) text_out(" unarmed");
-			text_out(format(", it does %dd%d", object_ability(o_ptr, ABILITY_DAMAGE_DICE), object_ability(o_ptr, ABILITY_DAMAGE_SIDES)));
+			text_out(format(", it does %dd%d", object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)));
 			if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM)));
 			else if (object_aval(o_ptr, ABILITY_TO_DAM) < 0) text_out(format("%d", object_aval(o_ptr, ABILITY_TO_DAM)));
 			text_out(" ");
@@ -6980,10 +7009,19 @@ s32b slay_power(u32b s_index)
 {
 	s32b sv;
 	int i;
+	u32b j;
 	int mult;
 	monster_race *r_ptr;
 
-	/* s_index combines the slay bytes into an index value
+	u32b rf2_slay = 0x00000000L;
+	u32b rf3_slay = 0x00000000L;
+	u32b rf9_slay = 0x00000000L;
+	u32b rf2_brand = 0x00000000L;
+	u32b rf3_brand = 0x00000000L;
+	u32b rf9_brand = 0x00000000L;
+
+	/* s_index combines the slay bytes into an index value. It is determined
+	 * using the slay_index function below.
 	 */
 
 	/* Check the cache */
@@ -6996,119 +7034,77 @@ s32b slay_power(u32b s_index)
 		if (sv) return slays[s_index];
 	}
 
+	/* Precompute matches */
+	for (i = 0, j = 0x00000000L; i < 32; i++, j <<= 1L)
+	{
+		if ((s_index & j) == 0) continue;
+
+		if (ability_bonus[slay_index_to_ability[i]].type == BONUS_SLAY)
+		{
+			switch(ability_bonus[slay_index_to_ability[i]].flag_num)
+			{
+				case 2:
+					rf2_slay |= ability_bonus[slay_index_to_ability[i]].flag_match;
+					break;
+				case 3:
+					rf3_slay |= ability_bonus[slay_index_to_ability[i]].flag_match;
+					break;
+				case 9:
+					rf9_slay |= ability_bonus[slay_index_to_ability[i]].flag_match;
+					break;
+			}
+		}
+
+		else if (ability_bonus[slay_index_to_ability[i]].type >= BONUS_BRAND)
+		{
+			switch(ability_bonus[slay_index_to_ability[i]].flag_num)
+			{
+				case 2:
+					rf2_brand |= ability_bonus[slay_index_to_ability[i]].flag_match;
+					break;
+				case 3:
+					rf3_brand |= ability_bonus[slay_index_to_ability[i]].flag_match;
+					break;
+				case 9:
+					rf9_brand |= ability_bonus[slay_index_to_ability[i]].flag_match;
+					break;
+			}
+		}
+	}
+
+
 	/* Otherwise we need to calculate the expected average multiplier
 	 * for this combination (multiplied by the total number of
-	 * monsters, which we'll divide out later).
+	 * monsters, which we'll divide out later). Note that we only ever
+	 * have to compute a multiplier of 2 as we can determine higher multipliers
+	 * through clever use of algebra.
+	 *
+	 * XXX We could equally compute 'partial' resistances by bumping the multiple
+	 * up to 3, and using partial resistance as a multiple of 2. Examples include
+	 * monsters with oppose element, and monsters who are likely to be encountered
+	 * in water. This is unlikely to affect things much in the big scheme of things,
+	 * and will increase the number of comparisons required in what is probably
+	 * an 'expensive' function (there's been a considerable amount of effort to
+	 * cache the results of this function, so I'm guessing it is expensive).
 	 */
 
 	sv = 0;
 
-	for(i = 0; i < z_info->r_max; i++) {
+	for (i = 0; i < z_info->r_max; i++) {
 
 		mult = 1;
 
 		r_ptr = &r_info[i];
 
-		/*
-		 * Do the following in ascending order so that the best
-		 * multiple is retained
-		 */
+		/* Any matching slays */
+		if ( (r_ptr->flags2 & (rf2_slay)) != 0) mult = 2;
+		if ( (r_ptr->flags3 & (rf3_slay)) != 0) mult = 2;
+		if ( (r_ptr->flags9 & (rf9_slay)) != 0) mult = 2;
 
-		/* Armoured monsters get partial resistance to resist acid */
-		if ( !(r_ptr->flags3 & RF3_IM_ACID) && (r_ptr->flags2 & RF2_ARMOR)
-			&& (s_index & 0x00001000L) )
-				mult = 2;
-
-		/* Holy brand -- acts like slay */
-		if ( (r_ptr->flags3 & RF3_EVIL)
-			&& (s_index & 0x00000002L) )
-				mult = 3;
-
-		/* New brand - brand_lite - acts like slay */
-		if ( (r_ptr->flags3 & (RF3_HURT_LITE))
-			&& (s_index & 0x00010000L) )
-				mult = 3;
-
-		/* Brands get the multiple if monster is NOT immune / resistant */
-		if ( !(r_ptr->flags9 & RF9_RES_DARK)
-			&& (s_index & 0x00020000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_ACID) && !(r_ptr->flags2 & RF2_ARMOR)
-			&& (s_index & 0x00001000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_ELEC)
-			&& (s_index & 0x00002000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_FIRE)
-			&& (s_index & 0x00004000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_COLD)
-			&& (s_index & 0x00008000L) )
-				mult = 3;
-		if ( !(r_ptr->flags3 & RF3_IM_POIS)
-			&& (s_index & 0x00000800L) )
-				mult = 3;
-
-		/* Original slays */
-		if ( (r_ptr->flags3 & RF3_UNDEAD)
-			&& (s_index & 0x00000004L) )
-				mult = 3;
-		if ( (r_ptr->flags3 & RF3_DEMON)
-			&& (s_index & 0x00000008L) )
-				mult = 3;
-		if ( (r_ptr->flags3 & RF3_DRAGON)
-			&& (s_index & 0x00000080L) )
-				mult = 3;
-
-		/* Increased slays */
-		if ( (r_ptr->flags3 & (RF3_ANIMAL | RF3_INSECT | RF3_PLANT))
-			&& (s_index & 0x00000001L) )
-				mult = 4;
-		if ( (r_ptr->flags3 & RF3_ORC)
-			&& (s_index & 0x00000010L) )
-				mult = 4;
-		if ( (r_ptr->flags3 & RF3_TROLL)
-			&& (s_index & 0x00000020L) )
-				mult = 4;
-		if ( (r_ptr->flags3 & RF3_GIANT)
-			&& (s_index & 0x00000040L) )
-				mult = 4;
-		if ( (r_ptr->flags9 & RF9_MAN)
-			&& (s_index & 0x00040000L) )
-				mult = 4;
-		if ( (r_ptr->flags9 & RF9_ELF)
-			&& (s_index & 0x00080000L) )
-				mult = 4;
-		if ( (r_ptr->flags9 & RF9_DWARF)
-			&& (s_index & 0x00100000L) )
-				mult = 4;
-		if ( (r_ptr->flags2 & RF2_ARCHER)
-			&& (s_index & 0x00200000L) )
-				mult = 4;
-		if ( (r_ptr->flags2 & RF2_ARMOR)
-			&& (s_index & 0x00400000L) )
-				mult = 4;
-		if ( (r_ptr->flags2 & RF2_MAGE)
-			&& (s_index & 0x00800000L) )
-				mult = 4;
-		if ( (r_ptr->flags2 & RF2_PRIEST)
-			&& (s_index & 0x01000000L) )
-				mult = 4;
-		if ( (r_ptr->flags2 & RF2_SNEAKY)
-			&& (s_index & 0x02000000L) )
-				mult = 4;
-
-		/* Do kill flags last since they have the highest multiplier */
-
-		if ( (r_ptr->flags3 & RF3_DRAGON)
-			&& (s_index & 0x00000100L) )
-				mult = 5;
-		if ( (r_ptr->flags3 & RF3_DEMON)
-			&& (s_index & 0x00000200L) )
-				mult = 5;
-		if ( (r_ptr->flags3 & RF3_UNDEAD)
-			&& (s_index & 0x00000400L) )
-				mult = 5;
+		/* Any missing brand resistances */
+		if ( (r_ptr->flags2 & (rf2_brand)) != rf2_brand) mult = 2;
+		if ( (r_ptr->flags3 & (rf3_brand)) != rf3_brand) mult = 2;
+		if ( (r_ptr->flags9 & (rf9_brand)) != rf9_brand) mult = 2;
 
 		/* Add the multiple to sv */
 		sv += mult * r_info[i].power;
@@ -7129,28 +7125,63 @@ s32b slay_power(u32b s_index)
 }
 
 /*
- * Convert all slay and brand flags into a single index value. This is used in randart.c.
+ * Convert all slay and brand flags into a single index value. This is used in slay_power, above.
+ *
+ * The order is dependent on the ability_bonus table, and at initialisation is:
+ * 	ABILITY_SLAY_DEMON	0x00000001L
+ *	ABILITY_SLAY_ORC	0x00000002L
+ *  ABILITY_SLAY_TROLL	0x00000004L
+ *	ABILITY_SLAY_GIANT	0x00000008L
+ * 	ABILITY_SLAY_DRAGON 0x00000010L
+ *	ABILITY_SLAY_ANIMAL	0x00000020L
+ *  ABILITY_SLAY_UNDEAD	0x00000040L
+ *	ABILITY_BRAND_HOLY	0x00000080L
+ *	ABILITY_BRAND_POIS	0x00000100L
+ *	ABILITY_BRAND_ACID	0x00000200L
+ *	ABILITY_BRAND_ELEC	0x00000400L
+ *	ABILITY_BRAND_FIRE	0x00000800L
+ *	ABILITY_BRAND_COLD	0x00001000L
+ *	ABILITY_SLAY_PLANT	0x00002000L
+ *	ABILITY_SLAY_INSECT	0x00004000L
+ *	ABILITY_BRAND_DARK	0x00008000L
+ *	ABILITY_BRAND_LITE	0x00010000L
+ *	ABILITY_BRAND_NETHER0x00020000L
+ *	ABILITY_BRAND_NEXUS	0x00040000L
+ *	ABILITY_BRAND_MAGIC	0x00080000L
+ *	ABILITY_BRAND_CHAOS	0x00100000L
+ *	ABILITY_SLAY_MAN	0x00200000L
+ *	ABILITY_SLAY_ELF	0x00400000L
+ *	ABILITY_SLAY_DWARF	0x00800000L
+ *	ABILITY_SLAY_ARCHER	0x01000000L
+ *	ABILITY_SLAY_WARRIOR0x02000000L
+ *	ABILITY_SLAY_MAGE	0x04000000L
+ *	ABILITY_SLAY_PRIEST	0x08000000L
+ *	ABILITY_SLAY_THIEF	0x10000000L
+ *	ABILITY_BRAND_PSYCHIC 0x20000000L
+ *	ABILITY_BRAND_WATER	0x40000000L
+ *	ABILITY_BRAND_LAVA	0x80000000L
+ *
+ *	However, following initialisation, we cut down the table so that only brands/slays which
+ *	can occur multiple times on a single ego item are counted.
  */
-u32b slay_index(const s16b *ability, int ability_count, s16b *aval)
+u32b slay_index(const s16b *ability, int ability_count)
 {
 	u32b s_index = 0x00000000L;
-	int i, j , k = 0;
+	int i;
 
-	(void)aval;
-	
-	for (i = 0; i < ABILITY_MAX; i++)
+	/* Efficiency */
+	for (i = 0; i < ability_count; i++)
 	{
-		if ((k < 32) && (ability_bonus[i].type >= BONUS_SLAY))
+		if (ability_bonus[i].type >= BONUS_SLAY)
 		{
-			for (j = 0; j < ability_count; j++)
-			{
-				if (ability[j] == i) s_index |= (1L << k);
-			}			
+			/* Look up value from pre-computed table */
+			s_index |= (ability_to_slay_index[i]);
 		}
 	}
 
 	return s_index;
 }
+
 
 enum
 {
@@ -7319,9 +7350,9 @@ s32b object_power(const object_type *o_ptr)
 				break;
 			case POWER_UNARMED:
 				if ((f6 & (TR6_WEARABLE)) == 0) continue;
-				if (o_ptr->tval != TV_AMULET) continue;
-				if (o_ptr->tval != TV_BODY) continue;
-				if (o_ptr->tval != TV_CLOAK) continue;
+				if (o_ptr->tval == TV_AMULET) continue;
+				if (o_ptr->tval == TV_BODY) continue;
+				if (o_ptr->tval == TV_CLOAK) continue;
 				break;
 			case POWER_AMMO:
 				if ((f5 & (TR5_AMMO)) == 0) continue;
@@ -7430,32 +7461,86 @@ s32b object_power(const object_type *o_ptr)
 			r *= mult;
 		}
 		
-		/* Apply the correct ego slay multiplier */
-		if (o_ptr->name2)
+		/* Apply the correct artifact/ego slay multiplier */
+		if ((o_ptr->name1) || (o_ptr->name2))
 		{
-			q = (q * e_info[o_ptr->name2].slay_power) / tot_mon_power;
+			int lowest_aval = 9999;
+			int highest_aval = -9999;
+
+			int j, k;
+
+			/* Find highest aval which is a brand/slay */
+			for (j = 0; j < o_ptr->ability_count; j++)
+			{
+				/* Note we use the 'restricted' ego list once random artifacts have been created */
+				if (ability_to_slay_index[o_ptr->ability[j]])
+				{
+					if ((o_ptr->aval[j] > 0) && (lowest_aval > o_ptr->aval[j])) lowest_aval = o_ptr->aval[j];
+					if (highest_aval < o_ptr->aval[j]) highest_aval = o_ptr->aval[j];
+				}
+			}
+
+			/* Iterate from lowest aval to highest */
+			if (highest_aval > 0)
+			{
+				u32b s_index = 0L;
+				int s = 0;
+				int last_match = 0;
+
+				/* Iterate through valid avals */
+				for (j = lowest_aval; j <= highest_aval; j++)
+				{
+					bool match = FALSE;
+
+					for (k = 0; k < o_ptr->ability_count; k++)
+					{
+						/* Collect brands/slays with this or better aval */
+						if (ability_to_slay_index[o_ptr->ability[k]])
+						{
+							if (o_ptr->aval[k] >= j) s_index |= ability_to_slay_index[o_ptr->ability[k]];
+							if (o_ptr->aval[k] == j) match = TRUE;
+						}
+					}
+
+					/* No slays/brands with this aval */
+					if (!match) continue;
+
+					/* Get the power */
+					s += (slay_power(s_index) - tot_mon_power) * (j - last_match);
+
+					/* Looking for difference */
+					last_match = j;
+				}
+
+				/* Add total power contributed by slays/brands */
+				q = q * (tot_mon_power + s) / tot_mon_power;
+			}
 		}
 
 		/* Hack -- For efficiency, compute for first slay or brand flag only */
 		else
 		{
-#if 0
-			int k;
-			u32b j, s_index;
+			int j;
 
-			s_index = slay_index(ability, );
+			/* Increase power based on effectiveness against this monster class */
+			for (j = 0; j < o_ptr->ability_count; j++)
+			{
+				if ((ability_to_magic_slay_power[o_ptr->ability[j]]) && (o_ptr->aval[j] > 0))
+				{
+					q = (q * (tot_mon_power + (magic_slay_power[ability_to_magic_slay_power[o_ptr->ability[j]]-1] - tot_mon_power) * o_ptr->aval[j])) / tot_mon_power;
+					break;
+				}
+			}
+		}
 
-			for (k = 0, j = 0x00000001L;(k < 32) && (j != s_index); k++, j<<=1);
-
-			if (k < 32) q = (q * magic_slay_power[i]) / tot_mon_power;
-			
-			/*** Base item ***/
-			s_index = slay_index(kf0, kf1, kf2, kf3, kf4);
-
-			for (k = 0, j = 0x00000001L;(k < 32) && (j != s_index); k++, j<<=1);
-
-			if (k < 32) r = (r * magic_slay_power[i]) / tot_mon_power;
-#endif
+		/*** Base item - only count first slay or brand ***/
+		for (j = 0; j < k_ptr->ability_count; j++)
+		{
+			if ((ability_to_magic_slay_power[k_ptr->ability[j]]) && (k_ptr->aval[j] > 0))
+			{
+				r = (r * (tot_mon_power + (magic_slay_power[ability_to_magic_slay_power[k_ptr->ability[j]]-1] - tot_mon_power) * k_ptr->aval[j])) / tot_mon_power;
+				break;
+			}
 		}
 
 		/* Increase average damage? */

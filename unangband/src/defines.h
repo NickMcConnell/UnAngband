@@ -2324,6 +2324,7 @@ enum
 #define SV_AMULET_INFRAVISION		21
 #define SV_AMULET_RESIST_LIGHTNING  22
 #define SV_AMULET_SERPENTS      23
+#define SV_AMULET_AGILITY		24
 
 /* These may be incorrect */
 /* The "sval" codes for TV_RING */
@@ -2366,7 +2367,9 @@ enum
 #define SV_RING_VILYA			36
 #define SV_RING_POWER			37
 #define SV_RING_LIGHTNING		38
-
+#define SV_RING_SUSTAIN_MIND	39
+#define SV_RING_SUSTAIN_BODY	40
+#define SV_RING_SIZ				41
 
 /* The "sval" codes for TV_STAFF */
 #define SV_STAFF_DARKNESS		0
@@ -3619,30 +3622,30 @@ enum
 	ABILITY_STR,     /* STR += "aval" */
 	ABILITY_INT,     /* INT += "aval" */
 	ABILITY_WIS,     /* WIS += "aval" */
-	ABILITY_DEX,     /* DEX += "aval"; AGI += "aval" */
+	ABILITY_DEX,     /* DEX += "aval" */
 	ABILITY_CON,     /* CON += "aval" */
 	ABILITY_CHR,     /* CHR += "aval" */
-	ABILITY_SAVE,		/* Save += "aval" */
-	ABILITY_DEVICE,		/* Devices += "aval" */
-	ABILITY_STEALTH,	/* Stealth += "aval" */
-	ABILITY_SEARCH,		/* Search += "aval" */
-	ABILITY_INFRA,     /* Infravision */
-	ABILITY_DIGGING,		/* Digging += "aval" */
-	ABILITY_SPEED_MOVE,		/* Movement speed += "aval" */
-	ABILITY_BLOWS,		/* Blows += "aval" */
-	ABILITY_SHOTS,		/* Shots += "aval" */
-	ABILITY_MIGHT,     /* Shooting damage multiplier += "aval" */
-	ABILITY_SLAY_ANIMAL,     /* Weapon slays animals */
-	ABILITY_BRAND_HOLY,     /* Weapon has holy brand */
-	ABILITY_SLAY_UNDEAD,     /* Weapon slays undead */
+	ABILITY_SIZ,		/* Was save */
+	ABILITY_AGI,		/* Was device */
+	ABILITY_DISARM,		/* Was stealth */
+	ABILITY_DEVICE,		/* Was search */
+	ABILITY_SAVE,		/* Was infravision */
+	ABILITY_STEALTH,	/* Was digging */
+	ABILITY_SEARCH,		/* Was speed */
+	ABILITY_DIGGING,	/* Was blows */
+	ABILITY_TO_HIT_THROW,	/* Was shots */
+	ABILITY_TO_HIT_MELEE,	/* Was might */
+	ABILITY_TO_HIT_BOW,		/* Was slay animal */
+	ABILITY_TO_HIT_UNARM,	/* Was brand holy */
+	ABILITY_TO_HIT_TRAP,	/* Was slay undead */
 	ABILITY_SLAY_DEMON,     /* Weapon slays demon */
 	ABILITY_SLAY_ORC,     /* Weapon slays orc */
 	ABILITY_SLAY_TROLL,     /* Weapon slays troll */
 	ABILITY_SLAY_GIANT,     /* Weapon slays giant */
 	ABILITY_SLAY_DRAGON,     /* Weapon slays dragon */
-	ABILITY_SIZ,     /* SIZ += "aval" */
-	ABILITY_AGI,     /* AGI += "aval" */
-	ABILITY_DISARM,		/* Disarm += "aval" */
+	ABILITY_SLAY_ANIMAL,     /* Weapon slays animals */
+	ABILITY_SLAY_UNDEAD,     /* Weapon slays undead */
+	ABILITY_BRAND_HOLY,     /* Weapon has holy brand */
 	ABILITY_BRAND_POIS,	 /* Weapon has poison brand */
 	ABILITY_BRAND_ACID,     /* Weapon has acid brand */
 	ABILITY_BRAND_ELEC,     /* Weapon has elec brand */
@@ -3657,10 +3660,10 @@ enum
 	ABILITY_TO_AC_BLOCK,
 	ABILITY_TO_AC_RANGED,
 	ABILITY_TO_AC_MELEE,
-	ABILITY_TO_HIT_THROW,	/* To hit throwing += "aval" */
-	ABILITY_TO_HIT_MELEE,	/* To hit melee += "aval" */
-	ABILITY_TO_HIT_BOW,		/* To hit bows += "aval" */
-	ABILITY_TO_HIT_UNARM,		/* To hit unarmed += "aval" */
+	ABILITY_INFRA,     /* Infravision */
+	ABILITY_BLOWS,		/* Blows += "aval" */
+	ABILITY_SHOTS,		/* Shots += "aval" */
+	ABILITY_MIGHT,     /* Shooting damage multiplier += "aval" */
 	ABILITY_TO_DAM_THROW,	/* To dam throwing += "aval" */
 	ABILITY_TO_DAM_MELEE,	/* To dam melee += "aval" */
 	ABILITY_TO_DAM_BOW,		/* To dam bows += "aval" */
@@ -3669,7 +3672,7 @@ enum
 	ABILITY_RESIST_ELEC,     /* Resist elec */
 	ABILITY_RESIST_FIRE,     /* Resist fire */
 	ABILITY_RESIST_COLD,     /* Resist cold */
-	ABILITY_RESIST_POIS,     /* Resist poison */
+	ABILITY_RESIST_POISON,     /* Resist poison */
 	ABILITY_RESIST_FEAR, 	/* Resist fear */
 	ABILITY_RESIST_LITE,     /* Resist lite */
 	ABILITY_RESIST_DARK,     /* Resist dark */
@@ -3698,7 +3701,7 @@ enum
 	ABILITY_BOW_RANGE,		/* Bow range += "aval" */
 	ABILITY_HURL_RANGE,		/* Hurl range += "aval" */
 	ABILITY_REGEN_MANA,		/* Mana regeneration */
-	ABILITY_TO_HIT_TRAP,	/* To hit traps += "aval" */
+	ABILITY_SPEED_MOVE,		/* Movement speed += "aval" */
 	ABILITY_TO_DAM_TRAP,	/* To dam traps += "aval" */
 	ABILITY_TRAP_MIGHT,		/* Trap damage multiplier += "aval" */
 	ABILITY_TRAPS,			/* Number of shots with traps */
@@ -4098,7 +4101,7 @@ enum
 
 /* Total number of different slay types used */
 
-#define SLAY_MAX 0x00200000L
+#define SLAY_MAX 0xFFFFFFFFL
 
 
 

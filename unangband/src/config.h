@@ -377,7 +377,7 @@
 /*
  * OPTION: Allow the use of random artifacts (see "randart.c").
  */
-#define GJW_RANDART
+/* #define GJW_RANDART */
 
 /*
  * OPTION: Allow the use of 'pretty' character names for various class + style combinations

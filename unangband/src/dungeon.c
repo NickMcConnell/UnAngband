@@ -3928,10 +3928,13 @@ void play_game(bool new_game)
 		/* Roll up a new character */
 		player_birth();
 
+
+#ifdef GJW_RANDART
 		/* Generate random artifacts */
 		/* Needs to be done even with no adult_reseed_artifacts,
 		   because the state of adult_randarts may have changed either way */
 		do_randart(seed_randart, TRUE);
+#endif /* GJW_RANDART */
 
 		/* Hack -- enter the world */
 		turn = 1;

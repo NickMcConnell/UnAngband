@@ -1545,14 +1545,28 @@ errr init_slays(void)
 		tot_mon_power += r_ptr->power;
 	}
 
-	/* Allocate the "slay values" array - now used to compute magic item power */
+	/* Allocate the "slay values" array - used to compute artifact/magic item power */
 	slays = C_ZNEW(SLAY_MAX, s32b);
 
 	/* Clear values */
 	for (i = 0; i < SLAY_MAX; i++) slays[i] = 0L;
 
+	j = 0;
+
+	/* Compute ability to slay index lookup and vice versa */
+	for (i = 0; (i < ABILITY_MAX) && (j < 32); i++)
+	{
+		if (ability_bonus[i].type >= BONUS_SLAY)
+		{
+			slay_index_to_ability[j] = i;
+			ability_to_slay_index[i] = 1L << j;
+			ability_to_magic_slay_power[i] = j + 1; /* Offset by one */
+			j++;
+		}
+	}
+
 	/* Precompute values for single flag slays for magic items */
-	for (i = 0, j = 0x00000001L; (i < 32) && (j < 0x00200000L); i++, j <<=1)
+	for (i = 0, j = 0x00000001L; i < 32; i++, j <<=1)
 	{
 		/* Compute slay power for single flags */
 		magic_slay_power[i] = slay_power(j);

@@ -1818,8 +1818,8 @@ bool player_assembly(int item2)
 		/* Modify the target item */
 		i_ptr->k_idx = lookup_kind(i_ptr->tval, tgt_sval);
 		i_ptr->sval = tgt_sval;
-		if (src_sval != k_ptr->sval) object_ability_add_one(i_ptr, ABILITY_WEIGHT, object_aval(k_ptr, ABILITY_WEIGHT) /2);
-		else object_ability_add_one(i_ptr, ABILITY_WEIGHT, object_aval(k_ptr, ABILITY_WEIGHT));
+		if (src_sval != k_ptr->sval) object_ability_add(i_ptr, ABILITY_WEIGHT, object_aval(k_ptr, ABILITY_WEIGHT) /2);
+		else object_ability_add(i_ptr, ABILITY_WEIGHT, object_aval(k_ptr, ABILITY_WEIGHT));
 		if (k_info[i_ptr->k_idx].charges) i_ptr->timeout = (s16b)randint(k_info[i_ptr->k_idx].charges) + k_info[i_ptr->k_idx].charges;
 
 		/* Hack - mark as made by the player */
@@ -1845,7 +1845,7 @@ bool player_assembly(int item2)
 			k_ptr->sval = src_sval;
 			
 			/* Halve the weight */
-			object_ability_add_one(k_ptr, ABILITY_WEIGHT, -(object_aval(k_ptr, ABILITY_WEIGHT)/2));
+			object_ability_add(k_ptr, ABILITY_WEIGHT, -(object_aval(k_ptr, ABILITY_WEIGHT)/2));
 
 			/* Adjust the weight and carry */
 			if (item >= 0)

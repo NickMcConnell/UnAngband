@@ -4061,21 +4061,21 @@ void player_fire_or_throw_selected(int item, bool fire)
 					/* Assume a default death */
 					cptr note_dies = " dies.";
 
-					int mult = object_damage_multiplier(o_ptr, m_ptr, item < 0);
+					int mult = object_damage_multiplier(o_ptr, m_ptr, item < 0, TRUE);
 
 					/* Apply bow brands */
-					if (fire) mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_BOW], m_ptr, item < 0) - 1);
+					if (fire) mult += object_damage_multiplier(&inventory[INVEN_BOW], m_ptr, item < 0, FALSE) - 1;
 
 					/* Use left-hand ring brand when shooting. Rings contribute 1 less multiplier. */
 					if ((fire) && (inventory[INVEN_LEFT].k_idx))
 					{
-						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_LEFT], m_ptr, item < 0) - 1);
+						mult += object_damage_multiplier(&inventory[INVEN_LEFT], m_ptr, item < 0, FALSE) - 1;
 					}
 
 					/* Use right-hand ring brand when shooting. Rings contribute 1 less multiplier. */
 					if ((!fire) && (inventory[INVEN_LEFT].k_idx))
 					{
-						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_RIGHT], m_ptr, item < 0) - 1);
+						mult += object_damage_multiplier(&inventory[INVEN_RIGHT], m_ptr, item < 0, FALSE) - 1;
 					}
 
 					/* Get total damage */

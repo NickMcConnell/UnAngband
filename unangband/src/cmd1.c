@@ -159,8 +159,11 @@ sint critical_norm(int weight, int plus, int dam)
  * Brand lite and brand dark are also (x2).
  *
  * Acid damage is only (x2) against armoured opponents.
+ *
+ * Floor is whether the item is being used from the floor. Use_player is whether the player innate
+ * abilities should be added.
  */
-sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, bool floor)
+sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, bool floor, bool use_player)
 {
 	int mult = 1;
 	int bonus;
@@ -194,7 +197,7 @@ sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, boo
 				bonus = object_aval(o_ptr, i);
 				
 				/* Weapon has a bonus or penalty */
-				if ((bonus < 1) || (bonus > 1))
+				if (bonus != 0)
 				{
 					object_can_ability(o_ptr,i, floor);
 					
@@ -213,11 +216,14 @@ sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, boo
 					object_not_ability(o_ptr,i, floor);
 				}
 				
+				/* Use player abilities */
+				if (use_player) bonus += p_ptr->ability[i];
+
 				/* Player branding */
-				if (p_ptr->branded_blows == i + 1) bonus = MAX(3, bonus);
+				if ((use_player) && (p_ptr->branded_blows == i + 1)) bonus += 2;
 				
-				/* Use bonus if higher than multiplier */
-				if (bonus > mult) mult = bonus;
+				/* Use bonus if higher than multiplier. Note multiplier is one greater than bonus. */
+				if (bonus >= mult) mult = bonus + 1;
 			}	
 		}
 		
@@ -239,7 +245,7 @@ sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, boo
 				bonus = object_aval(o_ptr, i);
 				
 				/* Weapon has a bonus or penalty */
-				if ((bonus < 1) || (bonus > 1))
+				if (bonus != 0)
 				{
 					object_can_ability(o_ptr,i, floor);
 				}
@@ -248,8 +254,11 @@ sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, boo
 					object_not_ability(o_ptr,i, floor);
 				}
 				
+				/* Use player abilities */
+				if (use_player) bonus += p_ptr->ability[i];
+
 				/* Player branding */
-				if (p_ptr->branded_blows == i + 1) bonus = MAX(3, bonus);
+				if ((use_player) && (p_ptr->branded_blows == i + 1)) bonus += 2;
 				
 				/* Oppose elements reduces damage */
 				if (ability_bonus[i].type >= BONUS_BRAND_ELEM)
@@ -275,7 +284,7 @@ sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, boo
 						bonus++;
 					}
 				}
-				/* Water descreases damage */
+				/* Water decreases damage */
 				else if (ability_bonus[i].type >= BONUS_BRAND_WATER_WEAK)
 				{
 					if (f_info[cave_feat[m_ptr->fy][m_ptr->fx]].flags2 & (FF2_WATER))
@@ -285,7 +294,7 @@ sint object_damage_multiplier(object_type *o_ptr, const monster_type *m_ptr, boo
 				}
 				
 				/* Use bonus if higher than multiplier */
-				if (bonus > mult) mult = bonus;
+				if (bonus >= mult) mult = bonus + 1;
 			}
 			else
 			{
@@ -1992,8 +2001,8 @@ bool discharge_trap(int y, int x, int ty, int tx, s16b child_region)
 								/* Add slay multipliers. TODO: Apply equivalent multipliers for trap affecting player */
 								if (!player)
 								{
-									mult = object_damage_multiplier(o_ptr, &m_list[cave_m_idx[y][x]], TRUE);
-									mult = MAX(mult, object_damage_multiplier(j_ptr, &m_list[cave_m_idx[y][x]], TRUE) - 1);
+									mult = object_damage_multiplier(o_ptr, &m_list[cave_m_idx[y][x]], TRUE, FALSE);
+									mult += object_damage_multiplier(j_ptr, &m_list[cave_m_idx[y][x]], TRUE, FALSE) - 1;
 
 									k = tot_dam_mult(k, mult);
 								}
@@ -2916,7 +2925,7 @@ void py_attack(int dir)
 			/* Handle normal weapon/gauntlets/boots */
 			if (o_ptr->k_idx)
 			{
-				int mult = object_damage_multiplier(o_ptr, m_ptr, FALSE);
+				int mult = object_damage_multiplier(o_ptr, m_ptr, FALSE, TRUE);
 
 				k = damroll(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES));
 
@@ -2926,19 +2935,19 @@ void py_attack(int dir)
 					/* Use gauntlet brand. Gauntlets use 1 less multiplier */
 					if (inventory[INVEN_HANDS].k_idx)
 					{
-						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE) - 1);
+						mult += object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE, FALSE) - 1;
 					}
 
 					/* Use ring brands on right hand for main weapon. Rings use 1 less multiplier. */
 					if ((inventory[INVEN_RIGHT].k_idx) && ((slot == INVEN_WIELD) || (melee_style & (1L << WS_TWO_HANDED))))
 					{
-						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE) - 1);
+						mult += object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE, FALSE) - 1;
 					}
 
 					/* Use ring brands on left hand for off-hand weapon. Rings use 1 less multiplier. */
 					if ((inventory[INVEN_LEFT].k_idx) && ((slot == INVEN_ARM) || (melee_style & (1L << WS_TWO_HANDED))))
 					{
-						mult = MAX(mult, object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE) - 1);
+						mult += object_damage_multiplier(&inventory[INVEN_HANDS], m_ptr, FALSE, FALSE) - 1;
 					}
 				}
 
@@ -3237,8 +3246,8 @@ void py_attack(int dir)
 	/* Hack -- wake up nearby allies */
 	if (was_asleep)
 	{
-		/* Cutting or stunning a monster shuts them up */
-		if ((m_ptr->cut < 20) && (m_ptr->stunned < 20)) tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has attacked me!");
+		/* Cutting, stunning, poisoning or dazing  a monster shuts them up */
+		if ((m_ptr->cut < 20) && (m_ptr->stunned < 20)&& (m_ptr->poisoned < 20) && (m_ptr->dazed < 20)) tell_allies_not_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), "& has attacked me!");
 	}
 
 	/* Hack -- delay fear messages */

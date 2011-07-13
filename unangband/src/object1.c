@@ -3683,7 +3683,7 @@ bool get_item(int *cp, cptr pmt, cptr str, int mode)
 				object_prep(o_ptr, k);
 
 				/* And remove weight */
-				object_ability_clear_one(o_ptr, ABILITY_WEIGHT);
+				object_ability_clear(o_ptr, ABILITY_WEIGHT);
 
 				/* And belong to the player */
 				o_ptr->name3 = -1;

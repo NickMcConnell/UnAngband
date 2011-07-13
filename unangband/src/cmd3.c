@@ -666,31 +666,35 @@ bool player_wield(int item)
 	/* Some flags are instantly known */
 	object_flags(j_ptr, f0, &f1, &f2, &f3, &f4);
 	
-	/* Hack -- the following are obvious from the displayed combat statistics */
-	object_learn_ability(j_ptr, ABILITY_BLOWS, FALSE);
-	object_learn_ability(j_ptr, ABILITY_SHOTS, FALSE);
-	object_learn_ability(j_ptr, ABILITY_HURL_NUM, FALSE);
-	object_learn_ability(j_ptr, ABILITY_STRIKES, FALSE);
-	object_learn_ability(j_ptr, ABILITY_SPEED_MOVE, FALSE);
-	object_learn_ability(j_ptr, ABILITY_SPEED_CAST, FALSE);
-	object_learn_ability(j_ptr, ABILITY_SPEED_FIGHT, FALSE);
-	object_learn_ability(j_ptr, ABILITY_SPEED_USE, FALSE);
-	
-	/* Check other automatically identified abilities */
-	for (i = 0; i < ABILITY_MAX; i++)
+	/* Check for automatically identified abilities. These are known because they
+	 * are displayed on the character sheet. */
+	/* Hack - for efficiency, we directly check the item, instead of iterating through all possible abilities */
+	for (i = 0; i < j_ptr->ability_count; i++)
 	{
-		switch (ability_bonus[i].type)
+		switch(j_ptr->ability[i])
 		{
-			/* Hack -- the following are obvious from the displayed stats */
+			/* The following are obvious from the displayed stats */
+			case ABILITY_BLOWS:
+			case ABILITY_SHOTS:
+			case ABILITY_HURL_NUM:
+			case ABILITY_STRIKES:
+				object_learn_ability(j_ptr, j_ptr->ability[i], FALSE);
+				break;
+		}
+
+		switch (ability_bonus[j_ptr->ability[i]].type)
+		{
+			/* The following are obvious from the displayed stats */
+			case BONUS_SPEED:
 			case BONUS_ADD_STAT:
 			case BONUS_ADD_SKILL:
 			case BONUS_ADD_WEAPON_SKILL:
-				object_learn_ability(j_ptr, i, FALSE);
+				object_learn_ability(j_ptr, j_ptr->ability[i], FALSE);
 				break;
 #ifndef ALLOW_OBJECT_INFO_MORE				
 			/* Hack --- we do these here, because they are too computationally expensive in the 'right' place */
 			case BONUS_SENSE:
-				object_learn_ability(j_ptr, i);
+				object_learn_ability(j_ptr, j_ptr->ability[i]);
 				break;
 #endif
 		}

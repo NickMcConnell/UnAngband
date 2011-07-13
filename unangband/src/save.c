@@ -158,7 +158,7 @@ static void wr_string(cptr str)
  */
 static void wr_item(const object_type *o_ptr)
 {
-	int i,j;
+	int i;
 	
 	wr_s16b(o_ptr->k_idx);
 
@@ -178,17 +178,12 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->spare);
 
 	wr_byte(o_ptr->number);
-	wr_s16b(o_ptr->weight);
 
 	wr_byte(o_ptr->name1);
 	wr_byte(o_ptr->name2);
 
 	wr_s16b(o_ptr->timeout);
 	wr_s16b(o_ptr->charges);
-
-	wr_s16b(o_ptr->ac);
-	wr_byte(o_ptr->dd);
-	wr_byte(o_ptr->ds);
 
 	wr_u32b(o_ptr->ident);
 
@@ -204,9 +199,12 @@ static void wr_item(const object_type *o_ptr)
 	wr_byte(o_ptr->xtra2);
 
 	/* Aval information */
-	wr_s16b(MAX_AVALS_OBJECT);
-	for (i = 0; i < MAX_AVALS_OBJECT; i++) wr_s16b(o_ptr->aval[i]);
-	for (i = 0; i < MAX_AVALS_OBJECT; i++) wr_byte(o_ptr->aval_index[i]);
+	wr_s16b(o_ptr->ability_count);
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		wr_s16b(o_ptr->ability[i]);
+		wr_s16b(o_ptr->aval[i]);
+	}
 
 	/* Ability information */
 	wr_s16b(ABILITY_ARRAY_SIZE);
@@ -827,7 +825,7 @@ static void wr_extra(void)
  */
 static void wr_randarts(void)
 {
-	int i, j, k;
+	int i, j;
 
 	wr_u16b(z_info->a_max);
 
@@ -837,23 +835,16 @@ static void wr_randarts(void)
 
 		wr_byte(a_ptr->tval);
 		wr_byte(a_ptr->sval);
-
-		wr_s16b(a_ptr->ac);
-
-		wr_byte(a_ptr->dd);
-		wr_byte(a_ptr->ds);
-
-		wr_s16b(a_ptr->weight);
-
 		wr_s32b(a_ptr->cost);
 
-		wr_s16b(MAX_AVALS_ARTIFACT);
-		
-		for (j = 0; j < MAX_AVALS_ARTIFACT; j++) wr_s16b(a_ptr->aval[j]);
-		
-		wr_s16b(ABILITY_ARRAY_SIZE);
-		
-		for (k = 0; k < MAX_AVALS_ARTIFACT; k++) for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(a_ptr->flags0[j][k]);
+		wr_s16b(a_ptr->ability_count);
+
+		for (j = 0; j < a_ptr->ability_count; j++)
+		{
+			wr_s16b(a_ptr->ability[j]);
+			wr_s16b(a_ptr->aval[j]);
+		}
+
 		wr_u32b(a_ptr->flags1);
 		wr_u32b(a_ptr->flags2);
 		wr_u32b(a_ptr->flags3);
@@ -1290,14 +1281,15 @@ static bool wr_savefile_new(void)
 
 		wr_byte(a_ptr->cur_num);
 		wr_byte(0);
-		wr_byte(0);
-		wr_byte(0);
+		wr_s16b(ABILITY_ARRAY_SIZE);
 
+		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->can_flags0[j]);
 		wr_u32b(n_ptr->can_flags1);
 		wr_u32b(n_ptr->can_flags2);
 		wr_u32b(n_ptr->can_flags3);
 		wr_u32b(n_ptr->can_flags4);
 
+		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->not_flags0[j]);
 		wr_u32b(n_ptr->not_flags1);
 		wr_u32b(n_ptr->not_flags2);
 		wr_u32b(n_ptr->not_flags3);
@@ -1319,16 +1311,21 @@ static bool wr_savefile_new(void)
         {
                 object_lore *n_ptr = &e_list[i];
 
+        		wr_s16b(ABILITY_ARRAY_SIZE);
+
+        		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->can_flags0[j]);
                 wr_u32b(n_ptr->can_flags1);
                 wr_u32b(n_ptr->can_flags2);
                 wr_u32b(n_ptr->can_flags3);
                 wr_u32b(n_ptr->can_flags4);
 
+        		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->may_flags0[j]);
                 wr_u32b(n_ptr->may_flags1);
                 wr_u32b(n_ptr->may_flags2);
                 wr_u32b(n_ptr->may_flags3);
                 wr_u32b(n_ptr->may_flags4);
 
+        		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->not_flags0[j]);
                 wr_u32b(n_ptr->not_flags1);
                 wr_u32b(n_ptr->not_flags2);
                 wr_u32b(n_ptr->not_flags3);
@@ -1354,12 +1351,15 @@ static bool wr_savefile_new(void)
 	        for (i = 0; i < tmp16u; i++)
 		{
                 	object_info *n_ptr = &x_list[i];
+            		wr_s16b(ABILITY_ARRAY_SIZE);
 
+            		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->can_flags0[j]);
                 	wr_u32b(n_ptr->can_flags1);
                 	wr_u32b(n_ptr->can_flags2);
                 	wr_u32b(n_ptr->can_flags3);
                 	wr_u32b(n_ptr->can_flags4);
 
+            		for (j = 0; j < ABILITY_ARRAY_SIZE; j++) wr_u32b(n_ptr->not_flags0[j]);
                 	wr_u32b(n_ptr->not_flags1);
                 	wr_u32b(n_ptr->not_flags2);
                 	wr_u32b(n_ptr->not_flags3);

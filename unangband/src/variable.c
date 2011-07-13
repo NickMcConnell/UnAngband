@@ -1284,8 +1284,20 @@ s32b magic_slay_power[32];
  * Cache the results of slay_value(), which is expensive and would
  * otherwise be called much too often. We create this as a part of initialisation,
  * then free it after we have either loaded or randomly generated the artifacts.
+ *
+ * A cut down version of this table is then created for egos for those egos which
+ * have multiple possible slays/brands only.
  */
 s32b *slays = NULL;
+
+/* These allow fast lookups of slay indexes from ability and vice versa */
+int slay_index_to_ability[32];
+u32b ability_to_slay_index[ABILITY_MAX];
+
+/* This allows fast look up of single flag slays */
+int ability_to_magic_slay_power[ABILITY_MAX];
+
+
 
 /*
  * Total monster power
