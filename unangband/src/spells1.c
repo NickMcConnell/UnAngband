@@ -1438,6 +1438,9 @@ void take_hit(int who, int what, int dam)
 	/* Disturb */
 	disturb(1, 1);
 
+	/* Safe to eat does less damage */
+	if ((who == SOURCE_PLAYER_EAT_SAFE) || (who == SOURCE_PLAYER_EAT_MONSTER_SAFE)) dam /= 3;
+
 	/* Make test-id and traps less deadly */
 	if (p_ptr->chp >= p_ptr->mhp / 2
 		 && dam >= p_ptr->chp
@@ -1445,8 +1448,10 @@ void take_hit(int who, int what, int dam)
 			  || who == SOURCE_ENTOMB
 			  || who == SOURCE_PLAYER_COATING
 			  || who == SOURCE_PLAYER_EAT_MONSTER
+			  || who == SOURCE_PLAYER_EAT_MONSTER_SAFE
 			  || who == SOURCE_PLAYER_VAMP_DRAIN
 			  || who == SOURCE_PLAYER_EAT_UNKNOWN
+			  || who == SOURCE_PLAYER_EAT_SAFE
 			  || who == SOURCE_PLAYER_QUAFF_UNKNOWN
 			  || who == SOURCE_PLAYER_READ_UNKNOWN
 			  || who == SOURCE_PLAYER_ZAP_NO_TARGET
@@ -1557,6 +1562,7 @@ void take_hit(int who, int what, int dam)
 
 				case SOURCE_BIRTH:
 				case SOURCE_PLAYER_EAT_MONSTER:
+				case SOURCE_PLAYER_EAT_MONSTER_SAFE:
 				case SOURCE_PLAYER_SPORE:
 				case SOURCE_PLAYER_VAMP_DRAIN:
 				{
@@ -2858,7 +2864,7 @@ static void poison_dam(int who, int what, int dam, bool inven, bool delay, bool 
 	{
 		set_slow_poison(MAX(p_ptr->timed[TMD_SLOW_POISON], 100));
 	}
-	else if ((p_ptr->timed[TMD_SLOW_POISON]) || ((p_ptr->flags2 & (TR2_SLOW_POISON)) != 0))
+	else if ((p_ptr->timed[TMD_SLOW_POISON]) || ((p_ptr->cur_flags2 & (TR2_SLOW_POISON)) != 0))
 	{
 		delay = TRUE;
 	}
@@ -4752,6 +4758,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 	char o_name[80];
 
 	int make_meat = 0;
+	int make_meat_name3 = 0;
 
 	/* Prevent warning */
 	(void)who;
@@ -4901,6 +4908,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					do_kill = TRUE;
 					note_kill = (plural ? " salt!" : " salts!");
 					make_meat += object_aval(o_ptr, ABILITY_WEIGHT);
+					make_meat_name3 = o_ptr->name3;
 					break;
 				}
 
@@ -5420,6 +5428,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 			note_kill = (plural ? " cook!" : " cooks!");
 
 			make_meat += object_aval(o_ptr, ABILITY_WEIGHT);
+			make_meat_name3 = o_ptr->name3;
 		}
 
 		/* Attempt to destroy the object */
@@ -5587,7 +5596,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		object_prep(i_ptr, 981);
 
 		/* Hack -- ensure we don't violate conservation of mass */
-		if (make_meat < object_aval(i_ptr, ABILITY_WEIGHT)) object_aval(i_ptr, ABILITY_WEIGHT) = make_meat;
+		if (make_meat < object_aval(i_ptr, ABILITY_WEIGHT)) object_ability_set(i_ptr, ABILITY_WEIGHT, make_meat);
+
+		/* Mark it with the original meat type */
+		i_ptr->name3 = make_meat_name3;
 
 		/* Drop it near the new location */
 		drop_near(i_ptr, -1, y, x, FALSE);
@@ -6234,8 +6246,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			case 5: typ = GF_LOSE_STR; break;
 			case 6: typ = GF_LOSE_INT; break;
 			case 7: typ = GF_LOSE_WIS; break;
-			case 8: typ = GF_LOSE_DEX; break;
-			case 9: typ = GF_LOSE_CON; break;
+			case 8: typ = GF_LOSE_DEX_AGI; break;
+			case 9: typ = GF_LOSE_CON_CHR; break;
 			case 10: typ = GF_HUNGER; break;
 			case 11: typ = GF_FORGET; break;
 			case 12: typ = GF_CURSE; break;
@@ -7300,11 +7312,51 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_DRAIN_LIFE:
 		case GF_VAMP_DRAIN:
 		case GF_VAMP_DRAIN_FAMILIAR:
+		case GF_DRAIN_BLOOD:
+		case GF_DRAIN_BLOOD_FAMILIAR:
+		case GF_VAMP_DRAIN_BLOOD:
 		{
 			if (seen) obvious = TRUE;
 
+			/* Draining blood -- instead effective against monsters who have blood */
+			if ((typ == GF_DRAIN_BLOOD) || (typ == GF_DRAIN_BLOOD_FAMILIAR) || (typ == GF_VAMP_DRAIN_BLOOD))
+			{
+				/* Does not have blood */
+				if ((r_ptr->flags8 & (RF8_HAS_BLOOD)) == 0)
+				{
+					/* Less damage and no side effects */
+					dam = (dam+2)/3;
+					break;
+				}
+
+				note = " is drained of blood.";
+
+				/* Drain monsters vampirically */
+				if (typ == GF_VAMP_DRAIN_BLOOD)
+				{
+					int new_maxhp;
+
+					m_ptr->mflag &= ~(MFLAG_STRONG | MFLAG_SMART | MFLAG_WISE | MFLAG_SKILLFUL | MFLAG_HEALTHY);
+					m_ptr->mflag |= (MFLAG_WEAK | MFLAG_STUPID | MFLAG_NAIVE | MFLAG_CLUMSY | MFLAG_SICK);
+
+					new_maxhp = calc_monster_hp(cave_m_idx[y][x]);
+
+					if (new_maxhp < m_ptr->maxhp)
+					{
+						/* Scale down hit points */
+						m_ptr->hp = m_ptr->hp * new_maxhp / m_ptr->maxhp;
+
+						/* To a minimum */
+						if (m_ptr->hp < 0) m_ptr->hp = 0;
+
+						/* Permanently reduce maximum hp */
+						m_ptr->maxhp = new_maxhp;
+					}
+				}
+			}
+
 			/* Hack -- heal undead */
-			if (r_ptr->flags3 & (RF3_UNDEAD))
+			else if (r_ptr->flags3 & (RF3_UNDEAD))
 			{
 				do_heal = dam;
 				dam = 0;
@@ -7346,49 +7398,67 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				note = " is drained of health.";
 			}
 
-			if ((typ == GF_DRAIN_LIFE) || (typ == GF_DRAIN_LIFE_PERC)) break;
+			if (typ == GF_DRAIN_LIFE) break;
 
 			/* Do not allow wimpy monsters to yield much profit */
 			if (m_ptr->hp + 1 < dam) dam = m_ptr->hp + 1;
 
 			/* Character has cast the spell, or familiar has drained on their behalf */
-			if ((who < SOURCE_PLAYER_START) || ((who == SOURCE_PLAYER_ALLY) && (typ == GF_VAMP_DRAIN_FAMILIAR) && (p_ptr->chp < p_ptr->mhp)))
+			if ((who < SOURCE_PLAYER_START) || ((who == SOURCE_PLAYER_ALLY) && ((typ == GF_VAMP_DRAIN_FAMILIAR) || (typ == GF_DRAIN_BLOOD_FAMILIAR))))
 			{
-				/* Spell is damaging, and has hit a warm-blooded creature. */
-				if (dam > 0)
+				/* Spell is damaging, and has hit a blood filled or living creature. */
+				if ((dam > 0) && (typ == GF_VAMP_DRAIN_FAMILIAR) && (p_ptr->chp < p_ptr->mhp))
 				{
 					/* msg_print("You suck in some life force."); */
 
 					/* Heal caster */
 					(void)hp_player(dam);
-
-					/* Feed caster -- protect against bloating */
-					if (p_ptr->food + dam * 8 < PY_FOOD_FULL)
-						(void)set_food(p_ptr->food + dam * 8);
-					else
-						(void)set_food(PY_FOOD_FULL);
 				}
 				/* Oops */
 				else if (do_heal)
 				{
 					take_hit(SOURCE_PLAYER_VAMP_DRAIN, m_ptr->r_idx, do_heal);
 				}
+
+				/* Feed the player */
+				if (dam > 0)
+				{
+					/* Feed caster -- protect against bloating */
+					if (p_ptr->food + dam * 8 < PY_FOOD_FULL)
+						(void)set_food(p_ptr->food + dam * 8);
+					else
+						(void)set_food(PY_FOOD_FULL);
+
+					/* Blood has additional healing properties */
+					if (typ == GF_DRAIN_BLOOD_FAMILIAR)
+					{
+						feed_player_more(dam * 8);
+					}
+				}
 			}
+
 			/* Monster gets the benefit */
-			else if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY))
+			if ((who > SOURCE_MONSTER_START) || (who == SOURCE_PLAYER_ALLY))
 			{
 				if (dam > 0)
 				{
-					feed_monster(who > SOURCE_MONSTER_START ? who : what);
+					/* Blood has additional healing properties */
+					if ((typ == GF_DRAIN_BLOOD) || (typ == GF_DRAIN_BLOOD_FAMILIAR) || (typ == GF_VAMP_DRAIN_BLOOD))
+					{
+						feed_monster(who > SOURCE_MONSTER_START ? who : what);
+					}
 
 					/* Heal */
-					m_ptr->hp += dam;
+					if ((typ == GF_VAMP_DRAIN) || (typ == GF_VAMP_DRAIN_FAMILIAR) || (typ == GF_VAMP_DRAIN_BLOOD))
+					{
+						m_ptr->hp += dam;
 
-					/* No overflow */
-					if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
+						/* No overflow */
+						if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
 
-					/* Redraw (later) if needed */
-					if (p_ptr->health_who == who) p_ptr->redraw |= (PR_HEALTH);
+						/* Redraw (later) if needed */
+						if (p_ptr->health_who == who) p_ptr->redraw |= (PR_HEALTH);
+					}
 				}
 			}
 			break;
@@ -8290,6 +8360,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		/* Melee attack - lose strength */
 		case GF_HUNGER:
 		case GF_LOSE_STR:
+		case GF_LOSE_STR_SIZ:
+		case GF_LOSE_BODY:
 		{
 			if (m_ptr->mflag & (MFLAG_STRONG))
 			{
@@ -8305,71 +8377,13 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			if (obvious) note = " appears weaker.";
-			break;
-		}
-
-		/* Melee attack - lose int */
-		case GF_LOSE_INT:
-		{
-			if (m_ptr->mflag & (MFLAG_SMART))
-			{
-				if (seen) obvious = TRUE;
-
-				m_ptr->mflag &= ~(MFLAG_SMART);
-			}
-			else if (!(m_ptr->mflag & (MFLAG_STUPID)))
-			{
-				if (seen) obvious = TRUE;
-
-				m_ptr->mflag |= (MFLAG_STUPID);
-			}
-
-			if (obvious) note = " appears stupider.";
-			break;
-		}
-
-		/* Melee attack - lose wisdom */
-		case GF_LOSE_WIS:
-		{
-			if (m_ptr->mflag & (MFLAG_WISE))
-			{
-				if (seen) obvious = TRUE;
-
-				m_ptr->mflag &= ~(MFLAG_WISE);
-			}
-			else if (!(m_ptr->mflag & (MFLAG_NAIVE)))
-			{
-				if (seen) obvious = TRUE;
-
-				m_ptr->mflag |= (MFLAG_NAIVE);
-			}
-
-			if (obvious) note = " appears more naive.";
-			break;
-		}
-
-		/* Melee attack - lose dex */
-		case GF_LOSE_DEX:
-		{
-			if (m_ptr->mflag & (MFLAG_SKILLFUL))
-			{
-				if (seen) obvious = TRUE;
-
-				m_ptr->mflag &= ~(MFLAG_SKILLFUL);
-			}
-			else if (!(m_ptr->mflag & (MFLAG_CLUMSY)))
-			{
-				if (seen) obvious = TRUE;
-
-				m_ptr->mflag |= (MFLAG_CLUMSY);
-			}
-
-			if (obvious) note = " appears clumsier.";
-			break;
+			if (((typ == GF_HUNGER) && obvious)) || (typ == GF_LOSE_STR)) break;
 		}
 
 		/* Melee attack - lose con */
 		case GF_LOSE_CON:
+		case GF_LOSE_CON_CHR:
+		case GF_LOSE_SIZ:
 		{
 			int new_maxhp;
 
@@ -8407,8 +8421,74 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 				/* Permanently reduce maximum hp */
 				m_ptr->maxhp = new_maxhp;
 			}
+			if (typ != GF_LOSE_BODY) break;
+		}
+
+		/* Melee attack - lose dex */
+		case GF_LOSE_DEX:
+		case GF_LOSE_AGI:
+		case GF_LOSE_DEX_AGI:
+		case GF_LOSE_MIND:
+		{
+			if (m_ptr->mflag & (MFLAG_SKILLFUL))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_SKILLFUL);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_CLUMSY)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_CLUMSY);
+			}
+
+			if (obvious) note = " appears clumsier.";
+			if (typ != GF_LOSE_MIND) break;
+		}
+
+		/* Melee attack - lose int */
+		case GF_LOSE_INT:
+		case GF_LOSE_INT_WIS:
+		{
+			if (m_ptr->mflag & (MFLAG_SMART))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_SMART);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_STUPID)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_STUPID);
+			}
+
+			if (obvious) note = " appears stupider.";
+			if (typ == GF_LOSE_INT) break;
+		}
+
+		/* Melee attack - lose wisdom */
+		case GF_LOSE_WIS:
+		{
+			if (m_ptr->mflag & (MFLAG_WISE))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag &= ~(MFLAG_WISE);
+			}
+			else if (!(m_ptr->mflag & (MFLAG_NAIVE)))
+			{
+				if (seen) obvious = TRUE;
+
+				m_ptr->mflag |= (MFLAG_NAIVE);
+			}
+
+			if (obvious) note = " appears more naive.";
 			break;
 		}
+
+
 
 		/* Melee attack - lose cha */
 		case GF_LOSE_CHR:
@@ -9965,6 +10045,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 	/* Get diseases */
 	u32b old_disease = p_ptr->disease;
 	
+	/* Hack -- various safe to eat hacks */
+	bool good_eat = (who == SOURCE_PLAYER_EAT_SAFE) || (who == SOURCE_PLAYER_EAT_MONSTER_SAFE);
+
+	/* Hack -- internal effects don't damage inventory */
+	bool internal = good_eat || (who == SOURCE_PLAYER_EAT) || (who == SOURCE_PLAYER_QUAFF) || (who == SOURCE_PLAYER_EAT_UNKNOWN) || (who == SOURCE_PLAYER_QUAFF_UNKNOWN);
+
 	/* No player here */
 	if (!(cave_m_idx[y][x] < 0)) return (FALSE);
 
@@ -10048,8 +10134,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- halve acid damage in water */
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam /= 2;
 
-			msg_print ("You are covered in acid!");
-			acid_dam(who, what, dam, typ == GF_ACID);
+			/* Good to eat? */
+			if (good_eat) set_timed(TMD_OPP_ACID, dam, TRUE);
+
+			msg_format ("You are %s acid!", internal ? "eaten from within by" : "covered in");
+			acid_dam(who, what, dam, (typ == GF_ACID) && !internal);
 			break;
 		}
 		
@@ -10069,8 +10158,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- halve fire damage in water */
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam /= 2;
 
-			msg_print ("You are enveloped in flames!");
-			fire_dam(who, what, dam, typ == GF_FIRE);
+			/* Good to eat? */
+			if (good_eat) set_timed(TMD_OPP_FIRE, dam, TRUE);
+
+			msg_format ("You are %s flames!", internal ? "burned from within by" : "enveloped in");
+			fire_dam(who, what, dam, (typ == GF_FIRE) && !internal);
 			break;
 		}
 
@@ -10090,8 +10182,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- double cold damage in water */
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
 
-			msg_print ("You are covered in frost!");
-			cold_dam(who, what, dam, typ == GF_COLD);
+			/* Good to eat? */
+			if (good_eat) set_timed(TMD_OPP_COLD, dam, TRUE);
+
+			msg_format ("You are %s frost!", internal ? "chilled from within by" : "covered in");
+			cold_dam(who, what, dam, (typ == GF_COLD) && !internal);
 			break;
 		}
 
@@ -10111,8 +10206,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Hack -- double electricy damage in water */
 			if (f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) dam *= 2;
 
-			msg_print("You are struck by electricity!");
-			elec_dam(who, what, dam, typ == GF_ELEC);
+			/* Good to eat? */
+			if (good_eat) set_timed(TMD_OPP_ELEC, dam, TRUE);
+
+			msg_format ("You are %s electricity!", internal ? "shocked from within by" : "struck by");
+			elec_dam(who, what, dam, (typ == GF_ELEC) && !internal);
 			break;
 		}
 
@@ -10135,6 +10233,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_SLIME:
 		{
 			if (fuzzy && (typ != GF_DELAY_POISON)) msg_print("You are hit by poison!");
+			if (good_eat) inc_timed(TMD_SLOW_POISON, dam, TRUE);
 			poison_dam(who, what, dam, TRUE, typ == GF_DELAY_POISON, typ == GF_POISON_WEAK, typ == GF_POISON_HALF, typ == GF_HURT_POISON);
 			break;
 		}
@@ -10414,6 +10513,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				check_hold_life(who, 75, 200);
 			}
 			take_hit(who, what, dam);
+			/* TODO: Eat for temporary hold life */
 			break;
 		}
 
@@ -10459,6 +10559,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			water_dam(who, what, dam, TRUE);
 
+			if (good_eat) inc_timed(TMD_OPP_WATER, dam, TRUE);
+
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
 
@@ -10495,8 +10597,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_SALT_WATER:
 		case GF_WATER_WEAK:
 		{
-			if (fuzzy) msg_print("You are hit by something!");
+			int old_dam = dam;
 
+			if (fuzzy) msg_print("You are hit by something!");
 			if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
 			{
 				/* Always notice */
@@ -10511,6 +10614,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			water_dam(who, what, dam, TRUE);
+			if (good_eat) inc_timed(TMD_OPP_WATER, old_dam, TRUE);
 			break;
 		}
 
@@ -10566,6 +10670,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			take_hit(who, what, dam);
+			if (good_eat) change_shape(rand_int(RACE_MAX));
 			break;
 		}
 
@@ -10592,6 +10697,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				(void)set_cut(p_ptr->timed[TMD_CUT] + dam);
 			}
 			take_hit(who, what, dam);
+			if (good_eat) inc_timed(TMD_STONESKIN, dam, TRUE);
 			break;
 		}
 
@@ -10626,6 +10732,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				}
 			}
 			take_hit(who, what, dam);
+			/* TODO: Useful if eaten? */
 			break;
 		}
 
@@ -10661,6 +10768,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			take_hit(who, what, dam);
+			if (good_eat) inc_timed(TMD_OPP_CONFUSE, randint(20) + dam, TRUE);
 			break;
 		}
 
@@ -10716,6 +10824,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				(void)apply_disenchant(0);
 			}
 			take_hit(who, what, dam);
+			/* TODO: Temporary magic resistance if eaten */
 			break;
 		}
 
@@ -10738,6 +10847,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				if (m_ptr) apply_nexus(m_ptr);
 			}
 			take_hit(who, what, dam);
+			if (good_eat) inc_timed(TMD_REGENERATION, dam, TRUE);
 			break;
 		}
 
@@ -10767,6 +10877,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
 			}
 			take_hit(who, what, dam);
+			if (good_eat) inc_timed(TMD_SHIELD, dam, TRUE);
 
 			/* Mark grid for later processing. */
 			cave_temp_mark(y, x, FALSE);
@@ -10780,6 +10891,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something strange!");
 			inc_timed(TMD_SLOW, rand_int(4) + 4, TRUE);
 			take_hit(who, what, dam);
+			if (good_eat) inc_timed(TMD_SPRINT, randint(dam), TRUE);
 			break;
 		}
 
@@ -10829,10 +10941,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,(TR2_RES_LITE),0x0L,0x0L);
 			}
 			take_hit(who, what, dam);
+
+			if (good_eat) inc_timed(TMD_SEE_INVIS, randint(100) + 10 + dam * 2, TRUE);
 			break;
 		}
 
-		/* Weak darkness -- douses light now instead of blinding */
+		/* Weak darkness -- douses light now instead of blinding, unless taken internally */
 		case GF_DARK_WEAK:
 		{
 			object_type *o_ptr = &inventory[INVEN_LITE];
@@ -10840,7 +10954,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			dam = 0;
 			
 			/* Douse light */
-			if (o_ptr->timeout)
+			if (o_ptr->timeout && !internal)
 			{
 				o_ptr->charges = o_ptr->timeout;
 				o_ptr->timeout = 0;
@@ -10854,7 +10968,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				p_ptr->update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
 			}
 
-			break;
+			if (!internal) break;
 		}
 
 		/* Dark -- blinding */
@@ -10881,6 +10995,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				player_not_flags(who, 0x0L,(TR2_RES_DARK),0x0L,0x0L);
 			}
 			take_hit(who, what, dam);
+
+			/* Note long duration */
+			if (good_eat) inc_timed(TMD_INFRA, randint(1000) + 10 + dam * 10, TRUE);
 			break;
 		}
 
@@ -10924,6 +11041,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				}
 			}
 			take_hit(who, what, dam);
+
+			/* Note we can use this to pump haste to much high duration than potions */
+			if (good_eat) inc_timed(TMD_FAST, dam, TRUE);
 			break;
 		}
 
@@ -11820,6 +11940,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		case GF_LOSE_STR_SIZ:
 		case GF_LOSE_STR:
 		{
 			/* Take damage */
@@ -11830,20 +11951,32 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_STR, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_STR, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_STR, dam, TRUE);
 			}
+
+			if (typ == GF_LOSE_STR) break;
+
+		case GF_LOSE_SIZ:
+
+			/* Take damage */
+			if (typ == GF_LOSE_SIZ) take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_SIZ)))
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_SIZ, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_SIZ, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_SIZ, dam, TRUE);
 			}
 
 			break;
 		}
 
+		case GF_LOSE_INT_WIS:
 		case GF_LOSE_INT:
 		{
 			/* Take damage */
@@ -11854,28 +11987,33 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_INT, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_INT, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_INT, dam, TRUE);
 			}
 
-			break;
+			if (typ == GF_LOSE_INT) break;
 		}
 
 		case GF_LOSE_WIS:
 		{
 			/* Take damage */
-			take_hit(who, what, dam);
+			if (typ == GF_LOSE_WIS) take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_WIS)))
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_WIS, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_WIS, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_WIS, dam, TRUE);
 			}
 
 			break;
 		}
 
+		case GF_LOSE_DEX_AGI:
 		case GF_LOSE_DEX:
 		{
 			/* Take damage */
@@ -11886,19 +12024,32 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_DEX, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_DEX, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_DEX, dam, TRUE);
 			}
+
+			if (typ == GF_LOSE_DEX) break;
+
+		case GF_LOSE_AGI:
+
+			/* Take damage */
+			if (typ == GF_LOSE_AGI) take_hit(who, what, dam);
+
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_AGI)))
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_AGI, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_AGI, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_AGI, dam, TRUE);
 			}
 
 			break;
 		}
 
+		case GF_LOSE_CON_CHR:
 		case GF_LOSE_CON:
 		{
 			/* Heal the player if undead, but affect CON */
@@ -11923,28 +12074,34 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_CON, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_CON, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_CON, dam, TRUE);
 			}
 
-			break;
+			if (typ == GF_LOSE_CON) break;
 		}
 
 		case GF_LOSE_CHR:
 		{
 			/* Take damage */
-			take_hit(who, what, dam);
+			if (typ == GF_LOSE_CHR) take_hit(who, what, dam);
 
 			/* Damage (stat) */
 			if ((drained = do_dec_stat(A_CHR)))
 			{
 				obvious = TRUE;
 				if (drained > 0)
-					inc_timed(A_MAX + A_CHR, rand_int(20) + 20, TRUE);
+					inc_timed(TMD_DEC_CHR, rand_int(20) + 20, TRUE);
+				if (good_eat)
+					inc_timed(TMD_INC_CHR, dam, TRUE);
 			}
 
 			break;
 		}
 
+		case GF_LOSE_BODY:
+		case GF_LOSE_MIND:
 		case GF_LOSE_ALL:
 		{
 			/* Take damage */
@@ -11953,12 +12110,27 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Lose all stats */
 			for (k = 0; k < A_MAX; k++)
 			{
+				/* Skip if not body/mind */
+				switch (k)
+				{
+					case A_STR:
+					case A_CON:
+					case A_SIZ:
+					case A_AGI:
+						if (typ == GF_LOSE_MIND) continue;
+						break;
+					default:
+						if (typ == GF_LOSE_BODY) continue;
+				}
+
 				/* Damage (stats) */
 				if ((drained = do_dec_stat(k)))
 				{
 					obvious = TRUE;
 					if (drained > 0)
-						inc_timed(A_MAX + k, rand_int(20) + 20, TRUE);
+						inc_timed(k, rand_int(20) + 20, TRUE);
+					if (good_eat)
+						inc_timed(TMD_INC_STR + k, dam, TRUE);
 				}
 			}
 
@@ -11976,7 +12148,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
-			if (m_ptr)
+			/* Give us protection */
+			if (good_eat)
+			{
+				 inc_timed(TMD_STONESKIN, dam, TRUE);
+			}
+			else if (m_ptr)
 			{
 				/* Radius 8 earthquake centered at the monster */
 				if (dam > 23) make_attack_ranged(who, 101, m_ptr->fy, m_ptr->fx);
@@ -11999,8 +12176,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
+			/* Eating */
+			if (good_eat) restore_level();
+
 			/* Lose grip on life */
-			check_hold_life(who, 95, damroll(10,6));
+			else check_hold_life(who, 95, damroll(10,6));
 
 			break;
 		}
@@ -12013,8 +12193,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
+			/* Eating */
+			if (good_eat) restore_level();
+
 			/* Lose grip on life */
-			check_hold_life(who, 90, damroll(20,6));
+			else check_hold_life(who, 90, damroll(20,6));
 
 			break;
 		}
@@ -12027,8 +12210,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
+			/* Eating */
+			if (good_eat) restore_level();
+
 			/* Lose grip on life */
-			check_hold_life(who, 75, damroll(40,6));
+			else check_hold_life(who, 75, damroll(40,6));
 
 			break;
 		}
@@ -12041,8 +12227,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			/* Take damage */
 			take_hit(who, what, dam);
 
+			/* Eating */
+			if (good_eat) restore_level();
+
 			/* Lose grip on life */
-			check_hold_life(who, 50, damroll(80,6));
+			else check_hold_life(who, 50, damroll(80,6));
 
 			break;
 		}
@@ -12401,30 +12590,46 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				take_hit(who, what, dam);
 
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 			}
 			break;
 		}
+
+		/* Injure the player. */
+		case GF_VAMP_DRAIN_BLOOD:
+		case GF_DRAIN_BLOOD:
+		case GF_DRAIN_BLOOD_FAMILIAR:
 
 		/* Injure the player unless undead. We assume monsters switch this off when required. */
 		case GF_VAMP_DRAIN:
 		case GF_VAMP_DRAIN_FAMILIAR:
 		{
-			if (!(p_ptr->cur_flags4 & (TR4_UNDEAD)))
+			/* Monster gets benefit of hp loss from player's reduced experience as well as damage */
+			int drain = p_ptr->chp;
+
+			if (((p_ptr->cur_flags4 & (TR4_UNDEAD)) == 0) || ((typ != GF_VAMP_DRAIN) && (typ != GF_VAMP_DRAIN_FAMILIAR)))
 			{
 				obvious = TRUE;
 				take_hit(who, what, dam);
 
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				if (p_ptr->cur_flags4 & (TR4_UNDEAD)) player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+
+				/* Vampires also drain experience */
+				if (typ == VAMP_DRAIN_BLOOD)
+				{
+					/* Drain depends on vampire level */
+					check_hold_life(who, 100 - r_ptr->level, damroll(r_ptr->level,6));
+				}
 
 				/* Assist the source monster */
 				if ((m_ptr) && (dam > 0))
 				{
-					feed_monster(who);
+					/* Feed monster if draining blood */
+					if ((typ != GF_VAMP_DRAIN) && (typ != GF_VAMP_DRAIN_FAMILIAR)) feed_monster(who);
 
-					/* Heal */
-					m_ptr->hp += dam;
+					/* Heal if not just draining blood */
+					if ((typ != GF_DRAIN_BLOOD) && (typ != GF_DRAIN_BLOOD_FAMILIAR)) m_ptr->hp += drain - p_ptr->chp;
 
 					/* No overflow */
 					if (m_ptr->hp > m_ptr->maxhp) m_ptr->hp = m_ptr->maxhp;
@@ -12746,20 +12951,11 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			msg_print("You have been stripped of enchantments!");
 
-			/* Apply to all timed effects */
-			for (j = 0; j < TMD_MAX; j++)
+			/* Apply to all timed effects, excluding negative effects */
+			for (j = TMD_DISPEL_MIN; j < TMD_MAX; j++)
 			{
-				/* Remove positive effects */
-				if ((j < TMD_PSLEEP) && (j > A_MAX) && (j != TMD_FAST)) continue;
-
-				/* Hack -- give player one round to react */
-				if (p_ptr->timed[j]) set_timed(j, 1, FALSE);
-			}
-
-			if (p_ptr->word_recall)
-			{
-				msg_print("A tension leaves the air around you.");
-				p_ptr->word_recall = 0;
+				/* Hack -- give player one round to react, except when recalling/returning/sleeping */
+				if (p_ptr->timed[j]) set_timed(j, j < TMD_INC_STR ? 0 : 1, FALSE);
 			}
 
 			/* Dispel worked */
@@ -12778,7 +12974,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->cur_flags4 & (TR4_UNDEAD))
 			{
 				/* Notice */
-				player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_UNDEAD);
+				player_can_flags(who, NULL, 0x0L, 0x0L, 0x0L, TR4_UNDEAD);
 
 				/* Obvious */
 				obvious = TRUE;

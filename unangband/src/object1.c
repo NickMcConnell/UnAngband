@@ -702,6 +702,26 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 		{
 			/* Get the name */
 			race_desc(mon_buf, sizeof(mon_buf), o_ptr->name3, 0x800, 1);
+
+			/* Hack - until we have proper 'meat' names */
+			if (o_ptr->tval == TV_MONSTER_FOOD)
+			{
+				switch (o_ptr->name3)
+				{
+					case 1246: /* Cow */
+					{
+						/* Save the monster name */
+						my_strcpy(mon_buf, "Beef", sizeof(mon_buf));
+						break;
+					}
+					case 1247: /* Sheep */
+					{
+						/* Save the monster name */
+						my_strcpy(mon_buf, "Lamb", sizeof(mon_buf));
+						break;
+					}
+				}
+			}
 		}
 
 		/* Describe player */
@@ -727,6 +747,9 @@ void object_desc(char *buf, size_t max, const object_type *o_ptr, int pref, int 
 					break;
 				case TV_BODY:
 					modstr = "mummified";
+					break;
+				case TV_MONSTER_FOOD:
+					modstr = "pork";
 					break;
 				case TV_FLASK:
 					modstr = "spoiled";

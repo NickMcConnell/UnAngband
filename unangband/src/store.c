@@ -1296,6 +1296,12 @@ static void store_create(int store_index)
 		/* Create a new object of the chosen kind */
 		object_prep(i_ptr, k_idx);
 
+		/* Mark as dropped */
+		name_drop(i_ptr);
+
+		/* Modify weight */
+		modify_weight(i_ptr,i_ptr->name3);
+
 		/* Apply some "low-level" magic (no artifacts unless reward) */
 		apply_magic(i_ptr, level, FALSE, FALSE, FALSE);
 

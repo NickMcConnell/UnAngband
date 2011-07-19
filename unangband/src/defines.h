@@ -675,9 +675,17 @@ enum
 {
 	/* First 32 timed effects can restrict some commands from being used */
 	TMD_DEC_STR = 0, TMD_DEC_INT, TMD_DEC_WIS, TMD_DEC_DEX, TMD_DEC_CON, TMD_DEC_CHR, TMD_DEC_AGI, TMD_DEC_SIZ, /* 8 */
-	TMD_SLOW, TMD_BLIND, TMD_PARALYZED, TMD_CONFUSED, /* 12 */
-	TMD_AFRAID, TMD_IMAGE, TMD_POISONED, TMD_CUT, TMD_STUN, TMD_CURSED, TMD_AMNESIA, TMD_PETRIFY, TMD_STASTIS, /* 21 */
-	TMD_MSLEEP, TMD_PSLEEP, TMD_BERSERK, TMD_DAZED, TMD_TERROR, TMD_SOAKED, TMD_AGGRAVATE, TMD_STENCH, /* 29 */
+	TMD_SLOW, TMD_BLIND, TMD_PARALYZED, TMD_CONFUSED, TMD_AFRAID, TMD_IMAGE, TMD_POISONED, TMD_CUT, TMD_STUN, /* 17 */
+	TMD_DAZED, TMD_TERROR, TMD_SOAKED, TMD_AGGRAVATE, TMD_STENCH, TMD_PETRIFY, /* 23 */
+
+	/* From here is removed by dispelling (see define below). */
+	TMD_CURSED, TMD_AMNESIA, TMD_STASTIS, TMD_MSLEEP, /* 27 */
+
+	/* Special timer used for helping the player sleep */
+	TMD_PSLEEP,
+
+	/* Mixed effects from here on. */
+	TMD_BERSERK, /* 29 */
 	TMD_WORD_RECALL, TMD_WORD_RETURN, TMD_DELAY_SPELL, /* 32 */
 	
 	/* Useful effects from here on */
@@ -690,6 +698,7 @@ enum
 };
 
 #define TMD_CONDITION_MAX 32
+#define TMD_DISPEL_MIN	TMD_CURSED
 
 
 /*
@@ -781,7 +790,7 @@ enum
 #define RACE_BAT          	37
 #define RACE_SERPENT          	38
 #define RACE_CAT          	39
-
+#define RACE_MAX			40
 
 /*** Screen Locations ***/
 
@@ -1102,8 +1111,17 @@ enum
 #define GF_VAMP_DRAIN_FAMILIAR	162
 #define GF_MANA_DRAIN_FAMILIAR	163
 #define GF_DRAIN_LIFE_PERC   164
-
-
+#define GF_DRAIN_BLOOD	165
+#define GF_DRAIN_BLOOD_FAMILIAR	166
+#define GF_VAMP_DRAIN_BLOOD	167
+#define GF_LOSE_SIZ     168
+#define GF_LOSE_AGI     169
+#define GF_LOSE_BODY	170
+#define GF_LOSE_MIND	171
+#define GF_LOSE_STR_SIZ	172
+#define GF_LOSE_INT_WIS	173
+#define GF_LOSE_DEX_AGI	174
+#define GF_LOSE_CON_CHR	175
 
 /*
  * Columns for the spell cost or damage flags
@@ -2004,6 +2022,7 @@ enum
 #define TV_FLASK 77
 #define TV_MUSHROOM	79
 #define TV_FOOD  80
+#define TV_MONSTER_FOOD 81
 #define TV_STUDY	85
 #define TV_MAGIC_BOOK   90
 #define TV_PRAYER_BOOK  91
@@ -2637,7 +2656,15 @@ enum
 #define SV_FOOD_SPRIG_OF_ATHELAS	        43
 
 
+/*
+ * Special "sval" limit -- last nonliving monster food
+ */
+#define SV_MONSTER_FOOD_MAX_NONLIVING	4
 
+/*
+ * Special "sval" limit -- first monster cut 'on the bone'
+ */
+#define SV_MONSTER_FOOD_MIN_BONE	34
 
 /*
  * Special "sval" limit -- last "normal" lite
@@ -2684,91 +2711,22 @@ enum
  */
 #define MAX_METHOD_DESCRIPTIONS	10
 
+
 /*
- * New monster blow methods
+ * Some 'legacy' fixed blow values which have been repurposed or hard-coded
  */
-#define RBM_HIT		1
-#define RBM_TOUCH		2
-#define RBM_PUNCH		3
-#define RBM_KICK		4
-#define RBM_CLAW 		5
-#define RBM_BITE 		6
-#define RBM_STING       7
-#define RBM_VOMIT       8
-#define RBM_BUTT 		9
-#define RBM_CRUSH       10
-#define RBM_ENGULF      11
-#define RBM_PECK		12
-#define RBM_CRAWL       13
-#define RBM_DROOL       14
-#define RBM_SLIME		15
-#define RBM_SPIT		16     /* Minimum ranged attacks */
-#define RBM_GAZE 		17
-#define RBM_WAIL 		18
-#define RBM_SPORE       19
-#define RBM_LASH		20
-#define RBM_BEG  		21
-#define RBM_INSULT      22
-#define RBM_MOAN 		23
-#define RBM_SING		24	/* Maximum normal attacks */
-#define RBM_TRAP 		25
-#define RBM_BOULDER       26
-#define RBM_AURA 		27
-#define RBM_SELF 		28
-#define RBM_ADJACENT    29
-#define RBM_HANDS       30
-#define RBM_MISSILE     31
-#define RBM_BOLT_10     32		/* Spell bolt - 10% chance of beam*/
-#define RBM_BOLT 		33	/* Spell bolt */
-#define RBM_BEAM 		34
-#define RBM_BLAST       35
-#define RBM_WALL 		36
-#define RBM_BALL 		37
-#define RBM_CLOUD       38
-#define RBM_STORM       39
-#define RBM_BREATH      40
-#define RBM_AREA 		41
-#define RBM_LOS  		42
-#define RBM_LINE 		43
-#define RBM_AIM  		44
-#define RBM_ORB  		45
-#define RBM_STAR 		46
-#define RBM_SPHERE	47
-#define RBM_PANEL		48
-#define RBM_LEVEL		49
-#define RBM_CROSS       50
-#define RBM_STRIKE      51
+#define RBM_TOUCH	2
+#define	RBM_VOMIT	8
+#define	RBM_SPIT	16
+#define RBM_TRAP	25
+#define RBM_AURA	27
+#define RBM_SELF	28
+#define RBM_AIM		44
 #define RBM_EXPLODE	52
 #define RBM_ARROW	53
-#define RBM_XBOLT	54		/* Crossbow bolt */
-#define RBM_DART	55
 #define RBM_DAGGER	56
-#define RBM_SHOT 	57
-#define RBM_ARC_20	58
-#define RBM_ARC_30	59
-#define RBM_ARC_40	60
-#define RBM_ARC_50	61
-#define RBM_ARC_60	62
-#define RBM_FLASK	63
 #define RBM_TRAIL	64
-#define RBM_SHRIEK	65
-#define RBM_BOLT_MINOR	66
-#define RBM_BALL_MINOR	67
-#define RBM_BALL_II	68
-#define RBM_BALL_III	69
-#define RBM_AURA_MINOR	70
-#define RBM_8WAY	71
-#define RBM_8WAY_II	72
-#define RBM_8WAY_III	73
-#define RBM_SWARM	74
-#define RBM_SPIKE	75
-#define RBM_AIM_AREA	76
-#define RBM_SCATTER		77
-#define RBM_HOWL 		78
-
-#define RBM_MAX_NORMAL  24
-#define RBM_MIN_RANGED  16
-
+#define RBM_AURA_MINOR	72
 
 /*** Function flags ***/
 
@@ -2881,18 +2839,15 @@ enum
 #define PR2_POWER_ARC			0x00400000
 #define PR2_ADD_AMMO	 		0x00800000
 
-/* Attack can fail */
-#define PR2_FAIL				0x01000000
-#define PR2_EYESIGHT			0x02000000
-#define PR2_SCALE_AMMO			0x04000000
-
 /* Irregular attacks */
+#define PR2_EAT					0x01000000	/* Applied if the monster body is eaten */
+#define PR2_EYESIGHT			0x02000000	/* Requires the monster is visible */
+#define PR2_SCALE_AMMO			0x04000000	/* Scale ammunition chosen */
 #define PR2_SPECIAL_CASE		0x08000000	/* Special case in the code */
 #define PR2_SCATTER				0x10000000
 #define PR2_AUTOMATIC			0x20000000
-#define PR2_SUMMON				0x40000000
-#define PR2_NO_ECOLOGY			0x80000000	/* Switch off monster ecology */
-
+#define PR2_SUMMON				0x40000000	/* Summoning spell */
+#define PR2_NO_ECOLOGY			0x80000000	/* Switch off monster ecology when summoning */
 
 /* Flags for regions */
 #define RE1_TRIGGER_MOVE		0x00000001	/* Trigger attack when moving into region */
@@ -2991,29 +2946,31 @@ enum
 #define SOURCE_PLAYER_SPORE		-19
 #define SOURCE_PLAYER_COATING	-20
 #define SOURCE_PLAYER_EAT_MONSTER	-21
-#define SOURCE_PLAYER_VAMP_DRAIN	-22
-#define SOURCE_PLAYER_EAT_UNKNOWN	-23
-#define SOURCE_PLAYER_QUAFF_UNKNOWN	-24
-#define SOURCE_PLAYER_READ_UNKNOWN	-25
-#define SOURCE_PLAYER_EAT		-26
-#define SOURCE_PLAYER_QUAFF		-27
-#define SOURCE_PLAYER_AIM		-28	/* Wands */
-#define SOURCE_PLAYER_ZAP		-29	/* Rods - with target specified */
-#define SOURCE_PLAYER_ZAP_NO_TARGET		-30	/* Rods - with no target specified */
-#define SOURCE_PLAYER_READ		-31
-#define SOURCE_PLAYER_USE		-32	/* Staffs*/
-#define SOURCE_PLAYER_ACT_ARTIFACT	-33
-#define SOURCE_PLAYER_ACT_EGO_ITEM	-34
-#define SOURCE_PLAYER_ACTIVATE	-35
-#define SOURCE_PLAYER_SERVICE	-36
-#define SOURCE_PLAYER_WIZARD	-37
-#define SOURCE_PLAYER_CAST		-38
-#define SOURCE_PLAYER_END		-39
+#define SOURCE_PLAYER_EAT_MONSTER_SAFE	-22
+#define SOURCE_PLAYER_VAMP_DRAIN	-23
+#define SOURCE_PLAYER_EAT_UNKNOWN	-24
+#define SOURCE_PLAYER_QUAFF_UNKNOWN	-25
+#define SOURCE_PLAYER_READ_UNKNOWN	-26
+#define SOURCE_PLAYER_EAT		-27
+#define SOURCE_PLAYER_EAT_SAFE	-28
+#define SOURCE_PLAYER_QUAFF		-29
+#define SOURCE_PLAYER_AIM		-30	/* Wands */
+#define SOURCE_PLAYER_ZAP		-31	/* Rods - with target specified */
+#define SOURCE_PLAYER_ZAP_NO_TARGET		-32	/* Rods - with no target specified */
+#define SOURCE_PLAYER_READ		-33
+#define SOURCE_PLAYER_USE		-34	/* Staffs*/
+#define SOURCE_PLAYER_ACT_ARTIFACT	-35
+#define SOURCE_PLAYER_ACT_EGO_ITEM	-36
+#define SOURCE_PLAYER_ACTIVATE	-37
+#define SOURCE_PLAYER_SERVICE	-38
+#define SOURCE_PLAYER_WIZARD	-39
+#define SOURCE_PLAYER_CAST		-40
+#define SOURCE_PLAYER_END		-41
 
 #define SOURCE_PREFIX			-11	/* Less than here or equal to here, we suffix the string, otherwise we prefix it */
 #define SOURCE_PLAYER_START		-13	/* Less than here or equal to here, player is the source, and gets experience */
-#define SOURCE_PLAYER_SAFE		-28	/* Less than here or equal to here, player cannot hurt themselves with safe attacks */
-#define SOURCE_PLAYER_NO_TARGET	-30	/* Less than here or equal to here, no target is specified and some messages are suppressed.
+#define SOURCE_PLAYER_SAFE		-30	/* Less than here or equal to here, player cannot hurt themselves with safe attacks */
+#define SOURCE_PLAYER_NO_TARGET	-32	/* Less than here or equal to here, no target is specified and some messages are suppressed.
 									 * Note that all items less than here that could specify a target always have a 'known' effect. */
 
 #define SOURCE_MESSAGES	4

@@ -2325,7 +2325,7 @@ static bool spell_desc_blows(const spell_type *s_ptr, const char *intro, int lev
 		switch(target)
 		{
 			case SPELL_TARGET_SELF:
-				if ((method!= RBM_SPIT) && (method != RBM_BREATH) && (method!= RBM_VOMIT)) method = RBM_SELF;
+				if ((method != RBM_SPIT) && (method != RBM_VOMIT) && ((method_info[method].flags2 & (PR2_BREATH)) == 0)) method = RBM_SELF;
 				break;
 
 			case SPELL_TARGET_AIMED:
@@ -4093,7 +4093,7 @@ void list_object(const object_type *o_ptr, int mode)
 	f6 = k_info[o_ptr->k_idx].flags6;
 
 	/* Basic abilities -- damage/ damage multiplier */
-	if (!random && object_ability(o_ptr, ABILITY_DAMAGE_DICE) && object_ability(o_ptr, ABILITY_DAMAGE_SIDES))
+	if (!random && object_aval(o_ptr, ABILITY_DAMAGE_DICE) && object_aval(o_ptr, ABILITY_DAMAGE_SIDES))
 	{
 		bool throw_it = TRUE;
 		bool throw_it_good = ((f0[2] & ((1L << (ABILITY_HURL_DAM % 32)) | (1L << (ABILITY_HURL_NUM % 32)))) != 0) || ((f3 & TR3_THROWING) != 0);

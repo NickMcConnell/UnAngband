@@ -14,10 +14,10 @@
 V:0.6.4
 
 # Maximum number of method/blow types
-M:m:229
+M:m:231
 
 # Maximum number of effect types
-M:e:165
+M:e:176
 
 # Maximum number of feature types
 M:F:1011
@@ -26,7 +26,7 @@ M:F:1011
 M:D:900
 
 # Maximum number of object kinds
-M:K:1018
+M:K:1059
 
 # Maximum number of standard artifacts
 M:a:137

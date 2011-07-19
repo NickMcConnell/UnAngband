@@ -295,6 +295,14 @@ bool item_tester_hook_food_edible(const object_type *o_ptr)
 			if (!(p_ptr->cur_flags4 & TR4_UNDEAD)) return (TRUE);
 			break;
 
+		/* Monster food can be eaten by anyone except undead */
+	    case TV_MONSTER_FOOD:
+			/* Undead cannot eat cooked food */
+			if (p_ptr->cur_flags4 & (TR4_UNDEAD)) return (FALSE);
+
+			return (TRUE);
+
+			break;
 
 		/* Eggs can be eaten by animals and hungry people */
 		case TV_EGG:
@@ -337,6 +345,15 @@ bool item_tester_hook_food_edible(const object_type *o_ptr)
 
 
 /*
+ * Cures the player of various ills. See feed_monster for examples.
+ */
+void feed_player_more(int food)
+{
+
+}
+
+
+/*
  * The player eats some food
  */
 bool player_eat_food(int item)
@@ -353,6 +370,9 @@ bool player_eat_food(int item)
 
 	/* Must be true to let us cancel */
 	bool cancel = TRUE;
+
+	/* Gets extra nutrition and can never be killed, and takes less damage from eating things */
+	bool good_eater = ((p_ptr->pshape == RACE_HOBBIT) || (p_ptr->pshape == RACE_STONE_TROLL) || (p_ptr->pshape == RACE_GOAT) || (p_ptr->pshape == RACE_VAMPIRE));
 
 	/* Get the item (in the pack) */
 	if (item >= 0)
@@ -399,7 +419,7 @@ bool player_eat_food(int item)
 			if (power < 0) return (FALSE);
 
 			/* Apply food effect */
-			if (process_spell(object_aware_p(o_ptr) ? SOURCE_PLAYER_EAT : SOURCE_PLAYER_EAT_UNKNOWN,
+			if (process_spell(good_eater ? SOURCE_PLAYER_EAT_SAFE : (object_aware_p(o_ptr) ? SOURCE_PLAYER_EAT : SOURCE_PLAYER_EAT_UNKNOWN),
 					o_ptr->k_idx, power,0,&cancel,&ident, TRUE)) ident = TRUE;
 
 			/* Parania */
@@ -443,15 +463,117 @@ bool player_eat_food(int item)
 
 		default:
 		{
-			/* First, apply breath weapon attack */
+			int i;
+			monster_race *r_ptr = &r_info[o_ptr->name3];
+			bool make_rations = FALSE;
 
-			/* Then apply touch attack */
-			mon_blow_ranged(SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, RBM_TOUCH, 0, PROJECT_HIDE | PROJECT_PLAY);
+			/* We're eating well */
+			if (good_eater)
+			{
+				/* Undead only safe to eat if undead or correctly prepared */
+				if (((r_ptr->flags3 & (RF3_UNDEAD)) != 0) && ((p_ptr->cur_flags4 & (TR4_UNDEAD)) == 0))
+				{
+					good_eater = FALSE;
+				}
 
-			/* Then apply spore attack */
-			mon_blow_ranged(SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, RBM_SPORE, 0, PROJECT_HIDE | PROJECT_PLAY);
+				/* Hack -- goats are vegetarian. We use a 'broad' definition of vegetarian to include stupid monsters which are not otherwise known to be
+				 * a particular race. */
+				if ((p_ptr->pshape == RACE_GOAT) && ((r_ptr->flags3 & (RF3_PLANT)) == 0) && (((r_ptr->flags2 & (RF2_STUPID)) == 0) ||
+					 ((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT | RF3_DRAGON | RF3_DEMON | RF3_INSECT)) != 0) ||
+								((r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) != 0)))
+				{
+					good_eater = FALSE;
+				}
 
-			/* Parania */
+				/* Hack -- undead are carnivores */
+				if (((p_ptr->cur_flags4 & (TR4_UNDEAD)) == 0) && ((r_ptr->flags3 & (RF3_PLANT)) != 0))
+				{
+					good_eater = FALSE;
+				}
+			}
+
+			/* Monster food is delicious. We use a fixed seed so that a particular way of preparing a monster
+			 * is always harmful or safe, and when we implement skills, increasing skill makes more ways of
+			 * preparing a particular monster safely. Note that hobbits, vampires, trolls and goats are
+			 * capable of eating food safely without preparing it, but vampires and goats have restrictions on
+			 * what kinds of food this applies to. */
+			if (o_ptr->tval == TV_MONSTER_FOOD)
+			{
+				int flavor;
+
+				/* Hack -- Use the "simple" RNG */
+				Rand_quick = TRUE;
+
+				/* Hack -- Induce consistent flavors */
+				Rand_value = seed_flavor + o_ptr->name3 + o_ptr->sval * z_info->r_max;
+
+				/* Get the first random value from fixed seed. Probably horribly biased. */
+				flavor = randint(100 /* TODO: Use cooking skill, or alchemy skill for nonliving monsters */);
+
+				/* Hack -- Use the "complex" RNG */
+				Rand_quick = FALSE;
+
+				/* Hack -- monster dish has been prepared correctly? */
+				if (flavor > 10 + 2 * r_ptr->level)
+				{
+					good_eater = TRUE;
+				}
+				/* Merely edible */
+				else if (flavor > r_ptr->level)
+				{
+					/* Hack -- remaining food becomes rations. This simplifies food management after trying one of a stack. */
+					if (object_aval(o_ptr, ABILITY_WEIGHT) == 10) make_rations = TRUE;
+
+					break;
+				}
+				/* Otherwise we can poison ourselves */
+			}
+
+			/* Check for all attacks which can be 'eaten' */
+			for (i = 0; i < z_info->method_max; i++)
+			{
+				/* This attack applies if the monster is eaten */
+				if (method_info[i].flags2 & (PR2_EAT))
+				{
+					bool do_spell = FALSE;
+
+					/* Check the monster spells. Note we skip the first four 'fake' monster spells. */
+					if ((i >= 96) && (i < 96 + 4)) continue;
+					else if ((i >= 96) && (i < 128) && ((r_ptr->flags4 & (1L << (i - 96))) != 0)) do_spell = TRUE;
+					else if ((i >= 128) && (i < 160) && ((r_ptr->flags5 & (1L << (i - 128))) != 0)) do_spell = TRUE;
+					else if ((i >= 160) && (i < 192) && ((r_ptr->flags6 & (1L << (i - 160))) != 0)) do_spell = TRUE;
+					else if ((i >= 192) && (i < 224) && ((r_ptr->flags7 & (1L << (i - 192))) != 0)) do_spell = TRUE;
+
+					/* Applying a monster spell flag */
+					if (do_spell)
+					{
+						int dam;
+
+						/* Get damage for breath weapons */
+						if (method_info[i].flags2 & (PR2_BREATH))
+						{
+							/* Damage for average hit point version of monster. This is dangerous, so we reduce damage above a minimum level. */
+							dam = get_breath_dam(r_ptr->hp, i, (r_ptr->flags2 & (RF2_POWERFUL) ? TRUE : FALSE));
+
+							/* Reduce high damage to safer levels. This makes 1600 hp breath do 112 hp damage, or 39 hp damage if safely prepared. */
+							if (dam > 30) dam = 28 + (dam / 15);
+						}
+						else
+						{
+							/* Get spell damage */
+							dam = get_dam(r_ptr->spell_power, i, TRUE);
+						}
+
+						/* Apply the spell */
+						project(good_eater ? SOURCE_PLAYER_EAT_MONSTER_SAFE : SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, 0, 0, p_ptr->py, p_ptr->px,p_ptr->py, p_ptr->px, dam, method_info[i].d_res, PROJECT_HIDE | PROJECT_PLAY, 0, 0);
+					}
+
+					/* Apply the attacks if the monster has it */
+					mon_blow_ranged(good_eater ? SOURCE_PLAYER_EAT_MONSTER_SAFE : SOURCE_PLAYER_EAT_MONSTER, o_ptr->name3, p_ptr->py, p_ptr->px, i, 0, PROJECT_HIDE | PROJECT_PLAY);
+				}
+			}
+
+			/* Paranoia */
 			if (item >= 0)
 			{
 				item = find_item_to_reduce(item);
@@ -471,6 +593,15 @@ bool player_eat_food(int item)
 				if (!o_ptr->k_idx) return(!cancel);
 			}
 
+			/* Make rations? */
+			if (make_rations)
+			{
+				o_ptr->tval = TV_FOOD;
+				o_ptr->sval = SV_FOOD_RATION;
+				o_ptr->k_idx = lookup_kind(TV_FOOD, SV_FOOD_RATION);
+				o_ptr->name3 = 0;
+			}
+
 			break;
 		}
 	}
@@ -480,6 +611,12 @@ bool player_eat_food(int item)
 
 	/* Food can feed the player */
 	(void)set_food(p_ptr->food + o_ptr->charges * object_aval(o_ptr, ABILITY_WEIGHT));
+
+	/* Hack -- some foods feed the player more */
+	if (good_eater)
+	{
+		feed_player_more(o_ptr->charges * object_aval(o_ptr, ABILITY_WEIGHT));
+	}
 
 	/* Destroy a food in the pack */
 	if (item >= 0)

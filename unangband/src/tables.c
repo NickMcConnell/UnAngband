@@ -3310,7 +3310,7 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"an ancient curse", "a perpetual weakness", "a black pact", "the spoor of Morgoth"},	/* SOURCE_CURSED_ITEM */
 	{"being entombed by ", "being crushed by ", "being buried under ", "a falling cask of Amontillado stored by "},	/* SOURCE_ENTOMB */
 	{"blood debt for a slain ", "backlash for summoning a ", "a dark pact claimed by a dying ", "unearthly powers seeking vengeance on behalf of a "}, /* SOURCE_BLOOD_DEBT */
-	{"misjudging ", "treachery of ", "a knife in the back from ", "walking in front of the line of fire of "}, /* SOURCE_PLAYER_ALLY */
+	{"trusting ", "the treachery of ", "a knife in the back from ", "walking in front of the line of fire of "}, /* SOURCE_PLAYER_ALLY */
 	{"a swing, and a miss", "overenthusiasm", "a hellavu shaving cut", "hmmm... you're not quite sure how you hit that part of you"}, /* SOURCE_PLAYER_ATTACK */
 	{"a misfire","an unintended discharge","shooting your own foot","hmmm... you're not quite sure how you shot that part of you"}, /* SOURCE_PLAYER_SHOT */
 	{"a misthrow", "a fumble","juggling a dangerous object","hmmm... you're not quite sure how you threw that there"}, /* SOURCE_PLAYER_THROW */
@@ -3318,12 +3318,14 @@ const cptr cause_of_death[-SOURCE_PLAYER_END][SOURCE_MESSAGES] =
 	{"breaking ", "smashing ", "cracking open ", "shattering "}, /* SOURCE_PLAYER_BREAK */
 	{"sniffing ", "inhaling ", "snorting ", "getting addicted to "}, /* SOURCE_PLAYER_SPORE */
 	{"a nick from a weapon coated with ", "extract of ", "toxic ", "fumes reeking of "		}, /* SOURCE_PLAYER_COATING */
-	{"over cooking ", "undercooking ", "having a taste for ", "not cutting out the poisonous bits off "}, /* SOURCE_PLAYER_EAT_MONSTER */
+	{"taking a bite of ", "a diet of ", "having a taste for ", "not cutting out the poisonous bits off of "}, /* SOURCE_PLAYER_EAT_MONSTER */
+	{"a tasty snack of ", "the under appreciated flavours of ", "a deadly addiction to ", "dangerous gourmet tricks with "}, /* SOURCE_PLAYER_EAT_MONSTER_SAFE */
 	{"trying to draw health from ", "the eldritch power of ", "taking the place of ", "connecting to the Negative Plane through "}, /* SOURCE_PLAYER_VAMP_DRAIN */
 	{"nibbling ", "tasting ", "trying ", "an unknown allergy to "}, /* SOURCE_PLAYER_EAT_UNKNOWN */
 	{"sipping ", "sniffing ", "fumes from ", "not spitting out "}, /* SOURCE_PLAYER_QUAFF_UNKNOWN */
 	{"glancing at ", "casting your eyes over ", "browsing ", "looking sideways at "}, /* SOURCE_PLAYER_READ_UNKNOWN */
 	{"eating ", "chewing ", "choking on ", "indigestion from "}, /* SOURCE_PLAYER_EAT */
+	{"overseasoning ", "undercooking ", "broken glass in ", "a wafer thin after dinner mint with "}, /* SOURCE_PLAYER_EAT_SAFE */
 	{"quaffing ", "drinking ", "slurping ", "guzzling "}, /* SOURCE_PLAYER_QUAFF */
 	{"aiming ", "waving ", "pointing ", "holding the wrong end of "}, /* SOURCE_PLAYER_AIM */
 	{"zapping ", "plughing ", "xyzzying ", "holding the wrong end of "}, /* SOURCE_PLAYER_ZAP */

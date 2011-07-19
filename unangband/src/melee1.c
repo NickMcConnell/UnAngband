@@ -2101,8 +2101,8 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 			}
 		}
 
-		/* Check for spell failure (breath/shot attacks never fail) */
-		if (method_ptr->flags2 & (PR2_FAIL))
+		/* Check for spell failure (breath/innate/shot attacks never fail) */
+		if (((method_ptr->flags1 & (PROJECT_MISS)) == 0) && ((method_ptr->flags2 & (PR2_BREATH | PR2_INNATE)) == 0))
 		{
 			/* Calculate spell failure rate */
 			int failrate = 25 - (rlev + 3) / 4;

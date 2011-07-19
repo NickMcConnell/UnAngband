@@ -403,8 +403,8 @@ T:paralyzation
 
 N:77:LOSE_STR
 I:0
-D:reduce~:strength and size from:::::
-T:weakness and smallness
+D:reduce~:strength from:::::
+T:weakness
 
 N:78:LOSE_INT
 I:0
@@ -418,8 +418,8 @@ T:naivity
 
 N:80:LOSE_DEX
 I:0
-D:reduce~:dexterity and agility from:::::
-T:clumsiness
+D:reduce~:dexterity from:::::
+T:fumbling
 
 N:81:LOSE_CON
 I:0
@@ -825,18 +825,73 @@ I:5
 D:appear~ to be safe ground::all but the wary::::
 T:illusion
 
-N:162:VAMP_DRAIN
+N:162:VAMP_DRAIN_FAMILIAR
 I:20
-D:drain~:health from::and give it to you:::
+D:drain~:health from::and give~ it to you:::
 T:stealing health
 
-N:163:MANA_DRAIN
+N:163:MANA_DRAIN_FAMILIAR
 I:20
-D:drain~:mana from::and give it to you::spell points:mana
+D:drain~:mana from::and give~ it to you::spell points:mana
 T:stealing mana
 
 N:164:DRAIN_LIFE_PERC
 I:20
 D:drain~:life from::::percent of hitpoints:% life
 T:life draining
+
+N:165:DRAIN_BLOOD
+I:20
+D:drain~:blood from:::::
+T:stealing blood
+
+N:166:DRAIN_BLOOD_FAMILIAR
+I:20
+D:drain~:blood from::and give~ it to you:::
+T:stealing health
+
+N:167:VAMP_DRAIN_BLOOD
+I:20
+D:drain~:blood from:::::
+T:stealing blood
+
+N:168:LOSE_SIZ
+I:0
+D:reduce~:size from:::::
+T:smallness
+
+N:169:LOSE_AGI
+I:0
+D:reduce~:agility from:::::
+T:clumsiness
+
+N:170:LOSE_BODY
+I:0
+D:reduce~:physical stats from:::::
+T:physical ruination
+
+N:171:LOSE_MIND
+I:0
+D:reduce~:mental stats from:::::
+T:mental ruination
+
+N:172:LOSE_STR_SIZ
+I:0
+D:reduce~:strength and size from:::::
+T:weakness and smallness
+
+N:173:LOSE_INT_WIS
+I:0
+D:reduce~:intelligence and wisdom from:::::
+T:stupidity and naivity
+
+N:174:LOSE_DEX_AGI
+I:0
+D:reduce~:dexterity and agility from:::::
+T:dexterity and agility
+
+N:175:LOSE_CON_CHR
+I:0
+D:reduce~:constitution and charisma from:::::
+T:constitution and charisma
 

@@ -242,7 +242,7 @@ static cptr method_info_flags2[] =
 	"MAGIC_MISSILE",
 	"POWER_ARC",
 	"ADD_AMMO",
-	"FAIL",
+	"EAT",
 	"EYESIGHT",
 	"SCALE_AMMO",
 	"SPECIAL_CASE",
@@ -8371,6 +8371,9 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_DARK:
 		case GF_SLOW:
 		case GF_DISPEL:
+		case GF_LOSE_DEX:
+		case GF_DRAIN_BLOOD:
+		case GF_DRAIN_BLOOD_FAMILIAR:
 		{
 			atk_dam += 10;
 			break;
@@ -8387,7 +8390,9 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_LOSE_STR:
 		case GF_LOSE_INT:
 		case GF_LOSE_WIS:
-		case GF_LOSE_DEX:
+		case GF_LOSE_AGI:
+		case GF_LOSE_INT_WIS:
+		case GF_LOSE_DEX_AGI:
 		case GF_HALLU:
 		case GF_PETRIFY:
 		{
@@ -8401,9 +8406,15 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_UN_BONUS:
 		case GF_UN_POWER:
 		case GF_LOSE_CON:
+		case GF_LOSE_CON_CHR:
+		case GF_LOSE_SIZ:
+		case GF_LOSE_STR_SIZ:
+		case GF_LOSE_MIND:
 		case GF_ANIM_DEAD:
 		case GF_ANIM_ELEMENT:
 		case GF_ANIM_OBJECT:
+		case GF_VAMP_DRAIN:
+		case GF_VAMP_DRAIN_FAMILIAR:
 		{
 			atk_dam += 30;
 			break;
@@ -8411,6 +8422,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		/*other bad effects - major*/
 		case GF_PARALYZE:
 		case GF_LOSE_ALL:
+		case GF_LOSE_BODY:
 		{
 			atk_dam += 40;
 			break;
@@ -8433,6 +8445,7 @@ static long eval_blow_effect(int effect, int atk_dam, int rlev)
 		case GF_TIME:
 		case GF_EXP_40:
 		case GF_EXP_80:
+		case GF_VAMP_DRAIN_BLOOD:
 		{
 			atk_dam += 2000 / (rlev + 1);
 			break;
@@ -9099,7 +9112,7 @@ static long eval_max_dam(monster_race *r_ptr)
 				if (freq < 10) freq = 10;
 
 				/* Hack -- aura frequency */
-				if (method == RBM_AURA)
+				if ((method == RBM_AURA) || (method == RBM_AURA_MINOR))
 				{
 					freq += 100;
 				}

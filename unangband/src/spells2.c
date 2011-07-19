@@ -5295,6 +5295,12 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
  */
 void change_shape(int shape)
 {
+	/* Paranoia */
+	if ((shape < 0) || (shape > RACE_MAX)) return;
+
+	/* Valid shape */
+	if (!strlen(p_name + p_info[shape].name)) return;
+
 	/* Set new shape */
 	p_ptr->pshape = shape;
 

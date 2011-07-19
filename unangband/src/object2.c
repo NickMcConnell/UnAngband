@@ -587,6 +587,7 @@ errr get_obj_num_prep(void)
 				case TV_STAFF:
 				case TV_WAND:
 				case TV_FOOD:
+				case TV_MONSTER_FOOD:
 				case TV_MUSHROOM:
 				{
 					if (object_level > level + 9) chance /= 3;
@@ -1814,6 +1815,7 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		case TV_EGG:
 		case TV_BONE:
 		case TV_BODY:
+		case TV_MONSTER_FOOD:
 		case TV_SKIN:
 		case TV_HOLD:
 		{
@@ -5020,7 +5022,7 @@ bool sense_magic(object_type *o_ptr, int sense_type, bool heavy, bool floor)
  */
 void apply_magic(object_type *o_ptr, int lev, bool okay, bool good, bool great)
 {
-	int i, j, k, rolls, f1, f2, power;
+	int i, k, rolls, f1, f2, power;
 
 
 	/* Maximum "level" for various things */
@@ -5452,6 +5454,8 @@ static bool (*get_mon_old_hook)(int r_idx);
 
 static int name_drop_k_idx;
 
+static bool name_drop_evil;
+
 static bool name_drop_okay(int r_idx)
 {
 	monster_race *r_ptr = &r_info[r_idx];
@@ -5518,6 +5522,20 @@ static bool name_drop_okay(int r_idx)
 		else if ((j_ptr->sval == SV_BODY_LEG) && !(r_ptr->flags8 & (RF8_HAS_LEG))) return (FALSE);
 		else if ((j_ptr->sval == SV_BODY_WING) && !(r_ptr->flags8 & (RF8_HAS_WING))) return (FALSE);
 		else if ((j_ptr->sval == SV_BODY_CLAW) && !(r_ptr->flags8 & (RF8_HAS_CLAW))) return (FALSE);
+	}
+	else if (j_ptr->tval == TV_MONSTER_FOOD)
+	{
+		/* If nonliving, don't generate most food */
+		if ((j_ptr->sval > SV_MONSTER_FOOD_MAX_NONLIVING) && (r_ptr->flags8 & (RF3_NONLIVING))) return (FALSE);
+
+		/* Skip cuts 'on the bone' if monster doesn't have bones */
+		if ((j_ptr->sval >= SV_MONSTER_FOOD_MIN_BONE) && !(r_ptr->flags8 & (RF8_HAS_SKELETON))) return (FALSE);
+
+		/* Skip non-plant/non-animal/non-insect/non-stupid monsters if we're not generating 'evil' food. Dragons are too good a meat supply to ignore.
+		 *  Don't eat hybrids. */
+		if ((!name_drop_evil) && (( ((r_ptr->flags3 & (RF3_PLANT | RF3_ANIMAL | RF3_INSECT | RF3_DRAGON | RF3_NONLIVING)) == 0) && ((r_ptr->flags2 & (RF2_STUPID)) == 0)) ||
+							  ((r_ptr->flags3 & (RF3_ORC | RF3_TROLL | RF3_GIANT | RF3_DEMON)) != 0) ||
+										((r_ptr->flags9 & (RF9_MAN | RF9_ELF | RF9_DWARF)) != 0))) return (FALSE);
 	}
 	else if (j_ptr->tval == TV_ASSEMBLY)
 	{
@@ -5650,8 +5668,8 @@ static void name_drop(object_type *j_ptr)
 #endif
 	/* Are we done? */
 	if ((j_ptr->tval != TV_BONE) && (j_ptr->tval != TV_EGG) && (j_ptr->tval != TV_STATUE)
-		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) &&
-		(j_ptr->tval != TV_HOLD) && (j_ptr->tval != TV_FLASK)) return;
+		&& (j_ptr->tval != TV_SKIN) && (j_ptr->tval != TV_BODY) && (j_ptr->tval != TV_MONSTER_FOOD)
+		&& (j_ptr->tval != TV_HOLD) && (j_ptr->tval != TV_FLASK)) return;
 
 	/* Hack -- only some flasks are flavoured */
 	if ((j_ptr->tval == TV_FLASK) && (j_ptr->sval != SV_FLASK_BLOOD) && (j_ptr->sval != SV_FLASK_SLIME)
@@ -5661,6 +5679,20 @@ static void name_drop(object_type *j_ptr)
 	if ((rand_int(100) < (30+ (p_ptr->depth * 2))) || (race_drop_idx))
 	{
 		bool old_ecology = cave_ecology.ready;
+		int old_depth = p_ptr->depth;
+
+		/* Is the monster carrying the item evil? */
+		if (race_drop_idx) r_idx = race_drop_idx;
+
+		/* If we're flavouring food, determine if 'evil' food is typical for level. Important: This must happen before we mess with the monster hooks below. */
+		else if (j_ptr->tval == TV_MONSTER_FOOD)
+		{
+			/* Generate monster appropriate for level */
+			r_idx = get_mon_num(monster_level);
+		}
+
+		/* Store if monster carrying item is evil */
+		name_drop_evil = (r_info[r_idx].flags3 & (RF3_EVIL)) != 0;
 
 		/* Store the old hook */
 		get_mon_old_hook = get_mon_num_hook;
@@ -5672,7 +5704,13 @@ static void name_drop(object_type *j_ptr)
 		name_drop_k_idx = j_ptr->k_idx;
 
 		/* Sometimes ignore the ecology */
-		if (rand_int(100) < 50) cave_ecology.ready = FALSE;
+		if (rand_int(100) < 50)
+		{
+			cave_ecology.ready = FALSE;
+
+			/* Generate shallower food. Note that this allows food from the town level to appear in the dungeon. */
+			if (j_ptr->tval == TV_MONSTER_FOOD) p_ptr->depth = rand_int(p_ptr->depth);
+		}
 
 		/* Prep the list */
 		get_mon_num_prep();
@@ -5688,6 +5726,9 @@ static void name_drop(object_type *j_ptr)
 
 		/* Reset the ecology */
 		cave_ecology.ready = old_ecology;
+
+		/* Reset the depth */
+		p_ptr->depth = old_depth;
 
 		/* Failure? */
 		if (!r_idx) return;
@@ -6135,6 +6176,7 @@ static bool kind_is_race(int k_idx)
 		/* Food */
 		case TV_FOOD:
 		case TV_MUSHROOM:
+		case TV_MONSTER_FOOD:
 		{
 			/* Hack -- monster equipment only has limited food */
 			if (hack_monster_equip & (RF8_DROP_FOOD)) return (FALSE);
@@ -6320,6 +6362,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 			/* Pick a random tval. */
 			switch (rand_int(15 + 5 * (object_level / 3)) + 3)
 			{
+				case 6: tval_drop_idx = TV_MONSTER_FOOD; break;
 				case 7:	tval_drop_idx = TV_FOOD; break;
 				case 8: tval_drop_idx = TV_MUSHROOM; break;
 				case 9: tval_drop_idx = TV_POTION; break;
@@ -6441,6 +6484,7 @@ bool make_object(object_type *j_ptr, bool good, bool great)
 		case TV_WAND:
 		case TV_FOOD:
 		case TV_MUSHROOM:
+		case TV_MONSTER_FOOD:
 		{
 			if (object_level > k_info[j_ptr->k_idx].level + 9) j_ptr->number = (byte)randint(5);
 			else if (object_level > k_info[j_ptr->k_idx].level + 4) j_ptr->number = (byte)randint(3);
@@ -7483,7 +7527,7 @@ bool break_near(object_type *j_ptr, int y, int x)
 					if (!method) break;
 
 					/* Skip if not spores */
-					if (method != RBM_SPORE) continue;
+					if ((method_info[method].ammo_tval != j_ptr->tval) || (method_info[method].ammo_sval != j_ptr->sval)) continue;
 
 					/* Message */
 					if (!i) msg_format("The %s explode%s.",o_name, (plural ? "" : "s"));

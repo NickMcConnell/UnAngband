@@ -593,6 +593,7 @@ extern bool item_tester_hook_activate(const object_type *o_ptr);
 extern bool item_tester_hook_apply(const object_type *o_ptr);
 extern bool item_tester_hook_coating(const object_type *o_ptr);
 extern int cmd_tester_rune_or_coating(int item);
+extern void feed_player_more(int food);
 extern bool player_eat_food(int item);
 extern bool player_quaff_potion(int item);
 extern bool player_read_scroll(int item);
