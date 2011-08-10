@@ -332,8 +332,9 @@ static void object_flags_aux(int mode, const object_type *o_ptr, u32b f0[ABILITY
 				case TR1_NO_PARALYZE:
 					(*f1) |= (TR1_NO_SLOW);
 					break;
-				case TR1_NO_PSLEEP:
-					(*f1) |= (TR1_NO_MSLEEP);
+				case TR1_CANT_SLEEP:
+					(*f1) |= (TR1_NO_SLEEP);
+					(*f3) |= (TR3_LIGHT_CURSE);
 					break;
 				case TR1_NO_TERROR:
 					(*f1) |= (TR1_NO_FEAR);
@@ -4132,7 +4133,7 @@ void list_object(const object_type *o_ptr, int mode)
 
 		if (throw_it)
 		{
-			text_out(format("does %dd%d", object_ability(o_ptr, ABILITY_DAMAGE_DICE), object_ability(o_ptr, ABILITY_DAMAGE_SIDES)));
+			text_out(format("does %dd%d", object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)));
 			if (object_bonus_p(o_ptr) || spoil)
 			{
 				if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) text_out(format("+%d", object_aval(o_ptr, ABILITY_TO_DAM)));
@@ -7185,36 +7186,37 @@ u32b slay_index(const s16b *ability, int ability_count)
 
 enum
 {
-	POWER_MELEE,
-	POWER_CHARGE,
-	POWER_SLING,
-	POWER_BOW,
-	POWER_XBOW,
-	POWER_GUN,
-	POWER_THROW,
-	POWER_TRAP,
-	POWER_UNARMED,
-	POWER_AMMO,
-	POWER_MAX
+	ATTACK_MELEE,
+	ATTACK_CHARGE,
+	ATTACK_SLING,
+	ATTACK_BOW,
+	ATTACK_XBOW,
+	ATTACK_GUN,
+	ATTACK_THROW,
+	ATTACK_TRAP,
+	ATTACK_UNARMED,
+	ATTACK_AMMO,
+	ATTACK_MAX
 };
 
 
 enum
 {
-	POWER2_DD,
-	POWER2_DS,
-	POWER2_ATTACKS,
-	POWER2_MAX_ATTACKS,
-	POWER2_TO_HIT,
-	POWER2_MAX_TO_HIT,
-	POWER2_TO_DAM,
-	POWER2_MAX_TO_DAM,
-	POWER2_MIGHT,
-	POWER2_MAX_MIGHT,
-	POWER2_CRIT,
-	POWER2_RANGE,
-	POWER2_MIN_RANGE,
-	POWER2_MAX
+	BONUS2_DD,
+	BONUS2_DS,
+	BONUS2_ATTACKS,
+	BONUS2_MAX_ATTACKS,
+	BONUS2_TO_HIT,
+	BONUS2_MAX_TO_HIT,
+	BONUS2_TO_DAM,
+	BONUS2_MAX_TO_DAM,
+	BONUS2_MULTIPLIER,
+	BONUS2_MAX_MULTIPLIER,
+	BONUS2_CRIT,
+	BONUS2_RANGE,
+	BONUS2_MIN_RANGE,
+	BONUS2_TO_AC,
+	BONUS2_MAX
 };
 
 
@@ -7224,23 +7226,122 @@ enum
  * on. We don't add power for e.g. unarmed combat from a bow, which means that bows with an unarmed combat bonus
  * "shouldn't" be generated.
  */
-static const s16b power_table[POWER_MAX][POWER2_MAX] =
+static const s16b attack_table[ATTACK_MAX][BONUS2_MAX] =
 {
-		{ 0, 0, ABILITY_BLOWS, 3, ABILITY_TO_HIT_MELEE, 9, ABILITY_TO_DAM_MELEE, 0, ABILITY_MELEE_MIGHT, 3, ABILITY_MELEE_CRIT, 0, 0},
-		{ 0, 0, ABILITY_CHARGE, 3, ABILITY_TO_HIT_MELEE, 9, ABILITY_TO_DAM_MELEE, 0, 0, 0, ABILITY_MELEE_CRIT, 0, 0},
-		{ 3, 5, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
-		{ 4, 6, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
-		{ 4, 7, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
-		{ 3, 5, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1},
-		{ 0, 0, ABILITY_HURL_NUM, 4, ABILITY_TO_HIT_THROW, 9, ABILITY_TO_DAM_THROW, 0, ABILITY_HURL_DAM, 4, ABILITY_HURL_CRIT, ABILITY_HURL_RANGE, 1},
-		{ 0, 0, ABILITY_TRAPS, 4, ABILITY_TO_HIT_TRAP, 9, ABILITY_TO_DAM_TRAP, 0, ABILITY_TRAP_MIGHT, 4, ABILITY_TRAP_CRIT, ABILITY_TRAP_RANGE, 1},
-		{ 0, 0, ABILITY_STRIKES, 4, ABILITY_TO_HIT_UNARM, 9, ABILITY_TO_DAM_UNARM, 0, ABILITY_UNARM_MIGHT, 4, ABILITY_UNARM_CRIT, 0, 0},
-		{ 0, 0, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 0, ABILITY_MIGHT, 4, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1}
+		{ 0, 0, ABILITY_BLOWS, 3, ABILITY_TO_HIT_MELEE, 9, ABILITY_TO_DAM_MELEE, 0, ABILITY_MELEE_MIGHT, 3, ABILITY_MELEE_CRIT, 0, 0, ABILITY_TO_AC_MELEE},
+		{ 0, 0, ABILITY_CHARGE, 3, ABILITY_TO_HIT_MELEE, 9, ABILITY_TO_DAM_MELEE, 0, 0, 0, ABILITY_MELEE_CRIT, 0, 0, ABILITY_TO_AC_MELEE},
+		{ 3, 5, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1, ABILITY_TO_AC_RANGED},
+		{ 4, 6, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1, ABILITY_TO_AC_RANGED},
+		{ 4, 7, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1, ABILITY_TO_AC_RANGED},
+		{ 3, 5, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 9, ABILITY_MIGHT, 3, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1, ABILITY_TO_AC_RANGED},
+		{ 0, 0, ABILITY_HURL_NUM, 4, ABILITY_TO_HIT_THROW, 9, ABILITY_TO_DAM_THROW, 0, ABILITY_HURL_DAM, 4, ABILITY_HURL_CRIT, ABILITY_HURL_RANGE, 1, ABILITY_TO_AC_RANGED},
+		{ 0, 0, ABILITY_TRAPS, 4, ABILITY_TO_HIT_TRAP, 9, ABILITY_TO_DAM_TRAP, 0, ABILITY_TRAP_MIGHT, 4, ABILITY_TRAP_CRIT, ABILITY_TRAP_RANGE, 1, ABILITY_TO_AC_RANGED},
+		{ 0, 0, ABILITY_STRIKES, 4, ABILITY_TO_HIT_UNARM, 9, ABILITY_TO_DAM_UNARM, 0, ABILITY_UNARM_MIGHT, 4, ABILITY_UNARM_CRIT, 0, 0, ABILITY_TO_AC_MELEE},
+		{ 0, 0, ABILITY_SHOTS, 3, ABILITY_TO_HIT_BOW, 9, ABILITY_TO_DAM_BOW, 0, ABILITY_MIGHT, 4, ABILITY_BOW_CRIT, ABILITY_BOW_RANGE, 1, ABILITY_TO_AC_RANGED}
 };
 
 #define AVG_DAM_UNCORRECTED(x,y) ((x) * (((y) > 1) ? ((y) + 1) : (y)) * (((y) > 1) ? 1 : 2))
 
 #define AVG_DAM(x,y) ((x) * (((y) > 1) ? ((y) + 1) : (y)) / (((y) > 1) ? 2 : 1))
+
+
+/*
+ * Returns to hit, to damage etc. bonus, depending on attack and bonus2 type.
+ * If attack is set to ATTACK_MAX, it returns the highest to hit, to dam, to ac bonus instead.
+ * If bonus2 is set to BONUS2_MAX, it returns armour class.
+ */
+static s16b object_bonus2(const object_type *o_ptr, int attack, int bonus2)
+{
+	int i;
+	int bonus = attack == ATTACK_MAX ? -9999 : 0;
+
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		/* Highest to hit bonus */
+		if (attack == ATTACK_MAX)
+		{
+			switch(ability_bonus[o_ptr->ability[i]].type)
+			{
+				case BONUS_TO_HIT:
+				case BONUS_WEAPON_TO_HIT:
+				case BONUS_ADD_WEAPON_SKILL:
+					if (bonus2 == BONUS2_TO_HIT) bonus = MAX(bonus, object_aval(o_ptr, o_ptr->ability[i])
+							+ (o_ptr->ability[i] == ABILITY_TO_HIT ? 0 : object_aval(o_ptr, ABILITY_TO_HIT)));
+					break;
+				case BONUS_TO_DAM:
+				case BONUS_WEAPON_TO_DAM:
+					if (bonus2 == BONUS2_TO_DAM) bonus = MAX(bonus, object_aval(o_ptr, o_ptr->ability[i])
+							+ (o_ptr->ability[i] == ABILITY_TO_DAM ? 0 : object_aval(o_ptr, ABILITY_TO_DAM)));
+					break;
+				case BONUS_TO_AC:
+					if (bonus2 == BONUS2_TO_AC) bonus = MAX(bonus, object_aval(o_ptr, o_ptr->ability[i])
+							+ (o_ptr->ability[i] == ABILITY_TO_AC ? 0 : object_aval(o_ptr, ABILITY_TO_AC)));
+					break;
+/*
+				case BONUS_AC:
+					if (bonus2 == BONUS2_AC) bonus = MAX(bonus, object_aval(o_ptr, o_ptr->ability[i])
+							+ (o_ptr->ability[i] == ABILITY_AC ? 0 : object_aval(o_ptr, ABILITY_AC)));
+					break;
+*/
+			}
+		}
+		/* Accumulate 'specific' bonus */
+		else if (o_ptr->ability[i] == attack_table[attack][bonus2])
+		{
+			bonus += o_ptr->aval[i];
+		}
+		/* Accumulate 'global' bonus */
+		else if ((o_ptr->ability[i] == ABILITY_TO_HIT) && (bonus2 == BONUS2_TO_HIT))
+		{
+			bonus += o_ptr->aval[i];
+		}
+		/* Accumulate 'global' bonus */
+		else if ((o_ptr->ability[i] == ABILITY_TO_DAM) && (bonus2 == BONUS2_TO_DAM))
+		{
+			bonus += o_ptr->aval[i];
+		}
+		/* Accumulate 'global' bonus */
+		else if ((o_ptr->ability[i] == ABILITY_TO_AC) && (bonus2 == BONUS2_TO_AC))
+		{
+			bonus += o_ptr->aval[i];
+		}
+/*
+		else if ((o_ptr->ability[i] == ABILITY_AC) && (bonus2 == BONUS2_AC))
+		{
+			bonus += o_ptr->aval[i];
+		}
+*/
+	}
+
+	/* Paranoia */
+	if (bonus == -9999) bonus = 0;
+
+	return (bonus);
+}
+
+/*
+ * Externally accessible version of the above function
+ */
+s16b object_to_h(const object_type *o_ptr, int attack)
+{
+	return (object_bonus2(o_ptr, attack, BONUS2_TO_HIT));
+}
+
+/*
+ * Externally accessible version of the above function
+ */
+s16b object_to_d(const object_type *o_ptr, int attack)
+{
+	return (object_bonus2(o_ptr, attack, BONUS2_TO_DAM));
+}
+
+/*
+ * Externally accessible version of the above function
+ */
+s16b object_to_a(const object_type *o_ptr, int attack)
+{
+	return (object_bonus2(o_ptr, attack, BONUS2_TO_AC));
+}
 
 
 /*
@@ -7324,7 +7425,7 @@ s32b object_power(const object_type *o_ptr)
 	 * the q & r, checked for all possible ways the item can be
 	 * used to cause damage.
 	 */
-	for (i = 0; i < POWER_MAX; i++)
+	for (i = 0; i < ATTACK_MAX; i++)
 	{
 		s32b q = 0;
 		s32b r = 0;
@@ -7333,28 +7434,28 @@ s32b object_power(const object_type *o_ptr)
 		/* Ignore abilities on some items */
 		switch (i)
 		{
-			case POWER_MELEE:
-			case POWER_CHARGE:
+			case ATTACK_MELEE:
+			case ATTACK_CHARGE:
 				if ((f6 & (TR6_WEAPON)) == 0) continue;
 				if (o_ptr->tval == TV_BOW) continue;
 				break;
-			case POWER_SLING:
-			case POWER_BOW:
-			case POWER_XBOW:
-			case POWER_GUN:
+			case ATTACK_SLING:
+			case ATTACK_BOW:
+			case ATTACK_XBOW:
+			case ATTACK_GUN:
 				if (o_ptr->tval != TV_BOW) continue;
-				if ((o_ptr->sval / 10) != (i - POWER_SLING)) continue;
+				if ((o_ptr->sval / 10) != (i - ATTACK_SLING)) continue;
 				break;
-			case POWER_THROW:
+			case ATTACK_THROW:
 				if ((f3 & (TR3_THROWING)) == 0) continue;
 				break;
-			case POWER_UNARMED:
+			case ATTACK_UNARMED:
 				if ((f6 & (TR6_WEARABLE)) == 0) continue;
 				if (o_ptr->tval == TV_AMULET) continue;
 				if (o_ptr->tval == TV_BODY) continue;
 				if (o_ptr->tval == TV_CLOAK) continue;
 				break;
-			case POWER_AMMO:
+			case ATTACK_AMMO:
 				if ((f5 & (TR5_AMMO)) == 0) continue;
 				break;
 				
@@ -7362,9 +7463,9 @@ s32b object_power(const object_type *o_ptr)
 		}
 		
 		/* Get average damage - missile weapons*/
-		if ((power_table[i][POWER2_DD]) && (power_table[i][POWER2_DS]))
+		if ((attack_table[i][BONUS2_DD]) && (attack_table[i][BONUS2_DS]))
 		{
-			q = AVG_DAM_UNCORRECTED(power_table[i][POWER2_DD], power_table[i][POWER2_DS]);
+			q = AVG_DAM_UNCORRECTED(attack_table[i][BONUS2_DD], attack_table[i][BONUS2_DS]);
 			r = q;
 		}
 		/* Get average damage - other weapons*/
@@ -7375,71 +7476,71 @@ s32b object_power(const object_type *o_ptr)
 		}
 
 		/* Increased to hit chance? */
-		if (power_table[i][POWER2_TO_HIT])
+		if (attack_table[i][BONUS2_TO_HIT])
 		{
 			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
-			if (object_aval(o_ptr, power_table[i][POWER2_TO_HIT]) > power_table[i][POWER2_TO_HIT])
+			if (object_aval(o_ptr, attack_table[i][BONUS2_TO_HIT]) > attack_table[i][BONUS2_TO_HIT])
 			{
-				q += 4 * object_aval(o_ptr, power_table[i][POWER2_TO_HIT]) / 3;
+				q += 4 * object_aval(o_ptr, attack_table[i][BONUS2_TO_HIT]) / 3;
 			}
 			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
-			else if ((f0[power_table[i][POWER2_TO_HIT]/32] & (1L << (power_table[i][POWER2_TO_HIT]%32))) != 0)
+			else if ((f0[attack_table[i][BONUS2_TO_HIT]/32] & (1L << (attack_table[i][BONUS2_TO_HIT]%32))) != 0)
 			{
-				q += 4 * power_table[i][POWER2_MAX_TO_HIT] / 3;
+				q += 4 * attack_table[i][BONUS2_MAX_TO_HIT] / 3;
 			}
 			
 			/*** Base item ***/
 			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
-			if ((ability_base[power_table[i][POWER2_TO_HIT]]) > power_table[i][POWER2_TO_HIT])
+			if ((ability_base[attack_table[i][BONUS2_TO_HIT]]) > attack_table[i][BONUS2_TO_HIT])
 			{
-				r += 4 * ability_base[power_table[i][POWER2_TO_HIT]] / 3;
+				r += 4 * ability_base[attack_table[i][BONUS2_TO_HIT]] / 3;
 			}
 			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
-			else if ((kf0[power_table[i][POWER2_TO_HIT]/32] & (1L << (power_table[i][POWER2_TO_HIT]%32))) != 0)
+			else if ((kf0[attack_table[i][BONUS2_TO_HIT]/32] & (1L << (attack_table[i][BONUS2_TO_HIT]%32))) != 0)
 			{
-				r += 4 * power_table[i][POWER2_MAX_TO_HIT] / 3;
+				r += 4 * attack_table[i][BONUS2_MAX_TO_HIT] / 3;
 			}
 		}
 		
 		/* Increase power for to-hit - general to-hit bonus - if we exceed the maximum allowed */
-		if (object_aval(o_ptr, ABILITY_TO_HIT) > power_table[i][POWER2_MAX_TO_HIT])
+		if (object_aval(o_ptr, ABILITY_TO_HIT) > attack_table[i][BONUS2_MAX_TO_HIT])
 		{
 			q += 4 * object_aval(o_ptr, ABILITY_TO_HIT) / 3;
 		}
 		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
 		else if ((f0[ABILITY_TO_HIT/32] & (1L << (ABILITY_TO_HIT%32))) != 0)
 		{
-			q += 4 * (power_table[i][POWER2_MAX_TO_HIT]) / 3;
+			q += 4 * (attack_table[i][BONUS2_MAX_TO_HIT]) / 3;
 		}
 		
 		/*** Base item ***/
 		/* Increase power for to-hit - general to-hit bonus - if we exceed the maximum allowed */
-		if (ability_base[ABILITY_TO_HIT] > power_table[i][POWER2_MAX_TO_HIT])
+		if (ability_base[ABILITY_TO_HIT] > attack_table[i][BONUS2_MAX_TO_HIT])
 		{
 			q += 4 * ability_base[ABILITY_TO_HIT] / 3;
 		}
 		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
 		else if ((kf0[ABILITY_TO_HIT/32] & (1L << (ABILITY_TO_HIT%32))) != 0)
 		{
-			q += 4 * (power_table[i][POWER2_MAX_TO_HIT]) / 3;
+			q += 4 * (attack_table[i][BONUS2_MAX_TO_HIT]) / 3;
 		}
 		
 		
 		/* Multiply average damage? */
-		if (power_table[i][POWER2_MIGHT])
+		if (attack_table[i][BONUS2_MULTIPLIER])
 		{
 			/* Hack - for the moment include bow multiplier */
 			if (o_ptr->tval == TV_BOW) mult = bow_multiplier(o_ptr->sval);
 	
 			/* Get damage multiplier */
-			if ((object_aval(o_ptr, power_table[i][POWER2_MIGHT]) > power_table[i][POWER2_MAX_MIGHT]) || (object_aval(o_ptr, power_table[i][POWER2_MIGHT]) < 0))
+			if ((object_aval(o_ptr, attack_table[i][BONUS2_MULTIPLIER]) > attack_table[i][BONUS2_MAX_MULTIPLIER]) || (object_aval(o_ptr, attack_table[i][BONUS2_MULTIPLIER]) < 0))
 			{
 				p += 20000;	/* inhibit */
 				break;	/* don't overflow */
 			}
 			else
 			{
-				mult += object_aval(o_ptr, power_table[i][POWER2_MIGHT]);
+				mult += object_aval(o_ptr, attack_table[i][BONUS2_MULTIPLIER]);
 			}
 			
 			q *= mult;
@@ -7448,14 +7549,14 @@ s32b object_power(const object_type *o_ptr)
 			mult = 1;
 			
 			/* Get damage multiplier */
-			if ((ability_base[power_table[i][POWER2_MIGHT]] > power_table[i][POWER2_MAX_MIGHT]) || (ability_base[power_table[i][POWER2_MIGHT]] < 0))
+			if ((ability_base[attack_table[i][BONUS2_MULTIPLIER]] > attack_table[i][BONUS2_MAX_MULTIPLIER]) || (ability_base[attack_table[i][BONUS2_MULTIPLIER]] < 0))
 			{
 				p += 20000;	/* inhibit */
 				break;	/* don't overflow */
 			}
 			else
 			{
-				mult += ability_base[power_table[i][POWER2_MIGHT]];
+				mult += ability_base[attack_table[i][BONUS2_MULTIPLIER]];
 			}
 			
 			r *= mult;
@@ -7544,38 +7645,38 @@ s32b object_power(const object_type *o_ptr)
 		}
 
 		/* Increase average damage? */
-		if (power_table[i][POWER2_TO_DAM])
+		if (attack_table[i][BONUS2_TO_DAM])
 		{
 			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
-			if (object_aval(o_ptr, power_table[i][POWER2_TO_DAM]) > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+			if (object_aval(o_ptr, attack_table[i][BONUS2_TO_DAM]) > (attack_table[i][BONUS2_MAX_TO_DAM] ? attack_table[i][BONUS2_MAX_TO_DAM] :
 				AVG_DAM_UNCORRECTED(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES))))
 			{
-				q += 2 * object_aval(o_ptr, power_table[i][POWER2_TO_DAM]);
+				q += 2 * object_aval(o_ptr, attack_table[i][BONUS2_TO_DAM]);
 			}
 			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
-			else if ((f0[power_table[i][POWER2_TO_DAM]/32] & (1L << (power_table[i][POWER2_TO_DAM]%32))) != 0)
+			else if ((f0[attack_table[i][BONUS2_TO_DAM]/32] & (1L << (attack_table[i][BONUS2_TO_DAM]%32))) != 0)
 			{
-				q += 2 * (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+				q += 2 * (attack_table[i][BONUS2_MAX_TO_DAM] ? attack_table[i][BONUS2_MAX_TO_DAM] :
 					AVG_DAM_UNCORRECTED(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)));
 			}
 
 			/*** Base item ***/
 			/* Increase power for to-dam - power specific - if we exceed the maximum allowed */
-			if (ability_base[power_table[i][POWER2_TO_DAM]] > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+			if (ability_base[attack_table[i][BONUS2_TO_DAM]] > (attack_table[i][BONUS2_MAX_TO_DAM] ? attack_table[i][BONUS2_MAX_TO_DAM] :
 				AVG_DAM_UNCORRECTED(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES])))
 			{
-				r += 2 * ability_base[power_table[i][POWER2_TO_DAM]];
+				r += 2 * ability_base[attack_table[i][BONUS2_TO_DAM]];
 			}
 			/* Assume the maximum allowed for any lessor values- these can be enchanted up */
-			else if ((kf0[power_table[i][POWER2_TO_DAM]/32] & (1L << (power_table[i][POWER2_TO_DAM]%32))) != 0)
+			else if ((kf0[attack_table[i][BONUS2_TO_DAM]/32] & (1L << (attack_table[i][BONUS2_TO_DAM]%32))) != 0)
 			{
-				r += 2 * (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+				r += 2 * (attack_table[i][BONUS2_MAX_TO_DAM] ? attack_table[i][BONUS2_MAX_TO_DAM] :
 					AVG_DAM_UNCORRECTED(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES]));
 			}
 		}
 		
 		/* Increase power for to-dam - general to-dam bonus - if we exceed the maximum allowed */
-		if (object_aval(o_ptr, ABILITY_TO_DAM) > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+		if (object_aval(o_ptr, ABILITY_TO_DAM) > (attack_table[i][BONUS2_MAX_TO_DAM] ? attack_table[i][BONUS2_MAX_TO_DAM] :
 			AVG_DAM(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES))))
 		{
 			q += 2 * object_aval(o_ptr, ABILITY_TO_DAM);
@@ -7583,13 +7684,13 @@ s32b object_power(const object_type *o_ptr)
 		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
 		else if ((f0[ABILITY_TO_DAM/32] & (1L << (ABILITY_TO_DAM%32))) != 0)
 		{
-			q += 2 * (power_table[i][POWER2_TO_DAM] ? power_table[i][POWER2_TO_DAM] :
+			q += 2 * (attack_table[i][BONUS2_TO_DAM] ? attack_table[i][BONUS2_TO_DAM] :
 				AVG_DAM(object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)));
 		}
 		
 		/*** Base item ***/
 		/* Increase power for to-dam - general to-dam bonus - if we exceed the maximum allowed */
-		if (ability_base[ABILITY_TO_DAM] > (power_table[i][POWER2_MAX_TO_DAM] ? power_table[i][POWER2_MAX_TO_DAM] :
+		if (ability_base[ABILITY_TO_DAM] > (attack_table[i][BONUS2_MAX_TO_DAM] ? attack_table[i][BONUS2_MAX_TO_DAM] :
 			AVG_DAM(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES])))
 		{
 			r += 2 * object_aval(o_ptr, ABILITY_TO_DAM);
@@ -7597,25 +7698,25 @@ s32b object_power(const object_type *o_ptr)
 		/* Assume the maximum allowed for any lessor values- these can be enchanted up */
 		else if ((kf0[ABILITY_TO_DAM/32] & (1L << (ABILITY_TO_DAM%32))) != 0)
 		{
-			r += 2 * (power_table[i][POWER2_TO_DAM] ? power_table[i][POWER2_TO_DAM] : AVG_DAM(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES]));
+			r += 2 * (attack_table[i][BONUS2_TO_DAM] ? attack_table[i][BONUS2_TO_DAM] : AVG_DAM(ability_base[ABILITY_DAMAGE_DICE], ability_base[ABILITY_DAMAGE_SIDES]));
 		}
 
 		/* Increase average crits? */
-		if (power_table[i][POWER2_CRIT])
+		if (attack_table[i][BONUS2_CRIT])
 		{
 			/* TODO: Need to check the relative 'value' of crits */
-			q += object_aval(o_ptr, power_table[i][POWER2_CRIT]);
+			q += object_aval(o_ptr, attack_table[i][BONUS2_CRIT]);
 			
-			r += ability_base[power_table[i][POWER2_CRIT]];
+			r += ability_base[attack_table[i][BONUS2_CRIT]];
 		}
 		
 		/* Increase average damage? */
-		if (power_table[i][POWER2_RANGE])
+		if (attack_table[i][BONUS2_RANGE])
 		{
 			int range = 6, div;
 			
 			/* Calculate throwing range instead */
-			if (i == POWER_THROW)
+			if (i == ATTACK_THROW)
 			{
 				/* Extract a "distance multiplier" */
 				mult = is_throwing_item(o_ptr) ? 10 : 3;
@@ -7631,11 +7732,11 @@ s32b object_power(const object_type *o_ptr)
 			}
 			
 			/* TODO: Need to check the relative 'value' of range */
-			q += (range + object_aval(o_ptr, power_table[i][POWER2_RANGE])) * q / 10;
+			q += (range + object_aval(o_ptr, attack_table[i][BONUS2_RANGE])) * q / 10;
 			
 			/*** Base item ***/
 			/* Calculate throwing range instead */
-			if (i == POWER_THROW)
+			if (i == ATTACK_THROW)
 			{
 				/* Extract a "distance multiplier" */
 				mult = is_throwing_item(o_ptr) ? 10 : 3;
@@ -7651,13 +7752,13 @@ s32b object_power(const object_type *o_ptr)
 			}			
 
 			/*** Base item ***/
-			r += (range + ability_base[power_table[i][POWER2_RANGE]]) * r / ((kf3 & TR3_THROWING) ? 10 : 3);
+			r += (range + ability_base[attack_table[i][BONUS2_RANGE]]) * r / ((kf3 & TR3_THROWING) ? 10 : 3);
 		}
 
 		/* Multiply total damage? */
-		if ((power_table[i][POWER2_ATTACKS]) || (i == POWER_MELEE) || (i == POWER_THROW))
+		if ((attack_table[i][BONUS2_ATTACKS]) || (i == ATTACK_MELEE) || (i == ATTACK_THROW))
 		{
-			if (i == POWER_MELEE)
+			if (i == ATTACK_MELEE)
 			{
 				/* These values are calculated from the maximum possible blows from
 				 * a warrior for the weapon weight. It's much easier to hard code this. */
@@ -7665,23 +7766,23 @@ s32b object_power(const object_type *o_ptr)
 				else if (object_aval(o_ptr, ABILITY_WEIGHT) > 250) mult = 4;
 				else mult = 5;
 			}
-			else if (i == POWER_THROW) mult = 5;
+			else if (i == ATTACK_THROW) mult = 5;
 			else mult = 1;
 			
 			/* Get damage multiplier */
-			if ((object_aval(o_ptr, power_table[i][POWER2_ATTACKS]) > power_table[i][POWER2_MAX_ATTACKS]) || object_aval(o_ptr, power_table[i][POWER2_ATTACKS]) < 0)
+			if ((object_aval(o_ptr, attack_table[i][BONUS2_ATTACKS]) > attack_table[i][BONUS2_MAX_ATTACKS]) || object_aval(o_ptr, attack_table[i][BONUS2_ATTACKS]) < 0)
 			{
 				p += 20000;	/* inhibit */
 				break;
 			}
 			else
 			{
-				mult += object_aval(o_ptr, power_table[i][POWER2_ATTACKS]);
+				mult += object_aval(o_ptr, attack_table[i][BONUS2_ATTACKS]);
 			}
 			
 			q *= mult;
 			
-			if (i == POWER_MELEE)
+			if (i == ATTACK_MELEE)
 			{
 				/* These values are calculated from the maximum possible blows from
 				 * a warrior for the weapon weight. It's much easier to hard code this. */
@@ -7689,11 +7790,11 @@ s32b object_power(const object_type *o_ptr)
 				else if (ability_base[ABILITY_WEIGHT] > 250) mult = 4;
 				else mult = 5;
 			}
-			else if (i == POWER_THROW) mult = 5;
+			else if (i == ATTACK_THROW) mult = 5;
 			else mult = 1;
 			
 			/* Get damage multiplier */
-			mult += ability[power_table[i][POWER2_ATTACKS]];
+			mult += ability[attack_table[i][BONUS2_ATTACKS]];
 			
 			r *= mult;
 		}

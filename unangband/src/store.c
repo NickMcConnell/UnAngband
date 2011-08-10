@@ -571,6 +571,8 @@ static s16b label_to_store(int c, int store_index)
  */
 static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 {
+	int i;
+
 	/* Hack -- Identical items cannot be stacked */
 	if (o_ptr == j_ptr) return (0);
 
@@ -585,11 +587,6 @@ static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 
 	/* Different charges (etc) cannot be stacked */
 	if (o_ptr->charges != j_ptr->charges) return (0);
-
-	/* Require many identical values */
-	if (o_ptr->to_h != j_ptr->to_h) return (0);
-	if (o_ptr->to_d != j_ptr->to_d) return (0);
-	if (o_ptr->to_a != j_ptr->to_a) return (0);
 
 	/* Require identical "artifact" names */
 	if (o_ptr->name1 != j_ptr->name1) return (0);
@@ -606,13 +603,34 @@ static bool store_object_similar(object_type *o_ptr, object_type *j_ptr)
 	/* Hack -- Never stack recharging items */
 	if (o_ptr->timeout || j_ptr->timeout) return (0);
 
-	/* Require many identical values */
-	if (o_ptr->ac != j_ptr->ac) return (0);
-	if (o_ptr->dd != j_ptr->dd) return (0);
-	if (o_ptr->ds != j_ptr->ds) return (0);
-
 	/* Require matching "discount" fields */
 	if (o_ptr->discount != j_ptr->discount) return (0);
+
+	/* Hack -- Require identical abilities */
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		/* Check that the avals match. This is probably not very performant but it is correct */
+		if (object_aval(o_ptr, o_ptr->ability[i]) != object_aval(j_ptr, o_ptr->ability[i]))
+		{
+			if (cheat_xtra) msg_format("abilities do not match (%s %s does not match %s)", ability_bonus[o_ptr->ability[i]].name, object_aval(o_ptr, o_ptr->ability[i]),object_aval(j_ptr, o_ptr->ability[i]));
+
+			return (0);
+
+		}
+	}
+
+	/* Hack -- Require identical abilities */
+	for (i = 0; i < j_ptr->ability_count; i++)
+	{
+		/* Check that the avals match. This is probably not very performant but it is correct */
+		if (object_aval(o_ptr, j_ptr->ability[i]) != object_aval(j_ptr, j_ptr->ability[i]))
+		{
+			if (cheat_xtra) msg_format("abilities do not match (%s %s does not match %s)", ability_bonus[j_ptr->ability[i]].name, object_aval(o_ptr, j_ptr->ability[i]),object_aval(j_ptr, j_ptr->ability[i]));
+
+			return (0);
+
+		}
+	}
 
 	/* They match, so they must be similar */
 	return (TRUE);
@@ -768,7 +786,7 @@ static bool store_will_buy(const object_type *o_ptr)
 	{
 		u32b f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
 
-		object_flags_known(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags_known(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 		if (f3 & (TR3_BLESSED)) return (TRUE);
 	}
@@ -1524,7 +1542,7 @@ static void display_entry(int item, int store_index)
 		}
 
 		/* Only show the weight of a single object */
-		wgt = o_ptr->weight;
+		wgt = object_aval(o_ptr, ABILITY_WEIGHT);
 		sprintf(out_val, "%3d.%d lb", wgt / 10, wgt % 10);
 		put_str(out_val, y, 68);
 	}
@@ -1552,7 +1570,7 @@ static void display_entry(int item, int store_index)
 		c_put_str(attr, o_name, y, 3);
 
 		/* Only show the weight of a single object */
-		wgt = o_ptr->weight;
+		wgt = object_aval(o_ptr, ABILITY_WEIGHT);
 		sprintf(out_val, "%3d.%d", wgt / 10, wgt % 10);
 		put_str(out_val, y, 61);
 

@@ -1763,6 +1763,8 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 {
 	int total = o_ptr->number + j_ptr->number;
 
+	int i;
+
 	/* Hack -- magical bags */
 	if ((o_ptr->tval == TV_BAG) || (j_ptr->tval == TV_BAG))
 	{
@@ -2025,6 +2027,32 @@ bool object_similar(const object_type *o_ptr, const object_type *j_ptr)
 		if (cheat_xtra) msg_format("feeling %d does not match feeling %d", o_ptr->feeling, j_ptr->feeling);
 
 		return (0);
+	}
+
+	/* Hack -- Require identical abilities */
+	for (i = 0; i < o_ptr->ability_count; i++)
+	{
+		/* Check that the avals match. This is probably not very performant but it is correct */
+		if (object_aval(o_ptr, o_ptr->ability[i]) != object_aval(j_ptr, o_ptr->ability[i]))
+		{
+			if (cheat_xtra) msg_format("abilities do not match (%s %s does not match %s)", ability_bonus[o_ptr->ability[i]].name, object_aval(o_ptr, o_ptr->ability[i]),object_aval(j_ptr, o_ptr->ability[i]));
+
+			return (0);
+
+		}
+	}
+
+	/* Hack -- Require identical abilities */
+	for (i = 0; i < j_ptr->ability_count; i++)
+	{
+		/* Check that the avals match. This is probably not very performant but it is correct */
+		if (object_aval(o_ptr, j_ptr->ability[i]) != object_aval(j_ptr, j_ptr->ability[i]))
+		{
+			if (cheat_xtra) msg_format("abilities do not match (%s %s does not match %s)", ability_bonus[j_ptr->ability[i]].name, object_aval(o_ptr, j_ptr->ability[i]),object_aval(j_ptr, j_ptr->ability[i]));
+
+			return (0);
+
+		}
 	}
 
 	/* Maximal "stacking" limit */

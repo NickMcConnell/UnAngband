@@ -50,13 +50,13 @@ u32b player_smart_flags(u32b f0[ABILITY_ARRAY_SIZE], u32b f1, u32b f2, u32b f3, 
 		if (f0[ABILITY_RESIST_LITE/32] & (1L << (ABILITY_RESIST_LITE % 32))) tmp |= (SM_RES_LITE);
 		if (f0[ABILITY_RESIST_DARK/32] & (1L << (ABILITY_RESIST_DARK % 32))) tmp |= (SM_RES_DARK);
 		if (f0[ABILITY_RESIST_BLIND/32] & (1L << (ABILITY_RESIST_BLIND % 32))) tmp |= (SM_RES_BLIND);
-		if (f0[ABILITY_RESIST_CONFU/32] & (1L << (ABILITY_RESIST_CONFU % 32))) tmp |= (SM_RES_CONFU);
+		if (f0[ABILITY_RESIST_CONFUSE/32] & (1L << (ABILITY_RESIST_CONFUSE % 32))) tmp |= (SM_RES_CONFU);
 		if (f0[ABILITY_RESIST_SOUND/32] & (1L << (ABILITY_RESIST_SOUND % 32))) tmp |= (SM_RES_SOUND);
 		if (f0[ABILITY_RESIST_SHARD/32] & (1L << (ABILITY_RESIST_SHARD % 32))) tmp |= (SM_RES_SHARD);
 		if (f0[ABILITY_RESIST_NEXUS/32] & (1L << (ABILITY_RESIST_NEXUS % 32))) tmp |= (SM_RES_NEXUS);
-		if (f0[ABILITY_RESIST_NETHR/32] & (1L << (ABILITY_RESIST_NETHR % 32))) tmp |= (SM_RES_NETHR);
+		if (f0[ABILITY_RESIST_NETHER/32] & (1L << (ABILITY_RESIST_NETHER % 32))) tmp |= (SM_RES_NETHR);
 		if (f0[ABILITY_RESIST_CHAOS/32] & (1L << (ABILITY_RESIST_CHAOS % 32))) tmp |= (SM_RES_CHAOS);
-		if (f0[ABILITY_RESIST_DISEN/32] & (1L << (ABILITY_RESIST_DISEN % 32))) tmp |= (SM_RES_DISEN);
+		if (f0[ABILITY_RESIST_DISENCHANT/32] & (1L << (ABILITY_RESIST_DISENCHANT % 32))) tmp |= (SM_RES_DISEN);
 	}
 
 	return(tmp);
@@ -1936,10 +1936,10 @@ static int set_acid_destroy(object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
 	if (!hates_acid(o_ptr)) return (FALSE);
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL,&f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_ACID))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
+		object_can_flags(o_ptr,NULL,0x0L,TR2_IGNORE_ACID,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1953,10 +1953,10 @@ static int set_fire_destroy(object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
 	if (!hates_fire(o_ptr)) return (FALSE);
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_FIRE))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_FIRE,0x0L,0x0L, FALSE);
+		object_can_flags(o_ptr,NULL,0x0L,TR2_IGNORE_FIRE,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1970,10 +1970,10 @@ static int set_cold_destroy(object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
 	if (!hates_cold(o_ptr)) return (FALSE);
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_COLD))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_COLD,0x0L,0x0L, FALSE);
+		object_can_flags(o_ptr,NULL,0x0L,TR2_IGNORE_COLD,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -1992,10 +1992,10 @@ static int set_elec_destroy(object_type *o_ptr)
 	/* Only affect rods, staffs and wands */
 	if ((o_ptr->tval != TV_ROD) && (o_ptr->tval != TV_STAFF) && (o_ptr->tval != TV_WAND)) return (FALSE);
 
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_ELEC))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_ELEC,0x0L,0x0L, FALSE);
+		object_can_flags(o_ptr,NULL,0x0L,TR2_IGNORE_ELEC,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -2010,10 +2010,10 @@ static int set_water_destroy(object_type *o_ptr)
 {
 	u32b f1, f2, f3, f4;
 	if (!hates_water(o_ptr)) return (FALSE);
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 	if (f2 & (TR2_IGNORE_WATER))
 	{
-		object_can_flags(o_ptr,0x0L,TR2_IGNORE_WATER,0x0L,0x0L, FALSE);
+		object_can_flags(o_ptr, NULL, 0x0L,TR2_IGNORE_WATER,0x0L,0x0L, FALSE);
 		return (FALSE);
 	}
 	return (TRUE);
@@ -2088,8 +2088,8 @@ static int inven_damage(inven_func typ, int perc)
 				if (rand_int(100) < perc)
 				{
 					/* Damage the item */
-					object_aval(o_ptr, ABILITY_TO_HIT)--;
-					object_aval(o_ptr, ABILITY_TO_DAM)--;
+					object_ability_add(o_ptr, ABILITY_TO_HIT, -1);
+					object_ability_add(o_ptr, ABILITY_TO_DAM, -1);
 
 					/* Damaged! */
 					damage = TRUE;
@@ -2114,7 +2114,7 @@ static int inven_damage(inven_func typ, int perc)
 				if (rand_int(100) < perc)
 				{
 					/* Damage the item */
-					object_aval(o_ptr, ABILITY_TO_AC)--;
+					object_ability_add(o_ptr, ABILITY_TO_AC, -1);
 
 					/* Damaged! */
 					damage = TRUE;
@@ -3048,7 +3048,7 @@ static void water_dam(int who, int what, int dam, bool inven)
 	else
 	{
 		/* Sometimes notice */
-		(void)player_not_flags(who, ABILITY_RESIST_WATER);
+		(void)player_not_ability(who, ABILITY_RESIST_WATER);
 	}
 
 	/* Resist the damage */
@@ -3109,14 +3109,6 @@ bool player_ignore_terrain(int f_idx)
 {
 	feature_type *f_ptr= &f_info[f_idx];
 
-	/* Hack -- boots provide protection from terrain */
-	object_type *i_ptr = &inventory[INVEN_FEET];
-
-	u32b f1 = 0x0L;
-	u32b f2 = 0x0L;
-	u32b f3 = 0x0L;
-	u32b f4 = 0x0L;
-
 	bool ignore = FALSE;
 
 	/* Use covered if necessary */
@@ -3125,9 +3117,6 @@ bool player_ignore_terrain(int f_idx)
 		f_ptr = &f_info[f_ptr->mimic];
 	}
 
-	/* Get boot flags -- hack: only if terrain not filled */
-	if ((i_ptr->k_idx) && !(f_ptr->flags2 & (FF2_FILLED))) object_flags(i_ptr, &f1, &f2, &f3, &f4);
-
 	/* Check the blow type for terrain */
 	if ((f_ptr->blow.method) && !(f_ptr->flags1 & (FF1_HIT_TRAP)))
 		switch(f_ptr->blow.effect)
@@ -3135,16 +3124,20 @@ bool player_ignore_terrain(int f_idx)
 		case GF_FIRE:
 		case GF_SMOKE:
 		{
-			if ((p_ptr->timed[TMD_OPP_FIRE]) || (p_ptr->timed[TMD_OPP_LAVA])) ignore = TRUE;
-			else if (f2 & (TR2_RES_FIRE))
+			if (p_ptr->timed[TMD_OPP_FIRE]) ignore = TRUE;
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_FIRE)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
 			{
-				(void)object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L, FALSE);
+				(void)equip_can_flags(NULL, 0x0L, TR2_WALK_FIRE, 0x0L, 0x0L);
 				ignore = TRUE;
 			}
 			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
 			{
-				(void)equip_can_flags(0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
+				(void)equip_can_flags(NULL, 0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
 				ignore = TRUE;
+			}
+			else
+			{
+				equip_not_flags(NULL, 0x0L, (TR2_WALK_FIRE | TR2_IM_FIRE), 0x0L, 0x0L);
 			}
 			break;
 		}
@@ -3152,15 +3145,19 @@ bool player_ignore_terrain(int f_idx)
 		case GF_VAPOUR:
 		{
 			if (p_ptr->timed[TMD_OPP_ACID]) ignore = TRUE;
-			else if (f2 & (TR2_RES_ACID))
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_ACID)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_ACID, 0x0L, 0x0L, FALSE);
+				equip_can_flags(NULL, 0x0L, TR2_WALK_ACID, 0x0L, 0x0L);
 				ignore = TRUE;
 			}
 			else if (p_ptr->cur_flags2 & (TR2_IM_ACID))
 			{
-				equip_can_flags(0x0L, TR2_IM_ACID, 0x0L, 0x0L);
+				equip_can_flags(NULL, 0x0L, TR2_IM_ACID, 0x0L, 0x0L);
 				ignore = TRUE;
+			}
+			else
+			{
+				equip_not_flags(NULL, 0x0L, (TR2_WALK_ACID | TR2_IM_ACID), 0x0L, 0x0L);
 			}
 			break;
 		}
@@ -3168,15 +3165,21 @@ bool player_ignore_terrain(int f_idx)
 		/* case GF_ICE: */
 		{
 			if (p_ptr->timed[TMD_OPP_COLD]) ignore = TRUE;
-			else if (f2 & (TR2_RES_COLD))
+#if 0
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_COLD)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_COLD, 0x0L, 0x0L, FALSE);
+				equip_can_flags(NULL, 0x0L, TR2_RES_COLD, 0x0L, 0x0L);
 				ignore = TRUE;
 			}
+#endif
 			else if (p_ptr->cur_flags2 & (TR2_IM_COLD))
 			{
-				equip_can_flags(0x0L, TR2_IM_COLD, 0x0L, 0x0L);
+				equip_can_flags(NULL,0x0L, TR2_IM_COLD, 0x0L, 0x0L);
 				ignore = TRUE;
+			}
+			else
+			{
+				equip_not_flags(NULL, 0x0L, (/*TR2_WALK_COLD |*/ TR2_IM_COLD), 0x0L, 0x0L);
 			}
 			break;
 		}
@@ -3186,10 +3189,19 @@ bool player_ignore_terrain(int f_idx)
 		case GF_POISON_WATER:
 		{
 			if (p_ptr->timed[TMD_OPP_WATER]) ignore = TRUE;
-			else if (f4 & (TR4_RES_WATER))
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_WATER)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
 			{
-				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER, FALSE);
+				equip_can_flags(NULL, 0x0L, TR2_WALK_WATER, 0x0L, 0x0L);
 				ignore = TRUE;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_IM_WATER))
+			{
+				equip_can_flags(NULL,0x0L, TR2_IM_WATER, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			else
+			{
+				equip_not_flags(NULL, 0x0L, (TR2_WALK_WATER | TR2_IM_WATER), 0x0L, 0x0L);
 			}
 			break;
 		}
@@ -3197,31 +3209,56 @@ bool player_ignore_terrain(int f_idx)
 		case GF_BWATER:
 		case GF_STEAM:
 		{
-			if ((p_ptr->timed[TMD_OPP_WATER]) && (p_ptr->timed[TMD_OPP_FIRE])) ignore = TRUE;
-			else if ((f4 & (TR4_RES_WATER)) && (p_ptr->timed[TMD_OPP_FIRE]))
+			bool ignore_fire = FALSE;
+			bool ignore_water = FALSE;
+
+			if (p_ptr->timed[TMD_OPP_WATER]) ignore_water = TRUE;
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_WATER)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
 			{
-				object_can_flags(i_ptr, 0x0L, 0x0L, 0x0L, TR4_RES_WATER, FALSE);
-				ignore = TRUE;
+				equip_can_flags(NULL, 0x0L, TR2_WALK_WATER, 0x0L, 0x0L);
+				ignore_water = TRUE;
 			}
-			else if ((f2 & (TR2_RES_FIRE)) && (p_ptr->timed[TMD_OPP_WATER]))
+			else if (p_ptr->cur_flags2 & (TR2_IM_WATER))
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, 0x0L, FALSE);
-				ignore = TRUE;
+				equip_can_flags(NULL,0x0L, TR2_IM_WATER, 0x0L, 0x0L);
+				ignore_water = TRUE;
 			}
-			else if ((f4 & (TR4_RES_WATER)) && (f2 & (TR2_RES_FIRE)))
+			else
 			{
-				object_can_flags(i_ptr, 0x0L, TR2_RES_FIRE, 0x0L, TR4_RES_WATER, FALSE);
-				ignore = TRUE;
+				equip_not_flags(NULL, 0x0L, (TR2_WALK_WATER | TR2_IM_WATER), 0x0L, 0x0L);
 			}
+
+			if (p_ptr->timed[TMD_OPP_FIRE]) ignore_fire = TRUE;
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_FIRE)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
+			{
+				(void)equip_can_flags(NULL, 0x0L, TR2_WALK_FIRE, 0x0L, 0x0L);
+				ignore_fire = TRUE;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+			{
+				(void)equip_can_flags(NULL, 0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
+				ignore_fire = TRUE;
+			}
+			else
+			{
+				equip_not_flags(NULL, 0x0L, (TR2_WALK_FIRE | TR2_IM_FIRE), 0x0L, 0x0L);
+			}
+
+			if (ignore_water && ignore_fire) ignore = TRUE;
 
 			/* Fall through */
 		}
 		case GF_LAVA:
 		{
 			if (p_ptr->timed[TMD_OPP_LAVA]) ignore = TRUE;
-			else if (p_ptr->cur_flags2 & (TR2_IM_FIRE))
+			else if ((p_ptr->cur_flags2 & (TR2_WALK_LAVA)) && ((f_ptr->flags2 & (FF2_FILLED)) == 0))
 			{
-				equip_can_flags(0x0L, TR2_IM_FIRE, 0x0L, 0x0L);
+				equip_can_flags(NULL, 0x0L, TR2_WALK_LAVA, 0x0L, 0x0L);
+				ignore = TRUE;
+			}
+			else if (p_ptr->cur_flags2 & (TR2_IM_LAVA))
+			{
+				equip_can_flags(NULL, 0x0L, TR2_IM_LAVA, 0x0L, 0x0L);
 				ignore = TRUE;
 			}
 
@@ -3485,16 +3522,16 @@ bool apply_disenchant(int mode)
 	}
 
 	/* Disenchant tohit */
-	if (object_aval(o_ptr, ABILITY_TO_HIT) > 0) object_aval(o_ptr, ABILITY_TO_HIT)--;
-	if ((object_aval(o_ptr, ABILITY_TO_HIT) > 5) && (rand_int(100) < 20)) object_aval(o_ptr, ABILITY_TO_HIT)--;
+	if (object_aval(o_ptr, ABILITY_TO_HIT) > 0) object_ability_add(o_ptr, ABILITY_TO_HIT, -1);
+	if ((object_aval(o_ptr, ABILITY_TO_HIT) > 5) && (rand_int(100) < 20)) object_ability_add(o_ptr, ABILITY_TO_HIT, -1);
 
 	/* Disenchant todam */
-	if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) object_aval(o_ptr, ABILITY_TO_DAM)--;
-	if ((object_aval(o_ptr, ABILITY_TO_DAM) > 5) && (rand_int(100) < 20)) object_aval(o_ptr, ABILITY_TO_DAM)--;
+	if (object_aval(o_ptr, ABILITY_TO_DAM) > 0) object_ability_add(o_ptr, ABILITY_TO_DAM, -1);
+	if ((object_aval(o_ptr, ABILITY_TO_DAM) > 5) && (rand_int(100) < 20)) object_ability_add(o_ptr, ABILITY_TO_DAM, -1);
 
 	/* Disenchant toac */
-	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) object_aval(o_ptr, ABILITY_TO_AC)--;
-	if ((object_aval(o_ptr, ABILITY_TO_AC) > 5) && (rand_int(100) < 20)) object_aval(o_ptr, ABILITY_TO_AC)--;
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) object_ability_add(o_ptr, ABILITY_TO_AC, -1);
+	if ((object_aval(o_ptr, ABILITY_TO_AC) > 5) && (rand_int(100) < 20)) object_ability_add(o_ptr, ABILITY_TO_AC, -1);
 
 	/* Message */
 	msg_format("Your %s (%c) %s disenchanted!",
@@ -4792,7 +4829,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 		if (o_ptr->ident & (IDENT_STORE)) continue;
 
 		/* Extract the flags */
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 		/* Get the "plural"-ness */
 		if (o_ptr->number > 1) plural = TRUE;
@@ -5461,7 +5498,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					/* Learn about resistences */
 					if (if1 | if2 | if3 | if4)
 					{
-						object_can_flags(o_ptr,if1,if2,if3,if4, TRUE);
+						object_can_flags(o_ptr,NULL, if1,if2,if3,if4, TRUE);
 					}
 
 					/* Item is unbreakable */
@@ -5480,7 +5517,7 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 							o_ptr->ident |= (IDENT_SENSE);
 						}
 
-						object_can_flags(o_ptr,0x0L,TR2_IGNORE_MASK,0x0L,0x0L, TRUE);
+						object_can_flags(o_ptr,NULL, 0x0L,TR2_IGNORE_MASK,0x0L,0x0L, TRUE);
 					}
 
 					/* Check for new flags */
@@ -8377,7 +8414,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			}
 
 			if (obvious) note = " appears weaker.";
-			if (((typ == GF_HUNGER) && obvious)) || (typ == GF_LOSE_STR)) break;
+			if (((typ == GF_HUNGER) && obvious) || (typ == GF_LOSE_STR)) break;
 		}
 
 		/* Melee attack - lose con */
@@ -9965,28 +10002,28 @@ static void inflict_disease(u32b disease, int dam, int serious)
  */
 static void check_hold_life(int who, int chance, int amt)
 {
-	if (((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0) && (rand_int(100) < chance))
+	if ((p_ptr->ability[ABILITY_HOLD_LIFE] > 0) && (rand_int(100) < (chance * p_ptr->ability[ABILITY_HOLD_LIFE])))
 	{
 		/* Always notice */
-		if (!p_ptr->timed[TMD_BLESSED]) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+		if (!p_ptr->timed[TMD_BLESSED]) player_can_ability(who, ABILITY_HOLD_LIFE);
 
 		msg_print("You keep hold of your life force!");
 	}
 	else
 	{
 		s32b d = amt + (p_ptr->exp/100) * MON_DRAIN_LIFE;
-		if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0)
+		if (p_ptr->ability[ABILITY_HOLD_LIFE] > 0)
 		{
 			/* Always notice */
-			if (!p_ptr->timed[TMD_BLESSED]) player_can_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+			if (!p_ptr->timed[TMD_BLESSED]) player_can_ability(who, ABILITY_HOLD_LIFE);
 
 			msg_print("You feel your life slipping away!");
-			lose_exp(d/10);
+			lose_exp(d/(9+p_ptr->ability[ABILITY_HOLD_LIFE]));
 		}
 		else
 		{
 			/* Always notice */
-			player_not_flags(who, 0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
+			player_not_ability(who, ABILITY_HOLD_LIFE);
 
 			msg_print("You feel your life draining away!");
 			lose_exp(d);
@@ -10246,20 +10283,20 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by disease!");
 
 			/* Disease resistance */
-			if ((p_ptr->cur_flags4 & (TR4_RES_DISEASE)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_DISEASE] > 0)
 			{
 				/* Always notice */
-				(void)player_can_flags(who, 0x0L,0x0L,0x0L,TR4_RES_DISEASE);
+				(void)player_can_ability(who, ABILITY_RESIST_DISEASE);
 
 				/* Reduce damage */
-				dam *= 6; dam /= (randint(6) + 6);
+				dam *= 6; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_DISEASE], 6) + 6);
 			}
 			else
 			{
 				int rating = dam / (adj_con_fix[p_ptr->stat_ind[A_CON]] + 1);
 
 				/* Always notice */
-				(void)player_not_flags(who, 0x0L,0x0L,0x0L,TR4_RES_DISEASE);
+				(void)player_not_ability(who, ABILITY_RESIST_DISEASE);
 
 				/* Critical disease - multiple effects either quickly, powerfully or heavily */
 				if (rating > 45)
@@ -10358,13 +10395,13 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags4 & (TR4_EVIL)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_EVIL);
+				player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_EVIL);
 
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_EVIL);
+				player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_EVIL);
 
 				/* Reduce damage */
 				dam /= 2;
@@ -10382,21 +10419,21 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->cur_flags4 & (TR4_EVIL))
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_EVIL);
+				player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_EVIL);
 
 				dam = 0;
 			}
-			else if (p_ptr->cur_flags2 & (TR2_RES_DARK))
+			else if (p_ptr->ability[ABILITY_RESIST_DARK] > 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_DARK,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_DARK);
 
-				dam = dam / 3;
+				dam /= 1 + p_ptr->ability[ABILITY_RESIST_DARK];
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_DARK,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_DARK);
 
 				/* Hack -- ignore resist blindness */
 				inc_timed(TMD_BLIND, rand_range(4, 8), TRUE);
@@ -10407,52 +10444,52 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (!(p_ptr->cur_flags4 & (TR4_EVIL)) || (rand_int(100) > p_ptr->skills[SKILL_SAVE]))
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_EVIL);
+				player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_EVIL);
 
 				/* Note lack of resistance */
-				if (!(p_ptr->cur_flags2 & (TR2_RES_FEAR | TR2_RES_CHAOS | TR2_RES_CONFU)))
+				if (!(p_ptr->cur_flags1 & (TR1_NO_FEAR | TR1_NO_IMAGE | TR1_NO_CONFUSE)))
 				{
 					msg_print("Visions of hell invade your mind!");
 				}
 
 				/* Resist fear */
-				if (p_ptr->cur_flags2 & (TR2_RES_FEAR))
+				if (p_ptr->cur_flags1 & (TR1_NO_FEAR))
 				{
 					/* Sometimes notice */
-					if(!(p_ptr->timed[TMD_HERO] || p_ptr->timed[TMD_BERSERK])) player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+					if(!(p_ptr->timed[TMD_HERO] || p_ptr->timed[TMD_BERSERK])) player_can_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L);
 				}
 				else
 				{
 					/* Always notice */
-					player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+					player_not_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L);
 
 					(void)set_afraid(p_ptr->timed[TMD_AFRAID] + rand_range(10, 20));
 				}
 
 				/* Resist chaos */
-				if (p_ptr->cur_flags2 & (TR2_RES_CHAOS))
+				if (p_ptr->cur_flags1 & (TR1_NO_IMAGE))
 				{
 					/* Always notice */
-					player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+					player_can_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 				}
 				else
 				{
 					/* Always notice */
-					player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+					player_not_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 
 					inc_timed(TMD_IMAGE, rand_range(40, 80), TRUE);
 				}
 
 				/* Resist confusion */
-				if (p_ptr->cur_flags2 & (TR2_RES_CONFU))
+				if (p_ptr->cur_flags1 & (TR1_NO_CONFUSE))
 				{
 					/* Sometimes notice */
-					player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+					player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 				}
 				else
 				{
 					/* Always notice */
-					player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+					player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 
 					inc_timed(TMD_CONFUSED,  rand_range(15, 30), TRUE);
 				}
@@ -10461,17 +10498,18 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
-		/* Plasma -- No resist XXX */
+		/* Plasma */
 		case GF_PLASMA:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
 			take_hit(who, what, dam);
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				int k = (randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
 
 				/* Notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN,0x0L,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 75)
@@ -10488,7 +10526,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_STUN,0x0L,0x0L,0x0L);
 			}
 			break;
 		}
@@ -10497,17 +10535,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_NETHER:
 		{
 			if (fuzzy) msg_print("You are hit by something strange!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_NETHER] > 0)
 			{
 				/* Notice */
-				player_can_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_NETHER);
 
-				dam *= 6; dam /= (randint(6) + 6);
+				dam *= 6; dam /= (damroll(ABILITY_RESIST_NETHER,6) + 6);
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_NETHER);
 
 				/* Lose grip on life */
 				check_hold_life(who, 75, 200);
@@ -10521,10 +10559,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_WATER:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+			if (((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0) && ((p_ptr->cur_flags2 & (TR2_IM_WATER)) == 0))
 			{
+				int k = (randint((dam > 40) ? 35 : (dam * 3 / 4 + 5)));
+
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN,TR2_IM_WATER,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 90)
@@ -10538,23 +10578,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(10) : randint(40));
 				}
 			}
-			else
+			else if (p_ptr->cur_flags1 & (TR1_NO_STUN))
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
-			}
-
-			if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
-			{
-				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
-
-				dam *= 2;
-			}
-			else
-			{
-				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+				player_can_flags(who, NULL, TR1_NO_STUN, 0x0L,0x0L,0x0L);
 			}
 
 			water_dam(who, what, dam, TRUE);
@@ -10570,10 +10597,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_POISON_WATER:
 		{
 			/* Increase poison counter */
-			if (!(p_ptr->timed[TMD_OPP_POIS]) && !(p_ptr->cur_flags2 & (TR2_RES_POIS)))
+			if (!(p_ptr->timed[TMD_OPP_POIS]) && !(p_ptr->cur_flags1 & (TR1_NO_POISON)))
 			{
 				/* Sometimes notice */
-				(void)player_not_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+				(void)player_not_flags(who, NULL, TR1_NO_POISON,0x0L,0x0L,0x0L);
 
 				/* Monster notices */
 				(void)update_smart_forget(who, SM_OPP_POIS);
@@ -10588,7 +10615,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				(void)update_smart_learn(who, SM_OPP_POIS);
 			}
 			/* Sometimes notice */
-			else (void)player_can_flags(who, 0x0L,TR2_RES_POIS,0x0L,0x0L);
+			else (void)player_can_flags(who, NULL, 0x0L,TR1_NO_POISON,0x0L,0x0L);
 
 			/* Fall through */
 		}
@@ -10603,12 +10630,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+				player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+				player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
 
 				dam = 0;
 			}
@@ -10624,49 +10651,58 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (fuzzy) msg_print("You are hit by something strange!");
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_CHAOS] > 0)
 			{
-				dam *= 6; dam /= (randint(6) + 6);
-			}
+				dam *= 6; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_CHAOS], 6) + 6);
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
+				/* Always notice */
+				player_can_ability(who, ABILITY_RESIST_CHAOS);
+			}
+			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_CHAOS);
+			}
 
+			if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) == 0)
+			{
 				set_timed(TMD_CONFUSED, p_ptr->timed[TMD_CONFUSED] ? p_ptr->timed[TMD_CONFUSED] + 1: rand_int(20) + 10, TRUE);
+
+				/* Always notice */
+				player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 			}
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_IMAGE)) == 0)
 			{
-				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
-
 				set_timed(TMD_IMAGE, p_ptr->timed[TMD_IMAGE] ? p_ptr->timed[TMD_IMAGE] + 1 : randint(10), TRUE);
+
+				/* Always notice */
+				player_not_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 			}
 
-			if (((p_ptr->cur_flags2 & (TR2_RES_NETHR)) == 0) && ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0))
+			/* Nether and chaos protect against life drain */
+			if ((p_ptr->ability[ABILITY_RESIST_NETHER] > 0) || (p_ptr->ability[ABILITY_RESIST_CHAOS] > 0))
 			{
-				/* Notice */
-				player_not_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
-
 				/* Lose grip on life force */
 				check_hold_life(who, 75, 100);
+
+				/* Notice */
+				player_not_ability(who, ABILITY_RESIST_NETHER);
 			}
-			else if ((p_ptr->cur_flags2 & (TR2_RES_NETHR)) != 0)
+			else if (p_ptr->ability[ABILITY_RESIST_NETHER] < 0)
 			{
 				/* Notice */
-				player_can_flags(who, 0x0L,TR2_RES_NETHR,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_NETHER);
 			}
 
 			take_hit(who, what, dam);
@@ -10678,23 +10714,35 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_SHARD:
 		{
 			if (fuzzy) msg_print("You are hit by something sharp!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) != 0)
-			{
-				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
 
-				dam *= 6; dam /= (randint(6) + 6);
-			}
-			else
+			if ((p_ptr->cur_flags1 & (TR1_NO_CUTS)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_CUTS, 0x0L, 0x0L, 0x0L);
 
 				/* Inflict disease */
 				if ((p_ptr->timed[TMD_CUT] > 100) && (randint(1500) < dam)) inflict_disease(DISEASE_CUT, dam, 50);
 
 				/* Inflict cuts */
 				(void)set_cut(p_ptr->timed[TMD_CUT] + dam);
+			}
+			else
+			{
+				/* Always notice */
+				player_not_flags(who, NULL, TR1_NO_CUTS, 0x0L, 0x0L, 0x0L);
+			}
+
+			if (p_ptr->ability[ABILITY_RESIST_SHARD] > 0)
+			{
+				/* Always notice */
+				player_can_ability(who, ABILITY_RESIST_SHARD);
+
+				dam *= 6; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_SHARD],6) + 6);
+			}
+			else
+			{
+				/* Always notice */
+				player_not_ability(who, ABILITY_RESIST_SHARD);
 			}
 			take_hit(who, what, dam);
 			if (good_eat) inc_timed(TMD_STONESKIN, dam, TRUE);
@@ -10705,19 +10753,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_SOUND:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) != 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
-
-				dam *= 5; dam /= (randint(6) + 6);
+				player_can_flags(who, NULL, TR1_NO_STUN, 0x0L,0x0L,0x0L);
 			}
 			else
 			{
 				int k = (randint((dam > 90) ? 35 : (dam / 3 + 5)));
 
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN, 0x0L,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 75)
@@ -10730,6 +10776,19 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					/* Inflict stun */
 					(void)set_stun(p_ptr->timed[TMD_STUN] ? p_ptr->timed[TMD_STUN] + randint(MIN(10, k)) : k);
 				}
+			}
+
+			if (p_ptr->ability[ABILITY_RESIST_SOUND] > 0)
+			{
+				/* Always notice */
+				player_can_ability(who, ABILITY_RESIST_SOUND);
+
+				dam *= 5; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_SOUND], 6) + 6);
+			}
+			else
+			{
+				/* Always notice */
+				player_not_ability(who, ABILITY_RESIST_SOUND);
 			}
 			take_hit(who, what, dam);
 			/* TODO: Useful if eaten? */
@@ -10747,24 +10806,35 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_CONFUSION:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) != 0)
+
+			if (p_ptr->ability[ABILITY_RESIST_CONFUSE] > 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_CONFUSE);
 
-				dam *= 5; dam /= (randint(6) + 6);
+				dam *= 5; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_CONFUSE], 6) + 6);
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_CONFUSE);
+			}
+
+			if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) != 0)
+			{
+				/* Always notice */
+				player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
+			}
+			else
+			{
+				/* Always notice */
+				player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 
 				/* Inflict disease */
 				if ((p_ptr->timed[TMD_CONFUSED] > 100) && (randint(3000) < dam)) inflict_disease(DISEASE_CONFUSE, dam, 50);
 
 				/* Inflict confusion */
 				set_timed(TMD_CONFUSED, p_ptr->timed[TMD_CONFUSED] ? p_ptr->timed[TMD_CONFUSED] + 1 : randint(20) + 10, TRUE);
-
 			}
 
 			take_hit(who, what, dam);
@@ -10781,7 +10851,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(who, what, dam);
 
 			/* Increase "image" */
-			if ((p_ptr->cur_flags2 & (TR2_RES_CHAOS)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_IMAGE)) == 0)
 			{
 				int k = 6 + randint(dam / 2);
 
@@ -10795,12 +10865,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				}
 
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_IMAGE,0x0L,0x0L,0x0L);
 			}
 			break;
 		}
@@ -10809,17 +10879,17 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_DISENCHANT:
 		{
 			if (fuzzy) msg_print("You are hit by something strange!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_DISEN)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_DISENCHANT] > 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_DISEN,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_DISENCHANT);
 
 				dam *= 6; dam /= (randint(6) + 6);
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_DISEN,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_DISENCHANT);
 
 				(void)apply_disenchant(0);
 			}
@@ -10832,20 +10902,22 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_NEXUS:
 		{
 			if (fuzzy) msg_print("You are hit by something strange!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_NEXUS] > 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_NEXUS);
 
 				dam *= 6; dam /= (randint(6) + 6);
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_NEXUS,0x0L,0x0L);
-
-				if (m_ptr) apply_nexus(m_ptr);
+				player_not_ability(who, ABILITY_RESIST_NEXUS);
 			}
+
+			/* Mark grid for later processing. */
+			cave_temp_mark(y, x, FALSE);
+
 			take_hit(who, what, dam);
 			if (good_eat) inc_timed(TMD_REGENERATION, dam, TRUE);
 			break;
@@ -10855,10 +10927,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_FORCE:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL,TR1_NO_STUN,0x0L,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 80)
@@ -10874,7 +10946,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_STUN,0x0L,0x0L,0x0L);
 			}
 			take_hit(who, what, dam);
 			if (good_eat) inc_timed(TMD_SHIELD, dam, TRUE);
@@ -10898,11 +10970,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		/* Weak lite -- blinding, plus damage if vulnerable */
 		case GF_LITE_WEAK:
 		{
-			if ((p_ptr->cur_flags4 & (TR4_HURT_LITE)) == 0)
-			{
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_LITE);
-				dam = 0;
-			}
+			if ((p_ptr->cur_flags4 & (TR4_HURT_LITE)) == 0) dam = 0;
 
 			/* Fall through */
 		}
@@ -10914,31 +10982,33 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags4 & (TR4_HURT_LITE)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_LITE);
+				player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_LITE);
 
 				/* Extra damage */
 				if (typ != GF_LITE_WEAK) dam *= 2;
 			}
-			else player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_LITE);
+			else player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_LITE);
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_LITE)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_LITE] > 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_LITE,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_LITE);
 
-				dam *= 4; dam /= (randint(6) + 6);
+				dam *= 4; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_LITE], 6) + 6);
 			}
-			else if (!blind && ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0))
+			else if (!blind && ((p_ptr->cur_flags1 & (TR1_NO_BLIND)) == 0))
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,(TR2_RES_BLIND|TR2_RES_LITE),0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_LITE);
+				player_not_flags(who, NULL, TR1_NO_BLIND, 0x0L, 0x0L, 0x0L);
 
 				inc_timed(TMD_BLIND, randint(5) + 2, TRUE);
 			}
 			else if (!blind)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,(TR2_RES_LITE),0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_LITE);
+				player_can_flags(who, NULL, TR1_NO_BLIND, 0x0L, 0x0L, 0x0L);
 			}
 			take_hit(who, what, dam);
 
@@ -10975,24 +11045,26 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_DARK:
 		{
 			if (fuzzy) msg_print("You are hit by something!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_DARK)) != 0)
+			if (p_ptr->ability[ABILITY_RESIST_DARK] > 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_DARK,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_DARK);
 
-				dam *= 4; dam /= (randint(6) + 6);
+				dam *= 4; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_DARK], 6) + 6);
 			}
-			else if (!blind && ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0))
+			else if (!blind && ((p_ptr->cur_flags1 & (TR1_NO_BLIND)) == 0))
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,(TR2_RES_BLIND|TR2_RES_DARK),0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_DARK);
+				player_not_flags(who, NULL, TR1_NO_BLIND, 0x0L, 0x0L, 0x0L);
 
 				inc_timed(TMD_BLIND, randint(5) + 2, TRUE);
 			}
 			else if (!blind)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,(TR2_RES_DARK),0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_DARK);
+				player_can_flags(who, NULL, TR1_NO_BLIND, 0x0L, 0x0L, 0x0L);
 			}
 			take_hit(who, what, dam);
 
@@ -11053,7 +11125,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are hit by something strange!");
 			msg_print("Gravity warps around you.");
 			inc_timed(TMD_SLOW, rand_int(4) + 4, TRUE);
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				k = (randint((dam > 90) ? 35 : (dam / 3 + 5)));
 
@@ -11068,6 +11140,12 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					/* Inflict stun */
 					(void)set_stun(p_ptr->timed[TMD_STUN] + k);
 				}
+
+				player_can_flags(who, NULL, TR1_NO_STUN, 0x0L, 0x0L, 0x0L);
+			}
+			else
+			{
+				player_not_flags(who, NULL, TR1_NO_STUN, 0x0L, 0x0L, 0x0L);
 			}
 			take_hit(who, what, dam);
 
@@ -11100,23 +11178,25 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			cold_dam(who, what, dam, TRUE);
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) == 0)
+			/* Ice cuts */
+			if ((p_ptr->cur_flags1 & (TR1_NO_CUTS)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_CUTS, 0x0L, 0x0L, 0x0L);
 
 				(void)set_cut(p_ptr->timed[TMD_CUT] + damroll(5, 8));
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
-
+				player_can_flags(who, NULL, TR1_NO_CUTS, 0x0L, 0x0L, 0x0L);
 			}
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+
+			/* Ice stuns (freezing cold) */
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN, 0x0L, 0x0L, 0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 85)
@@ -11133,7 +11213,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_STUN, 0x0L, 0x0L, 0x0L);
 			}
 			break;
 		}
@@ -11149,14 +11229,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->cur_flags3 & (TR3_FEATHER))
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_can_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				dist = (dist + 2) / 3;
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_not_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 			}
 
 			/* Scale down damage based on distance */
@@ -11165,7 +11245,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (fuzzy) msg_print("You are buffeted by winds!");
 			if (dam > randint(200))
 			{
-				if ((!(p_ptr->cur_flags2 & (TR2_RES_CONFU))) || (!rand_int(6)))
+				if ((p_ptr->ability[ABILITY_RESIST_CONFUSE] <= 0) ||
+					(!rand_int(6 + p_ptr->ability[ABILITY_RESIST_CONFUSE])))
 				{
 					msg_print("You are spun until dizzy!");
 					inc_timed(TMD_CONFUSED, rand_range(2, 3), TRUE);
@@ -11201,10 +11282,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(who, what, dam);
 
 			/* Allow complete resist */
-			if ((p_ptr->cur_flags2 & (TR2_RES_DISEN)) == 0)
+			if (p_ptr->ability[ABILITY_RESIST_DISENCHANT] <= 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_DISEN,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_DISENCHANT);
 
 				/* Apply disenchantment */
 				if (apply_disenchant(0)) obvious = TRUE;
@@ -11217,8 +11298,8 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			}
 			else
 			{
-				/* Sometimes notice */
-				player_can_flags(who, 0x0L,TR2_RES_DISEN,0x0L,0x0L);
+				/* Always notice */
+				player_can_ability(who, ABILITY_RESIST_DISENCHANT);
 			}
 			break;
 		}
@@ -11386,10 +11467,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				f1 = f2 = f3 = 0x0L;
 
 				/* Get the flags */
-				object_flags(o_ptr,&f1,&f2,&f3,&f4);
+				object_flags(o_ptr,NULL, &f1,&f2,&f3,&f4);
 
 				/* Sometimes notice theft-protection */
-				if ((rand_int(100)<10) && (f2 & (TR2_IGNORE_THEFT))) object_can_flags(o_ptr,0x0L,TR2_IGNORE_THEFT,0x0L,0x0L, FALSE);
+				if ((rand_int(100)<10) && (f2 & (TR2_IGNORE_THEFT))) object_can_flags(o_ptr,NULL,0x0L,TR2_IGNORE_THEFT,0x0L,0x0L, FALSE);
 
 				/* Skip artifacts */
 				if (f2 & (TR2_IGNORE_THEFT)) continue;
@@ -11553,22 +11634,22 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_BLIND:
 		{
 			/* Apply resistance */
-			if ((dam) && ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) != 0))
+			if ((dam) && (p_ptr->ability[ABILITY_RESIST_BLIND] > 0))
 			{
 				/* Sometimes notice */
-				player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_BLIND);
 
-				dam *= 5; dam /= (randint(6) + 6);
+				dam *= 5; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_BLIND], 6) + 6);
 			}
 
 			/* Take damage */
 			take_hit(who, what, dam);
 
 			/* Increase "blind" */
-			if ((p_ptr->cur_flags2 & (TR2_RES_BLIND)) == 0)
+			if (p_ptr->ability[ABILITY_RESIST_BLIND] <= 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
+				player_not_ability(who, ABILITY_RESIST_BLIND);
 
 				/* Inflict disease */
 				if ((p_ptr->timed[TMD_BLIND] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_BLIND, dam, 50);
@@ -11582,7 +11663,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_BLIND,0x0L,0x0L);
+				player_can_ability(who, ABILITY_RESIST_BLIND);
 			}
 
 			break;
@@ -11598,43 +11679,50 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_TERRIFY:
 		{
 			/* Apply resistance */
-			if ((dam) && ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0))
+			if ((dam) && (p_ptr->ability[ABILITY_RESIST_FEAR] > 0))
 			{
 				/* Sometimes notice */
-				if(!(p_ptr->timed[TMD_HERO] || p_ptr->timed[TMD_BERSERK])) player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+				if(!(p_ptr->timed[TMD_HERO] || p_ptr->timed[TMD_BERSERK])) player_can_ability(who, ABILITY_RESIST_FEAR);
 
-				dam *= 5; dam /= (randint(6) + 6);
+				dam *= 5; dam /= (damroll(p_ptr->ability[ABILITY_RESIST_FEAR],6) + 6);
+			}
+			else
+			{
+				player_not_ability(who, ABILITY_RESIST_FEAR);
 			}
 
 			/* Take damage */
 			take_hit(who, what, dam);
 
 			/* Increase "afraid" */
-			if ((p_ptr->cur_flags2 & (TR2_RES_FEAR)) != 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_FEAR)) != 0)
 			{
 				/* Sometimes notice */
-				if (!(p_ptr->timed[TMD_HERO] || p_ptr->timed[TMD_BERSERK])) player_can_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+				if (!(p_ptr->timed[TMD_HERO] || p_ptr->timed[TMD_BERSERK])) player_can_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L);
 
-				msg_print("You stand your ground!");
-				obvious = TRUE;
-			}
-			else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
-			{
 				msg_print("You stand your ground!");
 				obvious = TRUE;
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_FEAR,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_FEAR,0x0L,0x0L,0x0L);
 
-				/* Inflict disease */
-				if ((p_ptr->timed[TMD_AFRAID] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_FEAR, dam, 50);
-
-				/* Inflict fear - always cumulative */
-				if (set_afraid(p_ptr->timed[TMD_AFRAID] + 3 + randint(dam)))
+				if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 				{
+					msg_print("You stand your ground!");
 					obvious = TRUE;
+				}
+				else
+				{
+					/* Inflict disease */
+					if ((p_ptr->timed[TMD_AFRAID] > 100) && (randint(4000) < dam)) inflict_disease(DISEASE_FEAR, dam, 50);
+
+					/* Inflict fear - always cumulative */
+					if (set_afraid(p_ptr->timed[TMD_AFRAID] + 3 + randint(dam)))
+					{
+						obvious = TRUE;
+					}
 				}
 			}
 
@@ -11645,10 +11733,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_SLEEP:
 		{
 			/* Increase "paralyzed" */
-			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
+			if (((p_ptr->cur_flags1 & (TR1_NO_SLEEP)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 			{
 				/* Always notice */
-				if (!p_ptr->timed[TMD_FREE_ACT]) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				if (!p_ptr->timed[TMD_FREE_ACT]) player_can_flags(who, NULL, TR1_NO_SLEEP,0x0L,0x0L,0x0L);
 				else update_smart_learn(who, SM_FREE_ACT);
 
 				msg_print("You are unaffected!");
@@ -11657,7 +11745,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				player_not_flags(who, NULL, TR1_NO_SLEEP, 0x0L,0x0L,0x0L);
 
 				msg_print("You resist the effects!");
 				obvious = TRUE;
@@ -11676,7 +11764,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				player_not_flags(who, NULL, TR1_NO_SLEEP, 0x0L,0x0L,0x0L);
 
 				/* Inflict sleepiness */
 				if (inc_timed(TMD_MSLEEP, dam, TRUE))
@@ -11775,10 +11863,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(who, what, dam);
 
 			/* Increase "petrification" */
-			if ((p_ptr->cur_flags2 & (TR2_RES_SHARD)) != 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_PETRIFY)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_PETRIFY, 0x0L,0x0L,0x0L);
 
 				msg_print("You are unaffected!");
 				obvious = TRUE;
@@ -11786,7 +11874,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_PETRIFY, 0x0L,0x0L,0x0L);
 
 				msg_print("You resist the effects!");
 				obvious = TRUE;
@@ -11805,7 +11893,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SHARD,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_PETRIFY, 0x0L,0x0L,0x0L);
 
 				/* Inflict petrification */
 				if (inc_timed(TMD_PETRIFY, k, TRUE))
@@ -11827,10 +11915,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(who, what, dam);
 
 			/* Increase "paralyzed" */
-			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
+			if (((p_ptr->cur_flags1 & (TR1_NO_PARALYZE)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 			{
 				/* Always notice */
-				if (!p_ptr->timed[TMD_FREE_ACT]) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				if (!p_ptr->timed[TMD_FREE_ACT]) player_can_flags(who, NULL, TR1_NO_PARALYZE, 0x0L,0x0L,0x0L);
 				else update_smart_learn(who, SM_FREE_ACT);
 
 				msg_print("You are unaffected!");
@@ -11839,7 +11927,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				player_not_flags(who, NULL, TR1_NO_PARALYZE,0x0L,0x0L,0x0L);
 
 				msg_print("You resist the effects!");
 				obvious = TRUE;
@@ -11854,7 +11942,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				int k = randint((dam / 3) + 2);
 
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				player_not_flags(who, NULL, TR1_NO_PARALYZE,0x0L,0x0L,0x0L);
 
 				/* Inflict paralyzation */
 				if (set_timed(TMD_PARALYZED, k, TRUE))
@@ -11906,10 +11994,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			take_hit(who, what, dam);
 
 			/* Increase "paralyzed" */
-			if (((p_ptr->cur_flags3 & (TR3_FREE_ACT)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
+			if (((p_ptr->cur_flags1 & (TR1_NO_SLOW)) != 0) || (p_ptr->timed[TMD_FREE_ACT]))
 			{
 				/* Always notice */
-				if (!p_ptr->timed[TMD_FREE_ACT]) player_can_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				if (!p_ptr->timed[TMD_FREE_ACT]) player_can_flags(who, NULL, TR1_NO_SLOW, 0x0L,0x0L,0x0L);
 				else update_smart_learn(who, SM_FREE_ACT);
 
 				msg_print("You are unaffected!");
@@ -11918,7 +12006,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else if (rand_int(100) < p_ptr->skills[SKILL_SAVE])
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				player_not_flags(who, NULL, TR1_NO_SLOW, 0x0L,0x0L,0x0L);
 
 				msg_print("You resist the effects!");
 				obvious = TRUE;
@@ -11926,7 +12014,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				player_not_flags(who, NULL, TR1_NO_SLOW, 0x0L,0x0L,0x0L);
 
 				/* Inflict disease */
 				if ((p_ptr->timed[TMD_SLOW] > 100) && (randint(2000) < dam)) inflict_disease(DISEASE_SLOW, dam, 50);
@@ -12058,7 +12146,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				obvious = hp_player(dam);
 
 				/* Always notice */
-				if (obvious) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				if (obvious) player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 
 				dam = 0;
 			}
@@ -12066,7 +12154,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				/* Take damage */
 				take_hit(who, what, dam);
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 			}
 
 			/* Damage (stat) */
@@ -12242,7 +12330,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags3 & (TR3_FEATHER)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_can_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				msg_print("You float gently down to the bottom of the pit.");
 
@@ -12251,7 +12339,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_not_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				take_hit(who, what, dam);
 			}
@@ -12266,7 +12354,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				 (p_ptr->cur_flags3 & TR3_FEATHER) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_can_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				if (typ == GF_FALL_MORE)
 					msg_print("You gently float down.");
@@ -12277,7 +12365,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			{
 				if (typ == GF_FALL_MORE)
 					/* Always notice */
-					player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+					player_not_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				take_hit(who, what, dam);
 			}
@@ -12327,7 +12415,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags3 & (TR3_FEATHER)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_can_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				msg_print("You float gently to the floor of the pit.");
 				msg_print("You carefully avoid touching the spikes.");
@@ -12336,7 +12424,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_not_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				/* Extra spike damage */
 				if (rand_int(100) < 50)
@@ -12358,7 +12446,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags3 & (TR3_FEATHER)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_can_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				msg_print("You float gently to the floor of the pit.");
 				msg_print("You carefully avoid touching the spikes.");
@@ -12367,7 +12455,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,TR3_FEATHER,0x0L);
+				player_not_flags(who, NULL, 0x0L,0x0L,TR3_FEATHER,0x0L);
 
 				/* Extra spike damage */
 				if (rand_int(100) < 50)
@@ -12392,10 +12480,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_LAVA:
 		{
 			msg_print ("You are surrounded by lava!");
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN,0x0L,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 90)
@@ -12412,19 +12500,19 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_STUN,0x0L,0x0L,0x0L);
 			}
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 
 				inc_timed(TMD_CONFUSED, p_ptr->timed[TMD_CONFUSED] ? 1 : randint(5) + 5, TRUE);
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 			}
 
 			fire_dam(who, what, dam, TRUE);
@@ -12436,10 +12524,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			msg_print("You are scalded by boiling water.");
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN,0x0L,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 90)
@@ -12456,19 +12544,19 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 			}
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 
 				inc_timed(TMD_CONFUSED, p_ptr->timed[TMD_CONFUSED] ? 1 : randint(5) + 5, TRUE);
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 			}
 
 			fire_dam(who, what, dam/3, FALSE);
@@ -12476,14 +12564,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if ((p_ptr->cur_flags4 & (TR4_HURT_WATER)) != 0)
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+				player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
 
 				dam *= 2;
 			}
 			else
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
+				player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_HURT_WATER);
 			}
 
 			water_dam(who, what, (dam*2)/3, TRUE);
@@ -12493,10 +12581,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		{
 			msg_print("You are splashed with boiling mud.");
 
-			if ((p_ptr->cur_flags2 & (TR2_RES_SOUND)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_STUN)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_STUN, 0x0L,0x0L,0x0L);
 
 				/* Work on preventing infinite knockout */
 				if (p_ptr->timed[TMD_STUN] > 90)
@@ -12513,19 +12601,19 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_STUN, 0x0L,0x0L,0x0L);
 			}
-			if ((p_ptr->cur_flags2 & (TR2_RES_CONFU)) == 0)
+			if ((p_ptr->cur_flags1 & (TR1_NO_CONFUSE)) == 0)
 			{
 				/* Always notice */
-				player_not_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_not_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 
 				inc_timed(TMD_CONFUSED, p_ptr->timed[TMD_CONFUSED] ? 1 : randint(5) + 5, TRUE);
 			}
 			else
 			{
 				/* Always notice */
-				player_can_flags(who, 0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				player_can_flags(who, NULL, TR1_NO_CONFUSE,0x0L,0x0L,0x0L);
 			}
 
 			water_dam(who, what, (dam*2)/3, FALSE);
@@ -12550,14 +12638,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				take_hit(who, what, dam);
 
 				/* Always notice */
-				player_can_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 			}
 			else
 			{
 				obvious = hp_player(dam);
 
 				/* Always notice */
-				if (obvious) player_not_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				if (obvious) player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 
 				dam = 0;
 			}
@@ -12580,7 +12668,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				obvious = hp_player(dam);
 
 				/* Always notice */
-				if (obvious) player_can_flags(who, 0x0L,0x0L,0x0L,TR4_UNDEAD);
+				if (obvious) player_can_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 
 				dam = 0;
 			}
@@ -12616,10 +12704,10 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 				if (p_ptr->cur_flags4 & (TR4_UNDEAD)) player_not_flags(who, NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 
 				/* Vampires also drain experience */
-				if (typ == VAMP_DRAIN_BLOOD)
+				if (typ == GF_VAMP_DRAIN_BLOOD)
 				{
-					/* Drain depends on vampire level */
-					check_hold_life(who, 100 - r_ptr->level, damroll(r_ptr->level,6));
+					/* Drain depends on level */
+					check_hold_life(who, 100 - p_ptr->depth, damroll(p_ptr->depth+1,6));
 				}
 
 				/* Assist the source monster */
@@ -12650,7 +12738,9 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_AWAY_FIRE:
 		{
 			/* Teleport restriction fails */
-			if ((teleport_hook && !(teleport_hook(y, x, y, x))) || (p_ptr->cur_flags4 & (TR4_ANCHOR)) || (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
+			if ((teleport_hook && !(teleport_hook(y, x, y, x))) ||
+				(who <= SOURCE_PLAYER_START ? ((p_ptr->cur_flags4 & (TR4_LODESTONE)) != 0) : ((p_ptr->cur_flags3 & (TR3_ANCHOR)) != 0))
+				|| (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
 			{
 				/* Source is player */
 				if (who <= SOURCE_PLAYER_START)
@@ -12674,12 +12764,14 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 					msg_print("It fails to teleport you away.");
 				}
 
-				/* Learn about anchor */
-				if (p_ptr->cur_flags4 & (TR4_ANCHOR)) player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+				/* Learn about anchor/lodestone */
+				if (p_ptr->cur_flags3 & (TR3_ANCHOR)) player_can_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
+				if (p_ptr->cur_flags4 & (TR4_LODESTONE)) player_can_flags(who, NULL, 0x0L, 0x0L, 0x0L, TR4_LODESTONE);
 			}
 			else
 			{
-				player_not_flags(who, 0x0L, 0x0L, 0x0L, TR4_ANCHOR);
+				if (who <= SOURCE_PLAYER_START) player_not_flags(who, NULL, 0x0L, 0x0L, 0x0L, TR4_LODESTONE);
+				else player_not_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
 
 				/* Mark grid for later processing. */
 				cave_temp_mark(y, x, FALSE);
@@ -12886,29 +12978,28 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 
 			obvious = TRUE;
 
+			/* Allow resistance */
+			if (rand_int(100) < p_ptr->skills[SKILL_SAVE]) resist++;
+
+			if (p_ptr->ability[ABILITY_SLOW_DIGEST] > 0)
+			{
+				resist += 1 + p_ptr->ability[ABILITY_SLOW_DIGEST];
+				player_can_ability(who, ABILITY_SLOW_DIGEST);
+				dam /= 1 + p_ptr->ability[ABILITY_SLOW_DIGEST];
+			}
+			else
+			{
+				player_not_ability(who, ABILITY_SLOW_DIGEST);
+			}
+
 			/* Take damage */
 			take_hit(who, what, dam);
 
-			/* We're not dead yet */
 			if (!p_ptr->is_dead)
 			{
-				/* Allow resistance */
-				if (rand_int(100) < p_ptr->skills[SKILL_SAVE]) resist++;
-
-				if ((p_ptr->cur_flags3 & (TR3_SLOW_DIGEST)) != 0)
-				{
-					resist += 2;
-					player_can_flags(who, 0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
-					dam /= 3;
-				}
-				else
-				{
-					player_not_flags(who, 0x0L,0x0L,TR3_SLOW_DIGEST,0x0L);
-				}
-
 				/* Message -- only if appropriate */
 				if ((resist > 2) &&
-				    (p_ptr->food > PY_FOOD_ALERT))
+					(p_ptr->food > PY_FOOD_ALERT))
 				{
 					msg_print("You resist the effects!");
 				}
@@ -13004,7 +13095,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			if (p_ptr->cur_flags4 & (TR4_EVIL))
 			{
 				/* Notice */
-				player_can_flags(who, 0x0L, 0x0L, 0x0L, TR4_EVIL);
+				player_can_flags(who, NULL, 0x0L, 0x0L, 0x0L, TR4_EVIL);
 
 				/* Obvious */
 				obvious = TRUE;
@@ -13223,7 +13314,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (affect_player)
 			{
-				if (((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) || (p_ptr->cur_flags3 & (TR3_FEATHER))) &&
+				if (((p_ptr->cur_flags3 & (TR3_ANCHOR)) || (p_ptr->cur_flags3 & (TR3_FEATHER))) &&
 				    (rand_int(3)))
 				{
 					msg_print("You barely hold your ground.");
@@ -13346,7 +13437,7 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		{
 			if (affect_player)
 			{
-				if ((p_ptr->cur_flags2 & (TR2_RES_NEXUS)) == 0)
+				if ((p_ptr->ability[ABILITY_RESIST_NEXUS]) <= 0)
 				{
 					monster_type *n_ptr = NULL;
 

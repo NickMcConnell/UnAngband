@@ -2715,18 +2715,26 @@ enum
 /*
  * Some 'legacy' fixed blow values which have been repurposed or hard-coded
  */
+#define RBM_HIT		1
 #define RBM_TOUCH	2
+#define RBM_CLAW	5
+#define RBM_BITE	6
 #define	RBM_VOMIT	8
+#define	RBM_BUTT	9
+#define	RBM_PECK	12
 #define	RBM_SPIT	16
 #define RBM_TRAP	25
+#define RBM_BOULDER	26
 #define RBM_AURA	27
 #define RBM_SELF	28
 #define RBM_AIM		44
 #define RBM_EXPLODE	52
 #define RBM_ARROW	53
 #define RBM_DAGGER	56
+#define RBM_SHOT	57
 #define RBM_TRAIL	64
 #define RBM_AURA_MINOR	72
+#define RBM_SPIKE	75
 
 /*** Function flags ***/
 
@@ -3553,6 +3561,8 @@ enum
 	BONUS_RESIST,
 	BONUS_LOW_RESIST,		/* Basic resists - acid/elec/fire/cold */
 	BONUS_WEAPON,			/* Bonuses from here onwards on a weapon only applied when using that weapon */
+	BONUS_WEAPON_TO_HIT,
+	BONUS_WEAPON_TO_DAM,
 	BONUS_ADD_WEAPON_SKILL,
 	BONUS_WEAPON_MULTIPLIER,	/* Weapon multiplier instead of adder */
 	BONUS_VAMP,
@@ -3634,13 +3644,13 @@ enum
 	ABILITY_RESIST_LITE,     /* Resist lite */
 	ABILITY_RESIST_DARK,     /* Resist dark */
 	ABILITY_RESIST_BLIND,     /* Resist blind */
-	ABILITY_RESIST_CONFU,     /* Resist confusion */
+	ABILITY_RESIST_CONFUSE,     /* Resist confusion */
 	ABILITY_RESIST_SOUND,     /* Resist sound */
 	ABILITY_RESIST_SHARD,     /* Resist shards */
 	ABILITY_RESIST_NEXUS,     /* Resist nexus */
-	ABILITY_RESIST_NETHR,     /* Resist nether */
+	ABILITY_RESIST_NETHER,     /* Resist nether */
 	ABILITY_RESIST_CHAOS,     /* Resist chaos */
-	ABILITY_RESIST_DISEN,     /* Resist disenchant */
+	ABILITY_RESIST_DISENCHANT,     /* Resist disenchant */
 
 	ABILITY_SLOW_DIGEST,	/* Slows digestion */
 	ABILITY_STRIKES,		/* Unarmed strikes += "aval" */
@@ -3790,12 +3800,12 @@ enum
 #define TR1_NO_AMNESIA	0x00040000L     /* Prevents amnesia */
 #define TR1_NO_PETRIFY	0x00080000L     /* Prevents petrification */
 #define TR1_NO_STASTIS	0x00100000L     /* Prevents time side effects */
-#define TR1_NO_MSLEEP	0x00200000L     /* Prevents monster induced sleep */
-#define TR1_NO_PSLEEP	0x00400000L     /* Unable to sleep naturally */
+#define TR1_NO_SLEEP	0x00200000L     /* Prevents monster induced sleep */
+#define TR1_CANT_SLEEP	0x00400000L     /* Unable to sleep naturally */
 #define TR1_NO_BERSERK	0x00800000L     /* Unable to go berserk */
 #define TR1_NO_DAZED	0x01000000L		/* Prevents being dazed */
 #define TR1_NO_TERROR	0x0200000L     	/* Prevents terror */
-#define TR1_NO_SOAKED	0x04000000L     /* Prevents getting soaked to the skin */
+#define TR1_NO_SOAK		0x04000000L     /* Prevents getting soaked to the skin */
 #define TR1_NO_AGGRAVATE 0x08000000L	/* Prevents aggravation */
 #define TR1_NO_STENCH	0x10000000L     /* Prevents bad odours */
 #define TR1_NO_RECALL	0x20000000L     /* Prevents recalling */
@@ -3804,10 +3814,10 @@ enum
 
 #define TR1_OLD_FLAGS (0L)
 
-#define TR2_WALK_ACID	0x00000001L     /* Unaffected by acidic terrain */
-#define TR2_WALK_FIRE	0x00000002L		/* Unaffected by fiery terrain */
-#define TR2_WALK_WATER	0x00000004L		/* Unaffected by watery terrain */
-#define TR2_WALK_LAVA	0x00000008L		/* Unaffected by lava terrain */
+#define TR2_WALK_ACID	0x00000001L     /* Unaffected by acidic terrain unless filled */
+#define TR2_WALK_FIRE	0x00000002L		/* Unaffected by fiery terrain unless filled  */
+#define TR2_WALK_WATER	0x00000004L		/* Unaffected by watery terrain unless filled  */
+#define TR2_WALK_LAVA	0x00000008L		/* Unaffected by lava terrain unless filled  */
 #define TR2_IGNORE_TPORT	0x00000010L	/* Item ignores teleportation */
 #define TR2_IGNORE_LAVA	0x00000020L    /* Item ignores Lava damage */
 #define TR2_IGNORE_ACID   0x00000040L     /* Item ignores Acid damage */

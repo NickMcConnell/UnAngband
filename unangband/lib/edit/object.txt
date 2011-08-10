@@ -5248,11 +5248,15 @@ A:45/3
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 
+N:630:Probe Monster
+G:-:w
+I:66:39:0
+W:5:50:15:100
+A:5/1
+P:0:1d1:0:0:0
+Y:1:1
+
 ### New scrolls (13)
-
-### 630 - Unused ###
-
-#$# 630 - Unused ###
 
 N:631:Continual Light
 G:?:w
@@ -8174,7 +8178,7 @@ A:45/12
 P:0:1d1:0:0:0
 F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 
-N:997:of Corrosion
+N:997:of Solvents
 G:?:r
 I:90:36:0
 W:46:0:30:13000

@@ -267,7 +267,7 @@ void generate_familiar(void)
 						/* Spikes are shorter range, and therefore more powerful at higher level.
 						 * Note that shots get converted into boulders for more damage than this if
 						 * the familiar goes giant size. */
-						if (p_ptr->familiar_attr[i] == FAMILIAR_SPIKE) d_side = p_ptr->max_lev / 2;
+						if (p_ptr->familiar_attr[i] == FAMILIAR_SPIKE) r_ptr->blow[blow].d_side = p_ptr->max_lev / 2;
 					}
 					break;
 				default:
@@ -290,7 +290,7 @@ void generate_familiar(void)
 		/* Hack -- supersize shots for huge monsters */
 		if ((r_ptr->blow[i].method == RBM_SHOT) && ((r_ptr->flags3 & (RF3_HUGE)) != 0))
 		{
-			r_ptr->blow[i].method == RBM_BOULDER;
+			r_ptr->blow[i].method = RBM_BOULDER;
 			r_ptr->blow[i].d_side *= 2;
 		}
 		
@@ -468,14 +468,14 @@ static cptr desc_stat_neg[] =
 int do_dec_stat(int stat)
 {
 	/* Sustain */
-	if (p_ptr->cur_flags2 & (TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat))))
+	if (p_ptr->cur_flags1 & (TR1_SUST_STR << stat))
 	{
 		/* Message */
 		msg_format("You feel very %s for a moment, but the feeling passes.",
 			   desc_stat_neg[stat]);
 
 		/* Always notice */
-		equip_can_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat)), 0x0L, 0x0L);
+		equip_can_flags(NULL, TR1_SUST_STR << stat, 0x0L, 0x0L, 0x0L);
 
 		/* Notice effect */
 		return -1;
@@ -488,7 +488,7 @@ int do_dec_stat(int stat)
 		msg_format("You feel very %s.", desc_stat_neg[stat]);
 
 		/* Always notice */
-		equip_not_flags(0x0L, TR2_SUST_STR << (stat == A_AGI ? A_DEX : (stat == A_SIZ ? A_STR : stat)), 0x0L, 0x0L);
+		equip_not_flags(NULL, TR1_SUST_STR << stat, 0x0L, 0x0L, 0x0L);
 
 		/* Notice effect */
 		return 1;
@@ -631,13 +631,13 @@ static int remove_curse_aux(int all)
 		if (!cursed_p(o_ptr)) continue;
 
 		/* Extract the flags */
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 		/* Heavily Cursed Items need a special spell */
 		if (!all && (f3 & (TR3_HEAVY_CURSE)))
 		{
 			/* Learn about the object */
-			object_can_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L, FALSE);
+			object_can_flags(o_ptr,NULL,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L, FALSE);
 
 			continue;
 		}
@@ -646,16 +646,16 @@ static int remove_curse_aux(int all)
 		if (f3 & (TR3_PERMA_CURSE))
 		{
 			/* Learn about the object */
-			if (all) object_can_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L, FALSE);
+			if (all) object_can_flags(o_ptr,NULL,0x0L,0x0L,TR3_PERMA_CURSE,0x0L, FALSE);
 
 			continue;
 		}
 
 		/* Learn about the object */
-		if (!all) object_not_flags(o_ptr,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L, FALSE);
+		if (!all) object_not_flags(o_ptr,NULL,0x0L,0x0L,TR3_HEAVY_CURSE,0x0L, FALSE);
 
 		/* Learn about the object */
-		object_not_flags(o_ptr,0x0L,0x0L,TR3_PERMA_CURSE,0x0L, FALSE);
+		object_not_flags(o_ptr,NULL,0x0L,0x0L,TR3_PERMA_CURSE,0x0L, FALSE);
 
 		/* Uncurse the object */
 		uncurse_object(o_ptr);
@@ -801,11 +801,11 @@ bool disease_desc(char *desc, size_t desc_s, u32b old_disease, u32b new_disease)
  */
 void self_knowledge_aux(bool spoil, bool random)
 {
-	int i, n;
+	int i, n, slot;
 
-	u32b f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
+	u32b f0[ABILITY_ARRAY_SIZE], f1 = 0L, f2 = 0L, f3 = 0L, f4 = 0L;
 
-	u32b t1, t2, t3, t4;
+	u32b t0[ABILITY_ARRAY_SIZE], t1, t2, t3, t4;
 
 	object_type *o_ptr;
 
@@ -814,6 +814,14 @@ void self_knowledge_aux(bool spoil, bool random)
 	int vn;
 
 	bool healthy = TRUE;
+	bool f0_set = FALSE;
+	bool t0_set = FALSE;
+
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+	{
+		f0[i] = 0L;
+		t0[i] = 0L;	/* Paranoia */
+	}
 
 	for (i = 0; i < TMD_MAX; i++)
 	{
@@ -1025,28 +1033,22 @@ void self_knowledge_aux(bool spoil, bool random)
 		text_out("Use the study command to learn from books, altars, magic circles or instruments.  ");
 	}
 
-	if (p_ptr->word_recall)
-	{
-		text_out("You will soon be recalled.  ");
-	}
-
-	if (p_ptr->word_return)
-	{
-		text_out("You will soon be returned to a nearby location.  ");
-	}
-
 	/* Get player flags */
-	player_flags(&t1,&t2,&t3,&t4);
+	player_flags(t0, &t1,&t2,&t3,&t4);
 
 	/* Hack -- race / shape effects */
 	if (!random)
 	{
 		bool intro = FALSE;
 
-		object_flags(&inventory[INVEN_SELF], &f1, &f2, &f3, &f4);
+		object_flags(&inventory[INVEN_SELF], f0, &f1, &f2, &f3, &f4);
+
+		/* Check ability flags */
+		f0_set = FALSE;
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0_set |= (f0[i] != 0);
 
 		/* Hack -- shape flags */
-		if ((!random) && (f1 || f2 || f3 || f4))
+		if ((!random) && (f0_set || f1 || f2 || f3 || f4))
 		{
 			if (!intro) text_out(format("Your %s affects you.  ", p_ptr->prace != p_ptr->pshape ? "shape" : "race"));
 
@@ -1059,21 +1061,27 @@ void self_knowledge_aux(bool spoil, bool random)
 		if (intro) text_out("\n");
 
 		/* Eliminate shape flags */
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] &= ~(f0[i]);
 		t1 &= ~(f1);
 		t2 &= ~(f2);
 		t3 &= ~(f3);
 		t4 &= ~(f4);
 
 		/* Clear the flags */
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
 		f1 = f2 = f3 = f4 = 0L;
 	}
 
+	/* Check ability flags */
+	t0_set = FALSE;
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0_set |= (t0[i] != 0);
+
 	/* Hack -- class effects */
-	if ((!random) && (t1 || t2 || t3 || t4))
+	if ((!random) && (t0_set || t1 || t2 || t3 || t4))
 	{
 		text_out("Your training affects you.  ");
 
-		list_object_flags(t1,t2,t3,t4,1, 1);
+		list_object_flags(p_ptr->ability, t0, t1,t2,t3,t4,1, 1);
 
 		text_out("\n");
 	}
@@ -1086,77 +1094,103 @@ void self_knowledge_aux(bool spoil, bool random)
 		o_ptr = &inventory[i];
 
 		/* Clear the flags */
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] = 0L;
 		t1 = t2 = t3 = t4 = 0L;
 
 		/* Skip non-objects */
 		if (!o_ptr->k_idx) continue;
 
 		/* Extract the flags */
-		if (spoil) object_flags(o_ptr, &t1, &t2, &t3, &t4);
-		else object_flags_known(o_ptr, &t1, &t2, &t3, &t4);
+		if (spoil) object_flags(o_ptr, t0, &t1, &t2, &t3, &t4);
+		else object_flags_known(o_ptr, t0, &t1, &t2, &t3, &t4);
 
 		/* Extract flags */
+		for (i = 0; i < ABILITY_MAX; i++) if (ability_bonus[i].type >= BONUS_WEAPON) f0[i/32] &= ~(1L << (i % 32));
 		f1 |= t1 & ~(TR1_IGNORE_FLAGS);
 		f2 |= t2 & ~(TR2_IGNORE_FLAGS);
 		f3 |= t3 & ~(TR3_IGNORE_FLAGS);
 		f4 |= t4 & ~(TR4_IGNORE_FLAGS);
 	}
 
+	/* Check ability flags */
+	f0_set = FALSE;
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0_set |= (f0[i] != 0);
+
 	/* Hack -- other equipment effects */
-	if ((f1) || (f2) || (f3) || (f4))
+	if ((f0_set) || (f1) || (f2) || (f3) || (f4))
 	{
 		text_out("Your equipment affects you.  ");
 
-		list_object_flags(f1,f2,f3,f4,0, 1);
+		list_object_flags(p_ptr->ability, f0, f1,f2,f3,f4,0, 1);
 
 		if (spoil)
 		{
-			equip_can_flags(f1,f2,f3,f4);
+			equip_can_flags(f0, f1,f2,f3,f4);
 
-			equip_not_flags(~(f1 | TR1_IGNORE_FLAGS),~(f2 | TR2_IGNORE_FLAGS),~(f3 | TR3_IGNORE_FLAGS), ~(f4 | TR4_IGNORE_FLAGS));
+			for (i = 0; i < ABILITY_MAX; i++) if (ability_bonus[i].type >= BONUS_WEAPON) f0[i/32] |= 1L << (i % 32);
+			for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = ~(f0[i]);
+			equip_not_flags(f0, ~(f1 | TR1_IGNORE_FLAGS),~(f2 | TR2_IGNORE_FLAGS),~(f3 | TR3_IGNORE_FLAGS), ~(f4 | TR4_IGNORE_FLAGS));
 		}
 
 		text_out("\n");
 	}
 
-	o_ptr = &inventory[INVEN_WIELD];
-
-	if (o_ptr->k_idx)
+	/* Need to check off-hand weapon and bows as well if required */
+	for (slot = INVEN_WIELD; slot < END_EQUIPMENT; slot++)
 	{
-		/* Clear the flags */
-		t1 = t2 = t3 = t4 = 0L;
+		o_ptr = &inventory[slot];
 
-		/* Extract the flags */
-		if (spoil) object_flags(o_ptr, &t1, &t2, &t3, &t4);
-		else object_flags_known(o_ptr, &t1, &t2, &t3, &t4);
-
-		/* Extract weapon flags */
-		t1 = t1 & (TR1_WEAPON_FLAGS);
-		t2 = t2 & (TR2_WEAPON_FLAGS);
-		t3 = t3 & (TR3_WEAPON_FLAGS);
-		t4 = t4 & (TR4_WEAPON_FLAGS);
-
-		/* Hack -- weapon effects */
-		if (t1 || t2 || t3 || t4)
+		/* Using a slot with a weapon */
+		if ((o_ptr->k_idx) && ((slot == INVEN_WIELD) || ((slot == INVEN_ARM) && (o_ptr->tval != TV_SHIELD)) ||
+				((slot == INVEN_BOW) && (o_ptr->tval == TV_BOW))))
 		{
-			text_out("Your weapon has special powers.  ");
+			/* Clear the flags */
+			for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] = 0L;
+			t1 = t2 = t3 = t4 = 0L;
 
-			list_object_flags(t1,t2,t3,t4,o_ptr->pval, 1);
+			/* Extract the flags */
+			if (spoil) object_flags(o_ptr, t0, &t1, &t2, &t3, &t4);
+			else object_flags_known(o_ptr, t0 ,&t1, &t2, &t3, &t4);
 
-			if (spoil)
+			/* Extract weapon flags */
+			for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+			for (i = 0; i < ABILITY_MAX; i++) if (ability_bonus[i].type >= BONUS_WEAPON) f0[i/32] |= (1L << (i % 32));
+			for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] &= f0[i];
+			t1 &= (TR1_WEAPON_FLAGS);
+			t2 &= (TR2_WEAPON_FLAGS);
+			t3 &= (TR3_WEAPON_FLAGS);
+			t4 &= (TR4_WEAPON_FLAGS);
+
+			/* Check ability flags */
+			t0_set = FALSE;
+			for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0_set |= (t0[i] != 0);
+
+			/* Hack -- weapon effects */
+			if (t0_set || t1 || t2 || t3 || t4)
 			{
-				object_can_flags(o_ptr,t1,t2,t3,t4, FALSE);
+				text_out("Your weapon has special powers.  ");
 
-				object_not_flags(o_ptr,TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4), FALSE);
+				list_object_flags(o_ptr->ability, t0,t1,t2,t3,t4,o_ptr->pval, 1);
+
+				if (spoil)
+				{
+					object_can_flags(o_ptr,t0, t1,t2,t3,t4, FALSE);
+
+					for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+					for (i = 0; i < ABILITY_MAX; i++) if (ability_bonus[i].type >= BONUS_WEAPON) f0[i/32] |= (1L << (i%32));
+					for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] = f0[i] & ~(t0[i]);
+					object_not_flags(o_ptr,t0, TR1_WEAPON_FLAGS & ~(t1),TR2_WEAPON_FLAGS & ~(t2),TR3_WEAPON_FLAGS & ~(t3), TR4_WEAPON_FLAGS & ~(t4), FALSE);
+				}
+
+				text_out("\n");
 			}
 
-			text_out("\n");
 		}
-
 	}
 
 remainder:
 	/* Clear the flags */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] = 0L;
 	t1 = t2 = t3 = t4 = 0L;
 
 	/* Collect may flags */
@@ -1164,18 +1198,23 @@ remainder:
 	{
 		o_ptr = &inventory[n];
 
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0[i] |= o_ptr->may_flags0[i];
 		t1 |= o_ptr->may_flags1;
 		t2 |= o_ptr->may_flags2;
 		t3 |= o_ptr->may_flags3;
 		t4 |= o_ptr->may_flags4;
 	}
 
+	/* Check ability flags */
+	t0_set = FALSE;
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) t0_set |= (t0[i] != 0);
+
 	/* Hack -- weapon effects */
 	if (t1 || t2 || t3 || t4)
 	{
 		text_out("You are carrying equipment that you have not fully identified.  ");
 
-		list_object_flags(t1,t2,t3,t4,0, 1);
+		list_object_flags(p_ptr->ability, t0,t1,t2,t3,t4,0, 1);
 
 		text_out("\n");
 	}
@@ -1287,7 +1326,7 @@ static bool set_recall(void)
 	}
 
 	/* Activate recall */
-	if (!p_ptr->word_recall)
+	if (!p_ptr->timed[TMD_WORD_RECALL])
 	{
 		if (!get_check("The air starts crackling. Are you sure you want to continue? "))
 		{
@@ -1307,14 +1346,14 @@ static bool set_recall(void)
 				 t_info[p_ptr->dungeon].attained_depth = p_ptr->depth;
 		}
 
-		p_ptr->word_recall = (s16b)rand_int(20) + 15;
+		p_ptr->timed[TMD_WORD_RECALL] = (s16b)rand_int(20) + 15;
 		msg_print("The air about you becomes charged...");
 	}
 
 	/* Deactivate recall */
 	else
 	{
-		p_ptr->word_recall = 0;
+		p_ptr->timed[TMD_WORD_RECALL] = 0;
 		msg_print("A tension leaves the air around you...");
 	}
 
@@ -1665,34 +1704,34 @@ int value_check_aux3(const object_type *o_ptr)
 	}
 
 	/* Great "armor" bonus */
-	if (o_ptr->to_a > MAX(7, o_ptr->ac))
+	if (object_aval(o_ptr, ABILITY_TO_AC) > MAX(7, object_aval(o_ptr, ABILITY_AC)))
 	  return (INSCRIP_GREAT);
 
 	/* Great to_h bonus */
-	if (o_ptr->to_h > 9) return (INSCRIP_GREAT);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) > 9) return (INSCRIP_GREAT);
 
 	/* Great to_d bonus */
-	if (o_ptr->to_d >
-	    MAX(7, k_info[o_ptr->k_idx].dd * k_info[o_ptr->k_idx].ds))
+	if (object_aval(o_ptr, ABILITY_TO_DAM) >
+	    MAX(7, kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_DICE) * kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_SIDES)))
 	  return (INSCRIP_GREAT);
 
 	/* Great "weapon" dice */
-	if (o_ptr->dd > k_info[o_ptr->k_idx].dd) return (INSCRIP_GREAT);
+	if (object_aval(o_ptr, ABILITY_DAMAGE_DICE) > kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_DICE)) return (INSCRIP_GREAT);
 
 	/* Great "weapon" sides */
-	if (o_ptr->ds > k_info[o_ptr->k_idx].ds) return (INSCRIP_GREAT);
+	if (object_aval(o_ptr, ABILITY_DAMAGE_SIDES) > kind_aval(o_ptr->k_idx, ABILITY_DAMAGE_SIDES)) return (INSCRIP_GREAT);
 
 	/* Very good "armor" bonus */
-	if (o_ptr->to_a > 5) return (INSCRIP_VERY_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 5) return (INSCRIP_VERY_GOOD);
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 7) return (INSCRIP_VERY_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 7) return (INSCRIP_VERY_GOOD);
 
 	/* Good "armor" bonus */
-	if (o_ptr->to_a > 0) return (INSCRIP_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0) return (INSCRIP_GOOD);
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 0) return (INSCRIP_GOOD);
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0) return (INSCRIP_GOOD);
 
 	/* Have already got nonmagical sensed */
 	if (o_ptr->feeling == INSCRIP_AVERAGE) return(INSCRIP_AVERAGE);
@@ -1821,13 +1860,13 @@ int value_check_aux5(const object_type *o_ptr)
 	}
 
 	/* Good "armor" bonus */
-	if (o_ptr->to_a > 0)
+	if (object_aval(o_ptr, ABILITY_TO_AC) > 0)
 	{
 		return (INSCRIP_MAGIC_ITEM);
 	}
 
 	/* Good "weapon" bonus */
-	if (o_ptr->to_h + o_ptr->to_d > 0)
+	if (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0)
 	{
 		return (INSCRIP_MAGIC_ITEM);
 	}
@@ -1869,7 +1908,7 @@ static bool item_tester_magic(const object_type *o_ptr)
 	}
 
 	/* Positive bonuses */
-	if ((o_ptr->to_a > 0) || (o_ptr->to_h + o_ptr->to_d > 0)) return (TRUE);
+	if ((object_aval(o_ptr, ABILITY_TO_AC) > 0) || (object_aval(o_ptr, ABILITY_TO_HIT) + object_aval(o_ptr, ABILITY_TO_DAM) > 0)) return (TRUE);
 
 	return (FALSE);
 }
@@ -2428,7 +2467,7 @@ bool concentrate_life_hook(const int y, const int x, const bool modify)
 {
 	feature_type *f_ptr = &f_info[cave_feat[y][x]];
 
-	/* Need 'running water' */
+	/* Need 'living' */
 	if ((f_ptr->flags3 & (FF3_LIVING)) == 0) return (FALSE);
 
 	/* Not modifying yet */
@@ -2879,7 +2918,7 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 	u32b f1, f2, f3, f4;
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 	/* Large piles resist enchantment */
 	prob = o_ptr->number * 100;
@@ -2901,9 +2940,9 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 		/* Enchant to hit */
 		if (eflag & (ENCH_TOHIT))
 		{
-			if (o_ptr->to_h < 0) chance = 0;
-			else if (o_ptr->to_h > 15) chance = 1000;
-			else chance = enchant_table[o_ptr->to_h];
+			if (object_aval(o_ptr, ABILITY_TO_HIT) < 0) chance = 0;
+			else if (object_aval(o_ptr, ABILITY_TO_HIT) > 15) chance = 1000;
+			else chance = enchant_table[object_aval(o_ptr, ABILITY_TO_HIT)];
 
 			/* Attempt to enchant */
 			if ((randint(1000) > chance) && (!a || (rand_int(100) < 50)))
@@ -2911,12 +2950,12 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 				res = TRUE;
 
 				/* Enchant */
-				o_ptr->to_h++;
+				object_ability_add(o_ptr, ABILITY_TO_HIT, 1);
 
 				/* Break curse */
 				if (cursed_p(o_ptr) &&
 				    (!(f3 & (TR3_PERMA_CURSE))) &&
-				    (o_ptr->to_h >= 0) && (rand_int(100) < 25))
+				    (object_aval(o_ptr, ABILITY_TO_HIT) >= 0) && (rand_int(100) < 25))
 				{
 					msg_print("The curse is broken!");
 
@@ -2929,15 +2968,15 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 		/* Enchant to damage */
 		if (eflag & (ENCH_TODAM))
 		{
-			if (o_ptr->to_d < 0) chance = 0;
+			if (object_aval(o_ptr, ABILITY_TO_DAM) < 0) chance = 0;
 			else if (o_ptr->tval == TV_BOW)
 			{
-				if (o_ptr->to_d > 15) chance = 1000;
-				else chance = enchant_table[o_ptr->to_d];
+				if (object_aval(o_ptr, ABILITY_TO_DAM) > 15) chance = 1000;
+				else chance = enchant_table[object_aval(o_ptr, ABILITY_TO_DAM)];
 			}
-			else if (o_ptr->to_d > o_ptr->dd * o_ptr->ds + 5) chance = 1000;
-			else if (o_ptr->to_d < o_ptr->dd * o_ptr->ds) chance = enchant_table[o_ptr->to_d * 10 / o_ptr->dd / o_ptr->ds];
-			else chance = enchant_table[o_ptr->to_d + 10 - o_ptr->dd * o_ptr->ds];
+			else if (object_aval(o_ptr, ABILITY_TO_DAM) > object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES) + 5) chance = 1000;
+			else if (object_aval(o_ptr, ABILITY_TO_DAM) < object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES)) chance = enchant_table[object_aval(o_ptr, ABILITY_TO_DAM) * 10 / object_aval(o_ptr, ABILITY_DAMAGE_DICE) / object_aval(o_ptr, ABILITY_DAMAGE_SIDES)];
+			else chance = enchant_table[object_aval(o_ptr, ABILITY_TO_DAM) + 10 - object_aval(o_ptr, ABILITY_DAMAGE_DICE) * object_aval(o_ptr, ABILITY_DAMAGE_SIDES)];
 
 			/* Attempt to enchant */
 			if ((randint(1000) > chance) && (!a || (rand_int(100) < 50)))
@@ -2945,12 +2984,12 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 				res = TRUE;
 
 				/* Enchant */
-				o_ptr->to_d++;
+				object_ability_add(o_ptr, ABILITY_TO_DAM, 1);
 
 				/* Break curse */
 				if (cursed_p(o_ptr) &&
 				    (!(f3 & (TR3_PERMA_CURSE))) &&
-				    (o_ptr->to_d >= 0) && (rand_int(100) < 25))
+				    (object_aval(o_ptr, ABILITY_TO_DAM) >= 0) && (rand_int(100) < 25))
 				{
 					msg_print("The curse is broken!");
 
@@ -2963,10 +3002,10 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 		/* Enchant to armor class */
 		if (eflag & (ENCH_TOAC))
 		{
-			if (o_ptr->to_a < 0) chance = 0;
-			else if (o_ptr->to_a > o_ptr->ac + 5) chance = 1000;
-			else if (o_ptr->to_a < o_ptr->ac) chance = enchant_table[o_ptr->to_a * 10 / o_ptr->ac];
-			else chance = enchant_table[o_ptr->to_a + 10 - o_ptr->ac];
+			if (object_aval(o_ptr, ABILITY_TO_AC) < 0) chance = 0;
+			else if (object_aval(o_ptr, ABILITY_TO_AC) > object_aval(o_ptr, ABILITY_AC) + 5) chance = 1000;
+			else if (object_aval(o_ptr, ABILITY_TO_AC) < object_aval(o_ptr, ABILITY_AC)) chance = enchant_table[object_aval(o_ptr, ABILITY_TO_AC) * 10 / object_aval(o_ptr, ABILITY_AC)];
+			else chance = enchant_table[object_aval(o_ptr, ABILITY_TO_AC) + 10 - object_aval(o_ptr, ABILITY_AC)];
 
 			/* Attempt to enchant */
 			if ((randint(1000) > chance) && (!a || (rand_int(100) < 50)))
@@ -2974,12 +3013,12 @@ bool enchant(object_type *o_ptr, int n, int eflag)
 				res = TRUE;
 
 				/* Enchant */
-				o_ptr->to_a++;
+				object_ability_add(o_ptr, ABILITY_TO_AC, 1);
 
 				/* Break curse */
 				if (cursed_p(o_ptr) &&
 				    (!(f3 & (TR3_PERMA_CURSE))) &&
-				    (o_ptr->to_a >= 0) && (rand_int(100) < 25))
+				    (object_aval(o_ptr, ABILITY_TO_AC) >= 0) && (rand_int(100) < 25))
 				{
 					msg_print("The curse is broken!");
 
@@ -3231,21 +3270,32 @@ bool brand_item(int brand, cptr act)
 		o_ptr->xtra1 = brand;
 		o_ptr->xtra2 = (byte)rand_int(object_xtra_size[brand]);
 
-		if (object_xtra_what[brand] == 1)
+		/* Know the brand */
+		if (object_xtra_what[brand] == 0)
 		{
-    			object_can_flags(o_ptr,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L,0x0L, item < 0);
+			u32b f0[ABILITY_ARRAY_SIZE];
+			int i;
+
+			for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+			f0[(object_xtra_base[brand] + o_ptr->xtra2)/32] |= (1L << ((object_xtra_base[brand] + o_ptr->xtra2) % 32));
+
+			object_can_flags(o_ptr, f0, 0x0L, 0x0L, 0x0L, 0x0L, item < 0);
+		}
+		else if (object_xtra_what[brand] == 1)
+		{
+    		object_can_flags(o_ptr,NULL, object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L,0x0L, item < 0);
 		}
 		else if (object_xtra_what[brand] == 2)
 		{
-	    		object_can_flags(o_ptr,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L, item < 0);
+	    	object_can_flags(o_ptr,NULL, 0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L,0x0L, item < 0);
 		}
 		else if (object_xtra_what[brand] == 3)
 		{
-    			object_can_flags(o_ptr,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L, item < 0);
+    		object_can_flags(o_ptr,NULL, 0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2,0x0L, item < 0);
 		}
 		else if (object_xtra_what[brand] == 4)
 		{
-    			object_can_flags(o_ptr,0x0L,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2, item < 0);
+    		object_can_flags(o_ptr,NULL, 0x0L,0x0L,0x0L,object_xtra_base[brand] << o_ptr->xtra2, item < 0);
 		}
 
 		/* Hack -- some items become marked with a brand feeling */
@@ -3946,6 +3996,7 @@ bool ident_spell_runes(void)
 	return (TRUE);
 }
 
+#define RUMOR_CHANCE	25	/* % Chance that a rumour is missing information */
 
 /*
  * Reveal some powers of a known artifact or ego item.
@@ -3963,7 +4014,9 @@ bool ident_spell_rumor(void)
 
 	bool done;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1,f2,f3,f4;
+	bool f0_set = FALSE;
 
 	/* Only un-id'ed items */
 	item_tester_hook = item_tester_known_rumor;
@@ -4025,39 +4078,50 @@ bool ident_spell_rumor(void)
 	}
 
 	/* Examine the item */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 	/* Remove known flags */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] &= ~(o_ptr->can_flags0[i]);
 	f1 &= ~(o_ptr->can_flags1);
 	f2 &= ~(o_ptr->can_flags2);
 	f3 &= ~(o_ptr->can_flags3);
 	f4 &= ~(o_ptr->can_flags4);
 
+	/* Check ability flags */
+	f0_set = FALSE;
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0_set |= (f0[i] != 0);
+
 	/* We know everything? */
-	done = ((f1 | f2 | f3 | f4) ? FALSE : TRUE);
+	done = ((f0_set | f1 | f2 | f3 | f4) ? FALSE : TRUE);
+
+	/* Clear some flags0 */
+	for (i = 0; i < ABILITY_ARRAY_SIZE; i++)
+	{
+		if ((f0[i/32] & (1L<<(i%32))) && (rand_int(100)<RUMOR_CHANCE)) f0[i/32] &= ~(1L<< (i%32));
+	}
 
 	/* Clear some flags1 */
 	if (f1)	for (i = 0;i<32;i++)
 	{
-		if ((f1 & (1L<<i)) && (rand_int(100)<25)) f1 &= ~(1L<<i);
+		if ((f1 & (1L<<i)) && (rand_int(100)<RUMOR_CHANCE)) f1 &= ~(1L<<i);
 	}
 
 	/* Clear some flags2 */
 	if (f2)	for (i = 0;i<32;i++)
 	{
-		if ((f2 & (1L<<i)) && (rand_int(100)<25)) f2 &= ~(1L<<i);
+		if ((f2 & (1L<<i)) && (rand_int(100)<RUMOR_CHANCE)) f2 &= ~(1L<<i);
 	}
 
 	/* Clear some flags3 */
 	if (f3)	for (i = 0;i<32;i++)
 	{
-		if ((f3 & (1L<<i)) && (rand_int(100)<25)) f3 &= ~(1L<<i);
+		if ((f3 & (1L<<i)) && (rand_int(100)<RUMOR_CHANCE)) f3 &= ~(1L<<i);
 	}
 
 	/* Clear some flags3 */
 	if (f4)	for (i = 0;i<32;i++)
 	{
-		if ((f4 & (1L<<i)) && (rand_int(100)<25)) f4 &= ~(1L<<i);
+		if ((f4 & (1L<<i)) && (rand_int(100)<RUMOR_CHANCE)) f4 &= ~(1L<<i);
 	}
 
 	if (done || (f1 | f2 | f3 | f4))
@@ -4080,7 +4144,7 @@ bool ident_spell_rumor(void)
 		}
 
 		/* Learn more about the item */
-		object_can_flags(o_ptr,f1,f2,f3,f4, item < 0);
+		object_can_flags(o_ptr,f0,f1,f2,f3,f4, item < 0);
 
 		/* Description */
 		object_desc(o_name, sizeof(o_name), o_ptr, TRUE, 3);
@@ -4129,7 +4193,7 @@ bool ident_spell_rumor(void)
 		Term_gotoxy(0, 1);
 
 		/* Actually display the item */
-		list_object_flags(f1, f2, f3, f4, o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? o_ptr->pval : 0, 1);
+		list_object_flags(o_ptr->ability, f0, f1, f2, f3, f4, o_ptr->ident & (IDENT_PVAL | IDENT_MENTAL | IDENT_KNOWN) ? o_ptr->pval : 0, 1);
 
 		(void)anykey();
 
@@ -5169,6 +5233,8 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 	object_type *i_ptr;
 	object_type object_type_body;
 
+	int i;
+
 	cptr act;
 
 	char o_name[80];
@@ -5184,24 +5250,48 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 	i_ptr->timeout = time;
 	object_aware(i_ptr, item < 0);
 	object_known(i_ptr);
-	i_ptr->weight = 0;
 
 	/* Scale the item based on the player's level */
-
-	/* Hack - scale damage */
-	if ((level > 8) && (i_ptr->ds)) i_ptr->dd += (level-5)/4;
-
-	/* Hack - scale pvals */
-	if (i_ptr->pval) i_ptr->pval += (level / 10);
-
-	/* Hack - scale to hit */
-	if (i_ptr->to_h) i_ptr->to_h += (level / 2);
-
-	/* Hack - scale to dam */
-	if (i_ptr->to_d) i_ptr->to_d += (level / 2);
-
-	/* Hack - scale to ac */
-	if (i_ptr->ac) i_ptr->to_a += (i_ptr->ac * level / 25);
+	for (i = 0; i < i_ptr->ability_count; i++)
+	{
+		switch(i_ptr->ability[i])
+		{
+			case ABILITY_WEIGHT:
+			{
+				i_ptr->aval[i] = 0;
+			}
+			case ABILITY_DAMAGE_DICE:
+			{
+				if (level > 8) i_ptr->aval[i] += (level-5)/4;
+				break;
+			}
+			case ABILITY_DAMAGE_SIDES:
+				/* No change */
+				break;
+			case ABILITY_TO_HIT:
+			case ABILITY_TO_HIT_THROW:
+			case ABILITY_TO_HIT_MELEE:
+			case ABILITY_TO_HIT_BOW:
+			case ABILITY_TO_HIT_UNARM:
+			case ABILITY_TO_HIT_TRAP:
+			case ABILITY_TO_DAM:
+			case ABILITY_TO_DAM_THROW:
+			case ABILITY_TO_DAM_MELEE:
+			case ABILITY_TO_DAM_BOW:
+			case ABILITY_TO_DAM_UNARM:
+			case ABILITY_TO_DAM_TRAP:
+			{
+				if (i_ptr->aval[i] > 0) i_ptr->aval[i] += (level / 2);
+				break;
+			}
+			case ABILITY_TO_AC:
+				if (i_ptr->aval[i] > 0) i_ptr->aval[i] += i_ptr->aval[i] * level / 25;
+				break;
+			default:
+				if (i_ptr->aval[i] > 0) i_ptr->aval[i] += (level / 10);
+				break;
+		}
+	}
 
 	/* Mark with 'monster race' */
 	i_ptr->name3 = r_idx;
@@ -5216,11 +5306,21 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 			if (o_ptr->timeout < time) o_ptr->timeout = time;
 
 			/* Ensure minimum level of enchantment */
-			if (o_ptr->dd < i_ptr->dd) o_ptr->dd = i_ptr->dd;
-			if (o_ptr->to_h < i_ptr->to_h) o_ptr->to_h = i_ptr->to_h;
-			if (o_ptr->to_d < i_ptr->to_d) o_ptr->to_d = i_ptr->to_d;
-			if (o_ptr->to_a < i_ptr->to_a) o_ptr->to_a = i_ptr->to_a;
-			if (o_ptr->pval < i_ptr->pval) o_ptr->pval = i_ptr->pval;
+			for (i = 0; i < i_ptr->ability_count; i++)
+			{
+				/* Check if we have less if positive*/
+				if ((i_ptr->aval[i] > 0) && (object_aval(o_ptr, i_ptr->ability[i]) < i_ptr->aval[i]))
+				{
+					/* Fix up */
+					object_ability_set(o_ptr, i_ptr->ability[i], i_ptr->aval[i]);
+				}
+				/* Check if we have more if negative */
+				else if ((i_ptr->aval[i] < 0) && (object_aval(o_ptr, i_ptr->ability[i]) > i_ptr->aval[i]))
+				{
+					/* Fix up */
+					object_ability_set(o_ptr, i_ptr->ability[i], i_ptr->aval[i]);
+				}
+			}
 
 			/* Update */
 			p_ptr->update |= (PU_BONUS);
@@ -5290,8 +5390,9 @@ static void wield_spell(int item, int k_idx, int time, int level, int r_idx)
 	p_ptr->window |= (PW_INVEN | PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 }
 
+
 /*
- *  Change shape. Add 'built-in' equipment for that shape.
+ *  Change shape.
  */
 void change_shape(int shape)
 {
@@ -5316,6 +5417,7 @@ void change_shape(int shape)
 	/* Window stuff */
 	p_ptr->window |= (PW_EQUIP | PW_PLAYER_0 | PW_PLAYER_1);
 }
+
 
 /*
  * Enchant item --- a big pile of (fun) hack
@@ -5505,6 +5607,7 @@ static void enchant_item(byte tval, int plev)
 
 }
 
+
 /*
  * Create gold
  */
@@ -5571,12 +5674,12 @@ static bool curse_armor(void)
 		/* Blast the armor */
 		o_ptr->name1 = 0;
 		o_ptr->name2 = EGO_BLASTED;
-		o_ptr->to_a = 0 - (s16b)randint(5) - (s16b)randint(5);
-		o_ptr->to_h = 0;
-		o_ptr->to_d = 0;
-		o_ptr->ac = 0;
-		o_ptr->dd = 0;
-		o_ptr->ds = 0;
+		object_ability_set(o_ptr, ABILITY_TO_AC, 0 - (s16b)randint(5) - (s16b)randint(5));
+		object_ability_set(o_ptr, ABILITY_TO_HIT, 0);
+		object_ability_set(o_ptr, ABILITY_TO_DAM, 0);
+		object_ability_set(o_ptr, ABILITY_AC, 0);
+		object_ability_set(o_ptr, ABILITY_DAMAGE_DICE, 0);
+		object_ability_set(o_ptr, ABILITY_DAMAGE_SIDES, 0);
 
 		/* Forget about it */
 		inven_drop_flags(o_ptr);
@@ -5639,12 +5742,11 @@ static bool curse_weapon(void)
 		/* Shatter the weapon */
 		o_ptr->name1 = 0;
 		o_ptr->name2 = EGO_SHATTERED;
-		o_ptr->to_h = 0 - (s16b)randint(5) - (s16b)randint(5);
-		o_ptr->to_d = 0 - (s16b)randint(5) - (s16b)randint(5);
-		o_ptr->to_a = 0;
-		o_ptr->ac = 0;
-		o_ptr->dd = 0;
-		o_ptr->ds = 0;
+		object_ability_set(o_ptr, ABILITY_TO_HIT, 0 - (s16b)randint(5) - (s16b)randint(5));
+		object_ability_set(o_ptr, ABILITY_TO_DAM, 0 - (s16b)randint(5) - (s16b)randint(5));
+		object_ability_set(o_ptr, ABILITY_AC, 0);
+		object_ability_set(o_ptr, ABILITY_DAMAGE_DICE, 0);
+		object_ability_set(o_ptr, ABILITY_DAMAGE_SIDES, 0);
 
 		/* Drop all flags */
 		inven_drop_flags(o_ptr);
@@ -5693,7 +5795,7 @@ static bool thaumacurse(bool verbose, int power, bool forreal)
 	{
 		o_ptr = &inventory[i];
 
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 		/* Skip non-objects */
 		if (!o_ptr->k_idx) continue;
@@ -5743,7 +5845,7 @@ static bool thaumacurse(bool verbose, int power, bool forreal)
 		/* Object isn't cursed -- ignore */
 		if (!cursed_p(o_ptr)) continue;
 
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags(o_ptr, NULL, &f1, &f2, &f3, &f4);
 
 		/* Ignore heavy and permanent curses */
 		if (f3 & (TR3_HEAVY_CURSE | TR3_PERMA_CURSE)) continue;
@@ -6115,7 +6217,7 @@ bool retarget_blows(int *ty, int *tx, u32b *flg, int method, int level, bool ful
 	}
 
 	/* Eaten spells use a single target */
-	else if (retarget_blows_eaten && (method != RBM_SPIT) && (method != RBM_BREATH))
+	else if (retarget_blows_eaten && (method != RBM_SPIT) && ((method_info[method].flags2 & (PR2_BREATH)) == 0))
 	{
 		*one_grid = TRUE;
 		retarget_blows_dir = (method == RBM_VOMIT) ? ddd[rand_int(8)] : 5;
@@ -6599,7 +6701,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 			{
 				do_timed = FALSE;
 				
-				equip_can_flags(p_ptr->cur_flags1 & (timed_effects[i].ignore_flags1),
+				equip_can_flags(NULL, p_ptr->cur_flags1 & (timed_effects[i].ignore_flags1),
 					p_ptr->cur_flags2 & (timed_effects[i].ignore_flags2),
 					p_ptr->cur_flags3 & (timed_effects[i].ignore_flags3),
 					p_ptr->cur_flags4 & (timed_effects[i].ignore_flags4));
@@ -6612,7 +6714,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 			
 			if (i < 32)
 			{
-				equip_not_flags(timed_effects[i].ignore_flags1,
+				equip_not_flags(NULL,timed_effects[i].ignore_flags1,
 					timed_effects[i].ignore_flags2,
 					timed_effects[i].ignore_flags3,
 					timed_effects[i].ignore_flags4);
@@ -6745,7 +6847,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_SHARD,0x0L,0x0L);
+				equip_not_flags(NULL,0x0L,TR2_RES_SHARD,0x0L,0x0L);
 			}
 		}
 		else /* if (obvious) */
@@ -6764,7 +6866,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_SOUND,0x0L,0x0L);
+				equip_not_flags(NULL,0x0L,TR2_RES_SOUND,0x0L,0x0L);
 			}
 		}
 		else /* if (obvious)*/
@@ -6784,7 +6886,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_POIS,0x0L,TR4_IM_POIS);
+				equip_not_flags(NULL,0x0L,TR2_RES_POIS,0x0L,TR4_IM_POIS);
 			}
 		}
 		else if (!p_ptr->timed[TMD_OPP_POIS]) /* && (obvious) */
@@ -6806,7 +6908,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_BLIND,0x0L,0x0L);
+				equip_not_flags(NULL,0x0L,TR2_RES_BLIND,0x0L,0x0L);
 			}
 		}
 		else /* if (obvious)*/
@@ -6825,7 +6927,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_FEAR,0x0L,0x0L);
+				equip_not_flags(NULL,0x0L,TR2_RES_FEAR,0x0L,0x0L);
 			}
 		}
 		else if ((!p_ptr->timed[TMD_HERO])&&(!p_ptr->timed[TMD_BERSERK])) /* && (obvious) */
@@ -6844,7 +6946,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_CONFU,0x0L,0x0L);
+				equip_not_flags(NULL,0x0L,TR2_RES_CONFU,0x0L,0x0L);
 			}
 		}
 		else /* if (obvious) */
@@ -6863,7 +6965,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,TR2_RES_CHAOS,0x0L,0x0L);
+				equip_not_flags(NULL,0x0L,TR2_RES_CHAOS,0x0L,0x0L);
 			}
 		}
 		else /* if (obvious) */
@@ -6882,7 +6984,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				equip_not_flags(NULL,0x0L,0x0L,TR3_FREE_ACT,0x0L);
 			}
 		}
 		else /* if (obvious) */
@@ -6901,7 +7003,7 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 				obvious = TRUE;
 
 				/* Always notice */
-				equip_not_flags(0x0L,0x0L,TR3_FREE_ACT,0x0L);
+				equip_not_flags(NULL,0x0L,0x0L,TR3_FREE_ACT,0x0L);
 			}
 		}
 		else /* if (obvious) */
@@ -6961,29 +7063,36 @@ bool process_spell_flags(int who, int what, int spell, int level, bool *cancel, 
 
 	if (s_ptr->flags3 & (SF3_DEC_EXP))
 	{
+		u32b f0[ABILITY_ARRAY_SIZE];
+
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) f0[i] = 0L;
+
+		f0[ABILITY_HOLD_LIFE /32] |= (1L << (ABILITY_HOLD_LIFE %32));
+
 		/* Undead races are healed instead */
 		if (p_ptr->cur_flags4 & TR4_UNDEAD
 			&& !p_ptr->timed[TMD_BLESSED])
 		{
 			obvious = hp_player(300);
 
-			equip_can_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
+			equip_can_flags(NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
-		else if ((p_ptr->cur_flags3 & (TR3_HOLD_LIFE)) != 0
+		else if ((p_ptr->ability[ABILITY_HOLD_LIFE] > 0)
 				 || p_ptr->timed[TMD_BLESSED]
 				 || p_ptr->exp == 0)
 		{
 			if (!p_ptr->timed[TMD_BLESSED] && p_ptr->exp > 0)
-				equip_can_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-			equip_not_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
+				equip_can_flags(f0, 0x0L, 0x0L, 0x0L, 0x0L);
+			equip_not_flags(NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
 		else
 		{
 			lose_exp(p_ptr->exp / 4);
 			obvious = TRUE;
 
-			equip_not_flags(0x0L,0x0L,TR3_HOLD_LIFE,0x0L);
-			equip_not_flags(0x0L,0x0L,0x0L,TR4_UNDEAD);
+			/* TODO: Need to be smarter about checking this */
+			equip_not_flags(f0, 0x0L, 0x0L, 0x0L, 0x0L);
+			equip_not_flags(NULL, 0x0L,0x0L,0x0L,TR4_UNDEAD);
 		}
 	}
 
@@ -8054,11 +8163,11 @@ bool process_spell_prepare(int spell, int level, bool *cancel, bool forreal, boo
 					/* Roll out the duration */
 					if ((s_ptr->lasts_dice) && (s_ptr->lasts_side))
 					{
-						p_ptr->word_return = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
+						p_ptr->timed[TMD_WORD_RETURN] = damroll(s_ptr->lasts_dice, s_ptr->lasts_side) + s_ptr->lasts_plus;
 					}
 					else
 					{
-						p_ptr->word_return = s_ptr->lasts_plus;
+						p_ptr->timed[TMD_WORD_RETURN] = s_ptr->lasts_plus;
 					}
 				}
 
@@ -8304,9 +8413,9 @@ int process_item_blow(int who, int what, object_type *o_ptr, int y, int x, bool 
 	/* Calculate average base damage if guessing */
 	if (!forreal)
 	{
-		int d_dice = o_ptr->dd;
-		int d_side = o_ptr->ds;
-		int d_plus = o_ptr->to_d;
+		int d_dice = object_aval(o_ptr, ABILITY_DAMAGE_DICE);
+		int d_side = object_aval(o_ptr, ABILITY_DAMAGE_SIDES);
+		int d_plus = object_aval(o_ptr, ABILITY_TO_DAM);
 
 		/* Base damage */
 		damage += d_side > 1 ? (d_dice * (d_side + 1)) / 2 + d_plus : d_dice * d_side + d_plus;

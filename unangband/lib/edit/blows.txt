@@ -15,23 +15,17 @@
 # depend on this file to provide the blow names, in order that they
 # can be parsed.
 
-# We alias hit to 50% hit cut, 50% hit stun and handle bolt with a 10%
-# chance of beam in the actual blow setup (hit_cut:50:hit_stun and
-# bolt:10:beam respectively). Because 99% of blows are always identical
-# (except hits), we alias all other blows to mean blow:0:(undefined)
-
-# Remember all hurt huge attacks are MON_BEAM | RAD_2 so all melee
-# attacks need to be set up with this as the default.
-
-# I:mana_cost:best_range:max_range
-# A:arc in degrees:diameter_of_source:degree factor
+# T:damage min-damage max:text
+# I:sound:best range:diameter of source
+# W:mana_cost:ammo tval:ammo sval
+# X:damage mult:divisor:variation:maximum:divisor(powerful):maximum(powerful):type
+# C:base % chance:summoning +%:if hurt +%:need mana +%:need escape +%:tactical move +%:damage reduction from range
+# A:arc in degrees:diameter_of_source
 # R:radius + radius / levels
-# D:damage mult:divisor:variation:maximum:type
 # M:max range + max range / levels
 # U:number + number / levels
-
-# Note need to move diameter of source to I:, as this applies
-# to any attack with a radius, not just arcs.
+# S:summoning type
+# F:flags
 
 # Corresponding projection flags.
 
@@ -156,7 +150,7 @@ F:MELEE | RANGED | TOUCH | INNATE |
 D:spit~:@ target#
 
 N:17:GAZE
-T:20-30:gaze~ terribly at &
+T:20-9999:gaze~ terribly at &
 T:5-30:gaze~ upon &
 T:0-4:gaze~ at &
 W:3:0:0
@@ -242,7 +236,7 @@ W:0:3:1
 M:8
 F:MISS | GRID | KILL | PLAY | STOP |
 F:RANGED | INNATE |
-D:throw~ a boulder at:@ adjacent target#
+D:throw~ a boulder at:@ target#
 
 N:27:AURA
 T:0-9999:intensif|y|ies| % aura

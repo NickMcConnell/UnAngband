@@ -168,13 +168,6 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 	/* It is known */
 	i_ptr->ident |= (IDENT_KNOWN);
 
-	/* Cancel bonuses */
-	i_ptr->pval = 0;
-	i_ptr->to_a = 0;
-	i_ptr->to_h = 0;
-	i_ptr->to_d = 0;
-
-
 	/* Level */
 	(*lev) = k_ptr->locale[0];
 
@@ -206,7 +199,7 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 		case TV_BOLT:
 		case TV_ARROW:
 		{
-			sprintf(dam, "%dd%d", i_ptr->dd, i_ptr->ds);
+			sprintf(dam, "%dd%d", object_aval(i_ptr, ABILITY_DAMAGE_DICE), object_aval(i_ptr, ABILITY_DAMAGE_SIDES));
 			break;
 		}
 
@@ -217,7 +210,7 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 		case TV_DIGGING:
 		case TV_STAFF:
 		{
-			sprintf(dam, "%dd%d", i_ptr->dd, i_ptr->ds);
+			sprintf(dam, "%dd%d", object_aval(i_ptr, ABILITY_DAMAGE_DICE), object_aval(i_ptr, ABILITY_DAMAGE_SIDES));
 			break;
 		}
 
@@ -232,14 +225,14 @@ static void kind_info(char *buf, int buf_s, char *dam, int dam_s, char *wgt, int
 		case TV_HARD_ARMOR:
 		case TV_DRAG_ARMOR:
 		{
-			sprintf(dam, "%d", i_ptr->ac);
+			sprintf(dam, "%d", object_aval(i_ptr, ABILITY_AC));
 			break;
 		}
 	}
 
 
 	/* Weight */
-	sprintf(wgt, "%3d.%d", i_ptr->weight / 10, i_ptr->weight % 10);
+	sprintf(wgt, "%3d.%d", object_aval(i_ptr, ABILITY_WEIGHT) / 10, object_aval(i_ptr, ABILITY_WEIGHT) % 10);
 
         /* Power */
         my_strcpy(pow, "", pow_s);
@@ -686,11 +679,10 @@ static void spoil_artifact(cptr fname)
 
 			/*
 			 * Determine the minimum depth an artifact can appear, its rarity,
-			 * its weight, and its value in gold pieces.
+			 * and its value in gold pieces.
 			 */
-			text_out(format("\nLevel %u, Rarity %u, %d.%d lbs, %ld AU\n",
-		                a_ptr->level, a_ptr->rarity, (a_ptr->weight / 10),
-                		(a_ptr->weight % 10), ((long)a_ptr->cost)));
+			text_out(format("\nLevel %u, Rarity %u, %ld AU\n",
+		                a_ptr->level, a_ptr->rarity, ((long)a_ptr->cost)));
 
 			/* Terminate the entry */
 			spoiler_blanklines(2);
@@ -1487,7 +1479,7 @@ static void spoil_ego_desc(cptr fname)
 
 				/* Dump it */
                                 fprintf(fff, "%-37s  %7ld%4d%4d\n",
-					e_name + e_ptr->name, e_ptr->slay_power * 1000 / tot_mon_power,
+					e_name + e_ptr->name, 0L /*e_ptr->slay_power * 1000 / tot_mon_power */,
 					e_ptr->level, e_ptr->rarity);
 
 			}
