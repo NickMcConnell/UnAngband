@@ -6170,6 +6170,12 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	/* Daze amount (amount to be dazed for) */
 	int do_daze = 0;
 	
+	/* Amnesia amount (amount to amnesia for) */
+	int do_amnesia = 0;
+
+	/* Terror amount (amount to be terrified for) */
+	int do_terror = 0;
+
 	/* Image damage - amount before reduction */
 	int image_dam = dam;
 
@@ -8236,7 +8242,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_TERRIFY:
 		{
 			if (seen) obvious = TRUE;
+
+			/* Always at least afraid */
 			do_fear = 10 + randint(15);
+
 			if (r_ptr->flags3 & (RF3_NO_FEAR))
 			{
 				dam = 0;
@@ -8261,6 +8270,19 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 					l_ptr->flags4 |= (RF4_BRTH_FEAR);
 				}
 			}
+			/* Save against terror */
+			else if (monster_save(m_ptr, dam, &near))
+			{
+				if ((near) && (seen))
+				{
+					do_terror = 2;
+				}
+			}
+			else
+			{
+				do_terror = do_fear/2;
+			}
+
 			break;
 		}
 
@@ -8921,7 +8943,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			{
 				if ((near) && (seen))
 				{
-					note = " appears absent-minded.";
+					note = " appears momentarily absent-minded.";
 					m_ptr->ty = 0;
 					m_ptr->tx = 0;
 				}
@@ -8936,10 +8958,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Monster forgets stuff */
 			else
 			{
-				m_ptr->ty = 0;
-				m_ptr->tx = 0;
-				m_ptr->mflag &= ~(MFLAG_HIT_BLOW | MFLAG_HIT_RANGE | MFLAG_AGGR | MFLAG_SMART);
-				m_ptr->smart = 0L;
+				/* Temporary forgetting */
+				do_amnesia = dam;
 			}
 
 			/* No "real" damage */
@@ -9278,7 +9298,8 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			do_pois = 0;
 			was_asleep = FALSE;
 			note = " is unaffected by illusions.";
-			l_ptr->flags2 |= (RF2_EMPTY_MIND | RF2_WEIRD_MIND);
+			if ((r_ptr->flags2 & (RF2_EMPTY_MIND)) != 0) l_ptr->flags2 |= (RF2_EMPTY_MIND);
+			if ((r_ptr->flags2 & (RF2_WEIRD_MIND)) != 0) l_ptr->flags2 |= (RF2_WEIRD_MIND);
 		}
 		/* Ignores illusions */
 		else if (!(m_ptr->csleep) && !(m_ptr->image)
@@ -9729,15 +9750,16 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			/* Increase fear */
 			tmp = m_ptr->monfear + do_fear;
 
-			/* Hack -- excess fear causes petrification or dazing */
-			/* If this occurs, we reduce the original confusion effect and
+			/* Hack -- excess fear causes petrification, terror or dazing */
+			/* If this occurs, we reduce the original fear effect and
 			 * override the note so that the player notices */
 			if (tmp > 100)
 			{
 				/* Higher values translate into more dazed effect, but
 				 * greater reduction on total confusion */
 				int div = MIN((tmp - 95) / 5, 9);
-				if (rand_int(100) < 50 + (m_ptr->dazed ? 50 : 0) - (m_ptr->petrify ? 50 : 0)) do_daze += (tmp - 80) / (10 - div);
+				if (rand_int(100) < 33 + (m_ptr->dazed ? 33 : 0) - (m_ptr->petrify ? 33 : 0) - (m_ptr->terror ? 33 : 0)) do_daze += (tmp - 80) / (10 - div);
+				else if (rand_int(100) < 50 + (m_ptr->terror ? 50 : 0) - (m_ptr->petrify ? 50 : 0)) do_terror += (tmp - 80) / (10 - div);
 				else do_petrify += (tmp - 80) / (10 - div);
 				tmp /= div;
 				note = NULL;
@@ -9797,6 +9819,9 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			/* Apply confusion */
 			m_ptr->image = tmp > 200 ? 200 : (byte)tmp;
+
+			/* Hack - ensure monster attacks those around it */
+			m_ptr->mflag |= (MFLAG_IGNORE);
 		}
 
 		/* Handle dazed */
@@ -9809,7 +9834,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			if (m_ptr->dazed)
 			{
 				if (!note) note = " looks more dazed.";
-				tmp = m_ptr->confused + (do_daze / (r_ptr->level / 10 + 1));
+				tmp = m_ptr->dazed + (do_daze / (r_ptr->level / 10 + 1));
 			}
 
 			/* Was not dazed */
@@ -9821,6 +9846,61 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 
 			/* Apply daze */
 			m_ptr->dazed = tmp > 200 ? 200 : (byte)tmp;
+		}
+
+		/* Handle amnesia */
+		if (do_amnesia > 1)
+		{
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Already partially forgetful */
+			if (m_ptr->amnesia)
+			{
+				if (!note) note = " looks more forgetful.";
+				tmp = m_ptr->amnesia + (do_amnesia / (r_ptr->level / 10 + 1));
+			}
+
+			/* Was not forgetful */
+			else
+			{
+				if (!note) note = " looks forgetful.";
+				tmp = do_amnesia;
+			}
+
+			/* Apply daze */
+			m_ptr->amnesia = tmp > 200 ? 200 : (byte)tmp;
+
+			/* Forget stuff */
+			m_ptr->ty = 0;
+			m_ptr->tx = 0;
+			m_ptr->mflag &= ~(MFLAG_HIT_BLOW | MFLAG_HIT_RANGE | MFLAG_SMART);
+			m_ptr->mflag |= (MFLAG_IGNORE);
+			m_ptr->smart = 0L;
+		}
+
+		/* Handle terror */
+		if (do_terror > 1)
+		{
+			/* Obvious */
+			if (seen) obvious = TRUE;
+
+			/* Already partially terrified */
+			if (m_ptr->terror)
+			{
+				if (!note) note = " looks more terrified.";
+				tmp = m_ptr->terror + (do_terror / (r_ptr->level / 10 + 1));
+			}
+
+			/* Was not terrified */
+			else
+			{
+				if (!note) note = " looks terrified.";
+				tmp = do_terror;
+			}
+
+			/* Apply terror */
+			m_ptr->terror = tmp > 200 ? 200 : (byte)tmp;
 		}
 	}
 

@@ -2805,7 +2805,7 @@ void show_inven(void)
 
 			/* Determine index, print it out. */
 			sprintf(tmp_val, "%c)", index_to_label(INVEN_PACK -
-				p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags + i));
+				p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags - p_ptr->pack_size_reduce_study + i));
 
 			put_str(tmp_val, j, col);
 
@@ -2832,11 +2832,11 @@ void show_inven(void)
 				strnfmt(o_name, sizeof(o_name), "(BAG CONTENTS)");
 				attr = TERM_BLUE_SLATE;
 			}
-			/* Hack -- use "(STUDIED - Book name)" as a description. Show these back to front. */
+			/* Hack -- use "(STUDIED - Book name)" as a description. */
 			else
 			{
 				attr = TERM_DEEP_L_BLUE;
-				strnfmt(o_name, sizeof(o_name), "(STUDIED - %s)", k_name + k_info[p_ptr->study_slot[p_ptr->pack_size_reduce_quiver + p_ptr->pack_size_reduce_bags + p_ptr->pack_size_reduce_study - i]].name + 3);
+				strnfmt(o_name, sizeof(o_name), "(STUDIED - %s)", k_name + k_info[p_ptr->study_slot[i - p_ptr->pack_size_reduce_quiver - p_ptr->pack_size_reduce_bags]].name + 3);
 			}
 			
 			c_put_str(attr, o_name, j, col + 3);

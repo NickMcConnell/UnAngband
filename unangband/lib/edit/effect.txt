@@ -815,7 +815,7 @@ I:10
 D:freeze~::weak-willed, sleeping or hallucinating monsters:without waking them up:::
 T:illusory cold
 
-N:160:IMAGE_POISON
+N:160:IMAGE_POIS
 I:5
 D:poison~::weak-willed, sleeping or hallucinating monsters:without waking them up:::
 T:illusory poison

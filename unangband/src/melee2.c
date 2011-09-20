@@ -907,7 +907,7 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 	/* Don't Bless if Blessed */
 	if (m_ptr->bless) f6 &= ~(RF6_BLESS);
 
-	/* Don't Berserk if Beserk */
+	/* Don't Berserk if Berserk */
 	if (m_ptr->berserk) f6 &= ~(RF6_BERSERK);
 
 	/* Don't Shield if Shielded */
@@ -918,7 +918,8 @@ static void remove_useless_spells(int m_idx, u32b *f4p, u32b *f5p, u32b *f6p, u3
 
 	/* Don't cure if not needed */
 	if (!((m_ptr->stunned) ||(m_ptr->monfear) || (m_ptr->confused) || (m_ptr->blind) ||
-	      (m_ptr->cut) || (m_ptr->poisoned)))	f6 &= ~(RF6_CURE);
+	      (m_ptr->cut) || (m_ptr->poisoned) || (m_ptr->dazed) || (m_ptr->image) ||
+	      (m_ptr->amnesia) || (m_ptr->terror)))	f6 &= ~(RF6_CURE);
 
 	/* Don't jump in already close, or don't want to be close */
 	if (!(m_ptr->cdis > m_ptr->best_range) && require_los)
@@ -1058,7 +1059,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	u32b f6 = (RF6_ASSIST_MASK);
 	u32b f7 = (RF7_ASSIST_MASK);
 
-	/* Mages and priests can assist others */
+	/* Priests can assist others */
 	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) &&
 	
 		/* Allow assisting the player if an ally */
@@ -1115,7 +1116,7 @@ static int pick_target(int m_idx, int *tar_y, int *tar_x, int i)
 	}
 
 	/* Player dodges -- point the target at their old location */
-	if ((p_ptr->dodging) && (*tar_y == p_ptr->py) && (*tar_x == p_ptr->px)
+	if ((p_ptr->dodging) && (*tar_y == p_ptr->py) && (*tar_x == p_ptr->px) && ((m_ptr->mflag & (MFLAG_ALLY)) == 0)
 		&& (rand_int(100) < (extract_energy[p_ptr->pspeed] + adj_agi_ta[p_ptr->stat_ind[A_AGI]] - 128)))
 	{
 		/* msg_print("You dodge the attack."); */
@@ -1369,13 +1370,25 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
-	/* Eliminate 'direct' spells when blinded or afraid (except innate spells) * */
-	else if ((m_ptr->blind) || (m_ptr->monfear))
+	/* Eliminate 'direct' spells when blinded, afraid or terrified (except innate spells) * */
+	else if ((m_ptr->blind) || (m_ptr->monfear) || (m_ptr->terror))
 	{
-		f4 &= (rf4_no_player_mask | RF4_INNATE_MASK | RF4_SUMMON_MASK);
-		f5 &= (RF5_NO_PLAYER_MASK | RF5_INNATE_MASK | RF4_SUMMON_MASK);
-		f6 &= (RF6_NO_PLAYER_MASK | RF6_INNATE_MASK | RF6_SUMMON_MASK);
-		f7 &= (RF7_NO_PLAYER_MASK | RF7_INNATE_MASK | RF7_SUMMON_MASK);
+		f4 &= (rf4_no_player_mask | (m_ptr->terror ? 0L : RF4_INNATE_MASK) | RF4_SUMMON_MASK);
+		f5 &= (RF5_NO_PLAYER_MASK | (m_ptr->terror ? 0L : RF5_INNATE_MASK) | RF4_SUMMON_MASK);
+		f6 &= (RF6_NO_PLAYER_MASK | (m_ptr->terror ? 0L : RF6_INNATE_MASK) | RF6_SUMMON_MASK);
+		f7 &= (RF7_NO_PLAYER_MASK | (m_ptr->terror ? 0L : RF7_INNATE_MASK) | RF7_SUMMON_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
+	}
+
+	/* If dazed, eliminate casting on self */
+	if (m_ptr->dazed)
+	{
+		f4 &= ~(rf4_self_target_mask);
+		f5 &= ~(RF5_SELF_TARGET_MASK);
+		f6 &= ~(RF6_SELF_TARGET_MASK);
+		f7 &= ~(RF7_SELF_TARGET_MASK);
 
 		/* No spells left */
 		if (!f4 && !f5 && !f6 && !f7) return (0);
@@ -1431,28 +1444,37 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 	dist = distance(m_ptr->fy, m_ptr->fx, *tar_y, *tar_x);
 
 	/* Priests will assist others if they are not near death */
-	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (m_ptr->hp < m_ptr->maxhp / 5))
+	if (((r_ptr->flags2 & (RF2_PRIEST)) != 0) && (m_ptr->hp > m_ptr->maxhp / 5))
 	{
 		assist |= (((f4 & (RF4_ASSIST_MASK)) != 0) || ((f5 & (RF5_ASSIST_MASK)) != 0) ||
 					((f6 & (RF6_ASSIST_MASK)) != 0) || ((f7 & (RF7_ASSIST_MASK)) != 0));
+
+		/* Priests switch to using spells on their allies one third of the time */
+		if (((m_ptr->mflag & (MFLAG_ALLY | MFLAG_IGNORE)) == 0) && (m_idx % 3 == (turn / 10) % 9))
+		{
+			m_ptr->mflag |= (MFLAG_IGNORE);
+		}
 	}
-	
+
 	/*
 	 * Is the monster an ally who can assist the player in
 	 * a time of crisis?
 	 */
-	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (p_ptr->chp < p_ptr->mhp / 3) && (assist)
+	if (((m_ptr->mflag & (MFLAG_ALLY)) != 0) && (p_ptr->chp < p_ptr->mhp) && (assist)
 
 		/* Ensure proximity */
 		&& (m_ptr->cdis < MAX_RANGE) && ((m_ptr->mflag & (MFLAG_VIEW)) != 0)
 			
 		/* Hack -- to avoid call to random */
-		&& (m_idx % 6 < 5 - (10 * p_ptr->chp / p_ptr->mhp)))
+		&& ((m_idx + (turn / 10)) % 6 < 5 - (10 * p_ptr->chp / p_ptr->mhp)))
 	{
 		f4 &= (RF4_ASSIST_MASK);
 		f5 &= (RF5_ASSIST_MASK);
 		f6 &= (RF6_ASSIST_MASK);
 		f7 &= (RF7_ASSIST_MASK);
+
+		/* Remove teleport unless player is near death */
+		if (p_ptr->chp > p_ptr->mhp / 10) f6 &= ~(RF6_TELE_TO);
 	}
 	
 	/*
@@ -1582,8 +1604,94 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					}
 				}
 
+				/* Determine if we can help ally */
+				if ((assist_ally) && (!m_ptr->image))
+				{
+					int d_base = MAX_SIGHT * 16 + ((m_idx + i) % 16);
+
+					u32b tmpf4 = f4;
+					u32b tmpf5 = f5;
+					u32b tmpf6 = f6;
+					u32b tmpf7 = f7;
+					
+					/* Remove useless spells - don't require that the monster is smart to keep below code simple */
+					remove_useless_spells(i, &tmpf4, &tmpf5, &tmpf6, &tmpf7, TRUE);
+
+					/* I'd benefit more from ignoring you and healing myself. */
+					if ((!m_ptr->dazed) && ((tmpf6 & (RF6_HEAL | RF6_TELE_TO | RF6_TELE_SELF_TO)) != 0)) d_base += MAX_SIGHT * 8 - MAX_SIGHT * 8 * m_ptr->hp / m_ptr->maxhp;
+					
+					/* Determine if it is worth helping this monster */
+					d = d_base;
+					
+					/* Target would benefit more from healing / buffing / teleporting away from danger as its hit points decrease. */
+					if ((tmpf6 & (RF6_HEAL | RF6_HASTE | RF6_SHIELD | RF6_BLESS | RF6_TELE_TO)) != 0) d -= MAX_SIGHT * 8 * n_ptr->hp / n_ptr->maxhp;
+					
+					/* Don't bother buffing or curing badly hurt targets that we can't heal or teleport away */
+					if (((tmpf6 & (RF6_HEAL | RF6_TELE_TO)) == 0) && (n_ptr->hp < n_ptr->maxhp / 2)) d += MAX_SIGHT * 12 - MAX_SIGHT * 24 * n_ptr->hp / n_ptr->maxhp;
+					
+					/* Benefit from healing */
+					if ((tmpf6 & (RF6_HEAL)) && (n_ptr->hp < n_ptr->maxhp)) need_assist_f6 |= (RF6_HEAL);
+
+					/* Benefit from teleportation */
+					if ((tmpf6 & (RF6_TELE_TO)) && (n_ptr->hp < n_ptr->maxhp / 4)) need_assist_f6 |= (RF6_TELE_TO);
+					if ((tmpf6 & (RF6_TELE_SELF_TO)) && (n_ptr->hp < m_ptr->hp / 2)) need_assist_f6 |= (RF6_TELE_SELF_TO);
+
+					/* Benefit from hasting */
+					if ((tmpf6 & (RF6_HASTE)) != 0)
+					{
+						int d_speed = d;
+						if (m_ptr->hasted) d_speed = MIN(d, d_base / 2);
+						if (n_ptr->slowed) d_speed -= 48;
+						d = ((tmpf6 & ((RF6_ASSIST_MASK) & ~(RF6_HASTE))) != 0) ? MIN(d, d_speed) : d_speed;
+					}
+					
+					/* Benefit from shielding */
+					if ((tmpf6 & (RF6_SHIELD)) != 0)
+					{
+						int d_shield = d;
+						if (m_ptr->shield) d_shield = MIN(d, d_base / 2);
+						d = ((tmpf6 & ((RF6_ASSIST_MASK) & ~(RF6_SHIELD))) != 0) ? MIN(d, d_shield) : d_shield;
+					}
+
+					/* Benefit from elemental protection */
+					if ((tmpf6 & (RF6_OPPOSE_ELEM)) != 0)
+					{
+						int d_oppose_elem = d;
+						if (m_ptr->oppose_elem) d_oppose_elem = MIN(d, d_base / 2);
+						d = ((tmpf6 & ((RF6_ASSIST_MASK) & ~(RF6_OPPOSE_ELEM))) != 0) ? MIN(d, d_oppose_elem) : d_oppose_elem;
+					}
+
+					/* Benefit from blessing */
+					if ((tmpf6 & (RF6_BLESS)) != 0)
+					{
+						int d_bless = d;
+						if (m_ptr->bless) d_bless = MIN(d, d_base / 2);
+						d = ((tmpf6 & ((RF6_ASSIST_MASK) & ~(RF6_BLESS))) != 0) ? MIN(d, d_bless) : d_bless;
+					}
+					
+					/* Benefit from curing */
+					if ((tmpf6 & (RF6_CURE)) != 0)
+					{
+						int d_cure = d_base;
+						d_cure -= n_ptr->stunned / 2;
+						d_cure -= n_ptr->confused / 2;
+						d_cure -= n_ptr->monfear / 2;
+						d_cure -= n_ptr->cut / 2;
+						d_cure -= n_ptr->poisoned / 2;
+						d_cure -= n_ptr->mana ? n_ptr->blind : n_ptr->blind / 2;
+						d_cure -= n_ptr->image;
+						d_cure -= n_ptr->mana ? n_ptr->dazed : n_ptr->dazed / 2;
+						d_cure -= n_ptr->mana ? n_ptr->amnesia : n_ptr->amnesia / 2;
+						d_cure -= n_ptr->terror;
+						d = MIN(d, MAX(d_cure, d_base - MAX_SIGHT * 4));
+					}
+
+					/* Not worth helping */
+					if (d >= MAX_SIGHT * 16) continue;
+				}
+				
 				/* Check if forcing a particular kind */
-				if (ally && p_ptr->target_race)
+				if (ally && p_ptr->target_race && !assist_ally)
 				{
 					/* No match */
 					if (p_ptr->target_race != n_ptr->r_idx)
@@ -1598,80 +1706,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 						i = m_max;
 					}
 				}
-				
-				/* Determine if we can help ally */
-				if (assist_ally)
-				{
-					int d_base = MAX_SIGHT * 16 + ((m_idx + i) % 16);
-					
-					/* I'd benefit more from ignoring you and healing myself. */
-					if ((f6 & (RF6_HEAL | RF6_TELE_TO)) != 0) d_base += MAX_SIGHT * 8 - MAX_SIGHT * 8 * m_ptr->hp / m_ptr->maxhp;
-					
-					/* Determine if it is worth helping this monster */
-					d = d_base;
-					
-					/* Target would benefit more from healing / buffing / teleporting away from danger as its hit points decrease. */
-					if ((f6 & (RF6_HEAL | RF6_HASTE | RF6_SHIELD | RF6_BLESS | RF6_TELE_TO)) != 0) d -= MAX_SIGHT * 8 * n_ptr->hp / n_ptr->maxhp;
-					
-					/* Don't bother buffing or curing badly hurt targets that we can't heal or teleport away */
-					if (((f6 & (RF6_HEAL | RF6_TELE_TO)) == 0) && (n_ptr->hp < n_ptr->maxhp / 2)) d += MAX_SIGHT * 12 - MAX_SIGHT * 24 * n_ptr->hp / n_ptr->maxhp;
-					
-					/* Benefit from curing */
-					if ((f6 & (RF6_CURE)) != 0)
-					{
-						int d_cure = d_base;
-						d_cure -= n_ptr->stunned / 2;
-						d_cure -= n_ptr->confused / 2;
-						d_cure -= n_ptr->monfear / 2;
-						d_cure -= n_ptr->cut / 2;
-						d_cure -= n_ptr->poisoned / 2;
-						d_cure -= n_ptr->mana ? n_ptr->blind : n_ptr->blind / 2;
-						d_cure -= n_ptr->image;
-						d_cure -= n_ptr->mana ? n_ptr->blind : n_ptr->blind / 2;
-						d = MIN(d, MAX(d_cure, d_base - MAX_SIGHT * 4));
-					}
-					
-					/* Benefit from hasting */
-					if ((f6 & (RF6_HASTE)) != 0)
-					{
-						int d_speed = d;
-						if (m_ptr->hasted) d_speed = MIN(d, d_base / 2);
-						if (n_ptr->hasted) d_speed = 10000;
-						if (n_ptr->slowed) d_speed -= 48;
-						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_HASTE))) != 0) ? MIN(d, d_speed) : d_speed;
-					}
-					
-					/* Benefit from shielding */
-					if ((f6 & (RF6_SHIELD)) != 0)
-					{
-						int d_shield = d;
-						if (m_ptr->shield) d_shield = MIN(d, d_base / 2);
-						if (n_ptr->shield) d_shield = 10000;
-						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_SHIELD))) != 0) ? MIN(d, d_shield) : d_shield;
-					}
-#if 0					
-					/* Benefit from elemental protection */
-					if ((f6 & (RF6_OPPOSE_ELEM)) != 0)
-					{
-						int d_oppose_elem = d;
-						if (m_ptr->oppose_elem) d_oppose_elem = MIN(d, d_base / 2);
-						if (n_ptr->oppose_elem) d_oppose_elem = 10000;
-						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_OPPOSE_ELEM))) != 0) ? MIN(d, d_oppose_elem) : d_oppose_elem;
-					}
-#endif					
-					/* Benefit from blessing */
-					if ((f6 & (RF6_BLESS)) != 0)
-					{
-						int d_bless = d;
-						if (m_ptr->bless) d_bless = MIN(d, d_base / 2);
-						if (n_ptr->bless) d_bless = 10000;
-						d = ((f6 & ((RF6_ASSIST_MASK) & ~(RF6_BLESS))) != 0) ? MIN(d, d_bless) : d_bless;
-					}
-					
-					/* Not worth helping */
-					if (d >= MAX_SIGHT * 16) continue;
-				}
-				
+
 				/* Pick a random target. Have checked for LOS already. */
 				if ((see_target) && (d < k))
 				{
@@ -1693,33 +1728,54 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 		if ((target_m_idx) && ((r_info[m_list[target_m_idx].r_idx].flags3 & (RF3_DEMON)) != 0)) f5 &= ~(RF5_ARC_HFIRE);
 	}
 	
+	/* Not necessarily assisting any more */
+	assist = FALSE;
+
 	/* Hack -- helping allies */
-	if ((target_m_idx) && ((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[target_m_idx].mflag & (MFLAG_ALLY)) != 0))
+	if ((target_m_idx) && !(m_ptr->image) && ((m_ptr->mflag & (MFLAG_ALLY)) != 0) == ((m_list[target_m_idx].mflag & (MFLAG_ALLY)) != 0))
 	{
 		/* Hack - cure hallucinating monsters or kill them */
 		if (m_list[target_m_idx].image)
 		{
 			if (f6 & (RF6_CURE))
 			{
+				assist = TRUE;
+
 				f4 = f5 = f7 = 0L;
 				f6 = (RF6_CURE);
 			}
 		}			
 		/* Sometimes be selfish */
-		else if ((m_idx + target_m_idx) % 2)
+		else if ((!m_ptr->dazed) && ((m_idx + target_m_idx + (turn / 10)) % 2))
 		{
 			target_m_idx = 0;
 		}
 		/* Only allow spells which assist the target */
 		else
 		{
+			/* Assisting */
+			assist = TRUE;
+
 			f4 &= (RF4_ASSIST_MASK);
 			f5 &= (RF5_ASSIST_MASK);
 			f6 &= (RF6_ASSIST_MASK);
 			f7 &= (RF7_ASSIST_MASK);
-		
-			/* TODO: Figure out what spells it is worth using to assist this particular ally */
+
+			/* Always remove useless spells - ignore whether the caster is smart */
+			remove_useless_spells(target_m_idx, &f4, &f5, &f6, &f7, TRUE);
 		}
+	}
+
+	/* If dazed, eliminate assistance spells if casting on self */
+	if ((m_ptr->dazed) && !(assist))
+	{
+		f4 &= ~(RF4_ASSIST_MASK);
+		f5 &= ~(RF5_ASSIST_MASK);
+		f6 &= ~(RF6_ASSIST_MASK);
+		f7 &= ~(RF7_ASSIST_MASK);
+
+		/* No spells left */
+		if (!f4 && !f5 && !f6 && !f7) return (0);
 	}
 
 	/* No valid target or targetting player and friendly/neutral and not aggressive. */
@@ -1957,7 +2013,7 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 
 	/* Remove spells that have no benefit
 	 * Does not include the effects of player resists/immunities */
-	remove_useless_spells(m_idx, &f4, &f5, &f6, &f7, require_los);
+	if (!assist) remove_useless_spells(m_idx, &f4, &f5, &f6, &f7, require_los);
 
 	/* No spells left */
 	if (!f4 && !f5 && !f6 && !f7) return (0);
@@ -2319,7 +2375,7 @@ static int cave_passable_mon(monster_type *m_ptr, int y, int x, bool *bash)
 	else if (mmove != MM_FAIL)
 	{
 		/* Hack -- allow incautious enemies to think they can move safely on illusory terrain */
-		if (((r_ptr->flags2 & (RF2_EMPTY_MIND)) == 0) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_SMART)) == 0)
+		if (((r_ptr->flags2 & (RF2_EMPTY_MIND | RF2_WEIRD_MIND)) == 0) && ((m_ptr->mflag & (MFLAG_ALLY | MFLAG_SMART)) == 0)
 				&& (region_grid(y, x, region_illusion_hook)))
 		{
 			if ((mmove == MM_TRAP) || (mmove == MM_DROWN)) mmove = MM_WALK;
@@ -6586,19 +6642,19 @@ static void process_monster(int m_idx)
 	/* Cannot use innate attacks when not aware. */
 	if ((chance_innate) && (!aware)) chance_innate = 0;
 
-	/* Blind, confused and stunned monsters use spell attacks half as often. */
-	if ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned))
+	/* Blind, confused, amnesiac and stunned monsters use spell attacks half as often. */
+	if ((m_ptr->blind) || (m_ptr->confused) || (m_ptr->stunned) || (m_ptr->amnesia))
 	{
 		chance_spell /= 2;
 		chance_innate /= 2;
 	}
-#if 0	
-	/* Blind and not smart monsters cannot cast spells, except rarely */
-	if ((m_ptr->blind) && ((m_ptr->mflag & (MFLAG_SMART)) == 0) && (chance_spell))
+
+	/* Blind and amnesiac monsters cannot cast spells */
+	if ((m_ptr->blind) && (m_ptr->amnesia))
 	{
-		chance_spell = 1;
+		chance_spell = 0;
 	}
-#endif
+
 	/* Monster can use ranged attacks */
 	/* Now use a 'save' against the players charisma to avoid this */
 	if ((chance_innate) || (chance_spell)
@@ -8170,6 +8226,133 @@ static void recover_monster(int m_idx, bool regen)
 
 				/* Dump a message */
 				msg_format("%^s is no longer confused.", m_name);
+			}
+		}
+	}
+
+
+	/* Recover from daze */
+	if (m_ptr->dazed)
+	{
+		int d = randint(r_ptr->level / 10 + 1);
+
+		/* Still confused */
+		if (m_ptr->dazed > d)
+		{
+			/* Reduce the confusion */
+			m_ptr->dazed -= d;
+		}
+
+		/* Recovered */
+		else
+		{
+			/* No longer confused */
+			m_ptr->dazed = 0;
+
+			/* Message if visible */
+			if (m_ptr->ml)
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* Dump a message */
+				msg_format("%^s is no longer dazed.", m_name);
+			}
+		}
+	}
+
+
+	/* Recover from hallucination */
+	if (m_ptr->image)
+	{
+		int d = randint(r_ptr->level / 10 + 1);
+
+		/* Still confused */
+		if (m_ptr->image > d)
+		{
+			/* Reduce the confusion */
+			m_ptr->image -= d;
+
+			/* Hack -- ensure this monster targets those around it */
+			m_ptr->mflag |= (MFLAG_IGNORE);
+		}
+
+		/* Recovered */
+		else
+		{
+			/* No longer confused */
+			m_ptr->image = 0;
+
+			/* Message if visible */
+			if (m_ptr->ml)
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* Dump a message */
+				msg_format("%^s is no longer drugged.", m_name);
+			}
+		}
+	}
+
+
+	/* Recover from terror */
+	if (m_ptr->terror)
+	{
+		int d = randint(r_ptr->level / 10 + 1);
+
+		/* Still confused */
+		if (m_ptr->terror > d)
+		{
+			/* Reduce the confusion */
+			m_ptr->terror -= d;
+		}
+
+		/* Recovered */
+		else
+		{
+			/* No longer confused */
+			m_ptr->terror = 0;
+
+			/* Message if visible */
+			if (m_ptr->ml)
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* Dump a message */
+				msg_format("%^s is no longer terrified.", m_name);
+			}
+		}
+	}
+
+
+	/* Recover from amnesia */
+	if (m_ptr->amnesia)
+	{
+		int d = randint(r_ptr->level / 10 + 1);
+
+		/* Still confused */
+		if (m_ptr->amnesia > d)
+		{
+			/* Reduce the confusion */
+			m_ptr->amnesia -= d;
+		}
+
+		/* Recovered */
+		else
+		{
+			/* No longer confused */
+			m_ptr->amnesia = 0;
+
+			/* Message if visible */
+			if (m_ptr->ml)
+			{
+				/* Acquire the monster name */
+				monster_desc(m_name, sizeof(m_name), m_idx, 0);
+
+				/* Dump a message */
+				msg_format("%^s is no longer forgetful.", m_name);
 			}
 		}
 	}

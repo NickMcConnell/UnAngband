@@ -301,7 +301,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->spare);
 
 	rd_byte(&o_ptr->number);
-	if (older_than(0, 6, 4, 3))	rd_s16b(&weight);
+	if (older_than(0, 6, 4, 4))	rd_s16b(&weight);
 
 	rd_byte(&o_ptr->name1);
 	rd_byte(&o_ptr->name2);
@@ -318,7 +318,7 @@ static errr rd_item(object_type *o_ptr)
 		o_ptr->charges = k_info[o_ptr->k_idx].charges;
 
 	/* Read old to hit/to dam/to ac information */
-	if (older_than(0, 6, 4, 3))
+	if (older_than(0, 6, 4, 4))
 	{
 		rd_s16b(&to_h);
 		rd_s16b(&to_d);
@@ -328,7 +328,7 @@ static errr rd_item(object_type *o_ptr)
 		rd_byte(&ds);
 	}
 
-	if (older_than(0, 6, 4, 3))
+	if (older_than(0, 6, 4, 4))
 	{
 		u16b tmp16u;
 		
@@ -347,7 +347,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->origin_depth);
 	rd_u16b(&o_ptr->origin_xtra);
 
-	if (older_than(0, 6, 4, 3))
+	if (older_than(0, 6, 4, 4))
 	{
 		/* Old flags */
 		strip_bytes(8);
@@ -361,14 +361,14 @@ static errr rd_item(object_type *o_ptr)
 	rd_byte(&o_ptr->xtra2);
 
 	/* Read the aval information */
-	if (!older_than(0, 6, 4, 3)) rd_s16b(&o_ptr->ability_count);
+	if (!older_than(0, 6, 4, 4)) rd_s16b(&o_ptr->ability_count);
 	for (j = 0; j < o_ptr->ability_count; j++)
 	{
 		rd_s16b(&o_ptr->ability[j]);
 		rd_s16b(&o_ptr->aval[j]);
 	}
 	
-	if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+	if (!older_than(0, 6, 4, 4)) rd_s16b(&ability);
 
 	/* Flags we have learnt about an item */
 	for (i = 0; i < ability; i++) rd_u32b(&o_ptr->can_flags0[i]);	
@@ -390,7 +390,7 @@ static errr rd_item(object_type *o_ptr)
 	rd_u32b(&o_ptr->not_flags4);
 
 	/* Translate flags to new system */
-	if (older_than(0, 6, 4, 3))
+	if (older_than(0, 6, 4, 4))
 	{
 		/* Fix up free action */
 		if (o_ptr->can_flags3 & (TR3_OLD_FREE_ACT)) o_ptr->can_flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
@@ -766,7 +766,14 @@ static void rd_monster(monster_type *m_ptr)
 	rd_byte(&m_ptr->hasted);
 	rd_byte(&m_ptr->cut);
 	rd_byte(&m_ptr->poisoned);
-	rd_byte(&m_ptr->blind);
+	if (!older_than(0, 6, 4, 3))
+	{
+		rd_byte(&m_ptr->dazed);
+		rd_byte(&m_ptr->image);
+		rd_byte(&m_ptr->amnesia);
+		rd_byte(&m_ptr->terror);
+	}
+	rd_byte(&m_ptr->terror);
 	rd_byte(&m_ptr->tim_invis);
 	rd_byte(&m_ptr->tim_passw);
 	rd_byte(&m_ptr->bless);
@@ -1591,7 +1598,7 @@ static errr rd_extra(void)
 	rd_u32b(&p_ptr->spell_forgotten4);
 	
 	/* Read spell memorisation */
-	if (!older_than(0, 6, 4, 3))
+	if (!older_than(0, 6, 4, 4))
 	{
 		rd_u32b(&p_ptr->spell_memorised1);
 		rd_u32b(&p_ptr->spell_memorised2);
@@ -1655,7 +1662,7 @@ static errr rd_randarts(void)
 			a_ptr->sval = 9;
 		}
 
-		if (older_than(0, 6, 4, 3))
+		if (older_than(0, 6, 4, 4))
 		{
 			rd_s16b(&pval);
 			rd_s16b(&to_h);  if (to_h) {a_ptr->aval[a_ptr->ability_count] = to_h; a_ptr->aval[a_ptr->ability_count++] = ABILITY_TO_HIT;}
@@ -1672,7 +1679,7 @@ static errr rd_randarts(void)
 		rd_s32b(&a_ptr->cost);
 
 		/* Read the aval information */
-		if (!older_than(0, 6, 4, 3))
+		if (!older_than(0, 6, 4, 4))
 		{
 			rd_s16b(&a_ptr->ability_count);
 			for (j = 0; j < a_ptr->ability_count; j++)
@@ -1690,7 +1697,7 @@ static errr rd_randarts(void)
 		rd_u32b(&a_ptr->flags4);
 
 		/* Translate flags to new system */
-		if (older_than(0, 6, 4, 3))
+		if (older_than(0, 6, 4, 4))
 		{
 			/* Fix up free action */
 			if (a_ptr->flags3 & (TR3_OLD_FREE_ACT)) a_ptr->flags1 |= (TR1_NO_SLOW | TR1_NO_PARALYZE);
@@ -1878,6 +1885,9 @@ static errr rd_inventory(void)
 		{
 			/* Copy object */
 			object_copy(&inventory[n], i_ptr);
+
+			/* Hack -- count bags */
+			if (i_ptr->tval == TV_BAG) p_ptr->pack_size_reduce_bags++;
 
 			/* Add the weight */
 			p_ptr->total_weight += (i_ptr->number * object_aval(i_ptr, ABILITY_WEIGHT));
@@ -3068,7 +3078,7 @@ static errr rd_savefile_new_aux(void)
 		object_lore *n_ptr = &e_list[i];
 		s16b ability = 0;
 
-		if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+		if (!older_than(0, 6, 4, 4)) rd_s16b(&ability);
 
 		for (j = 0; j < ability; j++) rd_u32b(&n_ptr->can_flags0[j]);
 		rd_u32b(&n_ptr->can_flags1);
@@ -3120,7 +3130,7 @@ static errr rd_savefile_new_aux(void)
 			object_info *n_ptr = &x_list[i];
 			s16b ability = 0;
 
-			if (!older_than(0, 6, 4, 3)) rd_s16b(&ability);
+			if (!older_than(0, 6, 4, 4)) rd_s16b(&ability);
 
 			for (j = 0; j < ability; j++) rd_u32b(&n_ptr->can_flags0[j]);
 			rd_u32b(&n_ptr->can_flags1);
@@ -3266,7 +3276,7 @@ static errr rd_savefile_new_aux(void)
 			note("event that a root cause of the problem is found and a fix implemented in a later");
 			note("version of Unangband.");
 			note("Please note that recovery will involve generating a new dungeon level.");
-			if (older_than(0, 6, 3, 4)) note("You will also lose some contents of your magic bags.");
+			if (older_than(0, 6, 3, 3)) note("You will also lose some contents of your magic bags.");
 			note("--------");
 			if(!get_check("Attempt a recovery? ")) return(-1);
 			if(!get_check("Have you made a backup of this save file? ")) return(-1);
@@ -3275,7 +3285,7 @@ static errr rd_savefile_new_aux(void)
 			p_ptr->leaving = TRUE;
 
 			/* Fix bags */
-			if (older_than(0, 6, 3, 4)) fix_bags(FALSE);
+			if (older_than(0, 6, 3, 3)) fix_bags(FALSE);
 			
 			/* Don't bother reading the rest of the file */
 			return (0);
@@ -3286,7 +3296,7 @@ static errr rd_savefile_new_aux(void)
 	}
 
 	/* Fix bags */
-	if (older_than(0, 6, 3, 4)) fix_bags(TRUE);
+	if (older_than(0, 6, 3, 3)) fix_bags(TRUE);
 
 #ifdef VERIFY_CHECKSUMS
 

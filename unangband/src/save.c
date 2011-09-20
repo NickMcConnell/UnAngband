@@ -316,6 +316,10 @@ static void wr_monster(const monster_type *m_ptr)
 	wr_byte(m_ptr->hasted);
 	wr_byte(m_ptr->cut);
 	wr_byte(m_ptr->poisoned);
+	wr_byte(m_ptr->dazed);
+	wr_byte(m_ptr->image);
+	wr_byte(m_ptr->amnesia);
+	wr_byte(m_ptr->terror);
 	wr_byte(m_ptr->blind);
 	wr_byte(m_ptr->tim_invis);
 	wr_byte(m_ptr->tim_passw);

@@ -8268,7 +8268,7 @@ F:IGNORE_ACID | IGNORE_ELEC | IGNORE_FIRE | IGNORE_COLD | IGNORE_WATER |
 
 #More magic bags
 
-I:1008:Mixed Mushrooms
+N:1008:Mixed Mushrooms
 G:&:o
 I:98:24:0
 W:20:0:100:350

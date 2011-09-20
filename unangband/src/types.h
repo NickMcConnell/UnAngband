@@ -1203,10 +1203,12 @@ struct monster_type
 	byte tim_invis;	/* Monster is temporarily invisible */
 	byte tim_passw;	/* Monster is temporarily passwall */
 	byte bless;	/* Monster is temporarily blessed */
-	byte berserk;	/* Monster is temporarily beserk */
+	byte berserk;	/* Monster is temporarily berserk */
 
 	byte image;	/* Monster is hallucinating */
 	byte dazed;	/* Monster is dazed */
+	byte amnesia;	/* Monster is forgetful */
+	byte terror;	/* Monster is terrified */
 	
 	byte shield;	/* Monster is temporarily shielded */
 	byte oppose_elem; /* Monster is temporarily resistant to elements */

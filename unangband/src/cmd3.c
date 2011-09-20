@@ -1270,7 +1270,7 @@ bool player_offer(int item)
 			/* Mustn't be injured -- unless critically injured and the player offering healing */
 			/* This critically injured definition must match the critically injured and looking to feed monster definition in melee2.c so that the
 			 * monster can use the item after being given it. */
-			if ((m_ptr->hp < m_ptr->maxhp) && !((m_ptr->hp < m_ptr->maxhp / 10) || (m_ptr->mana < r_ptr->mana / 5)))
+			if ((m_ptr->hp < m_ptr->maxhp) && !(m_ptr->blind) && !((m_ptr->hp < m_ptr->maxhp / 2) || (m_ptr->mana < r_ptr->mana / 5)))
 			{
 				msg_format("%^s is hurt and not interested.", m_name);
 				return (FALSE);
@@ -1885,7 +1885,7 @@ bool player_trade(int item2)
 				p_ptr->cur_flags4 = hack_cur_flags4;
 
 				/* If smart, we try to talk in common language to trick the player */
-				if (r_info[m_ptr->r_idx].flags2 & (RF2_SMART)) monster_speech(trade_m_idx, comment_5a[rand_int(MAX_COMMENT_5a)], TRUE);
+				if (r_info[m_ptr->r_idx].flags2 & (RF2_SMART)) monster_speech(trade_m_idx, comment_4a[rand_int(MAX_COMMENT_4a)], TRUE);
 
 				/* Tell allies to cool their heels */
 				if (tell_allies_mflag(m_ptr->fy, m_ptr->fx, (MFLAG_TOWN), comment_5a[rand_int(MAX_COMMENT_5a)]))
@@ -3223,7 +3223,7 @@ void ang_sort_swap_hook(vptr u, vptr v, int a, int b)
 /*
  * Hack -- Display the "name" and "attr/chars" of a monster race
  */
-static void roff_top(int r_idx)
+void roff_top(int r_idx)
 {
 	monster_race *r_ptr = &r_info[r_idx];
 	char m_name[80];

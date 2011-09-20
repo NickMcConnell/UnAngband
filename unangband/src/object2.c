@@ -9252,6 +9252,9 @@ void inven_item_optimize(int item)
 	/* The item is in the pack */
 	if (item < INVEN_WIELD)
 	{
+		/* Hack - bags take up 2 slots. We calculate this here. */
+		if (o_ptr->tval == TV_BAG) p_ptr->pack_size_reduce_bags--;
+
 		/* One less item */
 		p_ptr->inven_cnt--;
 
@@ -9659,6 +9662,9 @@ s16b inven_carry(object_type *o_ptr)
 
 	/* No longer marked */
 	j_ptr->ident &= ~(IDENT_MARKED);
+
+	/* Hack - bags take up 2 slots. We calculate this here. */
+	if (j_ptr->tval == TV_BAG) p_ptr->pack_size_reduce_bags++;
 
 	/* Increase the weight */
 	p_ptr->total_weight += (j_ptr->number * object_aval(j_ptr, ABILITY_WEIGHT));
@@ -10159,6 +10165,8 @@ void combine_pack(void)
 	/* Hack - count the number of bags */
 	for (i = 0; i < INVEN_PACK; i++)
 	{
+		o_ptr = &inventory[i];
+
 		if (!o_ptr->k_idx) continue;
 		
 		if (o_ptr->tval == TV_BAG) p_ptr->pack_size_reduce_bags++;

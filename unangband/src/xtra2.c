@@ -1752,10 +1752,10 @@ void improve_familiar(void)
 		}
 		
 		/* Record last blow effect */
-		if (slot > FAMILIAR_BLOW) last_blow_effect = familiar_ability[i].attr;
+		if (familiar_ability[i].attr > FAMILIAR_BLOW) last_blow_effect = familiar_ability[i].attr;
 		
 		/* Count blows and clear last blow effect if we get an extra blow */
-		else if (slot == FAMILIAR_BLOW)
+		else if (familiar_ability[i].attr == FAMILIAR_BLOW)
 		{
 			blows_left--;
 			last_blow_effect = FAMILIAR_BLOW + GF_HURT;
@@ -1809,7 +1809,7 @@ void improve_familiar(void)
 			}
 
 			/* Can only choose blows 4 times */
-			if ((!blows_left) && (familiar_ability[i].attr == FAMLIAR_BLOW)) okay = FALSE;
+			if ((!blows_left) && (familiar_ability[i].attr == FAMILIAR_BLOW)) okay = FALSE;
 			
 			/* Can't pick the same blow improvement twice in a row */
 			if ((slot) && (familiar_ability[i].attr == last_blow_effect)) okay = FALSE;
