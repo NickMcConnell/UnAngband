@@ -1628,13 +1628,6 @@ static int choose_ranged_attack(int m_idx, int *tar_y, int *tar_x, byte choose)
 					
 					/* Don't bother buffing or curing badly hurt targets that we can't heal or teleport away */
 					if (((tmpf6 & (RF6_HEAL | RF6_TELE_TO)) == 0) && (n_ptr->hp < n_ptr->maxhp / 2)) d += MAX_SIGHT * 12 - MAX_SIGHT * 24 * n_ptr->hp / n_ptr->maxhp;
-					
-					/* Benefit from healing */
-					if ((tmpf6 & (RF6_HEAL)) && (n_ptr->hp < n_ptr->maxhp)) need_assist_f6 |= (RF6_HEAL);
-
-					/* Benefit from teleportation */
-					if ((tmpf6 & (RF6_TELE_TO)) && (n_ptr->hp < n_ptr->maxhp / 4)) need_assist_f6 |= (RF6_TELE_TO);
-					if ((tmpf6 & (RF6_TELE_SELF_TO)) && (n_ptr->hp < m_ptr->hp / 2)) need_assist_f6 |= (RF6_TELE_SELF_TO);
 
 					/* Benefit from hasting */
 					if ((tmpf6 & (RF6_HASTE)) != 0)
