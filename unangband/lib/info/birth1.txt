@@ -14,7 +14,8 @@ everything at first, especially if you have never played a "roguelike" game
 before.  To assist you, notes like this will occasionally appear around the
 dungeon, explaining various aspects of the game.  To get additional
 help and advice, you can press ? when the game is waiting for a command
-and browse through all of the "online help files".
+and browse through all of the "online help files". You can access notes you
+have previously read by using the ~ command to access the knowledge menus.
 
 You can begin the game by pressing ESC to leave this screen, and using the
 movement keys to move around the town. Depending on the choice you made at

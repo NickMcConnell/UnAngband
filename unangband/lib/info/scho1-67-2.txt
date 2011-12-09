@@ -1,0 +1,44 @@
+=== Detritus from a delirious dream, dark and delicious ===
+
+Just as I invade your dreams, you can invade the sleeping and
+waking moments of others.
+
+- Charm Plant allows you to influence monstrous plants and mushrooms
+so that they aid you in battle, instead of attacking you. Most plants
+are stationary, but you can choose to lead your enemies to them. If
+you come close to charming a monster, try again: it may be more easily
+swayed by a second attempt.
+
+- Wizard Lock will allow you to magically lock doors so that they are
+much harder to open. This can help you escape monsters, even slowing
+those which can open or bash doors, if there is a door between you and
+them.
+
+- Detect Minds will detect all monsters with minds, except only a few
+if the mind is sufficiently insectoid or alien to your way of thinking.
+Mindless monsters will remain hidden. Once detected:
+
+- Mind Thrust and Ego Whip allow you to attack those same minds of
+monsters, damaging them.
+
+- Poison Thoughts is the first of many illusion magics you can use.
+These cause damage only to sleeping, hallucinating and weak-willed
+monsters, but will not normally disturb a sleeping monster from its
+slumber. Mindless and weirdly minded monsters are unaffected by
+illusions, as are monsters normally immune to the element that the
+illuaion duplicates.
+
+- Temporary Displacement allow you to displace yourself a moderate
+distance. At the end of the displacement effect, you return to your
+original location: or the previous location you displaced from if you
+cast it multiple times.
+
+- Ignore Pain isn't as effective as healing potions but should
+keep you alive long enough to survive most minor cuts and poisons.
+
+- Confused monsters will be highly inaccurate with their ranged
+attacks which may cause them to accidentally hit those around them.
+
+- Infravision allows you to temporarily see warm blooded monsters who
+might otherwise not be visible to you.
+

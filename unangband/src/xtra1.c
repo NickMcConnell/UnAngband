@@ -2732,13 +2732,14 @@ static void calc_mana(void)
 	/* Only mages are affected */
 	if (icky_hands)
 	{
+		u32b f0[ABILITY_ARRAY_SIZE];
 		u32b f1, f2, f3, f4;
 
 		/* Get the gloves */
 		o_ptr = &inventory[INVEN_HANDS];
 
 		/* Examine the gloves */
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 		/* Normal gloves hurt mage-type spells */
 		if (o_ptr->k_idx &&
@@ -2759,14 +2760,14 @@ static void calc_mana(void)
 
 	/* Weigh the armor */
 	cur_wgt = 0;
-	cur_wgt += inventory[INVEN_BODY].weight;
-	cur_wgt += inventory[INVEN_HEAD].weight;
+	cur_wgt += object_aval(&inventory[INVEN_BODY], ABILITY_WEIGHT);
+	cur_wgt += object_aval(&inventory[INVEN_HEAD], ABILITY_WEIGHT);
 	/* do not count rings and off-hand weapons */
 	if (inventory[INVEN_ARM].tval == TV_SHIELD)
-		cur_wgt += inventory[INVEN_ARM].weight;
-	cur_wgt += inventory[INVEN_OUTER].weight;
-	cur_wgt += inventory[INVEN_HANDS].weight;
-	cur_wgt += inventory[INVEN_FEET].weight;
+		cur_wgt += object_aval(&inventory[INVEN_ARM], ABILITY_WEIGHT);
+	cur_wgt += object_aval(&inventory[INVEN_OUTER], ABILITY_WEIGHT);
+	cur_wgt += object_aval(&inventory[INVEN_HANDS], ABILITY_WEIGHT);
+	cur_wgt += object_aval(&inventory[INVEN_FEET], ABILITY_WEIGHT);
 
 	/* Determine the weight allowance */
 	max_wgt = pc_ptr->spell_weight;
@@ -2912,16 +2913,19 @@ static void calc_torch(void)
 {
 	object_type *o_ptr = &inventory[INVEN_LITE];
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1;
 	u32b f2;
 	u32b f3;
 	u32b f4;
 
+	int i;
+
 	/* Assume no light */
 	p_ptr->cur_lite = 0;
 
 	/* Get the object flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 	/* Examine actual lites */
 	if (o_ptr->tval == TV_LITE)
@@ -2949,7 +2953,6 @@ static void calc_torch(void)
 #endif
 
 		}
-
 	}
 	/* Examine spells */
 	else if (o_ptr->tval == TV_SPELL)
@@ -2959,7 +2962,7 @@ static void calc_torch(void)
 			p_ptr->cur_lite = 2;
 
 #ifdef ALLOW_OBJECT_INFO_MORE
-			object_can_flags(o_ptr,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
+			object_can_flags(o_ptr,NULL,0x0L,0x0L,TR3_LITE,0x0L, FALSE);
 #endif
 		}
 		else
@@ -2972,7 +2975,7 @@ static void calc_torch(void)
 	if ((p_ptr->cur_flags3 & (TR3_LITE)) != 0)
 	{
 #ifdef ALLOW_OBJECT_INFO_MORE
-		equip_can_flags(0x0L,0x0L,TR3_LITE,0x0L);
+		equip_can_flags(NULL, 0x0L,0x0L,TR3_LITE,0x0L);
 #endif
 		p_ptr->cur_lite += p_ptr->glowing;
 	}
@@ -2980,6 +2983,44 @@ static void calc_torch(void)
 	/* Notice changes in the "lite radius" */
 	if (p_ptr->old_lite != p_ptr->cur_lite)
 	{
+		/* Allies switch lights on or off */
+		for (i = 1; i < m_max; i++)
+		{
+			monster_type *m_ptr = &m_list[i];
+
+			/* Paranoia -- Skip dead monsters */
+			if (!m_ptr->r_idx) continue;
+
+			/* Skip town monsters */
+			if ((m_ptr->mflag & (MFLAG_TOWN)) != 0) continue;
+
+			/* Skip anything but allies */
+			if ((m_ptr->mflag & (MFLAG_ALLY)) == 0) continue;
+
+			/* Ally in line of sight/aware */
+			if ((m_ptr->mflag & (MFLAG_MARK)) == 0) continue;
+
+			/* Skip permalit */
+			if ((r_info[m_ptr->r_idx].flags2 & (RF2_HAS_LITE)) != 0) continue;
+
+			/* Doesn't need lite */
+			if ((r_info[m_ptr->r_idx].flags2 & (RF2_NEED_LITE)) == 0) continue;
+
+			/* Switch light on */
+			if (p_ptr->cur_lite)
+			{
+				m_ptr->mflag |= (MFLAG_LITE);
+				gain_attribute(m_ptr->fy, m_ptr->fx, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+			}
+
+			/* Turn light off */
+			else
+			{
+				m_ptr->mflag &= ~(MFLAG_LITE);
+				check_attribute_lost(m_ptr->fy, m_ptr->fx, 2, CAVE_XLOS, require_torch_lit, has_torch_lit, redraw_torch_lit_loss, remove_torch_lit, reapply_torch_lit);
+			}
+		}
+
 		/* Update the visuals */
 		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
 
@@ -3084,6 +3125,7 @@ static void calc_bonuses(void)
 
 	object_type *o_ptr;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	player_race *shape_ptr = &p_info[p_ptr->pshape];
@@ -3146,10 +3188,10 @@ static void calc_bonuses(void)
 	p_ptr->cur_flags3 = 0L;
 	p_ptr->cur_flags4 = 0L;
 
-	/* Clear all incremental resist counters */
-	for (i = 0; i < MAX_INCR_RESISTS; i++)
+	/* Clear all abilities */
+	for (i = 0; i < ABILITY_MAX; i++)
 	{
-		p_ptr->incr_resist[i] = 1;
+		p_ptr->ability[i] = 0;
 	}
 
 	/* Clear uncontrolled status */
@@ -3200,7 +3242,7 @@ static void calc_bonuses(void)
 	/*** Analyze player ***/
 
 	/* Extract the player flags */
-	player_flags(&f1, &f2, &f3, &f4);
+	player_flags(f0, &f1, &f2, &f3, &f4);
 
 	p_ptr->cur_flags1 = f1;
 	p_ptr->cur_flags2 = f2;
@@ -3221,44 +3263,46 @@ static void calc_bonuses(void)
 		if (!o_ptr->k_idx) continue;
 
 		/* Extract the item flags */
-		object_flags(o_ptr, &f1, &f2, &f3, &f4);
+		object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
-		/* Affect stats */
-		if (f1 & (TR1_STR))
-		  {
-		    p_ptr->stat_add[A_STR] += o_ptr->pval;
-		    p_ptr->stat_add[A_SIZ] += o_ptr->pval;
-		  }
-		if (f1 & (TR1_INT)) p_ptr->stat_add[A_INT] += o_ptr->pval;
-		if (f1 & (TR1_WIS)) p_ptr->stat_add[A_WIS] += o_ptr->pval;
-		if (f1 & (TR1_DEX))
-		  {
-		    p_ptr->stat_add[A_DEX] += o_ptr->pval;
-		    p_ptr->stat_add[A_AGI] += o_ptr->pval;
-		  }
-		if (f1 & (TR1_CON)) p_ptr->stat_add[A_CON] += o_ptr->pval;
-		if (f1 & (TR1_CHR)) p_ptr->stat_add[A_CHR] += o_ptr->pval;
+		/* Get abilities */
+		for (i = 0; i < ABILITY_MAX; i++)
+		{
+			int aval = object_aval(o_ptr, i);
+			p_ptr->ability[i] += aval;
 
-		/* Affect saves */
-		if (f1 & (TR1_SAVE)) p_ptr->skills[SKILL_SAVE] += o_ptr->pval;
+			switch (ability_bonus[i].type)
+			{
+				case BONUS_ADD_STAT:
+					p_ptr->stat_add[ability_bonus[i].flag_num] += aval;
+					break;
+				case BONUS_ADD_SKILL:
+				case BONUS_ADD_SKILL_PASSIVE:
+				case BONUS_ADD_WEAPON_SKILL:
+					if (ability_bonus[i].flag_match)
+					{
+						p_ptr->skills[ability_bonus[i].flag_num] += aval * ability_bonus[i].flag_match;
+					}
+					else
+					{
+						p_ptr->skills[ability_bonus[i].flag_num] += aval;
+					}
+					break;
+			}
 
-		/* Affect devices */
-		if (f1 & (TR1_DEVICE)) p_ptr->skills[SKILL_DEVICE] += o_ptr->pval;
-
-		/* Affect stealth */
-		if (f1 & (TR1_STEALTH)) p_ptr->skills[SKILL_STEALTH] += o_ptr->pval;
-
-		/* Affect searching ability (factor of ten) */
-		if (f1 & (TR1_SEARCH)) p_ptr->skills[SKILL_SEARCH] += (o_ptr->pval * 10);
-
-		/* Affect infravision */
-		if (f1 & (TR1_INFRA)) p_ptr->see_infra += o_ptr->pval;
-
-		/* Affect digging (factor of 20) */
-		if (f1 & (TR1_TUNNEL)) p_ptr->skills[SKILL_DIGGING] += (o_ptr->pval * 20);
-
-		/* Affect speed */
-		if (f1 & (TR1_SPEED)) p_ptr->pspeed += o_ptr->pval;
+			switch(i)
+			{
+				case ABILITY_REGEN_HP:
+					p_ptr->regen_hp += aval;
+					break;
+				case ABILITY_REGEN_MANA:
+					p_ptr->regen_mana += aval;
+					break;
+				case ABILITY_LITE:
+					p_ptr->glowing += aval;
+					break;
+			}
+		}
 
 		/* Affect blows */
 		if (f1 & (TR1_BLOWS)) extra_blows += o_ptr->pval;
@@ -3269,43 +3313,27 @@ static void calc_bonuses(void)
 		/* Affect Might */
 		if (f1 & (TR1_MIGHT)) extra_might += o_ptr->pval;
 
-		/* Affect hitpoint regeneration */
-		if (f3 & (TR3_REGEN_HP)) p_ptr->regen_hp += o_ptr->pval;
-
-		/* Affect mana regeneration */
-		if (f3 & (TR3_REGEN_MANA)) p_ptr->regen_mana += o_ptr->pval;
-
-		/* Affect light radius */
-		if (f3 & (TR3_LITE)) p_ptr->glowing += o_ptr->pval;
-
-		/* Affect incremental resists */
-		if (f2 & (TR2_RES_ACID)) p_ptr->incr_resist[INCR_RES_ACID]++;
-		if (f2 & (TR2_RES_COLD)) p_ptr->incr_resist[INCR_RES_COLD]++;
-		if (f2 & (TR2_RES_ELEC)) p_ptr->incr_resist[INCR_RES_ELEC]++;
-		if (f2 & (TR2_RES_FIRE)) p_ptr->incr_resist[INCR_RES_FIRE]++;
-		if (f2 & (TR2_RES_POIS)) p_ptr->incr_resist[INCR_RES_POIS]++;
-		if (f4 & (TR4_RES_WATER)) p_ptr->incr_resist[INCR_RES_WATER]++;
-
 		/* Affect uncontrolled status */
 		if ((f3 & (TR3_UNCONTROLLED)) && (uncontrolled_p(o_ptr))) p_ptr->uncontrolled = TRUE;
 
 		/* Affect flags */
+		for (i = 0; i < ABILITY_ARRAY_SIZE; i++) p_ptr->cur_flags0[i] |= f0[i];
 		p_ptr->cur_flags1 |= f1;
 		p_ptr->cur_flags2 |= f2;
 		p_ptr->cur_flags3 |= f3;
 		p_ptr->cur_flags4 |= f4;
 
 		/* Modify the base armor class */
-		p_ptr->ac += o_ptr->ac;
+		p_ptr->ac += object_aval(o_ptr, ABILITY_AC);
 
 		/* The base armor class is always known */
-		p_ptr->dis_ac += o_ptr->ac;
+		p_ptr->dis_ac += object_aval(o_ptr, ABILITY_AC);
 
 		/* Apply the bonuses to armor class */
-		p_ptr->to_a += o_ptr->to_a;
+		p_ptr->to_a += object_aval(o_ptr, ABILITY_TO_AC);
 
 		/* Apply the mental bonuses to armor class, if known */
-		if (object_bonus_p(o_ptr)) p_ptr->dis_to_a += o_ptr->to_a;
+		if (object_bonus_p(o_ptr)) p_ptr->dis_to_a += object_aval(o_ptr, ABILITY_TO_AC);
 
 		/* Hack -- do not apply "weapon" bonuses */
 		if (i == INVEN_WIELD) continue;
@@ -3315,12 +3343,12 @@ static void calc_bonuses(void)
 		if (i == INVEN_BOW) continue;
 
 		/* Apply the bonuses to hit/damage */
-		p_ptr->to_h += o_ptr->to_h;
-		p_ptr->to_d += o_ptr->to_d;
+		p_ptr->to_h += object_aval(o_ptr, ABILITY_TO_HIT);
+		p_ptr->to_d += object_aval(o_ptr, ABILITY_TO_DAM);
 
 		/* Apply the mental bonuses to hit/damage, if known */
-		if (object_bonus_p(o_ptr)) p_ptr->dis_to_h += o_ptr->to_h;
-		if (object_bonus_p(o_ptr)) p_ptr->dis_to_d += o_ptr->to_d;
+		if (object_bonus_p(o_ptr)) p_ptr->dis_to_h += object_aval(o_ptr, ABILITY_TO_HIT);
+		if (object_bonus_p(o_ptr)) p_ptr->dis_to_d += object_aval(o_ptr, ABILITY_TO_DAM);
 	}
 
 
@@ -3656,11 +3684,11 @@ static void calc_bonuses(void)
 	p_ptr->heavy_shoot = FALSE;
 
 	/* It is hard to hold a heavy bow */
-	if (hold < o_ptr->weight / 10)
+	if (hold < object_aval(o_ptr, ABILITY_WEIGHT) / 10)
 	{
 		/* Hard to wield a heavy bow */
-		p_ptr->to_h += 2 * (hold - o_ptr->weight / 10);
-		p_ptr->dis_to_h += 2 * (hold - o_ptr->weight / 10);
+		p_ptr->to_h += 2 * (hold - object_aval(o_ptr, ABILITY_WEIGHT) / 10);
+		p_ptr->dis_to_h += 2 * (hold - object_aval(o_ptr, ABILITY_WEIGHT) / 10);
 
 		/* Heavy Bow */
 		p_ptr->heavy_shoot = TRUE;
@@ -3729,7 +3757,7 @@ static void calc_bonuses(void)
 	p_ptr->heavy_wield = FALSE;
 
 	/* Get the weight */
-	if (o_ptr->k_idx) weight = o_ptr->weight;
+	if (o_ptr->k_idx) weight = object_aval(o_ptr, ABILITY_WEIGHT);
 
 	/* Hack -- no weapon */
 	else weight = 0;
@@ -3738,7 +3766,7 @@ static void calc_bonuses(void)
 	o_ptr = &inventory[INVEN_ARM];
 
 	/* Add weight of secondary weapon */
-	if (o_ptr->k_idx && (o_ptr->tval != TV_SHIELD)) weight += o_ptr->weight;
+	if (o_ptr->k_idx && (o_ptr->tval != TV_SHIELD)) weight += object_aval(o_ptr, ABILITY_WEIGHT);
 
 	/* It is hard to hold a heavy weapon */
 	if (hold < weight / 10)
@@ -3846,10 +3874,10 @@ static void calc_bonuses(void)
 	else
 	{
 		/* One-handed if less than 20 lbs */
-		if (o_ptr->weight < 200) p_ptr->cur_style |= (1L << WS_ONE_HANDED);
+		if (object_aval(o_ptr, ABILITY_WEIGHT) < 200) p_ptr->cur_style |= (1L << WS_ONE_HANDED);
 
 		/* Two-handed if greater than or equal to 10 lbs */
-		if (o_ptr->weight >= 100) p_ptr->cur_style |= (1L << WS_TWO_HANDED);
+		if (object_aval(o_ptr, ABILITY_WEIGHT) >= 100) p_ptr->cur_style |= (1L << WS_TWO_HANDED);
 
 		/* Set weapon preference styles */
 		switch(o_ptr->tval)
@@ -3885,8 +3913,8 @@ static void calc_bonuses(void)
 	if (p_ptr->cur_style & (1L << WS_UNARMED)
 	    && p_ptr->wt >= 2 * cp_ptr->chg_weight)
 	  p_ptr->num_charge = p_ptr->wt / cp_ptr->chg_weight;
-	else if (o_ptr->weight >= 2 * cp_ptr->chg_weight)
-	  p_ptr->num_charge = o_ptr->weight / cp_ptr->chg_weight;
+	else if (object_aval(o_ptr, ABILITY_WEIGHT) >= 2 * cp_ptr->chg_weight)
+	  p_ptr->num_charge = object_aval(o_ptr, ABILITY_WEIGHT) / cp_ptr->chg_weight;
 	else
 	  p_ptr->num_charge = 1;
 
@@ -3970,9 +3998,9 @@ static void calc_bonuses(void)
 					p_ptr->cur_style |= (1L << WS_TWO_WEAPON);
 
 					/* Charging multiplier, if larger than of the primary weapon */
-					if (o_ptr->weight >= 2 * cp_ptr->chg_weight
-						 &&  o_ptr->weight / cp_ptr->chg_weight > p_ptr->num_charge)
-						p_ptr->num_charge = o_ptr->weight / cp_ptr->chg_weight;
+					if (object_aval(o_ptr, ABILITY_WEIGHT) >= 2 * cp_ptr->chg_weight
+						 &&  object_aval(o_ptr, ABILITY_WEIGHT) / cp_ptr->chg_weight > p_ptr->num_charge)
+						p_ptr->num_charge = object_aval(o_ptr, ABILITY_WEIGHT) / cp_ptr->chg_weight;
 				}
 				break;
 			}

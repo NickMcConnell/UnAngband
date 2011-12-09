@@ -895,3 +895,27 @@ I:0
 D:reduce~:constitution and charisma from:::::
 T:constitution and charisma
 
+N:176:AWAY_ALL_TO
+I:0
+D:teleport~:::to::distance on average:range
+T:teleportation to
+
+N:177:AWAY_DARK_TO
+I:0
+D:teleport~:::to only in darkness::distance on average:range
+T:teleporting to in darkness
+
+N:178:AWAY_JUMP_TO
+I:0
+D:jump~:::to to a location still in line of fire::distance on average:range
+T:jumping to
+
+N:179:AWAY_NATURE_TO
+I:0
+D:teleport~:::to if adjacent to water or nature::distance on average:range
+T:teleporting to near nature
+
+N:180:AWAY_FIRE_TO
+I:0
+D:teleport~:::to if adjacent to fire, smoke or lava::distance on average:range
+T:teleporting to in fire

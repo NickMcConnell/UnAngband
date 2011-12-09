@@ -1,6 +1,6 @@
-=== A crocheted woollen bookmark inserted in your first spell book ===
+=== A crocheted woolen book mark inserted in your first spell book ===
 
-This incongrous object appears poorly made until you notice the warp and
+This incongruous object appears poorly made until you notice the warp and
 weft of the weave corresponds to the dashes and dots of the Wizard Code.
 It is slow work translating the hidden message:
 
@@ -36,7 +36,7 @@ with a limited range and will be ineffective against monsters which
 are immune to fire damage. You can also use Torch to start fires, or
 burn through some locked doors.
 
-- Mend Light Wounds isn't effective against healing potions but should
+- Mend Light Wounds isn't as effective as healing potions but should
 keep you alive long enough to survive most minor cuts and poisons.
 
 - Stinking Cloud is an effective damage over time attack that is
@@ -49,4 +49,4 @@ attacks which may cause them to accidentally hit those around them.
 
 Good luck!
 
-(Thing seemed a lot easier on graduation day).
+(This seemed a lot easier on graduation day).

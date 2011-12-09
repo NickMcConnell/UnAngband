@@ -1,0 +1,45 @@
+=== Words written in the after image of a burning fire ===
+
+A thaumaturge is weaker than other users of magic for miscellaneous
+purposes, but has powerful and unusual attack magics to compensate
+for these weaknesses. Be initially wary of monsters immune to fire
+as many of your spells will be useless against them, as well as
+regions of water which reduce the strength of your fire and acid
+magics when used against those sheltering in them.
+
+- Find Flame will locate burning monsters and terrain, but also
+scatters flames around you which can set alight nearby terrain and burn
+your enemies, and briefly light up darkness.
+
+- Wizard Lock will allow you to magically lock doors so that they are
+much harder to open. This can help you escape monsters, even slowing
+those which can open or bash doors, if there is a door between you and
+them.
+
+- Torch is your main magical attack: it does high damage but with a
+limited range and will be ineffective against monsters which are
+immune to fire damage. You can also use Torch to start fires, or burn
+through some locked doors.
+
+- Fire Walk will let you travel between places filled with fire and
+smoke. If you are not standing in such a region, attempting to cast
+this spell will not cost you time or mana. A lit torch - carried by
+you or a monster - counts as a fiery location for this spell.
+
+- Ignore Pain isn't as effective as healing potions but should
+keep you alive long enough to survive most minor cuts and poisons.
+
+- Fire Blast is a short range, damaging area effect attack.
+
+- Acid Splash damages all adjacent monsters. You should be careful not
+to use it when next to items which could be damaged by its effect.
+
+- Infravision allows you to temporarily see warm blooded monsters who
+might otherwise not be visible to you.
+
+- Thaumaturgic Missile is the first of your more powerful attack
+magics.
+
+It takes fire to know fire, my friend. 
+
+G.

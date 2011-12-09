@@ -475,12 +475,12 @@ bool teleport_project_hook(const int oy, const int ox, const int ny, const int n
 
 
 /*
- * Teleport hook: Destination must be in darkness
+ * Teleport hook: Origin and destination must be in darkness
  */
 bool teleport_darkness_hook(const int oy, const int ox, const int ny, const int nx)
 {
-	(void)oy;
-	(void)ox;
+	/* Daylight or permanent light */
+	if ((cave_info[oy][ox] & (CAVE_DLIT | CAVE_GLOW)) != 0) return (FALSE);
 
 	/* Daylight or permanent light */
 	if ((cave_info[ny][nx] & (CAVE_DLIT | CAVE_GLOW)) != 0) return (FALSE);
@@ -490,15 +490,40 @@ bool teleport_darkness_hook(const int oy, const int ox, const int ny, const int 
 
 
 /*
- * Teleport hook: Destination must be adjacent to water or living terrain
+ * Teleport hook: Origin and destination must be adjacent to water or living terrain
  */
 bool teleport_nature_hook(const int oy, const int ox, const int ny, const int nx)
 {
+	bool valid = FALSE;
 	int y, x;
 
-	(void)oy;
-	(void)ox;
+	/* Check origin */
+	for (y = oy - 1; y <= oy + 1; y++)
+	{
+		for (x = ox - 1; x <= ox + 1; x++)
+		{
+			/* Check for valid grid */
+			if (!in_bounds_fully(y,x)) continue;
 
+			/* Water or living feature */
+			if (((f_info[cave_feat[y][x]].flags2 & (FF2_WATER)) != 0)
+				/* Hack to allow fountains / wet floor */
+				|| (f_info[cave_feat[y][x]].k_idx == 224)
+				|| ((f_info[cave_feat[y][x]].flags3 & (FF3_LIVING)) != 0))
+			{
+				valid = TRUE;
+			}
+		}
+	}
+
+	/* Origin allowed? */
+	if (!valid) return (FALSE);
+	else valid = FALSE;
+
+	/* Hack - efficiency */
+	if ((ny == oy) && (nx == ox)) return (TRUE);
+
+	/* Check destination */
 	for (y = ny - 1; y <= ny + 1; y++)
 	{
 		for (x = nx - 1; x <= nx + 1; x++)
@@ -512,12 +537,12 @@ bool teleport_nature_hook(const int oy, const int ox, const int ny, const int nx
 				|| (f_info[cave_feat[y][x]].k_idx == 224)
 				|| ((f_info[cave_feat[y][x]].flags3 & (FF3_LIVING)) != 0))
 			{
-				return (TRUE);
+				valid = TRUE;
 			}
 		}
 	}
 
-	return (FALSE);
+	return (valid);
 }
 
 
@@ -526,11 +551,46 @@ bool teleport_nature_hook(const int oy, const int ox, const int ny, const int nx
  */
 bool teleport_fiery_hook(const int oy, const int ox, const int ny, const int nx)
 {
+	bool valid = FALSE;
 	int y, x;
 
-	(void)oy;
-	(void)ox;
+	/* Player carrying a lit torch */
+	if ((oy == p_ptr->py) && (ox == p_ptr->px))
+	{
+		object_type *o_ptr = &inventory[INVEN_LITE];
 
+		if ((o_ptr->tval == TV_LITE) && (o_ptr->sval == SV_LITE_TORCH) && (o_ptr->timeout))
+		{
+			valid = TRUE;
+		}
+	}
+
+	/* Check origin */
+	for (y = oy - 1; y <= oy + 1; y++)
+	{
+		for (x = ox - 1; x <= ox + 1; x++)
+		{
+			/* Check for valid grid */
+			if (!in_bounds_fully(y,x)) continue;
+
+			/* Lava or burning feature */
+			if ((f_info[cave_feat[y][x]].blow.effect == GF_LAVA) ||
+				(f_info[cave_feat[y][x]].blow.effect == GF_FIRE) ||
+				(f_info[cave_feat[y][x]].blow.effect == GF_SMOKE))
+			{
+				valid = TRUE;
+			}
+		}
+	}
+
+	/* Origin allowed? */
+	if (!valid) return (FALSE);
+	else valid = FALSE;
+
+	/* Hack - efficiency */
+	if ((ny == oy) && (nx == ox)) return (TRUE);
+
+	/* Check destination */
 	for (y = ny - 1; y <= ny + 1; y++)
 	{
 		for (x = nx - 1; x <= nx + 1; x++)
@@ -543,14 +603,65 @@ bool teleport_fiery_hook(const int oy, const int ox, const int ny, const int nx)
 				(f_info[cave_feat[y][x]].blow.effect == GF_FIRE) ||
 				(f_info[cave_feat[y][x]].blow.effect == GF_SMOKE))
 			{
-				return (TRUE);
+				valid = TRUE;
 			}
 		}
 	}
 
-	return (FALSE);
+	return (valid);
 }
 
+/*
+ * Sets the teleport hook based on the type of effect
+ */
+void set_teleport_hook(int typ, char **note)
+{
+	switch(typ)
+	{
+		/* Teleport from darkness to darkness */
+		case GF_AWAY_DARK:
+		case GF_AWAY_DARK_TO:
+		{
+			teleport_hook = teleport_darkness_hook;
+			if (note) *note = "is still in the light.";
+			break;
+		}
+
+		/* Teleport from water/living to water/living */
+		case GF_AWAY_NATURE:
+		case GF_AWAY_NATURE_TO:
+		{
+			teleport_hook = teleport_nature_hook;
+			if (note) *note = "is apart from nature.";
+			break;
+		}
+
+		/* Teleport from fire/lava to fire/lava */
+		case GF_AWAY_FIRE:
+		case GF_AWAY_FIRE_TO:
+		{
+			teleport_hook = teleport_fiery_hook;
+			if (note) *note = "is free of smoke and flame.";
+			break;
+		}
+
+		/* Teleport to a grid which is projectable from the origin */
+		case GF_AWAY_JUMP:
+		case GF_AWAY_JUMP_TO:
+		case GF_GRAVITY:
+		case GF_WIND:
+		{
+			teleport_hook = teleport_project_hook;
+			if (note) *note = "cannot be reached.";
+			break;
+		}
+
+		default:
+		{
+			teleport_hook = NULL;
+		}
+	}
+}
 
 
 
@@ -818,23 +929,23 @@ void teleport_player(int dis)
 
 
 /*
- * Teleport player to a grid near the given location
+ * Teleport origin to a grid near the given location
  *
  * This function is slightly obsessive about correctness.
  * This function allows teleporting into vaults (!)
+ *
+ * Note that this is more obsessive than teleport_towards.
  */
-void teleport_player_to(int ny, int nx)
+void teleport_to(int oy, int ox, int ny, int nx)
 {
-	int py = p_ptr->py;
-	int px = p_ptr->px;
-
+	bool player = ((oy == p_ptr->py) && (ox == p_ptr->px)) != 0;
 	int y, x;
 
 	int dis = 0, ctr = 0;
 
 	/* Initialize */
-	y = py;
-	x = px;
+	y = oy;
+	x = ox;
 
 	/* Find a usable location */
 	while (1)
@@ -860,6 +971,9 @@ void teleport_player_to(int ny, int nx)
 		/* Require "start" floor space */
 		if (!cave_start_bold(y, x)) continue;
 
+		/* Check if teleportation restricted */
+		if (teleport_hook && !(*teleport_hook)(oy, ox, y, x)) continue;
+
 		break;
 	}
 
@@ -867,10 +981,10 @@ void teleport_player_to(int ny, int nx)
 	sound(MSG_TELEPORT);
 
 	/* Move player */
-	monster_swap(py, px, y, x);
+	monster_swap(oy, ox, y, x);
 
 	/* Handle stuff XXX XXX XXX */
-	handle_stuff();
+	if (player) handle_stuff();
 }
 
 
@@ -910,6 +1024,9 @@ void teleport_towards(int oy, int ox, int ny, int nx)
 		{
 			/*Don't allow monster to teleport onto glyphs*/
 			if (f_info[cave_feat[y][x]].flags1 & (FF1_GLYPH)) continue;
+
+			/* Check if teleportation restricted */
+			if (teleport_hook && !(*teleport_hook)(oy, ox, y, x)) continue;
 
 			/* Calculate distance between target and current grid */
 			dist = distance(ny, nx, y, x);
@@ -3557,6 +3674,8 @@ bool apply_disenchant(int mode)
 
 /*
  * Apply Nexus
+ *
+ * TODO: Clean this up so it applies to monsters, and e.g. teleports targets to a nexus trap.
  */
 static void apply_nexus(monster_type *m_ptr)
 {
@@ -3575,7 +3694,7 @@ static void apply_nexus(monster_type *m_ptr)
 		{
 			if (m_ptr)
 			{
-				teleport_player_to(m_ptr->fy, m_ptr->fx);
+				teleport_to(p_ptr->py, p_ptr->px, m_ptr->fy, m_ptr->fx);
 				break;
 			}
 			else
@@ -3730,7 +3849,7 @@ bool temp_lite(int y, int x)
  * Luckily this is very generic and doesn't require we duplicate transition
  * code between here and project_t.
  */
-bool project_f(int who, int what, int y, int x, int dam, int typ)
+bool project_f(int who, int what, int y0, int x0, int y, int x, int dam, int typ)
 {
 	bool obvious = FALSE;
 	bool burnout = FALSE;
@@ -4689,6 +4808,30 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+		/* Teleport caster to
+		 * Hook should be prepared earlier */
+		case GF_AWAY_JUMP_TO:
+		case GF_AWAY_ALL_TO:
+		case GF_AWAY_DARK_TO:
+		case GF_AWAY_NATURE_TO:
+		case GF_AWAY_FIRE_TO:
+		{
+			/* No "real" damage */
+			dam = 0;
+
+			/* Use the right hook */
+			set_teleport_hook(typ, NULL);
+
+			/* Valid teleport grid? */
+			if (!teleport_hook || teleport_hook(y0, x0, y, x))
+			{
+				/* Grid was affected -- Mark grid for later processing. */
+				cave_temp_mark(y, x, FALSE);
+			}
+
+			break;
+		}
+
 		default:
 
 			dam=0;
@@ -4761,7 +4904,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ)
 /*
  * Forward declare these functions referenced by project_o
  */
-bool project_f(int who, int what, int y, int x, int dam, int typ);
+bool project_f(int who, int what, int y0, int x0, int y, int x, int dam, int typ);
 
 
 /*
@@ -4780,7 +4923,7 @@ bool project_f(int who, int what, int y, int x, int dam, int typ);
  *
  * We return "TRUE" if the effect of the projection is "obvious".
  */
-bool project_o(int who, int what, int y, int x, int dam, int typ)
+bool project_o(int who, int what, int y0, int x0, int y, int x, int dam, int typ)
 {
 	s16b this_o_idx, next_o_idx = 0;
 
@@ -5561,10 +5704,10 @@ bool project_o(int who, int what, int y, int x, int dam, int typ)
 					o_ptr->ident |= (IDENT_BREAKS);
 
 					/* Splash damage on terrain */
-					(void)project_f(SOURCE_OBJECT, what, y, x, damroll(1, object_aval(o_ptr, ABILITY_WEIGHT)), typ);
+					(void)project_f(SOURCE_OBJECT, what, y0, x0, y, x, damroll(1, object_aval(o_ptr, ABILITY_WEIGHT)), typ);
 
 					/* And apply effects */
-					(void)project_t(SOURCE_OBJECT, what, y, x, damroll(1, object_aval(o_ptr, ABILITY_WEIGHT)), typ);
+					(void)project_t(SOURCE_OBJECT, what, y0, x0, y, x, damroll(1, object_aval(o_ptr, ABILITY_WEIGHT)), typ);
 				}
 				else
 				{
@@ -6099,7 +6242,7 @@ static bool charm_undead_hook(int r_idx)
  *
  * We attempt to return "TRUE" if the player saw anything "useful" happen.
  */
-bool project_m(int who, int what, int y, int x, int dam, int typ)
+bool project_m(int who, int what, int y0, int x0, int y, int x, int dam, int typ)
 {
 	int tmp;
 
@@ -6189,10 +6332,10 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 	char m_name[80];
 
 	/* Assume no note */
-	cptr note = NULL;
+	char *note = NULL;
 
 	/* Assume a default death */
-	cptr note_dies = " dies.";
+	char *note_dies = " dies.";
 
 	bool was_asleep;
 
@@ -6297,39 +6440,6 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			case 13: typ = GF_PETRIFY; break;
 			case 14: typ = GF_PARALYZE; break;
 			case 15: typ = GF_LOSE_MANA; break;
-		}
-	}
-
-	/* Hack -- pre-stage teleportation hooks for efficiency */
-	switch(typ)
-	{
-		/* Teleport from darkness to darkness */
-		case GF_AWAY_DARK:
-		{
-			teleport_hook = teleport_darkness_hook;
-			note = "is still in the light.";
-			break;
-		}
-
-		/* Teleport from water/living to water/living */
-		case GF_AWAY_NATURE:
-		{
-			teleport_hook = teleport_nature_hook;
-			note = "is apart from nature.";
-			break;
-		}
-
-		/* Teleport from fire/lava to fire/lava */
-		case GF_AWAY_FIRE:
-		{
-			teleport_hook = teleport_fiery_hook;
-			note = "is free of smoke and flame.";
-			break;
-		}
-
-		default:
-		{
-			teleport_hook = NULL;
 		}
 	}
 
@@ -7952,6 +8062,7 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 			break;
 		}
 
+
 		/* Teleport monster (Use "dam" as "power").
 		 * Hook should be prepared earlier */
 		case GF_AWAY_JUMP:
@@ -7960,11 +8071,27 @@ bool project_m(int who, int what, int y, int x, int dam, int typ)
 		case GF_AWAY_NATURE:
 		case GF_AWAY_FIRE:
 		{
+			/* Hack -- force random teleport */
+			y0 = y;
+			x0 = x;
+		}
+
+		/* Teleport caster to
+		 * Hook should be prepared earlier */
+		case GF_AWAY_JUMP_TO:
+		case GF_AWAY_ALL_TO:
+		case GF_AWAY_DARK_TO:
+		case GF_AWAY_NATURE_TO:
+		case GF_AWAY_FIRE_TO:
+		{
 			/* No "real" damage */
 			dam = 0;
 
+			/* Use the right hook */
+			set_teleport_hook(typ, &note);
+
 			/* Valid teleport grid? */
-			if (!teleport_hook || teleport_hook(y, x, y, x))
+			if (!teleport_hook || teleport_hook(y0, x0, y, x))
 			{
 				/* Obvious */
 				if (seen) obvious = TRUE;
@@ -10130,7 +10257,7 @@ static void check_hold_life(int who, int chance, int amt)
  * Actually, for historical reasons, we just assume that the effects were
  * obvious.  XXX XXX XXX
  */
-bool project_p(int who, int what, int y, int x, int dam, int typ)
+bool project_p(int who, int what, int y0, int x0, int y, int x, int dam, int typ)
 {
 	int k = 0;
 	int i,j;
@@ -10199,36 +10326,6 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 			case 0: typ = GF_WIND; break;
 			case 1: typ = GF_WATER; break;
 			case 2: typ = GF_ELEC; break;
-		}
-	}
-
-	/* Hack -- pre-stage teleportation hooks for efficiency */
-	switch(typ)
-	{
-		/* Teleport from darkness to darkness */
-		case GF_AWAY_DARK:
-		{
-			teleport_hook = teleport_darkness_hook;
-			break;
-		}
-
-		/* Teleport from water/living to water/living */
-		case GF_AWAY_NATURE:
-		{
-			teleport_hook = teleport_nature_hook;
-			break;
-		}
-
-		/* Teleport from fire/lava to fire/lava */
-		case GF_AWAY_FIRE:
-		{
-			teleport_hook = teleport_fiery_hook;
-			break;
-		}
-
-		default:
-		{
-			teleport_hook = NULL;
 		}
 	}
 
@@ -12816,9 +12913,21 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
 		case GF_AWAY_DARK:
 		case GF_AWAY_NATURE:
 		case GF_AWAY_FIRE:
+			/* Hack -- destination is origin */
+			y0 = y;
+			x0 = x;
+
+		case GF_AWAY_JUMP_TO:
+		case GF_AWAY_ALL_TO:
+		case GF_AWAY_DARK_TO:
+		case GF_AWAY_NATURE_TO:
+		case GF_AWAY_FIRE_TO:
 		{
+			/* Use the right hook */
+			set_teleport_hook(typ, NULL);
+
 			/* Teleport restriction fails */
-			if ((teleport_hook && !(teleport_hook(y, x, y, x))) ||
+			if ((teleport_hook && !(teleport_hook(y0, x0, y0, x0))) ||
 				(who <= SOURCE_PLAYER_START ? ((p_ptr->cur_flags4 & (TR4_LODESTONE)) != 0) : ((p_ptr->cur_flags3 & (TR3_ANCHOR)) != 0))
 				|| (room_has_flag(p_ptr->py, p_ptr->px, ROOM_ANCHOR)))
 			{
@@ -13282,7 +13391,7 @@ bool project_p(int who, int what, int y, int x, int dam, int typ)
  *
  * This function assumes that most messages have already been shown.
  */
-bool project_t(int who, int what, int y, int x, int dam, int typ)
+bool project_t(int who, int what, int y0, int x0, int y, int x, int dam, int typ)
 {
 	monster_type *m_ptr = NULL;
 	monster_race *r_ptr = NULL;
@@ -13313,47 +13422,11 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		delete_object(y, x);
 	}
 
-	/* Hack -- pre-stage teleportation hooks for efficiency */
-	switch(typ)
-	{
-		/* Teleport to darkness to darkness */
-		case GF_AWAY_DARK:
-		{
-			teleport_hook = teleport_darkness_hook;
-			break;
-		}
-
-		/* Teleport to water/living to water/living */
-		case GF_AWAY_NATURE:
-		{
-			teleport_hook = teleport_nature_hook;
-			break;
-		}
-
-		/* Teleport to fire/lava to fire/lava */
-		case GF_AWAY_FIRE:
-		{
-			teleport_hook = teleport_fiery_hook;
-			break;
-		}
-
-		/* Teleport to 'projectable' locations */
-		case GF_AWAY_JUMP:
-		case GF_GRAVITY:
-		case GF_WIND:
-		{
-			teleport_hook = teleport_project_hook;
-			break;
-		}
-
-		default:
-		{
-			teleport_hook = NULL;
-		}
-	}
-
 	/* Clear the cave_temp flag.  (this is paranoid) */
 	play_info[y][x] &= ~(PLAY_TEMP);
+
+	/* Set the teleport flag */
+	set_teleport_hook(typ, NULL);
 
 	if (cave_m_idx[y][x] < 0)
 	{
@@ -13547,6 +13620,23 @@ bool project_t(int who, int what, int y, int x, int dam, int typ)
 		}
 
 		/* Teleport away - movement */
+		case GF_AWAY_JUMP_TO:
+		case GF_AWAY_ALL_TO:
+		case GF_AWAY_DARK_TO:
+		case GF_AWAY_NATURE_TO:
+		case GF_AWAY_FIRE_TO:
+		{
+			/* Not randomly teleporting */
+			if ((y0 != y) || (x0 != x))
+			{
+				affect_monster = FALSE;
+				affect_player = FALSE;
+
+				teleport_to(y0, x0, y, x);
+
+				break;
+			}
+		}
 		case GF_AWAY_JUMP:
 		case GF_AWAY_UNDEAD:
 		case GF_AWAY_EVIL:
@@ -15127,7 +15217,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			x = GRID_X(grid[i]);
 
 			/* Affect the feature in that grid */
-			if (project_f(who, what, y, x, gd[i], typ))
+			if (project_f(who, what, y0, x0, y, x, gd[i], typ))
 				notice = TRUE;
 		}
 	}
@@ -15143,7 +15233,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			x = GRID_X(grid[i]);
 
 			/* Affect the object in the grid */
-			if (project_o(who, what, y, x, gd[i], typ)) notice = TRUE;
+			if (project_o(who, what, y0, x0, y, x, gd[i], typ)) notice = TRUE;
 		}
 	}
 
@@ -15186,7 +15276,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 					&& (rand_int(res_magic + p_ptr->depth + 1) >= res_magic))
 				{
 					/* Hack -- resist magic */
-					if (project_m(who, what, y, x, 0, GF_RES_MAGIC)) notice = TRUE;
+					if (project_m(who, what, y0, x0, y, x, 0, GF_RES_MAGIC)) notice = TRUE;
 				}
 				/* Check if monster evades */
 				/* Area-effect and jumping spells cannot be dodged */
@@ -15201,7 +15291,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 							who <= SOURCE_PLAYER_SAFE ? " your magic" : ""))) continue;
 
 				/* Affect the monster in the grid */
-				else if (project_m(who, what, y, x, gd[i], typ))	notice = TRUE;
+				else if (project_m(who, what, y0, x0, y, x, gd[i], typ))	notice = TRUE;
 			}
 		}
 
@@ -15247,7 +15337,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 				}
 
 				/* Affect the player */
-				if (project_p(who, what, y, x, gd[i], typ))
+				if (project_p(who, what, y0, x0, y, x, gd[i], typ))
 				{
 					notice = TRUE;
 
@@ -15274,7 +15364,7 @@ bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, 
 			if ((play_info[y][x] & (PLAY_TEMP)) == 0) continue;
 
 			/* Affect marked grid */
-			if (project_t(who, what, y, x, gd[i], typ)) notice = TRUE;
+			if (project_t(who, what, y0, x0, y, x, gd[i], typ)) notice = TRUE;
 		}
 
 		/* Clear the "temp" array  (paranoia is good) */

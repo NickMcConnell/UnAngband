@@ -1122,6 +1122,11 @@ enum
 #define GF_LOSE_INT_WIS	173
 #define GF_LOSE_DEX_AGI	174
 #define GF_LOSE_CON_CHR	175
+#define GF_AWAY_ALL_TO	176
+#define GF_AWAY_DARK_TO	177
+#define GF_AWAY_JUMP_TO	178
+#define GF_AWAY_NATURE_TO	179
+#define GF_AWAY_FIRE_TO	180
 
 /*
  * Columns for the spell cost or damage flags
@@ -3318,7 +3323,7 @@ enum
 #define ROOM_PORTAL	0x00002000L	/* room teleports you randomly */
 #define ROOM_SILENT	0x00004000L	/* room is magically silent, stopping spells/songs */
 #define ROOM_STATIC	0x00008000L    /* room causes rods/staffs/wands to fail */
-#define ROOM_STATIS	0x00010000L	   /* room causes monsters to be in statis */
+#define ROOM_STASTIS	0x00010000L	   /* room causes monsters to be in stastis */
 #define ROOM_SEALED	0x00020000L    /* room causes features to be unalterable */
 #define ROOM_HIDDEN	0x00040000L	   /* room cannot be detected */
 #define ROOM_ANCHOR	0x00080000L	   /* room is anti-teleportation */
@@ -5509,6 +5514,21 @@ enum
 		(t_info[t_info[(DUNGEON)].guardian_ifvisited].visited) ? \
 			t_info[(DUNGEON)].replace_guardian : (ZONE_GUARD)))
 
+
+/*
+ * This gives whether the monster keeps a light on
+ * Line 1 -- Monster has a lite
+ * Line 2 -- Monster needs a lite
+ * Line 3 -- Town monsters
+ * Line 4 -- Whether the player has a light on matches whether the monster is their ally
+ * Line 5 -- If the monster is not allied, 1/5th of the time
+ */
+#define monster_keeps_lite(M_PTR) \
+	((r_info[(M_PTR)->r_idx].flags2 & (RF2_HAS_LITE)) || \
+			((r_info[(M_PTR)->r_idx].flags2 & (RF2_NEED_LITE)) && \
+				((((M_PTR)->mflag & (MFLAG_TOWN)) != 0) || \
+				((p_ptr->cur_lite != 0) != (((M_PTR)->mflag & (MFLAG_ALLY)) != 0)) || \
+					((((M_PTR)->mflag & (MFLAG_ALLY)) == 0) && ((M_PTR)->energy % 5 == 0)))))
 
 /*
  * Hack -- Prepare to use the "Secure" routines

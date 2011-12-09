@@ -26,7 +26,7 @@ that monster if they are not engaged in direct combat.  Archers
 and spell-casters will keep a distance from the target.
 
 If you specify a race of monsters, using the 's' key while
-targetting, your troops will preferentially target that race
+targeting, your troops will preferentially target that race
 against all others, ignoring other targets and direct combat
 if they can see one of the race you specify.
 
@@ -37,7 +37,7 @@ position: you can use this to specify your archers and spell
 casters stay back while you engage in melee with the enemy.
 
 You can also specify a grid position with the 'a' key, whilst
-targetting. This will cause your troops to assault the target
+targeting. This will cause your troops to assault the target
 grid.  Troops in an assault will disregard nearby combat in
 favour of attacking monsters near the grid that you are
 assaulting.  Archers and spell casters will also seek out

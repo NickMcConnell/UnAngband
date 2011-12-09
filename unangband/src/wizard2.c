@@ -53,7 +53,7 @@ static void do_cmd_wiz_bamf(void)
 	if (target_okay())
 	{
 		/* Teleport to the target */
-		teleport_player_to(p_ptr->target_row, p_ptr->target_col);
+		teleport_to(p_ptr->py, p_ptr->px, p_ptr->target_row, p_ptr->target_col);
 	}
 }
 
@@ -223,13 +223,14 @@ static void wiz_display_item(const object_type *o_ptr)
 {
 	int j = 0;
 
+	u32b f0[ABILITY_ARRAY_SIZE];
 	u32b f1, f2, f3, f4;
 
 	char buf[256];
 
 
 	/* Extract the flags */
-	object_flags(o_ptr, &f1, &f2, &f3, &f4);
+	object_flags(o_ptr, f0, &f1, &f2, &f3, &f4);
 
 	/* Clear screen */
 	Term_clear();
@@ -243,11 +244,11 @@ static void wiz_display_item(const object_type *o_ptr)
 	           o_ptr->tval, o_ptr->sval), 4, j);
 
 	prt(format("number = %-3d  wgt = %-6d  ac = %-5d    damage = %dd%d",
-	           o_ptr->number, o_ptr->weight,
-	           o_ptr->ac, o_ptr->dd, o_ptr->ds), 5, j);
+	           o_ptr->number, object_aval(o_ptr, ABILITY_WEIGHT),
+	           object_aval(o_ptr, ABILITY_AC), object_aval(o_ptr, ABILITY_DAMAGE_DICE), object_aval(o_ptr, ABILITY_DAMAGE_SIDES)), 5, j);
 
 	prt(format("pval = %-5d  toac = %-5d  tohit = %-4d  todam = %-4d",
-	           o_ptr->pval, o_ptr->to_a, o_ptr->to_h, o_ptr->to_d), 6, j);
+	           o_ptr->pval, object_aval(o_ptr, ABILITY_TO_AC), object_aval(o_ptr, ABILITY_TO_HIT), object_aval(o_ptr, ABILITY_TO_DAM)), 6, j);
 
 	prt(format("name1 = %-4d  name2 = %-4d  cost = %ld  charges = %-5d power = %-5d",
 	           o_ptr->name1, o_ptr->name2, (long)object_value(o_ptr), o_ptr->charges, object_power(o_ptr)), 7, j);
@@ -408,21 +409,21 @@ static void wiz_tweak_item(object_type *o_ptr)
 	wiz_display_item(o_ptr);
 
 	p = "Enter new 'to_a' setting: ";
-	sprintf(tmp_val, "%d", o_ptr->to_a);
+	sprintf(tmp_val, "%d", object_aval(o_ptr, ABILITY_TO_AC));
 	if (!get_string(p, tmp_val, 6)) return;
-	o_ptr->to_a = atoi(tmp_val);
+	object_ability_set(o_ptr, ABILITY_TO_AC, atoi(tmp_val));
 	wiz_display_item(o_ptr);
 
 	p = "Enter new 'to_h' setting: ";
-	sprintf(tmp_val, "%d", o_ptr->to_h);
+	sprintf(tmp_val, "%d", object_aval(o_ptr, ABILITY_TO_HIT));
 	if (!get_string(p, tmp_val, 6)) return;
-	o_ptr->to_h = atoi(tmp_val);
+	object_ability_set(o_ptr, ABILITY_TO_HIT, atoi(tmp_val));
 	wiz_display_item(o_ptr);
 
 	p = "Enter new 'to_d' setting: ";
-	sprintf(tmp_val, "%d", o_ptr->to_d);
+	sprintf(tmp_val, "%d", object_aval(o_ptr, ABILITY_TO_DAM));
 	if (!get_string(p, tmp_val, 6)) return;
-	o_ptr->to_d = atoi(tmp_val);
+	object_ability_set(o_ptr, ABILITY_TO_DAM, atoi(tmp_val));
 	wiz_display_item(o_ptr);
 }
 
@@ -644,27 +645,27 @@ static void wiz_statistics(object_type *o_ptr)
 
 			/* Check for match */
 			if ((i_ptr->pval == o_ptr->pval) &&
-			    (i_ptr->to_a == o_ptr->to_a) &&
-			    (i_ptr->to_h == o_ptr->to_h) &&
-			    (i_ptr->to_d == o_ptr->to_d))
+			    (object_aval(i_ptr, ABILITY_TO_AC) == object_aval(o_ptr, ABILITY_TO_AC)) &&
+			    (object_aval(i_ptr, ABILITY_TO_HIT) == object_aval(o_ptr, ABILITY_TO_HIT)) &&
+			    (object_aval(i_ptr, ABILITY_TO_DAM) == object_aval(o_ptr, ABILITY_TO_DAM)))
 			{
 				matches++;
 			}
 
 			/* Check for better */
 			else if ((i_ptr->pval >= o_ptr->pval) &&
-			         (i_ptr->to_a >= o_ptr->to_a) &&
-			         (i_ptr->to_h >= o_ptr->to_h) &&
-			         (i_ptr->to_d >= o_ptr->to_d))
+			         (object_aval(i_ptr, ABILITY_TO_AC) >= object_aval(o_ptr, ABILITY_TO_AC)) &&
+			         (object_aval(i_ptr, ABILITY_TO_HIT) >= object_aval(o_ptr, ABILITY_TO_HIT)) &&
+			         (object_aval(i_ptr, ABILITY_TO_DAM) >= object_aval(o_ptr, ABILITY_TO_DAM)))
 			{
 				better++;
 			}
 
 			/* Check for worse */
 			else if ((i_ptr->pval <= o_ptr->pval) &&
-			         (i_ptr->to_a <= o_ptr->to_a) &&
-			         (i_ptr->to_h <= o_ptr->to_h) &&
-			         (i_ptr->to_d <= o_ptr->to_d))
+			         (object_aval(i_ptr, ABILITY_TO_AC) <= object_aval(o_ptr, ABILITY_TO_AC)) &&
+			         (object_aval(i_ptr, ABILITY_TO_HIT) <= object_aval(o_ptr, ABILITY_TO_HIT)) &&
+			         (object_aval(i_ptr, ABILITY_TO_DAM) <= object_aval(o_ptr, ABILITY_TO_DAM)))
 			{
 				worse++;
 			}
@@ -718,10 +719,10 @@ static void wiz_quantity_item(object_type *o_ptr, bool carried)
 		if (carried)
 		{
 			/* Remove the weight of the old number of objects */
-			p_ptr->total_weight -= (o_ptr->number * o_ptr->weight);
+			p_ptr->total_weight -= (o_ptr->number * object_aval(o_ptr, ABILITY_WEIGHT));
 
 			/* Add the weight of the new number of objects */
-			p_ptr->total_weight += (tmp_int * o_ptr->weight);
+			p_ptr->total_weight += (tmp_int * object_aval(o_ptr, ABILITY_WEIGHT));
 		}
 
 		/* Accept modifications */
@@ -928,6 +929,7 @@ static void wiz_create_artifact(int a_idx)
 	object_type *i_ptr;
 	object_type object_type_body;
 	int k_idx;
+	int i;
 
 	artifact_type *a_ptr = &a_info[a_idx];
 
@@ -954,13 +956,7 @@ static void wiz_create_artifact(int a_idx)
 
 	/* Extract the fields */
 	i_ptr->pval = a_ptr->pval;
-	i_ptr->ac = a_ptr->ac;
-	i_ptr->dd = a_ptr->dd;
-	i_ptr->ds = a_ptr->ds;
-	i_ptr->to_a = a_ptr->to_a;
-	i_ptr->to_h = a_ptr->to_h;
-	i_ptr->to_d = a_ptr->to_d;
-	i_ptr->weight = a_ptr->weight;
+	for (i = 0; i < a_ptr->ability_count; i++) object_ability_add(i_ptr, a_ptr->ability[i], a_ptr->aval[i]);
 
 	/* Mark as cheat */
 	i_ptr->origin = ORIGIN_CHEAT;

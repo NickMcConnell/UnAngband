@@ -14,10 +14,10 @@
 V:0.6.4
 
 # Maximum number of method/blow types
-M:m:231
+M:m:232
 
 # Maximum number of effect types
-M:e:176
+M:e:181
 
 # Maximum number of feature types
 M:F:1011

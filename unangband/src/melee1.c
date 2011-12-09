@@ -3047,7 +3047,7 @@ bool make_attack_ranged(int who, int attack, int y, int x)
 				else
 				{
 					player_not_flags(who, NULL, 0x0L, 0x0L, TR3_ANCHOR, 0x0L);
-					teleport_player_to(m_ptr->fy, m_ptr->fx);
+					teleport_to(p_ptr->py, p_ptr->px, m_ptr->fy, m_ptr->fx);
 				}
 			}
 			

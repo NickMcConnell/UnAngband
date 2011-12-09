@@ -16,7 +16,7 @@ on your journey. But the most powerful and dangerous monsters you find
 will be evil, and should you survive long, it will become an invaluable
 tool.
 
-- Darkness will allow you to escape monsters which need lite to find
+- Darkness will allow you to escape monsters which need light to find
 you - the spell will also shutter your lantern and smother your torch -
 but you will have to put away your magical staff and any other light
 sources in order to benefit from this effect.
@@ -51,10 +51,3 @@ this resource against a single target.
  
                                      - Saruman the Wise 
  
-
-
-
-
-
-
-

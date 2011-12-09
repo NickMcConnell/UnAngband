@@ -4005,7 +4005,7 @@ void monster_hide(int y, int x, int mmove, monster_type *m_ptr)
 	}
 
 	/* Unhiding monsters which have light always show lite */
-	else if (r_ptr->flags2 & (RF2_HAS_LITE))
+	else if (monster_keeps_lite(m_ptr))
 	{
 		m_ptr->mflag |= (MFLAG_LITE);
 
@@ -4728,19 +4728,21 @@ static bool place_monster_one(int y, int x, int r_idx, bool slp, u32b flg)
 		n_ptr->energy = (byte)rand_int(50);
 	}
 
-	/* Some monsters radiate lite when born */
-	if ((r_ptr->flags2 & (RF2_HAS_LITE))
-			|| ((r_ptr->flags2 & (RF2_NEED_LITE)) && !(p_ptr->cur_lite)))
-	{
-		/* Update the visuals */
-		p_ptr->update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-	}
-
 	/* Place the monster in the dungeon */
 	if (!monster_place(y, x, n_ptr)) return (FALSE);
 
 	/* Important - reget the n_ptr once placed */
 	n_ptr = &m_list[cave_m_idx[y][x]];
+
+	/* Some monsters radiate lite when born */
+	if (monster_keeps_lite(n_ptr))
+	{
+		/* Give the light flag */
+		n_ptr->mflag |= (MFLAG_LITE);
+
+		/* Add the light */
+		gain_attribute(y, x, 2, CAVE_XLOS, apply_torch_lit, redraw_torch_lit_gain);
+	}
 
 	/* Calculate the monster hp */
 	n_ptr->maxhp = calc_monster_hp(cave_m_idx[y][x]);

@@ -791,8 +791,13 @@ extern void race_desc(char *desc, size_t max, int r_idx, int mode, int number);
 extern void monster_desc(char *desc, size_t max, int m_idx, int mode);
 extern void lore_do_probe(int r_idx);
 extern void lore_treasure(int m_idx, int num_item, int num_gold);
+extern bool require_torch_lit(int y, int x);
+extern bool has_torch_lit(int y, int x);
+extern bool redraw_torch_lit_loss(int y, int x);
 extern bool redraw_torch_lit_gain(int y, int x);
 extern void apply_torch_lit(int y, int x);
+extern int remove_torch_lit(int y, int x);
+extern void reapply_torch_lit(int y, int x, int r);
 extern void update_mon(int m_idx, bool full);
 extern void update_monsters(bool full);
 extern s16b monster_carry(int m_idx, object_type *j_ptr);
@@ -957,7 +962,7 @@ extern bool update_smart_forget(int who, u32b flag);
 extern bool update_smart_save(int who, bool saved);
 extern void teleport_away(int m_idx, int dis);
 extern void teleport_player(int dis);
-extern void teleport_player_to(int ny, int nx);
+extern void teleport_to(int oy, int ox, int ny, int nx);
 extern void teleport_towards(int oy, int ox, int ny, int nx);
 extern void teleport_player_level(void);
 extern bool teleport_darkness_hook(const int oy, const int ox, const int ny, const int nx);
@@ -977,12 +982,12 @@ extern void check_monster_quest(int m_idx, bool (*questor_test_hook)(int m_idx),
 extern bool temp_lite(int y, int x);
 extern u16b bolt_pict(int y, int x, int ny, int nx, int typ);
 #if 0
-extern bool project_f(int who, int what, int y, int x, int dam, int typ);
-extern bool project_o(int who, int what, int y, int x, int dam, int typ);
-extern bool project_m(int who, int what, int y, int x, int dam, int typ);
-extern bool project_p(int who, int what, int y, int x, int dam, int typ);
+extern bool project_f(int who, int what, int y0, int x0, int y, int x, int dam, int typ);
+extern bool project_o(int who, int what, int y0, int x0, int y, int x, int dam, int typ);
+extern bool project_m(int who, int what, int y0, int x0, int y, int x, int dam, int typ);
+extern bool project_p(int who, int what, int y0, int x0, int y, int x, int dam, int typ);
 #endif
-extern bool project_t(int who, int what, int y, int x, int dam, int typ);
+extern bool project_t(int who, int what, int y0, int x0, int y, int x, int dam, int typ);
 extern bool project_shape(u16b *grid, s16b *gd, int *grids, int grid_s, int rad, int rng, int y0, int x0, int y1, int x1, int dam, int typ,
 			 u32b flg, int degrees, byte source_diameter);
 extern bool project_effect(int who, int what, u16b *grid, s16b *gd, int grids, int y0, int x0, int typ, u32b flg);
@@ -1015,6 +1020,7 @@ extern int value_check_aux3(const object_type *o_ptr);
 extern int value_check_aux4(const object_type *o_ptr);
 extern int value_check_aux5(const object_type *o_ptr);
 extern int value_check_aux10(object_type *o_ptr, bool limit, bool weapon, bool floor);
+extern bool monster_tester_hook_fire(const int m_idx);
 extern bool place_random_stairs(int y, int x, int feat);
 extern bool stair_creation(void);
 extern bool enchant(object_type *o_ptr, int n, int eflag);

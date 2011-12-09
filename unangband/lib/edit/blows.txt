@@ -2438,3 +2438,11 @@ N:230:EAT
 T:0-9999:eaten||| by &
 F:EAT |
 D:eaten|||:
+
+N:231:AIM_GRID
+T:0-9999:aim~ * at &
+W:4:0:0
+M:20
+F:GRID | MAGIC | JUMP |
+F:RANGED |
+D::@ target#

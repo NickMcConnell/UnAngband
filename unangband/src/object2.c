@@ -6026,7 +6026,7 @@ static bool kind_is_race(int k_idx)
 		}
 		case TV_HELM:
 		{
-			/* Hack -- monster equipment only has one gloves */
+			/* Hack -- monster equipment only has one helmet */
 			if ((k_ptr->tval == TV_HELM) && (hack_monster_equip & (RF8_HAS_HEAD))) return (FALSE);
 
 			/* Helms are heavy armour */
@@ -6184,7 +6184,7 @@ static bool kind_is_race(int k_idx)
 		}
 		case TV_CROWN:
 		{
-			/* Hack -- monster equipment only has one crown/amulet */
+			/* Hack -- monster equipment only has one crown */
 			if (hack_monster_equip & (RF8_HAS_HEAD)) return (FALSE);
 
 			if (r_ptr->flags8 & (RF8_DROP_JEWELRY)) return (TRUE);

@@ -2085,8 +2085,8 @@ bool item_tester_hook_activate(const object_type *o_ptr)
 	/* Check the recharge */
 	else if ((o_ptr->timeout) && ((!o_ptr->stackc) || (o_ptr->stackc >= o_ptr->number))) return (FALSE);
 
-	/* Check activation flag */
-	if (f3 & (TR3_ACTIVATE)) return (TRUE);
+	/* Check activation flag. Hack - exclude assemblies */
+	if ((f3 & (TR3_ACTIVATE)) && (o_ptr->tval != TV_ASSEMBLY)) return (TRUE);
 
 	/* Check uncontrolled flag and not cursed, or has grown to control ability */
 	if ((f3 & (TR3_UNCONTROLLED)) && !(uncontrolled_p(o_ptr))) return (TRUE);

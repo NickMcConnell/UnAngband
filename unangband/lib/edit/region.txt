@@ -142,6 +142,8 @@ I:5
 B:ARC_40_SHORT
 F:PROJECTION | TRIGGER_MOVE | HIT_TRAP
 
+# Not used.
+
 N:15:shallow pit
 G:x:U
 

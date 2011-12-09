@@ -644,11 +644,21 @@ static void sense_inventory(void)
 			case BONUS_NOT_PASSIVE:
 				if ((f0[i/32] & (1L << (i % 32))) != 0)
 				{
-					if (ability_bonus[i].type != BONUS_NOT_PASSIVE) equip_can_flags(f0[i/32 & (i % 32)], 0x0L,0x0L,0x0L,0x0L);
+					u32b if0[ABILITY_ARRAY_SIZE];
+
+					for (j = 0; j < ABILITY_ARRAY_SIZE; j++) if0[i] = 0L;
+					f0[i/32] |= 1 << (i % 32);
+
+					if (ability_bonus[i].type != BONUS_NOT_PASSIVE) equip_can_flags(if0, 0x0L,0x0L,0x0L,0x0L);
 				}
 				else if ((af0[i/32] & (1L << (i % 32))) == 0)
 				{
-					equip_not_flags(f0[i/32 & (i % 32)], 0x0L,0x0L,0x0L,0x0L);
+					u32b if0[ABILITY_ARRAY_SIZE];
+
+					for (j = 0; j < ABILITY_ARRAY_SIZE; j++) if0[i] = 0L;
+					f0[i/32] |= 1 << (i % 32);
+
+					equip_not_flags(if0, 0x0L,0x0L,0x0L,0x0L);
 				}
 			
 				break;
@@ -2004,7 +2014,7 @@ static void process_world(void)
 			msg_print("You feel yourself yanked sideways!");
 
 			/* Teleport the player back to their original location */
-			teleport_player_to(p_ptr->return_y, p_ptr->return_x);
+			teleport_to(p_ptr->py, p_ptr->px, p_ptr->return_y, p_ptr->return_x);
 
 			/* Clear the return coordinates */
 			p_ptr->return_y = 0;

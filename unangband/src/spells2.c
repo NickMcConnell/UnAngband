@@ -2223,7 +2223,7 @@ static bool monster_tester_hook_mental(const int m_idx)
 /*
  * Hook to specify "fiery" monsters
  */
-static bool monster_tester_hook_fire(const int m_idx)
+bool monster_tester_hook_fire(const int m_idx)
 {
 	monster_type *m_ptr = &m_list[m_idx];
 	monster_race *r_ptr = &r_info[m_ptr->r_idx];
@@ -9667,7 +9667,7 @@ bool region_project_t_hook(int y, int x, s16b d, s16b region)
 	}
 
 	/* Apply projection effects to the grids */
-	notice = project_t(r_ptr->who, r_ptr->what, y, x, dam, r_ptr->effect);
+	notice = project_t(r_ptr->who, r_ptr->what, r_ptr->y0, r_ptr->x0, y, x, dam, r_ptr->effect);
 
 	return (notice);
 }
